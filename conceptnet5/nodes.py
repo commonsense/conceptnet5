@@ -9,8 +9,7 @@ def create_concept(graph,language, name):
 
     new_concept = graph.node(type = 'concept', language = language, name = name)
     index_key = '/' + language + '/' + name
-    if not 'concepts' in graph.nodes.indexes.keys(): graph.nodes.indexes.create('concepts')
-    graph.nodes.indexes['concepts'][index_key] = new_concept
+    graph.nodes.indexes['concepts'].add('name',index_key,new_concept)
     return new_concept
 
 def find_concept(graph, language, name):
@@ -36,8 +35,7 @@ def create_relation(graph, name):
 
     new_relation = graph.node(type = 'relation', name = name)
     index_key = '/rel/' + name
-    if not 'relations' in graph.nodes.indexes.keys(): graph.nodes.indexes.create('relations')
-    graph.nodes.indexes['relations'][index_key] = new_relation
+    graph.nodes.indexes['relations'].add('name',index_key,new_relation)
     return new_relation
 
 def find_relation(graph, name):
