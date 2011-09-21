@@ -15,4 +15,5 @@ def normalize(text):
     pieces = [morphy_stem(word) for word in tokenize(text) if word not in STOPWORDS]
     return ' '.join(pieces)
 
-print normalize("this is a test")
+if __name__ == '__main__':
+    print normalize("this is a test")
