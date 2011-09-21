@@ -8,10 +8,10 @@ setup(
     name = 'ConceptNet5',
     version = version_str,
     description = 'A semantic network of general knowledge',
-    author = "Rob Speer, Commonsense Computing Group',
+    author = "Rob Speer, Commonsense Computing Group",
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
-    install_requires=['csc-utils >= 0.6', 'neo4j-rest-client'],
+    install_requires=['csc-utils >= 0.6', 'neo4jrestclient'],
     license = 'GPLv3'
 )
 
