@@ -20,7 +20,7 @@ def find_concept(graph, language, name):
     if len(result): return result[0]
     else: return None
 
-def get_concept_id(graph, id):
+def get_concept_with_id(graph, id):
 
     _, lang, name = id.split('/')
     return get_concept(graph, lang, name)
@@ -47,7 +47,7 @@ def find_relation(graph, name):
     if len(result): return result[0]
     else: return None
 
-def get_relation_id(graph, id):
+def get_relation_with_id(graph, id):
 
     _, rel, name = id.split('/')
     return get_relation(graph, name)
