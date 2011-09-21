@@ -10,7 +10,7 @@ def create_concept(graph,language, name):
     new_concept = graph.node(type = 'concept', language = language, name = name)
     index_key = '/' + language + '/' + name
     if not 'concepts' in graph.nodes.indexes.keys(): graph.nodes.indexes.create('concepts')
-    graph.nodes.indexes['concepts']['index_key'] = new_concept
+    graph.nodes.indexes['concepts'][index_key] = new_concept
     return new_concept
 
 def find_concept(graph, language, name):
@@ -19,6 +19,11 @@ def find_concept(graph, language, name):
     result = graph.nodes.indexes['concepts'].query('name',index_key)[:]
     if len(result): return result[0]
     else: return None
+
+def get_concept_id(graph, id):
+
+    _, lang, name = id.split('/')
+    return get_concept(graph, lang, name)
 
 def get_concept(graph, language, name):
 
@@ -32,7 +37,7 @@ def create_relation(graph, name):
     new_relation = graph.node(type = 'relation', name = name)
     index_key = '/rel/' + name
     if not 'relations' in graph.nodes.indexes.keys(): graph.nodes.indexes.create('relations')
-    graph.nodes.indexes['relations']['index_key'] = new_relation
+    graph.nodes.indexes['relations'][index_key] = new_relation
     return new_relation
 
 def find_relation(graph, name):
@@ -41,6 +46,11 @@ def find_relation(graph, name):
     result = graph.nodes.indexes['relations'].query('tag',index_key)[:]
     if len(result): return result[0]
     else: return None
+
+def get_relation_id(graph, id):
+
+    _, rel, name = id.split('/')
+    return get_relation(graph, name)
 
 def get_relation(graph, name):
 
