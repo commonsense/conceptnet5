@@ -11,7 +11,7 @@ setup(
     author = "Rob Speer, Commonsense Computing Group",
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
-    install_requires=['csc-utils >= 0.6', 'neo4jrestclient'],
+    install_requires=['csc-utils >= 0.6', 'bulbs'],
     license = 'GPLv3'
 )
 
