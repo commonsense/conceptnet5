@@ -10,7 +10,7 @@ def create_concept(graph,language, name):
     new_concept = graph.node(type = 'concept', language = language, name = name)
     index_key = '/' + language + '/' + name
     if not 'concepts' in graph.nodes.indexes.keys(): graph.nodes.indexes.create('concepts')
-    graph.nodes.indexes['concepts']['index_key'] = new_concept
+    graph.nodes.indexes['concepts'][index_key] = new_concept
     return new_concept
 
 def find_concept(graph, language, name):
