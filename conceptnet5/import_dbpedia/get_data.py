@@ -3,8 +3,6 @@
 Get data from DBPedia.
 """
 
-import json
-import urllib2
 from SPARQLWrapper import SPARQLWrapper, JSON
 
 def get_concept_from_uri(uri):
@@ -30,7 +28,8 @@ def get_types(concept_string):
   return types
 
 def main():
-  concepts = ['Apple', 'Banana', 'Chess', 'Dog', 'Elevator', 'Fitzgerald', 'Ghana']
+  concepts = ['Apple', 'Banana', 'Chess', 'Dog', 'Elevator', 'Fitzgerald',
+      'Ghana']
   for concept in concepts:
     concept_types = get_types(concept)
     for concept_type in concept_types:
