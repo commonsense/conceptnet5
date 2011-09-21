@@ -16,14 +16,14 @@ def find_concept(graph, language, name):
 
     index_key = '/' + language + '/' + name
     index = graph.nodes.indexes['concept_index']
-    result = index.query('name',index_key)[:])
+    result = index.query('name',index_key)[:]
     if len(result): return result[0]
     else: return None
 
 def get_concept(graph, language, name):
 
-    concept = _find_concept(graph, language, name)
+    concept = find_concept(graph, language, name)
     if not concept:
-        concept = _create_concept(graph, language, name)
+        concept = create_concept(graph, language, name)
     return concept
 
