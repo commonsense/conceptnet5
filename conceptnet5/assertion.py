@@ -34,13 +34,14 @@ def assertion_key(node):
     pieces = [get_relation(node)] + get_args(node)
     arg_ids = [get_id(piece) for piece in pieces]
     arg_string = _list_to_id(arg_ids)
-    return "/assertion/:"+arg_string
+    return "/assertion/_"+arg_string
 
 def _index_assertion(graph, assertion):
     if not 'assertions' in graph.nodes.indexes.keys():
         graph.nodes.indexes.create('assertions')
     index_key = assertion_key(assertion)
     graph.nodes.indexes['assertions'].add('name', index_key, assertion)
+    assert graph.nodes.indexes['assertions'].query('name',index_key)[:]
 
 def _create_assertion(graph, language, rel, args):
     assertion = g.node(type='assertion', language=language)
@@ -75,7 +76,7 @@ def find_assertion(graph, rel, args):
     args = [_ensure_concept(graph, arg) for arg in args]
     arg_ids = [get_id(arg) for arg in [rel] + args]
     arg_string = _list_to_id(arg_ids)
-    index_key = "/assertion/:"+arg_string
+    index_key = "/assertion/_"+arg_string
 
     result = graph.nodes.indexes['assertions'].query('name',index_key)[:]
     if len(result):
@@ -90,5 +91,6 @@ if __name__ == '__main__':
     g = GraphDatabase("http://new-caledonia.media.mit.edu:7474/db/data/")
     assertion = get_assertion(g, 'en', '/rel/IsA', ['/en/dog', '/en/animal'])
     print assertion_key(assertion)     
+    print assertion.id
 
 
