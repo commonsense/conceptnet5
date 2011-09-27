@@ -1,4 +1,6 @@
+
 class ConceptNetGraph(object):
+
     def __init__(self, url)
         self.graph = GraphDatabase(url)
         self._index = self.graph.nodes.indexes['node_auto_index']
@@ -15,7 +17,7 @@ class ConceptNetGraph(object):
             raise ValueError("I don't know how to create type %r" % type)
         return method(self, url, rest)
 
-    def _create_concept_node(self, uri, rest)
+    def _create_concept_node(self, uri, rest):
         language, name = rest.split('/')
         return self.graph.node(
             type='concept',
@@ -24,7 +26,7 @@ class ConceptNetGraph(object):
             uri=uri
         )
 
-    def _create_relation_node(self, uri, rest)
+    def _create_relation_node(self, uri, rest):
         rel = rest
         return self.graph.node(
             type='relation',
@@ -32,6 +34,22 @@ class ConceptNetGraph(object):
             uri=uri
         )
     
+    def _create_assertion_node(self, uri, rest):
+        rest = '/' + rest
+        _,rel_uri,args_uris= rest.split('/_',2)
+        arg_uris = arg_uris.split('/_')
+        args = []
+        rel = self.get_or_create_node(rel_uri)
+        for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
+        assertion = self.graph.node(
+            type='assertion',
+            uri=uri
+        )
+        assertion.relationships.create("relation", rel)
+        for i in xrange(len(args)):
+            assertion.relationships.create("arg", args[i], position=i+1)
+        return assertion
+
     def get_node(self, uri):
         results = self._index.query('uri', uri)
         if len(results) == 1:
