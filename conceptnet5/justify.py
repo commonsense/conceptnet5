@@ -8,3 +8,4 @@ def justifies(assertion1, assertion2, weight=1.0):
     weight between -1 and 1 may be given.
     """
     assertion1.relationships.create('justifies', assertion2, weight=weight)
+

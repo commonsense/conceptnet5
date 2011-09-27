@@ -5,6 +5,10 @@ _find_concept()
 _get_concept()
 """
 
+class ConceptNetGraph(object):
+    def __init__(self, url)
+        self.graph = GraphDatabase(url)
+
 def create_concept(graph,language, name):
     new_concept = graph.node(type = 'concept', language = language, name = name)
     index_key = '/concept/' + language + '/' + name
@@ -56,3 +60,6 @@ def lookup_id(graph, key):
 def get_id(node):
     if node['type'] == 'relation': return '/relation/' + node['name']
     elif node['type'] == 'concept': return '/concept/' +  node['language'] + '/' + node['name']
+
+# Change this URL if you're not on n-c.
+g = GraphDatabase("http://localhost:7474/db/data/")
