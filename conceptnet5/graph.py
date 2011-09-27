@@ -15,8 +15,8 @@ class ConceptNetGraph(object):
             raise ValueError("I don't know how to create type %r" % type)
         return method(self, url, rest)
 
-    def _create_concept_node(self, uri, parts)
-        language, name = parts
+    def _create_concept_node(self, uri, rest)
+        language, name = rest.split('/')
         return self.graph.node(
             type='concept',
             language=language,
@@ -24,8 +24,8 @@ class ConceptNetGraph(object):
             uri=uri
         )
 
-    def _create_relation_node(self, uri, parts)
-        rel = parts[0]
+    def _create_relation_node(self, uri, rest)
+        rel = rest
         return self.graph.node(
             type='relation',
             name=name,
