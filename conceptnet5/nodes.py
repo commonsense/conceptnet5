@@ -6,58 +6,53 @@ _get_concept()
 """
 
 def create_concept(graph,language, name):
-
     new_concept = graph.node(type = 'concept', language = language, name = name)
-    index_key = '/' + language + '/' + name
-    graph.nodes.indexes['concepts'].add('name',index_key,new_concept)
+    index_key = '/concept/' + language + '/' + name
+    new_concept['key'] = index_key
     return new_concept
 
 def find_concept(graph, language, name):
-
-    index_key = '/' + language + '/' + name
-    result = graph.nodes.indexes['concepts'].query('name',index_key)[:]
-    if len(result): return result[0]
-    else: return None
+    index_key = '/concept/' + language + '/' + name
+    return lookup_id(graph, index_key)
 
 def get_concept_with_id(graph, id):
-
-    _, lang, name = id.split('/')
+    _, type, lang, name = id.split('/')
+    assert type == 'concept'
     return get_concept(graph, lang, name)
 
 def get_concept(graph, language, name):
-
     concept = find_concept(graph, language, name)
     if not concept:
         concept = create_concept(graph, language, name)
     return concept
 
 def create_relation(graph, name):
-
     new_relation = graph.node(type = 'relation', name = name)
-    index_key = '/rel/' + name
-    graph.nodes.indexes['relations'].add('name',index_key,new_relation)
+    index_key = '/relation/' + name
+    new_relation['key'] = index_key
     return new_relation
 
 def find_relation(graph, name):
-
-    index_key = '/rel/' + name
-    result = graph.nodes.indexes['relations'].query('tag',index_key)[:]
-    if len(result): return result[0]
-    else: return None
+    index_key = '/relation/' + name
+    return lookup_id(graph, index_key)
 
 def get_relation_with_id(graph, id):
-
-    _, rel, name = id.split('/')
+    _, type, name = id.split('/')
+    assert type == 'relation'
     return get_relation(graph, name)
 
 def get_relation(graph, name):
-
     relation = find_relation(graph, name)
     if not relation:
         relation = create_relation(graph, name)
     return relation
 
-def get_id(node):
+def lookup_id(graph, key):
+    "Get the node with a particular ID, no matter what type it is."
+    result = graph.nodes.indexes['node_auto_index'].query('key',key)[:]
+    if len(result): return result[0]
+    else: return None
 
-    if node['type'] == 'relation': return '/rel/' + node['name']
-    elif node['type'] == 'concept': return '/' +  node['language'] + '/' + node['name']
+def get_id(node):
+    if node['type'] == 'relation': return '/relation/' + node['name']
+    elif node['type'] == 'concept': return '/concept/' +  node['language'] + '/' + node['name']

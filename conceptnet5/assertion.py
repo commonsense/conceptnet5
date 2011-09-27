@@ -1,10 +1,11 @@
+# -*- coding: utf-8 -*-
 from neo4jrestclient.client import GraphDatabase, Index, Node
 from conceptnet5.nodes import get_id, get_concept_with_id, get_relation_with_id
 import json
 
 def _list_to_id(list):
     #return json.dumps(list).replace(', ', ',')
-    return ','.join(list)
+    return '/_'.join(list)
 
 def get_args(assertion):
     """
@@ -36,21 +37,16 @@ def assertion_key(node):
     arg_string = _list_to_id(arg_ids)
     return "/assertion/_"+arg_string
 
-def _index_assertion(graph, assertion):
-    if not 'assertions' in graph.nodes.indexes.keys():
-        graph.nodes.indexes.create('assertions')
-    index_key = assertion_key(assertion)
-    graph.nodes.indexes['assertions'].add('name', index_key, assertion)
-    assert graph.nodes.indexes['assertions'].query('name',index_key)[:]
-
-def _create_assertion(graph, language, rel, args):
+def _create_assertion(graph, language, rel, args, properties={}):
     assertion = g.node(type='assertion', language=language)
     rel = _ensure_relation(graph, rel)
     args = [_ensure_concept(graph, arg) for arg in args]
     assertion.relationships.create("relation", rel)
+    for prop, value in properties.items():
+        assertion[prop] = value
     for i in xrange(len(args)):
         assertion.relationships.create("arg", args[i], position=i+1)
-    _index_assertion(graph, assertion)
+    assertion['key'] = assertion_key(assertion)
     return assertion
 
 def _ensure_id(node):
@@ -78,19 +74,37 @@ def find_assertion(graph, rel, args):
     arg_string = _list_to_id(arg_ids)
     index_key = "/assertion/_"+arg_string
 
-    result = graph.nodes.indexes['assertions'].query('name',index_key)[:]
+    result = graph.nodes.indexes['node_auto_index'].query('key',index_key)[:]
     if len(result):
         return result[0]
     else:
         return None
 
-def get_assertion(graph, language, rel, args):
-    return find_assertion(graph, rel, args) or _create_assertion(graph, language, rel, args)
+def get_assertion(graph, language, rel, args, properties={}):
+    return find_assertion(graph, rel, args) or _create_assertion(graph, language, rel, args, properties)
 
 if __name__ == '__main__':
     g = GraphDatabase("http://new-caledonia.media.mit.edu:7474/db/data/")
-    assertion = get_assertion(g, 'en', '/rel/IsA', ['/en/dog', '/en/animal'])
-    print assertion_key(assertion)     
+    assertion = get_assertion(g, 'en', '/relation/IsA', ['/concept/en/dog', '/concept/en/animal'],
+        {
+            'frame': '{1} is {2}',
+            'texts': ['a dog', 'an animal']
+        }
+    )
+    print assertion_key(assertion)
     print assertion.id
+
+    assertion2 = get_assertion(g, 'zh_TW', '/relation/UsedFor',
+        [u'/concept/zh_TW/枕頭', u'/concept/zh_TW/睡覺'],
+        {
+            'frame': u'{2} 的時候可能會用到 {1}。',
+            'texts': ['枕頭', '睡覺']
+        }
+    )
+    print assertion_key(assertion2)
+    print assertion2.id
+    #raw_assertion = get_assertion(g, 'en', '/frame/en/{1} is used for {2}',
+    #    ['/text/en/a_wrench', '/text/en/turning'])
+    #print raw_assertion
 
 
