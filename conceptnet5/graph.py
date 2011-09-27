@@ -41,14 +41,20 @@ class ConceptNetGraph(object):
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
-        assertion = self.graph.node(
-            type='assertion',
-            uri=uri
+        return self._create_assertion_w_components(uri, relation, args)
+
+    def _create_assertion_w_components(self, uri, relation, args):
+        assertion = self.graph.node(   
+            type='assertion', 
+            uri=uri 
         )
         assertion.relationships.create("relation", rel)
         for i in xrange(len(args)):
             assertion.relationships.create("arg", args[i], position=i+1)
         return assertion
+
+    def _make_assertion_uri(self, relation_uri, arg_uri_list):
+        return '/assertion/_' + relation_uri + '/_' + arg_uri_list.join('/_')
 
     def get_node(self, uri):
         results = self._index.query('uri', uri)
@@ -61,5 +67,9 @@ class ConceptNetGraph(object):
 
     def get_or_create_node(self, uri):
         return self.get_node(uri) or self._create_node(uri)
-    
+
+    def get_or_create_assertion(self, relation, args):
+        uri = self._make_assertion_uri(self, relation['uri'],[arg['uri'] for arg in args])
+        return self.get_node(uri) or self._create_assertion_w_components(self, relation, args)
+
 
