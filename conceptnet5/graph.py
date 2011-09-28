@@ -107,7 +107,7 @@ class ConceptNetGraph(object):
         return self.graph.node(
             type='relation',
             name=decode_uri(rel),
-            uri=uri
+            uri= uri
         )
     
     def _create_assertion_node(self, uri, rest, properties):
@@ -149,7 +149,7 @@ class ConceptNetGraph(object):
 
         assertion = self.graph.node(   
             type='assertion', 
-            uri=uri 
+            uri=uri
         )
         assertion.relationships.create("relation", relation)
         for i in xrange(len(args)):
@@ -198,7 +198,7 @@ class ConceptNetGraph(object):
 
         """
         finds or creates assertion using the components of the assertion:
-        args, relation etc.
+        args, relation etc. convenience function.
 
         args:
         relation -- relation node in desired assertion
@@ -207,12 +207,34 @@ class ConceptNetGraph(object):
         """
 
         uri = self._make_assertion_uri(self, relation['uri'],[arg['uri'] for arg in args])
+        
         return self.get_node(uri) or self._create_assertion_w_components(self, relation, args, properties)
 
     def get_or_create_concept(self, language, name):
 
+        """
+        finds or creates concept using the properties of the concept:
+        language and name. convenience function.
+
+        args:
+        language -- language code ie. 'en'
+        name -- name of concept ie. 'dog','fish' etc
+        """
+
         uri = "/concept/%s/%s" % (language, uri_encode(name))
-        
+        return self.get_node(uri) or self._create_node(uri,{})
+
+    def get_or_create_relation(self, name):
+
+        """
+        finds or creates relation using the name of the relation. convenience function.
+
+        args:
+        name -- name of relation ie. 'IsA'
+        """
+
+        uri = "/concept/%s" % (uri_encode(name))
+        return self.get_node(uri) or self._create_node(uri,{})
 
 if __name__ == '__main__':
     g = ConceptNetGraph('http://localhost:7474/db/data')
