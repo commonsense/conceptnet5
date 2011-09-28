@@ -158,11 +158,15 @@ class ConceptNetGraph(object):
             assertion[prop] = value
         return assertion
 
-    def _make_assertion_uri(self, relation_uri, arg_uri_list):
+    def make_assertion_uri(self, relation_uri, arg_uri_list):
 
         """creates assertion uri out of component uris"""
 
-        return '/assertion/_' + relation_uri + '/_' + arg_uri_list.join('/_')
+        for uri in [relation_uri] + arg_uri_list:
+            if not uri_is_safe(uri):
+                raise ValueError("The URI %s has unsafe characters in it. " %(uri)
+                                 + "Please use encode_uri() first.")
+        return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
 
     def get_node(self, uri):
 
@@ -204,7 +208,9 @@ class ConceptNetGraph(object):
 
         """
         finds or creates assertion using the components of the assertion:
-        args, relation etc. convenience function.
+        args, relation etc. 
+        can take both uri or node, gets one using the other
+        convenience function.
 
         args:
         relation -- relation node in desired assertion
@@ -212,9 +218,17 @@ class ConceptNetGraph(object):
         properties -- properties for assertion
         """
 
-        uri = self._make_assertion_uri(self, relation['uri'],[arg['uri'] for arg in args])
-        
-        return self.get_node(uri) or self._create_assertion_w_components(self, relation, args, properties)
+        uris = []
+        nodes = []
+        for node-uri in [relation] + args:
+            if isinstance(node-uri,Node):
+                uris.append(node-uri['uri'])
+                nodes.append(node-uri)
+            elif uri_is_safe(node-uri):
+                uris.append(node-uri)
+                nodes.append(self.get_or_create_node(node_uri))
+        uri = self.make_assertion_uri(self, uris[0],[uris[1],uris[2]])
+        return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],[nodes[1],nodes[2]], properties)
 
     def get_or_create_concept(self, language, name):
 
