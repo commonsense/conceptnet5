@@ -1,3 +1,27 @@
+# -*- coding: utf-8 -*-
+from neo4jrestclient.client import GraphDatabase
+import urllib
+
+def encode_uri(uri):
+    """
+    Takes in a URI and makes sure it follows our conventions:
+    
+    - expressed as a UTF-8 string
+    - spaces are changed to underscores
+    - URL-encoded, so for example a comma becomes %2C
+    """
+    if isinstance(uri, unicode):
+        uri = uri.replace(u' ', u'_').encode('utf-8', 'replace')
+    else:
+        uri = uri.replace(' ', '_')
+    return urllib.quote(uri)
+
+def decode_uri(uri):
+    """
+    Converts a URI to readable Unicode text.
+    """
+    unquoted = urllib.unquote(uri).decode('utf-8', 'replace')
+    return unquoted.replace('_', ' ')
 
 class ConceptNetGraph(object):
 
@@ -53,7 +77,7 @@ class ConceptNetGraph(object):
         return self.graph.node(
             type='concept',
             language=language,
-            name=name,
+            name=decode_uri(name),
             uri=uri
         )
 
@@ -73,7 +97,7 @@ class ConceptNetGraph(object):
         name = rest
         return self.graph.node(
             type='relation',
-            name=name,
+            name=decode_uri(rel),
             uri=uri
         )
     
@@ -94,7 +118,7 @@ class ConceptNetGraph(object):
 
         rest = '/' + rest
         _,rel_uri,args_uris= rest.split('/_',2)
-        arg_uris = arg_uris.split('/_')
+        arg_uris = args_uris.split('/_')
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
@@ -118,7 +142,7 @@ class ConceptNetGraph(object):
             type='assertion', 
             uri=uri 
         )
-        assertion.relationships.create("relation", rel)
+        assertion.relationships.create("relation", relation)
         for i in xrange(len(args)):
             assertion.relationships.create("arg", args[i], position=i+1)
         for prop, value in properties.items():
@@ -132,7 +156,7 @@ class ConceptNetGraph(object):
         results = self._index.query('uri', uri)
         if len(results) == 1:
             return results[0]
-        else if len(results) == 0:
+        elif len(results) == 0:
             return None
         else:
             assert False, "Got multiple results for URI %r" % uri
@@ -140,8 +164,23 @@ class ConceptNetGraph(object):
     def get_or_create_node(self, uri, properties = {}):
         return self.get_node(uri) or self._create_node(uri, properties)
 
+    def get_or_create_node(self, uri):
+        uri = encode_uri(uri)
+        return self.get_node(uri) or self._create_node(uri)
+
     def get_or_create_assertion(self, relation, args, properties = {}):
         uri = self._make_assertion_uri(self, relation['uri'],[arg['uri'] for arg in args])
         return self.get_node(uri) or self._create_assertion_w_components(self, relation, args, properties)
 
+if __name__ == '__main__':
+    g = ConceptNetGraph('http://localhost:7474/db/data')
+    a1 = g.get_or_create_node("/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
+    print a1['uri'], a1.id
+
+    a2 = g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
+    
+    a3 = g.get_or_create_node("/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works")
+    print a1['uri'], a1.id
+    print a2['uri'], a2.id
+    print a3['uri'], a3.id
 
