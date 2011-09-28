@@ -159,9 +159,18 @@ class ConceptNetGraph(object):
         return assertion
 
     def _make_assertion_uri(self, relation_uri, arg_uri_list):
+
+        """creates assertion uri out of component uris"""
+
         return '/assertion/_' + relation_uri + '/_' + arg_uri_list.join('/_')
 
     def get_node(self, uri):
+
+        """
+        searches for node in main index,
+        returns either single Node, None or Error (for multiple results)
+        """
+
         if not uri_is_safe(uri):
             raise ValueError("This URI has unsafe characters in it. "
                              "Please use encode_uri() first.")
@@ -174,16 +183,34 @@ class ConceptNetGraph(object):
             assert False, "Got multiple results for URI %r" % uri
 
     def get_or_create_node(self, uri, properties = {}):
+
+        """
+        tries to find node (by uri), or creates node if it doesn't exist
+
+        args:
+        uri -- uri for node in question
+        properties -- optional properties for assertion       
+        """
+
         return self.get_node(uri) or self._create_node(uri, properties)
 
-    def get_or_create_node(self, uri):
-        return self.get_node(uri) or self._create_node(uri)
-
     def get_or_create_assertion(self, relation, args, properties = {}):
+
+        """
+        finds or creates assertion using the components of the assertion:
+        args, relation etc.
+
+        args:
+        relation -- relation node in desired assertion
+        args -- argument nodes desired in assertion
+        properties -- properties for assertion
+        """
+
         uri = self._make_assertion_uri(self, relation['uri'],[arg['uri'] for arg in args])
         return self.get_node(uri) or self._create_assertion_w_components(self, relation, args, properties)
 
     def get_or_create_concept(self, language, name):
+
         uri = "/concept/%s/%s" % (language, uri_encode(name))
         
 
