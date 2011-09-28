@@ -181,6 +181,12 @@ class ConceptNetGraph(object):
             return None
         else:
             assert False, "Got multiple results for URI %r" % uri
+    
+    def get_node_by_id(self, id):
+        """
+        Get a node by its ID in the database.
+        """
+        return self.g.graph.nodes[id]
 
     def get_or_create_node(self, uri, properties = {}):
 
@@ -237,12 +243,12 @@ class ConceptNetGraph(object):
         return self.get_node(uri) or self._create_node(uri,{})
 
 if __name__ == '__main__':
-    g = ConceptNetGraph('http://localhost:7474/db/data')
-    a1 = g.get_or_create_node("/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
+    g = ConceptNetGraph('http://new-caledonia.media.mit.edu:7474/db/data')
+    a1 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal"))
 
-    a2 = g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
+    a2 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺"))
     
-    a3 = g.get_or_create_node("/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works")
+    a3 = g.get_or_create_node(encode_uri("/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works"))
 
     print a1['uri'], a1.id
     print a2['uri'], a2.id
