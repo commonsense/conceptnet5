@@ -1,7 +1,8 @@
-# Author: Justin Venezuela (jven@mit.edu)
 """
 Get data from DBPedia.
 """
+
+__author__ = 'Justin Venezuela (jven@mit.edu)'
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 
