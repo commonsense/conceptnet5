@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from neo4jrestclient.client import GraphDatabase
+from neo4jrestclient.client import GraphDatabase, Node
 import urllib
 
 def uri_is_safe(uri):
@@ -45,7 +45,8 @@ class ConceptNetGraph(object):
         """
 
         self.graph = GraphDatabase(url)
-        self._index = self.graph.nodes.indexes['node_auto_index']
+        self._node_index = self.graph.nodes.indexes['node_auto_index']
+        self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
 
     def _create_node(self, uri, properties):
 
@@ -164,8 +165,8 @@ class ConceptNetGraph(object):
 
         for uri in [relation_uri] + arg_uri_list:
             if not uri_is_safe(uri):
-                raise ValueError("The URI %s has unsafe characters in it. " %(uri)
-                                 + "Please use encode_uri() first.")
+                raise ValueError("The URI %r has unsafe characters in it. "
+                                 "Please use encode_uri() first." % uri)
         return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
 
     def get_node(self, uri):
@@ -178,22 +179,75 @@ class ConceptNetGraph(object):
         if not uri_is_safe(uri):
             raise ValueError("This URI has unsafe characters in it. "
                              "Please use encode_uri() first.")
-        results = self._index.query('uri', uri)
+        results = self._node_index.query('uri', uri)
         if len(results) == 1:
             return results[0]
         elif len(results) == 0:
             return None
         else:
             assert False, "Got multiple results for URI %r" % uri
-    
+
+    def get_edges(self, source, target):
+        """
+        Get edges between `source` and `target`, specified as IDs or nodes.
+        """
+        source = self._any_to_id(source)
+        target = self._any_to_id(target)
+        return self._edge_index.query('nodes', '%d-%d' % (source, target))
+
+    def get_edge(self, type, source, target):
+        """
+        Get an existing edge between two nodes with the specified type, or None
+        if it doesn't exist.
+        """
+        edges = self.get_edges(source, target)
+        for edge in edges:
+            if edge.type == type:
+                return edge
+        return None
+
+    def _any_to_id(self, obj):
+        if isinstance(obj, Node):
+            return obj.id
+        elif isinstance(obj, basestring):
+            node = self.get_node(obj)
+            if node is None:
+                raise ValueError("Could not find node %r" % obj)
+            return node.id
+        elif isinstance(obj, int):
+            return obj
+        else:
+            raise TypeError
+
+    def _any_to_node(self, obj):
+        if isinstance(obj, Node):
+            return obj
+        elif isinstance(obj, basestring):
+            node = self.get_node(obj)
+            if node is None:
+                raise ValueError("Could not find node %r" % obj)
+            return node
+        elif isinstance(obj, int):
+            return self.get_node_by_id(obj)
+        else:
+            raise TypeError
+
+    def _create_edge(self, type, source, target, props):
+        """
+        Create an edge and ensure that it is indexed by its nodes.
+        """
+        source = self._any_to_node(source)
+        target = self._any_to_node(target)
+        edge = source.relationships.create(type, target, props)
+        edge['nodes'] = '%d-%d' % (source.id, target.id)
+
     def get_node_by_id(self, id):
         """
         Get a node by its ID in the database.
         """
-        return self.g.graph.nodes[id]
+        return self.graph.nodes[id]
 
     def get_or_create_node(self, uri, properties = {}):
-
         """
         tries to find node (by uri), or creates node if it doesn't exist
 
@@ -204,8 +258,15 @@ class ConceptNetGraph(object):
 
         return self.get_node(uri) or self._create_node(uri, properties)
 
-    def get_or_create_assertion(self, relation, args, properties = {}):
+    def get_or_create_edge(self, type, source, target, properties = {}):
+        """
+        Get an edge of the specified `type` between `source` and `target`.
+        If it doesn't exist, create it with the given properties.
+        """
+        return (self.get_edge(type, source, target) or
+                self._create_edge(type, source, target, properties))
 
+    def get_or_create_assertion(self, relation, args, properties = {}):
         """
         finds or creates assertion using the components of the assertion:
         args, relation etc. 
@@ -231,7 +292,6 @@ class ConceptNetGraph(object):
         return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],[nodes[1],nodes[2]], properties)
 
     def get_or_create_concept(self, language, name):
-
         """
         finds or creates concept using the properties of the concept:
         language and name. convenience function.
@@ -245,9 +305,9 @@ class ConceptNetGraph(object):
         return self.get_node(uri) or self._create_node(uri,{})
 
     def get_or_create_relation(self, name):
-
         """
-        finds or creates relation using the name of the relation. convenience function.
+        finds or creates relation using the name of the relation.
+        convenience function.
 
         args:
         name -- name of relation ie. 'IsA'
@@ -267,4 +327,5 @@ if __name__ == '__main__':
     print a1['uri'], a1.id
     print a2['uri'], a2.id
     print a3['uri'], a3.id
+    print g.get_edge('justify', 0, 474).id
 
