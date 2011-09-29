@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from neo4jrestclient.client import GraphDatabase
+from neo4jrestclient.client import GraphDatabase, Node
 import urllib
 
 def uri_is_safe(uri):
@@ -50,6 +50,22 @@ class ConceptNetGraph(object):
 
         self.graph = GraphDatabase(url)
         self._index = self.graph.nodes.indexes['node_auto_index']
+
+    def _list_nodes_and_uris(self, input_list):
+
+        uris = []
+        nodes = []
+        for index, node_uri in enumerate(input_list):
+            if isinstance(node_uri,Node):
+                uris.append(node_uri['uri'])
+                nodes.append(node_uri)
+            elif uri_is_safe(node_uri):
+                uris.append(node_uri)
+                nodes.append(self.get_or_create_node(node_uri))
+            else:
+                if index == 0: invalid = 'the relation/expression'
+                else: invalid = 'argument ' + str(index)
+                raise TypeError("%s is an invalid type. " %(invalid)
 
     def _create_node(self, uri, properties):
 
@@ -135,9 +151,31 @@ class ConceptNetGraph(object):
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
-        return self._create_assertion_w_components(uri, relation, args, properties)
+        return self._create_assertion_expr_w_components('assertion',uri, relation, args, properties)
 
-    def _create_assertion_w_components(self, uri, relation, args, properties):
+    def _create_expression_node(self, uri, rest, properties):
+
+        """
+        creates expression node,
+        uses rest as to get relevant component uris and pull up the relevant nodes
+        assigns relationships
+        creates properties
+        returns expression with parameters
+
+        args:
+        uri -- identifier of intended node, used in index
+        rest -- relevant parts of uri needed as parameters
+        properties -- properties for assertions
+        """
+         rest = '/' + rest
+        _,frame_uri,args_uris= rest.split('/_',2)
+        arg_uris = args_uris.split('/_')
+        args = []
+        frame = self.get_or_create_node(frame_uri)
+        for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
+        return self._create_assertion_expr_w_components('expression', uri, frame, args, properties)
+
+    def _create_assertion_expr_w_components(self, type, uri, relation_frame, args, properties):
 
         """
         creates assertion node,
@@ -152,10 +190,10 @@ class ConceptNetGraph(object):
         """
 
         assertion = self.graph.node(   
-            type='assertion', 
+            type=type, 
             uri=uri
         )
-        assertion.relationships.create("relation", relation)
+        assertion.relationships.create(relation_frame[], )
         for i in xrange(len(args)):
             assertion.relationships.create("arg", args[i], position=i+1)
         for prop, value in properties.items():
@@ -174,6 +212,7 @@ class ConceptNetGraph(object):
         rest -- relevant parts of uri needed as parameters
         properties -- properties for assertions (see _create_assertion_node function)
         """
+
         name = rest
         return self.graph.node(
             type='frame',
@@ -232,7 +271,7 @@ class ConceptNetGraph(object):
         """
         finds or creates assertion using the components of the assertion:
         args, relation etc. 
-        can take both uri or node, gets one using the other
+        can take either uri or node, gets one using the other
         convenience function.
 
         args:
@@ -243,16 +282,39 @@ class ConceptNetGraph(object):
 
         uris = []
         nodes = []
-        for node_uri in [relation] + args:
+        for index, node_uri in enumerate([relation] + args):
             if isinstance(node_uri,Node):
                 uris.append(node_uri['uri'])
                 nodes.append(node_uri)
             elif uri_is_safe(node_uri):
                 uris.append(node_uri)
                 nodes.append(self.get_or_create_node(node_uri))
-            else: 
-        uri = self.make_assertion_uri(self, uris[0],[uris[1],uris[2]])
-        return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],[nodes[1],nodes[2]], properties)
+            else:
+                if index == 0: invalid = 'relation'
+                else: invalid = 'argument ' + str(index)
+                raise TypeError("%s is an invalid type. " %(invalid)
+        uri = self.make_assertion_uri(self, uris[0],uris[1:])
+        return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],nodes[1:], properties)
+
+    def get_or_create_expression(self, frame, args, properties = {}):
+
+        """
+        finds or creates expression using components of the expression:
+        args, frame etc.
+        can take either uri or node, gets one using the other
+        convenience function.
+
+        args:
+        relation -- relation node in desired expression
+        args -- argument nodes desired in expression
+        properties -- properties for 
+        """
+
+       uris = []
+       nodes = []
+       for index, node_uri in enumerate([relation] + args):
+           
+
 
     def get_or_create_concept(self, language, name):
 
