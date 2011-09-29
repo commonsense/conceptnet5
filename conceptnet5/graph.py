@@ -144,7 +144,7 @@ class ConceptNetGraph(object):
         args:
         uri -- identifier of intended node, used in index
         rest -- relevant parts of uri needed as parameters
-        properties -- properties for assertions                 
+        properties -- properties for assertions (see _create_assertion_node function)
         """
 
         assertion = self.graph.node(   
@@ -157,6 +157,25 @@ class ConceptNetGraph(object):
         for prop, value in properties.items():
             assertion[prop] = value
         return assertion
+
+    def _create_frame_node(self, uri, rest, properties):
+
+        """
+        creates frame node,
+        assigns name property
+        returns frame (node)
+
+        args:
+        uri -- identifier of intended node, used in index
+        rest -- relevant parts of uri needed as parameters
+        properties -- properties for assertions (see _create_assertion_node function)
+        """
+        name = rest
+        return self.graph.node(
+            type='frame',
+            name=decode_uri(rel),
+            uri= uri
+        ) 
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
 
@@ -220,13 +239,14 @@ class ConceptNetGraph(object):
 
         uris = []
         nodes = []
-        for node_uri in [relation] + args:
-            if isinstance(node_uri,Node):
-                uris.append(node_uri['uri'])
-                nodes.append(node_uri)
-            elif uri_is_safe(node_uri):
-                uris.append(node_uri)
+        for node-uri in [relation] + args:
+            if isinstance(node-uri,Node):
+                uris.append(node-uri['uri'])
+                nodes.append(node-uri)
+            elif uri_is_safe(node-uri):
+                uris.append(node-uri)
                 nodes.append(self.get_or_create_node(node_uri))
+            else: 
         uri = self.make_assertion_uri(self, uris[0],[uris[1],uris[2]])
         return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],[nodes[1],nodes[2]], properties)
 
@@ -256,8 +276,40 @@ class ConceptNetGraph(object):
         uri = "/concept/%s" % (uri_encode(name))
         return self.get_node(uri) or self._create_node(uri,{})
 
+    def get_or_create_frame(self, name):
+
+        """
+        finds of creates frame using name of frame. convenience function.
+
+        args:
+        name -- name of frame, ie. "{1} is used for {2}"
+        """
+
+        uri = "/concept/%s" % (uri_encode(name))
+        return self.get_node(uri) or self._create_node(uri,{})
+
+    def get_args(self,assertion):
+        """
+        Given an assertion, get its arguments as a list.
+
+        Arguments are represented in the graph as edges of type 'argument', with a property
+        called 'position' that will generally either be 1 or 2. (People find 1-indexing
+        intuitive in this kind of situation.)
+        """
+
+        if uri_is_safe(assertion): self._get_node(assertion)
+        if node['type'] != 'assertion': 
+        edges = assertion.relationships.outgoing(types=['arg'])[:]
+        edges.sort(key = lambda edge: edge.properties['position'])
+        if len(edges) > 0:
+            assert edges[0]['position'] == 1, "Arguments of {0} are not 1-indexed".format(assertion)
+        return [edge.end for edge in edges]
+
+    
+
+
 if __name__ == '__main__':
-    g = ConceptNetGraph('http://localhost:7474/db/data')
+    g = ConceptNetGraph('http://new-caledonia.media.mit.edu:7474/db/data')
     a1 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal"))
 
     a2 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺"))
