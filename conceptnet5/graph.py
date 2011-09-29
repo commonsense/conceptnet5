@@ -3,6 +3,7 @@ from neo4jrestclient.client import GraphDatabase
 import urllib
 
 def uri_is_safe(uri):
+
     """
     Determines if this is a correctly-encoded URI, by checking for some
     common problems that would cause it to be incorrect.
@@ -13,6 +14,7 @@ def uri_is_safe(uri):
             and ' ' not in uri and '&' not in uri)
 
 def encode_uri(uri):
+
     """
     Takes in a URI and makes sure it follows our conventions:
     
@@ -27,6 +29,7 @@ def encode_uri(uri):
     return urllib.quote(uri)
 
 def decode_uri(uri):
+
     """
     Converts a URI to readable Unicode text.
     """
@@ -34,6 +37,7 @@ def decode_uri(uri):
     return unquoted.replace('_', ' ')
 
 class ConceptNetGraph(object):
+
     def __init__(self, url):
 
         """
@@ -285,7 +289,7 @@ class ConceptNetGraph(object):
         name -- name of frame, ie. "{1} is used for {2}"
         """
 
-        uri = "/concept/%s" % (uri_encode(name))
+        uri = "/frame/%s" % (uri_encode(name))
         return self.get_node(uri) or self._create_node(uri,{})
 
     def get_args(self,assertion):
