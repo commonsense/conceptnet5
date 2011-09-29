@@ -243,12 +243,12 @@ class ConceptNetGraph(object):
 
         uris = []
         nodes = []
-        for node-uri in [relation] + args:
-            if isinstance(node-uri,Node):
-                uris.append(node-uri['uri'])
-                nodes.append(node-uri)
-            elif uri_is_safe(node-uri):
-                uris.append(node-uri)
+        for node_uri in [relation] + args:
+            if isinstance(node_uri,Node):
+                uris.append(node_uri['uri'])
+                nodes.append(node_uri)
+            elif uri_is_safe(node_uri):
+                uris.append(node_uri)
                 nodes.append(self.get_or_create_node(node_uri))
             else: 
         uri = self.make_assertion_uri(self, uris[0],[uris[1],uris[2]])
