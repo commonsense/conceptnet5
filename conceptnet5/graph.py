@@ -66,7 +66,7 @@ class ConceptNetGraph(object):
             else:
                 if index == 0: invalid = 'the relation/expression'
                 else: invalid = 'argument ' + str(index)
-                raise TypeError("%s is an invalid type. " %(invalid)
+                raise TypeError("%s is an invalid type. " %(invalid))
 
     def _create_node(self, uri, properties):
 
@@ -151,29 +151,24 @@ class ConceptNetGraph(object):
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
-        return self._create_assertion_expr_w_components('assertion',uri, relation, args, properties)
-
-    def _create_expression_node(self, uri, rest, properties):
-
+        return self._create_assertion_from_components(uri, relation, args, properties)
+    
+    def _create_assertion_from_components(self, uri, relation, args, properties):
         """
-        creates expression node,
-        uses rest as to get relevant component uris and pull up the relevant nodes
-        assigns relationships
-        creates properties
-        returns expression with parameters
-
-        args:
-        uri -- identifier of intended node, used in index
-        rest -- relevant parts of uri needed as parameters
-        properties -- properties for assertions
+        A helper function used in creating assertions. Given that the 
+        relation and args have been found or created as nodes, use them to
+        create the assertion.
         """
-         rest = '/' + rest
-        _,frame_uri,args_uris= rest.split('/_',2)
-        arg_uris = args_uris.split('/_')
-        args = []
-        frame = self.get_or_create_node(frame_uri)
-        for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
-        return self._create_assertion_expr_w_components('expression', uri, frame, args, properties)
+        assertion = self.graph.node(   
+            type=type, 
+            uri=uri
+        )
+        self._create_edge("relation", assertion, relation)
+        for i in xrange(len(args)):
+            self._create_edge("arg", assertion, args[i], {'position': i+1})
+        for prop, value in properties.items():
+            assertion[prop] = value
+        return assertion
 
     def _create_assertion_expr_w_components(self, type, uri, relation_frame, args, properties):
 
@@ -353,9 +348,9 @@ class ConceptNetGraph(object):
             else:
                 if index == 0: invalid = 'relation'
                 else: invalid = 'argument ' + str(index)
-                raise TypeError("%s is an invalid type. " %(invalid)
+                raise TypeError("%s is an invalid type. " % invalid)
         uri = self.make_assertion_uri(self, uris[0],uris[1:])
-        return self.get_node(uri) or self._create_assertion_w_components(self, uri, nodes[0],nodes[1:], properties)
+        return self.get_node(uri) or self._create_assertion_from_components(self, uri, nodes[0],nodes[1:], properties)
 
     def get_or_create_expression(self, frame, args, properties = {}):
 
@@ -371,11 +366,9 @@ class ConceptNetGraph(object):
         properties -- properties for 
         """
 
-       uris = []
-       nodes = []
-       for index, node_uri in enumerate([relation] + args):
-           
-
+        #uris = []
+        #nodes = []
+        #for index, node_uri in enumerate([relation] + args):   
 
     def get_or_create_concept(self, language, name):
         """
@@ -414,28 +407,26 @@ class ConceptNetGraph(object):
         uri = "/frame/%s" % (uri_encode(name))
         return self.get_node(uri) or self._create_node(uri,{})
 
-    def get_args(self,assertion):
-        """
-        Given an assertion, get its arguments as a list.
-
-        Arguments are represented in the graph as edges of type 'argument', with a property
-        called 'position' that will generally either be 1 or 2. (People find 1-indexing
-        intuitive in this kind of situation.)
-        """
-
-        if uri_is_safe(assertion): self._get_node(assertion)
-        if node['type'] != 'assertion': 
-        edges = assertion.relationships.outgoing(types=['arg'])[:]
-        edges.sort(key = lambda edge: edge.properties['position'])
-        if len(edges) > 0:
-            assert edges[0]['position'] == 1, "Arguments of {0} are not 1-indexed".format(assertion)
-        return [edge.end for edge in edges]
-
-    
+    #def get_args(self,assertion):
+    #    """
+    #    Given an assertion, get its arguments as a list.
+    #
+    #    Arguments are represented in the graph as edges of type 'argument', with a property
+    #    called 'position' that will generally either be 1 or 2. (People find 1-indexing
+    #    intuitive in this kind of situation.)
+    #    """
+    #
+    #    if uri_is_safe(assertion): self._get_node(assertion)
+    #    if node['type'] != 'assertion': 
+    #    edges = assertion.relationships.outgoing(types=['arg'])[:]
+    #    edges.sort(key = lambda edge: edge.properties['position'])
+    #    if len(edges) > 0:
+    #        assert edges[0]['position'] == 1, "Arguments of {0} are not 1-indexed".format(assertion)
+    #    return [edge.end for edge in edges]
 
 
 if __name__ == '__main__':
-    g = ConceptNetGraph('http://new-caledonia.media.mit.edu:7474/db/data')
+    g = ConceptNetGraph('http://localhost:7474/db/data')
     a1 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal"))
 
     a2 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺"))
