@@ -1,5 +1,5 @@
 from conceptnet.models import Frame
-from conceptnet5.graph import get_graph
+from conceptnet5.graph import get_graph, list_to_uri_pieces
 import divisi2
 import os
 import codecs
@@ -17,18 +17,22 @@ def handle_file(filename):
             user, frame_id, concept1, concept2 = parts
             frame = Frame.objects.get(id=int(frame_id))
             relation = frame.relation
+            assertion = GRAPH.get_or_create_assertion(
+                '/relation/'+relation.name,
+                [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
+                {'dataset': 'conceptnet/zh_TW'}
+            )
+            print assertion['uri']
 
-            assertion_uri = u"/assertion/_/relation/%s/_/concept/zh_TW/%s/_/concept/zh_TW/%s" % (relation.name, concept1, concept2)
-            print assertion_uri
-            assertion = GRAPH.get_or_create_node(assertion_uri)
-
-            raw_uri = u"/assertion/_/frame/zh_TW/%s/_/concept/zh_TW/%s/_/concept/zh_TW/%s" % (frame.text, concept1, concept2)
-            raw = GRAPH.get_or_create_node(raw_uri)
-            GRAPH.derive_normalized(raw, assertion)
+            raw = GRAPH.get_or_create_assertion(
+                '/frame/'+frame.text,
+                [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
+                {'dataset': 'conceptnet/zh_TW'}
+            print raw['uri']
 
             source_uri = u"/source/contributor/petgame/%s" % user
             source = GRAPH.get_or_create_node(source_uri)
-            GRAPH.justify(0, source)
+            GRAPH.justify(0, source, weight=0.5)
             
             conjunction = GRAPH.get_or_create_conjunction([source, petgame])
             print conjunction['uri']

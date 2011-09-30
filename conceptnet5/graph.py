@@ -2,6 +2,23 @@
 from neo4jrestclient.client import GraphDatabase, Node
 import urllib
 import re
+import json
+
+def list_to_uri_piece(lst):
+    """
+    Encode a list in a format suitable for a URI, by representing it in a
+    form of JSON.
+    """
+    json_str = json.dumps(lst, ensure_ascii=False)
+    json_unicode = json_str.decode('utf-8')
+    return json_unicode.replace(u' ', u'')
+
+def uri_piece_to_list(uri):
+    """
+    Undo the effect of `list_to_uri_piece` by decoding the string from
+    JSON.
+    """
+    return json.loads(uri)
 
 LUCENE_UNSAFE = re.compile(r'([-+&|!(){}\[\]^"~*?\\: ])')
 def lucene_escape(text):
@@ -136,10 +153,9 @@ class ConceptNetGraph(object):
         rest -- relevant parts of uri needed as parameters
         properties -- properties for assertions
         """
-
-        rest = '/' + rest
-        _,rel_uri,args_uris= rest.split('/_',2)
-        arg_uris = args_uris.split('/_')
+        uri_parts = uri_piece_to_list(rest)
+        rel_uri = uri_parts[0]
+        arg_uris = uri_parts[1:]
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris:
@@ -203,7 +219,12 @@ class ConceptNetGraph(object):
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
-        return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
+        return '/assertion/' + list_to_uri_piece([relation_uri] + arg_uri_list)
+
+    def make_list_uri(self, type, args):
+        """Creates any list-based uri out of component uris"""
+        arglist = list_to_uri_piece(args)
+        return '/%s/%s' % (type, arglist)
 
     def get_node(self, uri):
         """
@@ -343,7 +364,7 @@ class ConceptNetGraph(object):
         conjuncts = [self._any_to_node(c) for c in conjuncts]
         uris = [c['uri'] for c in conjuncts]
         uris.sort()
-        uri = u"/conjunction/+" + (u'/+'.join(uris))
+        uri = u"/conjunction/" + list_to_uri_piece(uris)
         node = self.get_node(uri)
 
         # Do we want to use the _create_node machinery? It doesn't quite fit.
