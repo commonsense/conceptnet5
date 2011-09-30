@@ -193,13 +193,13 @@ class ConceptNetGraph(object):
         properties -- properties for assertions (see _create_assertion_node function)
         """
 
-        name = rest
+        language, name = rest.split('/')
         return self.graph.node(
             type='frame',
             name=name,
+            language=language,
             uri=uri
         )
-
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
