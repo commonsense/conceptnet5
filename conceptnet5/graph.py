@@ -50,31 +50,18 @@ def normalize_uri(uri):
     return uri.strip().replace(u' ', u'_')
 
 class ConceptNetGraph(object):
+
     def __init__(self, url):
         """
         Create a ConceptNetGraph object, backed by a Neo4j databases at the
         given URL.
         """
+
         self.graph = GraphDatabase(url)
         self._node_index = self.graph.nodes.indexes['node_auto_index']
         self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
 
-    def _list_nodes_and_uris(self, input_list):
-        uris = []
-        nodes = []
-        for index, node_uri in enumerate(input_list):
-            if isinstance(node_uri, Node):
-                uris.append(node_uri['uri'])
-                nodes.append(node_uri)
-            elif isinstance(node_uri, basestring):
-                uris.append(node_uri)
-                nodes.append(self.get_or_create_node(node_uri))
-            else:
-                if index == 0: invalid = 'the relation/expression'
-                else: invalid = 'argument ' + str(index)
-                raise TypeError("%s is an invalid type. " %(invalid))
-
-    def _create_node(self, uri, properties):
+    def _create_node(self, uri, properties = {}):
         """
         creates generic node object,
         parses uri, takes out args, identifies type of node and runs relevant method
@@ -85,6 +72,7 @@ class ConceptNetGraph(object):
         """
         # Apply normalization to the URI here. All downstream functions can
         # assume it's normalized.
+
         uri = normalize_uri(uri)
 
         if uri.count('/') < 2:
@@ -99,47 +87,34 @@ class ConceptNetGraph(object):
             raise ValueError("I don't know how to create type %r" % type)
         return method(uri, rest, properties)
 
-    def _create_concept_node(self, uri, rest, properties):
+    def _create_edge(self, type, source, target, properties = {}):
         """
-        creates concept node,
-        parses rest argument for language and name
-        returns node with concept parameters
-
-        args:
-        uri -- identifier of intended node, used in index
-        rest -- relevant parts of uri needed as parameters
-        properties -- (optional) properties for assertions (see assertions)
+        Create an edge and ensure that it is indexed by its nodes.
         """
 
-        language, name = rest.split('/')
-        return self.graph.node(
-            type='concept',
-            language=language,
-            name=name,
+        source = self._any_to_node(source)
+        target = self._any_to_node(target)
+        edge = source.relationships.create(type, target, **props)
+        edge['nodes'] = '%d-%d' % (source.id, target.id)
+        return edge
+
+    def _create_assertion_from_components(self, uri, relation, args, properties):
+        """
+        A helper function used in creating assertions. Given that the
+        relation and args have been found or created as nodes, use them to
+        create the assertion.
+        """
+
+        assertion = self.graph.node(
+            type='assertion',
             uri=uri,
             **properties
         )
+        self._create_edge("relation", assertion, relation)
+        for i in xrange(len(args)):
+            self._create_edge("arg", assertion, args[i], {'position': i+1})
+        return assertion
 
-    def _create_relation_node(self, uri, rest, properties):
-        """
-        creates relation node,                                  
-        uses rest as relation name
-        returns node with relation parameters
-
-        args: 
-        uri -- identifier of intended node, used in index
-        rest -- relevant parts of uri needed as parameters
-        properties -- (optional) properties for assertions (see assertions)        
-        """
-
-        name = rest
-        return self.graph.node(
-            type='relation',
-            name=name,
-            uri=uri,
-            **properties
-        )
-    
     def _create_assertion_node(self, uri, rest, properties):
         """
         creates assertion node,
@@ -162,40 +137,36 @@ class ConceptNetGraph(object):
             args.append(self.get_or_create_node(arg_uri))
         assertion = self._create_assertion_from_components(uri, rel, args,
                                                            properties)
-        
+
         # Set a property to keep track of whether this assertion is normalized.
         # An unnormalized ("raw") assertion has a Frame in its relation slot.
+        
         if rel['type'] == 'frame':
             assertion['normalized'] = False
         else:
             assertion['normalized'] = True
         return assertion
 
-    def _create_source_node(self, uri, rest, properties):
-        name = rest.split('/')[-1]
+    def _create_concept_node(self, uri, rest, properties):
+        """
+        creates concept node,
+        parses rest argument for language and name
+        returns node with concept parameters
+
+        args:
+        uri -- identifier of intended node, used in index
+        rest -- relevant parts of uri needed as parameters
+        properties -- (optional) properties for assertions (see assertions)
+        """
+
+        language, name = rest.split('/')
         return self.graph.node(
-            type='source',
+            type='concept',
+            language=language,
             name=name,
             uri=uri,
             **properties
         )
-    
-    def _create_assertion_from_components(self, uri, relation, args, properties):
-        """
-        A helper function used in creating assertions. Given that the 
-        relation and args have been found or created as nodes, use them to
-        create the assertion.
-        """
-        assertion = self.graph.node(   
-            type='assertion',
-            uri=uri
-        )
-        self._create_edge("relation", assertion, relation)
-        for i in xrange(len(args)):
-            self._create_edge("arg", assertion, args[i], {'position': i+1})
-        for prop, value in properties.items():
-            assertion[prop] = value
-        return assertion
 
     def _create_frame_node(self, uri, rest, properties):
         """
@@ -214,7 +185,48 @@ class ConceptNetGraph(object):
             type='frame',
             name=name,
             language=language,
-            uri=uri
+            uri=uri,
+            **properties
+        )
+
+    def _create_relation_node(self, uri, rest, properties):
+        """
+        creates relation node,                                  
+        uses rest as relation name
+        returns node with relation parameters
+
+        args: 
+        uri -- identifier of intended node, used in index
+        rest -- relevant parts of uri needed as parameters
+        properties -- (optional) properties, mainly for assertions (see assertions)        
+        """
+
+        name = rest
+        return self.graph.node(
+            type='relation',
+            name=name,
+            uri=uri,
+            **properties
+        )
+    
+    def _create_source_node(self, uri, rest, properties):
+        """
+        creates source node,
+        used rest as name
+        returns node with relation paramaters
+
+        args:
+        uri -- identifier of intended node, used in index
+        rest -- relevant parts or uri needed in parameters
+        properties -- (optional) properties for assertion (see assertions)
+        """
+
+        name = rest.split('/')[-1]
+        return self.graph.node(
+            type='source',
+            name=name,
+            uri=uri,
+            **properties
         )
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
@@ -231,6 +243,7 @@ class ConceptNetGraph(object):
         searches for node in main index,
         returns either single Node, None or Error (for multiple results)
         """
+
         uri = normalize_uri(uri)
         results = self._node_index.query('uri', lucene_escape(uri))
         if len(results) == 1:
@@ -250,14 +263,6 @@ class ConceptNetGraph(object):
         """
         return self._node_index.query('uri', pattern)
 
-    def get_edges(self, source, target):
-        """
-        Get edges between `source` and `target`, specified as IDs or nodes.
-        """
-        source = self._any_to_id(source)
-        target = self._any_to_id(target)
-        return self._edge_index.query('nodes', '%d-%d' % (source, target))
-
     def get_edge(self, type, source, target):
         """
         Get an existing edge between two nodes with the specified type, or None
@@ -268,6 +273,14 @@ class ConceptNetGraph(object):
             if edge.type == type:
                 return edge
         return None
+
+    def get_edges(self, source, target):
+        """
+        Get edges between `source` and `target`, specified as IDs or nodes.
+        """
+        source = self._any_to_id(source)
+        target = self._any_to_id(target)
+        return self._edge_index.query('nodes', '%d-%d' % (source, target))
 
     def _any_to_id(self, obj):
         if isinstance(obj, Node):
@@ -295,20 +308,21 @@ class ConceptNetGraph(object):
         else:
             raise TypeError
 
-    def _create_edge(self, type, source, target, props = {}):
-        """
-        Create an edge and ensure that it is indexed by its nodes.
-        """
-        source = self._any_to_node(source)
-        target = self._any_to_node(target)
-        edge = source.relationships.create(type, target, **props)
-        edge['nodes'] = '%d-%d' % (source.id, target.id)
-        return edge
+    def _any_to_uri(self, obj):
+        if isinstance(obj, Node):
+            return obj['uri']
+        elif isinstance(obj, basestring):
+            return obj
+        elif isinstance(obj, int):
+            return self.get_node_by_id(obj)['uri']
+        else:
+            raise TypeError
 
     def get_node_by_id(self, id):
         """
         Get a node by its ID in the database.
         """
+
         return self.graph.nodes[id]
 
     def get_or_create_node(self, uri, properties = {}):
@@ -327,13 +341,14 @@ class ConceptNetGraph(object):
         Get an edge of the specified `type` between `source` and `target`.
         If it doesn't exist, create it with the given properties.
         """
+
         return (self.get_edge(type, source, target) or
                 self._create_edge(type, source, target, properties))
 
     def get_or_create_assertion(self, relation, args, properties = {}):
         """
         finds or creates assertion using the components of the assertion:
-        args, relation etc. 
+        args, relation etc.
         can take either uri or node, gets one using the other
         convenience function.
 
@@ -343,24 +358,28 @@ class ConceptNetGraph(object):
         properties -- properties for assertion
         """
 
-        uris = []
-        nodes = []
-        for index, node_uri in enumerate([relation] + args):
-            if isinstance(node_uri,Node):
-                uris.append(node_uri['uri'])
-                nodes.append(node_uri)
-            elif isinstance(node_uri, basestring):
-                uris.append(node_uri)
-                nodes.append(self.get_or_create_node(node_uri))
-            else:
-                if index == 0: invalid = 'relation'
-                else: invalid = 'argument ' + str(index)
-                raise TypeError("%s is an invalid type. " % invalid)
+        uri = self.make_assertion_uri(self._any_to_uri(relation),[self._any_to_uri(arg) for arg in args])
+        return (self.get_node(uri) or 
+        self._create_assertion_from_components(uri, _any_to_node(relation), [self._any_to_node(arg) for arg in args], properties))
 
-        uri = self.make_assertion_uri(uris[0], uris[1:])
-        return self.get_node(uri) or self._create_assertion_from_components(uri, nodes[0],nodes[1:], properties)
+    def get_or_create_concept(self, language, name):
+        """
+        finds or creates concept using the properties of the concept:
+        language and name. convenience function.
+
+        args:
+        language -- language code ie. 'en'
+        name -- name of concept ie. 'dog','fish' etc
+        """
+
+        uri = "/concept/%s/%s" % (language, name)
+        return self.get_node(uri) or self._create_node(uri,{})
 
     def get_or_create_conjunction(self, conjuncts):
+        """
+        finds or creates a conjunction between nodes
+        takes in conjunct arguments and returns conjuntion node
+        """
         conjuncts = [self._any_to_node(c) for c in conjuncts]
         uris = [c['uri'] for c in conjuncts]
         uris.sort()
@@ -376,35 +395,16 @@ class ConceptNetGraph(object):
             for conjunct in conjuncts:
                 self.get_or_create_edge('conjunct', conjunct, node)
         return node
-
-    def get_or_create_expression(self, frame, args, properties = {}):
+    
+    def get_or_create_frame(self, name):
         """
-        finds or creates expression using components of the expression:
-        args, frame etc.
-        can take either uri or node, gets one using the other
-        convenience function.
+        finds of creates frame using name of frame. convenience function.
 
         args:
-        relation -- relation node in desired expression
-        args -- argument nodes desired in expression
-        properties -- properties for FIXME
+        name -- name of frame, ie. "$1 is used for $2"
         """
 
-        #uris = []
-        #nodes = []
-        #for index, node_uri in enumerate([relation] + args):   
-
-    def get_or_create_concept(self, language, name):
-        """
-        finds or creates concept using the properties of the concept:
-        language and name. convenience function.
-
-        args:
-        language -- language code ie. 'en'
-        name -- name of concept ie. 'dog','fish' etc
-        """
-
-        uri = "/concept/%s/%s" % (language, name)
+        uri = "/frame/%s" % name
         return self.get_node(uri) or self._create_node(uri,{})
 
     def get_or_create_relation(self, name):
@@ -418,17 +418,6 @@ class ConceptNetGraph(object):
 
         uri = "/concept/%s" % name
         return self.get_node(uri) or self._create_node(uri, {})
-
-    def get_or_create_frame(self, name):
-        """
-        finds of creates frame using name of frame. convenience function.
-
-        args:
-        name -- name of frame, ie. "$1 is used for $2"
-        """
-
-        uri = "/frame/%s" % name
-        return self.get_node(uri) or self._create_node(uri,{})
 
     def get_args(self, assertion):
         """
@@ -449,6 +438,7 @@ class ConceptNetGraph(object):
         The weight represents the strength of the justification, from
         -1 to 1.
         """
+
         return self.get_or_create_edge('justifies', source, target,
                                        {'weight': weight})
 
@@ -460,6 +450,7 @@ class ConceptNetGraph(object):
         Also adds a justification edge, which should have a positive
         weight.
         """
+
         assert weight > 0
         edge = self.get_or_create_edge('normalized', source, target)
         self.justify(source, target, weight)
