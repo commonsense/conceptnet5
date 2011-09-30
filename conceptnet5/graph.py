@@ -100,7 +100,8 @@ class ConceptNetGraph(object):
             type='concept',
             language=language,
             name=decode_uri(name),
-            uri=uri
+            uri=uri,
+            **properties
         )
 
     def _create_relation_node(self, uri, rest, properties):
@@ -119,7 +120,8 @@ class ConceptNetGraph(object):
         return self.graph.node(
             type='relation',
             name=decode_uri(rel),
-            uri= uri
+            uri=uri,
+            **properties
         )
     
     def _create_assertion_node(self, uri, rest, properties):
