@@ -112,7 +112,6 @@ class ConceptNetGraph(object):
         )
     
     def _create_assertion_node(self, uri, rest, properties):
-
         """
         creates assertion node,
         uses rest as to get relevant component uris and pull up the relevant nodes
@@ -135,7 +134,6 @@ class ConceptNetGraph(object):
         return self._create_assertion_w_components(uri, relation, args, properties)
 
     def _create_assertion_w_components(self, uri, relation, args, properties):
-
         """
         creates assertion node,
         assigns relationships
@@ -145,16 +143,16 @@ class ConceptNetGraph(object):
         args:
         uri -- identifier of intended node, used in index
         rest -- relevant parts of uri needed as parameters
-        properties -- properties for assertions                 
+        properties -- properties for assertions
         """
 
         assertion = self.graph.node(   
             type='assertion', 
             uri=uri
         )
-        assertion.relationships.create("relation", relation)
+        self._create_edge("relation", assertion, relation)
         for i in xrange(len(args)):
-            assertion.relationships.create("arg", args[i], position=i+1)
+            self._create_edge("arg", assertion, args[i], {'position': i+1})
         for prop, value in properties.items():
             assertion[prop] = value
         return assertion
