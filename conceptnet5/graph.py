@@ -3,7 +3,6 @@ from neo4jrestclient.client import GraphDatabase, Node
 import urllib
 
 def uri_is_safe(uri):
-
     """
     Determines if this is a correctly-encoded URI, by checking for some
     common problems that would cause it to be incorrect.
@@ -14,7 +13,6 @@ def uri_is_safe(uri):
             and ' ' not in uri and '&' not in uri)
 
 def encode_uri(uri):
-
     """
     Takes in a URI and makes sure it follows our conventions:
     
@@ -29,7 +27,6 @@ def encode_uri(uri):
     return urllib.quote(uri)
 
 def decode_uri(uri):
-
     """
     Converts a URI to readable Unicode text.
     """
@@ -37,9 +34,7 @@ def decode_uri(uri):
     return unquoted.replace('_', ' ')
 
 class ConceptNetGraph(object):
-
     def __init__(self, url):
-
         """
         initializes ConceptNetGraph,
         creates GraphDatabase and node_index objects
@@ -53,7 +48,6 @@ class ConceptNetGraph(object):
         self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
 
     def _list_nodes_and_uris(self, input_list):
-
         uris = []
         nodes = []
         for index, node_uri in enumerate(input_list):
@@ -69,7 +63,6 @@ class ConceptNetGraph(object):
                 raise TypeError("%s is an invalid type. " %(invalid))
 
     def _create_node(self, uri, properties):
-
         """
         creates generic node object,
         parses uri, takes out args, identifies type of node and runs relevant method
@@ -91,7 +84,6 @@ class ConceptNetGraph(object):
         return method(self, url, rest, properties)
 
     def _create_concept_node(self, uri, rest, properties):
-
         """
         creates concept node,
         parses rest argument for language and name
@@ -112,7 +104,6 @@ class ConceptNetGraph(object):
         )
 
     def _create_relation_node(self, uri, rest, properties):
-
         """
         creates relation node,                                  
         uses rest as relation name
@@ -171,7 +162,6 @@ class ConceptNetGraph(object):
         return assertion
 
     def _create_assertion_expr_w_components(self, type, uri, relation_frame, args, properties):
-
         """
         creates assertion node,
         assigns relationships
@@ -197,7 +187,6 @@ class ConceptNetGraph(object):
         #return assertion
 
     def _create_frame_node(self, uri, rest, properties):
-
         """
         creates frame node,
         assigns name property
@@ -217,7 +206,6 @@ class ConceptNetGraph(object):
         ) 
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
-
         """creates assertion uri out of component uris"""
 
         for uri in [relation_uri] + arg_uri_list:
@@ -227,7 +215,6 @@ class ConceptNetGraph(object):
         return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
 
     def get_node(self, uri):
-
         """
         searches for node in main index,
         returns either single Node, None or Error (for multiple results)
@@ -353,7 +340,6 @@ class ConceptNetGraph(object):
         return self.get_node(uri) or self._create_assertion_from_components(self, uri, nodes[0],nodes[1:], properties)
 
     def get_or_create_expression(self, frame, args, properties = {}):
-
         """
         finds or creates expression using components of the expression:
         args, frame etc.
@@ -396,7 +382,6 @@ class ConceptNetGraph(object):
         return self.get_node(uri) or self._create_node(uri,{})
 
     def get_or_create_frame(self, name):
-
         """
         finds of creates frame using name of frame. convenience function.
 
