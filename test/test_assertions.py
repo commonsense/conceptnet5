@@ -5,6 +5,9 @@ def test_create_assertions_twice():
     g = ConceptNetGraph('http://tortoise.csc.media.mit.edu/db/data')
     a1 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
     assert a1 == g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
+    assert a1 == g.get_or_create_assertion(u'/relation/IsA',
+        [u'/concept/en/dog', u'/concept/en/animal']
+    )
 
     a2 = g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
     assert a2 == g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")

@@ -46,10 +46,10 @@ class ConceptNetGraph(object):
         uris = []
         nodes = []
         for index, node_uri in enumerate(input_list):
-            if isinstance(node_uri,Node):
+            if isinstance(node_uri, Node):
                 uris.append(node_uri['uri'])
                 nodes.append(node_uri)
-            elif uri_is_safe(node_uri):
+            elif isinstance(node_uri, basestring):
                 uris.append(node_uri)
                 nodes.append(self.get_or_create_node(node_uri))
             else:
@@ -219,6 +219,16 @@ class ConceptNetGraph(object):
         else:
             assert False, "Got multiple results for URI %r" % uri
 
+    def find_nodes(self, pattern):
+        """
+        Search for all nodes whose URIs match a given wildcard pattern,
+        using Lucene's wildcard syntax. Returns an iterator of the results.
+
+        See this document for Lucene's syntax:
+        http://lucene.apache.org/java/2_0_0/queryparsersyntax.html
+        """
+        return self._node_index.query('uri', pattern)
+
     def get_edges(self, source, target):
         """
         Get edges between `source` and `target`, specified as IDs or nodes.
@@ -325,8 +335,9 @@ class ConceptNetGraph(object):
                 if index == 0: invalid = 'relation'
                 else: invalid = 'argument ' + str(index)
                 raise TypeError("%s is an invalid type. " % invalid)
-        uri = self.make_assertion_uri(self, uris[0],uris[1:])
-        return self.get_node(uri) or self._create_assertion_from_components(self, uri, nodes[0],nodes[1:], properties)
+
+        uri = self.make_assertion_uri(uris[0], uris[1:])
+        return self.get_node(uri) or self._create_assertion_from_components(uri, nodes[0],nodes[1:], properties)
 
     def get_or_create_conjunction(self, conjuncts):
         conjuncts = [self._any_to_node(c) for c in conjuncts]
