@@ -1,3 +1,12 @@
+ConceptNet 5 is a new version of ConceptNet, expressed as a hypergraph using a graph
+database, or with interoperable formats such as n3.
+
+Documentation: https://github.com/commonsense/conceptnet5/wiki
+
+Design documentation
+====================
+(a bit out of date; see the Wiki)
+
 Assertions
 ----------
 
