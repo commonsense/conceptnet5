@@ -429,12 +429,12 @@ class ConceptNetGraph(object):
         weight.
         """
         assert weight > 0
-        return self.get_or_create_edge('normalized', source, target)
+        edge = self.get_or_create_edge('normalized', source, target)
         self.justify(source, target, weight)
         for node1, node2 in zip(self.get_args(source), self.get_args(target)):
             if node1 != node2:
                 self.get_or_create_edge('normalized', source, target)
-
+        return edge
 
 def get_graph():
     return ConceptNetGraph('http://tortoise.csc.media.mit.edu/db/data/')
