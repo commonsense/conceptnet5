@@ -155,6 +155,15 @@ class ConceptNetGraph(object):
             assertion['normalized'] = True
         return assertion
 
+    def _create_source_node(self, uri, rest, properties):
+        name = rest.split('/')[-1]
+        return self.graph.node(
+            type='source',
+            name=name,
+            uri=uri,
+            **properties
+        )
+    
     def _create_assertion_from_components(self, uri, relation, args, properties):
         """
         A helper function used in creating assertions. Given that the 
@@ -189,7 +198,8 @@ class ConceptNetGraph(object):
             type='frame',
             name=name,
             uri=uri
-        ) 
+        )
+
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
@@ -317,6 +327,23 @@ class ConceptNetGraph(object):
                 raise TypeError("%s is an invalid type. " % invalid)
         uri = self.make_assertion_uri(self, uris[0],uris[1:])
         return self.get_node(uri) or self._create_assertion_from_components(self, uri, nodes[0],nodes[1:], properties)
+
+    def get_or_create_conjunction(self, conjuncts):
+        conjuncts = [self._any_to_node(c) for c in conjuncts]
+        uris = [c['uri'] for c in conjuncts]
+        uris.sort()
+        uri = u"/conjunction/+" + (u'/+'.join(uris))
+        node = self.get_node(uri)
+
+        # Do we want to use the _create_node machinery? It doesn't quite fit.
+        if node is None:
+            node = self.graph.node(
+                type='conjunction',
+                uri=uri
+            )
+            for conjunct in conjuncts:
+                self.get_or_create_edge('conjunct', conjunct, node)
+        return node
 
     def get_or_create_expression(self, frame, args, properties = {}):
         """
