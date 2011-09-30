@@ -1,48 +1,43 @@
 # -*- coding: utf-8 -*-
 from neo4jrestclient.client import GraphDatabase, Node
 import urllib
+import re
 
-def uri_is_safe(uri):
+LUCENE_UNSAFE = re.compile(r'([-+&|!(){}\[\]^"~*?\\: ])')
+def lucene_escape(text):
     """
-    Determines if this is a correctly-encoded URI, by checking for some
-    common problems that would cause it to be incorrect.
+    URIs are searchable with Lucene. This might be awesome, but it means
+    that when looking them up, we have to escape out special characters by
+    prepending a backslash to them.
 
-    The output of encode_uri() should always pass uri_is_safe().
+    This should only be done inside a neo4j index.query().
     """
-    return (isinstance(uri, str) and ',' not in uri and ':' not in uri
-            and ' ' not in uri and '&' not in uri)
+    # The first two backslashes are understood by the expression as a
+    # literal backslash. The final \1 refers to what the expression matched.
+    #
+    # Fun fact: if Python didn't have raw strings, the replacement string
+    # would have to be '\\\\\\1'.
+    return LUCENE_UNSAFE.sub(r'\\\1', text)
 
-def encode_uri(uri):
+def normalize_uri(uri):
     """
-    Takes in a URI and makes sure it follows our conventions:
-    
-    - expressed as a UTF-8 string
-    - spaces are changed to underscores
-    - URL-encoded, so for example a comma becomes %2C
-    """
-    if isinstance(uri, unicode):
-        uri = uri.replace(u' ', u'_').encode('utf-8', 'replace')
-    else:
-        uri = uri.replace(' ', '_')
-    return urllib.quote(uri)
+    Ensure that a URI is in Unicode, strip whitespace that may have crept
+    in, and change spaces to underscores, creating URIs that will be
+    friendlier to work with later.
 
-def decode_uri(uri):
+    We don't worry about URL-quoting here; the client framework takes
+    care of that for us.
     """
-    Converts a URI to readable Unicode text.
-    """
-    unquoted = urllib.unquote(uri).decode('utf-8', 'replace')
-    return unquoted.replace('_', ' ')
+    if isinstance(uri, str):
+        uri = uri.decode('utf-8')
+    return uri.strip().replace(u' ', u'_')
 
 class ConceptNetGraph(object):
     def __init__(self, url):
         """
-        initializes ConceptNetGraph,
-        creates GraphDatabase and node_index objects
-           
-        args:
-        url -- url of neo4j database in use
+        Create a ConceptNetGraph object, backed by a Neo4j databases at the
+        given URL.
         """
-
         self.graph = GraphDatabase(url)
         self._node_index = self.graph.nodes.indexes['node_auto_index']
         self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
@@ -71,17 +66,21 @@ class ConceptNetGraph(object):
         uri -- identifier of intended node, used in index
         properties -- (optional) properties for assertions (see assertions)
         """
+        # Apply normalization to the URI here. All downstream functions can
+        # assume it's normalized.
+        uri = normalize_uri(uri)
 
         if uri.count('/') < 2:
             raise ValueError("""
             The URI %r is too short. You can't create the root or
             a type with this method.
             """ % uri) 
+        
         _, type, rest = uri.split('/', 2)
         method = getattr(self, '_create_%s_node' % type)
         if method is None:
             raise ValueError("I don't know how to create type %r" % type)
-        return method(self, url, rest, properties)
+        return method(uri, rest, properties)
 
     def _create_concept_node(self, uri, rest, properties):
         """
@@ -99,7 +98,7 @@ class ConceptNetGraph(object):
         return self.graph.node(
             type='concept',
             language=language,
-            name=decode_uri(name),
+            name=name,
             uri=uri,
             **properties
         )
@@ -119,7 +118,7 @@ class ConceptNetGraph(object):
         name = rest
         return self.graph.node(
             type='relation',
-            name=decode_uri(rel),
+            name=rel,
             uri=uri,
             **properties
         )
@@ -144,7 +143,7 @@ class ConceptNetGraph(object):
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris: args.append(self.get_or_create_node(arg_uri))
-        return self._create_assertion_from_components(uri, relation, args, properties)
+        return self._create_assertion_from_components(uri, rel, args, properties)
     
     def _create_assertion_from_components(self, uri, relation, args, properties):
         """
@@ -153,7 +152,7 @@ class ConceptNetGraph(object):
         create the assertion.
         """
         assertion = self.graph.node(   
-            type=type, 
+            type='assertion',
             uri=uri
         )
         self._create_edge("relation", assertion, relation)
@@ -203,17 +202,12 @@ class ConceptNetGraph(object):
         name = rest
         return self.graph.node(
             type='frame',
-            name=decode_uri(rel),
-            uri= uri
+            name=rel,
+            uri=uri
         ) 
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
-
-        for uri in [relation_uri] + arg_uri_list:
-            if not uri_is_safe(uri):
-                raise ValueError("The URI %r has unsafe characters in it. "
-                                 "Please use encode_uri() first." % uri)
         return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
 
     def get_node(self, uri):
@@ -221,11 +215,8 @@ class ConceptNetGraph(object):
         searches for node in main index,
         returns either single Node, None or Error (for multiple results)
         """
-
-        if not uri_is_safe(uri):
-            raise ValueError("This URI has unsafe characters in it. "
-                             "Please use encode_uri() first.")
-        results = self._node_index.query('uri', uri)
+        uri = normalize_uri(uri)
+        results = self._node_index.query('uri', lucene_escape(uri))
         if len(results) == 1:
             return results[0]
         elif len(results) == 0:
@@ -278,13 +269,13 @@ class ConceptNetGraph(object):
         else:
             raise TypeError
 
-    def _create_edge(self, type, source, target, props):
+    def _create_edge(self, type, source, target, props = {}):
         """
         Create an edge and ensure that it is indexed by its nodes.
         """
         source = self._any_to_node(source)
         target = self._any_to_node(target)
-        edge = source.relationships.create(type, target, props)
+        edge = source.relationships.create(type, target, **props)
         edge['nodes'] = '%d-%d' % (source.id, target.id)
 
     def get_node_by_id(self, id):
@@ -331,7 +322,7 @@ class ConceptNetGraph(object):
             if isinstance(node_uri,Node):
                 uris.append(node_uri['uri'])
                 nodes.append(node_uri)
-            elif uri_is_safe(node_uri):
+            elif isinstance(node_uri, basestring):
                 uris.append(node_uri)
                 nodes.append(self.get_or_create_node(node_uri))
             else:
@@ -351,7 +342,7 @@ class ConceptNetGraph(object):
         args:
         relation -- relation node in desired expression
         args -- argument nodes desired in expression
-        properties -- properties for 
+        properties -- properties for FIXME
         """
 
         #uris = []
@@ -368,7 +359,7 @@ class ConceptNetGraph(object):
         name -- name of concept ie. 'dog','fish' etc
         """
 
-        uri = "/concept/%s/%s" % (language, uri_encode(name))
+        uri = "/concept/%s/%s" % (language, name)
         return self.get_node(uri) or self._create_node(uri,{})
 
     def get_or_create_relation(self, name):
@@ -380,18 +371,18 @@ class ConceptNetGraph(object):
         name -- name of relation ie. 'IsA'
         """
 
-        uri = "/concept/%s" % (uri_encode(name))
-        return self.get_node(uri) or self._create_node(uri,{})
+        uri = "/concept/%s" % name
+        return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_frame(self, name):
         """
         finds of creates frame using name of frame. convenience function.
 
         args:
-        name -- name of frame, ie. "{1} is used for {2}"
+        name -- name of frame, ie. "$1 is used for $2"
         """
 
-        uri = "/frame/%s" % (uri_encode(name))
+        uri = "/frame/%s" % name
         return self.get_node(uri) or self._create_node(uri,{})
 
     #def get_args(self,assertion):
@@ -414,14 +405,17 @@ class ConceptNetGraph(object):
 
 if __name__ == '__main__':
     g = ConceptNetGraph('http://localhost:7474/db/data')
-    a1 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal"))
+    a1 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
 
-    a2 = g.get_or_create_node(encode_uri(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺"))
+    a2 = g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
     
-    a3 = g.get_or_create_node(encode_uri("/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works"))
+    a3 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works")
 
+    g.get_or_create_edge('justify', 0, a1)
+    g.get_or_create_edge('justify', 0, a2)
     print a1['uri'], a1.id
     print a2['uri'], a2.id
     print a3['uri'], a3.id
-    print g.get_edge('justify', 0, 474).id
+    print g.get_edge('justify', 0, a1.id).id
+    print g.get_edge('justify', 0, a2.id).id
 
