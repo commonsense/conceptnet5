@@ -176,7 +176,8 @@ class ConceptNetGraph(object):
             type='frame',
             name=name,
             language=language,
-            uri=uri
+            uri=uri,
+            **properties
         )
 
     def _create_relation_node(self, uri, rest, properties):

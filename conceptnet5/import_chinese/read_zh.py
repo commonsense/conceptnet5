@@ -34,7 +34,8 @@ def handle_file(filename):
             print conjunction['uri']
             GRAPH.justify(conjunction, raw)
 
-for filename in os.listdir('.'):
-    if filename.startswith('conceptnet_zh_'):
-        handle_file(filename)
+if __name__ == '__main__':
+    for filename in os.listdir('.'):
+        if filename.startswith('conceptnet_zh_'):
+            handle_file(filename)
 
