@@ -8,6 +8,8 @@ GRAPH = get_graph()
 
 def handle_file(filename):
     petgame = GRAPH.get_or_create_node(u'/source/activity/petgame')
+    GRAPH.justify(0, petgame)
+
     for line in codecs.open(filename, encoding='utf-8', errors='replace'):
         line = line.strip()
         if line:
@@ -20,12 +22,13 @@ def handle_file(filename):
             print assertion_uri
             assertion = GRAPH.get_or_create_node(assertion_uri)
 
-            raw_uri = u"/assertion/_/frame/%s/_/concept/zh_TW/%s/_/concept/zh_TW/%s" % (frame.text, concept1, concept2)
+            raw_uri = u"/assertion/_/frame/zh_TW/%s/_/concept/zh_TW/%s/_/concept/zh_TW/%s" % (frame.text, concept1, concept2)
             raw = GRAPH.get_or_create_node(raw_uri)
             GRAPH.derive_normalized(raw, assertion)
 
             source_uri = u"/source/contributor/petgame/%s" % user
             source = GRAPH.get_or_create_node(source_uri)
+            GRAPH.justify(0, source)
             
             conjunction = GRAPH.get_or_create_conjunction([source, petgame])
             print conjunction['uri']
