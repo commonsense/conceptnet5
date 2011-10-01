@@ -2,7 +2,7 @@
 
 from conceptnet5.graph import *
 def test_create_assertions_twice():
-    g = ConceptNetGraph('http://tortoise.csc.media.mit.edu/db/data')
+    g = ConceptNetGraph('http://localhost:7474/db/data')
     a1 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
     assert a1 == g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
     assert a1 == g.get_or_create_assertion(u'/relation/IsA',

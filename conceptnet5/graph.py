@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from neo4jrestclient.client import GraphDatabase, Node
+from conceptnet5.justify import parallel
 import urllib
 import re
 
@@ -100,6 +101,7 @@ class ConceptNetGraph(object):
             language=language,
             name=name,
             uri=uri,
+            score=0,
             **properties
         )
 
@@ -120,6 +122,7 @@ class ConceptNetGraph(object):
             type='relation',
             name=name,
             uri=uri,
+            score=0,
             **properties
         )
     
@@ -161,6 +164,7 @@ class ConceptNetGraph(object):
             type='source',
             name=name,
             uri=uri,
+            score=0,
             **properties
         )
     
@@ -172,6 +176,7 @@ class ConceptNetGraph(object):
         """
         assertion = self.graph.node(   
             type='assertion',
+            score=0,
             uri=uri
         )
         self._create_edge("relation", assertion, relation)
@@ -198,6 +203,7 @@ class ConceptNetGraph(object):
             type='frame',
             name=name,
             language=language,
+            score=0,
             uri=uri
         )
 
@@ -352,8 +358,15 @@ class ConceptNetGraph(object):
                 type='conjunction',
                 uri=uri
             )
+            inverse_sum = 0.0
             for conjunct in conjuncts:
                 self.get_or_create_edge('conjunct', conjunct, node)
+                if conjunct['score'] > 0 and inverse_sum is not None:
+                    inverse_sum += 1./conjunct['score']
+                else:
+                    inverse_sum = None
+            if inverse_sum is not None:
+                node.score = 1./inverse_sum
         return node
 
     def get_or_create_expression(self, frame, args, properties = {}):
@@ -428,8 +441,17 @@ class ConceptNetGraph(object):
         The weight represents the strength of the justification, from
         -1 to 1.
         """
-        return self.get_or_create_edge('justifies', source, target,
+        edge = self.get_or_create_edge('justifies', source, target,
                                        {'weight': weight})
+        self.recompute_score(target)
+        return edge
+
+    def recompute_score(self, node):
+        score = 0
+        for edge in node.relationships.incoming(types=['justify']):
+            score += edge.start['score']
+        node['score'] = score
+        return score
 
     def derive_normalized(self, source, target, weight=1.0):
         """

@@ -1,6 +1,7 @@
-from neo4jrestclient.client import GraphDatabase, Index, Node
-
 def fuzzy_logic_scale(score):
+    """
+    Translate a summed score into a fuzzy truth value from 0 to 1.
+    """
     if score < 0.:
         return 0.
     return score / (1.0+score)
