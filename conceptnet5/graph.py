@@ -468,7 +468,7 @@ class ConceptNetGraph(object):
         if node['type'] == 'source':
             for rel_node in node.relationships.outgoing():
                 if rel_node['type'] == 'conjunction': conj_list.append(rel_node)
-        else:
+        elif node['type'] != 'conjunction':
             for edge in node.relationships.incoming():
                 if edge.start['type'] == 'assertion':
                     delete = False
