@@ -3,6 +3,23 @@ from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.justify import parallel
 import urllib
 import re
+import json
+
+def list_to_uri_piece(lst):
+    """
+    Encode a list in a format suitable for a URI, by representing it in a
+    form of JSON.
+    """
+    json_str = json.dumps(lst, ensure_ascii=False)
+    json_unicode = json_str.decode('utf-8')
+    return json_unicode.replace(u' ', u'')
+
+def uri_piece_to_list(uri):
+    """
+    Undo the effect of `list_to_uri_piece` by decoding the string from
+    JSON.
+    """
+    return json.loads(uri)
 
 LUCENE_UNSAFE = re.compile(r'([-+&|!(){}\[\]^"~*?\\: ])')
 def lucene_escape(text):
@@ -77,7 +94,7 @@ class ConceptNetGraph(object):
         """
         source = self._any_to_node(source)
         target = self._any_to_node(target)
-        edge = source.relationships.create(type, target, **props)
+        edge = source.relationships.create(type, target, **properties)
         edge['nodes'] = '%d-%d' % (source.id, target.id)
         return edge
 
@@ -112,10 +129,9 @@ class ConceptNetGraph(object):
         rest -- relevant parts of uri needed as parameters
         properties -- properties for assertions
         """
-
-        rest = '/' + rest
-        _,rel_uri,args_uris = rest.split('/_',2)
-        arg_uris = args_uris.split('/_')
+        uri_parts = uri_piece_to_list(rest)
+        rel_uri = uri_parts[0]
+        arg_uris = uri_parts[1:]
         args = []
         rel = self.get_or_create_node(rel_uri)
         for arg_uri in arg_uris:
@@ -154,24 +170,6 @@ class ConceptNetGraph(object):
             **properties
         )
     
-    def _create_assertion_from_components(self, uri, relation, args, properties):
-        """
-        A helper function used in creating assertions. Given that the 
-        relation and args have been found or created as nodes, use them to
-        create the assertion.
-        """
-        assertion = self.graph.node(   
-            type='assertion',
-            score=0,
-            uri=uri
-        )
-        self._create_edge("relation", assertion, relation)
-        for i in xrange(len(args)):
-            self._create_edge("arg", assertion, args[i], {'position': i+1})
-        for prop, value in properties.items():
-            assertion[prop] = value
-        return assertion
-
     def _create_frame_node(self, uri, rest, properties):
         """
         creates frame node,
@@ -236,7 +234,12 @@ class ConceptNetGraph(object):
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
-        return normalize_uri('/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list))
+        return '/assertion/' + list_to_uri_piece([relation_uri] + arg_uri_list)
+
+    def make_list_uri(self, type, args):
+        """Creates any list-based uri out of component uris"""
+        arglist = list_to_uri_piece(args)
+        return '/%s/%s' % (type, arglist)
 
     def get_node(self, uri):
         """
@@ -371,7 +374,6 @@ class ConceptNetGraph(object):
         language -- language code ie. 'en'
         name -- name of concept ie. 'dog','fish' etc
         """
-
         uri = "/concept/%s/%s" % (language, name)
         return self.get_node(uri) or self._create_node(uri,{})
 
@@ -383,7 +385,7 @@ class ConceptNetGraph(object):
         conjuncts = [self._any_to_node(c) for c in conjuncts]
         uris = [c['uri'] for c in conjuncts]
         uris.sort()
-        uri = u"/conjunction/+" + (u'/+'.join(uris))
+        uri = u"/conjunction/" + list_to_uri_piece(uris)
         node = self.get_node(uri)
 
         # Do we want to use the _create_node machinery? It doesn't quite fit.
