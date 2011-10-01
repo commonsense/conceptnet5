@@ -94,7 +94,7 @@ class ConceptNetGraph(object):
 
         source = self._any_to_node(source)
         target = self._any_to_node(target)
-        edge = source.relationships.create(type, target, **props)
+        edge = source.relationships.create(type, target, **properties)
         edge['nodes'] = '%d-%d' % (source.id, target.id)
         return edge
 
