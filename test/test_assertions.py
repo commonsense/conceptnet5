@@ -3,20 +3,17 @@
 from conceptnet5.graph import *
 def test_create_assertions_twice():
     g = ConceptNetGraph('http://localhost:7474/db/data')
-    a1 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
-    assert a1 == g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/dog/_/concept/en/animal")
+    a1 = g.get_or_create_node(u'/assertion/["/relation/IsA","/concept/en/dog","/concept/en/animal"]')
+    assert a1 == g.get_or_create_node(u'/assertion/["/relation/IsA","/concept/en/dog","/concept/en/animal"]')
     assert a1 == g.get_or_create_assertion(u'/relation/IsA',
         [u'/concept/en/dog', u'/concept/en/animal']
     )
 
-    a2 = g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
-    assert a2 == g.get_or_create_node(u"/assertion/_/relation/UsedFor/_/concept/zh_TW/枕頭/_/concept/zh_TW/睡覺")
+    a2 = g.get_or_create_node(u'/assertion/["/relation/UsedFor","/concept/zh_TW/枕頭","/concept/zh_TW/睡覺"]')
+    assert a2 == g.get_or_create_node(u'/assertion/["/relation/UsedFor","/concept/zh_TW/枕頭","/concept/zh_TW/睡覺"]')
     
-    a3 = g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works")
-    assert a3 == g.get_or_create_node(u"/assertion/_/relation/IsA/_/concept/en/test_:D/_/concept/en/it works")
-
-    just1 = g.get_or_create_edge('justify', 0, a1)
-    just2 = g.get_or_create_edge('justify', 0, a2)
-    assert just1 == g.get_or_create_edge('justify', 0, a1)
+    just1 = g.get_or_create_edge('justify', 0, a1, {'weight': 0.1})
+    just2 = g.get_or_create_edge('justify', 0, a2, {'weight': 0.1})
+    assert just1 == g.get_or_create_edge('justify', 0, a1, {'weight': 0.1})
     # TODO: clean up
     
