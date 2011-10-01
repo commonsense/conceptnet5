@@ -113,7 +113,7 @@ class ConceptNetGraph(object):
         """
 
         rest = '/' + rest
-        _,rel_uri,args_uris= rest.split('/_',2)
+        _,rel_uri,args_uris = rest.split('/_',2)
         arg_uris = args_uris.split('/_')
         args = []
         rel = self.get_or_create_node(rel_uri)
@@ -215,7 +215,7 @@ class ConceptNetGraph(object):
 
     def make_assertion_uri(self, relation_uri, arg_uri_list):
         """creates assertion uri out of component uris"""
-        return '/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list)
+        return normalize_uri('/assertion/_' + relation_uri + '/_' + '/_'.join(arg_uri_list))
 
     def get_node(self, uri):
         """
@@ -398,6 +398,19 @@ class ConceptNetGraph(object):
         uri = "/concept/%s" % name
         return self.get_node(uri) or self._create_node(uri, {})
 
+    def get_or_create_source(self, source_list):
+        """
+        finds or creates source using a list of the source uri components.
+        convenience function.
+
+        args:
+        source_list -- list of source components ex. for '/source/contributor/omcs/bedume'
+        source_list would be ['contributor','omcs','bedume']
+        """
+
+        uri = self.normalize_uri("source/" + "/".join(source_list))
+        return self.get_node(uri) or self._create_node(uri, {})
+
     def get_args(self, assertion):
         """
         Given an assertion, get its arguments as a list.
@@ -437,6 +450,34 @@ class ConceptNetGraph(object):
             if not (node1 == node2):
                 self.get_or_create_edge('normalized', source, target)
         return edge
+
+    def delete_node(self, obj):
+        """
+        This function deletes nodes safely by checking their connections
+        and confirming that they are superfluous for the network. It also
+        deletes conjunctions that are reliant on the assumption that 
+        sources are the only things that point to conjunctions
+
+        args:
+        obj -- a uri, id or node object that is the target of the deletion
+        """
+
+        node = self._any_to_node(obj)
+        delete = True
+        conj_list = []
+        if node['type'] == 'source':
+            for rel_node in node.relationships.outgoing():
+                if rel_node['type'] == 'conjunction': conj_list.append(rel_node)
+        else:
+            for edge in node.relationships.incoming():
+                if edge.start['type'] == 'assertion':
+                    delete = False
+                    break
+        if delete:
+            for edge in node.relationships(): edge.delete()
+            for conjunction in conj_list: conjunction.delete()
+            node.delete()
+        else: assert False, "There are other nodes that are dependent on this node"
 
 def get_graph():
     return ConceptNetGraph('http://tortoise.csc.media.mit.edu/db/data/')
