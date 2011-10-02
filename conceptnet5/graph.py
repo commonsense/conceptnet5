@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.justify import parallel
+from conceptnet5.config import get_auth
 import urllib
 import re
 import json
@@ -54,14 +55,19 @@ def normalize_uri(uri):
     return uri.strip().replace(u' ', u'_')
 
 class ConceptNetGraph(object):
-
-    def __init__(self, url):
+    def __init__(self, domain):
         """
-        Create a ConceptNetGraph object, backed by a Neo4j databases at the
+        Create a ConceptNetGraph object, backed by a Neo4j database at the
         given URL.
         """
 
+        #auth = get_auth()
+        #url = 'http://%s:%s@%s/db/data' %\
+        #    (auth['username'], auth['password'], domain)
+        #
+        url = 'http://%s/db/data' % domain
         self.graph = GraphDatabase(url)
+
         self._node_index = self.graph.nodes.indexes['node_auto_index']
         self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
 
@@ -524,4 +530,4 @@ class ConceptNetGraph(object):
         else: assert False, "There are other nodes that are dependent on this node"
 
 def get_graph():
-    return ConceptNetGraph('http://localhost:7474/db/data/')
+    return ConceptNetGraph('tortoise.csc.media.mit.edu')

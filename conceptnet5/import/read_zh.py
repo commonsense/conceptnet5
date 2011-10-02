@@ -21,22 +21,20 @@ def handle_file(filename):
                 [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
                 {'dataset': 'conceptnet/zh_TW'}
             )
-            print assertion['uri']
 
             raw = GRAPH.get_or_create_assertion(
                 '/frame/zh_TW/'+frame.text,
                 [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
                 {'dataset': 'conceptnet/zh_TW'}
             )
-            print raw['uri']
 
             source_uri = u"/source/contributor/petgame/%s" % user
             source = GRAPH.get_or_create_node(source_uri)
             GRAPH.justify(0, source, weight=0.5)
             
             conjunction = GRAPH.get_or_create_conjunction([source, petgame])
-            print conjunction['uri']
             GRAPH.justify(conjunction, raw)
+            print GRAPH.derive_normalized(raw, assertion)
 
 if __name__ == '__main__':
     for filename in os.listdir('.'):
