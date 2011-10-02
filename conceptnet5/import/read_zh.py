@@ -1,6 +1,5 @@
 from conceptnet.models import Frame
-from conceptnet5.graph import get_graph, list_to_uri_pieces
-import divisi2
+from conceptnet5.graph import get_graph
 import os
 import codecs
 
@@ -25,9 +24,10 @@ def handle_file(filename):
             print assertion['uri']
 
             raw = GRAPH.get_or_create_assertion(
-                '/frame/'+frame.text,
+                '/frame/zh_TW/'+frame.text,
                 [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
                 {'dataset': 'conceptnet/zh_TW'}
+            )
             print raw['uri']
 
             source_uri = u"/source/contributor/petgame/%s" % user

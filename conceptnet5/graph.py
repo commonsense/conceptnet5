@@ -11,7 +11,10 @@ def list_to_uri_piece(lst):
     form of JSON.
     """
     json_str = json.dumps(lst, ensure_ascii=False)
-    json_unicode = json_str.decode('utf-8')
+    if isinstance(json_str, unicode):
+        json_unicode = json_str
+    else:
+        json_unicode = json_str.decode('utf-8')
     return json_unicode.replace(u' ', u'')
 
 def uri_piece_to_list(uri):
@@ -298,13 +301,16 @@ class ConceptNetGraph(object):
         else:
             raise TypeError
 
-    def _any_to_node(self, obj):
+    def _any_to_node(self, obj, create=False):
         if isinstance(obj, Node):
             return obj
         elif isinstance(obj, basestring):
             node = self.get_node(obj)
             if node is None:
-                raise ValueError("Could not find node %r" % obj)
+                if create:
+                    node = self.get_or_create_node(obj)
+                else:
+                    raise ValueError("Could not find node %r" % obj)
             return node
         elif isinstance(obj, int):
             return self.get_node_by_id(obj)
@@ -363,7 +369,7 @@ class ConceptNetGraph(object):
 
         uri = self.make_assertion_uri(self._any_to_uri(relation),[self._any_to_uri(arg) for arg in args])
         return (self.get_node(uri) or 
-        self._create_assertion_from_components(uri, _any_to_node(relation), [self._any_to_node(arg) for arg in args], properties))
+        self._create_assertion_from_components(uri, self._any_to_node(relation, create=True), [self._any_to_node(arg, create=True) for arg in args], properties))
 
     def get_or_create_concept(self, language, name):
         """
@@ -518,4 +524,4 @@ class ConceptNetGraph(object):
         else: assert False, "There are other nodes that are dependent on this node"
 
 def get_graph():
-    return ConceptNetGraph('http://tortoise.csc.media.mit.edu/db/data/')
+    return ConceptNetGraph('http://localhost:7474/db/data/')
