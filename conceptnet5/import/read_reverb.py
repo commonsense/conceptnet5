@@ -7,7 +7,7 @@ import codecs
 import nltk
 import os
 
-#GRAPH = get_graph()
+GRAPH = get_graph()
 nl = get_nl('en')
 
 def contain_single_be(tokens, tags):
@@ -57,20 +57,17 @@ def output_sentence(arg1, arg2, arg3, relation, prep=None):
     arg2 = nl.normalize(arg2).strip()
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
-        """
         assertion = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             ['/concept/en/'+arg1, '/concept/en/'+arg2],
             {'dataset': 'reverb/en'}
         )
-        """
     else:
         if arg3.strip() == "": # Remove "A before/after/off" sentence
             return
         arg3 = nl.normalize(arg3).strip()
         print '%s(%s, %s), %s(%s, %s)' % \
             (relation, arg1, arg2, prep, arg2, arg3)
-        """
         assertion1 = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             ['/concept/en/'+arg1, '/concept/en/'+arg2],
@@ -82,7 +79,6 @@ def output_sentence(arg1, arg2, arg3, relation, prep=None):
             {'dataset': 'reverb/en'}
         )
         assertion = GRAPH.get_or_create_conjunction([assertion1, assertion2])
-        """
 
 def handle_file(filename):
     for line in codecs.open(filename, encoding='utf-8', errors='replace'):
