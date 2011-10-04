@@ -55,16 +55,23 @@ def normalize_uri(uri):
     return uri.strip().replace(u' ', u'_')
 
 class ConceptNetGraph(object):
+    """
+    This class acts as a container for all of the functions necessary to interact with
+    the Concept Net graph database. It has the ability to creata Node objects, representing
+    types of nodes like assertions, concepts, conjunctions, frames, relations, and sources.
+    It can also produce different types of edges, including justifications, and edges connecting
+    assertions with their relations and arguments. Methods in this class can also find nodes,
+    generate uris and translate uris, nodes and ids into each other.
+
+    """
     def __init__(self, domain):
         """
         Create a ConceptNetGraph object, backed by a Neo4j database at the
         given URL.
         """
-
         #auth = get_auth()
         #url = 'http://%s:%s@%s/db/data' %\
         #    (auth['username'], auth['password'], domain)
-        #
         url = 'http://%s/db/data' % domain
         self.graph = GraphDatabase(url)
 
@@ -91,19 +98,19 @@ class ConceptNetGraph(object):
             a type with this method.
             """ % uri) 
         
-        _, type, rest = uri.split('/', 2)
-        method = getattr(self, '_create_%s_node' % type)
+        _, _type, rest = uri.split('/', 2)
+        method = getattr(self, '_create_%s_node' % _type)
         if method is None:
-            raise ValueError("I don't know how to create type %r" % type)
+            raise ValueError("I don't know how to create type %r" % _type)
         return method(uri, rest, properties)
 
-    def _create_edge(self, type, source, target, properties = {}):
+    def _create_edge(self, _type, source, target, properties = {}):
         """
-        Create an edge and ensure that it is indexed by its nodes.
-        """
+	Create an edge and ensure that it is indexed by its nodes.
+	"""
         source = self._any_to_node(source)
         target = self._any_to_node(target)
-        edge = source.relationships.create(type, target, **properties)
+        edge = source.relationships.create(_type, target, **properties)
         edge['nodes'] = '%d-%d' % (source.id, target.id)
         return edge
 
@@ -111,7 +118,7 @@ class ConceptNetGraph(object):
         """
         A helper function used in creating assertions. Given that the
         relation and args have been found or created as nodes, use them to
-        create the assertion.
+	create the assertion.
         """
 
         assertion = self.graph.node(
@@ -245,10 +252,10 @@ class ConceptNetGraph(object):
         """creates assertion uri out of component uris"""
         return '/assertion/' + list_to_uri_piece([relation_uri] + arg_uri_list)
 
-    def make_list_uri(self, type, args):
+    def make_list_uri(self, _type, args):
         """Creates any list-based uri out of component uris"""
         arglist = list_to_uri_piece(args)
-        return '/%s/%s' % (type, arglist)
+        return '/%s/%s' % (_type, arglist)
 
     def get_node(self, uri):
         """
@@ -275,14 +282,14 @@ class ConceptNetGraph(object):
         """
         return self._node_index.query('uri', pattern)
 
-    def get_edge(self, type, source, target):
+    def get_edge(self, _type, source, target):
         """
         Get an existing edge between two nodes with the specified type, or None
         if it doesn't exist.
         """
         edges = self.get_edges(source, target)
         for edge in edges:
-            if edge.type == type:
+            if edge.type == _type:
                 return edge
         return None
 
@@ -294,7 +301,25 @@ class ConceptNetGraph(object):
         target = self._any_to_id(target)
         return self._edge_index.query('nodes', '%d-%d' % (source, target))
 
+    def query_edges(self, nodes = 0, start_edge = 1, stop_edge = 1):
+        """
+        Queries the edges from the node(s) given, from the start edge to the start edge,
+        and returns them as a list (or list of lists if a list of nodes is provided
+        """
+        if type(nodes) == int:
+            nodes = [nodes]
+        for index, node in enumerate(nodes):
+            nodes[index] = self._any_to_id(node)
+        return_list = []
+        for node in nodes:
+            query = 'g.v(' + str(node) + '.out[' + start_edge + '..' + stop_edge + ']'
+            return_list.append(self.graph.extensions.GremlinPlugin.execute_script(script=query))
+        if len(return_list) == 1:
+            return_list = return_list[0]
+        return return_list
+
     def _any_to_id(self, obj):
+        """Converts any given input in the form of an id, uri or node into an id number."""
         if isinstance(obj, Node):
             return obj.id
         elif isinstance(obj, basestring):
@@ -308,6 +333,7 @@ class ConceptNetGraph(object):
             raise TypeError
 
     def _any_to_node(self, obj, create=False):
+        """Converts any given input in the form of an id, uri or node into a node object."""
         if isinstance(obj, Node):
             return obj
         elif isinstance(obj, basestring):
@@ -324,6 +350,7 @@ class ConceptNetGraph(object):
             raise TypeError
 
     def _any_to_uri(self, obj):
+        """Converts any given input in the form of an id, uri or node into a uri string."""
         if isinstance(obj, Node):
             return obj['uri']
         elif isinstance(obj, basestring):
@@ -333,12 +360,12 @@ class ConceptNetGraph(object):
         else:
             raise TypeError
 
-    def get_node_by_id(self, id):
+    def get_node_by_id(self, _id):
         """
         Get a node by its ID in the database.
         """
 
-        return self.graph.nodes[id]
+        return self.graph.nodes[_id]
 
     def get_or_create_node(self, uri, properties = {}):
         """
@@ -351,14 +378,14 @@ class ConceptNetGraph(object):
 
         return self.get_node(uri) or self._create_node(uri, properties)
 
-    def get_or_create_edge(self, type, source, target, properties = {}):
+    def get_or_create_edge(self, _type, source, target, properties = {}):
         """
         Get an edge of the specified `type` between `source` and `target`.
         If it doesn't exist, create it with the given properties.
         """
 
-        return (self.get_edge(type, source, target) or
-                self._create_edge(type, source, target, properties))
+        return (self.get_edge(_type, source, target) or
+                self._create_edge(_type, source, target, properties))
 
     def get_or_create_assertion(self, relation, args, properties = {}):
         """
@@ -371,11 +398,11 @@ class ConceptNetGraph(object):
         relation -- relation node in desired assertion
         args -- argument nodes desired in assertion
         properties -- properties for assertion
-        """
 
-        uri = self.make_assertion_uri(self._any_to_uri(relation),[self._any_to_uri(arg) for arg in args])
+        """
+        uri = self.make_assertion_uri(self._any_to_uri(relation), [self._any_to_uri(arg) for arg in args])
         return (self.get_node(uri) or 
-        self._create_assertion_from_components(uri, self._any_to_node(relation, create=True), [self._any_to_node(arg, create=True) for arg in args], properties))
+        self._create_assertion_from_components(uri, self._any_to_node(relation, create=True),[self._any_to_node(arg, create=True) for arg in args], properties))
 
     def get_or_create_concept(self, language, name):
         """
@@ -387,7 +414,7 @@ class ConceptNetGraph(object):
         name -- name of concept ie. 'dog','fish' etc
         """
         uri = "/concept/%s/%s" % (language, name)
-        return self.get_node(uri) or self._create_node(uri,{})
+        return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_conjunction(self, conjuncts):
         """
@@ -426,7 +453,7 @@ class ConceptNetGraph(object):
         """
 
         uri = "/frame/%s" % name
-        return self.get_node(uri) or self._create_node(uri,{})
+        return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_relation(self, name):
         """
@@ -450,7 +477,7 @@ class ConceptNetGraph(object):
         source_list would be ['contributor','omcs','bedume']
         """
 
-        uri = self.normalize_uri("source/" + "/".join(source_list))
+        uri = normalize_uri("source/" + "/".join(source_list))
         return self.get_node(uri) or self._create_node(uri, {})
 
     def get_args(self, assertion):
@@ -478,6 +505,10 @@ class ConceptNetGraph(object):
         return edge
 
     def recompute_score(self, node):
+        """
+        Given a node object, recompute the 'justification' score based on the justify nodes.
+	Can be run after the justify nodes are updated with new nodes or new value.
+        """
         score = 0
         for edge in node.relationships.incoming(types=['justify']):
             score += edge.start['score']
@@ -517,17 +548,21 @@ class ConceptNetGraph(object):
         conj_list = []
         if node['type'] == 'source':
             for rel_node in node.relationships.outgoing():
-                if rel_node['type'] == 'conjunction': conj_list.append(rel_node)
+                if rel_node['type'] == 'conjunction':
+                    conj_list.append(rel_node)
         elif node['type'] != 'conjunction':
             for edge in node.relationships.incoming():
                 if edge.start['type'] == 'assertion':
                     delete = False
                     break
         if delete:
-            for edge in node.relationships(): edge.delete()
-            for conjunction in conj_list: conjunction.delete()
+            for edge in node.relationships():
+                edge.delete()
+            for conjunction in conj_list:
+                conjunction.delete()
             node.delete()
         else: assert False, "There are other nodes that are dependent on this node"
 
 def get_graph():
+    """Return a graph object representing the Concept Net graph hosted on the tortoise server for the Concept Net team."""
     return ConceptNetGraph('tortoise.csc.media.mit.edu')
