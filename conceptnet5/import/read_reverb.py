@@ -3,12 +3,18 @@ Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
 from conceptnet5.graph import get_graph
 from simplenlp import get_nl
+from urlparse import urlparse
 import codecs
 import nltk
 import os
 
 GRAPH = get_graph()
 nl = get_nl('en')
+
+reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
+GRAPH.justify(0, reverb)
+reverb_object = GRAPH.get_or_create_node(u'/source/rule/extract_reverb_objects')
+GRAPH.justify(0, reverb_object)
 
 def contain_single_be(tokens, tags):
     be = ['is', 'are', 'was', 'were', 'be']
@@ -47,14 +53,18 @@ def remove_tags(tokens, tags, target):
       tags.remove(tags[index_rb])
     return tokens, tags
 
-def output_sentence(arg1, arg2, arg3, relation, prep=None):
-    """
-    TODO: add source and justification
-    """
+def get_domain_names(urls):
+    parsed_urls = map(lambda x: urlparse(x), urls)
+    domain_names = map(lambda x: x.netloc, parsed_urls)
+    return domain_names
+
+def output_sentence(arg1, arg2, arg3, relation, \
+    raw_arg1, raw_arg2, raw_relation, urls, prep=None):
     if arg2.strip() == "": # Remove "A is for B" sentence
         return
     arg1 = nl.normalize(arg1).strip()
     arg2 = nl.normalize(arg2).strip()
+    assertion = None
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
         assertion = GRAPH.get_or_create_assertion(
@@ -79,6 +89,27 @@ def output_sentence(arg1, arg2, arg3, relation, prep=None):
             {'dataset': 'reverb/en'}
         )
         assertion = GRAPH.get_or_create_conjunction([assertion1, assertion2])
+    frame = u"{1}%s{2}" % (raw_relation)
+    raw = GRAPH.get_or_create_assertion(
+        '/frame/en/'+frame,
+        [u'/concept/en/'+raw_arg1, u'/concept/en/'+raw_arg2],
+        {'dataset': 'reverb/en'}
+    )
+    for domain in set(get_domain_names(urls.split('|'))):
+        source_uri = u"/source/source/web/%s" % domain
+        source = GRAPH.get_or_create_node(source_uri)
+        GRAPH.justify(0, source, weight=0.5)
+        conjunction = \
+            GRAPH.get_or_create_conjunction([source, reverb, reverb_object])
+        """
+        The assertions start with numbers are really bad in ReVerb.
+        We set a small weight on the justification edge.
+        """
+        if raw_arg1[0].isdigit():
+            GRAPH.justify(conjunction, raw, weight=0.2)
+        else:
+            GRAPH.justify(conjunction, raw, weight=0.7)
+        print GRAPH.derive_normalized(raw, assertion)
 
 def handle_file(filename):
     for line in codecs.open(filename, encoding='utf-8', errors='replace'):
@@ -87,9 +118,9 @@ def handle_file(filename):
             parts = line.split('\t')
             if len(parts) < 10:
                 continue
-            id, arg1, rel, arg2, nor_arg1, nor_rel, nor_arg2, \
+            id, old_arg1, old_rel, old_arg2, nor_arg1, nor_rel, nor_arg2, \
                 num_sentence, confidence, url = parts
-            sentence = "%s %s %s" % (arg1, rel, arg2)
+            sentence = "%s %s %s" % (old_arg1, old_rel, old_arg2)
             tokens = nltk.word_tokenize(sentence)
             tags = map(lambda x: x[1], nltk.pos_tag(tokens))
             tokens, tags = remove_tags(tokens, tags, 'RB')	# Remove adverb
@@ -118,26 +149,31 @@ def handle_file(filename):
                 if next_tag == 'DT': # IsA relation
                     if index_prep == 0:
                         arg2 = " ".join(tokens[index_be+2:])
-                        output_sentence(arg1, arg2, None, 'IsA')
+                        output_sentence(arg1, arg2, None, 'IsA', \
+                            old_arg1, old_arg2, old_rel, url)
                     else:
                         if tokens[index_prep] == 'of' and \
                             tokens[index_prep-1] == 'kind': # 'a kind of' frame
                             arg2 = " ".join(tokens[index_prep+1:])
-                            output_sentence(arg1, arg2, None, 'IsA')
+                            output_sentence(arg1, arg2, None, 'IsA', \
+                                old_arg1, old_arg2, old_rel, url)
                         else:
                             arg2 = " ".join(tokens[index_be+2:index_prep])
                             arg3 = " ".join(tokens[index_prep+1:])
-                            output_sentence(arg1, arg2, arg3, \
-                                'IsA', tokens[index_prep])
+                            output_sentence(arg1, arg2, arg3, 'IsA', \
+                                old_arg1, old_arg2, old_rel, url, \
+                                tokens[index_prep])
                 else: # HasProperty relation
                     if index_prep == 0:
                         arg2 = " ".join(tokens[index_be+1:])
-                        output_sentence(arg1, arg2, None, 'HasProperty')
+                        output_sentence(arg1, arg2, None, 'HasProperty', \
+                            old_arg1, old_arg2, old_rel, url)
                     else:
                         arg2 = " ".join(tokens[index_be+1:index_prep])
                         arg3 = " ".join(tokens[index_prep+1:])
                         output_sentence(arg1, arg2, arg3, \
-                            'HasProperty', tokens[index_prep])
+                            'HasProperty', old_arg1, old_arg2, old_rel, url, \
+                            tokens[index_prep])
             else:
                 index_be = index_of_be(tokens)
                 if index_be == len(tokens) - 1: continue
@@ -154,19 +190,22 @@ def handle_file(filename):
                         relation = 'DirectObjectOf'
                     if index_prep == 0:
                         arg2 = " ".join(tokens[index_be+1:])
-                        output_sentence(arg1, arg2, None, relation)
+                        output_sentence(arg1, arg2, None, relation, \
+                            old_arg1, old_arg2, old_rel, url)
                     else:
                         arg2 = " ".join(tokens[index_be+1:index_prep])
                         arg3 = " ".join(tokens[index_prep+1:])
-                        output_sentence(arg1, arg2, arg3, \
-                            relation, tokens[index_prep])
+                        output_sentence(arg1, arg2, arg3, relation, \
+                            old_arg1, old_arg2, old_rel, url, \
+                            tokens[index_prep])
                 else: # SubjectOf relation
                     if index_prep > 0:
                         arg1 = " ".join(tokens[:index_verbs[0]])
                         arg2 = " ".join(tokens[index_verbs[0]:index_prep])
                         arg3 = " ".join(tokens[index_prep+1:])
-                        output_sentence(arg1, arg2, arg3, \
-                            'SubjectOf', tokens[index_prep])
+                        output_sentence(arg1, arg2, arg3, 'SubjectOf', \
+                            old_arg1, old_arg2, old_rel, url, \
+                            tokens[index_prep])
 
 
 if __name__ == '__main__':
