@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+
+Concept Net 5
+graph.py file from concepnet5 module
+written by Rob Speer, Julian Chaidez
+Common Sense Computing Group, Medialab
+Massachussets Institute of Technology
+Fall 2011
+
+"""
 from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.justify import parallel
 from conceptnet5.config import get_auth
