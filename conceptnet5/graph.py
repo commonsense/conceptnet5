@@ -5,7 +5,7 @@ Concept Net 5
 graph.py file from concepnet5 module
 written by Rob Speer, Julian Chaidez
 Common Sense Computing Group, Medialab
-Massachussets Institute of Technology
+Massachusetts Institute of Technology
 Fall 2011
 
 """

@@ -1,0 +1,31 @@
+# Here's a way to stochastically iterate over weighted edges.
+
+rand = new Random()
+def fuzzify(weight) {weight / (weight+1.0)}
+def unfuzzify(weight) {weight / (1.0-weight)}
+
+g.v(0).outE.filter(it.label=='arg' | it.label=='relation' | it.label=='normalized' | it.weight > unfuzzify(rand.nextFloat())}
+
+
+
+g.V.in('normalized').sideEffect{it.normalized = false}
+
+Gremlin.defineStep('spread', [Vertex, Pipe], {
+  _().sideEffect{nodeWeight = it.score}
+  .outE.filter{
+    edgeWeight = it.weight;
+    edgeWeight > 0
+  }
+  .inV.sideEffect{
+    if (it.activation == null) it.activation = 0;
+    it.activation += nodeWeight * edgeWeight;
+  }
+  .filter{
+    it.score = it.activation;
+    it.activation = 0;
+    it.score > 0
+  }
+})
+g.v(0).spread()
+
+Gremlin.defineStep('collectConjunctions', [Vertex, Pipe]
