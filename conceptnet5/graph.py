@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+
+Concept Net 5
+graph.py file from concepnet5 module
+written by Rob Speer, Julian Chaidez
+Common Sense Computing Group, Medialab
+Massachusetts Institute of Technology
+Fall 2011
+
+"""
 from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.justify import parallel
 from conceptnet5.config import get_auth
@@ -366,29 +376,15 @@ class ConceptNetGraph(object):
         target = self._any_to_id(target)
         return self._edge_index.query('nodes', '%d-%d' % (source, target))
 
-    def query_edges(self, nodes = 0, start_edge = 1, stop_edge = 1):
+    def gremlin_query(self, query):
         """
-        Queries the edges from the node(s) given, from the start edge to the start edge,
-        and returns them as a list (or list of lists if a list of nodes is provided
+        Takes query in gremlin format and returns results
 
         args:
-	nodes -- a node/uri/id or a list of any combination of those things
-	which is comprised of the source node(s) of the edges in question
-	start_edge -- the start edge, by order, which is being queried i.e edge 1
-	stop_edge -- the last edge, by order, which is being queried i.e edge 3
+        query -- the script query for the gremlin plugin to process
 
         """
-        if type(nodes) == int:
-            nodes = [nodes]
-        for index, node in enumerate(nodes):
-            nodes[index] = self._any_to_id(node)
-        return_list = []
-        for node in nodes:
-            query = 'g.v(' + str(node) + '.out[' + start_edge + '..' + stop_edge + ']'
-            return_list.append(self.graph.extensions.GremlinPlugin.execute_script(script=query))
-        if len(return_list) == 1:
-            return_list = return_list[0]
-        return return_list
+        return self.graph.extensions.GremlinPlugin.execute_script(script=query)
 
     def _any_to_id(self, obj):
         """
