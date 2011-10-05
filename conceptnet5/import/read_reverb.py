@@ -2,7 +2,7 @@
 Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
 from conceptnet5.graph import get_graph
-from conceptnet5.english_nlp import normalize
+from conceptnet5.english_nlp import normalize, tokenize, untokenize
 from urlparse import urlparse
 import codecs
 import nltk
@@ -67,10 +67,10 @@ def output_sentence(arg1, arg2, arg3, relation, \
     assertion = None
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
-        return # temporary
         assertion = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
-            ['/concept/en/'+arg1, '/concept/en/'+arg2],
+            [GRAPH.get_or_create_concept('en', arg1),
+             GRAPH.get_or_create_concept('en', arg2)],
             {'dataset': 'reverb/en'}
         )
     else:
@@ -79,26 +79,29 @@ def output_sentence(arg1, arg2, arg3, relation, \
         arg3 = normalize(arg3).strip()
         print '%s(%s, %s), %s(%s, %s)' % \
             (relation, arg1, arg2, prep, arg2, arg3)
-        return # temporary
         assertion1 = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
-            ['/concept/en/'+arg1, '/concept/en/'+arg2],
+            [GRAPH.get_or_create_concept('en', arg1),
+             GRAPH.get_or_create_concept('en', arg2)],
             {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
         )
         assertion2 = GRAPH.get_or_create_assertion(
-            '/concept/en'+prep,
-            ['/concept/en/'+arg2, '/concept/en/'+arg3],
+            GRAPH.get_or_create_concept('en', prep),
+            [GRAPH.get_or_create_concept('en', arg2),
+             GRAPH.get_or_create_concept('en', arg3)],
             {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
         )
         assertion = GRAPH.get_or_create_conjunction([assertion1, assertion2])
     frame = u"{1}%s{2}" % (raw_relation)
-    return # temporary
     raw = GRAPH.get_or_create_assertion(
         '/frame/en/'+frame,
-        [u'/concept/en/'+raw_arg1, u'/concept/en/'+raw_arg2],
+        [GRAPH.get_or_create_concept('en', raw_arg1),
+         GRAPH.get_or_create_concept('en', raw_arg2)],
         {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
     )
-    for domain in set(get_domain_names(urls.split('|'))):
+    # Turns out that only en.wikipedia.org matters as a domain. The rest are
+    # all mirrors.
+    for domain in ('en.wikipedia.org',):
         source_uri = u"/source/web/%s" % domain
         source = GRAPH.get_or_create_node(source_uri)
         GRAPH.justify(0, source, weight=0.5)
@@ -112,7 +115,7 @@ def output_sentence(arg1, arg2, arg3, relation, \
             GRAPH.justify(conjunction, raw, weight=0.2)
         else:
             GRAPH.justify(conjunction, raw, weight=0.7)
-        print GRAPH.derive_normalized(raw, assertion)
+    print GRAPH.derive_normalized(raw, assertion)
 
 def handle_file(filename):
     for line in codecs.open(filename, encoding='utf-8', errors='replace'):
@@ -123,6 +126,10 @@ def handle_file(filename):
                 continue
             id, old_arg1, old_rel, old_arg2, nor_arg1, nor_rel, nor_arg2, \
                 num_sentence, confidence, url = parts
+            # Rob put this in: skip all the numeric ones for now, our time
+            # is better spent on others
+            if old_arg1[0].isdigit() or old_arg2[0].isdigit():
+                continue
             sentence = "%s %s %s" % (old_arg1, old_rel, old_arg2)
             tokens = nltk.word_tokenize(sentence)
             tags = map(lambda x: x[1], nltk.pos_tag(tokens))
@@ -145,35 +152,35 @@ def handle_file(filename):
                     index_prep = tags.index('TO')
             if index_be > 0:
                 if tokens[index_be] == 'been':
-                    arg1 = " ".join(tokens[:index_be-1])
+                    arg1 = untokenize(tokens[:index_be-1])
                 else:
-                    arg1 = " ".join(tokens[:index_be])
+                    arg1 = untokenize(tokens[:index_be])
                 next_tag = tags[index_be+1]
                 if next_tag == 'DT': # IsA relation
                     if index_prep == 0:
-                        arg2 = " ".join(tokens[index_be+2:])
+                        arg2 = untokenize(tokens[index_be+2:])
                         output_sentence(arg1, arg2, None, 'IsA', \
                             old_arg1, old_arg2, old_rel, url)
                     else:
                         if tokens[index_prep] == 'of' and \
                             tokens[index_prep-1] == 'kind': # 'a kind of' frame
-                            arg2 = " ".join(tokens[index_prep+1:])
+                            arg2 = untokenize(tokens[index_prep+1:])
                             output_sentence(arg1, arg2, None, 'IsA', \
                                 old_arg1, old_arg2, old_rel, url)
                         else:
-                            arg2 = " ".join(tokens[index_be+2:index_prep])
-                            arg3 = " ".join(tokens[index_prep+1:])
+                            arg2 = untokenize(tokens[index_be+2:index_prep])
+                            arg3 = untokenize(tokens[index_prep+1:])
                             output_sentence(arg1, arg2, arg3, 'IsA', \
                                 old_arg1, old_arg2, old_rel, url, \
                                 tokens[index_prep])
                 else: # HasProperty relation
                     if index_prep == 0:
-                        arg2 = " ".join(tokens[index_be+1:])
+                        arg2 = untokenize(tokens[index_be+1:])
                         output_sentence(arg1, arg2, None, 'HasProperty', \
                             old_arg1, old_arg2, old_rel, url)
                     else:
-                        arg2 = " ".join(tokens[index_be+1:index_prep])
-                        arg3 = " ".join(tokens[index_prep+1:])
+                        arg2 = untokenize(tokens[index_be+1:index_prep])
+                        arg3 = untokenize(tokens[index_prep+1:])
                         output_sentence(arg1, arg2, arg3, \
                             'HasProperty', old_arg1, old_arg2, old_rel, url, \
                             tokens[index_prep])
@@ -184,28 +191,28 @@ def handle_file(filename):
                     (index_verbs[0] == index_be or \
                     len(index_verbs) > 1): 
                     if tokens[index_be] == 'been':
-                        arg1 = " ".join(tokens[:index_be-1])
+                        arg1 = untokenize(tokens[:index_be-1])
                     else:
-                        arg1 = " ".join(tokens[:index_be])
+                        arg1 = untokenize(tokens[:index_be])
                     if tags[index_be+1] == 'VBG': 
                         relation = 'SubjectOf'
                     else: 
                         relation = 'DirectObjectOf'
                     if index_prep == 0:
-                        arg2 = " ".join(tokens[index_be+1:])
+                        arg2 = untokenize(tokens[index_be+1:])
                         output_sentence(arg1, arg2, None, relation, \
                             old_arg1, old_arg2, old_rel, url)
                     else:
-                        arg2 = " ".join(tokens[index_be+1:index_prep])
-                        arg3 = " ".join(tokens[index_prep+1:])
+                        arg2 = untokenize(tokens[index_be+1:index_prep])
+                        arg3 = untokenize(tokens[index_prep+1:])
                         output_sentence(arg1, arg2, arg3, relation, \
                             old_arg1, old_arg2, old_rel, url, \
                             tokens[index_prep])
                 else: # SubjectOf relation
                     if index_prep > 0:
-                        arg1 = " ".join(tokens[:index_verbs[0]])
-                        arg2 = " ".join(tokens[index_verbs[0]:index_prep])
-                        arg3 = " ".join(tokens[index_prep+1:])
+                        arg1 = untokenize(tokens[:index_verbs[0]])
+                        arg2 = untokenize(tokens[index_verbs[0]:index_prep])
+                        arg3 = untokenize(tokens[index_prep+1:])
                         output_sentence(arg1, arg2, arg3, 'SubjectOf', \
                             old_arg1, old_arg2, old_rel, url, \
                             tokens[index_prep])

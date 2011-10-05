@@ -30,10 +30,19 @@ def simple_stem(word):
 def tokenize(text):
     return EN.tokenize(text.strip()).split()
 
+def untokenize(tokens):
+    if isinstance(tokens, basestring):
+        text = tokens
+    else:
+        text = ' '.join(tokens)
+    return EN.untokenize(text)
+
 def normalize(text):
     pieces = [morphy_stem(word) for word in tokenize(text)
               if word not in STOPWORDS]
     pieces = [piece for piece in pieces if piece]
+    if not pieces:
+        return text
     return ' '.join(pieces)
 
 def normalize_english_assertion(graph, assertion):

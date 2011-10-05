@@ -501,7 +501,7 @@ class ConceptNetGraph(object):
         self._create_assertion_w_components(uri, self._any_to_node(relation, create=True), \
         [self._any_to_node(arg, create=True) for arg in args], properties))
 
-    def get_or_create_concept(self, language, name):
+    def get_or_create_concept(self, language, name, disambiguation=''):
         """
         finds or creates concept using the properties of the concept:
         language and name. convenience function.
@@ -509,9 +509,13 @@ class ConceptNetGraph(object):
         args:
         language -- language code ie. 'en'
         name -- name of concept ie. 'dog','fish' etc
-
         """
-        uri = "/concept/%s/%s" % (language, name)
+        # handle slashes the same way as spaces, so they don't look like
+        # we're disambiguating the concept
+        name = name.replace(u'/', u'_')
+        uri = u"/concept/%s/%s" % (language, name)
+        if disambiguation:
+            uri += u'/'+disambiguation
         return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_conjunction(self, conjuncts):
@@ -521,7 +525,6 @@ class ConceptNetGraph(object):
 
         args:
         conjuncts -- a list of the nodes to be connected to the conjunctions
-
         """
         conjuncts = [self._any_to_node(c) for c in conjuncts]
         uris = [c['uri'] for c in conjuncts]
