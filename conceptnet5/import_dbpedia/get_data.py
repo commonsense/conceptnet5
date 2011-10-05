@@ -4,37 +4,35 @@ Get data from DBPedia.
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+import urllib2
 
-def get_concept_from_uri(uri):
-  return uri.split('/')[-1].split('#')[-1]
+JUSTIFICATION = '/source/web/dbpedia.org'
 
-def get_types(concept_string):
-  sparql = SPARQLWrapper('http://dbpedia.org/sparql')
-  sparql.setQuery("""
-      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-      SELECT ?type
-      WHERE {
-        <http://dbpedia.org/resource/%s> rdf:type ?type .
-      }
-  """ % concept_string)
-  sparql.setReturnFormat(JSON)
-  results = sparql.query().convert()
-  type_results = results['results']['bindings']
+def get_url_from_obj(obj_name):
+  return 'http://dbpedia.org/page/%s' % obj_name
+
+def get_html_from_url(url):
+  page = urllib2.urlopen(url)
+  html = page.read()
+  page.close()
+  return html
+
+def get_types_from_html(html):
   types = []
-  for type_result in type_results:
-    concept_type = get_concept_from_uri(type_result['type']['value'])
-    if concept_type is not None:
-      types.append(concept_type)
+  raw_list = html.split('<a class="uri" href="http://www.w3.org/1999/02/'
+      '22-rdf-syntax-ns#type">', 1)[1].split('<ul>', 1)[1].split('</ul>', 1)[0]
+  while 'href="' in raw_list:
+    [new_type, raw_list] = raw_list.split('href="', 1)[1].split('">', 1)
+    types.append(new_type)
   return types
 
 def main():
-  concepts = ['Apple', 'Banana', 'Chess', 'Dog', 'Elevator', 'Fitzgerald',
-      'Ghana']
-  for concept in concepts:
-    concept_types = get_types(concept)
-    for concept_type in concept_types:
-      print '%s is of type %s.' % (concept, concept_type)
+  obj_names = ['Tetris']
+  for obj_name in obj_names:
+    url = get_url_from_obj(obj_name)
+    html = get_html_from_url(url)
+    types = get_types_from_html(html)
+    print types
 
 if __name__ == '__main__':
   main()
