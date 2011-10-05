@@ -606,7 +606,8 @@ class ConceptNetGraph(object):
         url -- the url of the web concept
 
         """
-        return self.get_node(url) or self._create_web_concept_node(url, {})
+        uri = 'web_concept/%s' % url
+        return self.get_node(uri) or self._create_web_concept_node(uri, {})
 
     def get_args(self, assertion):
         """

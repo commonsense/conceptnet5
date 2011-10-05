@@ -9,7 +9,7 @@ import urllib2
 
 DBPEDIA_DATA_PREFIX = u'http://dbpedia.org/page/'
 DBPEDIA_SOURCE = [u'source', u'web', u'dbpedia.org']
-TYPE_RELATION = u'/relation/rdf:type'
+TYPE_RELATION = u'rdf:type'
 TYPE_RELATION_PROP_KEY = u'owl:sameAs'
 TYPE_RELATION_PROP_VAL = u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 
@@ -47,17 +47,18 @@ def get_types_from_html(html):
   return obj_types
 
 def make_type_assertions_for_obj(conceptnet, obj_url, obj_types):
-  concept = conceptnet.get_or_create_node(obj_url)
-  print concept
-  return
+  concept = conceptnet.get_or_create_web_concept(obj_url)
   relation = conceptnet.get_or_create_relation(TYPE_RELATION)
   source = conceptnet.get_or_create_source(DBPEDIA_SOURCE)
   relation[TYPE_RELATION_PROP_KEY] = TYPE_RELATION_PROP_VAL
   for obj_type in obj_types:
-    obj_type_concept = conceptnet.get_or_create_node(obj_type)
+    obj_type_concept = conceptnet.get_or_create_web_concept(obj_type)
     assertion = conceptnet.get_or_create_assertion(
-        TYPE_RELATION, concept, obj_type_concept)
+        relation, [concept, obj_type_concept])
     conceptnet.justify(source, assertion)
+  print 'concept: %s' % concept
+  print 'relation: %s' % relation
+  print 'source: %s' % source
 
 def main():
   conceptnet = get_graph()
