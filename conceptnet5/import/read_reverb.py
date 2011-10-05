@@ -2,14 +2,13 @@
 Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
 from conceptnet5.graph import get_graph
-from simplenlp import get_nl
+from conceptnet5.english_nlp import normalize
 from urlparse import urlparse
 import codecs
 import nltk
 import os
 
 GRAPH = get_graph()
-nl = get_nl('en')
 
 reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
 GRAPH.justify(0, reverb)
@@ -60,13 +59,15 @@ def get_domain_names(urls):
 
 def output_sentence(arg1, arg2, arg3, relation, \
     raw_arg1, raw_arg2, raw_relation, urls, prep=None):
+    print raw_arg1, raw_relation, raw_arg2
     if arg2.strip() == "": # Remove "A is for B" sentence
         return
-    arg1 = nl.normalize(arg1).strip()
-    arg2 = nl.normalize(arg2).strip()
+    arg1 = normalize(arg1).strip()
+    arg2 = normalize(arg2).strip()
     assertion = None
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
+        return # temporary
         assertion = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             ['/concept/en/'+arg1, '/concept/en/'+arg2],
@@ -75,28 +76,30 @@ def output_sentence(arg1, arg2, arg3, relation, \
     else:
         if arg3.strip() == "": # Remove "A before/after/off" sentence
             return
-        arg3 = nl.normalize(arg3).strip()
+        arg3 = normalize(arg3).strip()
         print '%s(%s, %s), %s(%s, %s)' % \
             (relation, arg1, arg2, prep, arg2, arg3)
+        return # temporary
         assertion1 = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             ['/concept/en/'+arg1, '/concept/en/'+arg2],
-            {'dataset': 'reverb/en'}
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
         )
         assertion2 = GRAPH.get_or_create_assertion(
             '/concept/en'+prep,
             ['/concept/en/'+arg2, '/concept/en/'+arg3],
-            {'dataset': 'reverb/en'}
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
         )
         assertion = GRAPH.get_or_create_conjunction([assertion1, assertion2])
     frame = u"{1}%s{2}" % (raw_relation)
+    return # temporary
     raw = GRAPH.get_or_create_assertion(
         '/frame/en/'+frame,
         [u'/concept/en/'+raw_arg1, u'/concept/en/'+raw_arg2],
-        {'dataset': 'reverb/en'}
+        {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
     )
     for domain in set(get_domain_names(urls.split('|'))):
-        source_uri = u"/source/source/web/%s" % domain
+        source_uri = u"/source/web/%s" % domain
         source = GRAPH.get_or_create_node(source_uri)
         GRAPH.justify(0, source, weight=0.5)
         conjunction = \
@@ -206,7 +209,6 @@ def handle_file(filename):
                         output_sentence(arg1, arg2, arg3, 'SubjectOf', \
                             old_arg1, old_arg2, old_rel, url, \
                             tokens[index_prep])
-
 
 if __name__ == '__main__':
     for filename in os.listdir('.'):

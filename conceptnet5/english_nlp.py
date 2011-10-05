@@ -11,8 +11,17 @@ except LookupError:
 
 STOPWORDS = ['the', 'a', 'an']
 
+# Avoid obsolete roots, the way lexicographers don't
+EXCEPTIONS = {
+    'born': 'born',         # not 'bear'
+    'wrought': 'wrought',   # not 'work'
+    'media': 'media',       # not 'medium'
+}
+
 def morphy_stem(word):
     word = word.lower()
+    if word in EXCEPTIONS:
+        return EXCEPTIONS[word]
     return morphy(word, 'v') or morphy(word, 'n') or word
 
 def simple_stem(word):
