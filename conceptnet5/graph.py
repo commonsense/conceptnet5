@@ -36,7 +36,6 @@ def uri_piece_to_list(uri):
     """
     Undo the effect of `list_to_uri_piece` by decoding the string from
     JSON.
-    
     args:
     uri -- the uri to be decoded into a list
     """
@@ -148,9 +147,10 @@ class ConceptNetGraph(object):
             raise ValueError("""
             The URI %r is too short. You can't create the root or
             a type with this method.
-            """ % uri) 
-        
+            """ % uri)
         _, _type, rest = uri.split('/', 2)
+        if _ == 'http':
+            _type = 'web_concept'
         method = getattr(self, '_create_%s_node' % _type)
         if method is None:
             raise ValueError("I don't know how to create type %r" % _type)
@@ -310,6 +310,24 @@ class ConceptNetGraph(object):
         return self.graph.node(
             type='source',
             name=name,
+            uri=uri,
+            **properties
+        )
+
+    def _create_web_concept_node(self, uri, rest, properties):
+        """
+        creates a web concept node, whose uri is the url
+        of the web page from which the concept is sourced
+
+        args:
+        uri -- identifier of the intended node, used in index
+        also the url of the web concept
+        rest -- in this case, nonsense
+        properties -- optional properties of the web_concept
+
+        """
+        return self.graph.node(
+            type='web_concept',
             uri=uri,
             **properties
         )
@@ -566,7 +584,7 @@ class ConceptNetGraph(object):
         name -- name of relation ie. 'IsA'
         """
 
-        uri = "/concept/%s" % name
+        uri = "/relation/%s" % name
         return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_source(self, source_list):
@@ -581,6 +599,16 @@ class ConceptNetGraph(object):
 
         uri = normalize_uri("source/" + "/".join(source_list))
         return self.get_node(uri) or self._create_node(uri, {})
+
+    def get_or_create_web_concept(self, url):
+        """
+        finds or creates web concept using the url of that web concept
+
+        args:
+        url -- the url of the web concept
+
+        """
+        return self.get_node(url) or self._create_node(url, {})
 
     def get_args(self, assertion):
         """
