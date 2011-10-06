@@ -11,9 +11,8 @@ except LookupError:
 
 STOPWORDS = ['the', 'a', 'an']
 
-# Avoid obsolete and obscure roots, the way lexicographers don't.
 EXCEPTIONS = {
-    'born': 'born',         # not 'bear'
+    # Avoid obsolete and obscure roots, the way lexicographers don't.
     'wrought': 'wrought',   # not 'work'
     'media': 'media',       # not 'medium'
     'installed': 'install', # not 'instal'
@@ -21,23 +20,46 @@ EXCEPTIONS = {
     'synapses': 'synapse',  # not 'synapsis'
     'soles': 'sole',        # not 'sol'
     'pubes': 'pube',        # not 'pubis'
-    'organums': 'organum',  # 'organa' isn't even normalized
     'dui': 'dui',           # not 'duo'
     'comics': 'comic',      # WordNet's root for this will make you nerd-rage
-    'popes': 'pope',        # not 'pope'
-    'stove': 'stove',       # not 'stave'
     'taxis': 'taxi',        # not 'taxis'
+    'teeth': 'tooth',       # not 'teeth'
 
-    # Sacrifice a few irregular verbs to make nouns work better.
-    'ground': 'ground',     # not 'grind'
-    'bit': 'bit'            # not 'bite'
+    # Avoid nouns that shadow more common verbs.
+    'was': 'be',
+    'has': 'have',
+    'won': 'win',
+    'tore': 'tear',
+    'sung': 'sing',
+    'slain': 'slay',
+    'shook': 'shake',
+    'shot': 'shoot',
+    'thought': 'think',
+    'stole': 'steal',
+    'sat': 'sit',
+    'saw': 'see',
+    'sent': 'send',
+    'lost': 'lose',
+    'lit': 'light',
+    'found': 'find',
+    'felt': 'feel',
+    'fell': 'fall',
+    'drove': 'drive',
+    'am': 'be',
+    'are': 'be',
+    'ate': 'eat',
+    'bent': 'bend',
 }
 
 def morphy_stem(word):
     word = word.lower()
     if word in EXCEPTIONS:
         return EXCEPTIONS[word]
-    return morphy(word, 'v') or morphy(word, 'n') or word
+    elif word.endswith('ing') or word.endswith('ed'):
+        return morphy(word, 'v') or morphy(word) or word
+    else:
+        # trust in wordnet
+        return morphy(word) or word
 
 def simple_stem(word):
     return EN.normalize(word).strip()
@@ -58,7 +80,7 @@ def normalize(text):
     pieces = [piece for piece in pieces if piece]
     if not pieces:
         return text
-    return ' '.join(pieces)
+    return untokenize(pieces)
 
 def normalize_english_assertion(graph, assertion):
     """
