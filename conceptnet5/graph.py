@@ -100,15 +100,19 @@ def normalize_uri(uri):
         uri = uri.decode('utf-8')
     return uri.strip().replace(u' ', u'_')
 
+class GremlinWriterGraph(object):
+    pass
+
 class ConceptNetGraph(object):
     """
-    This class acts as a container for all of the functions necessary to interact with
-    the Concept Net graph database. It has the ability to creata Node objects, representing
-    types of nodes like assertions, concepts, conjunctions, frames, relations, and sources.
-    It can also produce different types of edges, including justifications, and edges connecting
-    assertions with their relations and arguments. Methods in this class can also find nodes,
-    generate uris and translate uris, nodes and ids into each other.
-
+    This class acts as a container for all of the functions necessary to
+    interact with the Concept Net graph database. It has the ability to creata
+    Node objects, representing types of nodes like assertions, concepts,
+    conjunctions, frames, relations, and sources.  It can also produce
+    different types of edges, including justifications, and edges connecting
+    assertions with their relations and arguments. Methods in this class can
+    also find nodes, generate uris and translate uris, nodes and ids into each
+    other.
     """
     def __init__(self, domain):
         """
@@ -219,13 +223,8 @@ class ConceptNetGraph(object):
         assertion = self._create_assertion_w_components(uri, rel, args,
                                                            properties)
 
-        # Set a property to keep track of whether this assertion is normalized.
-        # An unnormalized ("raw") assertion has a Frame in its relation slot.
-        
-        if rel['type'] == 'frame':
-            assertion['normalized'] = False
-        else:
-            assertion['normalized'] = True
+        # We used to set 'normalized' here based on whether we've got a
+        # frame. This was a bad idea.
         return assertion
 
     def _create_concept_node(self, uri, rest, properties):
@@ -456,7 +455,7 @@ class ConceptNetGraph(object):
         if isinstance(obj, Node):
             return obj['uri']
         elif isinstance(obj, basestring):
-            return obj
+            return normalize_uri(obj)
         elif isinstance(obj, int):
             return self.get_node_by_id(obj)['uri']
         else:
@@ -565,15 +564,15 @@ class ConceptNetGraph(object):
                 node.score = 1./inverse_sum
         return node
     
-    def get_or_create_frame(self, name):
+    def get_or_create_frame(self, language, name):
         """
         finds of creates frame using name of frame. convenience function.
 
         args:
         name -- name of frame, ie. "$1 is used for $2"
         """
-
-        uri = "/frame/%s" % name
+        name = name.replace(u'/', u'_')
+        uri = "/frame/%s/%s" % (language, name)
         return self.get_node(uri) or self._create_node(uri, {})
 
     def get_or_create_relation(self, name):
@@ -671,7 +670,7 @@ class ConceptNetGraph(object):
 
         args:
         source -- the source node, the 'justifier'
-	target -- the targate node, the node being justified
+        target -- the target node, the node being justified
         weight -- the weight of the normalized edge
         """
 
@@ -681,6 +680,8 @@ class ConceptNetGraph(object):
         for node1, node2 in zip(self.get_args(source), self.get_args(target)):
             if not (node1 == node2):
                 self.get_or_create_edge('normalized', source, target)
+        source['normalized'] = False
+        target['normalized'] = True
         return edge
 
     def delete_node(self, obj):
