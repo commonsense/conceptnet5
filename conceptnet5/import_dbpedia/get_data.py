@@ -62,8 +62,7 @@ def make_type_assertions_for_obj(conceptnet, obj_url, obj_types):
 
 def main():
   conceptnet = get_graph()
-  #wikipediaTitles = open(WIKIPEDIA_TITLES)
-  wikipediaTitles = ['"!!Tetris"', '"Tetris"', 'Tetris']
+  wikipediaTitles = open(WIKIPEDIA_TITLES)
   for line in wikipediaTitles:
     try:
       obj_name = line.strip().decode('utf-8')
