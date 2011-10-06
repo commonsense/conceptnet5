@@ -1,0 +1,30 @@
+nodeIndex = g.idx('node_auto_index')
+edgeIndex = g.idx('relationship_auto_index')
+
+def node(uri, properties) {
+  existing = nodeIndex.get('uri', uri)
+  if (existing) {
+    return existing
+  }
+  else {
+    return g.addVertex(properties)
+  }
+}
+
+def edge(type, source_uri, target_uri, properties) {
+  source = nodeIndex.get('uri', source_uri)
+  target = nodeIndex.get('uri', target_uri)
+  if (source && target) {
+    nodeKey = source.id + '-' + target.id
+    existing = edgeIndex.get('nodes', nodeKey)
+    if (existing) {
+      return existing
+    }
+    properties['nodes'] = nodeKey
+    return g.addEdge(source, target, type, properties)
+  }
+  else {
+    return false
+  }
+}
+
