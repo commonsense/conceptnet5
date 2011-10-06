@@ -11,11 +11,26 @@ except LookupError:
 
 STOPWORDS = ['the', 'a', 'an']
 
-# Avoid obsolete roots, the way lexicographers don't
+# Avoid obsolete and obscure roots, the way lexicographers don't.
 EXCEPTIONS = {
     'born': 'born',         # not 'bear'
     'wrought': 'wrought',   # not 'work'
     'media': 'media',       # not 'medium'
+    'installed': 'install', # not 'instal'
+    'installing': 'install',# not 'instal'
+    'synapses': 'synapse',  # not 'synapsis'
+    'soles': 'sole',        # not 'sol'
+    'pubes': 'pube',        # not 'pubis'
+    'organums': 'organum',  # 'organa' isn't even normalized
+    'dui': 'dui',           # not 'duo'
+    'comics': 'comic',      # WordNet's root for this will make you nerd-rage
+    'popes': 'pope',        # not 'pope'
+    'stove': 'stove',       # not 'stave'
+    'taxis': 'taxi',        # not 'taxis'
+
+    # Sacrifice a few irregular verbs to make nouns work better.
+    'ground': 'ground',     # not 'grind'
+    'bit': 'bit'            # not 'bite'
 }
 
 def morphy_stem(word):
