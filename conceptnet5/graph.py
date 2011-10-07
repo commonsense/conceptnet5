@@ -336,7 +336,7 @@ class ConceptNetGraph(object):
             **properties
         )
 
-    def _create_web_concept_node(self, uri, properties):
+    def _create_web_concept_node(self, uri, rest, properties):
         """
         creates a web concept node, whose uri is the url
         of the web page from which the concept is sourced
@@ -590,7 +590,7 @@ class ConceptNetGraph(object):
         source_list would be ['contributor','omcs','bedume']
         """
 
-        uri = normalize_uri("source/" + "/".join(source_list))
+        uri = normalize_uri("/source/" + "/".join(source_list))
         return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_web_concept(self, url):
@@ -601,8 +601,8 @@ class ConceptNetGraph(object):
         url -- the url of the web concept
 
         """
-        uri = 'web_concept/%s' % url
-        return self.get_node(uri) or self._create_web_concept_node(uri, {})
+        uri = '/web_concept/%s' % url
+        return self.get_node(uri) or self._create_web_concept_node(uri, '', {})
 
     def get_args(self, assertion):
         """
