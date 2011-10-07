@@ -83,7 +83,7 @@ for line in open('verbosity.txt'):
         relation = 'it is related to'
     rel = mapping.get(relation)
     if rel is None:
-        rel = '/concept/en/'+normalize(relation).replace(' ', '_')
+        rel = '/concept/en/'+normalize(relation[3:]).replace(' ', '_')
     
     if relation == 'it is' and\
        (right.startswith('a ') or right.startswith('an ')
