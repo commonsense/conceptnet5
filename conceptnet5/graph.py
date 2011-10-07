@@ -590,7 +590,7 @@ class ConceptNetGraph(object):
         source_list would be ['contributor','omcs','bedume']
         """
 
-        uri = normalize_uri("source/" + "/".join(source_list))
+        uri = normalize_uri("/source/" + "/".join(source_list))
         return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_web_concept(self, url):
