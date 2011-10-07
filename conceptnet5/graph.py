@@ -10,11 +10,11 @@ Fall 2011
 
 """
 from neo4jrestclient.client import GraphDatabase, Node
-from conceptnet5.justify import parallel
 from conceptnet5.config import get_auth
-import urllib
+from conceptnet5.whereami import get_project_filename
 import re
 import json
+import codecs
 
 def list_to_uri_piece(lst):
     """
@@ -100,9 +100,6 @@ def normalize_uri(uri):
         uri = uri.decode('utf-8')
     return uri.strip().replace(u' ', u'_')
 
-class GremlinWriterGraph(object):
-    pass
-
 class ConceptNetGraph(object):
     """
     This class acts as a container for all of the functions necessary to
@@ -132,10 +129,11 @@ class ConceptNetGraph(object):
         self._node_index = self.graph.nodes.indexes['node_auto_index']
         self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
 
-    def _create_node(self, uri, properties = {}):
+    def _create_node_by_type(self, uri, properties = {}):
         """
         creates generic node object,
-        parses uri, takes out args, identifies type of node and runs relevant method
+        parses uri, takes out args, identifies type of node and runs relevant
+        method
         
         args:
         uri -- identifier of intended node, used in index
@@ -158,9 +156,15 @@ class ConceptNetGraph(object):
             raise ValueError("I don't know how to create type %r" % _type)
         return method(uri, rest, properties)
 
+    def _create_node(self, **properties):
+        """
+        Actually create a node in the graph.
+        """
+        return self.graph.node(**properties)
+
     def _create_edge(self, _type, source, target, properties = {}):
         """
-	Create an edge and ensure that it is indexed by its nodes.
+        Create an edge and ensure that it is indexed by its nodes.
 
         args:
         _type -- the type of edge, i.e 'justifies' or 'normalized'
@@ -168,7 +172,7 @@ class ConceptNetGraph(object):
         target -- the target node of the edge
         properties -- (optional) properties to be attributed to this edge
 
-	"""
+        """
         source = self._any_to_node(source)
         target = self._any_to_node(target)
         edge = source.relationships.create(_type, target, **properties)
@@ -188,7 +192,7 @@ class ConceptNetGraph(object):
         properties -- important properties of the assertion
 
         """
-        assertion = self.graph.node(
+        assertion = self._create_node(
             type='assertion',
             uri=uri,
             score=0,
@@ -240,7 +244,7 @@ class ConceptNetGraph(object):
 
         """
         language, name = rest.split('/')
-        return self.graph.node(
+        return self._create_node(
             type='concept',
             language=language,
             name=name,
@@ -262,7 +266,7 @@ class ConceptNetGraph(object):
 
         """
         language, name = rest.split('/')
-        return self.graph.node(
+        return self._create_node(
             type='frame',
             name=name,
             language=language,
@@ -284,7 +288,7 @@ class ConceptNetGraph(object):
 
         """
         name = rest
-        return self.graph.node(
+        return self._create_node(
             type='relation',
             name=name,
             uri=uri,
@@ -304,7 +308,7 @@ class ConceptNetGraph(object):
 
         """
         name = rest.split('/')[-1]
-        return self.graph.node(
+        return self._create_node(
             type='source',
             name=name,
             uri=uri,
@@ -323,7 +327,7 @@ class ConceptNetGraph(object):
         properties -- optional properties of the web_concept
 
         """
-        return self.graph.node(
+        return self._create_node(
             type='web_concept',
             uri=uri,
             **properties
@@ -480,7 +484,7 @@ class ConceptNetGraph(object):
         properties -- optional properties for assertion       
 
         """
-        return self.get_node(uri) or self._create_node(uri, properties)
+        return self.get_node(uri) or self._create_node_by_type(uri, properties)
 
     def get_or_create_edge(self, _type, source, target, properties = {}):
         """
@@ -531,7 +535,7 @@ class ConceptNetGraph(object):
         uri = u"/concept/%s/%s" % (language, name)
         if disambiguation:
             uri += u'/'+disambiguation
-        return self.get_node(uri) or self._create_node(uri, {})
+        return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_conjunction(self, conjuncts):
         """
@@ -541,27 +545,17 @@ class ConceptNetGraph(object):
         args:
         conjuncts -- a list of the nodes to be connected to the conjunctions
         """
-        conjuncts = [self._any_to_node(c) for c in conjuncts]
-        uris = [c['uri'] for c in conjuncts]
+        uris = [self._any_to_uri(c) for c in conjuncts]
         uris.sort()
         uri = u"/conjunction/" + list_to_uri_piece(uris)
         node = self.get_node(uri)
 
-        # Do we want to use the _create_node machinery? It doesn't quite fit.
+        # Do we want to use the _create_node_by_type machinery? It doesn't quite fit.
         if node is None:
-            node = self.graph.node(
+            node = self._create_node(
                 type='conjunction',
                 uri=uri
             )
-            inverse_sum = 0.0
-            for conjunct in conjuncts:
-                self.get_or_create_edge('conjunct', conjunct, node)
-                if conjunct['score'] > 0 and inverse_sum is not None:
-                    inverse_sum += 1./conjunct['score']
-                else:
-                    inverse_sum = None
-            if inverse_sum is not None:
-                node.score = 1./inverse_sum
         return node
     
     def get_or_create_frame(self, language, name):
@@ -573,7 +567,7 @@ class ConceptNetGraph(object):
         """
         name = name.replace(u'/', u'_')
         uri = "/frame/%s/%s" % (language, name)
-        return self.get_node(uri) or self._create_node(uri, {})
+        return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_relation(self, name):
         """
@@ -585,7 +579,7 @@ class ConceptNetGraph(object):
         """
 
         uri = "/relation/%s" % name
-        return self.get_node(uri) or self._create_node(uri, {})
+        return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_source(self, source_list):
         """
@@ -598,7 +592,7 @@ class ConceptNetGraph(object):
         """
 
         uri = normalize_uri("source/" + "/".join(source_list))
-        return self.get_node(uri) or self._create_node(uri, {})
+        return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_web_concept(self, url):
         """
@@ -615,9 +609,9 @@ class ConceptNetGraph(object):
         """
         Given an assertion, get its arguments as a list.
     
-        Arguments are represented in the graph as edges of type 'argument', with a property
-        called 'position' that will generally either be 1 or 2. (People find 1-indexing
-        intuitive in this kind of situation.)
+        Arguments are represented in the graph as edges of type 'argument',
+        with a property called 'position' that will generally either be 1 or 2.
+        (People find 1-indexing intuitive in this kind of situation.)
 
         args:
         assertion -- the assertion (in any form, node, uri etc.) in question
@@ -627,6 +621,16 @@ class ConceptNetGraph(object):
         edges = assertion.relationships.outgoing(types=['arg'])[:]
         edges.sort(key = lambda edge: edge['position'])
         return [edge.end for edge in edges]
+    
+    def get_rel_and_args(self, assertion):
+        """
+        Get an assertion's list of both its relation and its arguments.
+        """
+        assertion = self._any_to_node(assertion)
+        edges = assertion.relationships.outgoing(types=['arg'])[:]
+        edges.sort(key = lambda edge: edge['position'])
+        rel_edge = assertion.relationships.outgoing(types=['relation'][0])
+        return [rel_edge.end] + [edge.end for edge in edges]
 
     def justify(self, source, target, weight=1.0):
         """
@@ -642,23 +646,7 @@ class ConceptNetGraph(object):
         """
         edge = self.get_or_create_edge('justifies', source, target,
                                        {'weight': weight})
-        self.recompute_score(target)
         return edge
-
-    def recompute_score(self, node):
-        """
-        Given a node object, recompute the 'justification' score based on the justify nodes.
-	Can be run after the justify nodes are updated with new nodes or new value.
-
-        args:
-        node -- the node whose score is being recomputed
-
-        """
-        score = 0
-        for edge in node.relationships.incoming(types=['justify']):
-            score += edge.start['score']
-        node['score'] = score
-        return score
 
     def derive_normalized(self, source, target, weight=1.0):
         """
@@ -677,11 +665,10 @@ class ConceptNetGraph(object):
         assert weight > 0
         edge = self.get_or_create_edge('normalized', source, target)
         self.justify(source, target, weight)
-        for node1, node2 in zip(self.get_args(source), self.get_args(target)):
+        for node1, node2 in zip(self.get_rel_and_args(source),
+                                self.get_rel_and_args(target)):
             if not (node1 == node2):
-                self.get_or_create_edge('normalized', source, target)
-        source['normalized'] = False
-        target['normalized'] = True
+                self.get_or_create_edge('normalized', node1, node2)
         return edge
 
     def delete_node(self, obj):
@@ -715,6 +702,90 @@ class ConceptNetGraph(object):
             node.delete()
         else: assert False, \
         "There are other nodes that are dependent on this node"
+
+class GremlinWriterGraph(ConceptNetGraph):
+    """
+    Follows the same interface as ConceptNetGraph, but does not actually access
+    the database. Instead, it outputs Gremlin statements to a file, which can
+    be loaded later on the server, much more quickly.
+
+    You should run `GremlinWriterGraph.close()` when finished, to ensure
+    that the file is up-to-date.
+    """
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.output = open(filename, 'w')
+        self.recently_created_uris = []
+        
+        # Initialize the file with our setup code.
+        with open(get_project_filename('gremlin/setup.gremlin')) as infile:
+            self.output.write(infile.read())
+    
+    def _dict_to_gremlin_map(self, thedict):
+        str = json.dumps(thedict, ensure_ascii=False).encode('utf-8')
+        return '[' + str[1:-1] + ']'
+
+    def _create_node(self, **properties):
+        uri = properties['uri']
+        map = self._dict_to_gremlin_map(properties)
+        print >> self.output, "Object.metaClass.makeNode(%r, %s)" % \
+          (uri.encode('utf-8'), map)
+
+        # put it on a queue of 20 URIs to not recreate
+        self.recently_created_uris = self.recently_created_uris[-19:] + [uri]
+        return uri
+
+    def _create_edge(self, _type, source, target, properties = {}):
+        if source == 0:
+            source = '/'
+        map = self._dict_to_gremlin_map(properties)
+        print >> self.output, "Object.metaClass.makeEdge(%r, %r, %r, %s)" % \
+          (str(_type), source.encode('utf-8'), target.encode('utf-8'), map)
+
+    def _any_to_uri(self, obj):
+        if isinstance(obj, basestring):
+            return normalize_uri(obj)
+        else:
+            raise TypeError
+
+    def _any_to_node(self, obj):
+        raise NotImplementedError
+
+    def get_or_create_assertion(self, relation, args, properties = {}):
+        uri = make_assertion_uri(self._any_to_uri(relation),
+                                 [self._any_to_uri(arg) for arg in args])
+        return (self.get_node(uri) or
+          self._create_assertion_w_components(uri,
+            self.get_or_create_node(relation),
+            [self.get_or_create_node(arg) for arg in args],
+            properties
+          )
+        )
+
+    def get_node(self, uri):
+        if uri in self.recently_created_uris:
+            return uri
+        else:
+            return None
+
+    def get_edge(self, _type, source, target):
+        # force it to be "created"
+        return None
+
+    def get_edges(self, source, target):
+        return []
+    
+    def get_args(self, assertion_uri):
+        return self.get_rel_and_args(assertion_uri)[1:]
+
+    def get_rel_and_args(self, assertion_uri):
+        assert assertion_uri[:11] == '/assertion/'
+        json = assertion_uri[11:]
+        return uri_piece_to_list(json)
+
+    def close(self):
+        self.output.close()
 
 def get_graph():
     """

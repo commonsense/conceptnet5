@@ -1,7 +1,7 @@
 """
 Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
-from conceptnet5.graph import get_graph
+from conceptnet5.graph import GremlinWriterGraph
 from conceptnet5.english_nlp import normalize, tokenize, untokenize
 from urlparse import urlparse
 import codecs
@@ -9,7 +9,7 @@ import nltk
 import os
 import re
 
-GRAPH = get_graph()
+GRAPH = GremlinWriterGraph('/tmp/test.gremlin')
 
 reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
 GRAPH.justify(0, reverb)
@@ -58,11 +58,11 @@ def index_of_verbs(tags):
 
 def remove_tags(tokens, tags, target):
     index_rb = 0
-    if target in tags:
+    while target in tags:
         index_rb = tags.index(target)
-    if index_rb > 0:
-      tokens.remove(tokens[index_rb])
-      tags.remove(tags[index_rb])
+        if index_rb > 0:
+          tokens.remove(tokens[index_rb])
+          tags.remove(tags[index_rb])
     return tokens, tags
 
 def get_domain_names(urls):
@@ -74,9 +74,26 @@ def output_triple(arg1, arg2, relation, raw):
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
     relation = normalize(relation).strip()
+    found_relation = False
+    if relation == 'be for':
+        found_relation = True
+        relation = 'UsedFor'
+    if relation == 'be used for':
+        found_relation = True
+        relation = 'UsedFor'
+    if relation == 'be not':
+        found_relation = True
+        relation = 'IsNot'
+    if relation == 'be part of':
+        found_relation = True
+        relation = 'PartOf'
+    if found_relation:
+        rel_node = GRAPH.get_or_create_relation(relation)
+    else:
+        rel_node = GRAPH.get_or_create_concept('en', relation)
 
     assertion = GRAPH.get_or_create_assertion(
-        GRAPH.get_or_create_concept('en', relation),
+        rel_node,
         [GRAPH.get_or_create_concept('en', arg1),
          GRAPH.get_or_create_concept('en', arg2)],
         {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
@@ -85,7 +102,7 @@ def output_triple(arg1, arg2, relation, raw):
     
     conjunction = GRAPH.get_or_create_conjunction([raw, reverb_triple])
     GRAPH.justify(conjunction, assertion)
-    print assertion['uri']
+    print assertion
     return assertion
 
 def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
@@ -109,7 +126,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         GRAPH.justify(conjunction, raw, weight=0.2)
     else:
         GRAPH.justify(conjunction, raw, weight=0.7)
-    print raw['uri']
+    print raw
     return raw
 
 def output_sentence(arg1, arg2, arg3, relation, raw, prep=None):
@@ -140,7 +157,7 @@ def output_sentence(arg1, arg2, arg3, relation, raw, prep=None):
             {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
         )
         assertion2 = GRAPH.get_or_create_assertion(
-            GRAPH.get_or_create_concept('en', prep),
+            GRAPH.get_or_create_concept('en', 'be_'+prep),
             [GRAPH.get_or_create_concept('en', arg2),
              GRAPH.get_or_create_concept('en', arg3)],
             {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
@@ -149,7 +166,7 @@ def output_sentence(arg1, arg2, arg3, relation, raw, prep=None):
 
     for assertion in assertions:
         GRAPH.derive_normalized(raw, assertion)
-        print assertion['uri']
+        print assertion
 
     return assertion
 
@@ -158,10 +175,7 @@ def handle_file(filename):
     for line in codecs.open(filename, encoding='utf-8', errors='replace'):
         line = line.strip()
         if line:
-            try:
-                handle_line(line)
-            except:
-                traceback.print_exc()
+            handle_line(line)
 
 def handle_line(line):
     parts = line.split('\t')
@@ -180,7 +194,7 @@ def handle_line(line):
     sentence = "%s %s %s" % (old_arg1, old_rel, old_arg2)
     tokens = nltk.word_tokenize(sentence)
     tags = map(lambda x: x[1], nltk.pos_tag(tokens))
-    tokens, tags = remove_tags(tokens, tags, 'RB')	# Remove adverb
+    #tokens, tags = remove_tags(tokens, tags, 'RB')	# Remove adverb
     tokens, tags = remove_tags(tokens, tags, 'MD')	# Remove modals
     tokens = map(lambda x: x.lower(), tokens)
 
@@ -226,10 +240,10 @@ def handle_line(line):
                     arg3 = untokenize(tokens[index_prep+1:])
                     output_sentence(arg1, arg2, arg3, 'IsA', raw,
                         prep=tokens[index_prep])
-        else: # HasProperty relation
+        else:
             if index_prep == 0:
                 arg2 = untokenize(tokens[index_be+1:])
-                output_sentence(arg1, arg2, None, 'HasProperty', raw)
+                print output_sentence(arg1, arg2, None, 'HasProperty', raw)
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
