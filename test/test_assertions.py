@@ -3,6 +3,12 @@
 from conceptnet5.graph import *
 def test_create_assertions_twice():
     g = get_graph()
+    root = g.get_node('/')
+    if not root:
+        root = g._create_node(uri='/', score=1000, name='root')
+    assert root['name'] == 'root'
+    assert root['uri'] == '/'
+
     a1 = g.get_or_create_node(u'/assertion/[/relation/IsA/,/concept/en/dog/,/concept/en/animal/]')
     assert a1 == g.get_or_create_node(u'/assertion/[/relation/IsA/,/concept/en/dog/,/concept/en/animal/]')
     assert a1 == g.get_or_create_assertion(u'/relation/IsA',
