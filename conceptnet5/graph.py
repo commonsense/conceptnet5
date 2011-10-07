@@ -9,9 +9,10 @@ Massachusetts Institute of Technology
 Fall 2011
 
 """
-from neo4jrestclient.client import GraphDatabase, Node
+#from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.config import get_auth
 from conceptnet5.whereami import get_project_filename
+from pymongo import Connection
 import re
 import json
 import codecs
@@ -61,25 +62,6 @@ def uri_piece_to_list(uri):
     chunks.append('/' + '/'.join(current))
     assert depth == 0
     return chunks
-
-LUCENE_UNSAFE = re.compile(r'([-+&|!(){}\[\]^"~*?\\: ])')
-def lucene_escape(text):
-    """
-    URIs are searchable with Lucene. This might be awesome, but it means
-    that when looking them up, we have to escape out special characters by
-    prepending a backslash to them.
-
-    This should only be done inside a neo4j index.query().
-
-    args:
-    text -- the text to be escaped
-    """
-    # The first two backslashes are understood by the expression as a
-    # literal backslash. The final \1 refers to what the expression matched.
-    #
-    # Fun fact: if Python didn't have raw strings, the replacement string
-    # would have to be '\\\\\\1'.
-    return LUCENE_UNSAFE.sub(r'\\\1', text)
 
 def make_assertion_uri(relation_uri, arg_uri_list):
     """
@@ -141,14 +123,14 @@ class ConceptNetGraph(object):
         domain -- url of the database that will be accessed and read by this graph object
 
         """
-        #auth = get_auth()
-        #url = 'http://%s:%s@%s/db/data' %\
-        #    (auth['username'], auth['password'], domain)
-        url = 'http://%s/db/data' % domain
-        self.graph = GraphDatabase(url)
+        self.connection = Connection(domain, 27017)
+        self.db = self.connection.conceptnet
 
-        self._node_index = self.graph.nodes.indexes['node_auto_index']
-        self._edge_index = self.graph.relationships.indexes['relationship_auto_index']
+        self.db.nodes.create_index('uri')
+        self.db.nodes.create_index('dataset')
+        self.db.edges.create_index('key')
+        self.db.edges.create_index([('start', 1), ('type', 1)])
+        self.db.edges.create_index([('end', 1), ('type', 1)])
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -181,7 +163,10 @@ class ConceptNetGraph(object):
         """
         Actually create a node in the graph.
         """
-        return self.graph.node(**properties)
+        properties = dict(properties)
+        uri = properties['uri']
+        self.db.nodes.update({'uri': uri}, properties, upsert=True, safe=True)
+        return self.db.nodes.find_one({'uri': uri})
 
     def _create_edge(self, _type, source, target, properties = {}):
         """
@@ -192,13 +177,15 @@ class ConceptNetGraph(object):
         source -- the source node of the edge
         target -- the target node of the edge
         properties -- (optional) properties to be attributed to this edge
-
         """
-        source = self._any_to_node(source)
-        target = self._any_to_node(target)
-        edge = source.relationships.create(_type, target, **properties)
-        edge['nodes'] = '%d-%d' % (source.id, target.id)
-        return edge
+        properties = dict(properties)
+        properties['start'] = self._any_to_uri(source)
+        properties['end'] = self._any_to_uri(target)
+        properties['type'] = _type
+        key = u'%s %s %s' % (_type, source, target)
+        properties['key'] = key
+        self.db.edges.update({'key': key}, properties, upsert=True, safe=True)
+        return self.db.edges.find_one({'key': key})
 
     def _create_assertion_w_components(self, uri, relation, args, properties):
         """
@@ -377,13 +364,7 @@ class ConceptNetGraph(object):
 
         """
         uri = normalize_uri(uri)
-        results = self._node_index.query('uri', lucene_escape(uri))
-        if len(results) == 1:
-            return results[0]
-        elif len(results) == 0:
-            return None
-        else:
-            assert False, "Got multiple results for URI %r" % uri
+        return self.db.nodes.find_one({'uri': uri})
 
     def find_nodes(self, pattern):
         """
@@ -410,59 +391,25 @@ class ConceptNetGraph(object):
         target -- the target of the edge being sought (the end)
 
         """
-        edges = self.get_edges(source, target)
-        for edge in edges:
-            if edge.type == _type:
-                return edge
-        return None
+        source = self._any_to_uri(source)
+        target = self._any_to_uri(target)
+        key = "%s %s %s" % (_type, source, target)
+        return self.db.edges.find_one({'key': key})
 
-    def get_edges(self, source, target):
+    def get_incoming_edges(self, node, _type):
         """
-        Get edges between `source` and `target`, specified as IDs or nodes.
-
-        args:
-        source -- the source of the edges in question (the start)
-        target -- the target of the edges in question (the end)
-
+        Get a list of (edge, node) pairs for incoming edges to the node.
         """
-        source = self._any_to_id(source)
-        target = self._any_to_id(target)
-        return self._edge_index.query('nodes', '%d-%d' % (source, target))
+        return self.db.edges.find_all({
+            'start': self._any_to_uri(node),
+            'type': _type
+        })
 
-    def gremlin_query(self, query):
+    def get_outgoing_edges(self, node, _type):
         """
-        Takes query in gremlin format and returns results
-
-        args:
-        query -- the script query for the gremlin plugin to process
-
+        Get a list of (edge, node) pairs for outgoing edges from the node.
         """
-        result=self.graph.extensions.GremlinPlugin.execute_script(script=query)
-        if isinstance(result, basestring):
-            if result.startswith('javax.script.ScriptException'):
-                raise RuntimeError("%s in query:\n\t%s" % (result, query))
-        else:
-            return result
 
-    def _any_to_id(self, obj):
-        """
-        Converts any given input in the form of an id, uri or node into an id number.
-
-        args:
-        obj -- the object to be converted
-
-        """
-        if isinstance(obj, Node):
-            return obj.id
-        elif isinstance(obj, basestring):
-            node = self.get_node(obj)
-            if node is None:
-                raise ValueError("Could not find node %r" % obj)
-            return node.id
-        elif isinstance(obj, int):
-            return obj
-        else:
-            raise TypeError
 
     def _any_to_node(self, obj, create=False):
         """
@@ -470,11 +417,8 @@ class ConceptNetGraph(object):
 
         args:
         obj -- the object to be converted(/made)
-
         """
-        if isinstance(obj, Node):
-            return obj
-        elif isinstance(obj, basestring):
+        if isinstance(obj, basestring):
             node = self.get_node(obj)
             if node is None:
                 if create:
@@ -482,8 +426,8 @@ class ConceptNetGraph(object):
                 else:
                     raise ValueError("Could not find node %r" % obj)
             return node
-        elif isinstance(obj, int):
-            return self.get_node_by_id(obj)
+        elif hasattr(obj, '__getitem__'):
+            return obj['uri']
         else:
             raise TypeError
 
@@ -495,24 +439,21 @@ class ConceptNetGraph(object):
         obj -- the object to be converted
 
         """
-        if isinstance(obj, Node):
-            return obj['uri']
-        elif isinstance(obj, basestring):
+        if isinstance(obj, basestring):
             return normalize_uri(obj)
-        elif isinstance(obj, int):
-            return self.get_node_by_id(obj)['uri']
+        elif hasattr(obj, '__getitem__'):
+            return obj['uri']
+        elif obj == 0:
+            # backwards compatibility
+            return u'/'
         else:
             raise TypeError
 
     def get_node_by_id(self, _id):
         """
         Get a node by its ID in the database.
-
-        args:
-        _id -- the id of the node (numeric)
-
         """
-        return self.graph.nodes[_id]
+        raise NotImplementedError
 
     def get_or_create_node(self, uri, properties = {}):
         """
@@ -656,22 +597,21 @@ class ConceptNetGraph(object):
 
         args:
         assertion -- the assertion (in any form, node, uri etc.) in question
-
         """
-        assertion = self._any_to_node(assertion)
-        edges = assertion.relationships.outgoing(types=['arg'])[:]
+        assertion = self._any_to_uri(assertion)
+        edges = self.get_outgoing_edges(assertion, 'arg')
         edges.sort(key = lambda edge: edge['position'])
-        return [edge.end for edge in edges]
+        return [edge['end'] for edge in edges]
     
     def get_rel_and_args(self, assertion):
         """
         Get an assertion's list of both its relation and its arguments.
         """
-        assertion = self._any_to_node(assertion)
-        edges = assertion.relationships.outgoing(types=['arg'])[:]
+        assertion = self._any_to_uri(assertion)
+        edges = self.get_outgoing_edges(assertion, 'arg')
         edges.sort(key = lambda edge: edge['position'])
-        rel_edge = assertion.relationships.outgoing(types=['relation'][0])
-        return [rel_edge.end] + [edge.end for edge in edges]
+        rel_edge = self.get_outgoing_edges(assertion, 'relation')[0]
+        return [rel_edge['end']] + [edge['end'] for edge in edges]
 
     def justify(self, source, target, weight=1.0):
         """
@@ -728,6 +668,7 @@ class ConceptNetGraph(object):
         args:
         obj -- a uri, id or node object that is the target of the deletion
         """
+        raise NotImplementedError
 
         node = self._any_to_node(obj)
         delete = True
