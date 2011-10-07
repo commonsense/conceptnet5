@@ -750,6 +750,91 @@ class ConceptNetGraph(object):
         else: assert False, \
         "There are other nodes that are dependent on this node"
 
+class JSONWriterGraph(ConceptNetGraph):
+    """
+    Follows the same interface as ConceptNetGraph, but does not actually access
+    the database. Instead, it outputs JSON statements to a node file and an
+    edge file, which can be batch imported into MongoDB.
+
+    You should run `JSONWriterGraph.close()` when finished, to ensure
+    that the files are up-to-date.
+    """
+    def __init__(self, filename):
+        self.filename = filename
+        self.nodes = open(filename+'.nodes.json', 'w')
+        self.edges = open(filename+'.edges.json', 'w')
+        self.recently_created_uris = []
+
+    def _write_node(self, properties):
+        print >> self.nodes, json.dumps(properties)
+
+    def _write_edge(self, type, start, end, properties):
+        properties = dict(properties)
+        properties['start'] = start
+        properties['end'] = end
+        properties['type'] = type
+        properties['key'] = u'%s %s %s' % (type, start, end)
+        print >> self.edges, json.dumps(properties)
+    
+    def _create_node(self, **properties):
+        uri = properties['uri']
+        if uri in self.recently_created_uris:
+            return uri
+        self._write_node(properties)
+
+        # put it on a queue of 50 URIs to not recreate
+        self.recently_created_uris = self.recently_created_uris[-49:] + [uri]
+        return uri
+
+    def _create_edge(self, _type, source, target, properties = {}):
+        if source == 0:
+            source = '/'
+        self._write_edge(_type, source, target, properties)
+
+    def _any_to_uri(self, obj):
+        if isinstance(obj, basestring):
+            return normalize_uri(obj)
+        else:
+            raise TypeError
+
+    def _any_to_node(self, obj):
+        raise NotImplementedError
+
+    def get_or_create_assertion(self, relation, args, properties = {}):
+        uri = make_assertion_uri(self._any_to_uri(relation),
+                                 [self._any_to_uri(arg) for arg in args])
+        return (self.get_node(uri) or
+          self._create_assertion_w_components(uri,
+            self.get_or_create_node(relation),
+            [self.get_or_create_node(arg) for arg in args],
+            properties
+          )
+        )
+
+    def get_node(self, uri):
+        if uri in self.recently_created_uris:
+            return uri
+        else:
+            return None
+
+    def get_edge(self, _type, source, target):
+        # force it to be "created"
+        return None
+
+    def get_edges(self, source, target):
+        return []
+    
+    def get_args(self, assertion_uri):
+        return self.get_rel_and_args(assertion_uri)[1:]
+
+    def get_rel_and_args(self, assertion_uri):
+        assert assertion_uri[:11] == '/assertion/'
+        rest = assertion_uri[11:]
+        return uri_piece_to_list(rest)
+
+    def close(self):
+        self.output.close()
+
 class GremlinWriterGraph(ConceptNetGraph):
     """
     Follows the same interface as ConceptNetGraph, but does not actually access

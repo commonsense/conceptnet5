@@ -11,11 +11,13 @@ def run_in_db(graph, command, tries=5):
             sys.stdout.write('.')
             sys.stdout.flush()
             return graph.gremlin_query(command)
-        except StatusException, e:
+        except Exception, e:
             if '500' in str(e):
-                print '?'
+                print command
+                traceback.print_exc()
                 time.sleep(0.5)
             else:
+                print command
                 raise
 
 def batch_import(filename):

@@ -1,9 +1,9 @@
 from conceptnet.models import Frame
-from conceptnet5.graph import GremlinWriterGraph
+from conceptnet5.graph import JSONWriterGraph
 import os
 import codecs
 
-GRAPH = GremlinWriterGraph('gremlin_data/zh.gremlin')
+GRAPH = JSONWriterGraph('json_data/zh')
 
 def handle_file(filename):
     petgame = GRAPH.get_or_create_node(u'/source/activity/petgame')

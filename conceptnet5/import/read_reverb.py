@@ -1,7 +1,7 @@
 """
 Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
-from conceptnet5.graph import GremlinWriterGraph
+from conceptnet5.graph import JSONWriterGraph
 from conceptnet5.english_nlp import normalize, normalize_topic, tokenize, untokenize
 from urlparse import urlparse
 import urllib
@@ -10,7 +10,7 @@ import nltk
 import os
 import re
 
-GRAPH = GremlinWriterGraph('gremlin_data/reverb.gremlin')
+GRAPH = JSONWriterGraph('json_data/reverb')
 
 reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
 GRAPH.justify(0, reverb)

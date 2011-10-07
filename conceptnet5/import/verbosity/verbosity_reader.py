@@ -1,10 +1,10 @@
 from conceptnet5.english_nlp import normalize
-from conceptnet5.graph import GremlinWriterGraph
+from conceptnet5.graph import JSONWriterGraph
 from rhyme import sounds_like_score
 from collections import defaultdict
 import math, re
 
-make_gremlin = True
+make_json = True
 
 assertions = []
 
@@ -37,8 +37,8 @@ good_out = open('output/ok_assertions.txt', 'w')
 
 GRAPH = None
 context = source = None
-if make_gremlin:
-    GRAPH = GremlinWriterGraph('../gremlin_data/verbosity.gremlin')
+if make_json:
+    GRAPH = JSONWriterGraph('../json_data/verbosity')
     source = GRAPH.get_or_create_node('/source/site/verbosity')
     context = GRAPH.get_or_create_node('/context/General')
     GRAPH.justify(0, source)
@@ -120,7 +120,7 @@ for line in open('verbosity.txt'):
     if count % 100 == 0:
         print (rel, left, right, score)
     
-    if make_gremlin:
+    if make_json:
         left_concept = GRAPH.get_or_create_concept('en', left)
         right_concept = GRAPH.get_or_create_concept('en', right)
         relation = GRAPH.get_or_create_node(rel)
@@ -129,7 +129,7 @@ for line in open('verbosity.txt'):
             [left_concept, right_concept],
             {'dataset': 'verbosity', 'license': 'CC-By'}
         )
-        GRAPH.justify(source, assertion)
+        GRAPH.justify(source, assertion, weight=min(score, 1000)/1000.0)
         GRAPH.add_context(assertion, context)
 
 print counts
