@@ -403,7 +403,12 @@ class ConceptNetGraph(object):
         query -- the script query for the gremlin plugin to process
 
         """
-        return self.graph.extensions.GremlinPlugin.execute_script(script=query)
+        result=self.graph.extensions.GremlinPlugin.execute_script(script=query)
+        if isinstance(result, basestring):
+            if result.startswith('javax.script.ScriptException'):
+                raise RuntimeError("%s in query:\n\t%s" % (result, query))
+        else:
+            return result
 
     def _any_to_id(self, obj):
         """

@@ -3,6 +3,7 @@ edgeIndex = g.idx('relationship_auto_index')
 
 node = { uri, properties ->
   existing = nodeIndex.get('uri', uri)
+  properties['uri'] = uri
   if (existing) {
     return existing[0]
   }
@@ -13,20 +14,15 @@ node = { uri, properties ->
 Object.metaClass.makeNode = node
 
 edge = { type, source_uri, target_uri, properties ->
-  source = nodeIndex.get('uri', source_uri)
-  target = nodeIndex.get('uri', target_uri)
-  if (source && target) {
-    nodeKey = source[0].id + '-' + target[0].id
-    existing = edgeIndex.get('nodes', nodeKey)
-    if (existing) {
-      return existing
-    }
-    properties['nodes'] = nodeKey
-    return g.addEdge(source[0], target[0], type, properties)
-  }
-  else {
-    return false
-  }
-}
+  source = nodeIndex.get('uri', source_uri) >> 1;
+  target = nodeIndex.get('uri', target_uri) >> 1;
+  nodeKey = source.id + '-' + target.id;
+  existing = edgeIndex.get('nodes', nodeKey);
+  if (existing) {
+    return existing;
+  };
+  properties['nodes'] = nodeKey;
+  g.addEdge(source, target, type, properties);
+};
 Object.metaClass.makeEdge = edge
 
