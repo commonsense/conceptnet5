@@ -18,28 +18,49 @@ import codecs
 
 def list_to_uri_piece(lst):
     """
-    Encode a list in a format suitable for a URI, by representing it in a
-    form of JSON.
+    Encode a list in a format that is hierarchical yet fits into a URI.
 
     args:
     lst -- the list which will be encoded
 
     """
-    json_str = json.dumps(lst, ensure_ascii=False)
-    if isinstance(json_str, unicode):
-        json_unicode = json_str
-    else:
-        json_unicode = json_str.decode('utf-8')
-    return json_unicode.replace(u' ', u'')
+    out_tokens = [u'[/']
+    first = True
+    for item in lst:
+        if first:
+            first = False
+        else:
+            out_tokens.append(u'/,/')
+        out_tokens.append(item.strip('/'))
+    out_tokens.append(u'/]')
+    return u''.join(out_tokens)
 
 def uri_piece_to_list(uri):
     """
-    Undo the effect of `list_to_uri_piece` by decoding the string from
-    JSON.
+    Undo the effect of `list_to_uri_piece`.
+
     args:
     uri -- the uri to be decoded into a list
     """
-    return json.loads(uri)
+    pieces = uri.split(u'/')
+    assert pieces[0] == '['
+    assert pieces[-1] == ']'
+    chunks = []
+    current = []
+    depth = 0
+    for piece in pieces[1:-1]:
+        if piece == u',' and depth == 0:
+            chunks.append('/' + '/'.join(current))
+            current = []
+        else:
+            current.append(piece)
+            if piece == '[':
+                depth += 1
+            elif piece == ']':
+                depth -= 1
+    chunks.append('/' + '/'.join(current))
+    assert depth == 0
+    return chunks
 
 LUCENE_UNSAFE = re.compile(r'([-+&|!(){}\[\]^"~*?\\: ])')
 def lucene_escape(text):
@@ -243,11 +264,11 @@ class ConceptNetGraph(object):
         properties -- (optional) properties for assertions (see assertions)
 
         """
-        language, name = rest.split('/')
+        language, name = rest.split('/', 1)
         return self._create_node(
             type='concept',
             language=language,
-            name=name,
+            name=name.replace('_', ' '),
             uri=uri,
             score=0,
             **properties
@@ -268,7 +289,7 @@ class ConceptNetGraph(object):
         language, name = rest.split('/')
         return self._create_node(
             type='frame',
-            name=name,
+            name=name.replace('_', ' '),
             language=language,
             score=0,
             uri=uri,
@@ -676,6 +697,12 @@ class ConceptNetGraph(object):
                 self.get_or_create_edge('normalized', node1, node2)
         return edge
 
+    def add_context(self, context, assertion):
+        """
+        Indicate that an assertion is true in a particular context.
+        """
+        return self.get_or_create_edge('context', context, assertion)
+
     def delete_node(self, obj):
         """
         This function deletes nodes safely by checking their connections
@@ -718,35 +745,45 @@ class GremlinWriterGraph(ConceptNetGraph):
     that the file is up-to-date.
     """
 
+    # Find things that look like floating point numbers after a colon.
+    # Then wrap them up in `new Float(...)` to protect Java, which will have to
+    # eventually deal with these structures, from its own stupidity.
+    FLOAT_REGEX = re.compile(ur": ?([-+]?[0-9]*\.[0-9]+)")
+
     def __init__(self, filename):
         self.filename = filename
         self.output = open(filename, 'w')
-        self.recently_created_uris = []
-        
-        # Initialize the file with our setup code.
-        with open(get_project_filename('gremlin/setup.gremlin')) as infile:
-            self.output.write(infile.read())
+        self.recently_created_uris = []    
     
     def _dict_to_gremlin_map(self, thedict):
+        if len(thedict) == 0:
+            return '[:]'
         str = json.dumps(thedict, ensure_ascii=False).encode('utf-8')
+        str = GremlinWriterGraph.FLOAT_REGEX.sub(ur": new Float(\1)", str)
+        str = str.replace('$', r'\$')
         return '[' + str[1:-1] + ']'
+
+    def _safestr(self, str):
+        return "'" + (str.encode('utf-8').replace('$', r'\$').replace("'", r"\'")) + "'"
 
     def _create_node(self, **properties):
         uri = properties['uri']
+        if uri in self.recently_created_uris:
+            return uri
         map = self._dict_to_gremlin_map(properties)
-        print >> self.output, "Object.metaClass.makeNode(%r, %s)" % \
-          (uri.encode('utf-8'), map)
+        print >> self.output, "Object.metaClass.makeNode(%s, %s)" % \
+          (self._safestr(uri), map)
 
-        # put it on a queue of 20 URIs to not recreate
-        self.recently_created_uris = self.recently_created_uris[-19:] + [uri]
+        # put it on a queue of 50 URIs to not recreate
+        self.recently_created_uris = self.recently_created_uris[-49:] + [uri]
         return uri
 
     def _create_edge(self, _type, source, target, properties = {}):
         if source == 0:
             source = '/'
         map = self._dict_to_gremlin_map(properties)
-        print >> self.output, "Object.metaClass.makeEdge(%r, %r, %r, %s)" % \
-          (str(_type), source.encode('utf-8'), target.encode('utf-8'), map)
+        print >> self.output, "Object.metaClass.makeEdge(%s, %s, %s, %s)" % \
+          (self._safestr(_type), self._safestr(source), self._safestr(target), map)
 
     def _any_to_uri(self, obj):
         if isinstance(obj, basestring):
@@ -786,8 +823,8 @@ class GremlinWriterGraph(ConceptNetGraph):
 
     def get_rel_and_args(self, assertion_uri):
         assert assertion_uri[:11] == '/assertion/'
-        json = assertion_uri[11:]
-        return uri_piece_to_list(json)
+        rest = assertion_uri[11:]
+        return uri_piece_to_list(rest)
 
     def close(self):
         self.output.close()

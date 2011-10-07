@@ -1,6 +1,7 @@
 import nltk
 from nltk.corpus import wordnet
 import simplenlp
+import re
 EN = simplenlp.get('en')
 
 try:
@@ -81,6 +82,14 @@ def normalize(text):
     if not pieces:
         return text
     return untokenize(pieces)
+
+def normalize_topic(topic):
+    # find titles of the form Foo (bar)
+    match = re.match(r'([^(]+) \(([^)]+)\)', topic)
+    if not match:
+        return normalize(topic), None
+    else:
+        return normalize(match.group(1)), 'n/'+match.group(2)
 
 def normalize_english_assertion(graph, assertion):
     """

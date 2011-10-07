@@ -2,8 +2,9 @@
 Parse the ReVerb dataset and put assertions to ConceptNet 5
 """
 from conceptnet5.graph import GremlinWriterGraph
-from conceptnet5.english_nlp import normalize, tokenize, untokenize
+from conceptnet5.english_nlp import normalize, normalize_topic, tokenize, untokenize
 from urlparse import urlparse
+import urllib
 import codecs
 import nltk
 import os
@@ -56,13 +57,18 @@ def index_of_verbs(tags):
             index.append(tags.index(tag))
     return index
 
+NEGATIVES = ['not', "n't", 'never', 'rarely']
+
 def remove_tags(tokens, tags, target):
     index_rb = 0
     while target in tags:
         index_rb = tags.index(target)
         if index_rb > 0:
-          tokens.remove(tokens[index_rb])
-          tags.remove(tags[index_rb])
+            if tokens[index_rb] not in NEGATIVES:
+                tokens.remove(tokens[index_rb])
+                tags.remove(tags[index_rb])
+            else:
+                tags[index_rb] = 'NEG'
     return tokens, tags
 
 def get_domain_names(urls):
@@ -74,6 +80,8 @@ def output_triple(arg1, arg2, relation, raw):
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
     relation = normalize(relation).strip()
+    print '%s(%s, %s)' % \
+        (relation, arg1, arg2)
     found_relation = False
     if relation == 'be for':
         found_relation = True
@@ -87,6 +95,9 @@ def output_triple(arg1, arg2, relation, raw):
     if relation == 'be part of':
         found_relation = True
         relation = 'PartOf'
+    if relation == 'be similar to':
+        found_relation = True
+        relation = 'SimilarTo'
     if found_relation:
         rel_node = GRAPH.get_or_create_relation(relation)
     else:
@@ -102,8 +113,11 @@ def output_triple(arg1, arg2, relation, raw):
     
     conjunction = GRAPH.get_or_create_conjunction([raw, reverb_triple])
     GRAPH.justify(conjunction, assertion)
-    print assertion
     return assertion
+
+def article_url_to_topic(url):
+    before, after = url.split('/wiki/', 1)
+    return urllib.unquote(after).replace('_', ' ')
 
 def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
     frame = u"{1} %s {2}" % (raw_relation)
@@ -126,10 +140,17 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         GRAPH.justify(conjunction, raw, weight=0.2)
     else:
         GRAPH.justify(conjunction, raw, weight=0.7)
-    print raw
+
+    for source in sources:
+        # Put in context with Wikipedia articles.
+        topic = article_url_to_topic(source)
+        context = GRAPH.get_or_create_concept('en', topic)
+        context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
+        GRAPH.add_context(context, raw)
+        GRAPH.get_or_create_edge('normalized', context, context_normal)
     return raw
 
-def output_sentence(arg1, arg2, arg3, relation, raw, prep=None):
+def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
     if arg2.strip() == "": # Remove "A is for B" sentence
         return
     arg1 = normalize(arg1).strip()
@@ -145,28 +166,32 @@ def output_sentence(arg1, arg2, arg3, relation, raw, prep=None):
         )
         assertions = (assertion,)
     else:
-        if arg3.strip() == "": # Remove "A before/after/off" sentence
-            return
-        arg3 = normalize(arg3).strip()
-        print '%s(%s, %s), %s(%s, %s)' % \
-            (relation, arg1, arg2, prep, arg2, arg3)
-        assertion1 = GRAPH.get_or_create_assertion(
-            '/relation/'+relation,
-            [GRAPH.get_or_create_concept('en', arg1),
-             GRAPH.get_or_create_concept('en', arg2)],
-            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
-        )
-        assertion2 = GRAPH.get_or_create_assertion(
-            GRAPH.get_or_create_concept('en', 'be_'+prep),
-            [GRAPH.get_or_create_concept('en', arg2),
-             GRAPH.get_or_create_concept('en', arg3)],
-            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
-        )
-        assertions = (assertion1, assertion2)
-
+        if arg3 != '' and prep != 'of':
+            print '%s(%s, %s), %s(%s, %s)' % \
+                (relation, arg1, arg2, prep, arg2, arg3)
+            assertion1 = GRAPH.get_or_create_assertion(
+                '/relation/'+relation,
+                [GRAPH.get_or_create_concept('en', arg1),
+                 GRAPH.get_or_create_concept('en', arg2)],
+                {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+            )
+            assertion2 = GRAPH.get_or_create_assertion(
+                GRAPH.get_or_create_concept('en', 'be_'+prep),
+                [GRAPH.get_or_create_concept('en', arg2),
+                 GRAPH.get_or_create_concept('en', arg3)],
+                {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+            )
+            assertions = (assertion1, assertion2)
+        else:
+            assertions = ()
+    
     for assertion in assertions:
         GRAPH.derive_normalized(raw, assertion)
-        print assertion
+        for source in sources:
+            # Put in context with Wikipedia articles.
+            topic = article_url_to_topic(source)
+            context = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
+            GRAPH.add_context(context, assertion)
 
     return assertion
 
@@ -194,12 +219,13 @@ def handle_line(line):
     sentence = "%s %s %s" % (old_arg1, old_rel, old_arg2)
     tokens = nltk.word_tokenize(sentence)
     tags = map(lambda x: x[1], nltk.pos_tag(tokens))
-    #tokens, tags = remove_tags(tokens, tags, 'RB')	# Remove adverb
+    tokens, tags = remove_tags(tokens, tags, 'RB')	# Remove adverb
     tokens, tags = remove_tags(tokens, tags, 'MD')	# Remove modals
     tokens = map(lambda x: x.lower(), tokens)
 
     raw = output_raw(old_arg1, old_arg2, old_rel, sources)
-    triple = output_triple(old_arg1, old_arg2, old_rel, raw)
+    if probably_present_tense(old_rel.split()[0]):
+        triple = output_triple(old_arg1, old_arg2, old_rel, raw)
 
     index_verbs = index_of_verbs(tags)
     if len(index_verbs) == 0: return
@@ -223,31 +249,31 @@ def handle_line(line):
         if next_tag == 'DT': # IsA relation
             if index_prep == 0:
                 arg2 = untokenize(tokens[index_be+2:])
-                output_sentence(arg1, arg2, None, 'IsA', raw)
+                output_sentence(arg1, arg2, None, 'IsA', raw, sources)
             else:
                 if tokens[index_prep] == 'of' and \
                     tokens[index_prep-1] in TYPE_WORDS:
                     # 'a kind of' frame
                     arg2 = untokenize(tokens[index_prep+1:])
-                    output_sentence(arg1, arg2, None, 'IsA', raw)
+                    output_sentence(arg1, arg2, None, 'IsA', raw, sources)
                 elif tokens[index_prep] == 'of' and \
                     tokens[index_prep-1] == 'part':
                     # 'a part of' frame
                     arg2 = untokenize(tokens[index_prep+1:])
-                    output_sentence(arg1, arg2, None, 'PartOf', raw)
+                    output_sentence(arg1, arg2, None, 'PartOf', raw, sources)
                 else:
                     arg2 = untokenize(tokens[index_be+2:index_prep])
                     arg3 = untokenize(tokens[index_prep+1:])
-                    output_sentence(arg1, arg2, arg3, 'IsA', raw,
+                    output_sentence(arg1, arg2, arg3, 'IsA', raw, sources,
                         prep=tokens[index_prep])
         else:
             if index_prep == 0:
                 arg2 = untokenize(tokens[index_be+1:])
-                print output_sentence(arg1, arg2, None, 'HasProperty', raw)
+                output_sentence(arg1, arg2, None, 'HasProperty', raw, sources)
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
-                output_sentence(arg1, arg2, arg3, 'HasProperty', raw,
+                output_sentence(arg1, arg2, arg3, 'HasProperty', raw, sources,
                     prep=tokens[index_prep])
     else:
         index_be = index_of_be(tokens)
@@ -265,18 +291,18 @@ def handle_line(line):
                 relation = 'DirectObjectOf'
             if index_prep == 0:
                 arg2 = untokenize(tokens[index_be+1:])
-                output_sentence(arg1, arg2, None, relation, raw)
+                output_sentence(arg1, arg2, None, relation, raw, sources)
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
-                output_sentence(arg1, arg2, arg3, relation, raw,
+                output_sentence(arg1, arg2, arg3, relation, raw, sources,
                     prep=tokens[index_prep])
         else: # SubjectOf relation
             if index_prep > 0:
                 arg1 = untokenize(tokens[:index_verbs[0]])
                 arg2 = untokenize(tokens[index_verbs[0]:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
-                output_sentence(arg1, arg2, arg3, 'SubjectOf', raw,
+                output_sentence(arg1, arg2, arg3, 'SubjectOf', raw, sources,
                     prep=tokens[index_prep])
 
 if __name__ == '__main__':
