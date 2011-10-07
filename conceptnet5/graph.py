@@ -396,20 +396,37 @@ class ConceptNetGraph(object):
         key = "%s %s %s" % (_type, source, target)
         return self.db.edges.find_one({'key': key})
 
-    def get_incoming_edges(self, node, _type):
+    def get_incoming_edges(self, node, _type=None):
         """
-        Get a list of (edge, node) pairs for incoming edges to the node.
+        Get a generator of (edge, node) pairs for incoming edges to the node.
         """
-        return self.db.edges.find_all({
-            'start': self._any_to_uri(node),
-            'type': _type
-        })
+        if _type is None:
+            edges = self.db.edges.find({
+                'end': self._any_to_uri(node)
+            })
+        else:
+            edges = self.db.edges.find({
+                'end': self._any_to_uri(node),
+                'type': _type
+            })
+        for edge in edges:
+            yield edge, edge['start']
 
-    def get_outgoing_edges(self, node, _type):
+    def get_outgoing_edges(self, node, _type=None):
         """
-        Get a list of (edge, node) pairs for outgoing edges from the node.
+        Get a generator of (edge, node) pairs for outgoing edges from the node.
         """
-
+        if _type is None:
+            edges = self.db.edges.find({
+                'start': self._any_to_uri(node)
+            })
+        else:
+            edges = self.db.edges.find({
+                'start': self._any_to_uri(node),
+                'type': _type
+            })
+        for edge in edges:
+            yield edge, edge['end']
 
     def _any_to_node(self, obj, create=False):
         """
