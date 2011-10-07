@@ -616,9 +616,9 @@ class ConceptNetGraph(object):
         assertion -- the assertion (in any form, node, uri etc.) in question
         """
         assertion = self._any_to_uri(assertion)
-        edges = self.get_outgoing_edges(assertion, 'arg')
-        edges.sort(key = lambda edge: edge['position'])
-        return [edge['end'] for edge in edges]
+        edge_pairs = self.get_outgoing_edges(assertion, 'arg')
+        edge_pairs.sort(key = lambda pair: pair[0]['position'])
+        return [arg for edge, arg in edge_pairs]
     
     def get_rel_and_args(self, assertion):
         """
@@ -627,8 +627,9 @@ class ConceptNetGraph(object):
         assertion = self._any_to_uri(assertion)
         edges = self.get_outgoing_edges(assertion, 'arg')
         edges.sort(key = lambda edge: edge['position'])
-        rel_edge = self.get_outgoing_edges(assertion, 'relation')[0]
-        return [rel_edge['end']] + [edge['end'] for edge in edges]
+        rel = self.get_outgoing_edges(assertion, 'relation')[0][1]
+        edge_pairs.sort(key = lambda pair: pair[0]['position'])
+        return [rel] + [edge['end'] for edge in edges]
 
     def justify(self, source, target, weight=1.0):
         """
