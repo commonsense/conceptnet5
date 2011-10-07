@@ -10,7 +10,7 @@ import nltk
 import os
 import re
 
-GRAPH = GremlinWriterGraph('/tmp/test.gremlin')
+GRAPH = GremlinWriterGraph('gremlin_data/reverb.gremlin')
 
 reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
 GRAPH.justify(0, reverb)
@@ -61,7 +61,9 @@ NEGATIVES = ['not', "n't", 'never', 'rarely']
 
 def remove_tags(tokens, tags, target):
     index_rb = 0
-    while target in tags:
+    iterations = 0
+    while target in tags and iterations < 10:
+        iterations += 1
         index_rb = tags.index(target)
         if index_rb > 0:
             if tokens[index_rb] not in NEGATIVES:
@@ -146,7 +148,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         topic = article_url_to_topic(source)
         context = GRAPH.get_or_create_concept('en', topic)
         context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
-        GRAPH.add_context(context, raw)
+        GRAPH.add_context(raw, context)
         GRAPH.get_or_create_edge('normalized', context, context_normal)
     return raw
 
@@ -191,7 +193,7 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
             # Put in context with Wikipedia articles.
             topic = article_url_to_topic(source)
             context = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
-            GRAPH.add_context(context, assertion)
+            GRAPH.add_context(assertion, context)
 
     return assertion
 

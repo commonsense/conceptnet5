@@ -1,9 +1,10 @@
 from conceptnet5.english_nlp import normalize
+from conceptnet5.graph import GremlinWriterGraph
 from rhyme import sounds_like_score
 from collections import defaultdict
 import math, re
 
-make = False
+make_gremlin = True
 
 assertions = []
 
@@ -13,6 +14,7 @@ mapping = {
     "it is used for": '/relation/UsedFor',
     "it is a kind of": '/relation/IsA',
     "it is a type of": '/relation/IsA',
+    "it is about the same size as": '/relation/RelatedTo',
     "it is related to": '/relation/RelatedTo',
     "it has": '/concept/en/have_or_involve',
     "it is": '/relation/HasProperty',
@@ -32,6 +34,14 @@ flag_out = open('output/flagged_assertions.txt', 'w')
 similar_out = open('output/text_similarity.txt', 'w')
 weak_out = open('output/weak_assertions.txt', 'w')
 good_out = open('output/ok_assertions.txt', 'w')
+
+GRAPH = None
+context = source = None
+if make_gremlin:
+    GRAPH = GremlinWriterGraph('../gremlin_data/verbosity.gremlin')
+    source = GRAPH.get_or_create_node('/source/site/verbosity')
+    context = GRAPH.get_or_create_node('/context/General')
+    GRAPH.justify(0, source)
 
 for line in open('verbosity.txt'):
     if skipcount > 0:
@@ -107,7 +117,20 @@ for line in open('verbosity.txt'):
     count += 1
     counts['success'] += 1
     good_out.write(line)
-    print (rel, left, right, score)
+    if count % 100 == 0:
+        print (rel, left, right, score)
+    
+    if make_gremlin:
+        left_concept = GRAPH.get_or_create_concept('en', left)
+        right_concept = GRAPH.get_or_create_concept('en', right)
+        relation = GRAPH.get_or_create_node(rel)
+        assertion = GRAPH.get_or_create_assertion(
+            relation,
+            [left_concept, right_concept],
+            {'dataset': 'verbosity', 'license': 'CC-By'}
+        )
+        GRAPH.justify(source, assertion)
+        GRAPH.add_context(assertion, context)
 
 print counts
 

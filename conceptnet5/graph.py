@@ -273,6 +273,19 @@ class ConceptNetGraph(object):
             score=0,
             **properties
         )
+
+    def _create_context_node(self, uri, rest, properties):
+        """
+        Creates a context node, an abstract node indicating when things are true
+        """
+        name = rest
+        return self._create_node(
+            type='context',
+            name=name.replace('_', ' '),
+            uri=uri,
+            score=0,
+            **properties
+        )
     
     def _create_frame_node(self, uri, rest, properties):
         """
@@ -582,6 +595,8 @@ class ConceptNetGraph(object):
                 type='conjunction',
                 uri=uri
             )
+            for conjunct in uris:
+                self._create_edge('conjunct', conjunct, node)
         return node
     
     def get_or_create_frame(self, language, name):
@@ -697,11 +712,11 @@ class ConceptNetGraph(object):
                 self.get_or_create_edge('normalized', node1, node2)
         return edge
 
-    def add_context(self, context, assertion):
+    def add_context(self, assertion, context):
         """
         Indicate that an assertion is true in a particular context.
         """
-        return self.get_or_create_edge('context', context, assertion)
+        return self.get_or_create_edge('context', assertion, context)
 
     def delete_node(self, obj):
         """
@@ -759,7 +774,7 @@ class GremlinWriterGraph(ConceptNetGraph):
         if len(thedict) == 0:
             return '[:]'
         str = json.dumps(thedict, ensure_ascii=False).encode('utf-8')
-        str = GremlinWriterGraph.FLOAT_REGEX.sub(ur": new Float(\1)", str)
+        str = GremlinWriterGraph.FLOAT_REGEX.sub(r": new Float(\1)", str)
         str = str.replace('$', r'\$')
         return '[' + str[1:-1] + ']'
 
@@ -782,8 +797,8 @@ class GremlinWriterGraph(ConceptNetGraph):
         if source == 0:
             source = '/'
         map = self._dict_to_gremlin_map(properties)
-        print >> self.output, "Object.metaClass.makeEdge(%s, %s, %s, %s)" % \
-          (self._safestr(_type), self._safestr(source), self._safestr(target), map)
+        self.output.write("Object.metaClass.makeEdge(%s, %s, %s, %s)\n" % \
+          (self._safestr(_type), self._safestr(source), self._safestr(target), map))
 
     def _any_to_uri(self, obj):
         if isinstance(obj, basestring):

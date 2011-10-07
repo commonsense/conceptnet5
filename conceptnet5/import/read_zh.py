@@ -1,9 +1,9 @@
 from conceptnet.models import Frame
-from conceptnet5.graph import get_graph
+from conceptnet5.graph import GremlinWriterGraph
 import os
 import codecs
 
-GRAPH = get_graph()
+GRAPH = GremlinWriterGraph('gremlin_data/zh.gremlin')
 
 def handle_file(filename):
     petgame = GRAPH.get_or_create_node(u'/source/activity/petgame')
@@ -19,13 +19,13 @@ def handle_file(filename):
             assertion = GRAPH.get_or_create_assertion(
                 '/relation/'+relation.name,
                 [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
-                {'dataset': 'conceptnet/zh_TW'}
+                {'dataset': 'conceptnet/zh_TW', 'license': 'CC-By'}
             )
 
             raw = GRAPH.get_or_create_assertion(
                 '/frame/zh_TW/'+frame.text,
                 [u'/concept/zh_TW/'+concept1, u'/concept/zh_TW/'+concept2],
-                {'dataset': 'conceptnet/zh_TW'}
+                {'dataset': 'conceptnet/zh_TW', 'license': 'CC-By'}
             )
 
             source_uri = u"/source/contributor/petgame/%s" % user
@@ -34,7 +34,8 @@ def handle_file(filename):
             
             conjunction = GRAPH.get_or_create_conjunction([source, petgame])
             GRAPH.justify(conjunction, raw)
-            print GRAPH.derive_normalized(raw, assertion)
+            GRAPH.derive_normalized(raw, assertion)
+            print assertion
 
 if __name__ == '__main__':
     for filename in os.listdir('.'):

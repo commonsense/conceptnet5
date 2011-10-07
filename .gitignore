@@ -6,3 +6,5 @@
 conceptnet5/import/*.txt
 enwiktionary.xml
 wikipedia.txt
+verbosity.txt
+gremlin_data
