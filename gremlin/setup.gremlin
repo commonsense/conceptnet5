@@ -1,28 +1,28 @@
-nodeIndex = g.idx('node_auto_index')
-edgeIndex = g.idx('relationship_auto_index')
+    nodeIndex = g.idx('node_auto_index')
+    edgeIndex = g.idx('relationship_auto_index')
 
-node = { uri, properties ->
-  existing = nodeIndex.get('uri', uri)
-  properties['uri'] = uri
-  if (existing) {
-    return existing[0]
-  }
-  else {
-    return g.addVertex(properties)
-  }
-}
-Object.metaClass.makeNode = node
+    node = { uri, properties ->
+      existing = nodeIndex.get('uri', uri)
+      properties['uri'] = uri
+      if (existing) {
+        return existing[0]
+      }
+      else {
+        return g.addVertex(properties)
+      }
+    }
+    Object.metaClass.makeNode = node
 
-edge = { type, source_uri, target_uri, properties ->
-  source = nodeIndex.get('uri', source_uri) >> 1;
-  target = nodeIndex.get('uri', target_uri) >> 1;
-  nodeKey = source.id + '-' + target.id;
-  existing = edgeIndex.get('nodes', nodeKey);
-  if (existing) {
-    return existing;
-  };
-  properties['nodes'] = nodeKey;
-  g.addEdge(source, target, type, properties);
-};
-Object.metaClass.makeEdge = edge
+    edge = { type, source_uri, target_uri, properties ->
+      source = nodeIndex.get('uri', source_uri) >> 1;
+      target = nodeIndex.get('uri', target_uri) >> 1;
+      nodeKey = source.id + '-' + target.id;
+      existing = edgeIndex.get('nodes', nodeKey);
+      if (existing) {
+        return existing;
+      };
+      properties['nodes'] = nodeKey;
+      g.addEdge(source, target, type, properties);
+    };
+    Object.metaClass.makeEdge = edge
 
