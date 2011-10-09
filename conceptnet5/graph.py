@@ -180,6 +180,8 @@ class ConceptNetGraph(object):
         properties = dict(properties)
         properties['start'] = self._any_to_uri(source)
         properties['end'] = self._any_to_uri(target)
+        if 'position' in properties:
+            _type += str(properties['position'])
         properties['type'] = _type
         key = u'%s %s %s' % (_type, source, target)
         properties['key'] = key
@@ -202,12 +204,11 @@ class ConceptNetGraph(object):
         assertion = self._create_node(
             type='assertion',
             uri=uri,
-            score=0,
             **properties
         )
-        self._create_edge("relation", assertion, relation)
+        self._create_edge("relation", assertion, relation, {'weight': 1})
         for i in xrange(len(args)):
-            self._create_edge("arg", assertion, args[i], {'position': i+1})
+            self._create_edge("arg", assertion, args[i], {'position': i+1, 'weight': 1})
         return assertion
 
     def _create_assertion_node(self, uri, rest, properties):
@@ -229,6 +230,8 @@ class ConceptNetGraph(object):
         arg_uris = uri_parts[1:]
         args = []
         rel = self.get_or_create_node(rel_uri)
+        properties['relation'] = rel_uri
+        properties['args'] = arg_uris
         for arg_uri in arg_uris:
             args.append(self.get_or_create_node(arg_uri))
         assertion = self._create_assertion_w_components(uri, rel, args,
@@ -256,7 +259,6 @@ class ConceptNetGraph(object):
             language=language,
             name=name.replace('_', ' '),
             uri=uri,
-            score=0,
             **properties
         )
 
@@ -269,7 +271,6 @@ class ConceptNetGraph(object):
             type='context',
             name=name.replace('_', ' '),
             uri=uri,
-            score=0,
             **properties
         )
     
@@ -290,7 +291,6 @@ class ConceptNetGraph(object):
             type='frame',
             name=name.replace('_', ' '),
             language=language,
-            score=0,
             uri=uri,
             **properties
         )
@@ -553,7 +553,7 @@ class ConceptNetGraph(object):
                 uri=uri
             )
             for conjunct in uris:
-                self._create_edge('conjunct', conjunct, node)
+                self._create_edge('conjunct', conjunct, node, {'weight': 0})
         return node
     
     def get_or_create_frame(self, language, name):
@@ -658,9 +658,9 @@ class ConceptNetGraph(object):
         target -- the target node, the node being justified
         weight -- the weight of the normalized edge
         """
-
         assert weight > 0
-        edge = self.get_or_create_edge('normalized', source, target)
+        if not (source == target):
+            edge = self.get_or_create_edge('normalized', source, target)
         self.justify(source, target, weight)
         for node1, node2 in zip(self.get_rel_and_args(source),
                                 self.get_rel_and_args(target)):
@@ -672,7 +672,7 @@ class ConceptNetGraph(object):
         """
         Indicate that an assertion is true in a particular context.
         """
-        return self.get_or_create_edge('context', assertion, context)
+        return self.get_or_create_edge('context', assertion, context, {'weight': 1})
 
     def delete_node(self, obj):
         """
@@ -694,7 +694,7 @@ class ConceptNetGraph(object):
                     conj_list.append(relation['end'])
         elif node['type'] != 'conjunction':
             for relation in concept_graph.get_outgoing_edges(node['uri']):
-                if relatiom['start']['type'] == 'assertion':
+                if relation['start']['type'] == 'assertion':
                     delete = False
                     break
         if delete:
@@ -728,6 +728,8 @@ class JSONWriterGraph(ConceptNetGraph):
         properties = dict(properties)
         properties['start'] = start
         properties['end'] = end
+        if 'position' in properties:
+            type += str(position)
         properties['type'] = type
         properties['key'] = u'%s %s %s' % (type, start, end)
         print >> self.edges, json.dumps(properties)
@@ -888,8 +890,8 @@ class GremlinWriterGraph(ConceptNetGraph):
 def get_graph():
     """
     Return a graph object representing the Concept Net graph hosted
-    on the tortoise server for the Concept Net team.
+    on the Amazon server for the Concept Net team.
 
     no args
     """
-    return ConceptNetGraph('ec2-75-101-189-5.compute-1.amazonaws.com')
+    return ConceptNetGraph('ec2-184-72-169-112.compute-1.amazonaws.com')
