@@ -3,8 +3,8 @@ from conceptnet5.graph import JSONWriterGraph, ConceptNetGraph
 import os
 import codecs
 
-#GRAPH = JSONWriterGraph('json_data/zh')
-GRAPH = ConceptNetGraph('localhost:7474')
+GRAPH = JSONWriterGraph('json_data/zh')
+#GRAPH = ConceptNetGraph('localhost:7474')
 
 def handle_file(filename):
     petgame = GRAPH.get_or_create_node(u'/source/activity/petgame')

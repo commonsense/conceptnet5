@@ -180,10 +180,10 @@ class ConceptNetGraph(object):
         properties = dict(properties)
         properties['start'] = self._any_to_uri(source)
         properties['end'] = self._any_to_uri(target)
+        properties['type'] = _type
         if 'position' in properties:
             _type += str(properties['position'])
-        properties['type'] = _type
-        key = u'%s %s %s' % (_type, source, target)
+        key = u'%s %s %s' % (_type, properties['start'], properties['end'])
         properties['key'] = key
         self.db.edges.update({'key': key}, properties, upsert=True, safe=True)
         return self.db.edges.find_one({'key': key})
@@ -201,6 +201,9 @@ class ConceptNetGraph(object):
         properties -- important properties of the assertion
 
         """
+        properties['relation'] = self._any_to_uri(relation)
+        arg_uris = [self._any_to_uri(arg) for arg in args]
+        properties['args'] = arg_uris
         assertion = self._create_node(
             type='assertion',
             uri=uri,
@@ -530,7 +533,9 @@ class ConceptNetGraph(object):
         name = name.replace(u'/', u'_')
         uri = u"/concept/%s/%s" % (language, name)
         if disambiguation:
+            base_uri = uri
             uri += u'/'+disambiguation
+            self.get_or_create_edge('sense', base_uri, uri, {'weight': 1})
         return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_conjunction(self, conjuncts):
@@ -725,12 +730,15 @@ class JSONWriterGraph(ConceptNetGraph):
         print >> self.nodes, json.dumps(properties)
 
     def _write_edge(self, type, start, end, properties):
+        start = self._any_to_uri(start)
+        end = self._any_to_uri(end)
+        
         properties = dict(properties)
         properties['start'] = start
         properties['end'] = end
-        if 'position' in properties:
-            type += str(position)
         properties['type'] = type
+        if 'position' in properties:
+            type += str(properties['position'])
         properties['key'] = u'%s %s %s' % (type, start, end)
         print >> self.edges, json.dumps(properties)
     
