@@ -443,7 +443,7 @@ class ConceptNetGraph(object):
                     raise ValueError("Could not find node %r" % obj)
             return node
         elif hasattr(obj, '__getitem__'):
-            return obj['uri']
+            return obj
         else:
             raise TypeError
 
@@ -678,8 +678,7 @@ class ConceptNetGraph(object):
         """
         This function deletes nodes safely by checking their connections
         and confirming that they are superfluous for the network. It also
-        deletes conjunctions that are reliant on the assumption that 
-        sources are the only things that point to conjunctions
+        deletes conjunctions.
 
         args:
         obj -- a uri, id or node object that is the target of the deletion
@@ -690,20 +689,20 @@ class ConceptNetGraph(object):
         delete = True
         conj_list = []
         if node['type'] == 'source':
-            for rel_node in node.relationships.outgoing():
-                if rel_node['type'] == 'conjunction':
-                    conj_list.append(rel_node)
+            for relation in concept_graph.get_outgoing_edges(node['uri']):
+                if relation['end']['type'] == 'conjunction':
+                    conj_list.append(relation['end'])
         elif node['type'] != 'conjunction':
-            for edge in node.relationships.incoming():
-                if edge.start['type'] == 'assertion':
+            for relation in concept_graph.get_outgoing_edges(node['uri']):
+                if relatiom['start']['type'] == 'assertion':
                     delete = False
                     break
         if delete:
-            for edge in node.relationships():
-                edge.delete()
+            for edge in concept_graph.get_edges(node['uri']):
+                self.db.edges.remove({'key':edge['key']})
             for conjunction in conj_list:
-                conjunction.delete()
-            node.delete()
+                self.db.nodes.remove({'key':conjunction['key']})
+            self.db.nodes.remove({'key':node['key']})
         else: assert False, \
         "There are other nodes that are dependent on this node"
 
