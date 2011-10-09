@@ -81,6 +81,8 @@ def normalize(text):
     pieces = [piece for piece in pieces if piece]
     if not pieces:
         return text
+    if pieces[0] == 'to':
+        pieces = pieces[1:]
     return untokenize(pieces)
 
 def normalize_topic(topic):
@@ -98,8 +100,9 @@ def normalize_english_assertion(graph, assertion):
     normalized forms, and add `normalized` links between them where
     appropriate.
     """
-    args = graph.get_args(assertion)
-    rel = assertion['relation']
+    relargs = graph.get_rel_and_args(assertion)
+    rel = relargs[0]
+    args = relargs[1:]
     if rel['type'] == 'concept':
         rel = graph.get_or_create_concept('en', normalize(rel['name']))
     concept_names = [normalize(arg['name']) for arg in args]

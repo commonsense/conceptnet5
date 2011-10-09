@@ -189,6 +189,10 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
     
     for assertion in assertions:
         GRAPH.derive_normalized(raw, assertion)
+        conjunction = GRAPH.get_or_create_conjunction(
+            [raw, reverb_object]
+        )
+        GRAPH.justify(conjunction, assertion)
         for source in sources:
             # Put in context with Wikipedia articles.
             topic = article_url_to_topic(source)

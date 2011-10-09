@@ -60,7 +60,6 @@ def uri_piece_to_list(uri):
             elif piece == ']':
                 depth -= 1
     chunks.append('/' + '/'.join(current))
-    assert depth == 0
     return chunks
 
 def make_assertion_uri(relation_uri, arg_uri_list):
@@ -894,4 +893,4 @@ def get_graph():
 
     no args
     """
-    return ConceptNetGraph('tortoise.csc.media.mit.edu')
+    return ConceptNetGraph('ec2-75-101-189-5.compute-1.amazonaws.com')
