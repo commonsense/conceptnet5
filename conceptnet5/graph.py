@@ -666,12 +666,12 @@ class ConceptNetGraph(object):
         assert weight > 0
         if not (source == target):
             edge = self.get_or_create_edge('normalized', source, target)
-        self.justify(source, target, weight)
-        for node1, node2 in zip(self.get_rel_and_args(source),
-                                self.get_rel_and_args(target)):
-            if not (node1 == node2):
-                self.get_or_create_edge('normalized', node1, node2)
-        return edge
+            self.justify(source, target, weight)
+            for node1, node2 in zip(self.get_rel_and_args(source),
+                                    self.get_rel_and_args(target)):
+                if not (node1 == node2):
+                    self.get_or_create_edge('normalized', node1, node2)
+            return edge
 
     def add_context(self, assertion, context):
         """
