@@ -11,7 +11,7 @@ DBPEDIA_DATA_PREFIX = u'http://dbpedia.org/page/'
 DBPEDIA_SOURCE = [u'source', u'web', u'dbpedia.org']
 TYPE_HTML = ('<a class="uri" href="http://www.w3.org/1999/02/'
     '22-rdf-syntax-ns#type">')
-TYPE_RELATION_NAME = u'rdf:type'
+TYPE_RELATION_NAME = u'InstanceOf'
 TYPE_RELATION_PROPERTIES = {
     u'owl:sameAs':u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 }
@@ -57,13 +57,12 @@ def get_types_from_html(html):
 
 def make_type_assertions_for_obj(conceptnet, obj_url, obj_types):
   concept = conceptnet.get_or_create_web_concept(obj_url)
-  relation = conceptnet.get_or_create_relation(TYPE_RELATION_NAME)
   source = conceptnet.get_or_create_source(DBPEDIA_SOURCE)
-  #set_node_properties(relation, TYPE_RELATION_PROPERTIES)
   for obj_type in obj_types:
     obj_type_concept = conceptnet.get_or_create_web_concept(obj_type)
     assertion = conceptnet.get_or_create_assertion(
-        relation, [concept, obj_type_concept])
+        '/relation/'+TYPE_RELATION_NAME, [concept, obj_type_concept],
+        properties=TYPE_ASSERTION_PROPERTIES)
     #set_node_properties(assertion, TYPE_ASSERTION_PROPERTIES)
     conceptnet.justify(source, assertion)
 
@@ -71,6 +70,8 @@ def main():
   #conceptnet = get_graph()
   #wikipediaTitles = open(WIKIPEDIA_TITLES)
   conceptnet = JSONWriterGraph('json_data/dbpedia_data')
+  instanceOf = conceptnet.get_or_create_relation(TYPE_RELATION_NAME,
+    properties=TYPE_RELATION_PROPERTIES)
   wikipediaTitles = ['Tetris']
   for line in wikipediaTitles:
     try:
