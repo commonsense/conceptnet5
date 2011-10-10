@@ -572,7 +572,7 @@ class ConceptNetGraph(object):
         uri = "/frame/%s/%s" % (language, name)
         return self.get_node(uri) or self._create_node_by_type(uri, {})
 
-    def get_or_create_relation(self, name):
+    def get_or_create_relation(self, name, properties={}):
         """
         finds or creates relation using the name of the relation.
         convenience function.
@@ -582,7 +582,7 @@ class ConceptNetGraph(object):
         """
 
         uri = "/relation/%s" % name
-        return self.get_node(uri) or self._create_node_by_type(uri, {})
+        return self.get_node(uri) or self._create_node_by_type(uri, properties)
 
     def get_or_create_source(self, source_list):
         """

@@ -75,10 +75,12 @@ def untokenize(tokens):
         text = ' '.join(tokens)
     return EN.untokenize(text)
 
+def good_lemma(lemma):
+    return lemma and lemma not in STOPWORDS and lemma[0].isalnum()
+
 def normalize(text):
-    pieces = [morphy_stem(word) for word in tokenize(text)
-              if word not in STOPWORDS]
-    pieces = [piece for piece in pieces if piece]
+    pieces = [morphy_stem(word) for word in tokenize(text)]
+    pieces = [piece for piece in pieces if good_lemma(piece)]
     if not pieces:
         return text
     if pieces[0] == 'to':

@@ -13,11 +13,11 @@ TYPE_HTML = ('<a class="uri" href="http://www.w3.org/1999/02/'
     '22-rdf-syntax-ns#type">')
 TYPE_RELATION_NAME = u'InstanceOf'
 TYPE_RELATION_PROPERTIES = {
-    u'owl:sameAs':u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+    'owl:sameAs':u'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 }
 TYPE_ASSERTION_PROPERTIES = {
-    u'source':u'dbpedia',
-    u'license':u'CC-By-SA'
+    'source':u'dbpedia',
+    'license':u'CC-By-SA'
 }
 WIKIPEDIA_TITLES = 'wikipedia.txt'
 
