@@ -1,0 +1,22 @@
+/**
+ * Author: Justin Venezuela (jven@mit.edu)
+ * Stylesheet for ConceptNet5 web interface.
+ */
+
+/* HTML Tags. */
+
+body{
+  background-image:url('../img/background.gif')
+}
+
+/* Classes. */
+
+.column{
+  margin:50px auto;
+  width:900px
+}
+.content{
+  background-image:url('../img/stucco.png');
+  border:5px solid black;
+  padding:50px
+}

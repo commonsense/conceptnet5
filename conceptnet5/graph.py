@@ -154,6 +154,10 @@ class ConceptNetGraph(object):
             a type with this method.
             """ % uri)
         _, _type, rest = uri.split('/', 2)
+        # Check if this is a web_concept
+        if uri.find('http') == 0:
+          return self._create_web_concept_node(
+              '/web_concept/%s' % uri, uri, properties)
         method = getattr(self, '_create_%s_node' % _type)
         if method is None:
             raise ValueError("I don't know how to create type %r" % _type)
@@ -339,21 +343,20 @@ class ConceptNetGraph(object):
             **properties
         )
 
-    def _create_web_concept_node(self, uri, properties):
+    def _create_web_concept_node(self, unused_uri, rest, properties):
         """
         creates a web concept node, whose uri is the url
         of the web page from which the concept is sourced
 
         args:
-        uri -- identifier of the intended node, used in index
-        also the url of the web concept
-        rest -- in this case, nonsense
+        uri -- this is /web_concept/ + rest, which we don't use
+        rest -- the url of the web concept
         properties -- optional properties of the web_concept
 
         """
         return self._create_node(
             type='web_concept',
-            uri=uri,
+            uri=rest,
             **properties
         )
 
@@ -606,7 +609,8 @@ class ConceptNetGraph(object):
         url -- the url of the web concept
 
         """
-        return self.get_node(url) or self._create_web_concept_node(url, {})
+        temp_uri = "/web_concept/%s" % url
+        return self.get_node(url) or self._create_node_by_type(temp_uri, {})
 
     def get_args(self, assertion):
         """
