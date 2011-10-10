@@ -16,6 +16,7 @@ from pymongo import Connection
 import re
 import json
 import codecs
+import random
 
 def list_to_uri_piece(lst):
     """
@@ -710,6 +711,38 @@ class ConceptNetGraph(object):
             self.db.nodes.remove({'key':node['key']})
         else: assert False, \
         "There are other nodes that are dependent on this node"
+
+    def summarize_assertion(self, assertion):
+        """
+        Get information about an assertion that isn't necessarily available
+        directly on its node.
+        """
+        node_data = assertion
+        relation = node_data['relation']
+        for normalized_edge, normalized_uri in self.get_outgoing_edges(node_data['uri'], 'normalized'):
+            relation = self.get_node(normalized_uri)['relation']
+        assert not relation.startswith('/frame')
+        relation = relation.split('/')[-1]
+
+        concepts = [concept.split('/')[3] for concept in node_data['args']]
+        context = None
+        for context_edge, context_uri in self.get_outgoing_edges(node_data['uri'], 'context'):
+            if context_uri.count('/') >= 3:
+                context = context_uri.split('/')[3]
+
+        if context:
+            return "[%s] %s [%s], in the context [%s]" % (concepts[0], relation, '] ['.join(concepts[1:]), context)
+        else:
+            return "[%s] %s [%s]" % (concepts[0], relation, '] ['.join(concepts[1:]))
+
+    def get_random_assertions(self):
+        rand = random.random()
+        for assertion in self.db.randomNodes.find({'value.type': 'assertion', 'value.random': {'$gt': rand}}).sort('value.random'):
+            yield self.get_node(assertion['_id'])
+
+    def random_assertions_to_evaluate(self):
+        for assertion in self.get_random_assertions():
+            print self.summarize_assertion(assertion)
 
 class JSONWriterGraph(ConceptNetGraph):
     """
