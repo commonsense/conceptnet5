@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% block content %}
+Assertions:
+<ul>
+{% for assertion in assertions %}
+<li>
+<!--<a href="{{ assertion }}">{{ assertion }}</a>-->
+{{ assertion }}
+</li>
+{% endfor %}
+</ul>
+<hr />
+Normalizations:
+<ul>
+{% for normalization in normalizations %}
+<li>
+{{ normalization[0] }} -- {{ normalization[1] }}
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
