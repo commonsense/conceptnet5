@@ -539,7 +539,7 @@ class ConceptNetGraph(object):
         if disambiguation:
             base_uri = uri
             uri += u'/'+disambiguation
-            self.get_or_create_edge('sense', base_uri, uri, {'weight': 1})
+            self.get_or_create_edge('senseOf', uri, base_uri, {'weight': 1})
         return self.get_node(uri) or self._create_node_by_type(uri, {})
 
     def get_or_create_conjunction(self, conjuncts):
@@ -669,6 +669,8 @@ class ConceptNetGraph(object):
         weight -- the weight of the normalized edge
         """
         assert weight > 0
+        source = self._any_to_uri(source)
+        target = self._any_to_uri(target)
         if not (source == target):
             edge = self.get_or_create_edge('normalized', source, target)
             self.justify(source, target, weight)
