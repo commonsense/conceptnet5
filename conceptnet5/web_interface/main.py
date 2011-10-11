@@ -61,7 +61,11 @@ def get_data(uri):
         assertions.append([assertion_relation, assertion_arg_left,
             assertion_args_right])
     elif relation[u'type'] == u'normalized':
-      normalizations.append((relation[u'start'], relation[u'end']))
+      relation_arg_left_uri = relation[u'start']
+      relation_arg_right_uri = relation[u'end']
+      relation_arg_left = conceptnet.get_node(relation_arg_left_uri)
+      relation_arg_right = conceptnet.get_node(relation_arg_right_uri)
+      normalizations.append([relation_arg_left, relation_arg_right])
   return render_template('data.html', assertions=assertions, frames=frames,
       normalizations=normalizations)
 

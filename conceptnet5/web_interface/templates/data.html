@@ -4,10 +4,9 @@ Assertions:
 <ul>
 {% for assertion in assertions %}
 <li>
-<!--<a href="{{ assertion }}">{{ assertion }}</a>-->
-{{ assertion[1].name }} -- {{ assertion[0].name }} -- 
+<a href="{{ url_for('get_data', uri=assertion[1].uri[1:]) }}">{{ assertion[1].name }}</a> -- <a href="{{ url_for('get_data', uri=assertion[0].uri[1:]) }}">{{ assertion[0].name }}</a> -- 
 {% for arg in assertion[2] %}
-{{ arg.name }}
+<a href="{{ url_for('get_data', uri=arg.uri[1:]) }}">{{ arg.name }}</a>
 {% endfor %}
 </li>
 {% endfor %}
@@ -26,7 +25,7 @@ Normalizations:
 <ul>
 {% for normalization in normalizations %}
 <li>
-{{ normalization[0] }} -- {{ normalization[1] }}
+<a href="{{ url_for('get_data', uri=normalization[0].uri[1:]) }}">{{ normalization[0].name }}</a> -- <a href="{{ url_for('get_data', uri=normalization[1].uri[1:]) }}">{{ normalization[1].name }}</a>
 </li>
 {% endfor %}
 </ul>
