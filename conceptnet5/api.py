@@ -27,29 +27,91 @@ def get_data(uri):
     """
     This function retrieves information about the desired node,
     and returns that information as a json file.
+    TO DO: PAGINATED, TWO ELEMENT DICTIONARY
+    CREATE A LINK TO FIRST ASSERTION PAGE
+    PAGINATED BY SCORE
     """
     uri = '/' + uri
-    print uri
+    #print uri
     node = concept_graph.get_node(uri)
     json = {}
-    json['properties']= node
-    json['properties']['url'] = root_url + '/data' + json['properties']['uri']
+    json['properties'] = node
+    json['properties']['url'] = root_url + '/data' + uri
     del json['properties']['_id']
-    json['incoming'] = []
-    json['outgoing'] = []
-    #json['assertions'] = []
-    #assertion_uris = []
-    for relation in concept_graph.get_incoming_edges(node['uri']):
-        json['incoming'].append(relation[0])
-        json['incoming'][-1]['start_url'] = root_url + '/data' + relation[0]['start']
-        del json['incoming'][-1]['_id']
-        if relation[0]['type'] == 'arg':
-            assertion_uris.append(relation[0]['start'])
-    for relation in concept_graph.get_outgoing_edges(node['uri']):
-        json['outgoing'].append(relation[0])
-        json['outgoing'][-1]['end_url'] = root_url + '/data' + relation[0]['end']
-        del json['outgoing'][-1]['_id']
+    json['incoming_assertions'] = get_assertions(uri)
+    json['incoming_assertions_url'] = root_url + '/incoming_assertions' + uri
+    json['incoming_edges'] = get_incoming(uri)
+    json['incoming_edges_url'] = root_url + '/incoming_edges' + uri
+    json['outgoing_edges'] = get_outgoing(uri)
+    json['outgoing_edges_url'] = root_url + '/outgoing_edges' + uri
     return flask.jsonify(json)
+
+def get_assertions(uri, max_score = 0.0):
+    """
+    This function retrieves information about which assertions point to
+    the node in question. It does so in a paginated format based on max score.
+    TO DO: PAGINATED BY ASSERTION SCORE
+    """
+    json = []
+    new_max_score = 0
+    for relation in concept_graph.get_incoming_edges(uri, _type='arg', max_score=max_score, result_limit=50):
+        json.append(concept_graph.get_node(relation[1]))
+        json[-1]['url'] = root_url + '/data' + json[-1]['uri']
+        del json[-1]['_id']
+        new_max_score = relation[0]['score']
+    if len(json) == 50:
+        json.append({})
+        json[-1]['next'] = root_url + '/incoming_assertions' + uri + '/' + str(new_max_score)
+    return json
+
+@app.route('/incoming_assertions/', defaults={'max_score':0.0})
+@app.route('/incoming_assertions/<path:uri>/<float:max_score>')
+def get_incoming_assertions(uri, max_score):
+    """This function uses get_assertions and outputs json"""
+    return flask.jsonify(get_assertions(uri, max_score=max_score))
+
+def get_incoming(uri, max_score = 0.0):
+    """
+    This function retrieves information about the incomign edges of
+    the node in question. It does so in a paginated format based on max score.
+    """
+    json = []
+    for relation in concept_graph.get_incoming_edges(uri, max_score=max_score, result_limit=50):
+        json.append(relation[0])
+        last_id = json[-1]['_id']
+        del json[-1]['_id']
+    if len(json) == 50:
+        json.append({})
+        #json[-1]['next'] = root_url + '/incoming_edges' + uri + '/' + json[-2]['key']
+        json[-1]['next'] = root_url + '/incoming_edges' + uri + '/' + str(json[-2]['score'])
+    return json
+
+@app.route('/incoming_edges/', defaults={'max_score':0.0})
+@app.route('/incoming_edges/<path:uri>/<float:max_score>')
+def get_incoming_edges(uri, max_score):
+    """This function uses get_incoming and outputs json"""
+    return flask.jsonify(get_incoming(uri, max_score=max_score))
+
+def get_outgoing(uri, max_score = 0.0):
+    """
+    This function retrieves information about the outgoing edges of
+    the node in question. It does so in a paginated format based on max score.
+    """
+    json = []
+    for relation in concept_graph.get_outgoing_edges(uri, max_score=max_score, result_limit=50):
+        json.append(relation[0])
+        del json[-1]['_id']
+    if len(json) == 50:
+        json.append({})
+        #json[-1]['next'] = root_url + '/outgoing_assertions' + uri + '/' + json[-2]['key']
+        json[-1]['next'] = root_url + '/outgoing_edges' + uri + '/' + str(json[-2]['score'])
+    return json
+
+@app.route('/outgoing_edges/', defaults={'max_score':0.0})
+@app.route('/outgoing_edges/<path:uri>/<float:max_score>')
+def get_outgoing_edges(uri, max_score):
+    """This function uses get_outgoing and outputs json"""
+    return flask.jsonify(get_incoming(uri, max_score=max_score))
 
 """
 @app.route('/search/<query>')
@@ -71,4 +133,4 @@ def search(query):
 """
 
 if __name__ == '__main__':
-   app.run(debug=False)
+    app.run(debug=True)

@@ -12,7 +12,7 @@ Fall 2011
 #from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.config import get_auth
 from conceptnet5.whereami import get_project_filename
-from pymongo import Connection
+from pymongo import Connection, DESCENDING
 import re
 import json
 import codecs
@@ -155,7 +155,7 @@ class ConceptNetGraph(object):
         _, _type, rest = uri.split('/', 2)
         # Check if this is a web_concept
         if uri.find('http') == 0:
-          return self._create_web_concept_node(
+              return self._create_web_concept_node(
               '/web_concept/%s' % uri, uri, properties)
         method = getattr(self, '_create_%s_node' % _type)
         if method is None:
@@ -401,38 +401,43 @@ class ConceptNetGraph(object):
         key = "%s %s %s" % (_type, source, target)
         return self.db.edges.find_one({'key': key})
 
-    def get_incoming_edges(self, node, _type=None):
+    def get_incoming_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for incoming edges to the node.
         """
-        if _type is None:
-            edges = self.db.edges.find({
-                'end': self._any_to_uri(node)
-            })
+        search = {'value.end':self._any_to_uri(node)}
+        if _type: 
+            search['value.type'] = _type
+        if max_score != 0.0: 
+            search['value.score'] = {'$lt':{'value.score':max_score}}
+        if result_limit:
+            edges = self.db.scoredEdges.find(search)\
+            .sort([('value.score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.edges.find({
-                'end': self._any_to_uri(node),
-                'type': _type
-            })
+            edges = self.db.scoredEdges.find(search)\
+            .sort([('value.score',DESCENDING)])
+        print edges
         for edge in edges:
-            yield edge, edge['start']
+            yield edge['value'], edge['value']['start']
 
-    def get_outgoing_edges(self, node, _type=None):
+    def get_outgoing_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for outgoing edges from the node.
         """
-        if _type is None:
-            edges = self.db.edges.find({
-                'start': self._any_to_uri(node)
-            })
+        search = {'value.start':self._any_to_uri(node)}
+        if _type: 
+            search['value.type'] = _type
+        if max_score != 0.0: 
+            search['value.score'] = {'$lt':{'value.score':max_score}}
+        if result_limit:
+            edges = self.db.scoredEdges.find(search)\
+            .sort([('value.score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.edges.find({
-                'start': self._any_to_uri(node),
-                'type': _type
-            })
+            edges = self.db.scoredEdges.find(search)\
+            .sort([('value.score',DESCENDING)])
         for edge in edges:
-            yield edge, edge['end']
-
+            yield edge['value'], edge['value']['end']
+        
     def _any_to_node(self, obj, create=False):
         """
         Converts any given input in the form of an id, uri or node into a node object.
@@ -698,16 +703,16 @@ class ConceptNetGraph(object):
         delete = True
         conj_list = []
         if node['type'] == 'source':
-            for relation in concept_graph.get_outgoing_edges(node['uri']):
+            for relation in self.get_outgoing_edges(node['uri']):
                 if relation['end']['type'] == 'conjunction':
                     conj_list.append(relation['end'])
         elif node['type'] != 'conjunction':
-            for relation in concept_graph.get_outgoing_edges(node['uri']):
+            for relation in self.get_outgoing_edges(node['uri']):
                 if relation['start']['type'] == 'assertion':
                     delete = False
                     break
         if delete:
-            for edge in concept_graph.get_edges(node['uri']):
+            for edge in self.get_edges(node['uri']):
                 self.db.edges.remove({'key':edge['key']})
             for conjunction in conj_list:
                 self.db.nodes.remove({'key':conjunction['key']})
