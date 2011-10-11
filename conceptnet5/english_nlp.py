@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import nltk
 from nltk.corpus import wordnet
 import simplenlp
@@ -65,6 +66,39 @@ def morphy_stem(word):
 def simple_stem(word):
     return EN.normalize(word).strip()
 
+def un_camel_case(text):
+    u"""
+    Splits apart words that are written in CamelCase.
+
+    Examples:
+
+    >>> un_camel_case('1984ZXSpectrumGames')
+        '1984 ZX Spectrum Games'
+
+    >>> un_camel_case('aaAa aaAaA 0aA AAAa!AAA')
+        'aa Aa aa Aa A 0a A AA Aa! AAA'
+
+    >>> un_camel_case(u'MotörHead')
+        u'Mot\xf6r Head'
+
+    This should not significantly affect text that is not camel-cased:
+    >>> un_camel_case('ACM_Computing_Classification_System')
+        'ACM Computing Classification System'
+    """
+    revtext = text[::-1]
+    pieces = []
+    while revtext:
+        match = re.match(ur'^([A-Z]+|[^A-Z0-9 _]+[A-Z _]|[0-9]+|[ _]+|[^A-Z]*[^A-Z_ ]+)(.*)$', revtext)
+        if match:
+            pieces.append(match.group(1))
+            revtext = match.group(2)
+        else:
+            print revtext
+            pieces.append(revtext)
+            revtext = ''
+    revstr = ' '.join(piece.strip(' _') for piece in pieces if piece.strip(' _'))
+    return revstr[::-1]
+
 def tokenize(text):
     return EN.tokenize(text.strip()).split()
 
@@ -89,7 +123,8 @@ def normalize(text):
 
 def normalize_topic(topic):
     # find titles of the form Foo (bar)
-    match = re.match(r'([^(]+)[_ ]\(([^)]+)\)', topic)
+    topic = topic.replace('_', ' ')
+    match = re.match(r'([^(]+) \(([^)]+)\)', topic)
     if not match:
         return normalize(topic), None
     else:
