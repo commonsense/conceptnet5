@@ -19,7 +19,7 @@ TYPE_ASSERTION_PROPERTIES = {
     'source':u'dbpedia',
     'license':u'CC-By-SA'
 }
-WIKIPEDIA_TITLES = 'wikipedia.txt'
+WIKIPEDIA_TITLES = 'breadth-first-articles.txt'
 
 VERBOSE = True
 
@@ -42,22 +42,18 @@ def get_html_from_url(url):
   return html
 
 def get_types_from_html(html):
-  show_message(u'NOTICE: Parsing...')
   if TYPE_HTML not in html:
-    show_message(u'WARNING: No types found.')
     return []
   obj_types = []
-  show_message(u'NOTICE: Types found, extracting.')
   html = html.split(TYPE_HTML, 1)[1].split('<ul>', 1)[1].split('</ul>', 1)[0]
   while 'href="' in html:
     [obj_type, html] = html.split('href="', 1)[1].split('">', 1)
     obj_types.append(obj_type)
-  show_message(u'NOTICE: Done extracting types.')
+  print obj_types
   return obj_types
 
 def make_type_assertions_for_obj(conceptnet, obj_url, obj_types):
   concept = conceptnet.get_or_create_web_concept(obj_url)
-  source = conceptnet.get_or_create_source(DBPEDIA_SOURCE)
   for obj_type in obj_types:
     obj_type_concept = conceptnet.get_or_create_web_concept(obj_type)
     assertion = conceptnet.get_or_create_assertion(
@@ -67,24 +63,23 @@ def make_type_assertions_for_obj(conceptnet, obj_url, obj_types):
     conceptnet.justify(source, assertion)
 
 def main():
-  #conceptnet = get_graph()
-  #wikipediaTitles = open(WIKIPEDIA_TITLES)
+  wikipediaTitles = open(WIKIPEDIA_TITLES)
   conceptnet = JSONWriterGraph('json_data/dbpedia_data')
+  source = conceptnet.get_or_create_source(DBPEDIA_SOURCE)
+  conceptnet.justify('/', source)
   instanceOf = conceptnet.get_or_create_relation(TYPE_RELATION_NAME,
     properties=TYPE_RELATION_PROPERTIES)
-  wikipediaTitles = ['Tetris']
   for line in wikipediaTitles:
     try:
       obj_name = line.strip().decode('utf-8')
-    except:
+    except Exception:
       show_message(u'WARNING: Could not decode \'%s\'.' % line)
       continue
     # get data from dbpedia
     obj_url = get_url_from_obj_name(obj_name)
     try:
       html = get_html_from_url(obj_url)
-      show_message(u'NOTICE: Found DBPedia page for \'%s\'.' % obj_name)
-    except:
+    except Exception:
       show_message(
           u'WARNING: Could not get DBPedia page for \'%s\'.' % obj_name)
       continue
