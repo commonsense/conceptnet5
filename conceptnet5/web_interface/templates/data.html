@@ -1,42 +1,46 @@
 {% extends "_base.html" %}
 {% block content %}
-<div class="header">
-{{ node.name }}
-</div>
+<h1>{{ node.name }}</h1>
 <hr />
-<div class="sub_header">
-Assertions:
+{% if normalized %}
+<h2>Normalized form</h2>
+<div class="concept-normalized">
+    <a href="{{ normalized['url'] }}">{{ normalized['name'] }}</a>
 </div>
-<ul>
-{% for assertion in assertions %}
-<li>
-<a href="{{ url_for('get_data', uri=assertion[1].uri[1:]) }}">{{ assertion[1].name }}</a> -- <a href="{{ url_for('get_data', uri=assertion[0].uri[1:]) }}">{{ assertion[0].name }}</a> -- 
-{% for arg in assertion[2] %}
-<a href="{{ url_for('get_data', uri=arg.uri[1:]) }}">{{ arg.name }}</a>
-{% endfor %}
-</li>
-{% endfor %}
-</ul>
-<hr />
-<div class="sub_header">
-Frames:
+{% endif %}
+
+<h2>Assertions</h2>
+<div class="container" id="#assertionContainer">
+    {% for assertion in assertions %}
+    <div class="concept-box" data-relation="{{ assertion['relation'] }}"
+        data-score="{{ assertion['score'] }}"
+        data-name="{{ assertion['target_text'] }}">
+        {% if assertion['position'] == 1 %}
+            <div class="concept-relation1">
+                <span class="self">...</span>
+                <span class="relation">{{ assertion['relation'] }}</span>
+            </div>
+            <div class="concept-name">{{ assertion['target_text'] }}</div>
+        {% else %}
+            <div class="concept-name">{{ assertion['target_text'] }}</div>
+            <div class="concept-relation2">
+                <span class="relation">{{ assertion['relation'] }}</span>
+                <span class="self">...</span>
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
 </div>
+
+<h2>Sentence frames</h2>
 <ul>
-{% for frame in frames %}
-<li>
-{{ frame|safe }}
-</li>
-{% endfor %}
+  {% for frame in frames %}
+    <li>
+      {{ frame|safe }}
+    </li>
+  {% endfor %}
 </ul>
-<hr />
-<div class="sub_header">
-Normalizations:
-</div>
-<ul>
-{% for normalization in normalizations %}
-<li>
-<a href="{{ url_for('get_data', uri=normalization[0].uri[1:]) }}">{{ normalization[0].name }}</a> -- <a href="{{ url_for('get_data', uri=normalization[1].uri[1:]) }}">{{ normalization[1].name }}</a>
-</li>
-{% endfor %}
-</ul>
+{% endblock %}
+
+{% block scripts %}
 {% endblock %}

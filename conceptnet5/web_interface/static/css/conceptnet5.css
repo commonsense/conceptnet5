@@ -32,3 +32,11 @@ body{
 .sub_header{
   font-size:1.5em
 }
+
+.concept-box{
+  margin: 0.5em;
+  background-color: #f0f0f0;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+}

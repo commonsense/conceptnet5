@@ -637,12 +637,10 @@ class ConceptNetGraph(object):
         """
         Get an assertion's list of both its relation and its arguments.
         """
-        assertion = self._any_to_uri(assertion)
-        edges = self.get_outgoing_edges(assertion, 'arg')
-        edges.sort(key = lambda edge: edge['position'])
-        rel = self.get_outgoing_edges(assertion, 'relation')[0][1]
-        edge_pairs.sort(key = lambda pair: pair[0]['position'])
-        return [rel] + [edge['end'] for edge in edges]
+        assertion_uri = self._any_to_uri(assertion)
+        assert assertion_uri[:11] == '/assertion/'
+        rest = assertion_uri[11:]
+        return uri_piece_to_list(rest)
 
     def justify(self, source, target, weight=1.0):
         """

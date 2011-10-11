@@ -2,7 +2,12 @@
 <html>
 <head>
 <link href="{{url_for('static', filename='css/conceptnet5.css')}}" rel="stylesheet" type="text/css" />
-<title>ConceptNet5</title>
+
+{% block title %}
+<title>ConceptNet 5</title>
+{% endblock %}
+<script src="{{url_for('static', filename='js/coffee-script.js')}}" type="text/javascript"></script>
+
 </head>
 <body>
 <div class="column">
@@ -11,5 +16,8 @@
 {% endblock %}
 </div>
 </div>
+
+{% block scripts %}
+{% endblock %}
 </body>
 </html>
