@@ -16,7 +16,7 @@ Frames:
 <ul>
 {% for frame in frames %}
 <li>
-{{ frame }}
+{{ frame|safe }}
 </li>
 {% endfor %}
 </ul>

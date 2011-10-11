@@ -52,10 +52,13 @@ def get_data(uri):
       assertion_args_right = assertion_args[1:]
       if assertion_relation_type == u'frame':
         rendered_frame = assertion_relation[u'name']
+        # get rid of the {%}
+        rendered_frame = rendered_frame.replace('{%}', '')
         for idx in xrange(len(assertion_args)):
           arg = assertion_args[idx]
           rendered_frame = rendered_frame.replace('{%d}' % (idx + 1),
-              arg[u'name'])
+              '<a href="%s">%s</a>' % (url_for('get_data',
+              uri=arg[u'uri'][1:]), arg[u'name']))
         frames.append(rendered_frame)
       else:
         assertions.append([assertion_relation, assertion_arg_left,
