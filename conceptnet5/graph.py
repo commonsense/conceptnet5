@@ -410,7 +410,7 @@ class ConceptNetGraph(object):
         if _type: 
             search['value.type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':{'value.score':max_score}}
+            search['value.score'] = {'$lt':max_score}
         if result_limit:
             edges = self.db.scoredEdges.find(search)\
             .sort([('value.score',DESCENDING)]).limit(result_limit)
@@ -429,7 +429,7 @@ class ConceptNetGraph(object):
         if _type: 
             search['value.type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':{'value.score':max_score}}
+            search['value.score'] = {'$lt':max_score}
         if result_limit:
             edges = self.db.scoredEdges.find(search)\
             .sort([('value.score',DESCENDING)]).limit(result_limit)
