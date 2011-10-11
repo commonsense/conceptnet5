@@ -5,7 +5,19 @@ Assertions:
 {% for assertion in assertions %}
 <li>
 <!--<a href="{{ assertion }}">{{ assertion }}</a>-->
-{{ assertion }}
+{{ assertion[1].name }} -- {{ assertion[0].name }} -- 
+{% for arg in assertion[2] %}
+{{ arg.name }}
+{% endfor %}
+</li>
+{% endfor %}
+</ul>
+<hr />
+Frames:
+<ul>
+{% for frame in frames %}
+<li>
+{{ frame }}
 </li>
 {% endfor %}
 </ul>
