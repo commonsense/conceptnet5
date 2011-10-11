@@ -3,10 +3,13 @@
  * Stylesheet for ConceptNet5 web interface.
  */
 
+@import url(http://fonts.googleapis.com/css?family=Fanwood+Text);
+
 /* HTML Tags. */
 
 body{
-  background-image:url('../img/background.gif')
+  background-image:url('../img/background.gif');
+  font-family:'Fanwood Text', serif
 }
 
 /* Classes. */
@@ -19,4 +22,13 @@ body{
   background-color:white;
   border:5px solid black;
   padding:50px
+}
+.header{
+  font-size:2em;
+  font-weight:bold;
+  text-align:center;
+  text-transform:uppercase
+}
+.sub_header{
+  font-size:1.5em
 }
