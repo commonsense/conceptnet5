@@ -22,7 +22,7 @@ if len(sys.argv) == 1:
 else:
     root_url = sys.argv[1]
 
-@app.route('/data/<path:uri>')
+@app.route('/data/<path:uri>/')
 def get_data(uri):
     """
     This function retrieves information about the desired node,
@@ -64,11 +64,11 @@ def get_assertions(uri, max_score = 0.0):
         json[-1]['next'] = root_url + '/incoming_assertions' + uri + '/' + str(new_max_score)
     return json
 
-@app.route('/incoming_assertions/', defaults={'max_score':0.0})
-@app.route('/incoming_assertions/<path:uri>/<float:max_score>')
+@app.route('/incoming_assertions/<path:uri>/', defaults={'max_score':0.0})
+@app.route('/incoming_assertions/<path:uri>/<float:max_score>/')
 def get_incoming_assertions(uri, max_score):
     """This function uses get_assertions and outputs json"""
-    return flask.jsonify(get_assertions(uri, max_score=max_score))
+    return flask.jsonify({'incoming_assertions':get_assertions('/'+uri, max_score=max_score)})
 
 def get_incoming(uri, max_score = 0.0):
     """
@@ -82,15 +82,14 @@ def get_incoming(uri, max_score = 0.0):
         del json[-1]['_id']
     if len(json) == 50:
         json.append({})
-        #json[-1]['next'] = root_url + '/incoming_edges' + uri + '/' + json[-2]['key']
         json[-1]['next'] = root_url + '/incoming_edges' + uri + '/' + str(json[-2]['score'])
     return json
 
-@app.route('/incoming_edges/', defaults={'max_score':0.0})
-@app.route('/incoming_edges/<path:uri>/<float:max_score>')
+@app.route('/incoming_edges/<path:uri>/', defaults={'max_score':0.0})
+@app.route('/incoming_edges/<path:uri>/<float:max_score>/')
 def get_incoming_edges(uri, max_score):
     """This function uses get_incoming and outputs json"""
-    return flask.jsonify(get_incoming(uri, max_score=max_score))
+    return flask.jsonify({'incoming_edges':get_incoming('/'+uri, max_score=max_score)})
 
 def get_outgoing(uri, max_score = 0.0):
     """
@@ -103,15 +102,14 @@ def get_outgoing(uri, max_score = 0.0):
         del json[-1]['_id']
     if len(json) == 50:
         json.append({})
-        #json[-1]['next'] = root_url + '/outgoing_assertions' + uri + '/' + json[-2]['key']
         json[-1]['next'] = root_url + '/outgoing_edges' + uri + '/' + str(json[-2]['score'])
     return json
 
-@app.route('/outgoing_edges/', defaults={'max_score':0.0})
-@app.route('/outgoing_edges/<path:uri>/<float:max_score>')
+@app.route('/outgoing_edges/<path:uri>/', defaults={'max_score':0.0})
+@app.route('/outgoing_edges/<path:uri>/<float:max_score>/')
 def get_outgoing_edges(uri, max_score):
     """This function uses get_outgoing and outputs json"""
-    return flask.jsonify(get_incoming(uri, max_score=max_score))
+    return flask.jsonify({'outgoing_edges':get_outgoing('/'+uri, max_score=max_score)})
 
 """
 @app.route('/search/<query>')
