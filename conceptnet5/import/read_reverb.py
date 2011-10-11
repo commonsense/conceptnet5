@@ -153,6 +153,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
     return raw
 
 def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
+    # arg3 is vestigial; we weren't getting sensible statements from it.
     if arg2.strip() == "": # Remove "A is for B" sentence
         return
     arg1 = normalize(arg1).strip()
@@ -168,27 +169,17 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
         )
         assertions = (assertion,)
     else:
-        if arg3 != '' and prep != 'of':
-            print '%s(%s, %s), %s(%s, %s)' % \
-                (relation, arg1, arg2, prep, arg2, arg3)
-            assertion1 = GRAPH.get_or_create_assertion(
-                '/relation/'+relation,
-                [GRAPH.get_or_create_concept('en', arg1),
-                 GRAPH.get_or_create_concept('en', arg2)],
-                {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
-            )
-            assertion2 = GRAPH.get_or_create_assertion(
-                GRAPH.get_or_create_concept('en', 'be_'+prep),
-                [GRAPH.get_or_create_concept('en', arg2),
-                 GRAPH.get_or_create_concept('en', arg3)],
-                {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
-            )
-            assertions = (assertion1, assertion2)
-        else:
-            assertions = ()
+        print '%s(%s, %s)' % \
+            (relation, arg1, arg2)
+        assertion1 = GRAPH.get_or_create_assertion(
+            '/relation/'+relation,
+            [GRAPH.get_or_create_concept('en', arg1),
+             GRAPH.get_or_create_concept('en', arg2)],
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+        )
+        assertions = (assertion1,)
     
     for assertion in assertions:
-        GRAPH.derive_normalized(raw, assertion)
         conjunction = GRAPH.get_or_create_conjunction(
             [raw, reverb_object]
         )

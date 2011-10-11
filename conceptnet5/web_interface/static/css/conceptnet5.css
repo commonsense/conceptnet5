@@ -16,7 +16,7 @@ body{
   width:900px
 }
 .content{
-  background-image:url('../img/stucco.png');
+  background-color:white;
   border:5px solid black;
   padding:50px
 }
