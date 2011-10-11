@@ -89,7 +89,7 @@ def normalize(text):
 
 def normalize_topic(topic):
     # find titles of the form Foo (bar)
-    match = re.match(r'([^(]+) \(([^)]+)\)', topic)
+    match = re.match(r'([^(]+)[_ ]\(([^)]+)\)', topic)
     if not match:
         return normalize(topic), None
     else:
