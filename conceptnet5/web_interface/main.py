@@ -69,8 +69,8 @@ def get_data(uri):
       relation_arg_left = conceptnet.get_node(relation_arg_left_uri)
       relation_arg_right = conceptnet.get_node(relation_arg_right_uri)
       normalizations.append([relation_arg_left, relation_arg_right])
-  return render_template('data.html', assertions=assertions, frames=frames,
-      normalizations=normalizations)
+  return render_template('data.html', node=node, assertions=assertions,
+      frames=frames, normalizations=normalizations)
 
 @app.errorhandler(404)
 def handler404(error):

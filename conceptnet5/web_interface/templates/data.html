@@ -1,6 +1,12 @@
 {% extends "_base.html" %}
 {% block content %}
+<div class="header">
+{{ node.name }}
+</div>
+<hr />
+<div class="sub_header">
 Assertions:
+</div>
 <ul>
 {% for assertion in assertions %}
 <li>
@@ -12,7 +18,9 @@ Assertions:
 {% endfor %}
 </ul>
 <hr />
+<div class="sub_header">
 Frames:
+</div>
 <ul>
 {% for frame in frames %}
 <li>
@@ -21,7 +29,9 @@ Frames:
 {% endfor %}
 </ul>
 <hr />
+<div class="sub_header">
 Normalizations:
+</div>
 <ul>
 {% for normalization in normalizations %}
 <li>
