@@ -76,3 +76,9 @@ db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
 
+db.edges.mapReduce(mapConjunctEdges, reduceNop, {out: {merge: 'edgeWeights'}, query: {type: 'conjunct'}});
+db.edges.mapReduce(mapOtherEdges, reduceNop, {out: {merge: 'edgeWeights'}});
+db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
+db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
+db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
+

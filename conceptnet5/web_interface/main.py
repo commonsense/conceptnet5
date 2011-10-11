@@ -33,9 +33,12 @@ def home():
 
 def uri2name(arg):
     if arg.startswith('/concept'):
-        return arg.split('/')[3].replace('_', ' ')
+        result = arg.split('/')[3].replace('_', ' ')
     else:
-        return arg.split('/')[-1].replace('_', ' ')
+        result = arg.split('/')[-1].replace('_', ' ')
+    if result.startswith('be ') or result.startswith('to '):
+        result = result[3:]
+    return result
 
 @app.route('/web/<path:uri>')
 def get_data(uri):
@@ -83,6 +86,7 @@ def get_data(uri):
                 otherNodeName = readable_args[0]
             assertions.append({
                 'position': position,
+                'relation_url': data_url(relation),
                 'relation': uri2name(relation),
                 'relkey': "%s/%s" % (relation, position),
                 'target_uri': otherNode,

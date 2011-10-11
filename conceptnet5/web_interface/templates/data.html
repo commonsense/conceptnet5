@@ -10,7 +10,7 @@
 {% endif %}
 
 <h2>Assertions</h2>
-<div class="container" id="#assertionContainer">
+<div class="container" id="assertionContainer">
     {% for assertion in assertions %}
     <div class="concept-box" data-relation="{{ assertion['relation'] }}"
         data-score="{{ assertion['score'] }}"
@@ -18,13 +18,33 @@
         {% if assertion['position'] == 1 %}
             <div class="concept-relation1">
                 <span class="self">...</span>
-                <span class="relation">{{ assertion['relation'] }}</span>
+                <span class="relation">
+                    <a href="{{ assertion['relation_url'] }}"
+                       title="{{ assertion['relation_uri'] }}">
+                        {{ assertion['relation'] }}
+                    </a>
+                </span>
             </div>
-            <div class="concept-name">{{ assertion['target_text'] }}</div>
+            <div class="concept-name">
+                <a href="{{ assertion['target_url'] }}"
+                   title="{{ assertion['target_uri'] }}">
+                    {{ assertion['target_text'] }}
+                </a>
+            </div>
         {% else %}
-            <div class="concept-name">{{ assertion['target_text'] }}</div>
+            <div class="concept-name">
+                <a href="{{ assertion['target_url'] }}"
+                   title="{{ assertion['target_uri'] }}">
+                    {{ assertion['target_text'] }}
+                </a>
+            </div>
             <div class="concept-relation2">
-                <span class="relation">{{ assertion['relation'] }}</span>
+                <span class="relation">
+                    <a href="{{ assertion['relation_url'] }}"
+                       title="{{ assertion['relation_uri'] }}">
+                        {{ assertion['relation'] }}
+                    </a>
+                </span>
                 <span class="self">...</span>
             </div>
         {% endif %}
@@ -43,4 +63,31 @@
 {% endblock %}
 
 {% block scripts %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-1.6.2.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery.isotope.min.js')}}"></script>
+<script type="text/coffeescript">
+$ ->
+    $container = $('#assertionContainer')
+    $container.find('.concept-box').each ->
+        $this = $(this)
+        textlength = $this.attr('data-name').length
+        boxwidth = textlength * 18
+        if boxwidth > 1000
+            boxwidth = 1000
+        if boxwidth < 150
+            boxwidth = 150
+        $this.width(boxwidth)
+
+
+    $container.isotope({
+        layoutMode: 'fitRows'
+        masonry: {columnWidth: 120},
+        getSortData: {
+            score: ($elem) -> $elem.attr('data-score')
+            relation: ($elem) -> $elem.attr('data-relation')
+        }
+    })
+    window.container = $container
+
+</script>
 {% endblock %}

@@ -7,21 +7,28 @@
 
 /* HTML Tags. */
 
+html { height: 100%; }
 body{
   background-image:url('../img/background.gif');
-  font-family:'Fanwood Text', serif
+  font-family:'Fanwood Text', serif,
+  height: 100%;
 }
+
+a { text-decoration: none; }
 
 /* Classes. */
 
 .column{
   margin:50px auto;
-  width:900px
+  width: 95%;
 }
 .content{
   background-color:white;
   border:5px solid black;
-  padding:50px
+  padding-left:50px;
+  padding-right:50px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .header{
   font-size:2em;
@@ -34,9 +41,19 @@ body{
 }
 
 .concept-box{
-  margin: 0.5em;
+  margin: 5px;
+  font-size: 16px;
   background-color: #f0f0f0;
   -webkit-border-radius: 5px;
      -moz-border-radius: 5px;
           border-radius: 5px;
+  overflow: hidden;
+  width: 210px;
+  height: 60px;
+  padding: 5px;
+}
+
+.concept-name{
+  font-size: 180%;
+  line-height: 1em;
 }
