@@ -33,6 +33,8 @@ def home():
 
 def uri2name(arg):
     if arg.startswith('/concept'):
+        if len(arg.split('/')) <= 3:
+            return arg.split('/')[-1]
         result = arg.split('/')[3].replace('_', ' ')
     else:
         result = arg.split('/')[-1].replace('_', ' ')
@@ -56,9 +58,15 @@ def get_data(uri):
     
     count = 0
     edge_generator = conceptnet.get_incoming_edges(uri, 'arg')
+    timer = None
     for edge, assertion_uri in edge_generator:
         count += 1
-        if count >= 50:
+
+        # Get 10 concepts, then however many concepts you can
+        # retrieve in 1/5 more second.
+        if count >= 10:
+            timer = time.time()
+        if timer is not None and time.time() - timer > 0.2:
             break
         
         # Determine the relation and arguments from the URI.
@@ -96,16 +104,32 @@ def get_data(uri):
             })
 
     normalized = None
+
     for edge, norm_uri in conceptnet.get_outgoing_edges(uri, 'normalized'):
-        normalized = {
-            'uri': norm_uri,
-            'url': data_url(norm_uri),
-            'name': uri2name(norm_uri)
-        }
-        break
+        name = uri2name(norm_uri)
+        # cheap trick to correct for erroneous normalized edges:
+        # make sure an appropriate 4 letters are the same
+        for word in name.split():
+            for offset in xrange(0, 5):
+                if name[:4] == node['name'][offset:offset+4]:
+                    normalized = {
+                        'uri': norm_uri,
+                        'url': data_url(norm_uri),
+                        'name': uri2name(norm_uri)
+                    }
+                    break
+    sense_list = list(conceptnet.get_incoming_edges(uri, 'senseOf')) + list(conceptnet.get_outgoing_edges(uri, 'sense'))
+    senses = []
+    for edge, sense_uri in sense_list:
+        name = uri2name(sense_uri)
+        senses.append({
+            'uri': sense_uri,
+            'url': data_url(sense_uri),
+            'name': sense_uri.split('/')[-1].replace('_', ' ')
+        })
 
     return render_template('data.html', node=node, assertions=assertions,
-            frames=frames, normalized=normalized)
+            frames=frames, normalized=normalized, senses=senses)
 
 @app.errorhandler(404)
 def handler404(error):

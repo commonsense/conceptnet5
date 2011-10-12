@@ -9,9 +9,10 @@ mapNodeScores = function () {
 }
 
 mapEdgeScores = function () {
-    var scored1 = db.scoredNodes.findOne({'_id': this.start});
-    var scored2 = db.scoredNodes.findOne({'_id': this.end});
-    var score = 0;
+    var scored1 = db.justification.findOne({'_id': this.start});
+    var scored2 = db.justification.findOne({'_id': this.end});
+    var score = Math.random() * .000001;
+    this.jitter = score;
     if (scored1) score += scored1.value.score;
     if (scored2) score += scored2.value.score;
     this.score = score;
@@ -22,7 +23,8 @@ reduceNop = function (key, values) {
     return values[0];
 }
 
-db.justification.mapReduce(mapNodeScores, reduceNop, {out: 'scoredNodes'});
+
+//db.justification.mapReduce(mapNodeScores, reduceNop, {out: 'scoredNodes'});
 db.edges.mapReduce(mapEdgeScores, reduceNop, {out: 'scoredEdges'});
 db.scoredEdges.ensureIndex({'value.start': 1, 'value.type': 1, 'value.score': 1})
 db.scoredEdges.ensureIndex({'value.end': 1, 'value.type': 1, 'value.score': 1})

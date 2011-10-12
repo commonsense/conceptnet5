@@ -3,10 +3,24 @@
 <h1>{{ node.name }}</h1>
 <hr />
 {% if normalized %}
-<h2>Normalized form</h2>
-<div class="concept-normalized">
+<h2>Normalized form:
+<span class="concept-normalized">
     <a href="{{ normalized['url'] }}">{{ normalized['name'] }}</a>
-</div>
+</span>
+</h2>
+{% endif %}
+
+{% if senses %}
+<h2>Word senses</h2>
+<ul class="senses">
+{% for sense in senses %}
+<li>
+<a href="{{ sense['url'] }}" title="{{ sense['uri'] }}">
+    {{ sense['name'] }}
+</a>
+</li>
+{% endfor %}
+</ul>
 {% endif %}
 
 <h2>Assertions</h2>
