@@ -1,0 +1,296 @@
+@charset "utf-8";
+/**
+ * SenCSS - Sensible Standards CSS framework
+ *
+ * Copyright (c) 2008-2010 Kilian Valkhof (kilianvalkhof.com)
+ * Visit sencss.kilianvalkhof.com for more information and changelogs.
+ * Licensed under the MIT license. http://www.opensource.org/licenses/mit-license.php
+ *
+ */
+html,body,div,span,object,iframe,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,var,fieldset,form,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,dialog,figure,footer,header,hgroup,menu,nav,section,time,mark,audio,video{
+  margin:0;
+  padding:0;
+  vertical-align:baseline;
+}
+article,aside,dialog,figure,footer,header,hgroup,menu,nav,section,time,mark,audio,video {
+  display:block;
+}
+body{
+  background:#fff;
+  color:#000;
+  font:100%/1.5em Palatino, "Book Antiqua", "Bitstream Charter", "Droid Serif", "Serif";
+  position:relative;
+}
+textarea{
+  font:101%/1.5em Arial, Helvetica, "DejaVu Sans",  "Liberation sans", "Bitstream Vera Sans", sans-serif;
+}
+blockquote,q{
+  quotes:none;
+}
+blockquote:before,blockquote:after,q:before,q:after{
+  content:'';content:none;
+}
+:focus{
+  outline:none;
+}
+/* Baseline and common looks - Sets a vertical rhythm and styles the different elements.
+ */
+a{
+  text-decoration:underline;
+  border:0;
+}
+a:hover,a:focus{
+  text-decoration:none;
+}
+a img{
+  border:0;
+}
+abbr,acronym{
+  border-bottom:1px dotted;
+  cursor:help;
+  font-variant:small-caps;
+}
+address,cite,em,i{
+  font-style:italic;
+}
+blockquote p{
+  margin:0 1.5em 1.5em;
+  padding:0.75em;
+}
+code,kbd,tt{
+  font-family: monospace;
+  line-height:1;
+  *line-height:1.5;
+}
+del{
+  text-decoration:line-through;
+}
+dfn{
+  border-bottom:1px dashed;
+  font-style:italic;
+}
+dl{
+  margin:0 0 1.5em;
+}
+dt{
+  font-weight:700;
+}
+dd{
+  margin-left:1.5em;
+
+}
+h1,h2,h3,h4,h5,h6{
+  font-weight:700;
+  padding:0;
+}
+h1{
+  font-size:2em;
+  margin:0 0 0.75em;
+}
+h2{
+  font-size:1.5em;
+  margin:2em 0 1em;
+}
+h3{
+  font-size:1.1666em;
+  margin:0 0 1.286em;
+}
+h4{
+  font-size:1em;
+  margin:0 0 1.5em;
+}
+h5{
+  font-size:0.8333em;
+  margin:0 0 1.8em;
+}
+h6{
+  font-size:0.666em;
+  margin:0 0 2.25em;
+}
+img{
+  display:inline-block;
+  vertical-align:text-bottom;
+}
+ins{
+  text-decoration:overline;
+}
+mark {
+  background-color:#ff9;
+  color:#000;
+  font-style:italic;
+  font-weight:bold;
+}
+ol{
+  list-style:outside decimal;
+}
+p{
+  font-weight:300;
+  margin:0 0 1.5em;
+}
+pre{
+  font-family:"Courier New", Courier, monospace, serif;
+  margin:0 0 1.5em;
+}
+sub{
+  top:0.4em;
+  font-size:0.85em;
+  line-height:1;
+  position:relative;
+  vertical-align:baseline;
+}
+sup{
+  font-size:0.85em;
+  line-height:1;
+  position:relative;
+  bottom:0.5em;
+  vertical-align:baseline;
+}
+strong,b{
+  font-weight:700;
+}
+ul{
+  list-style:outside disc;
+}
+ul,ol{
+  margin:0 0 1.5em 1.5em;
+  padding:0;
+}
+li ul,li ol{
+  padding:0;
+  margin:0 0 1.5em 1.5em;
+}
+table{
+  border-collapse:collapse;
+  border-spacing:0;
+  margin:0 0 1.5em;
+  padding:0;
+}
+caption{
+  font-style:italic;
+  text-align:left;
+}
+tr.alt td{
+  background:#eee;
+}
+td{
+  border:1px solid #000;
+  padding:0.333em;
+  vertical-align:middle;
+}
+th{
+  font-weight:700;
+  padding:0.333em;
+  vertical-align:middle;
+}
+button{
+  -x-system-font: none;
+  cursor:pointer;
+  display:block;
+  font-size:0.99em;
+  height:2em;
+  line-height:1.5em;
+  margin:0.8em 0 0;
+  *margin:1.75em 0 0;
+  padding:0 0.5em;
+}
+button::-moz-focus-inner {
+  border: 0;
+}
+fieldset{
+  border:0;
+  margin:0 0 1.5em;
+  position:relative;
+  padding:1.5em 0 0;
+}
+fieldset fieldset{
+  clear:both;
+  margin:0 0 0.75em;
+  padding:0 0 0 1.5em;
+}
+input{
+  border:1px solid #ccc;
+  border-bottom-color:#eee;
+  border-right-color:#eee;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -ms-box-sizing:border-box;
+  font-size:1em;
+  height:2.25em;
+  *height:1.5em;
+  line-height:1.5em;
+  padding:0.29em 0;
+  width:100%;
+  margin:0 0 0.75em;
+}
+input[type=file]{
+  height:2.25em;
+  font-size:1em;
+  padding:0;
+  border:0;
+  border:1px solid #ccc !ie;
+}
+textarea{
+  border:1px solid #ccc;
+  border-bottom-color:#eee;
+  border-right-color:#eee;
+  box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  -ms-box-sizing:border-box;
+  margin:0;
+  padding:0.29em 0;
+  width:100%;
+}
+select{
+  border:1px solid #ccc;
+  border-bottom-color:#eee;
+  border-right-color:#eee;
+  font-size:1em;
+  line-height:1.5em;
+  margin-bottom:0.75em;
+  padding:0.25em;
+  height:2.25em;
+}
+optgroup {
+  font-weight:700;
+  font-style:normal;
+  text-indent:0.2em;
+}
+optgroup + optgroup {
+  margin-top:1em;
+}
+option{
+  font-size:1em;
+  height:1.5em;
+  padding:0;
+  text-indent:1em;
+}
+label{
+  cursor:pointer;
+  display:block;
+  height:1.5em;
+  *height:auto;
+  *line-height:1.4em;
+  margin:0;
+  padding:0;
+  width:100%;
+}
+label input{
+  background:0;
+  border:0;
+  height:1em;
+  *height:1.5em;
+  line-height:1.5em;
+  margin:0 0.5em 0 0;
+  padding:0;
+  width:auto;
+}
+legend{
+  font-size:1.1666em;
+  font-weight:700;
+  left:0;
+  margin:0;
+  padding:0;
+}
+

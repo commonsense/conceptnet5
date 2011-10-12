@@ -43,7 +43,7 @@ def uri2name(arg):
         result = result[3:]
     return result
 
-@app.route('/web/<path:uri>')
+@app.route('/<path:uri>')
 def get_data(uri):
     uri = '/%s' % uri
     node = conceptnet.get_node(uri)
@@ -51,7 +51,7 @@ def get_data(uri):
     if node is None:
         return render_template('not_found.html', uri=uri)
     # Node exists, show stuff.
-    incoming_edges = conceptnet.get_incoming_edges(node)
+    incoming_edges = conceptnet.get_incoming_edges(node, result_limit=100)
 
     assertions = []
     frames = []
@@ -59,8 +59,8 @@ def get_data(uri):
     
     count = 0
     edge_generator = itertools.chain(
-        conceptnet.get_incoming_edges(uri, 'relation'),
-        conceptnet.get_incoming_edges(uri, 'arg')
+        conceptnet.get_incoming_edges(uri, 'relation', result_limit=100),
+        conceptnet.get_incoming_edges(uri, 'arg', result_limit=100)
     )
                                      
     timer = None
@@ -135,7 +135,9 @@ def get_data(uri):
                         'name': uri2name(norm_uri)
                     }
                     break
-    sense_list = list(conceptnet.get_incoming_edges(uri, 'senseOf')) + list(conceptnet.get_outgoing_edges(uri, 'sense'))
+    sense_list = list(conceptnet.get_incoming_edges(uri, 'senseOf',
+    result_limit=100)) + list(conceptnet.get_outgoing_edges(uri, 'senseOf',
+    result_limit=100))
     senses = []
     for edge, sense_uri in sense_list:
         name = uri2name(sense_uri)

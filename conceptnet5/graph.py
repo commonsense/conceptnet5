@@ -944,4 +944,4 @@ def get_graph():
 
     no args
     """
-    return ConceptNetGraph('ec2-184-72-169-112.compute-1.amazonaws.com')
+    return ConceptNetGraph('67.202.46.13')

@@ -18,11 +18,11 @@ app = flask.Flask(__name__)
 concept_graph = graph.get_graph()
 
 if len(sys.argv) == 1:
-    root_url = 'http://conceptnet.media.mit.edu'
+    root_url = 'http://conceptnet.media.mit.edu/data'
 else:
     root_url = sys.argv[1]
 
-@app.route('/data/<path:uri>/')
+@app.route('/<path:uri>/')
 def get_data(uri):
     """
     This function retrieves information about the desired node,
@@ -36,7 +36,7 @@ def get_data(uri):
     node = concept_graph.get_node(uri)
     json = {}
     json['properties'] = node
-    json['properties']['url'] = root_url + '/data' + uri
+    json['properties']['url'] = root_url + uri
     del json['properties']['_id']
     json['incoming_assertions'] = get_assertions(uri)
     json['incoming_assertions_url'] = root_url + '/incoming_assertions' + uri
@@ -56,7 +56,7 @@ def get_assertions(uri, max_score = 0.0):
     new_max_score = 0
     for relation in concept_graph.get_incoming_edges(uri, _type='arg', max_score=max_score, result_limit=50):
         json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url + '/data' + json[-1]['uri']
+        json[-1]['url'] = root_url  + json[-1]['uri']
         del json[-1]['_id']
         new_max_score = relation[0]['score']
     if len(json) == 50:
