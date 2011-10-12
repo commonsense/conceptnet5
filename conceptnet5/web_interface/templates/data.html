@@ -45,7 +45,7 @@
                     {{ assertion['target_text'] }}
                 </a>
             </div>
-        {% else %}
+        {% elif assertion['position'] == 2 %}
             <div class="concept-name">
                 <a href="{{ assertion['target_url'] }}"
                    title="{{ assertion['target_uri'] }}">
@@ -60,6 +60,28 @@
                     </a>
                 </span>
                 <span class="self">...</span>
+            </div>
+        {% else %}
+            {# i'm the relation #}
+            <div class="concept-name">
+                <a href="{{ assertion['source_url'] }}"
+                   title="{{ assertion['source_uri'] }}">
+                    {{ assertion['source_text'] }}
+                </a>
+            </div>
+            <div class="concept-relation2">
+                <span class="relation">
+                    <a href="{{ assertion['relation_url'] }}"
+                       title="{{ assertion['relation_uri'] }}">
+                        {{ assertion['relation'] }}
+                    </a>
+                </span>
+                <span class="small-concept-name">
+                    <a href="{{ assertion['target_url'] }}"
+                       title="{{ assertion['target_uri'] }}">
+                        {{ assertion['target_text'] }}
+                    </a>
+                </span>
             </div>
         {% endif %}
     </div>
