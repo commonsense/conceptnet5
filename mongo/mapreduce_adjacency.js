@@ -1,7 +1,7 @@
 // initiaize your "justification" table with {_id: '/', value: 1}
 // make sure '/' has an edge to itself of weight 1
 
-mapConjunctEdges = function () {
+mapEdges = function () {
     if (this.type === 'conjunct') {
         var startEntry = db.justification.findOne({_id: this.start});
         var endEntry = db.conjunctions.findOne({_id: this.end});
@@ -15,14 +15,7 @@ mapConjunctEdges = function () {
             })
         }
     }
-}
-
-reduceNop = function (key, values) {
-    return values[0];
-}
-
-mapOtherEdges = function () {
-    if (this.weight && this.type !== 'conjunct') {
+    else if (this.weight) {
         emit(this.key, {
             start: this.start,
             end: this.end,
@@ -30,7 +23,11 @@ mapOtherEdges = function () {
             type: this.type
         })
     }
-}   
+}
+
+reduceNop = function (key, values) {
+    return values[0];
+}
 
 reduceSum = function (key, values) {
     return Array.sum(values);
@@ -67,8 +64,8 @@ reduceParallel = function (key, values) {
     return 1/invWeight;
 }
 
-db.justification.insert({_id: '/', value: 1});
-db.edgeWeights.insert({_id: 'justifies / /', value: {start: '/', end: '/', type: 'justifies', weight: 1}});
+//db.justification.insert({_id: '/', value: 1});
+//db.edgeWeights.insert({_id: 'justifies / /', value: {start: '/', end: '/', type: 'justifies', weight: 1}});
 
 db.edges.mapReduce(mapConjunctEdges, reduceNop, {out: {merge: 'edgeWeights'}, query: {type: 'conjunct'}});
 db.edges.mapReduce(mapOtherEdges, reduceNop, {out: {merge: 'edgeWeights'}});
@@ -76,8 +73,7 @@ db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
 
-db.edges.mapReduce(mapConjunctEdges, reduceNop, {out: {merge: 'edgeWeights'}, query: {type: 'conjunct'}});
-db.edges.mapReduce(mapOtherEdges, reduceNop, {out: {merge: 'edgeWeights'}});
+db.edges.mapReduce(mapEdges, reduceNop, {out: {merge: 'edgeWeights'}});
 db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
 db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
