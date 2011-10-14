@@ -12,6 +12,7 @@ from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
 import time
+import itertools
 
 app = Flask(__name__)
 conceptnet = get_graph()
@@ -42,7 +43,7 @@ def uri2name(arg):
         result = result[3:]
     return result
 
-@app.route('/web/<path:uri>')
+@app.route('/<path:uri>')
 def get_data(uri):
     uri = '/%s' % uri
     node = conceptnet.get_node(uri)
@@ -50,23 +51,27 @@ def get_data(uri):
     if node is None:
         return render_template('not_found.html', uri=uri)
     # Node exists, show stuff.
-    incoming_edges = conceptnet.get_incoming_edges(node)
+    incoming_edges = conceptnet.get_incoming_edges(node, result_limit=100)
 
     assertions = []
     frames = []
     normalizations = []
     
     count = 0
-    edge_generator = conceptnet.get_incoming_edges(uri, 'arg')
+    edge_generator = itertools.chain(
+        conceptnet.get_incoming_edges(uri, 'relation', result_limit=100),
+        conceptnet.get_incoming_edges(uri, 'arg', result_limit=100)
+    )
+                                     
     timer = None
     for edge, assertion_uri in edge_generator:
         count += 1
 
         # Get 10 concepts, then however many concepts you can
-        # retrieve in 1/5 more second.
-        if count >= 10:
+        # retrieve in 1/5 more second, or at most 200.
+        if count >= 10 and timer is None:
             timer = time.time()
-        if timer is not None and time.time() - timer > 0.2:
+        if (timer is not None and time.time() - timer > 0.2):
             break
         
         # Determine the relation and arguments from the URI.
@@ -85,18 +90,30 @@ def get_data(uri):
                                                .replace('{2}', linked_args[1])
             frames.append(rendered_frame)
         else:
-            position = edge['position']
-            if position == 1:
+            position = edge.get('position')
+            thisNode = node['uri']
+            thisNodeName = '...'
+            if edge['type'] == 'relation':
+                thisNode = args[0]
+                otherNode = args[1]
+                thisNodeName = readable_args[0]
+                otherNodeName = readable_args[1]
+            elif position == 1:
                 otherNode = args[1]
                 otherNodeName = readable_args[1]
-            else:
+            elif position == 2:
                 otherNode = args[0]
                 otherNodeName = readable_args[0]
+            else:
+                raise ValueError
             assertions.append({
                 'position': position,
                 'relation_url': data_url(relation),
                 'relation': uri2name(relation),
                 'relkey': "%s/%s" % (relation, position),
+                'source_uri': thisNode,
+                'source_url': data_url(thisNode),
+                'source_text': thisNodeName,
                 'target_uri': otherNode,
                 'target_url': data_url(otherNode),
                 'target_text': otherNodeName,
@@ -118,7 +135,9 @@ def get_data(uri):
                         'name': uri2name(norm_uri)
                     }
                     break
-    sense_list = list(conceptnet.get_incoming_edges(uri, 'senseOf')) + list(conceptnet.get_outgoing_edges(uri, 'sense'))
+    sense_list = list(conceptnet.get_incoming_edges(uri, 'senseOf',
+    result_limit=100)) + list(conceptnet.get_outgoing_edges(uri, 'senseOf',
+    result_limit=100))
     senses = []
     for edge, sense_uri in sense_list:
         name = uri2name(sense_uri)

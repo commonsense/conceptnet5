@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 packages = find_packages()
-version_str = '5.0a1'
+version_str = '5.0b1'
 
 setup(
     name = 'ConceptNet5',
@@ -11,7 +11,7 @@ setup(
     author = "Rob Speer, Commonsense Computing Group",
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
-    install_requires=['csc-utils >= 0.6', 'simplenlp'],
+    install_requires=['csc-utils >= 0.6', 'simplenlp', 'pymongo'],
     license = 'GPLv3'
 )
 

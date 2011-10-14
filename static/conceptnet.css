@@ -1,0 +1,47 @@
+nav {
+    background-color: #000;
+    color: #fff;
+    padding: 0.2em 0.5em 0.2em 0.5em;
+}
+nav a {
+    color: #aef;
+    text-decoration: none;
+}
+.thispage {
+    font-weight: bold;
+    color: #fff;
+}
+article {
+    padding-top: 1em;
+    margin-left: 15%;
+    margin-right: 15%;
+    line-height: 150%;
+}
+span.relation {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+span.relation a {
+    font-style: italic;
+}
+span.relation:before { 
+    content: "\2014";
+    color: #025;
+}
+span.relation:after { 
+    content: "\2192";
+    color: #025;
+}
+div.paraphrase {
+    font-size: 90%;
+    font-style: italic;
+}
+.assertion-example {
+    padding: 0.5em;
+    margin: 0.5em;
+    background-color: #eee;
+    border-radius: 0.5em;
+}
+.assertion-example a {
+    text-decoration: none;
+}
