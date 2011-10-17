@@ -104,7 +104,9 @@ for synset in synset_senses:
 for sense, synset in sense_synsets.items():
     mapping[sense] = mapping[synset]
 
-graph = JSONWriterGraph('../json_data/wordnet')
+GRAPH = JSONWriterGraph('../json_data/wordnet')
+source = GRAPH.get_or_create_node('/source/wordnet/3.0')
+GRAPH.justify('/', source, 10)
 
 for line in chain(
     open('wordnet-attribute.ttl'),
@@ -144,4 +146,17 @@ for line in chain(
     else:
         pred = '/relation/'+pred_label
 
-    print subj, pred, obj
+    raw = GRAPH.get_or_create_assertion(
+        GRAPH.get_or_create_web_concept(web_rel),
+        [GRAPH.get_or_create_web_concept(web_subj), GRAPH.get_or_create_web_concept(web_obj)],
+        {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': False}
+    )
+    assertion = GRAPH.get_or_create_assertion(
+        GRAPH.get_or_create_node(pred),
+        [GRAPH.get_or_create_node(subj), GRAPH.get_or_create_node(obj)],
+        {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': True}
+    )
+    GRAPH.justify(source, raw)
+    GRAPH.derive_normalized(raw, assertion)
+    print assertion
+
