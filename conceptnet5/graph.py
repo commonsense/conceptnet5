@@ -957,4 +957,4 @@ def get_graph():
 
     no args
     """
-    return ConceptNetGraph('67.202.46.13')
+    return ConceptNetGraph('67.202.5.17')
