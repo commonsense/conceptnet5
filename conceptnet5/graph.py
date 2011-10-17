@@ -766,6 +766,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.filename = filename
         self.nodes = open(filename+'.nodes.json', 'w')
         self.edges = open(filename+'.edges.json', 'w')
+        self.scoredEdges = open(filename+'.scored.json', 'w')
         self.recently_created_uris = []
 
     def _write_node(self, properties):
@@ -783,6 +784,13 @@ class JSONWriterGraph(ConceptNetGraph):
             type += str(properties['position'])
         properties['key'] = u'%s %s %s' % (type, start, end)
         print >> self.edges, json.dumps(properties)
+        
+        # Set a default value in scoredEdges, so that we can use the data
+        # instantly and not have to wait to re-chug the data
+        properties['jitter'] = random.random()
+        properties['score'] = 100 + properties['jitter']*1e-6
+        scored = {'value': properties}
+        print >> self.scoredEdges, json.dumps(scored)
     
     def _create_node(self, **properties):
         uri = properties['uri']
@@ -839,9 +847,14 @@ class JSONWriterGraph(ConceptNetGraph):
         assert assertion_uri[:11] == '/assertion/'
         rest = assertion_uri[11:]
         return uri_piece_to_list(rest)
+    
+    def __del__(self):
+        self.close()
 
     def close(self):
-        self.output.close()
+        self.nodes.close()
+        self.edges.close()
+        self.scoredEdges.close()
 
 class GremlinWriterGraph(ConceptNetGraph):
     """
