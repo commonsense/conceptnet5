@@ -12,26 +12,12 @@ from flask import redirect
 from flask import render_template
 from flask import send_from_directory
 from flask import url_for
+from utils import data_url
+from utils import uri2name
 from conceptnet5.graph import get_graph
 
 app = Flask(__name__)
 conceptnet = get_graph()
-
-def data_url(uri):
-    # I appreciate that Justin had url_for here, but I can't get it to work
-    # myself, so I'm cutting corners.
-    return '/web/'+uri.strip('/')
-
-def uri2name(arg):
-    if arg.startswith('/concept'):
-        if len(arg.split('/')) <= 3:
-            return arg.split('/')[-1]
-        result = arg.split('/')[3].replace('_', ' ')
-    else:
-        result = arg.split('/')[-1].replace('_', ' ')
-    if result.startswith('be ') or result.startswith('to '):
-        result = result[3:]
-    return result
 
 @app.route('/favicon.ico')
 def favicon():
