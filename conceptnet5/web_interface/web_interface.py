@@ -4,15 +4,15 @@ Web interface for ConceptNet5.
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
 
+import itertools
 import os
+import time
 from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
-import time
-import itertools
 
 app = Flask(__name__)
 conceptnet = get_graph()
@@ -21,16 +21,6 @@ def data_url(uri):
     # I appreciate that Justin had url_for here, but I can't get it to work
     # myself, so I'm cutting corners.
     return '/web/'+uri.strip('/')
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static', 'img'), 'favicon.ico',
-        mimetype='image/vnd.microsoft.icon')
-
-@app.route('/')
-def home():
-    return render_template('home.html')
 
 def uri2name(arg):
     if arg.startswith('/concept'):
@@ -42,6 +32,45 @@ def uri2name(arg):
     if result.startswith('be ') or result.startswith('to '):
         result = result[3:]
     return result
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static', 'img'), 'favicon.ico',
+        mimetype='image/vnd.microsoft.icon')
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/random_assertion')
+def random_assertion():
+    # TODO(jven): For now, just use an arbitrary assertion.
+    #for assertion in conceptnet.get_random_assertions():
+    #    # Just use the first one.
+    #    return assertion
+    assertion_rel_args = conceptnet.get_rel_and_args('/assertion/[/concept/en/'
+        'be_style_of/,/concept/en/ragtime/,/concept/en/music/]')
+    relation_uri = assertion_rel_args[0]
+    relation_url = data_url(relation_uri)
+    relation_name = uri2name(relation_uri)
+    args_uri = assertion_rel_args[1:]
+    if len(args_uri) > 2:
+        return 'n-ary assertions not supported at this time.'
+    args_url = [data_url(arg_uri) for arg_uri in args_uri]
+    args_name = [uri2name(arg_uri) for arg_uri in args_uri]
+    assertion = {
+        'source_name':args_name[0],
+        'source_uri':args_uri[0],
+        'source_url':args_url[0],
+        'relation_name':relation_name,
+        'relation_uri':relation_uri,
+        'relation_url':relation_url,
+        'target_name':args_name[1],
+        'target_uri':args_uri[1],
+        'target_url':args_url[1]
+    }
+    return render_template('vote.html', assertion=assertion)
 
 @app.route('/<path:uri>')
 def get_data(uri):
