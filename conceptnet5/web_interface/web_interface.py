@@ -56,13 +56,13 @@ def get_data(uri):
     assertions = []
     frames = []
     normalizations = []
-    
+
     count = 0
     edge_generator = itertools.chain(
         conceptnet.get_incoming_edges(uri, 'relation', result_limit=100),
         conceptnet.get_incoming_edges(uri, 'arg', result_limit=100)
     )
-                                     
+
     timer = None
     for edge, assertion_uri in edge_generator:
         count += 1
@@ -73,21 +73,23 @@ def get_data(uri):
             timer = time.time()
         if (timer is not None and time.time() - timer > 0.2):
             break
-        
+
         # Determine the relation and arguments from the URI.
         relargs = conceptnet.get_rel_and_args(assertion_uri)
         relation = relargs[0]
         args = relargs[1:]
-        if len(args) != 2: continue
+
         # skip n-ary relations for now; I'm tired and we didn't implement them
         # successfully anyway. -- Rob
-        
+        if len(args) != 2:
+            continue
+
         linked_args = ['<a href="%s">%s</a>' % (data_url(arg), uri2name(arg))
                        for arg in args]
         readable_args = [uri2name(arg) for arg in args]
         if relation.startswith('/frame'):
-            rendered_frame = uri2name(relation).replace('{%}', '').replace('{1}', linked_args[0])\
-                                               .replace('{2}', linked_args[1])
+            rendered_frame = uri2name(relation).replace('{%}', '').replace(
+                '{1}', linked_args[0]).replace('{2}', linked_args[1])
             frames.append(rendered_frame)
         else:
             position = edge.get('position')
