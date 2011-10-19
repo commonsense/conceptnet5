@@ -8,7 +8,9 @@ labels = {}
 prefixes = {}
 glossary = {}
 synset_senses = defaultdict(list)
-sense_synsets = {}
+synset_sense_names = defaultdict(list)
+sense_name_synsets = defaultdict(list)
+sense_synsets = defaultdict(list)
 
 parts_of_speech = {
     'noun': 'n',
@@ -88,17 +90,34 @@ for line in open('full/wordnet-wordsense-synset-relations.ttl'):
         obj = resolve_prefix(parts[2].strip('. '))
         synset_senses[subj].append(obj)
         sense_synsets[obj] = subj
+        sense_name = labels[obj]
+        synset_sense_names[subj].append(sense_name)
+        sense_name_synsets[sense_name].append(subj)
 
-# Assign every synset a disambiguation name, which is its gloss.
+# Assign every synset a disambiguation name.
 for synset in synset_senses:
     senses = sorted(synset_senses[synset])
     synset_name = labels[synset]
     synset_pos = synset.split('-')[-2]
     pos = parts_of_speech[synset_pos]
     disambig = glossary[synset]
-    node = "/concept/en/%s/%s/%s" % (synset_name, pos, disambig)
+    # TODO: take into account domains, etc.
+    #
+    #if len(sense_name_synsets[synset_name]) > 1:
+    #    for sense in senses:
+    #        sense_name = labels[sense]
+    #        more_synsets = sense_name_synsets[sense_name]
+    #        if len(more_synsets) == 1:
+    #            disambig = sense_name
+    #            break
+    #    if disambig is None:
+    #        disambig = glossary[synset]
+    #if disambig is None:
+    #    disambig = '*'
+    node = ('en', synset_name, pos+'/'+disambig)
     if synset not in mapping:
         mapping[synset] = node
+        #print "%s -> %s" % (synset_name, node)
 
 # Map senses to the same nodes.
 for sense, synset in sense_synsets.items():
@@ -142,9 +161,9 @@ for line in chain(
             web_subj, web_obj = web_obj, web_subj
             web_rel = web_rel.replace('meronym', 'holonym')
             mapped = mapped[1:]
-        pred = '/relation/'+mapped
+        pred = mapped
     else:
-        pred = '/relation/'+pred_label
+        pred = pred_label
 
     raw = GRAPH.get_or_create_assertion(
         GRAPH.get_or_create_web_concept(web_rel),
@@ -152,8 +171,8 @@ for line in chain(
         {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': False}
     )
     assertion = GRAPH.get_or_create_assertion(
-        GRAPH.get_or_create_node(pred),
-        [GRAPH.get_or_create_node(subj), GRAPH.get_or_create_node(obj)],
+        GRAPH.get_or_create_relation(pred),
+        [GRAPH.get_or_create_concept(*subj), GRAPH.get_or_create_concept(*obj)],
         {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': True}
     )
     GRAPH.justify(source, raw)
