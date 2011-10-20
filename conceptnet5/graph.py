@@ -263,9 +263,13 @@ class ConceptNetGraph(object):
         """
         language, name = rest.split('/', 1)
         disambiguation = None
+        gloss = None
         if '/' in name:
             name, disambiguation = name.split('/', 1)
-            pos, gloss = disambiguation.split('/', 1)
+            disambiguation = disambiguation.replace('_', ' ')
+            if '/' in disambiguation:
+                pos, gloss = disambiguation.split('/', 1)
+        if gloss:
             words = name.replace('_', ' ').split() +\
                     gloss.replace('_', ' ').split()
         else:
@@ -274,8 +278,8 @@ class ConceptNetGraph(object):
             type='concept',
             language=language,
             name=name.replace('_', ' '),
-            disambiguation=disambiguation.replace('_', ' '),
             uri=uri,
+            disambiguation=disambiguation,
             words=words,
             **properties
         )
@@ -567,8 +571,8 @@ class ConceptNetGraph(object):
         
         norm_props = dict(properties)
         norm_props['normalized'] = True
-        norm = self.get_or_create_assertion(norm_assertion_pieces[0],
-                norm_assertion_pieces[1:], norm_props)
+        norm = self.get_or_create_assertion(normalized_assertion_pieces[0],
+                normalized_assertion_pieces[1:], norm_props)
 
         raw_props = dict(properties)
         raw_props['normalized'] = False
