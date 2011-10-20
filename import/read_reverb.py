@@ -312,6 +312,7 @@ def handle_line(line):
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
+                print (arg1, arg2, arg3)
                 output_sentence(arg1, arg2, arg3, relation, raw, sources,
                     prep=tokens[index_prep])
         else: # SubjectOf relation
