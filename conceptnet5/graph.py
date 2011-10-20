@@ -128,9 +128,16 @@ class ConceptNetGraph(object):
 
         self.db.nodes.create_index('uri')
         self.db.nodes.create_index('dataset')
+        self.db.nodes.create_index('words')
         self.db.edges.create_index('key')
         self.db.edges.create_index([('start', 1), ('type', 1)])
         self.db.edges.create_index([('end', 1), ('type', 1)])
+
+    def authorize(self, username, password):
+        """
+        Become authorized with the MongoDB.
+        """
+        self.db.auth(username, password)
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -1023,11 +1030,26 @@ class GremlinWriterGraph(ConceptNetGraph):
     def close(self):
         self.output.close()
 
-def get_graph():
+def get_graph(server='50.17.55.143'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
 
     no args
     """
-    return ConceptNetGraph('67.202.5.17')
+    try:
+        from conceptnet5 import secrets
+    except ImportError:
+        raise Exception("""
+You don't have a conceptnet5/secrets.py file.
+You should make one that looks like this:
+
+USERNAME=<username>
+PASSWORD=<password>
+
+You may be able to simply copy this file from the Dropbox.
+""")
+    graph = ConceptNetGraph(server)
+    graph.authorize(secrets.USERNAME, secrets.PASSWORD)
+    return graph
+
