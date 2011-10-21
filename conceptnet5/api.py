@@ -14,45 +14,62 @@ import graph
 import flask
 import urllib
 import sys
+import simplejson
 app = flask.Flask(__name__)
 concept_graph = graph.get_graph()
 
 if len(sys.argv) == 1:
-    root_url = 'http://conceptnet.media.mit.edu/data'
+    root_url = 'http://conceptnet5.media.mit.edu/data'
 else:
     root_url = sys.argv[1]
 
 @app.route('/<path:uri>/')
 def get_data(uri):
     """
-    This function retrieves information about the desired node,
-    and returns that information as a json file.
-    TO DO: PAGINATED, TWO ELEMENT DICTIONARY
-    CREATE A LINK TO FIRST ASSERTION PAGE
-    PAGINATED BY SCORE
+    This function is the primary get function which is used to return most
+    json data.
     """
-    uri = '/' + uri
-    #print uri
-    node = concept_graph.get_node(uri)
     json = {}
-    json['properties'] = node
-    json['properties']['url'] = root_url + uri
-    del json['properties']['_id']
-    json['incoming_assertions'] = get_assertions(uri)
-    json['incoming_assertions_url'] = root_url + '/incoming_assertions' + uri
-    json['incoming_edges'] = get_incoming(uri)
-    json['incoming_edges_url'] = root_url + '/incoming_edges' + uri
-    json['outgoing_edges'] = get_outgoing(uri)
-    json['outgoing_edges_url'] = root_url + '/outgoing_edges' + uri
-    return flask.jsonify(json)
+    uri = '/' + uri
+    if concept_graph.get_node(uri) != None:
+        request_list = flask.request.args.get('get')
+        if request_list == None:
+            for k,f_list in valid_requests.iteritems():
+                for label,f in f_list.iteritems():
+                    json[label] = f(uri)
+            return flask.jsonify(json)
+        else:
+            request_list = request_list.split(' ')
+            for i in request_list:
+                if i in valid_requests.keys():
+                    for label,f in valid_requests[i].iteritems():
+                        json[label] = f(uri)
+                    return flask.jsonify(json)
+                else:
+                    return flask.Response(response=flask.jsonify({'error':'invalid request for parameter ' + i}),status=404,mimetype='json')                   
+                break
+            return flask.jsonify(json)
+    else:
+        return flask.Response(response=flask.json.dumps({'error':'invalid uri ' + uri}),status=404,mimetype='json')
 
-def get_assertions(uri, max_score = 0.0):
+def get_properties(uri):
+    """
+    This function retrieves information about the node in question.
+    """
+    node = concept_graph.get_node(uri)
+    node['url'] = root_url + '/' + uri
+    del node['_id']
+    return node
+
+def get_incoming_assertions(uri):
     """
     This function retrieves information about which assertions point to
     the node in question. It does so in a paginated format based on max score.
-    TO DO: PAGINATED BY ASSERTION SCORE
     """
     json = []
+    max_score = flask.request.args.get('max_score',type=float)
+    if max_score == None:
+        max_score = 0.0
     new_max_score = 0
     for relation in concept_graph.get_incoming_edges(uri, _type='arg', max_score=max_score, result_limit=50):
         json.append(concept_graph.get_node(relation[1]))
@@ -61,74 +78,130 @@ def get_assertions(uri, max_score = 0.0):
         new_max_score = relation[0]['score']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + '/incoming_assertions' + uri + '/' + str(new_max_score)
+        json[-1]['next'] = root_url + uri + '?get=incoming_assertions&max_score='+str(new_max_score)
     return json
 
-@app.route('/incoming_assertions/<path:uri>/', defaults={'max_score':0.0})
-@app.route('/incoming_assertions/<path:uri>/<float:max_score>/')
-def get_incoming_assertions(uri, max_score):
-    """This function uses get_assertions and outputs json"""
-    return flask.jsonify({'incoming_assertions':get_assertions('/'+uri, max_score=max_score)})
+def get_incoming_assertions_url(uri):
+    """
+    This function returns a url linking to a json page with only information
+    on incoming assertions
+    """
+    return root_url + uri + '?get=incoming_assertions'
 
-def get_incoming(uri, max_score = 0.0):
+def get_incoming_edges(uri):
     """
     This function retrieves information about the incomign edges of
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
+    max_score = flask.request.args.get('max_score',type=float)
+    if max_score == None:
+        max_score = 0.0
     for relation in concept_graph.get_incoming_edges(uri, max_score=max_score, result_limit=50):
         json.append(relation[0])
-        last_id = json[-1]['_id']
         del json[-1]['_id']
+        del json[-1]['jitter']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + '/incoming_edges' + uri + '/' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + uri + '?get=incoming_edges&max_score=' + str(json[-2]['score'])
     return json
 
-@app.route('/incoming_edges/<path:uri>/', defaults={'max_score':0.0})
-@app.route('/incoming_edges/<path:uri>/<float:max_score>/')
-def get_incoming_edges(uri, max_score):
-    """This function uses get_incoming and outputs json"""
-    return flask.jsonify({'incoming_edges':get_incoming('/'+uri, max_score=max_score)})
+def get_incoming_edges_url(uri):
+    """
+    This function returns a url linking to a json page with only information
+    on incoming edges
+    """
+    return root_url + uri + '?get=incoming_edges'
 
-def get_outgoing(uri, max_score = 0.0):
+def get_outgoing_edges(uri):
     """
     This function retrieves information about the outgoing edges of
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
+    max_score = flask.request.args.get('max_score',type=float)
+    if max_score == None:
+        max_score = 0.0
     for relation in concept_graph.get_outgoing_edges(uri, max_score=max_score, result_limit=50):
         json.append(relation[0])
         del json[-1]['_id']
+        del json[-1]['jitter']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + '/outgoing_edges' + uri + '/' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + uri + '?get=outgoing_edges&max_score=' + str(json[-2]['score'])
     return json
 
-@app.route('/outgoing_edges/<path:uri>/', defaults={'max_score':0.0})
-@app.route('/outgoing_edges/<path:uri>/<float:max_score>/')
-def get_outgoing_edges(uri, max_score):
-    """This function uses get_outgoing and outputs json"""
-    return flask.jsonify({'outgoing_edges':get_outgoing('/'+uri, max_score=max_score)})
+def get_outgoing_edges_url(uri):
+    """
+    This function returns a url linking to a json page with only information
+    on outgoing edges.
+    """
+    return root_url + uri + '?get=outgoing_edges'
 
-"""
-@app.route('/search/<query>')
-def search(query):
-
-    
-    This function takes a url search string and outputs a
-    json list of nodes with some data and urls
-    
-
-    query = Q()
-    for key, val in flask.request.args.iteritems():
-        query = Q(query & Q(key, val))
+def get_word_senses(uri):
+    """
+    This function retrieves information about the word senses related to
+    the node in question. It gives all wordsenses in one go.
+    """
     json = []
-    for node in concept_graph._node_index.query(query):
-        json.append(node.properties)
-        json[-1]['url'] = root_url + '/data' + node['uri']
-    return flask.jsonify(json)
-"""
+    for relation in concept_graph.get_incoming_edges(uri, _type='senseOf'):
+        json.append(concept_graph.get_node(relation[1]))
+        json[-1]['url'] = root_url  + json[-1]['uri']
+        del json[-1]['_id']
+    return json
+
+def get_word_sense_of(uri):
+    """
+    This function retrieves information about the nodes that this node
+    is a word sense of. It ives all wordsenses in one go.
+    """
+    json = []
+    for relation in concept_graph.get_outgoing_edges(uri, _type='senseOf'):
+        json.append(concept_graph.get_node(relation[1]))
+        json[-1]['url'] = root_url + json[-1]['uri']
+        del json[-1]['_id']
+    return json
+
+def get_normalized(uri):
+    """
+    This function retrieves information about the nodes that are normalized
+    concepts of this node, if there are any.
+    """
+    json = []
+    for relation in concept_graph.get_outgoing_edges(uri, _type='normalized'):
+        json.append(concept_graph.get_node(relation[1]))
+        json[-1]['url'] = root_url + json[-1]['uri']
+        del json[-1]['_id']
+    return json
+
+def get_normalized_of(uri):
+    """
+    This function retrieves information about the nodes that this node is a
+    normalized version of, if there are any.
+    """
+    json = []
+    for relation in concept_graph.get_incoming_edges(uri, _type='normalized'):
+        json.append(concept_graph.get_node(relation[1]))
+        json[-1]['url'] = root_url + json[-1]['uri']
+        del json[-1]['_id']
+    return json
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return flask.jsonify({'error':'invalid request'})
+
+valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
+                                    'incoming_edges_url':get_incoming_edges_url},\
+             'outgoing_edges':{'outgoing_edges':get_outgoing_edges,\
+                               'outgoing_edges_url':get_outgoing_edges_url},\
+             'incoming_assertions':{'incoming_assertions':get_incoming_assertions,\
+                                    'incoming_assertions_url':get_incoming_assertions_url},\
+             'word_senses':{'word_senses':get_word_senses},\
+             'properties':{'properties':get_properties},\
+             'word_sense_of':{'word_sense_of':get_word_sense_of},\
+             'normalized':{'normalized':get_normalized},\
+             'normalized_of':{'normalized_of':get_normalized_of}}
 
 if __name__ == '__main__':
     app.run(debug=True)
