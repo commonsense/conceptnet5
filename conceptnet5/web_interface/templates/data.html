@@ -1,4 +1,7 @@
 {% extends "_base.html" %}
+{% block title %}
+<title>ConceptNet 5: {{ node.name }}</title>
+{% endblock %}
 {% block content %}
 <h1>{{ node.name }}</h1>
 <hr />
@@ -88,6 +91,7 @@
     {% endfor %}
 </div>
 
+{% if frames %}
 <h2>Sentence frames</h2>
 <ul>
   {% for frame in frames %}
@@ -96,6 +100,12 @@
     </li>
   {% endfor %}
 </ul>
+{% endif %}
+<hr/>
+<p>
+<a href="/data{{ node.uri }}">JSON format</a> -
+<a href="http://conceptnet5.media.mit.edu">About ConceptNet 5</a>
+</p>
 {% endblock %}
 
 {% block scripts %}
