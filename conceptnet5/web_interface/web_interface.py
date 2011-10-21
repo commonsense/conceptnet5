@@ -12,9 +12,9 @@ from flask import redirect
 from flask import render_template
 from flask import send_from_directory
 from flask import url_for
-from utils import data_url
-from utils import uri2name
 from conceptnet5.graph import get_graph
+from conceptnet5.web_interface.utils import data_url
+from conceptnet5.web_interface.utils import uri2name
 
 app = Flask(__name__)
 conceptnet = get_graph()
