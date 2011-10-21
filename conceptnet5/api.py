@@ -47,7 +47,7 @@ def get_data(uri):
                     return flask.jsonify(json)
                 else:
                     return flask.Response(response=flask.jsonify({'error':'invalid request for parameter ' + i}),status=404,mimetype='json')                   
-                break
+                    break
             return flask.jsonify(json)
     else:
         return flask.Response(response=flask.json.dumps({'error':'invalid uri ' + uri}),status=404,mimetype='json')
