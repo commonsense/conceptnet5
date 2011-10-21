@@ -34,9 +34,21 @@ def handle_file(filename):
             GRAPH.justify(0, source, weight=0.5)
             
             conjunction = GRAPH.get_or_create_conjunction([source, petgame])
+            raw, norm = GRAPH.make_assertion_pair(
+                (GRAPH.make_frame('zh_TW', frame.text),
+                 GRAPH.make_concept('zh_TW', concept1),
+                 GRAPH.make_concept('zh_TW', concept2)
+                ),
+                (GRAPH.make_relation(relation.name),
+                 GRAPH.make_concept('zh_TW', concept1),
+                 GRAPH.make_concept('zh_TW', concept2)
+                ),
+                dataset='conceptnet/zh_TW',
+                license='CC-By',
+            )
+
             GRAPH.justify(conjunction, raw)
-            GRAPH.derive_normalized(raw, assertion)
-            print assertion
+            print norm
 
 if __name__ == '__main__':
     for filename in os.listdir('.'):

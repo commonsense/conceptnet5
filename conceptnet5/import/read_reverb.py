@@ -13,18 +13,26 @@ import re
 GRAPH = JSONWriterGraph('json_data/reverb')
 
 reverb = GRAPH.get_or_create_node(u'/source/rule/reverb')
-GRAPH.justify(0, reverb)
+GRAPH.justify('/', reverb, 0.5)
 reverb_object = GRAPH.get_or_create_node(u'/source/rule/extract_reverb_objects')
+#reverb_prep = GRAPH.get_or_create_node(u'/source/rule/extract_reverb_prepositions')
 reverb_triple = GRAPH.get_or_create_node(u'/source/rule/reverb_present_tense_triples')
 wikipedia = GRAPH.get_or_create_node(u'/source/web/en.wikipedia.org')
-GRAPH.justify(0, reverb_object)
-GRAPH.justify(0, reverb_triple)
-GRAPH.justify(0, wikipedia)
+GRAPH.justify('/', reverb_object, 0.25)
+GRAPH.justify('/', reverb_triple, 0.5)
+GRAPH.justify('/', wikipedia)
 
-TYPE_WORDS = ('type', 'kind', 'sort', 'variety')
+TYPE_WORDS = ('type', 'kind', 'sort', 'variety', 'one')
 
 # Search for non-namespaced Wikipedia sources.
 WIKIPEDIA_SOURCE = re.compile(r'(http://en.wikipedia.org/wiki/([^:]|:_)+)(\||$)')
+
+def normalize_rel(text):
+    parts = normalize(text).split()
+    if len(p) >= 2 and p[1] == 'be' and p[0] in ('be', 'have'):
+        p = p[1:]
+    parts = [p for p in parts if p != 'also']
+    return ' '.join(parts)
 
 def probably_present_tense(text):
     return text in ('is', 'are') or normalize(text) == text
@@ -81,7 +89,7 @@ def get_domain_names(urls):
 def output_triple(arg1, arg2, relation, raw):
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
-    relation = normalize(relation).strip()
+    relation = normalize_rel(relation).strip()
     print '%s(%s, %s)' % \
         (relation, arg1, arg2)
     found_relation = False
@@ -109,7 +117,8 @@ def output_triple(arg1, arg2, relation, raw):
         rel_node,
         [GRAPH.get_or_create_concept('en', arg1),
          GRAPH.get_or_create_concept('en', arg2)],
-        {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+        {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+         'normalized': True}
     )
     GRAPH.derive_normalized(raw, assertion)
     
@@ -128,6 +137,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         [GRAPH.get_or_create_concept('en', raw_arg1),
          GRAPH.get_or_create_concept('en', raw_arg2)],
         {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+         'normalized': False,
          'sources': '|'.join(sources)}
     )
     
@@ -158,6 +168,7 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
         return
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
+    arg3 = normalize(arg3).strip()
     assertion = None
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
@@ -165,19 +176,28 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
             '/relation/'+relation,
             [GRAPH.get_or_create_concept('en', arg1),
              GRAPH.get_or_create_concept('en', arg2)],
-            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+             'normalized': True}
         )
         assertions = (assertion,)
     else:
-        print '%s(%s, %s)' % \
-            (relation, arg1, arg2)
+        print '%s(%s, %s) %s(%s, %s)' % \
+            (relation, arg1, arg2, prep, arg2, arg3)
         assertion1 = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             [GRAPH.get_or_create_concept('en', arg1),
              GRAPH.get_or_create_concept('en', arg2)],
-            {'dataset': 'reverb/en', 'license': 'CC-By-SA'}
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+             'normalized': True}
         )
-        assertions = (assertion1,)
+        assertion2 = GRAPH.get_or_create_assertion(
+            GRAPH.get_or_create_concept('en', prep, 'p'),
+            [GRAPH.get_or_create_concept('en', arg2),
+             GRAPH.get_or_create_concept('en', arg3)],
+            {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+             'normalized': True}
+        )
+        assertions = (assertion1, assertion2)
     
     for assertion in assertions:
         conjunction = GRAPH.get_or_create_conjunction(
