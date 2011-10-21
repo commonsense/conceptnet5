@@ -4,23 +4,20 @@ Web interface for ConceptNet5.
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
 
+import itertools
 import os
+import time
 from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import send_from_directory
 from flask import url_for
+from utils import data_url
+from utils import uri2name
 from conceptnet5.graph import get_graph
-import time
-import itertools
 
 app = Flask(__name__)
 conceptnet = get_graph()
-
-def data_url(uri):
-    # I appreciate that Justin had url_for here, but I can't get it to work
-    # myself, so I'm cutting corners.
-    return '/web/'+uri.strip('/')
 
 @app.route('/favicon.ico')
 def favicon():
@@ -32,16 +29,34 @@ def favicon():
 def home():
     return render_template('home.html')
 
-def uri2name(arg):
-    if arg.startswith('/concept'):
-        if len(arg.split('/')) <= 3:
-            return arg.split('/')[-1]
-        result = arg.split('/')[3].replace('_', ' ')
-    else:
-        result = arg.split('/')[-1].replace('_', ' ')
-    if result.startswith('be ') or result.startswith('to '):
-        result = result[3:]
-    return result
+@app.route('/random_assertion')
+def random_assertion():
+    # TODO(jven): For now, just use an arbitrary assertion.
+    #for assertion in conceptnet.get_random_assertions():
+    #    # Just use the first one.
+    #    return assertion
+    assertion_rel_args = conceptnet.get_rel_and_args('/assertion/[/concept/en/'
+        'be_style_of/,/concept/en/ragtime/,/concept/en/music/]')
+    relation_uri = assertion_rel_args[0]
+    relation_url = data_url(relation_uri)
+    relation_name = uri2name(relation_uri)
+    args_uri = assertion_rel_args[1:]
+    if len(args_uri) > 2:
+        return 'n-ary assertions not supported at this time.'
+    args_url = [data_url(arg_uri) for arg_uri in args_uri]
+    args_name = [uri2name(arg_uri) for arg_uri in args_uri]
+    assertion = {
+        'source_name':args_name[0],
+        'source_uri':args_uri[0],
+        'source_url':args_url[0],
+        'relation_name':relation_name,
+        'relation_uri':relation_uri,
+        'relation_url':relation_url,
+        'target_name':args_name[1],
+        'target_uri':args_uri[1],
+        'target_url':args_url[1]
+    }
+    return render_template('vote.html', assertion=assertion)
 
 @app.route('/<path:uri>')
 def get_data(uri):
@@ -56,13 +71,13 @@ def get_data(uri):
     assertions = []
     frames = []
     normalizations = []
-    
+
     count = 0
     edge_generator = itertools.chain(
         conceptnet.get_incoming_edges(uri, 'relation', result_limit=100),
         conceptnet.get_incoming_edges(uri, 'arg', result_limit=100)
     )
-                                     
+
     timer = None
     for edge, assertion_uri in edge_generator:
         count += 1
@@ -73,21 +88,23 @@ def get_data(uri):
             timer = time.time()
         if (timer is not None and time.time() - timer > 0.2):
             break
-        
+
         # Determine the relation and arguments from the URI.
         relargs = conceptnet.get_rel_and_args(assertion_uri)
         relation = relargs[0]
         args = relargs[1:]
-        if len(args) != 2: continue
+
         # skip n-ary relations for now; I'm tired and we didn't implement them
         # successfully anyway. -- Rob
-        
+        if len(args) != 2:
+            continue
+
         linked_args = ['<a href="%s">%s</a>' % (data_url(arg), uri2name(arg))
                        for arg in args]
         readable_args = [uri2name(arg) for arg in args]
         if relation.startswith('/frame'):
-            rendered_frame = uri2name(relation).replace('{%}', '').replace('{1}', linked_args[0])\
-                                               .replace('{2}', linked_args[1])
+            rendered_frame = uri2name(relation).replace('{%}', '').replace(
+                '{1}', linked_args[0]).replace('{2}', linked_args[1])
             frames.append(rendered_frame)
         else:
             position = edge.get('position')

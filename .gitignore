@@ -3,8 +3,12 @@
 *.egg-info
 .coverage
 .achievements
-conceptnet5/import/*.txt
+conceptnet5/import*/*.txt
+json_data
 enwiktionary.xml
 wikipedia.txt
 verbosity.txt
 gremlin_data
+*.ttl
+*.nt
+*.zip

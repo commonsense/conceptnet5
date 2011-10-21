@@ -262,11 +262,25 @@ class ConceptNetGraph(object):
 
         """
         language, name = rest.split('/', 1)
+        disambiguation = None
+        gloss = None
+        if '/' in name:
+            name, disambiguation = name.split('/', 1)
+            disambiguation = disambiguation.replace('_', ' ')
+            if '/' in disambiguation:
+                pos, gloss = disambiguation.split('/', 1)
+        if gloss:
+            words = name.replace('_', ' ').split() +\
+                    gloss.replace('_', ' ').split()
+        else:
+            words = name.replace('_', ' ').split()
         return self._create_node(
             type='concept',
             language=language,
             name=name.replace('_', ' '),
             uri=uri,
+            disambiguation=disambiguation,
+            words=words,
             **properties
         )
 
@@ -498,6 +512,7 @@ class ConceptNetGraph(object):
 
         """
         return self.get_node(uri) or self._create_node_by_type(uri, properties)
+    make_node = get_or_create_node
 
     def get_or_create_edge(self, _type, source, target, properties = {}):
         """
@@ -513,6 +528,7 @@ class ConceptNetGraph(object):
         """
         return (self.get_edge(_type, source, target) or
                 self._create_edge(_type, source, target, properties))
+    make_edge = get_or_create_edge
 
     def get_or_create_assertion(self, relation, args, properties = {}):
         """
@@ -532,6 +548,57 @@ class ConceptNetGraph(object):
         return (self.get_node(uri) or 
         self._create_assertion_w_components(uri, self._any_to_node(relation, create=True), \
         [self._any_to_node(arg, create=True) for arg in args], properties))
+    make_assertion = get_or_create_assertion
+    
+    def make_assertion_pair(self, raw_assertion_pieces,
+                            normalized_assertion_pieces,
+                            **properties):
+        """
+        Make a raw/normalized assertion pair, given all the data to make them:
+
+        - `raw_assertion_pieces`: a triple (or more) containing the
+          relation/frame that forms the predicate, followed by the args,
+          for the raw version of the assertion.
+        - `normalized_assertion_pieces`: the same triple (or more) for the
+          normalized version.
+        - `**properties`: additional properties to set on both assertions.
+          Should contain at least 'dataset' and 'license'.
+        
+        There are some steps of creating assertions that should still be
+        performed by the code that calls this, as they can vary.
+
+        The concepts involved should be created using make_concept (an
+        abbreviation for get_or_create_concept), and the
+        raw assertion returned from here should be justified.
+        """
+        assert 'dataset' in properties
+        assert 'license' in properties
+        
+        norm_props = dict(properties)
+        norm_props['normalized'] = True
+        norm = self.get_or_create_assertion(normalized_assertion_pieces[0],
+                normalized_assertion_pieces[1:], norm_props)
+
+        raw_props = dict(properties)
+        raw_props['normalized'] = False
+        raw = self.get_or_create_assertion(raw_assertion_pieces[0],
+                raw_assertion_pieces[1:], raw_props)
+
+        self.derive_normalized(raw, norm)
+        return raw, norm
+
+    def make_single_source_assertion_pair(self, raw_assertion_pieces,
+                                          normalized_assertion_pieces,
+                                          source, source_weight=1.0,
+                                          root_weight=1.0,
+                                          **properties):
+        raw, norm = self.make_assertion_pair(
+            raw_assertion_pieces, normalized_assertion_pieces, **properties
+        )
+        
+        self.justify('/', source, root_weight)
+        self.justify(source, raw, source_weight)
+        return raw, norm
 
     def get_or_create_concept(self, language, name, disambiguation=''):
         """
@@ -551,6 +618,7 @@ class ConceptNetGraph(object):
             uri += u'/'+disambiguation
             self.get_or_create_edge('senseOf', uri, base_uri, {'weight': 1})
         return self.get_node(uri) or self._create_node_by_type(uri, {})
+    make_concept = get_or_create_concept
 
     def get_or_create_conjunction(self, conjuncts):
         """
@@ -574,6 +642,7 @@ class ConceptNetGraph(object):
             for conjunct in uris:
                 self._create_edge('conjunct', conjunct, node, {'weight': 0})
         return node
+    make_conjunction = get_or_create_conjunction
     
     def get_or_create_frame(self, language, name):
         """
@@ -585,6 +654,7 @@ class ConceptNetGraph(object):
         name = name.replace(u'/', u'_')
         uri = "/frame/%s/%s" % (language, name)
         return self.get_node(uri) or self._create_node_by_type(uri, {})
+    make_frame = get_or_create_frame
 
     def get_or_create_relation(self, name, properties={}):
         """
@@ -597,6 +667,7 @@ class ConceptNetGraph(object):
 
         uri = "/relation/%s" % name
         return self.get_node(uri) or self._create_node_by_type(uri, properties)
+    make_relation = get_or_create_relation
 
     def get_or_create_source(self, source_list):
         """
@@ -610,6 +681,7 @@ class ConceptNetGraph(object):
 
         uri = normalize_uri("/source/" + "/".join(source_list))
         return self.get_node(uri) or self._create_node_by_type(uri, {})
+    make_source = get_or_create_source
 
     def get_or_create_web_concept(self, url):
         """
@@ -621,6 +693,7 @@ class ConceptNetGraph(object):
         """
         temp_uri = "/web_concept/%s" % url
         return self.get_node(url) or self._create_node_by_type(temp_uri, {})
+    make_web_concept = get_or_create_web_concept
 
     def get_args(self, assertion):
         """
@@ -771,6 +844,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.filename = filename
         self.nodes = open(filename+'.nodes.json', 'w')
         self.edges = open(filename+'.edges.json', 'w')
+        self.scoredEdges = open(filename+'.scored.json', 'w')
         self.recently_created_uris = []
 
     def _write_node(self, properties):
@@ -788,6 +862,13 @@ class JSONWriterGraph(ConceptNetGraph):
             type += str(properties['position'])
         properties['key'] = u'%s %s %s' % (type, start, end)
         print >> self.edges, json.dumps(properties)
+        
+        # Set a default value in scoredEdges, so that we can use the data
+        # instantly and not have to wait to re-chug the data
+        properties['jitter'] = random.random()
+        properties['score'] = 100 + properties['jitter']*1e-6
+        scored = {'value': properties}
+        print >> self.scoredEdges, json.dumps(scored)
     
     def _create_node(self, **properties):
         uri = properties['uri']
@@ -844,9 +925,14 @@ class JSONWriterGraph(ConceptNetGraph):
         assert assertion_uri[:11] == '/assertion/'
         rest = assertion_uri[11:]
         return uri_piece_to_list(rest)
+    
+    def __del__(self):
+        self.close()
 
     def close(self):
-        self.output.close()
+        self.nodes.close()
+        self.edges.close()
+        self.scoredEdges.close()
 
 class GremlinWriterGraph(ConceptNetGraph):
     """

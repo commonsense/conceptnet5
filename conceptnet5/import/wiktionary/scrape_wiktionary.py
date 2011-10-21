@@ -121,7 +121,7 @@ class FindTranslations(ContentHandler):
         self.curSense = None
         self.curTitle = ''
         self.curText = ''
-        self.locales = None
+        self.locales = []
         self.curRelation = None
 
         self.graph = JSONWriterGraph('../json_data/wiktionary_all')
@@ -162,7 +162,7 @@ class FindTranslations(ContentHandler):
             self.curTitle += text
         elif self.inArticle:
             self.curText.append(text)
-            if len(self.curText) > 100:
+            if len(self.curText) > 10000:
                 # bail out
                 self.inArticle = False
 
@@ -190,8 +190,6 @@ class FindTranslations(ContentHandler):
                 self.curRelation = None
                 if pos in PARTS_OF_SPEECH:
                     self.pos = PARTS_OF_SPEECH[pos]
-                else:
-                    self.pos = None
         elif language_match:
             self.lang = language_match.group(1)
             self.langcode = LANGUAGES.get(self.lang)
@@ -220,10 +218,13 @@ class FindTranslations(ContentHandler):
             self.curRelation = None
         elif trans_top_match:
             pos = self.pos or 'n'
-            sense = trans_top_match.group(1)
-            self.curSense = pos+'/'+sense
-            if self.lang == 'English':
-                self.output_sense(title, self.curSense)
+            sense = trans_top_match.group(1).split(';')[0].strip('.')
+            if 'translations' in sense.lower():
+                self.curSense = None
+            else:
+                self.curSense = pos+'/'+sense
+                if self.lang == 'English':
+                    self.output_sense(title, self.curSense)
         elif trans_tag_match:
             lang = trans_tag_match.group(1)
             translation = trans_tag_match.group(2)
@@ -242,6 +243,8 @@ class FindTranslations(ContentHandler):
                                         related, title)
     
     def output_monolingual(self, lang, relation, term1, term2):
+        if 'Wik' in term1 or 'Wik' in term2:
+            return
         source = self.graph.get_or_create_concept(lang, term1)
         target = self.graph.get_or_create_concept(lang, term2)
         relation = self.graph.get_or_create_relation(relation)
@@ -251,7 +254,6 @@ class FindTranslations(ContentHandler):
            'license': 'CC-By-SA', 'normalized': False}
         )
         self.graph.justify(self.monolingual_conjunction, assertion)
-        print assertion.encode('utf-8')
 
 
     def output_sense_translation(self, lang, foreign, english, disambiguation):
@@ -275,7 +277,6 @@ class FindTranslations(ContentHandler):
            'license': 'CC-By-SA', 'normalized': False}
         )
         self.graph.justify(self.conjunction, assertion)
-        print assertion.encode('utf-8')
         
     def output_sense(self, english, disambiguation):
         source = self.graph.get_or_create_concept(
@@ -331,8 +332,6 @@ class FindTranslations(ContentHandler):
         )
         self.graph.justify(self.conjunction, assertion)
         self.graph.derive_normalized(assertion, assertion_normal)
-        
-        print assertion.encode('utf-8')
 
 def filter_line(line):
     line = re.sub(r"\{\{.*?\}\}", "", line)
