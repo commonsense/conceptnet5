@@ -40,15 +40,19 @@ def get_data(uri):
             return flask.jsonify(json)
         else:
             request_list = request_list.split(' ')
+            valid = True
             for i in request_list:
                 if i in valid_requests.keys():
                     for label,f in valid_requests[i].iteritems():
                         json[label] = f(uri)
-                    return flask.jsonify(json)
                 else:
-                    return flask.Response(response=flask.jsonify({'error':'invalid request for parameter ' + i}),status=404,mimetype='json')                   
+                    valid = False
                     break
-            return flask.jsonify(json)
+            if valid:
+                return flask.jsonify(json)
+            else:
+                return flask.Response(response=flask.json.dumps({'error':'invalid request for parameter '\
+                        + i + ' from uri ' + uri}),status=404,mimetype='json')
     else:
         return flask.Response(response=flask.json.dumps({'error':'invalid uri ' + uri}),status=404,mimetype='json')
 
