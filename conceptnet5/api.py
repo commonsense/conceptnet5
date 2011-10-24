@@ -23,6 +23,29 @@ if len(sys.argv) == 1:
 else:
     root_url = sys.argv[1]
 
+no_leading_slash = ['http']
+
+def correct_uri(uri):
+    """
+    Corrects uri by adding slash if necessary
+    """
+    if uri[1:5] in no_leading_slash and uri[0] == '/':
+        return uri[1:]
+    elif uri[:4] in no_leading_slash or uri[0] == '/':
+        return uri
+    else:
+        return '/' + uri
+
+def add_slash(uri):
+    """
+    Ensures that a slash is present in all situations where slashes are
+    absolutely necessary for an address.
+    """
+    if uri[0] == '/':
+        return uri
+    else:
+        return '/' + uri
+
 @app.route('/<path:uri>/')
 def get_data(uri):
     """
@@ -30,8 +53,8 @@ def get_data(uri):
     json data.
     """
     json = {}
-    uri = '/' + uri
-    if concept_graph.get_node(uri) != None:
+    print correct_uri(uri)
+    if concept_graph.get_node(correct_uri(uri)) != None:
         request_list = flask.request.args.get('get')
         if request_list == None:
             for k,f_list in valid_requests.iteritems():
@@ -52,16 +75,16 @@ def get_data(uri):
                 return flask.jsonify(json)
             else:
                 return flask.Response(response=flask.json.dumps({'error':'invalid request for parameter '\
-                        + i + ' from uri ' + uri}),status=404,mimetype='json')
+                        + i + ' from uri ' + correct_uri(uri)}),status=404,mimetype='json')
     else:
-        return flask.Response(response=flask.json.dumps({'error':'invalid uri ' + uri}),status=404,mimetype='json')
+        return flask.Response(response=flask.json.dumps({'error':'invalid uri ' + correct_uri(uri)}),status=404,mimetype='json')
 
 def get_properties(uri):
     """
     This function retrieves information about the node in question.
     """
-    node = concept_graph.get_node(uri)
-    node['url'] = root_url + '/' + uri
+    node = concept_graph.get_node(correct_uri(uri))
+    node['url'] = root_url + add_slash(uri)
     del node['_id']
     return node
 
@@ -75,14 +98,14 @@ def get_incoming_assertions(uri):
     if max_score == None:
         max_score = 0.0
     new_max_score = 0
-    for relation in concept_graph.get_incoming_edges(uri, _type='arg', max_score=max_score, result_limit=50):
-        json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url  + json[-1]['uri']
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=max_score, result_limit=50):
+        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        json[-1]['url'] = root_url  + add_slash(json[-1]['uri'])
         del json[-1]['_id']
         new_max_score = relation[0]['score']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + uri + '?get=incoming_assertions&max_score='+str(new_max_score)
+        json[-1]['next'] = root_url + add_slash(uri) + '?get=incoming_assertions&max_score='+str(new_max_score)
     return json
 
 def get_incoming_assertions_url(uri):
@@ -90,7 +113,7 @@ def get_incoming_assertions_url(uri):
     This function returns a url linking to a json page with only information
     on incoming assertions
     """
-    return root_url + uri + '?get=incoming_assertions'
+    return root_url + add_slash(uri) + '?get=incoming_assertions'
 
 def get_incoming_edges(uri):
     """
@@ -101,13 +124,14 @@ def get_incoming_edges(uri):
     max_score = flask.request.args.get('max_score',type=float)
     if max_score == None:
         max_score = 0.0
-    for relation in concept_graph.get_incoming_edges(uri, max_score=max_score, result_limit=50):
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), max_score=max_score, result_limit=50):
         json.append(relation[0])
-        del json[-1]['_id']
+        try: del json[-1]['_id']
+        except KeyError: pass
         del json[-1]['jitter']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + uri + '?get=incoming_edges&max_score=' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + add_slash(uri) + '?get=incoming_edges&max_score=' + str(json[-2]['score'])
     return json
 
 def get_incoming_edges_url(uri):
@@ -115,7 +139,7 @@ def get_incoming_edges_url(uri):
     This function returns a url linking to a json page with only information
     on incoming edges
     """
-    return root_url + uri + '?get=incoming_edges'
+    return root_url + add_slash(uri) + '?get=incoming_edges'
 
 def get_outgoing_edges(uri):
     """
@@ -126,13 +150,14 @@ def get_outgoing_edges(uri):
     max_score = flask.request.args.get('max_score',type=float)
     if max_score == None:
         max_score = 0.0
-    for relation in concept_graph.get_outgoing_edges(uri, max_score=max_score, result_limit=50):
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), max_score=max_score, result_limit=50):
         json.append(relation[0])
-        del json[-1]['_id']
+        try: del json[-1]['_id']
+        except KeyError: pass
         del json[-1]['jitter']
     if len(json) == 50:
         json.append({})
-        json[-1]['next'] = root_url + uri + '?get=outgoing_edges&max_score=' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + add_slash(uri) + '?get=outgoing_edges&max_score=' + str(json[-2]['score'])
     return json
 
 def get_outgoing_edges_url(uri):
@@ -140,7 +165,7 @@ def get_outgoing_edges_url(uri):
     This function returns a url linking to a json page with only information
     on outgoing edges.
     """
-    return root_url + uri + '?get=outgoing_edges'
+    return root_url + add_slash(uri) + '?get=outgoing_edges'
 
 def get_word_senses(uri):
     """
@@ -148,9 +173,9 @@ def get_word_senses(uri):
     the node in question. It gives all wordsenses in one go.
     """
     json = []
-    for relation in concept_graph.get_incoming_edges(uri, _type='senseOf'):
-        json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url  + json[-1]['uri']
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='senseOf'):
+        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        json[-1]['url'] = root_url  + add_slash(json[-1]['uri'])
         del json[-1]['_id']
     return json
 
@@ -160,9 +185,9 @@ def get_word_sense_of(uri):
     is a word sense of. It ives all wordsenses in one go.
     """
     json = []
-    for relation in concept_graph.get_outgoing_edges(uri, _type='senseOf'):
-        json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url + json[-1]['uri']
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='senseOf'):
+        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
         del json[-1]['_id']
     return json
 
@@ -172,9 +197,9 @@ def get_normalized(uri):
     concepts of this node, if there are any.
     """
     json = []
-    for relation in concept_graph.get_outgoing_edges(uri, _type='normalized'):
-        json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url + json[-1]['uri']
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='normalized'):
+        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
         del json[-1]['_id']
     return json
 
@@ -184,9 +209,9 @@ def get_normalized_of(uri):
     normalized version of, if there are any.
     """
     json = []
-    for relation in concept_graph.get_incoming_edges(uri, _type='normalized'):
-        json.append(concept_graph.get_node(relation[1]))
-        json[-1]['url'] = root_url + json[-1]['uri']
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='normalized'):
+        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
         del json[-1]['_id']
     return json
 
