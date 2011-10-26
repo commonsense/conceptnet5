@@ -61,7 +61,7 @@ to start!
       </a>
     </span>
     <span class="relation">
-      <a href="http://conceptnet5.media.mit.edu/web/relation/be_style_of">
+      <a href="http://conceptnet5.media.mit.edu/web/concept/en/be_style_of">
         style of
       </a>
     </span>
@@ -233,6 +233,10 @@ release will have the same graph structure, but slightly different contents.</p>
 <p>Building ConceptNet 5 is a time-consuming process. Basically, there's
 another version in the pipeline right now, but it still has to take some
 time to index all the statements.</p>
+<h3>Known bugs in this release</h3>
+<li>Much of the Wiktionary data is missing; it generally only contains the
+first sense for each word.</li>
+<li>WordNet senses are missing.</li>
 <h2>Web API</h2>
 <p>The data in ConceptNet 5 is accessible through a Web API that returns JSON
 data. Here's some very short documentation for it:</p>
@@ -253,16 +257,16 @@ API.</li>
 <p>If you want all the data in ConceptNet for your application, you can have
 it! Here it is as some <a
 href="http://67.202.46.13/conceptnet5-beta-json-2011-10-12.tar.bz2">extremely
-compressed JSON files</a>. Be warned, this ~600 MB download will uncompress to
-nearly 19 gigabytes of data.</p>
-<!--
-<p id="ebs">So, that's a lot of gigabytes. You may find it a lot more
-convenient to
-mount our drive (complete with its MongoDB 2.0 database) through Amazon's <abbr
+compressed JSON files</a>. Be warned, this ~1.1 gigabyte download will
+uncompress to nearly 24 gigabytes of data.</p>
+<p>
+If you want to look things up quickly in ConceptNet 5, you may want to use the
+MongoDB 2.0 database that we have built. That database, with all its indexes,
+is at 111 gigabytes and counting. (Informative URIs have their price.) The best
+way to do this would be to mount our drive through through Amazon's <abbr
 title="Enterprise Block Storage">EBS</abbr>. <a href="#contact">Contact us</a>
 if you want to do that really soon; we're also working on becoming one of their
 public datasets.</p>
--->
 <h2>Development</h2>
 <p>ConceptNet 5 is an open-source project, developed with GPLv3 code hosted on
 <a href="http://github.com/commonsense/conceptnet">GitHub</a>.</p>

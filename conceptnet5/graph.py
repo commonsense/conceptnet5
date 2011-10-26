@@ -438,9 +438,11 @@ class ConceptNetGraph(object):
         else:
             edges = self.db.scoredEdges.find(search)\
             .sort([('value.score',DESCENDING)])
-        print edges
+        seen = set()
         for edge in edges:
-            yield edge['value'], edge['value']['start']
+            if edge['value']['key'] not in seen:
+                seen.add(edge['value']['key'])
+                yield edge['value'], edge['value']['start']
 
     def get_outgoing_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
@@ -457,8 +459,11 @@ class ConceptNetGraph(object):
         else:
             edges = self.db.scoredEdges.find(search)\
             .sort([('value.score',DESCENDING)])
+        seen = set()
         for edge in edges:
-            yield edge['value'], edge['value']['end']
+            if edge['value']['key'] not in seen:
+                seen.add(edge['value']['key'])
+                yield edge['value'], edge['value']['end']
         
     def _any_to_node(self, obj, create=False):
         """
