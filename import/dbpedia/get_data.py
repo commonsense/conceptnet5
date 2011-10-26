@@ -73,6 +73,7 @@ def handle_triple(line):
     print norm_assertion
 
 def main():
+    handle_file('mappingbased_properties_en.nt')
     handle_file('instance_types_en.nt')
 
 if __name__ == '__main__':

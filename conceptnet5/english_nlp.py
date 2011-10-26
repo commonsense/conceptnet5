@@ -128,7 +128,7 @@ def normalize_topic(topic):
     if not match:
         return normalize(topic), None
     else:
-        return normalize(match.group(1)), 'n/'+match.group(2)
+        return normalize(match.group(1)), 'n/'+match.group(2).strip(' _')
 
 def normalize_english_assertion(graph, assertion):
     """
