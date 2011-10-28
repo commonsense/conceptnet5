@@ -10,14 +10,27 @@ import time
 from flask import Flask
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
 from conceptnet5.web_interface.utils import data_url
 from conceptnet5.web_interface.utils import uri2name
 
+########################
+# Set this flag to True when developing, False otherwise! -JVen
+#
+DEVELOPMENT = True
+#
+########################
+
 app = Flask(__name__)
 conceptnet = get_graph()
+
+if DEVELOPMENT:
+  web_route = '/web/'
+else:
+  web_route = '/'
 
 @app.route('/favicon.ico')
 def favicon():
@@ -29,36 +42,52 @@ def favicon():
 def home():
     return render_template('home.html')
 
-@app.route('/random_assertion')
-def random_assertion():
-    # TODO(jven): For now, just use an arbitrary assertion.
-    #for assertion in conceptnet.get_random_assertions():
-    #    # Just use the first one.
-    #    return assertion
-    assertion_rel_args = conceptnet.get_rel_and_args('/assertion/[/concept/en/'
-        'be_style_of/,/concept/en/ragtime/,/concept/en/music/]')
-    relation_uri = assertion_rel_args[0]
-    relation_url = data_url(relation_uri)
-    relation_name = uri2name(relation_uri)
-    args_uri = assertion_rel_args[1:]
-    if len(args_uri) > 2:
-        return 'n-ary assertions not supported at this time.'
-    args_url = [data_url(arg_uri) for arg_uri in args_uri]
-    args_name = [uri2name(arg_uri) for arg_uri in args_uri]
-    assertion = {
-        'source_name':args_name[0],
-        'source_uri':args_uri[0],
-        'source_url':args_url[0],
-        'relation_name':relation_name,
-        'relation_uri':relation_uri,
-        'relation_url':relation_url,
-        'target_name':args_name[1],
-        'target_uri':args_uri[1],
-        'target_url':args_url[1]
-    }
-    return render_template('vote.html', assertion=assertion)
+@app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
+def get_assertion(uri):
+    assertion_uri = '/assertion/%s' % uri
+    assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
+    if not assertion_rel_args:
+        return 'Invalid assertion.'
+    if request.method == 'GET':
+        relation_uri = assertion_rel_args[0]
+        relation_url = data_url(relation_uri)
+        relation_name = uri2name(relation_uri)
+        args_uri = assertion_rel_args[1:]
+        if len(args_uri) > 2:
+            return 'n-ary assertions not supported at this time.'
+        args_url = [data_url(arg_uri) for arg_uri in args_uri]
+        args_name = [uri2name(arg_uri) for arg_uri in args_uri]
+        assertion = {
+            'source_name':args_name[0],
+            'source_uri':args_uri[0],
+            'source_url':args_url[0],
+            'relation_name':relation_name,
+            'relation_uri':relation_uri,
+            'relation_url':relation_url,
+            'target_name':args_name[1],
+            'target_uri':args_uri[1],
+            'target_url':args_url[1]
+        }
+        return render_template('get_assertion.html', assertion=assertion)
+    elif request.method == 'POST':
+        # Get inputs.
+        vote = request.form.get('vote')
+        # Validate.
+        if not vote:
+            return 'You didn\'t vote.'
+        # Record.
+        if vote == 'agree':
+            ip_address = request.remote_addr
+            # TODO(jven): store vote
+            return 'Successfully voted: agree'
+        elif vote == 'disagree':
+            ip_address = request.remote_addr
+            # TODO(jven): store vote
+            return 'Successfully voted: disagree.'
+        else:
+            return 'Invalid vote.'
 
-@app.route('/<path:uri>')
+@app.route('%s<path:uri>' % web_route)
 def get_data(uri):
     uri = '/%s' % uri
     node = conceptnet.get_node(uri)
@@ -124,6 +153,7 @@ def get_data(uri):
             else:
                 raise ValueError
             assertions.append({
+                'assertion_uri':assertion_uri,
                 'position': position,
                 'relation_url': data_url(relation),
                 'relation': uri2name(relation),
