@@ -1,40 +1,27 @@
 {% extends "_base.html" %}
 {% block content %}
 <h1>
-<a href="{{ assertion['source_url'] }}" title="{{ assertion['source_uri'] }}">({{ assertion['source_name'] }})</a>
-<a href="{{ assertion['relation_url'] }}" title="{{ assertion['relation_uri'] }}">{{ assertion['relation_name'] }}</a>
-<a href="{{ assertion['target_url'] }}" title="{{ assertion['target_uri'] }}">({{ assertion['target_name'] }})</a>
+<a href="{{ assertion['source_url'] }}"
+    title="{{ assertion['source_uri'] }}">({{ assertion[
+    'source_name'] }})</a>
+<a href="{{ assertion['relation_url'] }}"
+    title="{{ assertion['relation_uri'] }}">{{ assertion[
+    'relation_name'] }}</a>
+<a href="{{ assertion['target_url'] }}"
+    title="{{ assertion['target_uri'] }}">({{ assertion[
+    'target_name'] }})</a>
 </h1>
 <hr />
-Vote here!
-{% endblock %}
-
-{% block scripts %}
-<script type="text/javascript" src="{{url_for('static', filename='js/jquery-1.6.2.min.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/jquery.isotope.min.js')}}"></script>
-<script type="text/coffeescript">
-$ ->
-    $container = $('#assertionContainer')
-    $container.find('.concept-box').each ->
-        $this = $(this)
-        textlength = $this.attr('data-name').length
-        boxwidth = textlength * 18
-        if boxwidth > 1000
-            boxwidth = 1000
-        if boxwidth < 150
-            boxwidth = 150
-        $this.width(boxwidth)
-
-
-    $container.isotope({
-        layoutMode: 'fitRows'
-        masonry: {columnWidth: 120},
-        getSortData: {
-            score: ($elem) -> $elem.attr('data-score')
-            relation: ($elem) -> $elem.attr('data-relation')
-        }
-    })
-    window.container = $container
-
-</script>
+<form action="{{ url_for('random_assertion') }}" method=POST>
+<input type="hidden" name="assertion_uri"
+    value="{{ assertion['assertion_uri'] }}" />
+<input type="hidden" name="vote" value="agree" />
+<input type="submit" value="Agree" />
+</form>
+<form action="{{ url_for('random_assertion') }}" method=POST>
+<input type="hidden" name="assertion_uri"
+    value="{{ assertion['assertion_uri'] }}" />
+<input type="hidden" name="vote" value="disagree" />
+<input type="submit" value="Disagree" />
+</form>
 {% endblock %}

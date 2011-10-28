@@ -10,6 +10,7 @@ import time
 from flask import Flask
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
@@ -29,34 +30,60 @@ def favicon():
 def home():
     return render_template('home.html')
 
-@app.route('/random_assertion')
+@app.route('/random_assertion', methods=['GET', 'POST'])
 def random_assertion():
-    # TODO(jven): For now, just use an arbitrary assertion.
-    #for assertion in conceptnet.get_random_assertions():
-    #    # Just use the first one.
-    #    return assertion
-    assertion_rel_args = conceptnet.get_rel_and_args('/assertion/[/concept/en/'
-        'be_style_of/,/concept/en/ragtime/,/concept/en/music/]')
-    relation_uri = assertion_rel_args[0]
-    relation_url = data_url(relation_uri)
-    relation_name = uri2name(relation_uri)
-    args_uri = assertion_rel_args[1:]
-    if len(args_uri) > 2:
-        return 'n-ary assertions not supported at this time.'
-    args_url = [data_url(arg_uri) for arg_uri in args_uri]
-    args_name = [uri2name(arg_uri) for arg_uri in args_uri]
-    assertion = {
-        'source_name':args_name[0],
-        'source_uri':args_uri[0],
-        'source_url':args_url[0],
-        'relation_name':relation_name,
-        'relation_uri':relation_uri,
-        'relation_url':relation_url,
-        'target_name':args_name[1],
-        'target_uri':args_uri[1],
-        'target_url':args_url[1]
-    }
-    return render_template('vote.html', assertion=assertion)
+    if request.method == 'GET':
+        # TODO(jven): For now, just use an arbitrary assertion.
+        #for assertion in conceptnet.get_random_assertions():
+        #    # Just use the first one.
+        #    return assertion
+        assertion_uri = ('/assertion/[/concept/en/be_style_of/,'
+            '/concept/en/ragtime/,/concept/en/music/]')
+        assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
+        relation_uri = assertion_rel_args[0]
+        relation_url = data_url(relation_uri)
+        relation_name = uri2name(relation_uri)
+        args_uri = assertion_rel_args[1:]
+        if len(args_uri) > 2:
+            return 'n-ary assertions not supported at this time.'
+        args_url = [data_url(arg_uri) for arg_uri in args_uri]
+        args_name = [uri2name(arg_uri) for arg_uri in args_uri]
+        assertion = {
+            'assertion_uri':assertion_uri,
+            'source_name':args_name[0],
+            'source_uri':args_uri[0],
+            'source_url':args_url[0],
+            'relation_name':relation_name,
+            'relation_uri':relation_uri,
+            'relation_url':relation_url,
+            'target_name':args_name[1],
+            'target_uri':args_uri[1],
+            'target_url':args_url[1]
+        }
+        return render_template('vote.html', assertion=assertion)
+    elif request.method == 'POST':
+        # Get inputs.
+        assertion_uri = request.form.get('assertion_uri')
+        vote = request.form.get('vote')
+        # Validate.
+        if not assertion_uri:
+            return 'You didn\'t provide an assertion for which to vote.'
+        if not vote:
+            return 'You didn\'t vote.'
+        assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
+        if not assertion_rel_args:
+            return 'Invalid assertion.'
+        # Record.
+        if vote == 'agree':
+            ip_address = request.remote_addr
+            # TODO(jven): store vote
+            return 'Successfully voted: agree'
+        elif vote == 'disagree':
+            ip_address = request.remote_addr
+            # TODO(jven): store vote
+            return 'Successfully voted: disagree.'
+        else:
+            return 'Invalid vote.'
 
 @app.route('/<path:uri>')
 def get_data(uri):
