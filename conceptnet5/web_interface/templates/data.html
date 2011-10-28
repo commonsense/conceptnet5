@@ -87,6 +87,23 @@
                 </span>
             </div>
         {% endif %}
+        <!-- TODO(jven): remove tables :/ -->
+        <table>
+        <tr>
+        <td>
+        <form action="{{ assertion.assertion_uri|e }}" method=POST>
+        <input type="hidden" name="vote" value="agree" />
+        <input type="submit" value="Agree" />
+        </form>
+        </td>
+        <td>
+        <form action="{{ assertion.assertion_uri|e }}" method=POST>
+        <input type="hidden" name="vote" value="disagree" />
+        <input type="submit" value="Disagree" />
+        </form>
+        </td>
+        </tr>
+        </table>
     </div>
     {% endfor %}
 </div>

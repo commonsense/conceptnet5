@@ -141,6 +141,7 @@ def get_data(uri):
             else:
                 raise ValueError
             assertions.append({
+                'assertion_uri':assertion_uri,
                 'position': position,
                 'relation_url': data_url(relation),
                 'relation': uri2name(relation),
