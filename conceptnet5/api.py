@@ -13,6 +13,7 @@ Fall 2011
 import graph
 import flask
 import urllib
+import re
 import sys
 import simplejson
 app = flask.Flask(__name__)
@@ -36,13 +37,29 @@ The dictionaries for request parameters contain the following:
 'ignore':__]
 """
 request_keys = {'get':{'default':None,'type':str,'valid':None,'ignore':False},\
-        'rpp':{'default':50,'type':int,'upper':100,'lower':1,'ignore':False},
+        'per_page':{'default':50,'type':int,'upper':100,'lower':1,'ignore':False},
         'max_score':{'default':0.0,'type':float,'upper':None,'lower':0,'ignore':True}}
+
+def encode_uri(uri):
+    """
+    Encodes uri escape symbols # and ?
+    """
+    uri = re.sub('\?','%3F',uri)
+    return re.sub('\#','%23',uri)    
+
+def decode_uri(uri):
+    """
+    Decodes uri escape symbols # and ?
+    """
+    uri = re.sub('%3F','\?',uri)
+    return re.sub('%23','\#',uri)
 
 def correct_uri(uri):
     """
-    Corrects uri by adding slash if necessary
+    Corrects uri by adding slash and encoding # and ? characters if necessary
     """
+    re.sub('\?','%3F',uri)
+    re.sub('\#','%23',uri)
     if uri[1:5] in no_leading_slash and uri[0] == '/':
         return uri[1:]
     elif uri[:4] in no_leading_slash or uri[0] == '/':
@@ -97,7 +114,7 @@ def check_valid(arg, name, request_params):
     if type(arg) == int or type(arg) == float:
         if arg < request_params['lower'] or (arg > request_params['upper'] and request_params['upper'] != None):
             return None, 'the parameter ' + name + ' was given an invalid value.\
-            Please only request values between ' + str(request_params['lower']) + ' and '\
+            Please only request values from ' + str(request_params['lower']) + ' to '\
             + str(request_params['upper']) + '.'
         else:
             return arg, ''
@@ -108,6 +125,13 @@ def check_valid(arg, name, request_params):
             return None, 'the parameter ' + name + ' was given the invalid value: ' + arg\
             + '. Please only request one of the following values: ' + ', '.join(request_params['valid'])
 
+@app.route('/')
+def see_documentation():
+    """
+    This function redirects to the api documentation
+    """
+    return flask.redirect('https://github.com/commonsense/conceptnet5/wiki/API')
+
 @app.route('/<path:uri>/')
 def get_data(uri):
     """
@@ -115,6 +139,7 @@ def get_data(uri):
     json data.
     """
     json = {}
+    uri = decode_uri(uri)
     if concept_graph.get_node(correct_uri(uri)) != None:
         requests = flask.request.args.get('get')
         if requests == None or len(requests.split(' ')) != 1:
@@ -151,7 +176,7 @@ def get_properties(uri,args):
     This function retrieves information about the node in question.
     """
     node = concept_graph.get_node(correct_uri(uri))
-    node['url'] = root_url + add_slash(uri)
+    node['url'] = root_url + encode_uri(add_slash(uri))
     del node['_id']
     return node
 
@@ -162,15 +187,15 @@ def get_incoming_assertions(uri,args):
     """
     json = []
     new_max_score = 0.0
-    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=args['max_score'], result_limit=args['rpp']):
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=args['max_score'], result_limit=args['per_page']):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
-        json[-1]['url'] = root_url  + add_slash(json[-1]['uri'])
+        json[-1]['url'] = root_url  + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
         new_max_score = relation[0]['score']
-    if len(json) == args['rpp']:
+    if len(json) == args['per_page']:
         json.append({})
         json[-1]['next'] = root_url + add_slash(uri)\
-        + '?get=incoming_assertions'+ '&rpp=' + str(args['rpp']) + '&max_score=' + str(new_max_score)
+        + '?get=incoming_assertions'+ '&per_page=' + str(args['per_page']) + '&max_score=' + str(new_max_score)
     return json
 
 def get_incoming_assertions_url(uri,args):
@@ -178,7 +203,7 @@ def get_incoming_assertions_url(uri,args):
     This function returns a url linking to a json page with only information
     on incoming assertions
     """
-    return root_url + add_slash(uri) + '?get=incoming_assertions'
+    return root_url + encode_uri(add_slash(uri)) + '?get=incoming_assertions'
 
 def get_incoming_edges(uri,args):
     """
@@ -186,15 +211,16 @@ def get_incoming_edges(uri,args):
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
-    for relation in concept_graph.get_incoming_edges(correct_uri(uri), max_score=args['max_score'], result_limit=args['rpp']):
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), max_score=args['max_score'], result_limit=args['per_page']):
         json.append(relation[0])
+        json[-1]['start_url'] = root_url + encode_uri(add_slash(json[-1]['start']))
         try: del json[-1]['_id']
         except KeyError: pass
         del json[-1]['jitter']
-    if len(json) == args['rpp']:
+    if len(json) == args['per_page']:
         json.append({})
-        json[-1]['next'] = root_url + add_slash(uri)\
-        + '?get=incoming_edges'+ '&rpp=' + str(args['rpp']) + '&max_score=' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + encode_uri(add_slash(uri))\
+        + '?get=incoming_edges'+ '&per_page=' + str(args['per_page']) + '&max_score=' + str(json[-2]['score'])
     return json
 
 def get_incoming_edges_url(uri,args):
@@ -202,7 +228,7 @@ def get_incoming_edges_url(uri,args):
     This function returns a url linking to a json page with only information
     on incoming edges
     """
-    return root_url + add_slash(uri) + '?get=incoming_edges'
+    return root_url + encode_uri(add_slash(uri)) + '?get=incoming_edges'
 
 def get_outgoing_edges(uri,args):
     """
@@ -210,15 +236,16 @@ def get_outgoing_edges(uri,args):
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
-    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), max_score=args['max_score'], result_limit=args['rpp']):
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), max_score=args['max_score'], result_limit=args['per_page']):
         json.append(relation[0])
+        json[-1]['end_url'] = root_url + encode_uri(add_slash(json[-1]['end']))
         try: del json[-1]['_id']
         except KeyError: pass
         del json[-1]['jitter']
-    if len(json) == args['rpp']:
+    if len(json) == args['per_page']:
         json.append({})
-        json[-1]['next'] = root_url + add_slash(uri)\
-        + '?get=outgoing_edges'+ '&rpp=' + args['rpp'] + '&max_score=' + str(json[-2]['score'])
+        json[-1]['next'] = root_url + encode_uri(add_slash(uri))\
+        + '?get=outgoing_edges'+ '&per_page=' + str(args['per_page']) + '&max_score=' + str(json[-2]['score'])
     return json
 
 def get_outgoing_edges_url(uri,args):
@@ -226,7 +253,7 @@ def get_outgoing_edges_url(uri,args):
     This function returns a url linking to a json page with only information
     on outgoing edges.
     """
-    return root_url + add_slash(uri) + '?get=outgoing_edges'
+    return root_url + encode_uri(add_slash(uri)) + '?get=outgoing_edges'
 
 def get_word_senses(uri,args):
     """
@@ -237,7 +264,7 @@ def get_word_senses(uri,args):
     json = []
     for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='senseOf'):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
-        json[-1]['url'] = root_url  + add_slash(json[-1]['uri'])
+        json[-1]['url'] = root_url  + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
 
@@ -249,7 +276,7 @@ def get_word_sense_of(uri,args):
     json = []
     for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='senseOf'):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
-        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
+        json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
 
@@ -261,7 +288,7 @@ def get_normalized(uri,args):
     json = []
     for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='normalized'):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
-        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
+        json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
 
@@ -273,7 +300,7 @@ def get_normalized_of(uri,args):
     json = []
     for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='normalized'):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
-        json[-1]['url'] = root_url + add_slash(json[-1]['uri'])
+        json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
 
@@ -295,4 +322,4 @@ valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
              'normalized_of':{'normalized_of':get_normalized_of}}
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
