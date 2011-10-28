@@ -17,8 +17,20 @@ from conceptnet5.graph import get_graph
 from conceptnet5.web_interface.utils import data_url
 from conceptnet5.web_interface.utils import uri2name
 
+########################
+# Set this flag to True when developing, False otherwise! -JVen
+#
+DEVELOPMENT = True
+#
+########################
+
 app = Flask(__name__)
 conceptnet = get_graph()
+
+if DEVELOPMENT:
+  web_route = '/web/'
+else:
+  web_route = '/'
 
 @app.route('/favicon.ico')
 def favicon():
@@ -75,7 +87,7 @@ def get_assertion(uri):
         else:
             return 'Invalid vote.'
 
-@app.route('/<path:uri>')
+@app.route('%s<path:uri>' % web_route)
 def get_data(uri):
     uri = '/%s' % uri
     node = conceptnet.get_node(uri)
