@@ -12,15 +12,11 @@
     'target_name'] }})</a>
 </h1>
 <hr />
-<form action="{{ url_for('random_assertion') }}" method=POST>
-<input type="hidden" name="assertion_uri"
-    value="{{ assertion['assertion_uri'] }}" />
+<form method=POST>
 <input type="hidden" name="vote" value="agree" />
 <input type="submit" value="Agree" />
 </form>
-<form action="{{ url_for('random_assertion') }}" method=POST>
-<input type="hidden" name="assertion_uri"
-    value="{{ assertion['assertion_uri'] }}" />
+<form method=POST>
 <input type="hidden" name="vote" value="disagree" />
 <input type="submit" value="Disagree" />
 </form>

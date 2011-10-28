@@ -30,16 +30,13 @@ def favicon():
 def home():
     return render_template('home.html')
 
-@app.route('/random_assertion', methods=['GET', 'POST'])
-def random_assertion():
+@app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
+def get_assertion(uri):
+    assertion_uri = '/assertion/%s' % uri
+    assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
+    if not assertion_rel_args:
+        return 'Invalid assertion.'
     if request.method == 'GET':
-        # TODO(jven): For now, just use an arbitrary assertion.
-        #for assertion in conceptnet.get_random_assertions():
-        #    # Just use the first one.
-        #    return assertion
-        assertion_uri = ('/assertion/[/concept/en/be_style_of/,'
-            '/concept/en/ragtime/,/concept/en/music/]')
-        assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
         relation_uri = assertion_rel_args[0]
         relation_url = data_url(relation_uri)
         relation_name = uri2name(relation_uri)
@@ -49,7 +46,6 @@ def random_assertion():
         args_url = [data_url(arg_uri) for arg_uri in args_uri]
         args_name = [uri2name(arg_uri) for arg_uri in args_uri]
         assertion = {
-            'assertion_uri':assertion_uri,
             'source_name':args_name[0],
             'source_uri':args_uri[0],
             'source_url':args_url[0],
@@ -60,19 +56,13 @@ def random_assertion():
             'target_uri':args_uri[1],
             'target_url':args_url[1]
         }
-        return render_template('vote.html', assertion=assertion)
+        return render_template('get_assertion.html', assertion=assertion)
     elif request.method == 'POST':
         # Get inputs.
-        assertion_uri = request.form.get('assertion_uri')
         vote = request.form.get('vote')
         # Validate.
-        if not assertion_uri:
-            return 'You didn\'t provide an assertion for which to vote.'
         if not vote:
             return 'You didn\'t vote.'
-        assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
-        if not assertion_rel_args:
-            return 'Invalid assertion.'
         # Record.
         if vote == 'agree':
             ip_address = request.remote_addr
