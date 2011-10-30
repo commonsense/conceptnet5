@@ -14,20 +14,48 @@ GRAPH.justify(0, wikihow)
 GRAPH.justify(0, omics)
 
 def output_steps(goal, steps, source):
-    goal = normalize(goal).strip()
-    steps = map(lambda x: normalize(x).strip(), steps)
-    args = [GRAPH.get_or_create_concept('en', goal)]
+    # add raw assertions
+    args = []
     for step in steps:
         args.append(GRAPH.get_or_create_concept('en', step))
+    raw_sequence = GRAPH.get_or_create_assertion(
+        '/relation/Sequence', args,
+        {'dataset': 'goalnet/en', 'license': 'CC-By-SA'}
+    )
+    args = [GRAPH.get_or_create_concept('en', goal)]
+    args.append(raw_sequence)
+    raw_assertion = GRAPH.get_or_create_assertion(
+        '/relation/HasSteps', args,
+        {'dataset': 'goalnet/en', 'license': 'CC-By-SA'}
+    )
+    # add assertions
+    args = []
+    goal = normalize(goal).strip().lower()
+    steps = map(lambda x: normalize(x).strip().lower(), steps)
+    for step in steps:
+        args.append(GRAPH.get_or_create_concept('en', step))
+    sequence = GRAPH.get_or_create_assertion(
+        '/relation/Sequence', args,
+        {'dataset': 'goalnet/en', 'license': 'CC-By-SA'}
+    )
+    args = [GRAPH.get_or_create_concept('en', goal)]
+    args.append(sequence)
     assertion = GRAPH.get_or_create_assertion(
         '/relation/HasSteps', args,
         {'dataset': 'goalnet/en', 'license': 'CC-By-SA'}
     )
+    GRAPH.derive_normalized(raw_sequence, sequence)
+    GRAPH.derive_normalized(raw_assertion, assertion)
+    # add justification
     if source == 'wikihow':
-        conjunction = GRAPH.get_or_create_conjunction([wikihow, goalnet])
+        conjunction = GRAPH.get_or_create_conjunction([wikihow, goalnet, raw_sequence])
+        GRAPH.justify(conjunction, sequence, 0.8)
+        conjunction = GRAPH.get_or_create_conjunction([wikihow, goalnet, raw_assertion])
         GRAPH.justify(conjunction, assertion, 0.8)
     elif source == 'omics':
-        conjunction = GRAPH.get_or_create_conjunction([omics, goalnet])
+        conjunction = GRAPH.get_or_create_conjunction([omics, goalnet, raw_sequence])
+        GRAPH.justify(conjunction, sequence)
+        conjunction = GRAPH.get_or_create_conjunction([omics, goalnet, raw_assertion])
         GRAPH.justify(conjunction, assertion)
     return assertion
 
