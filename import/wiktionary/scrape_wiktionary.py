@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 from conceptnet5.graph import JSONWriterGraph
@@ -110,6 +112,8 @@ LANGUAGES = {
     'Urdu': 'ur',
     'Uzbek': 'uz',
     'Vietnamese': 'vi',
+    u'英語': 'en',
+    u'日本語': 'ja'
 }
 
 class FindTranslations(ContentHandler):
@@ -168,6 +172,7 @@ class FindTranslations(ContentHandler):
 
     def handleArticle(self, title, text):
         lines = text.split('\n')
+        self.pos = None
         for line in lines:
             self.handleLine(title, line.strip())
 
@@ -185,6 +190,10 @@ class FindTranslations(ContentHandler):
             elif pos == 'Related terms':
                 self.curRelation = 'ConceptuallyRelatedTo'
             elif pos == 'Derived terms':
+                if not line.startswith('===='):
+                    # this is at the same level as the part of speech;
+                    # now we don't know what POS these apply to
+                    self.pos = None
                 self.curRelation = 'DerivedFrom'
             else:
                 self.curRelation = None
@@ -246,7 +255,10 @@ class FindTranslations(ContentHandler):
         if 'Wik' in term1 or 'Wik' in term2:
             return
         source = self.graph.get_or_create_concept(lang, term1)
-        target = self.graph.get_or_create_concept(lang, term2)
+        if self.pos:
+            target = self.graph.get_or_create_concept(lang, term2, self.pos)
+        else:
+            target = self.graph.get_or_create_concept(lang, term2)
         relation = self.graph.get_or_create_relation(relation)
         assertion = self.graph.get_or_create_assertion(
           relation, [source, target],
@@ -254,9 +266,11 @@ class FindTranslations(ContentHandler):
            'license': 'CC-By-SA', 'normalized': False}
         )
         self.graph.justify(self.monolingual_conjunction, assertion)
-
+        print unicode(assertion).encode('utf-8')
 
     def output_sense_translation(self, lang, foreign, english, disambiguation):
+        if 'Wik' in foreign or 'Wik' in english:
+            return
         if lang == 'zh-cn':
             lang = 'zh_CN'
         elif lang == 'zh-tw':
@@ -304,7 +318,6 @@ class FindTranslations(ContentHandler):
 
         self.graph.justify(self.defn_conjunction, assertion)
         self.graph.derive_normalized(assertion, norm_assertion)
-        print assertion.encode('utf-8')
 
     def output_translation(self, foreign, english, locale=''):
         source = self.graph.get_or_create_concept(

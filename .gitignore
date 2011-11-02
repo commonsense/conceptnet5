@@ -8,6 +8,7 @@ json_data
 enwiktionary.xml
 wikipedia.txt
 verbosity.txt
+secrets.py
 gremlin_data
 *.ttl
 *.nt

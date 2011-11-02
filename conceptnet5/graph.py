@@ -128,9 +128,16 @@ class ConceptNetGraph(object):
 
         self.db.nodes.create_index('uri')
         self.db.nodes.create_index('dataset')
+        self.db.nodes.create_index('words')
         self.db.edges.create_index('key')
         self.db.edges.create_index([('start', 1), ('type', 1)])
         self.db.edges.create_index([('end', 1), ('type', 1)])
+
+    def authorize(self, username, password):
+        """
+        Become authorized with the MongoDB.
+        """
+        self.db.auth(username, password)
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -370,7 +377,7 @@ class ConceptNetGraph(object):
         """
         return self._create_node(
             type='web_concept',
-            uri=rest,
+            uri=rest.strip('/'),
             **properties
         )
 
@@ -844,8 +851,9 @@ class JSONWriterGraph(ConceptNetGraph):
         self.filename = filename
         self.nodes = open(filename+'.nodes.json', 'w')
         self.edges = open(filename+'.edges.json', 'w')
-        self.scoredEdges = open(filename+'.scored.json', 'w')
+        #self.scoredEdges = open(filename+'.scored.json', 'w')
         self.recently_created_uris = []
+        self.recently_created_edges = []
 
     def _write_node(self, properties):
         print >> self.nodes, json.dumps(properties)
@@ -863,15 +871,16 @@ class JSONWriterGraph(ConceptNetGraph):
         properties['key'] = u'%s %s %s' % (type, start, end)
         print >> self.edges, json.dumps(properties)
         
-        # Set a default value in scoredEdges, so that we can use the data
-        # instantly and not have to wait to re-chug the data
-        properties['jitter'] = random.random()
-        properties['score'] = 100 + properties['jitter']*1e-6
-        scored = {'value': properties}
-        print >> self.scoredEdges, json.dumps(scored)
+        ## Set a default value in scoredEdges, so that we can use the data
+        ## instantly and not have to wait to re-chug the data
+        #properties['jitter'] = random.random()
+        #properties['score'] = 100 + properties['jitter']*1e-6
+        #scored = {'value': properties}
+        #print >> self.scoredEdges, json.dumps(scored)
     
     def _create_node(self, **properties):
         uri = properties['uri']
+        assert not uri.startswith('/http')
         if uri in self.recently_created_uris:
             return uri
         self._write_node(properties)
@@ -883,6 +892,11 @@ class JSONWriterGraph(ConceptNetGraph):
     def _create_edge(self, _type, source, target, properties = {}):
         if source == 0:
             source = '/'
+        assert not source.startswith('/http')
+        if (_type, source, target) in self.recently_created_edges:
+            return True
+        self.recently_created_edges = self.recently_created_edges[-49:]\
+          + [(_type, source, target)]
         self._write_edge(_type, source, target, properties)
 
     def _any_to_uri(self, obj):
@@ -924,7 +938,13 @@ class JSONWriterGraph(ConceptNetGraph):
     def get_rel_and_args(self, assertion_uri):
         assert assertion_uri[:11] == '/assertion/'
         rest = assertion_uri[11:]
-        return uri_piece_to_list(rest)
+        return [self._fix_piece(piece) for piece in uri_piece_to_list(rest)]
+
+    def _fix_piece(self, piece):
+        if piece.startswith('/http'):
+            return piece[1:]
+        else:
+            return piece
     
     def __del__(self):
         self.close()
@@ -932,7 +952,6 @@ class JSONWriterGraph(ConceptNetGraph):
     def close(self):
         self.nodes.close()
         self.edges.close()
-        self.scoredEdges.close()
 
 class GremlinWriterGraph(ConceptNetGraph):
     """
@@ -1028,11 +1047,26 @@ class GremlinWriterGraph(ConceptNetGraph):
     def close(self):
         self.output.close()
 
-def get_graph():
+def get_graph(server='50.17.55.143'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
 
     no args
     """
-    return ConceptNetGraph('67.202.5.17')
+    try:
+        from conceptnet5 import secrets
+    except ImportError:
+        raise Exception("""
+You don't have a conceptnet5/secrets.py file.
+You should make one that looks like this:
+
+USERNAME=<username>
+PASSWORD=<password>
+
+You may be able to simply copy this file from the Dropbox.
+""")
+    graph = ConceptNetGraph(server)
+    graph.authorize(secrets.USERNAME, secrets.PASSWORD)
+    return graph
+
