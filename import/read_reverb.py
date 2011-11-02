@@ -86,7 +86,7 @@ def get_domain_names(urls):
     domain_names = map(lambda x: x.netloc, parsed_urls)
     return domain_names
 
-def output_triple(arg1, arg2, relation, raw):
+def output_triple(arg1, arg2, relation, raw, sources):
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
     relation = normalize_rel(relation).strip()
@@ -114,7 +114,7 @@ def output_triple(arg1, arg2, relation, raw):
     else:
         rel_node = GRAPH.get_or_create_concept('en', relation)
     print '%s(%s, %s)' % \
-        (relation, arg1, arg2)
+        (relation, arg1, arg2),
 
     assertion = GRAPH.get_or_create_assertion(
         rel_node,
@@ -127,6 +127,14 @@ def output_triple(arg1, arg2, relation, raw):
     
     conjunction = GRAPH.get_or_create_conjunction([raw, reverb_triple])
     GRAPH.justify(conjunction, assertion)
+    for source in sources:
+        # Put in context with Wikipedia articles.
+        topic = article_url_to_topic(source)
+        context = GRAPH.get_or_create_concept('en', topic)
+        context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
+        GRAPH.add_context(assertion, context_normal)
+        GRAPH.get_or_create_edge('normalized', context, context_normal)
+        print "in", context_normal
     return assertion
 
 def article_url_to_topic(url):
@@ -160,9 +168,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         # Put in context with Wikipedia articles.
         topic = article_url_to_topic(source)
         context = GRAPH.get_or_create_concept('en', topic)
-        context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
         GRAPH.add_context(raw, context)
-        GRAPH.get_or_create_edge('normalized', context, context_normal)
     return raw
 
 def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
@@ -245,7 +251,7 @@ def handle_line(line):
 
     raw = output_raw(old_arg1, old_arg2, old_rel, sources)
     if probably_present_tense(old_rel.split()[0]):
-        triple = output_triple(old_arg1, old_arg2, old_rel, raw)
+        triple = output_triple(old_arg1, old_arg2, old_rel, raw, sources)
 
     index_verbs = index_of_verbs(tags)
     if len(index_verbs) == 0: return

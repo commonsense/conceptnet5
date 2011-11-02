@@ -377,7 +377,7 @@ class ConceptNetGraph(object):
         """
         return self._create_node(
             type='web_concept',
-            uri=rest,
+            uri=rest.strip('/'),
             **properties
         )
 
@@ -880,6 +880,7 @@ class JSONWriterGraph(ConceptNetGraph):
     
     def _create_node(self, **properties):
         uri = properties['uri']
+        assert not uri.startswith('/http')
         if uri in self.recently_created_uris:
             return uri
         self._write_node(properties)
@@ -891,6 +892,7 @@ class JSONWriterGraph(ConceptNetGraph):
     def _create_edge(self, _type, source, target, properties = {}):
         if source == 0:
             source = '/'
+        assert not source.startswith('/http')
         if (_type, source, target) in self.recently_created_edges:
             return True
         self.recently_created_edges = self.recently_created_edges[-49:]\
@@ -936,7 +938,13 @@ class JSONWriterGraph(ConceptNetGraph):
     def get_rel_and_args(self, assertion_uri):
         assert assertion_uri[:11] == '/assertion/'
         rest = assertion_uri[11:]
-        return uri_piece_to_list(rest)
+        return [self._fix_piece(piece) for piece in uri_piece_to_list(rest)]
+
+    def _fix_piece(self, piece):
+        if piece.startswith('/http'):
+            return piece[1:]
+        else:
+            return piece
     
     def __del__(self):
         self.close()
