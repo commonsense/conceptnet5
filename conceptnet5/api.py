@@ -173,7 +173,7 @@ def get_data(uri):
 
 def get_properties(uri,args):
     """
-    This function retrieves information about the node in question.
+    This function retrieves parameters about the node in question.
     """
     node = concept_graph.get_node(correct_uri(uri))
     node['url'] = root_url + encode_uri(add_slash(uri))
@@ -186,6 +186,7 @@ def get_incoming_assertions(uri,args):
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
+    max_score = args['max_score'] / concept_graph.get_node(correct_uri(uri))['score']
     new_max_score = 0.0
     for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=args['max_score'], result_limit=args['per_page']):
         json.append(concept_graph.get_node(correct_uri(relation[1])))
