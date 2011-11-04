@@ -386,6 +386,20 @@ class ConceptNetGraph(object):
         uri = normalize_uri(uri)
         return self.db.nodes.find_one({'uri': uri})
 
+    def get_nodes(self, uri_list):
+        """
+        searches all nodes in node index, returns a list of the nodes with
+        all nodes that don't exist returning a None object in the place of a uri
+        that was not found.
+
+        args:
+        uri_list -- the list of uris being searched
+        """
+        search = {}
+        search['uri'] = {'$in':uri_list}
+        for node in self.db.nodes.find(search):
+            yield node
+
     def find_nodes(self, pattern):
         """
         Search for all nodes whose URIs match a given wildcard pattern,
