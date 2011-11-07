@@ -13,6 +13,7 @@ Fall 2011
 from conceptnet5.config import get_auth
 from conceptnet5.whereami import get_project_filename
 from pymongo import Connection, DESCENDING
+from itertools import izip
 import re
 import json
 import codecs
@@ -386,6 +387,22 @@ class ConceptNetGraph(object):
         uri = normalize_uri(uri)
         return self.db.nodes.find_one({'uri': uri})
 
+    def get_node_w_score(self, uri):
+        """
+        functions in the same manner as get_node,
+        also queries the justification database in order to find the
+        score of the queried node.
+        
+        args:
+        uri -- the uri of the node in question
+
+        """
+        uri = normalize_uri(uri)
+        id_uri = uri[1:]
+        return_dict = self.db.nodes.find_one({'uri':uri})
+        return_dict['score'] = self.db.justification.find_one({'_id':uri})['value']
+        return return_dict
+
     def get_nodes(self, uri_list):
         """
         searches all nodes in node index, returns a list of the nodes with
@@ -399,6 +416,25 @@ class ConceptNetGraph(object):
         search['uri'] = {'$in':uri_list}
         for node in self.db.nodes.find(search):
             yield node
+
+    def get_nodes_w_score(self, uri_list):
+        """
+        functions in the same manner as get_nodes,
+        also queries the justification database in order to find the
+        score of the queried nodes.
+
+        args:
+        uri_list -- the list of the uris being searched
+        """
+        search = {}
+        search['uri'] = {'$in':uri_list}
+        result_nodes = {}
+        for node in self.db.nodes.find({'uri':{'$in':uri_list}}):
+            result_nodes[node['uri']] = node
+        for node in self.db.justification.find({'_id':{'$in':uri_list}}).sort([('value',DESCENDING)]):
+            return_dict = result_nodes[node['_id']]
+            return_dict['score'] = node['value']
+            yield return_dict
 
     def find_nodes(self, pattern):
         """
