@@ -16,6 +16,7 @@ import urllib
 import re
 import sys
 import simplejson
+from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 concept_graph = graph.get_graph()
 
@@ -24,7 +25,15 @@ if len(sys.argv) == 1:
 else:
     root_url = sys.argv[1]
 
+cache_dict = {
+        'limit_timeout':60,
+        'limit_amount':10000
+        }
+
+request_cache = SimpleCache(default_timeout = cache_dict['limit_timeout'])
+
 no_leading_slash = ['http']
+
 """
 request keys is a dictionary which stores a record of which request paramaters
 are permitted, what their default value is, what type they should return,
@@ -125,6 +134,18 @@ def check_valid(arg, name, request_params):
             return None, 'the parameter ' + name + ' was given the invalid value: ' + arg\
             + '. Please only request one of the following values: ' + ', '.join(request_params['valid'])
 
+def request_limit(ip_address):
+    """
+    This function checks the query ip address and ensures that the requests from that
+    address have not passed the query limit
+    """
+    if request_cache.get(ip_address) > cache_dict['limit_amount']:
+        return True, flask.Response(response=flask.json.dumps(\
+        {'unauthorized':'rate limit violated'}),status=401,mimetype='json')
+    else:
+        request_cache.inc(ip_address,1)
+        return False, None
+
 @app.route('/')
 def see_documentation():
     """
@@ -140,6 +161,8 @@ def get_data(uri):
     """
     json = {}
     uri = decode_uri(uri)
+    req_lim = request_limit(flask.request.access_route[0])
+    if req_lim[0]: return req_lim[1]
     if concept_graph.get_node(correct_uri(uri)) != None:
         requests = flask.request.args.get('get')
         if requests == None or len(requests.split(' ')) != 1:
@@ -176,14 +199,7 @@ def get_properties(uri,args):
     This function retrieves parameters about the node in question.
     """
     uri = correct_uri(uri)
-    if uri[0] == '/':
-        identifier_uri = uri[1:]
-    else:
-        identifier_uri = uri
-    if uri.split('/')[0] == 'assertion':
-        node = concept_graph.get_node_w_score(uri)
-    else:
-        node = concept_graph.get_node(correct_uri(uri))
+    node = concept_graph.get_node_w_score(uri)
     node['url'] = root_url + encode_uri(add_slash(uri))
     del node['_id']
     return node
