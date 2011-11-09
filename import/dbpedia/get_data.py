@@ -55,7 +55,7 @@ def handle_triple(line):
             return
         items[i] = items[i][1:-1]
     subj, pred, obj = items[:3]
-    if 'foaf/0.1/homepage' in pred or 'Position__' in obj or '_Feature' in obj: return
+    if 'foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or '__' in subj or '__' in obj: return
     concept1, web_rel, concept2 = [GRAPH.get_or_create_web_concept(url) for url in items[:3]]
     assertion = GRAPH.get_or_create_assertion(
         web_rel, [concept1, concept2],
@@ -72,7 +72,7 @@ def handle_triple(line):
     GRAPH.derive_normalized(assertion, norm_assertion)
 
 def main():
-    handle_file('mappingbased_properties_en.nt')
+    #handle_file('mappingbased_properties_en.nt')
     handle_file('instance_types_en.nt')
 
 if __name__ == '__main__':
