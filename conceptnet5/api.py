@@ -16,6 +16,7 @@ import urllib
 import re
 import sys
 import simplejson
+from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 concept_graph = graph.get_graph()
 
@@ -24,7 +25,15 @@ if len(sys.argv) == 1:
 else:
     root_url = sys.argv[1]
 
+cache_dict = {
+        'limit_timeout':60,
+        'limit_amount':10000
+        }
+
+request_cache = SimpleCache(default_timeout = cache_dict['limit_timeout'])
+
 no_leading_slash = ['http']
+
 """
 request keys is a dictionary which stores a record of which request paramaters
 are permitted, what their default value is, what type they should return,
@@ -125,6 +134,18 @@ def check_valid(arg, name, request_params):
             return None, 'the parameter ' + name + ' was given the invalid value: ' + arg\
             + '. Please only request one of the following values: ' + ', '.join(request_params['valid'])
 
+def request_limit(ip_address):
+    """
+    This function checks the query ip address and ensures that the requests from that
+    address have not passed the query limit
+    """
+    if request_cache.get(ip_address) > cache_dict['limit_amount']:
+        return True, flask.Response(response=flask.json.dumps(\
+        {'unauthorized':'rate limit violated'}),status=401,mimetype='json')
+    else:
+        request_cache.inc(ip_address,1)
+        return False, None
+
 @app.route('/')
 def see_documentation():
     """
@@ -140,6 +161,8 @@ def get_data(uri):
     """
     json = {}
     uri = decode_uri(uri)
+    req_lim = request_limit(flask.request.access_route[0])
+    if req_lim[0]: return req_lim[1]
     if concept_graph.get_node(correct_uri(uri)) != None:
         requests = flask.request.args.get('get')
         if requests == None or len(requests.split(' ')) != 1:
@@ -173,9 +196,10 @@ def get_data(uri):
 
 def get_properties(uri,args):
     """
-    This function retrieves information about the node in question.
+    This function retrieves parameters about the node in question.
     """
-    node = concept_graph.get_node(correct_uri(uri))
+    uri = correct_uri(uri)
+    node = concept_graph.get_node_w_score(uri)
     node['url'] = root_url + encode_uri(add_slash(uri))
     del node['_id']
     return node
@@ -186,12 +210,18 @@ def get_incoming_assertions(uri,args):
     the node in question. It does so in a paginated format based on max score.
     """
     json = []
+    assertion_list = []
+    node_score = concept_graph.get_node_w_score(correct_uri(uri))['score']
+    max_score = args['max_score'] * node_score
     new_max_score = 0.0
-    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=args['max_score'], result_limit=args['per_page']):
-        json.append(concept_graph.get_node(correct_uri(relation[1])))
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='arg', max_score=max_score, result_limit=args['per_page']):
+        assertion_list.append(correct_uri(relation[1]))
+        new_max_score = relation[0]['score']
+    new_max_score = round(new_max_score / node_score, 19)
+    for assertion in concept_graph.get_nodes_w_score(assertion_list):
+        json.append(assertion)
         json[-1]['url'] = root_url  + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
-        new_max_score = relation[0]['score']
     if len(json) == args['per_page']:
         json.append({})
         json[-1]['next'] = root_url + add_slash(uri)\
@@ -262,8 +292,11 @@ def get_word_senses(uri,args):
     It also yields all word senses of those word senses by default.
     """
     json = []
+    node_list = []
     for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='senseOf'):
-        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
         json[-1]['url'] = root_url  + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
@@ -274,8 +307,11 @@ def get_word_sense_of(uri,args):
     is a word sense of. It yields all wordsenses in one go.
     """
     json = []
+    node_list = []
     for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='senseOf'):
-        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
         json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
@@ -286,8 +322,11 @@ def get_normalized(uri,args):
     concepts of this node, if there are any.
     """
     json = []
+    node_list = []
     for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='normalized'):
-        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
         json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
@@ -298,8 +337,11 @@ def get_normalized_of(uri,args):
     normalized version of, if there are any.
     """
     json = []
+    node_list = []
     for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='normalized'):
-        json.append(concept_graph.get_node(correct_uri(relation[1])))
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
         json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
         del json[-1]['_id']
     return json
@@ -322,4 +364,4 @@ valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
              'normalized_of':{'normalized_of':get_normalized_of}}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
