@@ -364,4 +364,7 @@ valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
              'normalized_of':{'normalized_of':get_normalized_of}}
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    if '--unsafe' in sys.argv:
+        app.run(debug=True, host='0.0.0.0')
+    else:
+        app.run(debug=True)

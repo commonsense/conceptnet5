@@ -138,7 +138,7 @@ class ConceptNetGraph(object):
         """
         Become authorized with the MongoDB.
         """
-        self.db.auth(username, password)
+        self.db.authenticate(username, password)
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -1003,7 +1003,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.nodes.close()
         self.edges.close()
 
-def get_graph(server='50.17.55.143'):
+def get_graph(server='67.202.5.17'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
