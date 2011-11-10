@@ -76,7 +76,7 @@ def un_camel_case(text):
         '1984 ZX Spectrum Games'
 
     >>> un_camel_case('aaAa aaAaA 0aA AAAa!AAA')
-        'aa Aa aa Aa A 0a A AA Aa! AAA'
+        'aa Aa aa Aa A 0 a A AA Aa! AAA'
 
     >>> un_camel_case(u'MotörHead')
         u'Mot\xf6r Head'
@@ -84,11 +84,17 @@ def un_camel_case(text):
     This should not significantly affect text that is not camel-cased:
     >>> un_camel_case('ACM_Computing_Classification_System')
         'ACM Computing Classification System'
+    
+    >>> un_camel_case(u'Anne_Blunt,_15th_Baroness_Wentworth')
+        u'Anne Blunt, 15 th Baroness Wentworth'
+
+    >>> un_camel_case(u'Hindi-Urdu')
+        u'Hindi-Urdu'
     """
     revtext = text[::-1]
     pieces = []
     while revtext:
-        match = re.match(ur'^([A-Z]+|[^A-Z0-9 _]+[A-Z _]|[0-9]+|[ _]+|[^A-Z]*[^A-Z_ ]+)(.*)$', revtext)
+        match = re.match(ur'^([A-Z]+|[^A-Z0-9 _]+[A-Z _]|[0-9]+|[ _]+|[^A-Z0-9]*[^A-Z0-9_ ]+)(.*)$', revtext)
         if match:
             pieces.append(match.group(1))
             revtext = match.group(2)
@@ -97,7 +103,7 @@ def un_camel_case(text):
             pieces.append(revtext)
             revtext = ''
     revstr = ' '.join(piece.strip(' _') for piece in pieces if piece.strip(' _'))
-    return revstr[::-1]
+    return revstr[::-1].replace('- ', '-')
 
 def tokenize(text):
     return EN.tokenize(text.strip()).split()
@@ -128,7 +134,7 @@ def normalize_topic(topic):
     if not match:
         return normalize(topic), None
     else:
-        return normalize(match.group(1)), 'n/'+match.group(2)
+        return normalize(match.group(1)), 'n/'+match.group(2).strip(' _')
 
 def normalize_english_assertion(graph, assertion):
     """

@@ -129,7 +129,7 @@ for line in open('verbosity.txt'):
             [left_concept, right_concept],
             {'dataset': 'verbosity', 'license': 'CC-By'}
         )
-        GRAPH.justify(source, assertion, weight=min(score, 1000)/1000.0)
+        GRAPH.justify(source, assertion, weight=score/10.0)
         GRAPH.add_context(assertion, context)
 
 print counts

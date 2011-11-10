@@ -18,7 +18,7 @@ reverb_object = GRAPH.get_or_create_node(u'/source/rule/extract_reverb_objects')
 #reverb_prep = GRAPH.get_or_create_node(u'/source/rule/extract_reverb_prepositions')
 reverb_triple = GRAPH.get_or_create_node(u'/source/rule/reverb_present_tense_triples')
 wikipedia = GRAPH.get_or_create_node(u'/source/web/en.wikipedia.org')
-GRAPH.justify('/', reverb_object, 0.25)
+GRAPH.justify('/', reverb_object, 0.2)
 GRAPH.justify('/', reverb_triple, 0.5)
 GRAPH.justify('/', wikipedia)
 
@@ -29,8 +29,8 @@ WIKIPEDIA_SOURCE = re.compile(r'(http://en.wikipedia.org/wiki/([^:]|:_)+)(\||$)'
 
 def normalize_rel(text):
     parts = normalize(text).split()
-    if len(p) >= 2 and p[1] == 'be' and p[0] in ('be', 'have'):
-        p = p[1:]
+    if len(parts) >= 2 and parts[1] == 'be' and parts[0] in ('be', 'have'):
+        parts = parts[1:]
     parts = [p for p in parts if p != 'also']
     return ' '.join(parts)
 
@@ -86,12 +86,10 @@ def get_domain_names(urls):
     domain_names = map(lambda x: x.netloc, parsed_urls)
     return domain_names
 
-def output_triple(arg1, arg2, relation, raw):
+def output_triple(arg1, arg2, relation, raw, sources):
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
     relation = normalize_rel(relation).strip()
-    print '%s(%s, %s)' % \
-        (relation, arg1, arg2)
     found_relation = False
     if relation == 'be for':
         found_relation = True
@@ -108,10 +106,15 @@ def output_triple(arg1, arg2, relation, raw):
     if relation == 'be similar to':
         found_relation = True
         relation = 'SimilarTo'
+    if relation.startswith('be ') and relation.endswith(' of') and relation[3:-3] in TYPE_WORDS:
+        found_relation = True
+        relation = 'IsA'
     if found_relation:
         rel_node = GRAPH.get_or_create_relation(relation)
     else:
         rel_node = GRAPH.get_or_create_concept('en', relation)
+    print '%s(%s, %s)' % \
+        (relation, arg1, arg2),
 
     assertion = GRAPH.get_or_create_assertion(
         rel_node,
@@ -124,6 +127,14 @@ def output_triple(arg1, arg2, relation, raw):
     
     conjunction = GRAPH.get_or_create_conjunction([raw, reverb_triple])
     GRAPH.justify(conjunction, assertion)
+    for source in sources:
+        # Put in context with Wikipedia articles.
+        topic = article_url_to_topic(source)
+        context = GRAPH.get_or_create_concept('en', topic)
+        context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
+        GRAPH.add_context(assertion, context_normal)
+        GRAPH.get_or_create_edge('normalized', context, context_normal)
+        print "in", context_normal
     return assertion
 
 def article_url_to_topic(url):
@@ -157,9 +168,7 @@ def output_raw(raw_arg1, raw_arg2, raw_relation, sources):
         # Put in context with Wikipedia articles.
         topic = article_url_to_topic(source)
         context = GRAPH.get_or_create_concept('en', topic)
-        context_normal = GRAPH.get_or_create_concept('en', *normalize_topic(topic))
         GRAPH.add_context(raw, context)
-        GRAPH.get_or_create_edge('normalized', context, context_normal)
     return raw
 
 def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
@@ -168,7 +177,6 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
         return
     arg1 = normalize(arg1).strip()
     arg2 = normalize(arg2).strip()
-    arg3 = normalize(arg3).strip()
     assertion = None
     if arg3 == None:
         print '%s(%s, %s)' % (relation, arg1, arg2)
@@ -181,8 +189,8 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
         )
         assertions = (assertion,)
     else:
-        print '%s(%s, %s) %s(%s, %s)' % \
-            (relation, arg1, arg2, prep, arg2, arg3)
+        print '%s(%s, %s)' % \
+            (relation, arg1, arg2)
         assertion1 = GRAPH.get_or_create_assertion(
             '/relation/'+relation,
             [GRAPH.get_or_create_concept('en', arg1),
@@ -190,14 +198,15 @@ def output_sentence(arg1, arg2, arg3, relation, raw, sources, prep=None):
             {'dataset': 'reverb/en', 'license': 'CC-By-SA',
              'normalized': True}
         )
-        assertion2 = GRAPH.get_or_create_assertion(
-            GRAPH.get_or_create_concept('en', prep, 'p'),
-            [GRAPH.get_or_create_concept('en', arg2),
-             GRAPH.get_or_create_concept('en', arg3)],
-            {'dataset': 'reverb/en', 'license': 'CC-By-SA',
-             'normalized': True}
-        )
-        assertions = (assertion1, assertion2)
+        #arg3 = normalize(arg3).strip()
+        #assertion2 = GRAPH.get_or_create_assertion(
+        #    GRAPH.get_or_create_concept('en', prep, 'p'),
+        #    [GRAPH.get_or_create_concept('en', arg2),
+        #     GRAPH.get_or_create_concept('en', arg3)],
+        #    {'dataset': 'reverb/en', 'license': 'CC-By-SA',
+        #     'normalized': True}
+        #)
+        assertions = (assertion1,)
     
     for assertion in assertions:
         conjunction = GRAPH.get_or_create_conjunction(
@@ -242,7 +251,7 @@ def handle_line(line):
 
     raw = output_raw(old_arg1, old_arg2, old_rel, sources)
     if probably_present_tense(old_rel.split()[0]):
-        triple = output_triple(old_arg1, old_arg2, old_rel, raw)
+        triple = output_triple(old_arg1, old_arg2, old_rel, raw, sources)
 
     index_verbs = index_of_verbs(tags)
     if len(index_verbs) == 0: return
@@ -279,10 +288,13 @@ def handle_line(line):
                     arg2 = untokenize(tokens[index_prep+1:])
                     output_sentence(arg1, arg2, None, 'PartOf', raw, sources)
                 else:
-                    arg2 = untokenize(tokens[index_be+2:index_prep])
+                    arg2 = untokenize(tokens[index_be+1:index_prep])
                     arg3 = untokenize(tokens[index_prep+1:])
+                    prep = tokens[index_prep]
+                    #prep_frame = 'Something can be '+untokenize([arg2, prep, arg3])
+                    #print prep_frame
                     output_sentence(arg1, arg2, arg3, 'IsA', raw, sources,
-                        prep=tokens[index_prep])
+                        prep=prep)
         else:
             if index_prep == 0:
                 arg2 = untokenize(tokens[index_be+1:])
@@ -290,8 +302,11 @@ def handle_line(line):
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
+                prep = tokens[index_prep]
+                #prep_frame = 'Something can be '+untokenize([arg2, prep, arg3])
+                #print prep_frame
                 output_sentence(arg1, arg2, arg3, 'HasProperty', raw, sources,
-                    prep=tokens[index_prep])
+                    prep=prep)
     else:
         index_be = index_of_be(tokens)
         if index_be == len(tokens) - 1: return
@@ -312,15 +327,21 @@ def handle_line(line):
             else:
                 arg2 = untokenize(tokens[index_be+1:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
+                prep = tokens[index_prep]
+                #prep_frame = 'Something can be '+untokenize([arg2, prep, arg3])
+                #print prep_frame
                 output_sentence(arg1, arg2, arg3, relation, raw, sources,
-                    prep=tokens[index_prep])
+                    prep=prep)
         else: # SubjectOf relation
             if index_prep > 0:
                 arg1 = untokenize(tokens[:index_verbs[0]])
                 arg2 = untokenize(tokens[index_verbs[0]:index_prep])
                 arg3 = untokenize(tokens[index_prep+1:])
+                prep = tokens[index_prep]
+                #prep_frame = 'Something '+untokenize([arg2, prep, arg3])
+                #print prep_frame
                 output_sentence(arg1, arg2, arg3, 'SubjectOf', raw, sources,
-                    prep=tokens[index_prep])
+                    prep=prep)
 
 if __name__ == '__main__':
     import sys

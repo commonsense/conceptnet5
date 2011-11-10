@@ -129,9 +129,16 @@ class ConceptNetGraph(object):
 
         self.db.nodes.create_index('uri')
         self.db.nodes.create_index('dataset')
+        self.db.nodes.create_index('words')
         self.db.edges.create_index('key')
         self.db.edges.create_index([('start', 1), ('type', 1)])
         self.db.edges.create_index([('end', 1), ('type', 1)])
+
+    def authorize(self, username, password):
+        """
+        Become authorized with the MongoDB.
+        """
+        self.db.authenticate(username, password)
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -371,7 +378,7 @@ class ConceptNetGraph(object):
         """
         return self._create_node(
             type='web_concept',
-            uri=rest,
+            uri=rest.strip('/'),
             **properties
         )
 
@@ -896,6 +903,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.edges = open(filename+'.edges.json', 'w')
         self.scoredEdges = open(filename+'.scored.json', 'w')
         self.recently_created_uris = []
+        self.recently_created_edges = []
 
     def _write_node(self, properties):
         print >> self.nodes, json.dumps(properties)
@@ -922,6 +930,7 @@ class JSONWriterGraph(ConceptNetGraph):
     
     def _create_node(self, **properties):
         uri = properties['uri']
+        assert not uri.startswith('/http')
         if uri in self.recently_created_uris:
             return uri
         self._write_node(properties)
@@ -933,6 +942,11 @@ class JSONWriterGraph(ConceptNetGraph):
     def _create_edge(self, _type, source, target, properties = {}):
         if source == 0:
             source = '/'
+        assert not source.startswith('/http')
+        if (_type, source, target) in self.recently_created_edges:
+            return True
+        self.recently_created_edges = self.recently_created_edges[-49:]\
+          + [(_type, source, target)]
         self._write_edge(_type, source, target, properties)
 
     def _any_to_uri(self, obj):
@@ -974,7 +988,13 @@ class JSONWriterGraph(ConceptNetGraph):
     def get_rel_and_args(self, assertion_uri):
         assert assertion_uri[:11] == '/assertion/'
         rest = assertion_uri[11:]
-        return uri_piece_to_list(rest)
+        return [self._fix_piece(piece) for piece in uri_piece_to_list(rest)]
+
+    def _fix_piece(self, piece):
+        if piece.startswith('/http'):
+            return piece[1:]
+        else:
+            return piece
     
     def __del__(self):
         self.close()
@@ -982,107 +1002,27 @@ class JSONWriterGraph(ConceptNetGraph):
     def close(self):
         self.nodes.close()
         self.edges.close()
-        self.scoredEdges.close()
 
-class GremlinWriterGraph(ConceptNetGraph):
-    """
-    Follows the same interface as ConceptNetGraph, but does not actually access
-    the database. Instead, it outputs Gremlin statements to a file, which can
-    be loaded later on the server, much more quickly.
-
-    You should run `GremlinWriterGraph.close()` when finished, to ensure
-    that the file is up-to-date.
-    """
-
-    # Find things that look like floating point numbers after a colon.
-    # Then wrap them up in `new Float(...)` to protect Java, which will have to
-    # eventually deal with these structures, from its own stupidity.
-    FLOAT_REGEX = re.compile(ur": ?([-+]?[0-9]*\.[0-9]+)")
-
-    def __init__(self, filename):
-        self.filename = filename
-        self.output = open(filename, 'w')
-        self.recently_created_uris = []    
-    
-    def _dict_to_gremlin_map(self, thedict):
-        if len(thedict) == 0:
-            return '[:]'
-        str = json.dumps(thedict, ensure_ascii=False).encode('utf-8')
-        str = GremlinWriterGraph.FLOAT_REGEX.sub(r": new Float(\1)", str)
-        str = str.replace('$', r'\$')
-        return '[' + str[1:-1] + ']'
-
-    def _safestr(self, str):
-        return "'" + (str.encode('utf-8').replace('$', r'\$').replace("'", r"\'")) + "'"
-
-    def _create_node(self, **properties):
-        uri = properties['uri']
-        if uri in self.recently_created_uris:
-            return uri
-        map = self._dict_to_gremlin_map(properties)
-        print >> self.output, "Object.metaClass.makeNode(%s, %s)" % \
-          (self._safestr(uri), map)
-
-        # put it on a queue of 50 URIs to not recreate
-        self.recently_created_uris = self.recently_created_uris[-49:] + [uri]
-        return uri
-
-    def _create_edge(self, _type, source, target, properties = {}):
-        if source == 0:
-            source = '/'
-        map = self._dict_to_gremlin_map(properties)
-        self.output.write("Object.metaClass.makeEdge(%s, %s, %s, %s)\n" % \
-          (self._safestr(_type), self._safestr(source), self._safestr(target), map))
-
-    def _any_to_uri(self, obj):
-        if isinstance(obj, basestring):
-            return normalize_uri(obj)
-        else:
-            raise TypeError
-
-    def _any_to_node(self, obj):
-        raise NotImplementedError
-
-    def get_or_create_assertion(self, relation, args, properties = {}):
-        uri = make_assertion_uri(self._any_to_uri(relation),
-                                 [self._any_to_uri(arg) for arg in args])
-        return (self.get_node(uri) or
-          self._create_assertion_w_components(uri,
-            self.get_or_create_node(relation),
-            [self.get_or_create_node(arg) for arg in args],
-            properties
-          )
-        )
-
-    def get_node(self, uri):
-        if uri in self.recently_created_uris:
-            return uri
-        else:
-            return None
-
-    def get_edge(self, _type, source, target):
-        # force it to be "created"
-        return None
-
-    def get_edges(self, source, target):
-        return []
-    
-    def get_args(self, assertion_uri):
-        return self.get_rel_and_args(assertion_uri)[1:]
-
-    def get_rel_and_args(self, assertion_uri):
-        assert assertion_uri[:11] == '/assertion/'
-        rest = assertion_uri[11:]
-        return uri_piece_to_list(rest)
-
-    def close(self):
-        self.output.close()
-
-def get_graph():
+def get_graph(server='67.202.5.17'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
 
     no args
     """
-    return ConceptNetGraph('67.202.5.17')
+    try:
+        from conceptnet5 import secrets
+    except ImportError:
+        raise Exception("""
+You don't have a conceptnet5/secrets.py file.
+You should make one that looks like this:
+
+USERNAME=<username>
+PASSWORD=<password>
+
+You may be able to simply copy this file from the Dropbox.
+""")
+    graph = ConceptNetGraph(server)
+    graph.authorize(secrets.USERNAME, secrets.PASSWORD)
+    return graph
+
