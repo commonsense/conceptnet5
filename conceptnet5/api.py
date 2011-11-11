@@ -353,7 +353,7 @@ def get_contexts(uri,args):
     """
     json = []
     node_list = []
-    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='context'):
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='context'):
         node_list.append(correct_uri(relation[1]))
     for node in concept_graph.get_nodes_w_score(node_list):
         json.append(node)
@@ -368,7 +368,7 @@ def get_context_of(uri, args):
     """
     json = []
     node_list = []
-    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='context'):
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='context'):
         node_list.append(correct_uri(relation[1]))
     for node in concept_graph.get_nodes_w_score(node_list):
         json.append(node)
@@ -388,11 +388,11 @@ valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
                                     'incoming_assertions_url':get_incoming_assertions_url},\
              'word_senses':{'word_senses':get_word_senses},\
              'properties':{'properties':get_properties},\
-             'is_word_sense_of':{'word_sense_of':get_word_sense_of},\
+             'is_word_sense_of':{'is_word_sense_of':get_word_sense_of},\
              'normalized':{'normalized':get_normalized},\
-             'is_normalized_of':{'normalized_of':get_normalized_of},\
+             'is_normalized_of':{'is_normalized_of':get_normalized_of},\
              'contexts':{'contexts':get_contexts},\
-             'is_contexts_of':{'contexts_of':get_contexts_of}}
+             'is_context_of':{'is_context_of':get_context_of}}
 
 if __name__ == '__main__':
     if '--unsafe' in sys.argv:
