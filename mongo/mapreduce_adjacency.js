@@ -64,8 +64,8 @@ reduceParallel = function (key, values) {
     return 1/invWeight;
 }
 
-//db.justification.insert({_id: '/', value: 1});
-//db.edgeWeights.insert({_id: 'justifies / /', value: {start: '/', end: '/', type: 'justifies', weight: 1}});
+db.justification.insert({_id: '/', value: 1});
+db.edgeWeights.insert({_id: 'justifies / /', value: {start: '/', end: '/', type: 'justifies', weight: 1}});
 
 db.edges.mapReduce(mapEdges, reduceNop, {out: {merge: 'edgeWeights'}});
 db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
