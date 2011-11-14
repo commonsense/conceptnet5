@@ -138,7 +138,7 @@ class ConceptNetGraph(object):
         """
         Become authorized with the MongoDB.
         """
-        self.db.auth(username, password)
+        self.db.authenticate(username, password)
 
     def _create_node_by_type(self, uri, properties = {}):
         """
@@ -407,7 +407,11 @@ class ConceptNetGraph(object):
         uri = normalize_uri(uri)
         id_uri = uri[1:]
         return_dict = self.db.nodes.find_one({'uri':uri})
-        return_dict['score'] = self.db.justification.find_one({'_id':uri})['value']
+        score = self.db.justification.find_one({'_id':uri})
+        if score == None:
+            return_dict['score'] = None
+        else:
+            return_dict['score'] = score['value']
         return return_dict
 
     def get_nodes(self, uri_list):
@@ -438,10 +442,20 @@ class ConceptNetGraph(object):
         result_nodes = {}
         for node in self.db.nodes.find({'uri':{'$in':uri_list}}):
             result_nodes[node['uri']] = node
-        for node in self.db.justification.find({'_id':{'$in':uri_list}}).sort([('value',DESCENDING)]):
-            return_dict = result_nodes[node['_id']]
-            return_dict['score'] = node['value']
-            yield return_dict
+        score_list = self.db.justification.find({'_id':{'$in':uri_list}}).sort([('value',DESCENDING)])
+        if score_list == None:
+            for node in result_nodes.items():
+                yield node
+        else:
+            for node in score_list:
+                return_dict = result_nodes[node['_id']]
+                del result_nodes[node['_id']]
+                return_dict['score'] = node['value']
+                yield return_dict
+            for node in result_nodes.values():
+                print node
+                node['score'] = None
+                yield node
 
     def find_nodes(self, pattern):
         """
@@ -1003,7 +1017,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.nodes.close()
         self.edges.close()
 
-def get_graph(server='50.17.55.143'):
+def get_graph(server='67.202.5.17'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.

@@ -346,6 +346,35 @@ def get_normalized_of(uri,args):
         del json[-1]['_id']
     return json
 
+def get_contexts(uri,args):
+    """
+    This function retrieves information about the nodes that are considered relevant to
+    the context of this nodei (usually an assertion), if there are any.
+    """
+    json = []
+    node_list = []
+    for relation in concept_graph.get_outgoing_edges(correct_uri(uri), _type='context'):
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
+        json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
+        del json[-1]['_id']
+    return json
+
+def get_context_of(uri, args):
+    """
+    This function retrieves information about the nodes for which this node is considered
+    a context (in other words, the nodes that point to this node as a context)
+    """
+    json = []
+    node_list = []
+    for relation in concept_graph.get_incoming_edges(correct_uri(uri), _type='context'):
+        node_list.append(correct_uri(relation[1]))
+    for node in concept_graph.get_nodes_w_score(node_list):
+        json.append(node)
+        json[-1]['url'] = root_url + encode_uri(add_slash(json[-1]['uri']))
+        del json[-1]['_id']
+    return json
 
 @app.errorhandler(404)
 def not_found(error):
@@ -359,9 +388,14 @@ valid_requests = {'incoming_edges':{'incoming_edges':get_incoming_edges,\
                                     'incoming_assertions_url':get_incoming_assertions_url},\
              'word_senses':{'word_senses':get_word_senses},\
              'properties':{'properties':get_properties},\
-             'word_sense_of':{'word_sense_of':get_word_sense_of},\
+             'is_word_sense_of':{'is_word_sense_of':get_word_sense_of},\
              'normalized':{'normalized':get_normalized},\
-             'normalized_of':{'normalized_of':get_normalized_of}}
+             'is_normalized_of':{'is_normalized_of':get_normalized_of},\
+             'contexts':{'contexts':get_contexts},\
+             'is_context_of':{'is_context_of':get_context_of}}
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    if '--unsafe' in sys.argv:
+        app.run(debug=True, host='0.0.0.0')
+    else:
+        app.run(debug=True)
