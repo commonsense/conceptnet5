@@ -5,7 +5,7 @@
 //
 // http://cautionsingularityahead.blogspot.com/2010/04/javascript-and-ieee754-redux.html
 
-function toIEEE754(v, ebits, fbits) {
+toIEEE754 = function (v, ebits, fbits) {
 
     var bias = (1 << (ebits - 1)) - 1;
 
@@ -50,9 +50,9 @@ function toIEEE754(v, ebits, fbits) {
         str = str.substring(8);
     }
     return bytes;
-}
+};
 
-function fromIEEE754(bytes, ebits, fbits) {
+fromIEEE754 = function (bytes, ebits, fbits) {
 
     // Bytes to bits
     var bits = [];
@@ -84,28 +84,38 @@ function fromIEEE754(bytes, ebits, fbits) {
     else {
         return s * 0;
     }
-}
-
-function fromIEEE754Single(b) { return fromIEEE754(b,  8, 23); }
-function   toIEEE754Single(v) { return   toIEEE754(v,  8, 23); }
+};
 
 // The functions below were added by Rob.
 
-function toScoreCode(v) {
+toScoreCode = function (v) {
   var ieee = toIEEE754Single(Math.max(v, 0));
   var bytes = [];
   for (var i=0; i<4; i++) {
-    bytes.push((255 - ieee[i]).toString(16));
+    hex = (255 - ieee[i]).toString(16);
+    if (hex.length == 1) hex = '0'+hex;
+    bytes.push(hex);
   }
   return bytes.join('');
-}
+};
 
-function fromScoreCode(h) {
+fromScoreCode = function (h) {
   var bytes = [];
   for (var i=0; i<4; i++) {
     var hex = h.substring(i*2, i*2+2);
     bytes.push(255 - parseInt(hex, 16));
   }
   return fromIEEE754Single(bytes);
-}
+};
+
+toIEEE754Single = function (v) { return   toIEEE754(v,  8, 23); };
+fromIEEE754Single = function (b) { return fromIEEE754(b,  8, 23); };
+
+db.system.js.save({_id: "toScoreCode", value: toScoreCode});
+db.system.js.save({_id: "toIEEE754Single", value: toIEEE754Single});
+db.system.js.save({_id: "toIEEE754", value: toIEEE754});
+db.system.js.save({_id: "fromScoreCode", value: fromScoreCode});
+db.system.js.save({_id: "fromIEEE754Single", value: fromIEEE754Single});
+db.system.js.save({_id: "fromIEEE754", value: fromIEEE754});
+
 
