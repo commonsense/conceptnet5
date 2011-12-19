@@ -1017,7 +1017,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.nodes.close()
         self.edges.close()
 
-def get_graph(server='67.202.5.17'):
+def get_graph(server='europa.csc.media.mit.edu'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
@@ -1040,3 +1040,6 @@ You may be able to simply copy this file from the Dropbox.
     graph.authorize(secrets.USERNAME, secrets.PASSWORD)
     return graph
 
+if __name__ == '__main__':
+    graph = get_graph()
+    print "The graph works."
