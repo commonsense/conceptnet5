@@ -29,8 +29,17 @@ reduceNop = function (key, values) {
     return values[0];
 }
 
-reduceSum = function (key, values) {
-    return Array.sum(values);
+reduceNode = function (key, values) {
+    if (key.substring(0, 12) === '/conjunction') {
+      var invWeight = 0.0;
+      for (var i=0; i<values.length; i++) {
+        if (values[i] === 0) return 0;
+        invWeight += 1/values[i];
+      }
+      return 1/invWeight;
+    } else {
+      return Array.sum(values);
+    }
 }
 
 mapActivation = function () {
@@ -39,7 +48,7 @@ mapActivation = function () {
         if (val.start === val.end && val.start !== "/") {
             return;
         }
-        var entry = db.justification.findOne({_id: val.start});
+        var entry = db.nodeScores.findOne({_id: val.start});
         if (entry && entry.value) {
             emit(val.end, entry.value * val.weight);
         }
