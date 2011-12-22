@@ -935,7 +935,7 @@ class ConceptNetGraph(object):
         if uri == '/':
             score = 1.
         for link in in_links:
-            linkscore = link.get('score', 0)
+            linkscore = link.get('score', 0) - link.get('jitter', 0)
             if score is None:
                 score = linkscore
             elif uri.startswith('/conjunction'):
@@ -951,7 +951,9 @@ class ConceptNetGraph(object):
         if score != 0:
             for link in out_links:
                 now = datetime.datetime.now()
-                link['score'] = score
+                jitter = random.random() / 1000000
+                link['score'] = score + jitter
+                link['jitter'] = jitter
                 self.db.edges.save(link)
                 self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
         print uri, score
