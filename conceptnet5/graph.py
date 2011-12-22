@@ -935,7 +935,7 @@ class ConceptNetGraph(object):
         if uri == '/':
             score = 1.
         for link in in_links:
-            linkscore = link.get('score', 0) - link.get('jitter', 0)
+            linkscore = (link.get('score', 0) - link.get('jitter', 0)) * link.get('weight', 0)
             if score is None:
                 score = linkscore
             elif uri.startswith('/conjunction'):
@@ -948,14 +948,13 @@ class ConceptNetGraph(object):
 
         self.db.nodes.update({'uri': uri}, {'$set': {'score': score}})
         out_links = self.db.edges.find({'start': uri})
-        if score != 0:
-            for link in out_links:
-                now = datetime.datetime.now()
-                jitter = random.random() / 1000000
-                link['score'] = score + jitter
-                link['jitter'] = jitter
-                self.db.edges.save(link)
-                self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
+        for link in out_links:
+            now = datetime.datetime.now()
+            jitter = random.random() / 1000000
+            link['score'] = score + jitter
+            link['jitter'] = jitter
+            self.db.edges.save(link)
+            self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
         print uri, score
 
 class JSONWriterGraph(ConceptNetGraph):
