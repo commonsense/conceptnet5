@@ -18,6 +18,7 @@ import re
 import json
 import codecs
 import random
+import datetime
 
 def list_to_uri_piece(lst):
     """
@@ -125,14 +126,22 @@ class ConceptNetGraph(object):
 
         """
         self.connection = Connection(domain, 27017)
-        self.db = self.connection.conceptnet
+        self.db = self.connection['conceptnet-small']
 
         self.db.nodes.create_index('uri')
         self.db.nodes.create_index('dataset')
-        self.db.nodes.create_index('words')
+        self.db.nodes.create_index([('words', 1), ('score', -1)])
+
         self.db.edges.create_index('key')
-        self.db.edges.create_index([('start', 1), ('type', 1)])
-        self.db.edges.create_index([('end', 1), ('type', 1)])
+        self.db.edges.create_index([('start', 1), ('type', 1), ('end', 1)])
+        self.db.edges.create_index([('end', 1), ('type', 1), ('start', 1)])
+        self.db.edges.create_index([('start', 1), ('type', 1), ('score', -1)])
+        self.db.edges.create_index([('end', 1), ('type', 1), ('score', -1)])
+        self.db.edges.create_index([('start', 1), ('score', -1)])
+        self.db.edges.create_index([('end', 1), ('score', -1)])
+
+        self.db.queue.create_index('timestamp')
+        self.db.queue.create_index('uri')
 
     def authorize(self, username, password):
         """
@@ -902,6 +911,50 @@ class ConceptNetGraph(object):
         for assertion in self.get_random_assertions():
             print self.summarize_assertion(assertion)
 
+    def corona_init(self):
+        now = datetime.datetime.now()
+        self.db.queue.insert({
+            'uri': '/', 'timestamp': now
+        })
+
+    def corona_downward_step(self):
+        # get a random node near the top of the queue
+        index = random.randrange(0, 20)
+        one_entry = list(self.db.queue.find().sort('timestamp').skip(index).limit(1))
+        if len(one_entry) == 0:
+            # If that missed, just take the first entry
+            one_entry = list(self.db.queue.find().sort('timestamp').limit(1))
+        if len(one_entry) == 0:
+            # oh, actually, there aren't any entries
+            return
+
+        uri = one_entry[0]['uri']
+        self.db.queue.remove({'uri': uri})
+        in_links = self.db.edges.find({'end': uri})
+        out_links = self.db.edges.find({'start': uri})
+        score = None
+        if uri == '/':
+            score = 1
+        for link in in_links:
+            linkscore = link.get(score, 0)
+            if score is None:
+                score = link['score']
+            elif uri.startswith('/conjunction'):
+                if score == 0 or linkscore == 0:
+                    score = 0
+                else:
+                    score = (linkscore * score) / (linkscore + score)
+            else:
+                score += linkscore
+
+        self.db.nodes.update({'uri': uri}, {'$set': {'score': score}})
+        for link in out_links:
+            now = datetime.datetime.now()
+            link['score'] = score
+            self.db.edges.save(link)
+            self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
+        print uri, score
+
 class JSONWriterGraph(ConceptNetGraph):
     """
     Follows the same interface as ConceptNetGraph, but does not actually access
@@ -1017,7 +1070,7 @@ class JSONWriterGraph(ConceptNetGraph):
         self.nodes.close()
         self.edges.close()
 
-def get_graph(server='europa.csc.media.mit.edu'):
+def get_graph(server='ganymede.csc.media.mit.edu:30000'):
     """
     Return a graph object representing the Concept Net graph hosted
     on the Amazon server for the Concept Net team.
