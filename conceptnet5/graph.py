@@ -938,7 +938,7 @@ class ConceptNetGraph(object):
         for link in in_links:
             linkscore = link.get(score, 0)
             if score is None:
-                score = link['score']
+                score = linkscore
             elif uri.startswith('/conjunction'):
                 if score == 0 or linkscore == 0:
                     score = 0
