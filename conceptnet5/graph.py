@@ -126,7 +126,7 @@ class ConceptNetGraph(object):
 
         """
         self.connection = Connection(domain, 27017)
-        self.db = self.connection['conceptnet-small']
+        self.db = self.connection['conceptnet']
 
         self.db.nodes.create_index('uri')
         self.db.nodes.create_index('dataset')
