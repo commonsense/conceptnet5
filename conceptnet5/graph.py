@@ -954,7 +954,7 @@ class ConceptNetGraph(object):
         for link in out_links:
             now = datetime.datetime.now()
             jitter = random.random() / 1000000
-            diff = abs((link['score'] - link['jitter']) - score)
+            #diff = abs((link.get('score',0) - link.get('jitter',0)) - score)
             if True: # maybe check the diff in the future
                 link['score'] = score + jitter
                 link['jitter'] = jitter
