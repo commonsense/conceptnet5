@@ -30,6 +30,11 @@ EXCEPTIONS = {
     'teeth': 'tooth',
     'things': 'thing',
     'people': 'person',
+
+    # Tokenization artifacts
+    'wo': 'will',
+    'ca': 'can',
+    "n't": 'not',
 }
 
 AMBIGUOUS_EXCEPTIONS = {
@@ -96,7 +101,7 @@ def tag_and_stem(text):
     out = []
     for token, tag in tagged:
         if token.startswith('#'):
-            out.append((token, 'TAG'))
+            out.append((token, 'TAG', token))
         else:
             stem = morphy_stem(token, tag)
             out.append((stem, tag, token))
