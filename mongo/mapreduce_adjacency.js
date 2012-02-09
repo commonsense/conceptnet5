@@ -1,79 +1,47 @@
-// initiaize your "justification" table with {_id: '/', value: 1}
-// make sure '/' has an edge to itself of weight 1
-
-mapEdges = function () {
-    if (this.type === 'conjunct') {
-        var startEntry = db.justification.findOne({_id: this.start});
-        var endEntry = db.conjunctions.findOne({_id: this.end});
-        if (startEntry && endEntry && endEntry.value && startEntry.value > 0) {
-            var weight = endEntry.value / startEntry.value;
-            emit(this.key, {
-                start: this.start,
-                end: this.end,
-                weight: weight,
-                type: this.type
-            })
-        }
-    }
-    else if (this.weight) {
-        emit(this.key, {
-            start: this.start,
-            end: this.end,
-            weight: this.weight,
-            type: this.type
-        })
-    }
-}
-
 reduceNop = function (key, values) {
     return values[0];
 }
 
-reduceSum = function (key, values) {
-    return Array.sum(values);
+mapEdges = function () {
+    if (this.weight) {
+        emit(this.start, {type: this.type, end: this.end, weight: this.weight})
+    }
+}
+
+mapNodes = function () {
+      emit(this._id, {type: 'NODE', end: 'NODE', weight: this.value});
+}
+
+reduceNode = function (key, values) {
+    if (key.substring(0, 12) === '/conjunction') {
+      var invWeight = 0.0;
+      for (var i=0; i<values.length; i++) {
+        if (values[i] === 0) return 0;
+        invWeight += 1/values[i];
+      }
+      return 1/invWeight;
+    } else {
+      return Array.sum(values);
+    }
 }
 
 mapActivation = function () {
-    var val = this.value;
-    if (val.weight) {
-        if (val.start === val.end && val.start !== "/") {
+    if (this.value.type === 'NODE') {
+        db.cachedValue = this.value.weight;
+    }
+    else if (this.weight) {
+        if (this.value.start === this.value.end && this.value.start !== "/") {
             return;
         }
-        var entry = db.justification.findOne({_id: val.start});
-        if (entry && entry.value) {
-            emit(val.end, entry.value * val.weight);
-        }
+        emit(this.value.end, db.cachedValue * this.value.weight);
     }
 }
 
-mapConjunctActivation = function () {
-    if (this.type === 'conjunct') {
-        var entry = db.justification.findOne({_id: this.start});
-        if (entry && entry.value) {
-            emit(this.end, entry.value);
-        }
-    }
-}
+db.nodeScores.save({_id: '/', value: 1});
+db.edges.mapReduce(mapEdges, reduceNop, {out: {replace: 'mrEdges', sharded: true}});
+db.nodeScores.mapReduce(mapNodes, reduceNop, {out: {merge: 'mrEdges', sharded: true}});
 
+db.edges.mapReduce(mapActivation, reduceNode, {out: {merge: 'nodeScores', sharded: true}});
 
-reduceParallel = function (key, values) {
-    var invWeight = 0.0;
-    for (var i=0; i<values.length; i++) {
-        invWeight += 1/values[i];
-    }
-    return 1/invWeight;
-}
-
-db.justification.insert({_id: '/', value: 1});
-db.edgeWeights.insert({_id: 'justifies / /', value: {start: '/', end: '/', type: 'justifies', weight: 1}});
-
-db.edges.mapReduce(mapEdges, reduceNop, {out: {merge: 'edgeWeights'}});
-db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
-db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
-db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
-
-db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
-db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
-db.edges.mapReduce(mapConjunctActivation, reduceParallel, {out: 'conjunctions'});
-
-db.edgeWeights.mapReduce(mapActivation, reduceSum, {out: 'justification'});
+//db.nodeScores.save({_id: '/', value: 1});
+//db.edges.mapReduce(mapActivation, reduceNode, {out: {merge: 'nodeScores'}});
