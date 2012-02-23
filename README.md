@@ -9,9 +9,7 @@ If you're interested in ConceptNet, please join the conceptnet-users Google
 group: http://groups.google.com/group/conceptnet-users?hl=en
 
 What we're doing here is partially documented on the Wiki:
-https://github.com/commonsense/conceptnet/wiki
-
-Documentation: https://github.com/commonsense/conceptnet5/wiki
+https://github.com/commonsense/conceptnet5/wiki
 
 Design documentation
 ====================
