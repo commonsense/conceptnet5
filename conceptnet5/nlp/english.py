@@ -6,10 +6,10 @@ import re
 EN = simplenlp.get('en')
 
 try:
-    morphy = wordnet.morphy
+    morphy = wordnet._morphy
 except LookupError:
     nltk.download('wordnet')
-    morphy = wordnet.morphy
+    morphy = wordnet._morphy
 
 STOPWORDS = ['the', 'a', 'an']
 
@@ -23,8 +23,21 @@ EXCEPTIONS = {
     'soles': 'sole',        # not 'sol'
     'pubes': 'pube',        # not 'pubis'
     'dui': 'dui',           # not 'duo'
-    'comics': 'comic',      # WordNet's root for this will make you nerd-rage
     'taxis': 'taxi',        # not 'taxis'
+    'alas': 'alas',
+    'corps': 'corps',
+    'cos': 'cos',
+    'enured': 'enure',
+    'fiver': 'fiver',
+    'hinder': 'hinder',
+    'lobed': 'lobe',
+    'offerer': 'offerer',
+    'outer': 'outer',
+    'sang': 'sing',
+    'singing': 'sing',
+    'solderer': 'solderer',
+    'tined': 'tine',
+    'twiner': 'twiner',
 
     # Stem common nouns whose plurals are apparently ambiguous
     'teeth': 'tooth',
@@ -40,6 +53,7 @@ EXCEPTIONS = {
 AMBIGUOUS_EXCEPTIONS = {
     # Avoid nouns that shadow more common verbs.
     'am': 'be',
+    'as': 'as',
     'are': 'be',
     'ate': 'eat',
     'bent': 'bend',
@@ -56,6 +70,7 @@ AMBIGUOUS_EXCEPTIONS = {
     'shook': 'shake',
     'shot': 'shoot',
     'slain': 'slay',
+    'spoke': 'speak',
     'stole': 'steal',
     'sung': 'sing',
     'thought': 'think',
@@ -63,6 +78,27 @@ AMBIGUOUS_EXCEPTIONS = {
     'was': 'be',
     'won': 'win',
 }
+
+def _word_badness(word):
+    if word.endswith('e'):
+        return len(word) - 2
+    elif word.endswith('ess'):
+        return len(word) - 10
+    elif word.endswith('ss'):
+        return len(word) - 4
+    else:
+        return len(word)
+
+def morphy_best(word, pos=None):
+    results = []
+    if pos is None:
+        pos = 'nvar'
+    for pos_item in pos:
+        results.extend(morphy(word, pos_item))
+    if not results:
+        return None
+    results.sort(key=lambda x: _word_badness(x))
+    return results[0]
 
 def morphy_stem(word, pos=None):
     word = word.lower()
@@ -81,9 +117,10 @@ def morphy_stem(word, pos=None):
         pos = None
     if word in EXCEPTIONS:
         return EXCEPTIONS[word]
-    if pos is None and word in AMBIGUOUS_EXCEPTIONS:
-        return AMBIGUOUS_EXCEPTIONS[word]
-    return (pos and morphy(word, pos)) or morphy(word) or word
+    if pos is None:
+        if word in AMBIGUOUS_EXCEPTIONS:
+            return AMBIGUOUS_EXCEPTIONS[word]
+    return morphy_best(word, pos) or word
 
 def simple_stem(word):
     return EN.normalize(word).strip()

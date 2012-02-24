@@ -9,7 +9,6 @@ Massachusetts Institute of Technology
 Fall 2011
 
 """
-#from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.config import get_auth
 from conceptnet5.whereami import get_project_filename
 from pymongo import Connection, DESCENDING
@@ -462,7 +461,6 @@ class ConceptNetGraph(object):
                 return_dict['score'] = node['value']
                 yield return_dict
             for node in result_nodes.values():
-                print node
                 node['score'] = None
                 yield node
 
@@ -495,6 +493,19 @@ class ConceptNetGraph(object):
         target = self._any_to_uri(target)
         key = "%s %s %s" % (_type, source, target)
         return self.db.edges.find_one({'key': key})
+
+    def get_edges_from_to(self, start, end):
+        """
+        Get a generator of the queried edges
+        """
+        search = {}
+        search['value.start'], search['value.end'] = start, end
+        edges = self.db.scoredEdges.find(search)
+        seen = set()
+        for edge in edges:
+            if edge['value']['key'] not in seen:
+                seen.add(edge['value']['key'])
+                yield edge['value']
 
     def get_incoming_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
