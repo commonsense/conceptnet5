@@ -24,6 +24,8 @@ EXCEPTIONS = {
     'pubes': 'pube',        # not 'pubis'
     'dui': 'dui',           # not 'duo'
     'taxis': 'taxi',        # not 'taxis'
+
+    # Work around errors that Morphy makes.
     'alas': 'alas',
     'corps': 'corps',
     'cos': 'cos',
@@ -38,6 +40,7 @@ EXCEPTIONS = {
     'solderer': 'solderer',
     'tined': 'tine',
     'twiner': 'twiner',
+    'us': 'us',
 
     # Stem common nouns whose plurals are apparently ambiguous
     'teeth': 'tooth',
