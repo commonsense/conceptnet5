@@ -37,10 +37,15 @@ def get_auth_filename():
     return os.path.join(get_config_dir(), 'conceptnet5.auth.json')
 
 def get_auth():
-    filename = get_auth_filename()
-    if not os.access(filename, os.F_OK):
-        make_auth()
-    return json.load(open(get_auth_filename()))
+    try:
+        from conceptnet5 import secrets
+        return {'username': secrets.USERNAME,
+                'password': secrets.PASSWORD}
+    except ImportError:
+        filename = get_auth_filename()
+        if not os.access(filename, os.F_OK):
+            make_auth()
+        return json.load(open(get_auth_filename()))
 
 def make_auth():
     dir = get_config_dir()

@@ -1084,20 +1084,9 @@ def get_graph(server='ganymede.csc.media.mit.edu:30000'):
 
     no args
     """
-    try:
-        from conceptnet5 import secrets
-    except ImportError:
-        raise Exception("""
-You don't have a conceptnet5/secrets.py file.
-You should make one that looks like this:
-
-USERNAME=<username>
-PASSWORD=<password>
-
-You may be able to simply copy this file from the Dropbox.
-""")
+    auth = get_auth()
     graph = ConceptNetGraph(server)
-    graph.authorize(secrets.USERNAME, secrets.PASSWORD)
+    graph.authorize(auth['username'], auth['password'])
     return graph
 
 if __name__ == '__main__':
