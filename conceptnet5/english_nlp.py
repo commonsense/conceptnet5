@@ -1,2 +1,2 @@
-from conceptnet5.nlp.english import *
+from metanl.english import *
 
