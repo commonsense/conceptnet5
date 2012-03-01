@@ -1,4 +1,12 @@
 {% extends "_base.html" %}
 {% block content %}
-Hello world!
+<h1 id="welcome" >Welcome to ConceptNet5</h1>
+<form id="search-form" method="POST" action="search">
+	<input id="search-text" type="text" name="keyword" placeholder="Search for a concept..." />
+	<input id="search-submit" type="submit" value="Search" />
+</form>
+{% endblock %} 
+{% block scripts %}
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-1.6.2.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/search.js')}}"></script>
 {% endblock %}

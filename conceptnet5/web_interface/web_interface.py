@@ -41,6 +41,11 @@ def favicon():
 @app.route('/')
 def home():
     return render_template('home.html')
+    
+@app.route('/search', methods=['POST'])
+def search():
+    keyword = request.form.get('keyword')
+    return redirect(web_route+ 'concept/en/' + keyword)
 
 @app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
 def get_assertion(uri):
