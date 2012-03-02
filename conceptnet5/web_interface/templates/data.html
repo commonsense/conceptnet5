@@ -3,7 +3,16 @@
 <title>ConceptNet 5: {{ node.name }}</title>
 {% endblock %}
 {% block content %}
-<h1>{{ node.name }}</h1>
+<form id="search-form" method="POST" action="/search">
+	<input id="search-text" type="search" name="keyword" placeholder="Search for a concept..." />
+	<select id="language-select" name="language" >
+		<option value="en">English</option>
+		<option value="ja">Japanese</option>
+	</select>
+	<input id="search-submit" type="submit" value="Search" />
+</form>
+<h1 id="concept-title" >{{ node.name }}</h1>
+<div class="clear-fix" ></div>
 <hr />
 {% if normalized %}
 <h2>Normalized form:

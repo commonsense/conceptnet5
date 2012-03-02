@@ -1,8 +1,12 @@
 {% extends "_base.html" %}
 {% block content %}
 <h1 id="welcome" >Welcome to ConceptNet5</h1>
-<form id="search-form" method="POST" action="search">
-	<input id="search-text" type="text" name="keyword" placeholder="Search for a concept..." />
+<form id="search-form-home" method="POST" action="/search">
+	<input id="search-text" type="search" name="keyword" placeholder="Search for a concept..." />
+	<select id="language-select" name="language" >
+		<option value="en">English</option>
+		<option value="ja">Japanese</option>
+	</select>
 	<input id="search-submit" type="submit" value="Search" />
 </form>
 {% endblock %} 
