@@ -499,55 +499,55 @@ class ConceptNetGraph(object):
         Get a generator of the queried edges
         """
         search = {}
-        search['value.start'], search['value.end'] = start, end
-        edges = self.db.scoredEdges.find(search)
+        search['start'], search['end'] = start, end
+        edges = self.db.edges.find(search)
         seen = set()
         for edge in edges:
-            if edge['value']['key'] not in seen:
-                seen.add(edge['value']['key'])
-                yield edge['value']
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge
 
     def get_incoming_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for incoming edges to the node.
         """
-        search = {'value.end':self._any_to_uri(node)}
+        search = {'end':self._any_to_uri(node)}
         if _type: 
-            search['value.type'] = _type
+            search['type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':max_score}
+            search['score'] = {'$lt':max_score}
         if result_limit:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)]).limit(result_limit)
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)])
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)])
         seen = set()
         for edge in edges:
-            if edge['value']['key'] not in seen:
-                seen.add(edge['value']['key'])
-                yield edge['value'], edge['value']['start']
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge, edge['start']
 
     def get_outgoing_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for outgoing edges from the node.
         """
-        search = {'value.start':self._any_to_uri(node)}
+        search = {'start':self._any_to_uri(node)}
         if _type: 
-            search['value.type'] = _type
+            search['type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':max_score}
+            search['score'] = {'$lt':max_score}
         if result_limit:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)]).limit(result_limit)
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)])
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)])
         seen = set()
         for edge in edges:
-            if edge['value']['key'] not in seen:
-                seen.add(edge['value']['key'])
-                yield edge['value'], edge['value']['end']
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge, edge['end']
         
     def _any_to_node(self, obj, create=False):
         """
