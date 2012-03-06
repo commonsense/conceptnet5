@@ -124,7 +124,11 @@ class ConceptNetGraph(object):
         domain -- url of the database that will be accessed and read by this graph object
 
         """
-        self.connection = Connection(domain, 27017)
+        port = 27017
+        if ':' in domain:
+            domain, port = domain.split(':')
+            port = int(port)
+        self.connection = Connection(domain, port)
         self.db = self.connection['conceptnet']
 
         self.db.nodes.create_index('uri')
