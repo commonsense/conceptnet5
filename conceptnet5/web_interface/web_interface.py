@@ -14,7 +14,7 @@ from flask import request
 from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
-from metanl.english import *
+from metanl.english import normalize
 from conceptnet5.web_interface.utils import data_url
 from conceptnet5.web_interface.utils import uri2name
 
@@ -48,7 +48,6 @@ def search():
     keyword = request.form.get('keyword')
     lang = request.form.get('language')
     keyword = normalize(keyword)
-    print "keyword: " + keyword + ", normalized: " + normalize(keyword)
     return redirect('%sconcept/%s/%s' % (web_route, lang, keyword))
 
 @app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
