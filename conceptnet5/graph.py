@@ -394,6 +394,42 @@ class ConceptNetGraph(object):
             **properties
         )
 
+    def get_regex(self, uri_regex):
+        """
+        returns a list of nodes whose uri regular expression matches uri_regex
+
+        args:
+        uri_regex -- the regex which the uri of the nodes must match
+        
+        """
+        uri_regex = normalize_uri(uri_regex)
+        results = []
+        latest_result = ''
+        while True:
+            hasMore = False
+            for node in self.db.nodes.find \
+                ({ 'uri' : {'$regex' : uri_regex, '$gt' : latest_result}}) \
+                .limit(100):
+                results.append(node)
+                hasMore = True
+                latest_result = node['uri']
+            if not hasMore:
+                break
+        return results
+            
+    def get_prefix(self, uri_prefix):
+        """
+        returns a list of nodes whose uri begins with uri_prefix
+
+        args:
+        uri_prefix -- the prefix which the uri of the nodes must have
+        
+        """
+        uri_prefix = normalize_uri(uri_prefix)
+        regex = '^' + uri_prefix
+        return self.get_regex(regex)
+                                       
+
     def get_node(self, uri):
         """
         searches for node in main index,
