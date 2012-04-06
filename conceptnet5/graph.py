@@ -396,30 +396,28 @@ class ConceptNetGraph(object):
 
     def get_regex(self, uri_regex):
         """
-        returns a list of nodes whose uri regular expression matches uri_regex
+        returns a generator of nodes whose uri regular expression matches uri_regex
 
         args:
         uri_regex -- the regex which the uri of the nodes must match
         
         """
         uri_regex = normalize_uri(uri_regex)
-        results = []
         latest_result = ''
         while True:
             hasMore = False
             for node in self.db.nodes.find \
                 ({ 'uri' : {'$regex' : uri_regex, '$gt' : latest_result}}) \
                 .limit(100):
-                results.append(node)
+                yield node
                 hasMore = True
                 latest_result = node['uri']
             if not hasMore:
                 break
-        return results
             
     def get_prefix(self, uri_prefix):
         """
-        returns a list of nodes whose uri begins with uri_prefix
+        returns a generator of nodes whose uri begins with uri_prefix
 
         args:
         uri_prefix -- the prefix which the uri of the nodes must have
