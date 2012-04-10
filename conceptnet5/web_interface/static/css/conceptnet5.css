@@ -57,3 +57,30 @@ a { text-decoration: none; }
   font-size: 180%;
   line-height: 1em;
 }
+
+#welcome{
+	text-align: center;
+}
+
+#search-form-home {
+	text-align: center;
+}
+
+#search-form {
+	text-align: right;
+	float: right;
+	margin-top: 30px;
+}
+
+#search-text{
+	width: 200px;
+	text-align: left;
+}
+
+.clear-fix {
+	clear: both;
+}
+
+h1#concept-title {
+	float: left;
+}

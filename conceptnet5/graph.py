@@ -9,7 +9,6 @@ Massachusetts Institute of Technology
 Fall 2011
 
 """
-#from neo4jrestclient.client import GraphDatabase, Node
 from conceptnet5.config import get_auth
 from conceptnet5.whereami import get_project_filename
 from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_assertion_uri, normalize_uri
@@ -41,7 +40,11 @@ class ConceptNetGraph(object):
         domain -- url of the database that will be accessed and read by this graph object
 
         """
-        self.connection = Connection(domain, 27017)
+        port = 27017
+        if ':' in domain:
+            domain, port = domain.split(':')
+            port = int(port)
+        self.connection = Connection(domain, port)
         self.db = self.connection['conceptnet']
 
         self.db.nodes.create_index('uri')
@@ -307,6 +310,40 @@ class ConceptNetGraph(object):
             **properties
         )
 
+    def get_regex(self, uri_regex):
+        """
+        returns a generator of nodes whose uri regular expression matches uri_regex
+
+        args:
+        uri_regex -- the regex which the uri of the nodes must match
+        
+        """
+        uri_regex = normalize_uri(uri_regex)
+        latest_result = ''
+        while True:
+            hasMore = False
+            for node in self.db.nodes.find \
+                ({ 'uri' : {'$regex' : uri_regex, '$gt' : latest_result}}) \
+                .limit(100):
+                yield node
+                hasMore = True
+                latest_result = node['uri']
+            if not hasMore:
+                break
+            
+    def get_prefix(self, uri_prefix):
+        """
+        returns a generator of nodes whose uri begins with uri_prefix
+
+        args:
+        uri_prefix -- the prefix which the uri of the nodes must have
+        
+        """
+        uri_prefix = normalize_uri(uri_prefix)
+        regex = '^' + uri_prefix
+        return self.get_regex(regex)
+                                       
+
     def get_node(self, uri):
         """
         searches for node in main index,
@@ -378,7 +415,6 @@ class ConceptNetGraph(object):
                 return_dict['score'] = node['value']
                 yield return_dict
             for node in result_nodes.values():
-                print node
                 node['score'] = None
                 yield node
 
@@ -412,47 +448,60 @@ class ConceptNetGraph(object):
         key = "%s %s %s" % (_type, source, target)
         return self.db.edges.find_one({'key': key})
 
+    def get_edges_from_to(self, start, end):
+        """
+        Get a generator of the queried edges
+        """
+        search = {}
+        search['start'], search['end'] = start, end
+        edges = self.db.edges.find(search)
+        seen = set()
+        for edge in edges:
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge
+
     def get_incoming_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for incoming edges to the node.
         """
-        search = {'value.end':self._any_to_uri(node)}
+        search = {'end':self._any_to_uri(node)}
         if _type: 
-            search['value.type'] = _type
+            search['type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':max_score}
+            search['score'] = {'$lt':max_score}
         if result_limit:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)]).limit(result_limit)
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)])
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)])
         seen = set()
         for edge in edges:
-            if edge['value']['key'] not in seen:
-                seen.add(edge['value']['key'])
-                yield edge['value'], edge['value']['start']
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge, edge['start']
 
     def get_outgoing_edges(self, node, _type=None, max_score=0.0, result_limit=None):
         """
         Get a generator of (edge, node) pairs for outgoing edges from the node.
         """
-        search = {'value.start':self._any_to_uri(node)}
+        search = {'start':self._any_to_uri(node)}
         if _type: 
-            search['value.type'] = _type
+            search['type'] = _type
         if max_score != 0.0: 
-            search['value.score'] = {'$lt':max_score}
+            search['score'] = {'$lt':max_score}
         if result_limit:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)]).limit(result_limit)
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)]).limit(result_limit)
         else:
-            edges = self.db.scoredEdges.find(search)\
-            .sort([('value.score',DESCENDING)])
+            edges = self.db.edges.find(search)\
+            .sort([('score',DESCENDING)])
         seen = set()
         for edge in edges:
-            if edge['value']['key'] not in seen:
-                seen.add(edge['value']['key'])
-                yield edge['value'], edge['value']['end']
+            if edge['key'] not in seen:
+                seen.add(edge['key'])
+                yield edge, edge['end']
         
     def _any_to_node(self, obj, create=False):
         """
@@ -851,7 +900,10 @@ class ConceptNetGraph(object):
         if uri == '/':
             score = 1.
         for link in in_links:
-            linkscore = (link.get('score', 0) - link.get('jitter', 0)) * link.get('weight', 0)
+            linkscore = (link.get('score', 0) - link.get('jitter', 0))
+            if not uri.startswith('/conjunction'):
+                # forgot to set weights on conjunctions
+                linkscore *= link.get('weight', 0)
             if score is None:
                 score = linkscore
             elif uri.startswith('/conjunction'):
@@ -867,10 +919,12 @@ class ConceptNetGraph(object):
         for link in out_links:
             now = datetime.datetime.now()
             jitter = random.random() / 1000000
-            link['score'] = score + jitter
-            link['jitter'] = jitter
-            self.db.edges.save(link)
-            self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
+            #diff = abs((link.get('score',0) - link.get('jitter',0)) - score)
+            if True: # maybe check the diff in the future
+                link['score'] = score + jitter
+                link['jitter'] = jitter
+                self.db.edges.save(link)
+                self.db.queue.update({'uri': link['end']}, {'$set': {'timestamp': now}}, safe=False, upsert=True)
         print uri, score
 
 class JSONWriterGraph(ConceptNetGraph):
@@ -995,20 +1049,9 @@ def get_graph(server='ganymede.csc.media.mit.edu:30000'):
 
     no args
     """
-    try:
-        from conceptnet5 import secrets
-    except ImportError:
-        raise Exception("""
-You don't have a conceptnet5/secrets.py file.
-You should make one that looks like this:
-
-USERNAME=<username>
-PASSWORD=<password>
-
-You may be able to simply copy this file from the Dropbox.
-""")
+    auth = get_auth()
     graph = ConceptNetGraph(server)
-    graph.authorize(secrets.USERNAME, secrets.PASSWORD)
+    graph.authorize(auth['username'], auth['password'])
     return graph
 
 if __name__ == '__main__':

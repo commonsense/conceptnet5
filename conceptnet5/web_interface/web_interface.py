@@ -14,8 +14,10 @@ from flask import request
 from flask import send_from_directory
 from flask import url_for
 from conceptnet5.graph import get_graph
+from metanl.english import normalize
 from conceptnet5.web_interface.utils import data_url
 from conceptnet5.web_interface.utils import uri2name
+from conceptnet5.web_interface.utils import get_sorted_languages
 
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
@@ -40,7 +42,14 @@ def favicon():
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', languages=get_sorted_languages())
+    
+@app.route('/search', methods=['POST'])
+def search():
+    keyword = request.form.get('keyword')
+    lang = request.form.get('language')
+    keyword = normalize(keyword)
+    return redirect('%sconcept/%s/%s' % (web_route, lang, keyword))
 
 @app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
 def get_assertion(uri):
@@ -195,7 +204,7 @@ def get_data(uri):
         })
 
     return render_template('data.html', node=node, assertions=assertions,
-            frames=frames, normalized=normalized, senses=senses)
+            frames=frames, normalized=normalized, senses=senses, languages=get_sorted_languages())
 
 @app.errorhandler(404)
 def handler404(error):

@@ -1,9 +1,90 @@
+# -*- coding: utf-8 -*-
+
+
 """
 Contains configuration for accessing the database.
 """
 import os
 import json
 from getpass import getpass
+
+LANGUAGES = {
+    'English': 'en',
+    
+    'Afrikaans': 'af',
+    'Arabic': 'ar',
+    'Armenian': 'hy',
+    'Basque': 'eu',
+    'Belarusian': 'be',
+    'Bengali': 'bn',
+    'Bosnian': 'bs',
+    'Bulgarian': 'bg',
+    'Burmese': 'my',
+    'Chinese': 'zh',
+    'Crimean Tatar': 'crh',
+    'Croatian': 'hr',
+    'Czech': 'cs',
+    'Danish': 'da',
+    'Dutch': 'nl',
+    'Esperanto': 'eo',
+    'Estonian': 'et',
+    'Finnish': 'fi',
+    'French': 'fr',
+    'Galician': 'gl',
+    'German': 'de',
+    'Greek': 'el',
+    'Hebrew': 'he',
+    'Hindi': 'hi',
+    'Hungarian': 'hu',
+    'Icelandic': 'is',
+    'Ido': 'io',
+    'Indonesian': 'id',
+    'Irish': 'ga',
+    'Italian': 'it',
+    'Japanese': 'ja',
+    'Kannada': 'kn',
+    'Kazakh': 'kk',
+    'Khmer': 'km',
+    'Korean': 'ko',
+    'Kyrgyz': 'ky',
+    'Lao': 'lo',
+    'Latin': 'la',
+    'Lithuanian': 'lt',
+    'Lojban': 'jbo',
+    'Macedonian': 'mk',
+    'Min Nan': 'nan',
+    'Malagasy': 'mg',
+    'Mandarin': 'zh',
+    'Norwegian': 'no',
+    'Pashto': 'ps',
+    'Persian': 'fa',
+    'Polish': 'pl',
+    'Portuguese': 'pt',
+    'Romanian': 'ro',
+    'Russian': 'ru',
+    'Sanskrit': 'sa',
+    'Sinhalese': 'si',
+    'Scots': 'sco',
+    'Scottish Gaelic': 'gd',
+    'Serbian': 'sr',
+    'Slovak': 'sk',
+    'Slovene': 'sl',
+    'Slovenian': 'sl',
+    'Spanish': 'es',
+    'Swahili': 'sw',
+    'Swedish': 'sv',
+    'Tajik': 'tg',
+    'Tamil': 'ta',
+    'Thai': 'th',
+    'Turkish': 'tr',
+    'Turkmen': 'tk',
+    'Ukrainian': 'uk',
+    'Urdu': 'ur',
+    'Uzbek': 'uz',
+    'Vietnamese': 'vi',
+    u'英語': 'en',
+    u'日本語': 'ja'
+}
 
 def _mkdir(newdir):
     """
@@ -37,10 +118,15 @@ def get_auth_filename():
     return os.path.join(get_config_dir(), 'conceptnet5.auth.json')
 
 def get_auth():
-    filename = get_auth_filename()
-    if not os.access(filename, os.F_OK):
-        make_auth()
-    return json.load(open(get_auth_filename()))
+    try:
+        from conceptnet5 import secrets
+        return {'username': secrets.USERNAME,
+                'password': secrets.PASSWORD}
+    except ImportError:
+        filename = get_auth_filename()
+        if not os.access(filename, os.F_OK):
+            make_auth()
+        return json.load(open(get_auth_filename()))
 
 def make_auth():
     dir = get_config_dir()
