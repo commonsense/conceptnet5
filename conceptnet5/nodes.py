@@ -1,3 +1,21 @@
+def normalize_arbitrary_text(text, lang):
+    if lang == 'en':
+        from metanl import english
+        normalized, disambig = english.normalize_topic(text)
+    elif lang == 'ja':
+        from metanl import japanese
+        normalized, disambig = japanese.normalize(text), None
+    else:
+        import simplenlp
+        nlp = simplenlp.get(lang)
+        normalized_list = [item for item in nlp.normalize(text).split()
+        disambig = None
+        normalized, disambig = nlp.normalize(text), None
+    if disambig:
+        return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
+    else:
+        return '/c/%s/%s' % (lang, normalized.replace(' ', '_'))
+
 def list_to_uri_piece(lst):
     """
     Encode a list in a format that is hierarchical yet fits into a URI.
@@ -43,7 +61,7 @@ def uri_piece_to_list(uri):
     chunks.append('/' + '/'.join(current))
     return chunks
 
-def make_assertion_uri(relation_uri, arg_uri_list):
+def make_assertion_uri(relation_uri, arg_uri_list, short=False):
     """
     creates assertion uri out of component uris
     
@@ -53,7 +71,11 @@ def make_assertion_uri(relation_uri, arg_uri_list):
     i.e ['/en/dog',...]
 
     """
-    return '/assertion/' + list_to_uri_piece([relation_uri] + arg_uri_list)
+    if short:
+        tag = 'a'
+    else:
+        tag = 'assertion'
+    return make_list_uri(tag, [relation_uri]+arg_uri_list)
 	    
 def make_list_uri(_type, args):
     """
@@ -83,4 +105,20 @@ def normalize_uri(uri):
         uri = uri.decode('utf-8')
     return uri.strip().replace(u' ', u'_')
 
+def concept_to_lemmas(concept):
+    """
+    Given a concept in lemmatized URI form, extract all the word roots
+    that appear in it. This includes lemmatizing the disambiguation text,
+    if it is there.
+    """
+    lemmas = []
+    if concept.startswith('/c/'):
+        parts = concept.split('/')
+        lang = parts[2]
+        if len(parts) > 3:
+            # get the concept name
+            lemmas.extend(parts[3].replace('_', ' '))
+        if len(parts) > 5:
+            norm = normalize_arbitrary_text(parts[5], lang)
+    return lemmas
 
