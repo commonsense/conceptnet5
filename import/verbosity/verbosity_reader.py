@@ -1,24 +1,22 @@
-from conceptnet5.english_nlp import normalize
-from conceptnet5.graph import JSONWriterGraph
+from conceptnet5.nodes import normalize_uri, make_concept_uri
+from conceptnet5.edges import MultiWriter, make_edge
 from rhyme import sounds_like_score
 from collections import defaultdict
 import math, re
 
 make_json = True
 
-assertions = []
-
 mapping = {
-    "it is typically near": '/concept/en/be_near',
-    "it is typically in": '/concept/en/be_in',
-    "it is used for": '/relation/UsedFor',
-    "it is a kind of": '/relation/IsA',
-    "it is a type of": '/relation/IsA',
-    "it is about the same size as": '/relation/RelatedTo',
-    "it is related to": '/relation/RelatedTo',
-    "it has": '/concept/en/have_or_involve',
-    "it is": '/relation/HasProperty',
-    "it looks like": '/concept/en/look_like',
+    "it is typically near": '/c/en/be_near',
+    "it is typically in": '/c/en/be_in',
+    "it is used for": '/r/UsedFor',
+    "it is a kind of": '/r/IsA',
+    "it is a type of": '/r/IsA',
+    "it is about the same size as": '/r/RelatedTo',
+    "it is related to": '/r/RelatedTo',
+    "it has": '/c/en/have_or_involve',
+    "it is": '/r/HasProperty',
+    "it looks like": '/c/en/look_like',
 }
 
 bad_regex_no_biscuit =\
@@ -34,14 +32,11 @@ flag_out = open('output/flagged_assertions.txt', 'w')
 similar_out = open('output/text_similarity.txt', 'w')
 weak_out = open('output/weak_assertions.txt', 'w')
 good_out = open('output/ok_assertions.txt', 'w')
+sources = ['/s/site/verbosity']
 
-GRAPH = None
-context = source = None
+writer = None
 if make_json:
-    GRAPH = JSONWriterGraph('../json_data/verbosity')
-    source = GRAPH.get_or_create_node('/source/site/verbosity')
-    context = GRAPH.get_or_create_node('/context/General')
-    GRAPH.justify(0, source)
+    writer = MultiWriter('verbosity')
 
 for line in open('verbosity.txt'):
     if skipcount > 0:
@@ -53,9 +48,9 @@ for line in open('verbosity.txt'):
         continue
     left, relation, right, freq, orderscore = parts[:5]
 
+
     # catch bad stuff
     flagged = False
-
 
     for rword in right.split():
         if bad_regex_no_biscuit.match(rword):
@@ -92,13 +87,15 @@ for line in open('verbosity.txt'):
     elif relation == 'it looks like':
         relation = 'it is related to'
     rel = mapping.get(relation)
+    reltext = relation[3:]
     if rel is None:
-        rel = '/concept/en/'+normalize(relation[3:]).replace(' ', '_')
+        rel = make_concept_uri(reltext, 'en')
+    text = '[[%s]] %s [[%s]]' % (left, reltext, right)
     
     if relation == 'it is' and\
        (right.startswith('a ') or right.startswith('an ')
         or right.startswith('the ')):
-        rel = '/relation/IsA'
+        rel = '/r/IsA'
     
     sls = sounds_like_score(left, right)
     text_similarities.append(sls)
@@ -121,18 +118,15 @@ for line in open('verbosity.txt'):
         print (rel, left, right, score)
     
     if make_json:
-        left_concept = GRAPH.get_or_create_concept('en', left)
-        right_concept = GRAPH.get_or_create_concept('en', right)
-        relation = GRAPH.get_or_create_node(rel)
-        assertion = GRAPH.get_or_create_assertion(
-            relation,
-            [left_concept, right_concept],
-            {'dataset': 'verbosity', 'license': 'CC-By'}
-        )
-        GRAPH.justify(source, assertion, weight=score/10.0)
-        GRAPH.add_context(assertion, context)
+        edge = make_edge(rel, left, 'en', right, 'en', '/d/verbosity',
+                         '/l/CC/By', sources, surfaceText=text,
+                         weight = score/10.0)
+        writer.write(edge)
 
 print counts
+
+if make_json:
+    writer.close()
 
 flag_out.close()
 good_out.close()

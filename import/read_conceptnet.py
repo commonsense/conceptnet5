@@ -1,9 +1,7 @@
 from csc_utils.batch import queryset_foreach
 from conceptnet.models import Sentence, Assertion, RawAssertion
-from conceptnet5.graph import JSONWriterGraph
+from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri
-from conceptnet5.solr import make_assertion, write_assertion, write_header, write_footer
-from conceptnet5.english_nlp import normalize as en_normalize
 import simplenlp
 
 #JA = simplenlp.get('ja')
@@ -12,7 +10,9 @@ import simplenlp
 #    return False
 #JA.is_stopword_record = answer_false
 
-def put_raw_assertion_in_file(raw, file):
+LICENSE = '/l/CC/By'
+
+def handle_raw_assertion(raw, writer):
     try:
         lang = raw.language_id
         if raw.frame.goodness < 1: return
@@ -50,14 +50,13 @@ def put_raw_assertion_in_file(raw, file):
                              normalize_uri(u'/s/activity/omcs/vote')], vote.vote))
 
         for source_list, weight in sources:
-            assertion = make_assertion(relation, startText, lang, endText, lang, dataset, source_list, frame_text, weight=weight)
-            write_assertion(assertion, file)
+            edge = make_edge(relation, startText, lang, endText, lang, dataset, LICENSE, source_list, frame_text, weight=weight)
+            writer.write(edge)
     except Exception:
         import traceback
         traceback.print_exc()
 
 if __name__ == '__main__':
-    file = open('solr_json/conceptnet4.json', 'w')
-    write_header(file)
-    queryset_foreach(RawAssertion.objects.filter(), lambda item: put_raw_assertion_in_file(item, file))
-    write_footer(file)
+    writer = MultiWriter('conceptnet4')
+    queryset_foreach(RawAssertion.objects.filter(), lambda item: handle_raw_assertion(item, writer))
+    writer.close()

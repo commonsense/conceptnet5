@@ -1,23 +1,25 @@
-from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_assertion_uri, normalize_uri, normalize_arbitrary_text, concept_to_lemmas
+from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas
 from hashlib import sha1
 import json, os
 
 def make_edge(rel, startText, startLang, endText, endLang,
-              dataset, license, sources, surfaceText=None,
-              weight=1.0):
+              dataset, license, sources, context='/ctx/all',
+              surfaceText=None, weight=1.0):
     """
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary from.
     """
-    start = normalize_arbitrary_text(startText, startLang)
-    end = normalize_arbitrary_text(endText, endLang)
+    start = make_concept_uri(startText, startLang)
+    end = make_concept_uri(endText, endLang)
     features = [
         "%s %s -" % (start, rel),
         "%s - %s" % (start, end),
         "- %s %s" % (rel, end)
     ]
     uri = make_assertion_uri(rel, [start, end], short=True)
-    edge_unique = (uri+'|'+('|'.join(sources))).encode('utf-8')
+    sources.sort()
+    edge_unique_data = [uri, context] + sources
+    edge_unique = u' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     obj = {
         'id': id,
@@ -25,10 +27,13 @@ def make_edge(rel, startText, startLang, endText, endLang,
         'rel': rel,
         'start': start,
         'end': end,
+        'context': context,
         'dataset': dataset,
         'sources': sources,
         'features': features,
-        'weight': weight
+        'license': license,
+        'weight': weight,
+        'surfaceText': surfaceText
     }
     return obj
 
@@ -67,7 +72,6 @@ class SolrEdgeWriter(FlatEdgeWriter):
     and a 'commit' key at the end. This is a format that Solr is good at
     importing.
     """
-
     def write_header(self):
         print >> self.out, '{'
 
@@ -75,18 +79,18 @@ class SolrEdgeWriter(FlatEdgeWriter):
         print >> self.out, '  commit: {},'
         print >> self.out, '}'
     
-    def write_edge(self, edge):
+    def write(self, edge):
         edge = dict(edge)
-        startLemmas = concept_to_lemmas(edge['start'])
-        endLemmas = concept_to_lemmas(edge['end'])
-        relLemmas = concept_to_lemmas(edge['rel'])
+        startLemmas = ' '.join(concept_to_lemmas(edge['start']))
+        endLemmas = ' '.join(concept_to_lemmas(edge['end']))
+        relLemmas = ' '.join(concept_to_lemmas(edge['rel']))
 
         edge['startLemmas'] = startLemmas
         edge['endLemmas'] = endLemmas
         if relLemmas:
             edge['relLemmas'] = relLemmas
 
-        json_struct = json.dumps(edge, indent=2)
+        json_struct = json.dumps({'add': {'doc': edge, 'boost': edge['weight']}}, indent=2)
         self.out.write(json_struct[2:-2]+',\n')
 
 class MultiWriter(object):

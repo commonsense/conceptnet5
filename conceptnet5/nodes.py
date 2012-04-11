@@ -1,16 +1,19 @@
-def normalize_arbitrary_text(text, lang):
+def make_concept_uri(text, lang):
     if lang == 'en':
         from metanl import english
         normalized, disambig = english.normalize_topic(text)
     elif lang == 'ja':
         from metanl import japanese
         normalized, disambig = japanese.normalize(text), None
-    else:
+    elif lang in ('pt', 'hu', 'nl', 'es'):
+        # languages where we know the stopword list
         import simplenlp
         nlp = simplenlp.get(lang)
-        normalized_list = [item for item in nlp.normalize(text).split()
         disambig = None
         normalized, disambig = nlp.normalize(text), None
+    else:
+        normalized = text
+        disambig = None
     if disambig:
         return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
     else:
@@ -117,8 +120,9 @@ def concept_to_lemmas(concept):
         lang = parts[2]
         if len(parts) > 3:
             # get the concept name
-            lemmas.extend(parts[3].replace('_', ' '))
+            lemmas.extend(parts[3].replace('_', ' ').split())
         if len(parts) > 5:
-            norm = normalize_arbitrary_text(parts[5], lang)
+            norm = make_concept_uri(parts[5], lang)
+            lemmas.extend(norm.split())
     return lemmas
 
