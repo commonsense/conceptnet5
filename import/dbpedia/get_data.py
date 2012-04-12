@@ -11,10 +11,16 @@ import urllib
 import urllib2
 
 source = '/s/web/dbpedia.org'
-
-writer = MultiWriter('dbpedia')
+WRITER_NUM = 1
+writer = MultiWriter('dbpedia.%d' % WRITER_NUM)
 sw_map = FlatEdgeWriter('data/sw/dbpedia.map.json')
 sw_map_used = set()
+
+def cycle_writer():
+    global writer, WRITER_NUM
+    writer.close()
+    WRITER_NUM += 1
+    writer = MultiWriter('dbpedia.%d' % WRITER_NUM)
 
 VERBOSE = True
 def show_message(message):
@@ -36,7 +42,12 @@ def map_web_relation(url):
         return result[0].upper() + result[1:]
 
 def handle_file(filename):
+    count = 0
     for line in open(filename):
+        count += 1
+        if count == 1000000:
+            cycle_writer()
+            count = 0
         handle_triple(line.strip())
 
 def handle_triple(line):

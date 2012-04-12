@@ -74,7 +74,7 @@ class SolrEdgeWriter(FlatEdgeWriter):
         print >> self.out, '{'
 
     def write_footer(self):
-        print >> self.out, '  commit: {},'
+        print >> self.out, '  "commit": {}'
         print >> self.out, '}'
     
     def write(self, edge):
@@ -100,6 +100,7 @@ class MultiWriter(object):
         self.solr_writer = SolrEdgeWriter('data/solr/%s.json' % basename)
         self.writers = [self.flat_writer, self.solr_writer]
         self.open = True
+        self.write_header()
 
     def write_header(self):
         for writer in self.writers:
@@ -118,3 +119,6 @@ class MultiWriter(object):
         for writer in self.writers:
             writer.write(edge)
 
+    def __del__(self):
+        if self.open:
+            self.close()
