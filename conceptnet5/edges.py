@@ -2,15 +2,13 @@ from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_asserti
 from hashlib import sha1
 import json, os
 
-def make_edge(rel, startText, startLang, endText, endLang,
+def make_edge(rel, start, end,
               dataset, license, sources, context='/ctx/all',
               surfaceText=None, weight=1.0):
     """
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary from.
     """
-    start = make_concept_uri(startText, startLang)
-    end = make_concept_uri(endText, endLang)
     features = [
         "%s %s -" % (start, rel),
         "%s - %s" % (start, end),

@@ -1,6 +1,7 @@
 from itertools import chain
 from collections import defaultdict
-from conceptnet5.graph import JSONWriterGraph
+from conceptnet5.nodes import make_concept_uri
+from conceptnet5.edges import make_edge, MultiWriter, FlatEdgeWriter
 import re
 
 mapping = {}
@@ -114,7 +115,7 @@ for synset in synset_senses:
     #        disambig = glossary[synset]
     #if disambig is None:
     #    disambig = '*'
-    node = ('en', synset_name, pos+'/'+disambig)
+    node = make_concept_uri(synset_name, 'en', pos+'/'+disambig)
     if synset not in mapping:
         mapping[synset] = node
         #print "%s -> %s" % (synset_name, node)
@@ -123,9 +124,10 @@ for synset in synset_senses:
 for sense, synset in sense_synsets.items():
     mapping[sense] = mapping[synset]
 
-GRAPH = JSONWriterGraph('../json_data/wordnet')
-source = GRAPH.get_or_create_node('/source/wordnet/3.0')
-GRAPH.justify('/', source, 10)
+sources = ['/s/wordnet/3.0']
+writer = MultiWriter('wordnet3')
+sw_map = FlatEdgeWriter('data/sw/wordnet30.map.json')
+sw_map_used = set()
 
 for line in chain(
     open('wordnet-attribute.ttl'),
@@ -165,17 +167,21 @@ for line in chain(
     else:
         pred = pred_label
 
-    raw = GRAPH.get_or_create_assertion(
-        GRAPH.get_or_create_web_concept(web_rel),
-        [GRAPH.get_or_create_web_concept(web_subj), GRAPH.get_or_create_web_concept(web_obj)],
-        {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': False}
+    if (web_rel, pred) not in sw_map_used:
+        sw_map.write({'from': web_rel, 'to': pred})
+    if (web_subj, subj) not in sw_map_used:
+        sw_map.write({'from': web_subj, 'to': subj})
+    if (web_obj, obj) not in sw_map_used:
+        sw_map.write({'from': web_obj, 'to': obj})
+
+    edge = make_edge(
+        pred, subj, obj, '/d/wordnet/3.0',
+        license='/l/CC/By', sources=sources,
+        context='/ctx/all', weight=2.0
     )
-    assertion = GRAPH.get_or_create_assertion(
-        GRAPH.get_or_create_relation(pred),
-        [GRAPH.get_or_create_concept(*subj), GRAPH.get_or_create_concept(*obj)],
-        {'dataset': 'wordnet/en/3.0', 'license': 'CC-By', 'normalized': True}
-    )
-    GRAPH.justify(source, raw)
-    GRAPH.derive_normalized(raw, assertion)
-    print assertion
+    writer.write(edge)
+    print edge
+
+writer.close()
+sw_map.close()
 

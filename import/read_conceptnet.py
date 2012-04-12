@@ -1,7 +1,7 @@
 from csc_utils.batch import queryset_foreach
 from conceptnet.models import Sentence, Assertion, RawAssertion
 from conceptnet5.edges import MultiWriter, make_edge
-from conceptnet5.nodes import normalize_uri
+from conceptnet5.nodes import normalize_uri, make_concept_uri
 import simplenlp
 
 #JA = simplenlp.get('ja')
@@ -50,7 +50,9 @@ def handle_raw_assertion(raw, writer):
                              normalize_uri(u'/s/activity/omcs/vote')], vote.vote))
 
         for source_list, weight in sources:
-            edge = make_edge(relation, startText, lang, endText, lang, dataset, LICENSE, source_list, frame_text, weight=weight)
+            start = make_concept_uri(startText, lang)
+            end = make_concept_uri(endText, lang)
+            edge = make_edge(relation, start, end, dataset, LICENSE, source_list, frame_text, weight=weight)
             writer.write(edge)
     except Exception:
         import traceback

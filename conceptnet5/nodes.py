@@ -1,4 +1,4 @@
-def make_concept_uri(text, lang):
+def make_concept_uri(text, lang, disambiguation):
     if lang == 'en':
         from metanl import english
         normalized, disambig = english.normalize_topic(text)
@@ -14,6 +14,8 @@ def make_concept_uri(text, lang):
     else:
         normalized = text
         disambig = None
+    if disambiguation is not None:
+        disambig = disambiguation
     if disambig:
         return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
     else:
