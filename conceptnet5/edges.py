@@ -88,6 +88,9 @@ class SolrEdgeWriter(FlatEdgeWriter):
         if relLemmas:
             edge['relLemmas'] = relLemmas
 
+        if 'surfaceText' in edge and edge['surfaceText'] is None:
+            del edge['surfaceText']
+
         json_struct = json.dumps({'add': {'doc': edge, 'boost': edge['weight']}}, indent=2)
         self.out.write(json_struct[2:-2]+',\n')
 

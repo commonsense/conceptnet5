@@ -3,17 +3,12 @@
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
-from conceptnet5.graph import JSONWriterGraph
-from conceptnet5.english_nlp import normalize
+from metanl import english
+from conceptnet5.nodes import make_concept_uri
+from conceptnet5.edges import MultiWriter, make_edge
 import unicodedata
 import re
 import sys
-
-def english_normalize(text):
-    if text.startswith('to '):
-        text = text[3:]
-    result = normalize(unicodedata.normalize('NFKC', text))
-    return result
 
 def ascii_enough(text):
     # cheap assumption: if it's ASCII, and it's meant to be in English, it's
@@ -116,6 +111,12 @@ LANGUAGES = {
     u'日本語': 'ja'
 }
 
+SOURCE = '/s/web/en.wiktionary.org'
+INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
+MONOLINGUAL = '/s/rule/wiktioary_monolingual_definitions'
+TRANSLATE = '/s/rule/wiktionary_translation_tables'
+DEFINE = '/s/rule/wiktionary_define_senses'
+
 class FindTranslations(ContentHandler):
     def __init__(self):
         self.lang = None
@@ -127,24 +128,7 @@ class FindTranslations(ContentHandler):
         self.curText = ''
         self.locales = []
         self.curRelation = None
-
-        self.graph = JSONWriterGraph('../json_data/wiktionary_all')
-
-        source = self.graph.get_or_create_node('/source/web/en.wiktionary.org')
-        rule = self.graph.get_or_create_node('/source/rule/wiktionary_interlingual_definitions')
-        monolingual_rule = self.graph.get_or_create_node('/source/rule/wiktionary_monolingual_definitions')
-        wordsense_rule = self.graph.get_or_create_node('/source/rule/wiktionary_translation_tables')
-        sense_define_rule = self.graph.get_or_create_node('/source/rule/wiktionary_define_senses')
-        self.graph.justify('/', source)
-        self.graph.justify('/', rule)
-        self.graph.justify('/', monolingual_rule)
-        self.graph.justify('/', wordsense_rule)
-        self.graph.justify('/', sense_define_rule)
-
-        self.conjunction = self.graph.get_or_create_conjunction([source, rule])
-        self.monolingual_conjunction = self.graph.get_or_create_conjunction([source, monolingual_rule])
-        self.wordsense_conjunction = self.graph.get_or_create_conjunction([source, wordsense_rule])
-        self.defn_conjunction = self.graph.get_or_create_conjunction([source, sense_define_rule])
+        self.writer = MultiWriter('wiktionary')
 
     def startElement(self, name, attrs):
         if name == 'page':
@@ -232,8 +216,6 @@ class FindTranslations(ContentHandler):
                 self.curSense = None
             else:
                 self.curSense = pos+'/'+sense
-                if self.lang == 'English':
-                    self.output_sense(title, self.curSense)
         elif trans_tag_match:
             lang = trans_tag_match.group(1)
             translation = trans_tag_match.group(2)
@@ -254,19 +236,17 @@ class FindTranslations(ContentHandler):
     def output_monolingual(self, lang, relation, term1, term2):
         if 'Wik' in term1 or 'Wik' in term2:
             return
-        source = self.graph.get_or_create_concept(lang, term1)
+        source = make_concept_uri(term1, lang)
         if self.pos:
-            target = self.graph.get_or_create_concept(lang, term2, self.pos)
+            target = make_concept_uri(term2, lang, self.pos)
         else:
-            target = self.graph.get_or_create_concept(lang, term2)
-        relation = self.graph.get_or_create_relation(relation)
-        assertion = self.graph.get_or_create_assertion(
-          relation, [source, target],
-          {'dataset': 'wiktionary/en/%s' % lang,
-           'license': 'CC-By-SA', 'normalized': False}
-        )
-        self.graph.justify(self.monolingual_conjunction, assertion)
-        print unicode(assertion).encode('utf-8')
+            target = make_concept_uri(term2, lang)
+        edge = make_edge(relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
+                         license='/l/CC/By-SA',
+                         sources=[SOURCE, MONOLINGUAL],
+                         context='/ctx/all',
+                         weight=1.5)
+        self.writer.write(edge)
 
     def output_sense_translation(self, lang, foreign, english, disambiguation):
         if 'Wik' in foreign or 'Wik' in english:
@@ -275,76 +255,35 @@ class FindTranslations(ContentHandler):
             lang = 'zh_CN'
         elif lang == 'zh-tw':
             lang = 'zh_TW'
-        source = self.graph.get_or_create_concept(
-          lang,
-          unicodedata.normalize('NFKC', foreign)
+        source = make_concept_uri(
+          unicodedata.normalize('NFKC', foreign), lang
         )
-        target = self.graph.get_or_create_concept(
-          'en', english, disambiguation
+        target = make_concept_uri(
+          english, 'en', disambiguation
         )
-        relation = self.graph.get_or_create_relation(
-          'TranslationOf'
-        )
-        assertion = self.graph.get_or_create_assertion(
-          relation, [source, target],
-          {'dataset': 'wiktionary/en/%s' % lang,
-           'license': 'CC-By-SA', 'normalized': False}
-        )
-        self.graph.justify(self.conjunction, assertion)
+        relation = '/r/TranslationOf'
+        edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
+                         license='/l/CC/By-SA',
+                         sources=[SOURCE, TRANSLATE],
+                         context='/ctx/all',
+                         weight=1.5)
+        self.writer.write(edge)
         
-    def output_sense(self, english, disambiguation):
-        source = self.graph.get_or_create_concept(
-          'en', english, disambiguation
-        )
-        definition = self.graph.get_or_create_concept(
-          'en', disambiguation[2:]
-        )
-        definition_norm = self.graph.get_or_create_concept(
-          'en', english_normalize(disambiguation[2:])
-        )
-        relation = self.graph.get_or_create_relation(
-          'DefinedAs'
-        )
-        assertion = self.graph.get_or_create_assertion(
-          relation, [source, definition],
-          {'dataset': 'wiktionary/en/en',
-           'license': 'CC-By-SA', 'normalized': False}
-        )
-        norm_assertion = self.graph.get_or_create_assertion(
-          relation, [source, definition_norm],
-          {'dataset': 'wiktionary/en/en',
-           'license': 'CC-By-SA', 'normalized': True}
-        )
-
-        self.graph.justify(self.defn_conjunction, assertion)
-        self.graph.derive_normalized(assertion, norm_assertion)
-
     def output_translation(self, foreign, english, locale=''):
-        source = self.graph.get_or_create_concept(
-          self.langcode+locale,
-          unicodedata.normalize('NFKC', foreign)
+        source = make_concept_uri(
+          unicodedata.normalize('NFKC', foreign),
+          self.langcode+locale
         )
-        target = self.graph.get_or_create_concept(
-          'en', english
+        target = make_concept_uri(
+          english, 'en'
         )
-        relation = self.graph.get_or_create_relation(
-          'TranslationOf'
-        )
-        assertion = self.graph.get_or_create_assertion(
-          relation, [source, target],
-          {'dataset': 'wiktionary/en/%s' % self.langcode,
-           'license': 'CC-By-SA', 'normalized': False}
-        )
-        target_normal = self.graph.get_or_create_concept(
-          'en', english_normalize(english)
-        )
-        assertion_normal = self.graph.get_or_create_assertion(
-          relation, [source, target_normal],
-          {'dataset': 'wiktionary/%s' % self.langcode,
-           'license': 'CC-By-SA', 'normalized': True}
-        )
-        self.graph.justify(self.conjunction, assertion)
-        self.graph.derive_normalized(assertion, assertion_normal)
+        relation = '/r/TranslationOf'
+        edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % self.langcode,
+                         license='/l/CC/By-SA',
+                         sources=[SOURCE, INTERLINGUAL],
+                         context='/ctx/all',
+                         weight=1.5)
+        self.writer.write(edge)
 
 def filter_line(line):
     line = re.sub(r"\{\{.*?\}\}", "", line)

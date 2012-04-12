@@ -1,4 +1,4 @@
-def make_concept_uri(text, lang, disambiguation):
+def make_concept_uri(text, lang, disambiguation=None):
     if lang == 'en':
         from metanl import english
         normalized, disambig = english.normalize_topic(text)
@@ -15,7 +15,7 @@ def make_concept_uri(text, lang, disambiguation):
         normalized = text
         disambig = None
     if disambiguation is not None:
-        disambig = disambiguation
+        disambig = disambiguation.replace(' ', '_')
     if disambig:
         return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
     else:
@@ -124,7 +124,8 @@ def concept_to_lemmas(concept):
             # get the concept name
             lemmas.extend(parts[3].replace('_', ' ').split())
         if len(parts) > 5:
-            norm = make_concept_uri(parts[5], lang)
-            lemmas.extend(norm.split())
+            uri = make_concept_uri(parts[5], lang)
+            norm = uri.split('/')[3]
+            lemmas.extend(norm.split('_'))
     return lemmas
 

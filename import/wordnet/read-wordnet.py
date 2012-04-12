@@ -101,7 +101,7 @@ for synset in synset_senses:
     synset_name = labels[synset]
     synset_pos = synset.split('-')[-2]
     pos = parts_of_speech[synset_pos]
-    disambig = glossary[synset]
+    disambig = glossary[synset].replace('/', '_')
     # TODO: take into account domains, etc.
     #
     #if len(sense_name_synsets[synset_name]) > 1:
@@ -118,7 +118,6 @@ for synset in synset_senses:
     node = make_concept_uri(synset_name, 'en', pos+'/'+disambig)
     if synset not in mapping:
         mapping[synset] = node
-        #print "%s -> %s" % (synset_name, node)
 
 # Map senses to the same nodes.
 for sense, synset in sense_synsets.items():
@@ -163,9 +162,9 @@ for line in chain(
             web_subj, web_obj = web_obj, web_subj
             web_rel = web_rel.replace('meronym', 'holonym')
             mapped = mapped[1:]
-        pred = mapped
+        pred = '/r/'+mapped
     else:
-        pred = pred_label
+        pred = '/r/wordnet/'+pred_label
 
     if (web_rel, pred) not in sw_map_used:
         sw_map.write({'from': web_rel, 'to': pred})
@@ -180,7 +179,6 @@ for line in chain(
         context='/ctx/all', weight=2.0
     )
     writer.write(edge)
-    print edge
 
 writer.close()
 sw_map.close()
