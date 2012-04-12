@@ -4,35 +4,26 @@ Get data from DBPedia.
 
 __author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
-from conceptnet5.graph import JSONWriterGraph
-from conceptnet5.english_nlp import normalize_topic, un_camel_case
+from metanl.english import normalize_topic, un_camel_case
+from conceptnet5.nodes import make_concept_uri, normalize_uri
+from conceptnet5.edges import make_edge, MultiWriter, FlatEdgeWriter
 import urllib
 import urllib2
 
-GRAPH = JSONWriterGraph('../json_data/dbpedia_data')
+source = '/s/web/dbpedia.org'
 
-DBPEDIA_SOURCE = GRAPH.get_or_create_node('/source/web/dbpedia.org')
-GRAPH.justify('/', DBPEDIA_SOURCE)
-
-TYPE_ASSERTION_PROPERTIES = {
-    'dataset':u'dbpedia',
-    'license':u'CC-By-SA',
-    'normalized':'False'
-}
-NORM_ASSERTION_PROPERTIES = {
-    'dataset':u'dbpedia',
-    'license':u'CC-By-SA',
-    'normalized':'False'
-}
+writer = MultiWriter('dbpedia')
+sw_map = FlatEdgeWriter('data/sw/dbpedia.map.json')
+sw_map_used = set()
 
 VERBOSE = True
 def show_message(message):
   if VERBOSE:
     print message
 
-def normalize_topic_url(url):
+def translate_wp_url(url):
     url = urllib.unquote(url).decode('utf-8', 'ignore')
-    return normalize_topic(un_camel_case(url.strip('/').split('/')[-1].split('#')[-1]))
+    return un_camel_case(url.strip('/').split('/')[-1].split('#')[-1])
 
 def map_web_relation(url):
     url = urllib.unquote(url).decode('utf-8', 'ignore')
@@ -56,20 +47,27 @@ def handle_triple(line):
         items[i] = items[i][1:-1]
     subj, pred, obj = items[:3]
     if 'foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or '__' in subj or '__' in obj: return
-    concept1, web_rel, concept2 = [GRAPH.get_or_create_web_concept(url) for url in items[:3]]
-    assertion = GRAPH.get_or_create_assertion(
-        web_rel, [concept1, concept2],
-        properties=TYPE_ASSERTION_PROPERTIES
-    )
-    norm1 = GRAPH.get_or_create_concept('en', *normalize_topic_url(subj))
-    norm2 = GRAPH.get_or_create_concept('en', *normalize_topic_url(obj))
-    rel = GRAPH.get_or_create_relation(map_web_relation(web_rel))
-    norm_assertion = GRAPH.get_or_create_assertion(
-        rel, [norm1, norm2],
-        properties=NORM_ASSERTION_PROPERTIES
-    )
-    GRAPH.justify(DBPEDIA_SOURCE, assertion)
-    GRAPH.derive_normalized(assertion, norm_assertion)
+    subj_concept = make_concept_uri(translate_wp_url(subj), 'en')
+    obj_concept = make_concept_uri(translate_wp_url(obj), 'en')
+    rel = normalize_uri('/r/'+map_web_relation(pred))
+
+    if (pred, rel) not in sw_map_used:
+        sw_map_used.add((pred, rel))
+        sw_map.write({'from': pred, 'to': rel})
+    if (subj, subj_concept) not in sw_map_used:
+        sw_map_used.add((subj, subj_concept))
+        sw_map.write({'from': subj, 'to': subj_concept})
+    if (obj, obj_concept) not in sw_map_used:
+        sw_map_used.add((obj, obj_concept))
+        sw_map.write({'from': obj, 'to': obj_concept})
+
+    edge = make_edge(rel, subj_concept, obj_concept,
+                     dataset='/d/dbpedia/en',
+                     license='/l/CC/By-SA',
+                     sources=['/s/dbpedia/3.7'],
+                     context='/ctx/all',
+                     weight=0.5)
+    writer.write(edge)
 
 def main():
     #handle_file('mappingbased_properties_en.nt')

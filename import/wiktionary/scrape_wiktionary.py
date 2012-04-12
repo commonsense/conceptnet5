@@ -6,7 +6,9 @@ from xml.sax.handler import feature_namespaces
 from metanl import english
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import MultiWriter, make_edge
+from conceptnet5.iso639 import langs
 import unicodedata
+import string
 import re
 import sys
 
@@ -241,11 +243,15 @@ class FindTranslations(ContentHandler):
             target = make_concept_uri(term2, lang, self.pos)
         else:
             target = make_concept_uri(term2, lang)
-        edge = make_edge(relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
+        surfaceText = "[[%s]] %s [[%s]]" % (term1, relation, term2)
+        print surfaceText
+
+        edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
                          license='/l/CC/By-SA',
                          sources=[SOURCE, MONOLINGUAL],
                          context='/ctx/all',
-                         weight=1.5)
+                         weight=1.5,
+                         surfaceText=surfaceText)
         self.writer.write(edge)
 
     def output_sense_translation(self, lang, foreign, english, disambiguation):
@@ -262,6 +268,12 @@ class FindTranslations(ContentHandler):
           english, 'en', disambiguation
         )
         relation = '/r/TranslationOf'
+        try:
+            surfaceRel = "is %s for" % (langs.english_name(lang))
+        except KeyError:
+            surfaceRel = "is [language %s] for" % lang
+        surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
+        print surfaceText
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
                          license='/l/CC/By-SA',
                          sources=[SOURCE, TRANSLATE],
@@ -278,6 +290,11 @@ class FindTranslations(ContentHandler):
           english, 'en'
         )
         relation = '/r/TranslationOf'
+        try:
+            surfaceRel = "is %s for" % (langs.english_name(self.langcode))
+        except KeyError:
+            surfaceRel = "is [language %s] for" % self.langcode
+        surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % self.langcode,
                          license='/l/CC/By-SA',
                          sources=[SOURCE, INTERLINGUAL],

@@ -52,7 +52,7 @@ def handle_raw_assertion(raw, writer):
         for source_list, weight in sources:
             start = make_concept_uri(startText, lang)
             end = make_concept_uri(endText, lang)
-            edge = make_edge(relation, start, end, dataset, LICENSE, source_list, frame_text, weight=weight)
+            edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
             writer.write(edge)
     except Exception:
         import traceback
