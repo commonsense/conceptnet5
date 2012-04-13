@@ -278,7 +278,8 @@ class FindTranslations(ContentHandler):
                          license='/l/CC/By-SA',
                          sources=[SOURCE, TRANSLATE],
                          context='/ctx/all',
-                         weight=1.5)
+                         weight=1.5,
+                         surfaceText=surfaceText)
         self.writer.write(edge)
         
     def output_translation(self, foreign, english, locale=''):
@@ -299,7 +300,8 @@ class FindTranslations(ContentHandler):
                          license='/l/CC/By-SA',
                          sources=[SOURCE, INTERLINGUAL],
                          context='/ctx/all',
-                         weight=1.5)
+                         weight=1.5,
+                         surfaceText=surfaceText)
         self.writer.write(edge)
 
 def filter_line(line):
