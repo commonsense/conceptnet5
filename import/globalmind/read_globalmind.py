@@ -17,11 +17,32 @@ lang_codes = {
 
 lang_names = {
     'eng': 'English',
+    'en': 'English',
     'cht': 'Traditional Chinese',
+    'zh_TW': 'Traditional Chinese',
     'chs': 'Simplified Chinese',
+    'zh_CN': 'Simplified Chinese',
     'jpn': 'Japanese',
+    'ja': 'Japanese',
     'kor': 'Korean',
+    'ko': 'Korean',
     'spa': 'Spanish',
+    'es': 'Spanish'
+}
+
+rel_change = {
+    'ThematicKLine': 'RelatedTo',
+    'EffectOf': 'Causes',
+    'MotivationOf': 'MotivatedByGoal',
+    'DesirousEffectOf': 'CausesDesire',
+    'OnEvent': 'HasSubevent',
+    'NotDesireOf': 'NotDesires',
+    'FirstSubeventOf': 'HasFirstSubevent',
+    'LastSubeventOf': 'HasLastSubevent',
+    'SubeventOf': 'HasSubevent',
+    'PrerequisiteEventOf': 'HasPrerequisite',
+    'PropertyOf': 'HasProperty',
+    'LocationOf': 'AtLocation',
 }
 
 for userinfo in userdata:
@@ -51,6 +72,20 @@ for assertion in assertiondata:
     start = make_concept_uri(obj['node1'], lang)
     end = make_concept_uri(obj['node2'], lang)
     rel = '/r/'+frame['relation']
+    
+    # fix messy english "around in"
+    if ' around ' in frametext:
+        if obj['node2'].startswith('in '):
+            frametext = frametext.replace(' around ', ' in ')
+            obj['node2'] = obj['node2'][3:]
+        else:
+            frametext = frametext.replace(' around ', ' near ')
+            rel = '/r/LocatedNear'
+    
+    # fix more awkward English. I wonder how bad the other languages are.
+    frametext = frametext.replace('hits your head', 'comes to mind')
+    frametext = frametext.replace(': [node1], [node2]', ' [node1] and [node2]')
+
     node1 = u'[[' + obj['node1'] + u']]'
     node2 = u'[[' + obj['node2'] + u']]'
     surfaceText = frametext.replace('//', '').replace('[node1]', node1).replace('[node2]', node2)
