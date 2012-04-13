@@ -18,7 +18,7 @@ for filename in os.listdir('.'):
                 relation = frame.relation.name
                 rel = '/r/'+relation
 
-                surfaceText = frame.replace(u'{1}', u'[['+concept1+u']]').replace(u'{2}', u'[['+concept2+u']]')
+                surfaceText = ftext.replace(u'{1}', u'[['+concept1+u']]').replace(u'{2}', u'[['+concept2+u']]')
                 start = make_concept_uri(concept1, 'zh_TW')
                 end = make_concept_uri(concept2, 'zh_TW')
                 sources = ['/s/contributor/petgame/'+user, '/s/activity/ntt/petgame']

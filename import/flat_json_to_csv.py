@@ -2,6 +2,8 @@ import json
 import codecs
 
 def convert_to_tab_separated(name):
+    if name.endswith('.json'):
+        name = name[:-5]
     infile = open('%s.json' % name)
     outfile = codecs.open('%s.csv' % name, 'w', encoding='utf-8')
     print >> outfile, "uri\trel\tstart\tend\tcontext\tweight\tsources\tid"
