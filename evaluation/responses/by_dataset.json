@@ -7,21 +7,13 @@
     "true": 51.0, 
     "vague": 7.0
   }, 
-  "disputed": {
-    "false": 8.0, 
+  "/d/wiktionary/other": {
+    "false": 4.0, 
     "sometimes": 8.0, 
     "nonsense": 6.0, 
-    "dontknow": 160.0, 
-    "true": 38.0, 
+    "dontknow": 233.0, 
+    "true": 51.0, 
     "vague": 2.0
-  }, 
-  "/d/wiktionary/other": {
-    "false": 2.0, 
-    "sometimes": 4.0, 
-    "nonsense": 1.0, 
-    "dontknow": 128.0, 
-    "true": 36.0, 
-    "vague": 1.0
   }, 
   "/d/globalmind": {
     "false": 1.0, 
@@ -30,12 +22,15 @@
     "nonsense": 2.0
   }, 
   "/d/conceptnet/4/en": {
-    "false": 32.0, 
-    "sometimes": 116.0, 
-    "nonsense": 51.0, 
+    "false": 34.0, 
+    "sometimes": 117.0, 
+    "nonsense": 50.0, 
     "dontknow": 15.0, 
-    "true": 302.0, 
-    "vague": 36.0
+    "true": 300.0, 
+    "vague": 37.0
+  }, 
+  "/d/globalmind/tr": {
+    "dontknow": 4.0
   }, 
   "/d/reverb/wp_frontpage": {
     "false": 2.0, 
@@ -47,14 +42,17 @@
   }, 
   "/d/dbpedia/en": {
     "false": 16.0, 
-    "sometimes": 39.0, 
-    "nonsense": 29.0, 
-    "dontknow": 338.0, 
-    "true": 215.0, 
+    "sometimes": 41.0, 
+    "nonsense": 30.0, 
+    "dontknow": 389.0, 
+    "true": 238.0, 
     "vague": 9.0
   }, 
   "negated": {
-    "nonsense": 1.0
+    "true": 2.0, 
+    "sometimes": 1.0, 
+    "false": 4.0, 
+    "nonsense": 2.0
   }, 
   "/d/wordnet/3.0": {
     "false": 4.0, 
