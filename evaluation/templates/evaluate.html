@@ -1,14 +1,21 @@
 <!doctype html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css"
-    href="static/bootstrap/css/boostrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
     <title>ConceptNet 5 Evaluation</title>
+    <style>
+      .statement {font-size: 125%; margin-top: 2em; margin-bottom: 0.5em}
+      .statement > b {color: #446}
+      h1 { margin-bottom: 0.4em; }
+      h2 { margin-top: 1em; }
+      body { padding-top: 1em; }
+    </style>
 </head>
 <body>
 
 <div class="container">
   <h1>ConceptNet 5 Evaluation</h1>
+  <div>
   <p>This page will be showing a variety of statements from different knowledge
   sources -- some of them good, some of them bad.</p>
   <p>Please rate the statements according to whether they are correct and would
@@ -16,13 +23,14 @@
   <p>This isn't a quiz; you're entitled to answer "I don't know" or to look up
   a statement on the Web if you choose. In particular, feel free to do either
   if the statement asks about a language you don't know.</p>
+  </div>
 
   <h2>The statements</h2>
   <form id="eval-form" method="POST" action="/respond">
   {% for statement in statements %}
   
   <div class="statement-eval">
-    <div class="statement">{{statement['display']|safe}}</div>
+    <div class="statement">{{statement['text']|safe}}</div>
     <div class="control-group">
       <div class="controls">
         <input type="hidden" name="dataset-{{statement['id']}}"
@@ -35,15 +43,15 @@
         </label>
         <label class="radio">
           <input type="radio" name="rating-{{statement['id']}}" id="rating-sometimes-{{statement['id']}}" value="sometimes">
-          True in some situations
+          Somewhat true
         </label>
         <label class="radio">
-          <input type="radio" name="rating-{{statement['id']}}" id="rating-dontknow-{{statement['id']}}" value="dontknow" checked>
+          <input type="radio" name="rating-{{statement['id']}}" id="rating-dontknow-{{statement['id']}}" value="dontknow">
           I don't know
         </label>
         <label class="radio">
           <input type="radio" name="rating-{{statement['id']}}" id="rating-vague-{{statement['id']}}" value="vague">
-          Too vague to answer
+          Unhelpful or vague
         </label>
         <label class="radio">
           <input type="radio" name="rating-{{statement['id']}}" id="rating-false-{{statement['id']}}" value="false">
@@ -58,7 +66,10 @@
   </div>
   {% endfor %}
   
-  <button type="Submit" class="btn btn-primary">Submit feedback</button>
+  <div class="form-actions">
+    <button type="Submit" class="btn btn-primary">Submit feedback</button>
+  </div>
+
   </form>
 </div>
 
