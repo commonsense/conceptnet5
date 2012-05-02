@@ -5,6 +5,9 @@
 .achievements
 conceptnet5/import*/*.txt
 json_data
+data
+evaluation/responses
+evaluation/data
 enwiktionary.xml
 wikipedia.txt
 verbosity.txt
