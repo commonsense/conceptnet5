@@ -15,7 +15,9 @@ def make_concept_uri(text, lang, disambiguation=None):
         normalized = text
         disambig = None
     if disambiguation is not None:
-        disambig = disambiguation.replace(' ', '_')
+        disambig = disambiguation
+    if disambig is not None:
+        disambig = disambig.replace(' ', '_')
     if disambig:
         return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
     else:

@@ -35,11 +35,13 @@ def map_web_relation(url):
     url = urllib.unquote(url).decode('utf-8', 'ignore')
     result = url.strip('/').split('/')[-1].split('#')[-1]
     if result == 'type':
-        return 'InstanceOf'
-    elif result == 'isPartOf':
+        return 'IsA'
+    elif result.startswith('isPartOf'):
         return 'PartOf'
+    elif result.startswith('location'):
+        return 'AtLocation'
     else:
-        return result[0].upper() + result[1:]
+        return None
 
 def handle_file(filename):
     count = 0
@@ -57,10 +59,13 @@ def handle_triple(line):
             return
         items[i] = items[i][1:-1]
     subj, pred, obj = items[:3]
-    if 'foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or '__' in subj or '__' in obj: return
+    if 'foaf/0.1/homepage' in pred or obj == 'work' or '_Feature' in obj or '#Thing' in obj or '__' in subj or '__' in obj or 'List_of' in subj or 'List_of' in obj: return
     subj_concept = make_concept_uri(translate_wp_url(subj), 'en')
     obj_concept = make_concept_uri(translate_wp_url(obj), 'en')
-    rel = normalize_uri('/r/'+map_web_relation(pred))
+    webrel = map_web_relation(pred)
+    if webrel is None:
+        return
+    rel = normalize_uri('/r/'+webrel)
 
     if (pred, rel) not in sw_map_used:
         sw_map_used.add((pred, rel))
@@ -81,7 +86,7 @@ def handle_triple(line):
     writer.write(edge)
 
 def main():
-    #handle_file('mappingbased_properties_en.nt')
+    handle_file('mappingbased_properties_en.nt')
     handle_file('instance_types_en.nt')
 
 if __name__ == '__main__':

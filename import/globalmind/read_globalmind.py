@@ -71,7 +71,7 @@ for assertion in assertiondata:
     lang = lang_codes[obj['lcode']]
     start = make_concept_uri(obj['node1'], lang)
     end = make_concept_uri(obj['node2'], lang)
-    rel = '/r/'+frame['relation']
+    rel = '/r/'+rel_change.get(frame['relation'], frame['relation'])
     
     # fix messy english "around in"
     if ' around ' in frametext:
