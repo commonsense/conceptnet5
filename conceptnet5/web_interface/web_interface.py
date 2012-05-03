@@ -13,7 +13,6 @@ from flask import render_template
 from flask import request
 from flask import send_from_directory
 from flask import url_for
-from conceptnet5.graph import get_graph
 from metanl.english import normalize
 from conceptnet5.web_interface.utils import data_url
 from conceptnet5.web_interface.utils import uri2name
@@ -27,7 +26,6 @@ DEVELOPMENT = True
 ########################
 
 app = Flask(__name__)
-conceptnet = get_graph()
 
 if DEVELOPMENT:
   web_route = '/web/'
@@ -49,7 +47,7 @@ def search():
     keyword = request.form.get('keyword')
     lang = request.form.get('language')
     keyword = normalize(keyword)
-    return redirect('%sconcept/%s/%s' % (web_route, lang, keyword))
+    return redirect('%sc/%s/%s' % (web_route, lang, keyword))
 
 @app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
 def get_assertion(uri):

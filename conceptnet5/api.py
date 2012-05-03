@@ -134,7 +134,7 @@ def get_query_result(params):
     print "Loading %s" % link
     fp = urllib2.urlopen(link)
     obj = json.load(fp)
-    return flask.jsonify(obj)
+    return flask.jsonify(obj['response'])
 
 @app.route('/')
 def see_documentation():
@@ -151,4 +151,4 @@ if __name__ == '__main__':
     if '--unsafe' in sys.argv:
         app.run(debug=True, host='0.0.0.0', port=5002)
     else:
-        app.run(debug=False)
+        app.run(debug=True, port=5002)
