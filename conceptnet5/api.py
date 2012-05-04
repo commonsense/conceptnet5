@@ -40,21 +40,22 @@ def add_slash(uri):
     else:
         return '/' + uri
 
-def request_limit(ip_address):
+def request_limit(ip_address, amount=1):
     """
-    This function checks the query ip address and ensures that the requests from that
-    address have not passed the query limit
+    This function checks the query ip address and ensures that the requests
+    from that address have not passed the query limit.
     """
     if request_cache.get(ip_address) > cache_dict['limit_amount']:
         return True, flask.Response(
           response=flask.json.dumps({'unauthorized':'rate limit violated'}),
           status=401, mimetype='json')
     else:
-        request_cache.inc(ip_address, 1)
+        request_cache.inc(ip_address, amount)
         return False, None
 
 @app.route('/<path:query>')
 def query_node(query):
+    req_args = flask.request.args
     path = '/'+query.strip('/')
     key = None
     if path.startswith('/c/') or path.startswith('/r/'):
@@ -69,7 +70,13 @@ def query_node(query):
         key = 'sources'
     if key is None:
         flask.abort(404)
-    return search({'nodes': path})
+    query_args = {key: path}
+    
+    # Take some parameters that will be passed on to /search
+    query_args['offset'] = req_args.get('offset', '0')
+    query_args['limit'] = req_args.get('limit', '50')
+    query_args['filter'] = req_args.get('filter', '')
+    return search(query_args)
 
 LUCENE_SPECIAL_RE = re.compile(r'([-+!(){}\[\]^"~*?:\\])')
 
@@ -122,6 +129,8 @@ def search(query_args=None):
     params['indent'] = 'on'
     if sharded:
         params['shards'] = 'localhost:8983/solr,callisto.csc.media.mit.edu:8983/solr'
+    if params['q'] == '':
+        return see_documentation()
     return get_query_result(params)
 
 SOLR_BASE = 'http://amalthea.csc.media.mit.edu:8983/solr/select?'
@@ -134,6 +143,10 @@ def get_query_result(params):
     print "Loading %s" % link
     fp = urllib2.urlopen(link)
     obj = json.load(fp)
+    #obj['response']['params'] = params
+    obj['response']['edges'] = obj['response']['docs']
+    del obj['response']['docs']
+    del obj['response']['start']
     return flask.jsonify(obj['response'])
 
 @app.route('/')
