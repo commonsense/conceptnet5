@@ -81,7 +81,7 @@ def query_node(query):
 LUCENE_SPECIAL_RE = re.compile(r'([-+!(){}\[\]^"~*?:\\])')
 
 def lucene_escape(text):
-    result = LUCENE_SPECIAL_RE.sub(r'\\\1', text)
+    text = LUCENE_SPECIAL_RE.sub(r'\\\1', text)
     if ' ' in text:
         return '"%s"' % text
     else:
