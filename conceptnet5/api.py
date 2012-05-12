@@ -8,15 +8,24 @@ Massachusetts Institute of Technology
 Fall 2011
 """
 
-import string
 import flask
 import urllib, urllib2
 import re
 import sys
 import json
+import numpy as np
 
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
+commonsense_assoc = None
+
+# load Luminoso's assoc code if it's available, because it works very well for
+# this purpose. We may have an open-source alternative in the future.
+try:
+    from luminoso3.background_space import get_commonsense_assoc
+    commonsense_assoc = get_commonsense_assoc('5.1', 150)
+except ImportError:
+    pass
 
 if len(sys.argv) == 1:
     root_url = 'http://conceptnet5.media.mit.edu/data/5.1'
@@ -159,6 +168,53 @@ def see_documentation():
 @app.errorhandler(404)
 def not_found(error):
     return flask.jsonify({'error':'invalid request'})
+
+@app.route('/assoc/text/<lang>/<termlist>')
+def text_assoc(lang, termlist):
+    if commonsense_assoc is None:
+        flask.abort(404)
+    if isinstance(termlist, basestring):
+        termlist = termlist.decode('utf-8')
+
+    terms = []
+    try:
+        term_pieces = termlist.split(',')
+        for piece in term_pieces:
+            piece = piece.strip()
+            if '@' in piece:
+                term, weight = piece.split('@')
+                weight = float(weight)
+            else:
+                term = piece
+                weight = 1.
+            terms.append(('/c/%s/%s' % (lang, term), weight))
+    except ValueError:
+        flask.abort(400)
+    return assoc_for_termlist(terms)
+
+def assoc_for_termlist(terms):
+    limit = flask.request.args.get('limit', '20')
+    limit = int(limit)
+    if limit > 1000: limit=20
+
+    filter = flask.request.args.get('filter')
+    def passes_filter(uri):
+        return filter is None or uri.startswith(filter)
+
+    vec = commonsense_assoc.vector_from_terms(terms)
+    similar = commonsense_assoc.terms_similar_to_vector(vec)
+    similar = [item for item in similar if item[1] > 0 and
+               passes_filter(item[0])][:limit]
+    
+    return flask.jsonify({'terms': terms, 'similar': similar})
+
+@app.route('/assoc/<path:uri>')
+def concept_assoc(uri):
+    uri = '/' + uri.rstrip('/')
+    if commonsense_assoc is None:
+        flask.abort(404)
+    
+    return assoc_for_termlist([(uri, 1.0)])
 
 if __name__ == '__main__':
     if '--unsafe' in sys.argv:
