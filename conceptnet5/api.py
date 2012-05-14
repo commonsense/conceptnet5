@@ -13,19 +13,32 @@ import urllib, urllib2
 import re
 import sys
 import json
+import os
 import numpy as np
 
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
-commonsense_assoc = None
 
+if not app.debug:
+    import logging
+    file_handler = logging.FileHandler('/srv/conceptnet5.1/logs/flask_errors.log')
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+commonsense_assoc = None
 # load Luminoso's assoc code if it's available, because it works very well for
 # this purpose. We may have an open-source alternative in the future.
-try:
-    from luminoso3.background_space import get_commonsense_assoc
-    commonsense_assoc = get_commonsense_assoc('5.1', 150)
-except ImportError:
-    pass
+def load_assoc():
+    global commonsense_assoc
+    if commonsense_assoc: return commonsense_assoc
+    try:
+        from luminoso3.background_space import get_commonsense_assoc
+        app.logger.info("Getting assoc space; env=%s" % os.environ.get('LUMINOSO_DATA'))
+        commonsense_assoc = get_commonsense_assoc('5.1', 150)
+        app.logger.info("Done")
+    except ImportError:
+        app.logger.info("Couldn't import luminoso3; running without similarity measures")
+    return commonsense_assoc
 
 if len(sys.argv) == 1:
     root_url = 'http://conceptnet5.media.mit.edu/data/5.1'
@@ -171,6 +184,7 @@ def not_found(error):
 
 @app.route('/assoc/text/<lang>/<termlist>')
 def text_assoc(lang, termlist):
+    load_assoc()
     if commonsense_assoc is None:
         flask.abort(404)
     if isinstance(termlist, basestring):
@@ -190,9 +204,9 @@ def text_assoc(lang, termlist):
             terms.append(('/c/%s/%s' % (lang, term), weight))
     except ValueError:
         flask.abort(400)
-    return assoc_for_termlist(terms)
+    return assoc_for_termlist(terms, commonsense_assoc)
 
-def assoc_for_termlist(terms):
+def assoc_for_termlist(terms, assoc):
     limit = flask.request.args.get('limit', '20')
     limit = int(limit)
     if limit > 1000: limit=20
@@ -201,8 +215,8 @@ def assoc_for_termlist(terms):
     def passes_filter(uri):
         return filter is None or uri.startswith(filter)
 
-    vec = commonsense_assoc.vector_from_terms(terms)
-    similar = commonsense_assoc.terms_similar_to_vector(vec)
+    vec = assoc.vector_from_terms(terms)
+    similar = assoc.terms_similar_to_vector(vec)
     similar = [item for item in similar if item[1] > 0 and
                passes_filter(item[0])][:limit]
     
@@ -210,11 +224,12 @@ def assoc_for_termlist(terms):
 
 @app.route('/assoc/<path:uri>')
 def concept_assoc(uri):
+    load_assoc()
     uri = '/' + uri.rstrip('/')
     if commonsense_assoc is None:
         flask.abort(404)
     
-    return assoc_for_termlist([(uri, 1.0)])
+    return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
 
 if __name__ == '__main__':
     if '--unsafe' in sys.argv:
