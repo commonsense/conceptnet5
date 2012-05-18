@@ -182,8 +182,8 @@ def see_documentation():
 def not_found(error):
     return flask.jsonify({'error':'invalid request'})
 
-@app.route('/assoc/text/<lang>/<termlist>')
-def text_assoc(lang, termlist):
+@app.route('/assoc/list/<lang>/<termlist>')
+def list_assoc(lang, termlist):
     load_assoc()
     if commonsense_assoc is None:
         flask.abort(404)
@@ -233,6 +233,6 @@ def concept_assoc(uri):
 
 if __name__ == '__main__':
     if '--unsafe' in sys.argv:
-        app.run(debug=True, host='0.0.0.0', port=5002)
+        app.run(debug=True, host='0.0.0.0', port=8084)
     else:
-        app.run(debug=True, port=5002)
+        app.run(debug=True, port=8084)
