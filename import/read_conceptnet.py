@@ -28,7 +28,8 @@ BEDUME_FLAGGED_CONCEPTS = [
   'make love', 'knit', 'go to take vacation', 'fish', 'go to dentist',
   'go to store', 'go to airport', 'go to go to store', 'kid', 'computer',
   'stew', 'take walk', 'tire', 'new computer', 'horn', 'serve mealfish',
-  'potatoe shed', 
+  'potatoe shed', 'hunt', 'crazy', 'buy new car', 'laugh', 'intoxicated',
+  'intoxicate', 'eat hamburger', 'wok'
 ]
 BEDUME_FLAGGED_PLACES = [
   'alaska', 'kansa', 'utah', 'austria', 'delaware', 'pennsylvania', 
@@ -94,7 +95,7 @@ def handle_raw_assertion(raw, writer):
             if 'bedume' in ' '.join(source_list):
                 for flagged in BEDUME_FLAGGED_CONCEPTS + BEDUME_FLAGGED_PLACES:
                     check = '/'+flagged.replace(' ', '_')
-                    if check in start or check in end:
+                    if start.endswith(check) or end.endswith(check):
                         bad = True
                         print "flagged:", str(raw)
                         break

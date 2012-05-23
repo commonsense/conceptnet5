@@ -7,16 +7,17 @@ __author__ = 'Justin Venezuela (jven@mit.edu)'
 import itertools
 import os
 import time
+import urllib2
+import json
+import re
 from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
 from flask import url_for
-from metanl.english import normalize
-from conceptnet5.web_interface.utils import data_url
-from conceptnet5.web_interface.utils import uri2name
-from conceptnet5.web_interface.utils import get_sorted_languages
+from conceptnet5.nodes import make_concept_uri
+from conceptnet5.web_interface.utils import data_url, uri2name, get_sorted_languages
 
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
@@ -28,9 +29,16 @@ DEVELOPMENT = True
 app = Flask(__name__)
 
 if DEVELOPMENT:
-  web_route = '/web/'
+  site = 'http://new-caledonia.media.mit.edu:8080'
+  web_root = ''
 else:
-  web_route = '/'
+  site = 'http://conceptnet5.media.mit.edu'
+  web_root = '/web'
+
+json_root = 'http://conceptnet5.media.mit.edu/data/5.1/'
+
+def get_json_from_uri(uri):
+    return json.load(urllib2.urlopen(json_root+uri))
 
 @app.route('/favicon.ico')
 def favicon():
@@ -46,12 +54,48 @@ def home():
 def search():
     keyword = request.form.get('keyword')
     lang = request.form.get('language')
-    keyword = normalize(keyword)
-    return redirect('%sc/%s/%s' % (web_route, lang, keyword))
+    return redirect(site + web_root + make_concept_uri(keyword, lang))
 
-@app.route('/assertion/<path:uri>', methods=['GET', 'POST'])
+@app.route('/<path:uri>', methods=['GET'])
+def edges_for_uri(uri):
+    """
+    This function replaces most functions in the old Web interface, as every
+    query to the API now returns a list of edges.
+    """
+    response = get_json_from_uri(uri + '?limit=500')
+    edges = response['edges']
+    seen_uris = set()
+    out_edges = []
+    for edge in edges:
+        switched = False
+        if edge['uri'] not in seen_uris:
+            url1 = web_root+edge['start']
+            url2 = web_root+edge['end']
+            edge['startName'] = uri2name(edge['start'])
+            edge['relName'] = uri2name(edge['rel'])
+            edge['endName'] = uri2name(edge['end'])
+            text = edge.get('surfaceText') or ''
+            ## possible guess:
+            #  "[[%s]] %s [[%s]]" %\
+            #  (uri2name(edge['start']), uri2name(edge['rel']),
+            #   uri2name(edge['end']))
+
+            linked1 = re.sub(r'\[\[([^\]]+)\]\]',
+                r'<a href="%s">\1</a>' % url1, text, count=1)
+            linked2 = re.sub(r'\[\[([^\]]+)\]\]',
+                r'<a href="%s">\1</a>' % url2, linked1, count=1)
+            edge['linked'] = linked2
+            out_edges.append(edge)
+            seen_uris.add(edge['uri'])
+    if not edges:
+        return render_template('not_found.html', uri=uri)
+    else:
+        return render_template('edges.html', uri=uri, edges=out_edges, root=web_root)
+
+"""
+@app.route('/a/<path:uri>', methods=['GET', 'POST'])
 def get_assertion(uri):
-    assertion_uri = '/assertion/%s' % uri
+    assertion_uri = '/a/%s' % uri
     assertion_rel_args = conceptnet.get_rel_and_args(assertion_uri)
     if not assertion_rel_args:
         return 'Invalid assertion.'
@@ -94,7 +138,7 @@ def get_assertion(uri):
         else:
             return 'Invalid vote.'
 
-@app.route('%s<path:uri>' % web_route)
+@app.route('%s/<path:uri>' % web_root)
 def get_data(uri):
     uri = '/%s' % uri
     node = conceptnet.get_node(uri)
@@ -203,10 +247,11 @@ def get_data(uri):
 
     return render_template('data.html', node=node, assertions=assertions,
             frames=frames, normalized=normalized, senses=senses, languages=get_sorted_languages())
+"""
 
 @app.errorhandler(404)
 def handler404(error):
     return render_template('404.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app.run(debug=True, host='0.0.0.0', port=8080)

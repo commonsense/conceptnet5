@@ -9,7 +9,6 @@ nav a {
 }
 .thispage {
     font-weight: bold;
-    color: #fff;
 }
 article {
     padding-top: 1em;
@@ -18,8 +17,8 @@ article {
     line-height: 150%;
 }
 span.relation {
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 1ex;
+    padding-right: 1ex;
 }
 span.relation a {
     font-style: italic;
@@ -36,12 +35,15 @@ div.paraphrase {
     font-size: 90%;
     font-style: italic;
 }
-.assertion-example {
+.assertion {
     padding: 0.5em;
     margin: 0.5em;
     background-color: #eee;
     border-radius: 0.5em;
+    -moz-border-radius: 0.5em;
+    -webkit-border-radius: 0.5em;
+    -o-border-radius: 0.5em;
 }
-.assertion-example a {
+.assertion a {
     text-decoration: none;
 }

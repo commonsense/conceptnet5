@@ -10,7 +10,7 @@ def data_url(uri):
     return '/web/' + uri.strip('/')
 
 def uri2name(arg):
-    if arg.startswith('/concept'):
+    if arg.startswith('/c/'):
         if len(arg.split('/')) <= 3:
             return arg.split('/')[-1]
         result = arg.split('/')[3].replace('_', ' ')
