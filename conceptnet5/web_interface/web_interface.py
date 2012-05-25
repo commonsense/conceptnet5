@@ -7,7 +7,7 @@ __author__ = 'Justin Venezuela (jven@mit.edu)'
 import itertools
 import os
 import time
-import urllib2
+import urllib2, urllib
 import json
 import re
 from flask import Flask
@@ -37,8 +37,15 @@ else:
 
 json_root = 'http://conceptnet5.media.mit.edu/data/5.1/'
 
-def get_json_from_uri(uri):
-    return json.load(urllib2.urlopen(json_root+uri))
+def get_json_from_uri(uri, params):
+    url = uri.lstrip(u'/')
+    url_bytes = url.encode('utf-8')
+    url_quoted = urllib.quote(url_bytes)
+    params_quoted = urllib.urlencode(params)
+    if params_quoted:
+        params_quoted = '?'+params_quoted
+    full_url = json_root + url_quoted + params_quoted
+    return json.load(urllib2.urlopen(full_url))
 
 @app.route('/favicon.ico')
 def favicon():
@@ -62,19 +69,26 @@ def edges_for_uri(uri):
     This function replaces most functions in the old Web interface, as every
     query to the API now returns a list of edges.
     """
-    response = get_json_from_uri(uri + '?limit=500')
+    uri = u'/'+uri.rstrip(u'/')
+    response = get_json_from_uri(uri, {'limit': 500})
     edges = response['edges']
-    seen_uris = set()
+    scores = {}
     out_edges = []
+    caption = uri
     for edge in edges:
         switched = False
-        if edge['uri'] not in seen_uris:
+        if edge['uri'] not in scores:
             url1 = web_root+edge['start']
             url2 = web_root+edge['end']
             edge['startName'] = uri2name(edge['start'])
             edge['relName'] = uri2name(edge['rel'])
             edge['endName'] = uri2name(edge['end'])
             text = edge.get('surfaceText') or ''
+            if caption == uri and edge['start'] == uri:
+                caption = edge['startName']
+            if caption == uri and edge['end'] == uri:
+                caption = edge['endName']
+
             ## possible guess:
             #  "[[%s]] %s [[%s]]" %\
             #  (uri2name(edge['start']), uri2name(edge['rel']),
@@ -86,11 +100,15 @@ def edges_for_uri(uri):
                 r'<a href="%s">\1</a>' % url2, linked1, count=1)
             edge['linked'] = linked2
             out_edges.append(edge)
-            seen_uris.add(edge['uri'])
+            scores[edge['uri']] = edge['score']
+        else:
+            scores[edge['uri']] += edge['score']
+
     if not edges:
         return render_template('not_found.html', uri=uri)
     else:
-        return render_template('edges.html', uri=uri, edges=out_edges, root=web_root)
+        return render_template('edges.html', uri=uri, caption=caption,
+        edges=out_edges, root=web_root, scores=scores)
 
 """
 @app.route('/a/<path:uri>', methods=['GET', 'POST'])

@@ -3,24 +3,29 @@
 {# all usual properties, plus 'linked' #}
 
 <div class="container">
+<h2>{{caption}} <small>{{uri}}</small></h2>
+<div class="row">
   {% for edge in edges %}
-  <div class="assertion">
-    <div class="assertion-edge">
-      <span class="concept">
-        <a href="{{root}}{{edge.start}}">{{edge.startName}}</a>
-      </span>
-      <span class="relation">
-        <a href="{{root}}{{edge.rel}}">{{edge.relName}}</a>
-      </span>
-      <span class="concept">
-        <a href="{{root}}{{edge.end}}">{{edge.endName}}</a>
-      </span>
-    </div>
-    <div class="paraphrase">
-      {{edge.linked|safe}}
+  <div class="span6">
+    <div class="assertion">
+      <div class="assertion-edge">
+        <span class="concept">
+          <a href="{{root}}{{edge.start}}">{{edge.startName}}</a>
+        </span>
+        <span class="relation">
+          <a href="{{root}}{{edge.rel}}">{{edge.relName}}</a>
+        </span>
+        <span class="concept">
+          <a href="{{root}}{{edge.end}}">{{edge.endName}}</a>
+        </span>
+      </div>
+      <div class="paraphrase">
+        {{edge.linked|safe}}
+      </div>
     </div>
   </div>
   {% endfor %}
+</div>
 </div>
 
 {% endblock %}

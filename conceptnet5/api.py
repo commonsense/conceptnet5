@@ -19,11 +19,11 @@ import numpy as np
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 
-if not app.debug:
-    import logging
-    file_handler = logging.FileHandler('/srv/conceptnet5.1/logs/flask_errors.log')
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
+#if not app.debug:
+#    import logging
+#    file_handler = logging.FileHandler('/srv/conceptnet5.1/logs/flask_errors.log')
+#    file_handler.setLevel(logging.INFO)
+#    app.logger.addHandler(file_handler)
 
 commonsense_assoc = None
 # load Luminoso's assoc code if it's available, because it works very well for
@@ -142,8 +142,8 @@ def search(query_args=None):
         filter_params.append("weight:[%s TO *]" % weight)
 
     params = {}
-    params['q'] = ' AND '.join(query_params)
-    params['fq'] = ' AND '.join(filter_params)
+    params['q'] = u' AND '.join(query_params).encode('utf-8')
+    params['fq'] = u' AND '.join(filter_params).encode('utf-8')
     params['start'] = query_args.get('offset', '0')
     params['rows'] = query_args.get('limit', '50')
     params['fl'] = '*,score'
@@ -233,6 +233,7 @@ def concept_assoc(uri):
 
 if __name__ == '__main__':
     if '--unsafe' in sys.argv:
+        app.debug = True
         app.run(debug=True, host='0.0.0.0', port=8084)
     else:
         app.run(debug=True, port=8084)
