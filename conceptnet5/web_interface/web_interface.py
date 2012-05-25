@@ -115,7 +115,7 @@ def edges_for_uri(uri):
             scores[edge['uri']] += edge['score']
 
     if not edges:
-        return render_template('not_found.html', uri=uri)
+        return render_template('not_found.html', uri=uri, languages=LANGUAGES)
     else:
         return render_template('edges.html', uri=uri, caption=caption,
         edges=out_edges, root=web_root, scores=scores, languages=LANGUAGES)
