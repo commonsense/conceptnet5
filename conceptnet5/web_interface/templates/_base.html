@@ -16,12 +16,13 @@
     <div class="container-fluid">
       <div class="brand"><a href="/">ConceptNet <span class='five'>5</span></a></div>
         <ul class="nav">
-          <li><a
-          href="http://conceptnet5.media.mit.edu">About</a></li>
+          <li><a href="http://conceptnet5.media.mit.edu">About</a></li>
         </ul>
         <ul class="nav">
-          <li><a
-          href="http://github.com/commonsense/conceptnet5/wiki">Wiki</a></li>
+          <li><a href="http://github.com/commonsense/conceptnet5/wiki">Wiki</a></li>
+        </ul>
+        <ul class="nav">
+          <li><a href="http://conceptnet5.media.mit.edu/downloads/current">Downloads</a></li>
         </ul>
 <form id="search-form-home" class="navbar-form pull-right" method="POST" action="/web/search">
         <input id="search-text" type="text" class="search-query span2" name="keyword" title="Search for a concept..." placeholder="Search for a concept..." />
@@ -46,6 +47,14 @@
 {% block content %}
 {% endblock %}
 </div>
+</div>
+
+<div class="creative-commons" style="margin: 1em;">
+<a
+href="https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet">
+<img src="/static/img/cc.primary.srr.gif" alt="Creative Commons - some rights
+reserved">
+</a>
 </div>
 
 {% block scripts %}

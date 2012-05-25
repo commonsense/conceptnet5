@@ -87,3 +87,12 @@ a.api-link {
     top: 10px;
     padding-right: 10px;
 }
+p {
+    font-size: 12pt;
+}
+li {
+    margin-bottom: 0.5ex;
+}
+h2 {
+    margin-top: 1em;
+}
