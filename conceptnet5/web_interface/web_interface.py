@@ -24,7 +24,7 @@ LANGUAGES = get_sorted_languages()
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
 #
-DEVELOPMENT = True
+DEVELOPMENT = False
 #
 ########################
 
