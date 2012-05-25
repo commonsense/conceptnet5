@@ -82,3 +82,8 @@ div.paraphrase {
     line-height: 14px;
     height: 24px;
 }
+a.api-link {
+    position: relative;
+    top: 10px;
+    padding-right: 10px;
+}

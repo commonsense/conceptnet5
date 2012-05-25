@@ -24,7 +24,7 @@ LANGUAGES = get_sorted_languages()
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
 #
-DEVELOPMENT = True
+DEVELOPMENT = False
 #
 ########################
 
@@ -125,7 +125,7 @@ def edges_for_uri(uri):
                 oldedge['linked'] = linked2
 
     if not edges:
-        return render_template('not_found.html', uri=uri)
+        return render_template('not_found.html', uri=uri, languages=LANGUAGES)
     else:
         return render_template('edges.html', uri=uri, caption=caption,
         edges=out_edges, root=web_root, languages=LANGUAGES)
