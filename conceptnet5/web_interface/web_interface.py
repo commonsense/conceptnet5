@@ -82,12 +82,12 @@ def edges_for_uri(uri):
     uri = u'/'+uri.rstrip(u'/')
     response = get_json_from_uri(uri, {'limit': 100})
     edges = response.get('edges', [])
-    scores = {}
+    seen_edges = {}
     out_edges = []
     caption = uri
     for edge in edges:
         switched = False
-        if edge['uri'] not in scores:
+        if edge['uri'] not in seen_edges:
             url1 = web_root+edge['start']
             url2 = web_root+edge['end']
             edge['startName'] = uri2name(edge['start'])
@@ -110,15 +110,25 @@ def edges_for_uri(uri):
                 r'<a href="%s">\1</a>' % url2, linked1, count=1)
             edge['linked'] = linked2
             out_edges.append(edge)
-            scores[edge['uri']] = edge['score']
+            seen_edges[edge['uri']] = edge
         else:
-            scores[edge['uri']] += edge['score']
+            oldedge = seen_edges[edge['uri']]
+            oldedge['score'] += edge['score']
+            if not oldedge.get('linked'):
+                text = edge.get('surfaceText') or ''
+                url1 = web_root+edge['start']
+                url2 = web_root+edge['end']
+                linked1 = re.sub(r'\[\[([^\]]+)\]\]',
+                    r'<a href="%s">\1</a>' % url1, text, count=1)
+                linked2 = re.sub(r'\[\[([^\]]+)\]\]',
+                    r'<a href="%s">\1</a>' % url2, linked1, count=1)
+                oldedge['linked'] = linked2
 
     if not edges:
         return render_template('not_found.html', uri=uri)
     else:
         return render_template('edges.html', uri=uri, caption=caption,
-        edges=out_edges, root=web_root, scores=scores, languages=LANGUAGES)
+        edges=out_edges, root=web_root, languages=LANGUAGES)
 
 """
 @app.route('/a/<path:uri>', methods=['GET', 'POST'])
