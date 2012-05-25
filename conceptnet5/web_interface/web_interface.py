@@ -24,7 +24,7 @@ LANGUAGES = get_sorted_languages()
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
 #
-DEVELOPMENT = False
+DEVELOPMENT = True
 #
 ########################
 
@@ -60,12 +60,12 @@ def home():
     return render_template('home.html', languages=get_sorted_languages())
     
 @app.route('/concept/<path:uri>')
-def concept_redirect(path):
-    return redirect(site + web_root + '/c/'+path)
+def concept_redirect(uri):
+    return redirect(site + web_root + '/c/'+uri)
 
 @app.route('/relation/<path:uri>')
-def rel_redirect(path):
-    return redirect(site + web_root + '/r/'+path)
+def rel_redirect(uri):
+    return redirect(site + web_root + '/r/'+uri)
 
 @app.route('/search', methods=['POST'])
 def search():
