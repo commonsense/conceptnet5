@@ -60,11 +60,11 @@ def home():
     return render_template('home.html', languages=get_sorted_languages())
     
 @app.route('/concept/<path:uri>')
-def concept_redirect():
+def concept_redirect(path):
     return redirect(site + web_root + '/c/'+path)
 
 @app.route('/relation/<path:uri>')
-def rel_redirect():
+def rel_redirect(path):
     return redirect(site + web_root + '/r/'+path)
 
 @app.route('/search', methods=['POST'])
