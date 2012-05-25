@@ -24,7 +24,7 @@ LANGUAGES = get_sorted_languages()
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
 #
-DEVELOPMENT = True
+DEVELOPMENT = False
 #
 ########################
 
@@ -59,6 +59,14 @@ def favicon():
 def home():
     return render_template('home.html', languages=get_sorted_languages())
     
+@app.route('/concept/<path:uri>')
+def concept_redirect():
+    return redirect(site + web_root + '/c/'+path)
+
+@app.route('/relation/<path:uri>')
+def rel_redirect():
+    return redirect(site + web_root + '/r/'+path)
+
 @app.route('/search', methods=['POST'])
 def search():
     keyword = request.form.get('keyword')
@@ -73,7 +81,7 @@ def edges_for_uri(uri):
     """
     uri = u'/'+uri.rstrip(u'/')
     response = get_json_from_uri(uri, {'limit': 100})
-    edges = response['edges']
+    edges = response.get('edges', [])
     scores = {}
     out_edges = []
     caption = uri
