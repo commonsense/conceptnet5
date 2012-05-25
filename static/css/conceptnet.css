@@ -47,3 +47,38 @@ div.paraphrase {
 .assertion a {
     text-decoration: none;
 }
+
+/* bootstrap tweaks */
+.brand a {
+    color: #cde;
+}
+
+.brand a .five {
+    color: #08c;
+}
+
+.navbar .nav > li > a {
+    padding: 9px 10px 6px;
+}
+
+.navbar .brand {
+    padding: 8px 20px 6px;
+}
+
+.navbar-inner {
+    min-height: 34px;
+}
+
+.navbar-form input {
+    font-size: 12px;
+    line-height: 14px;
+    height: 24px;
+}
+.navbar-form input[type="text"] {
+    height: 14px;
+}
+.navbar-form select {
+    font-size: 12px;
+    line-height: 14px;
+    height: 24px;
+}

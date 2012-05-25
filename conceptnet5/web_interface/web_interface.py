@@ -19,6 +19,8 @@ from flask import url_for
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.web_interface.utils import data_url, uri2name, get_sorted_languages
 
+LANGUAGES = get_sorted_languages()
+
 ########################
 # Set this flag to True when developing, False otherwise! -JVen
 #
@@ -70,7 +72,7 @@ def edges_for_uri(uri):
     query to the API now returns a list of edges.
     """
     uri = u'/'+uri.rstrip(u'/')
-    response = get_json_from_uri(uri, {'limit': 500})
+    response = get_json_from_uri(uri, {'limit': 100})
     edges = response['edges']
     scores = {}
     out_edges = []
@@ -108,7 +110,7 @@ def edges_for_uri(uri):
         return render_template('not_found.html', uri=uri)
     else:
         return render_template('edges.html', uri=uri, caption=caption,
-        edges=out_edges, root=web_root, scores=scores)
+        edges=out_edges, root=web_root, scores=scores, languages=LANGUAGES)
 
 """
 @app.route('/a/<path:uri>', methods=['GET', 'POST'])

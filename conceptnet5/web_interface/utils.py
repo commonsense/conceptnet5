@@ -28,8 +28,6 @@ def get_sorted_languages():
             non_ascii.append(key)
             keys.remove(key)
     sort = sorted(keys, key=str)
-    for key in non_ascii:
-        sort.append(key)
     
     #Return a dictionary that can be used in a template
     #containing the sorted list of keys and the actual
