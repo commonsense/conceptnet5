@@ -220,11 +220,23 @@ if it didn't contain other languages besides English, as well:</div>
 </div>
 <p>Notice how the relations between concepts can be abstract notions
 such as MadeOf, which we use to mean the same thing across all languages; or
-they can be language-specific text such as "inversely proportional to".
+they can be language-specific text such as "can cross"
 </p>
-<p>You can click any of these links to begin browsing ConceptNet. You can
-discover other concepts we know about by changing the URL (we're working on a
-search interface).</p>
+<p>You can click any of these links, or use the search bar above, to begin
+browsing ConceptNet.</p>
+
+<h2>API and Documentation</h2>
+<p>The newest release of ConceptNet, ConceptNet 5.1, is documented on our
+<a href="http://github.com/commonsense/conceptnet5">wiki</a>.</p>
+
+<p>The documentation includes how to use our REST API, which allows
+you to:</p>
+<ul>
+<li>Retrieve the data for particular nodes and edges</li>
+<li>Query for edges with given properties</li>
+<li>Measure and query the semantic distance between nodes</li>
+</ul>
+
 <h2>ConceptNet 5 is free</h2>
 <p>ConceptNet 5 comes largely from the hard work of hundreds of thousands of
 people who gave their time and knowledge for free. So ConceptNet is free as
@@ -297,70 +309,36 @@ href="#download">JSON</a>. You probably know better than
 we do what software you want to use to interact with it!
 </p>
 <p>
-That said, you can have our
-<a href="#ebs">idiosyncratic database</a> if you want, but that's not
-ConceptNet, it's just a system for quickly looking things up in ConceptNet.
+(That said, you can have our idiosyncratic Solr index if you want, but that's not
+ConceptNet, it's just a system for quickly looking things up in ConceptNet.)
 </p>
 <p>Some other interesting properties:</p>
 <ul>
-<li>The ConceptNet graph is <i>ID-less</i>. Every node and edge contains all
+<li>The ConceptNet graph is <i>ID-less</i>. Every node and assertion contains all
 the information necessary to identify it and no more in its URI, and does not
 rely on
 arbitrarily-assigned IDs. The advantage of this is that if multiple branches of
 ConceptNet are developed in multiple places, we can later merge them simply by
 taking the union of the nodes and edges. (And we <a href="#development">hope
 for this to happen!</a>)</li>
-<li>ConceptNet is a <i>property graph</i>, meaning that some of its information
-is stored in its nodes and edges. For example, each concept stores its
-human-readable name, and its language. This representation is not quite the
-same as RDF, but it does match up with other standards such as GraphML and Blueprints (which we are working on interoperating with).
-</li>
-<li>ConceptNet contains concepts and relations that are pointers to the greater
-Semantic Web, via <a href="http://dbpedia.org">DBPedia</a> and soon via RDF/OWL WordNet. For example, our concept 
+<li>ConceptNet supports linked data: you can download a list of links to the greater
+Semantic Web, via <a href="http://dbpedia.org">DBPedia</a> and via RDF/OWL WordNet. For example, our concept 
 <a href="http://conceptnet5.media.mit.edu/web/concept/en/cat">cat</a> is linked
 to the DBPedia node at <a href="http://dbpedia.org/resource/Cat">http://dbpedia.org/resource/Cat</a>.
 </ul>
-<h2>Beta release</h2>
-<p>This page provides you with a beta release of ConceptNet 5.0. The actual
-release will have the same graph structure, but slightly different contents.</p>
-<p>Building ConceptNet 5 is a time-consuming process. Basically, there's
-another version in the pipeline right now, but it still has to take some
-time to index all the statements.</p>
-<h3>Known bugs in this release</h3>
-<li>Much of the Wiktionary data is missing; it generally only contains the
-first sense for each word.</li>
-<li>WordNet senses can be found through the Web API, but are missing from this
-data..</li>
-<h2>Web API</h2>
-<p>The data in ConceptNet 5 is accessible through a Web API that returns JSON
-data. Here's some very short documentation for it:</p>
-<ul>
-<li>Every concept and assertion in ConceptNet has a URI. Put
-<code>http://conceptnet5.media.mit.edu/data</code> before that URI to retrieve
-information about that concept, including its incoming and outgoing edges.
-If there are lots of edges, the results may include a "next" URL to get more.
-</li>
-<li>Another way to say this is that if you browse to the Web page for any
-concept, change <code>/web</code> to <code>/data</code> to look it up in the
-API.</li>
-</ul>
-<p>More detailed documentation is being developed on our
-<a href="http://github.com/commonsense/conceptnet5/wiki">wiki</a>.
-</p>
 <h2 id="download">Downloading ConceptNet 5</h2>
-<p>If you want all the data in ConceptNet for your application, you can have
-it! Here it is as some <a href="downloads/">extremely
-compressed JSON files</a>. Be warned, this ~1.1 gigabyte download will
-uncompress to nearly 24 gigabytes of data.</p>
-<p>
-If you want to look things up quickly in ConceptNet 5, you may want to use the
-MongoDB 2.0 database that we have built. That database, with all its indexes,
-is at 111 gigabytes and counting. (Informative URIs have their price.) The best
-way to do this would be to mount our drive through through Amazon's <abbr
-title="Enterprise Block Storage">EBS</abbr>. <a href="#contact">Contact us</a>
-if you want to do that really soon; we're also working on becoming one of their
-public datasets.</p>
-<h2>Development</h2>
+<p>If you want all the data in ConceptNet for your application,
+<a href="/downloads">you can have it!</a> We provide the data in three formats:
+<ul>
+  <li><strong>Flat JSON</strong>: files in which each line is a ConceptNet edge
+  in JSON format</li>
+  <li><strong>Solr JSON</strong>: specially formatted JSON files that can be
+  loaded into an Apache Solr index for quick retrieval</li>
+  <li><strong>CSV</strong>: simple tabular data, very convenient for
+  command-line searching or as input to machine learning
+</ul>
+
+<h2 id="development">Development</h2>
 <p>ConceptNet 5 is an open-source project, developed with GPLv3 code hosted on
 <a href="http://github.com/commonsense/conceptnet">GitHub</a>.</p>
 
