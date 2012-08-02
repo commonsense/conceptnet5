@@ -39,6 +39,11 @@ else:
 
 json_root = 'http://conceptnet5.media.mit.edu/data/5.1/'
 
+import logging
+file_handler = logging.FileHandler('logs/web_errors.log')
+file_handler.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
+
 def get_json_from_uri(uri, params):
     url = uri.lstrip(u'/')
     url_bytes = url.encode('utf-8')
