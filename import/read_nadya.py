@@ -7,7 +7,9 @@ from csc_utils.batch import queryset_foreach
 from conceptnet.models import Sentence, Assertion, RawAssertion
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
-from metanl import japanese as JA
+from metanl import japanese
+
+JA = japanese.NoStopwordMeCabWrapper()
 
 LICENSE = '/l/CC/By'
 
@@ -26,10 +28,12 @@ def handle_raw_assertion(raw, writer):
 
         activity_node = normalize_uri(u'/s/site/nadya.jp')
         
-        startText = raw.text1
-        endText = raw.text2
-        normalize_uri('/text/'+lang+'/'+raw.text1)
-        end = normalize_uri('/text/'+lang+'/'+raw.text2)
+        startText = ' '.join(JA.normalize_list(raw.text1))
+        endText = ' '.join(JA.normalize_list(raw.text2))
+        if startText != raw.text1:
+            print raw.text1.encode('utf-8'), '=>',  startText.encode('utf-8')
+        normalize_uri('/text/'+lang+'/'+startText)
+        end = normalize_uri('/text/'+lang+'/'+endText)
 
         relname = raw.frame.relation.name
         if relname == 'ConceptuallyRelatedTo':
