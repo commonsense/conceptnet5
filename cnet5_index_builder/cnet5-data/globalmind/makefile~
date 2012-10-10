@@ -1,0 +1,5 @@
+GLOBALMIND_DEPENDENCIES = read_globalmind.py raw_data/GMUser.yaml raw_data/GMFrame.yaml raw_data/GMAssertion.yaml raw_data/GMTranslation.yaml
+
+globalmind: $(GLOBALMIND_DEPENDENCIES)
+	python read_globalmind.py
+

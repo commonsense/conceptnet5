@@ -1,0 +1,32 @@
+from conceptnet.models import *
+import os
+import codecs
+from conceptnet5.nodes import make_concept_uri
+from conceptnet5.edges import make_edge, MultiWriter
+
+path = "./raw_data/"
+sparse_pieces = []
+for filename in os.listdir(path):
+    if filename.startswith('conceptnet_zh_'):
+        print filename
+        writer = MultiWriter(filename.split('.')[0])
+        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            line = line.strip()
+            if line:
+                parts = line.split(', ')
+                user, frame_id, concept1, concept2 = parts
+                frame = Frame.objects.get(id=int(frame_id))
+                ftext = frame.text
+                relation = frame.relation.name
+                rel = '/r/'+relation
+
+                surfaceText = ftext.replace(u'{1}', u'[['+concept1+u']]').replace(u'{2}', u'[['+concept2+u']]')
+                start = make_concept_uri(concept1, 'zh_TW')
+                end = make_concept_uri(concept2, 'zh_TW')
+                sources = ['/s/contributor/petgame/'+user, '/s/activity/ntt/petgame']
+                edge = make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
+                                 license='/l/CC/By', sources=sources,
+                                 surfaceText=surfaceText, weight=1)
+                writer.write(edge)
+        writer.close()
+

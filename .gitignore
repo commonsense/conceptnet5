@@ -16,3 +16,8 @@ gremlin_data
 *.ttl
 *.nt
 *.zip
+*.json
+*.csv
+cnet5_index_builder/cnet5-data/*/data/*
+cnet5_index_builder/cnet5-data/*/raw_data/*
+cnet5_index_builder/cnet5-solr/*
