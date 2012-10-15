@@ -15,9 +15,6 @@ def build_core_from_csvs(csv_files):
         print "currently in file: " + str(csv_file)
         for line in codecs.open(csv_file, encoding='utf-8'):
             uri, rel, start, end, context, weight, sources, id, dataset = line.split('\t')[:9]
-
-            if context == '/ctx/all':
-                print "uri: " + uri + " context: " + str(context)
             if uri != 'uri' and context == '/ctx/all':
                 weight = float(weight)
                 weights[uri] += float(weight)
@@ -50,6 +47,6 @@ def build_core_from_csvs(csv_files):
 if __name__ == '__main__':
     import sys
     csv_files = sys.argv[1:]
-    print csv_files
+    print "building core from the following: \n" + str(csv_files)
     build_core_from_csvs(csv_files)
 

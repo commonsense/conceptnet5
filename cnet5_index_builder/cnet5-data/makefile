@@ -1,4 +1,4 @@
-
+DATE = $$(date +%Y%m%d_%H%M%S)
 CSV_FILES = */data/flat/*.csv
 
 all_json: conceptnet4_json conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
@@ -54,8 +54,12 @@ globalmind_csv: force_look
 wiktionary_csv: force_look
 	cd wiktionary/ ; make wiktionary_csv
 
-build_core: $(CSV_FILES)
+
+core: $(CSV_FILES)
 	python scripts/flat_assertions.py $(CSV_FILES)
+
+tar_bz_from_json: force_look
+	tar -cjf solr_json_$(DATE).tar.bz2 */data/solr/*.json core_data/solr/*.json
 
 force_look:
 	true

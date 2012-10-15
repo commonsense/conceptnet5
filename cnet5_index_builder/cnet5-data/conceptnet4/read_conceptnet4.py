@@ -4,6 +4,7 @@ from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
 import simplenlp
 
+
 #JA = simplenlp.get('ja')
 # monkey-patch
 #def answer_false(*args):
@@ -108,5 +109,8 @@ def handle_raw_assertion(raw, writer):
 
 if __name__ == '__main__':
     writer = MultiWriter('conceptnet4')
-    queryset_foreach(RawAssertion.objects.filter(), lambda item: handle_raw_assertion(item, writer))
+    raw_assertions = RawAssertion.objects.filter()
+    for item in raw_assertions:
+        handle_raw_assertion(item,writer)
+    #queryset_foreach(RawAssertion.objects.filter(), lambda item: handle_raw_assertion(item, writer))
     writer.close()

@@ -22,3 +22,4 @@ cnet5_index_builder/cnet5-data/*/data/*
 cnet5_index_builder/cnet5-data/*/raw_data/*
 cnet5_index_builder/cnet5-solr/*
 cnet5_index_builder/JAKE_LOG.txt
+*.tar.bz2
