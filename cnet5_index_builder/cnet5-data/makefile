@@ -1,16 +1,13 @@
-#this file will take all of the raw data from sources such 
-#as cnet4 and reverb and create standard json files in cnet5-json
 
-all_json: reverb_json wordnet_json verbosity_json dbpedia_json globalmind_json wiktionary_json
+CSV_FILES = */data/flat/*.csv
 
-reverb_json: force_look
-	cd reverb/ ; make reverb_json 
+all_json: conceptnet4_json conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
 
-wordnet_json: force_look
-	cd wordnet/ ; make wordnet_json
+conceptnet4_json: force_look
+	cd conceptnet4/ ; make conceptnet4_json
 
-verbosity_json: force_look
-	cd verbosity/ ; make verbosity_json
+conceptnet4_zh_json: force_look 
+	cd conceptnet4_zh/ ; make conceptnet_zh_json
 
 dbpedia_json: force_look
 	cd dbpedia/ ; make dbpedia_json
@@ -18,11 +15,26 @@ dbpedia_json: force_look
 globalmind_json: force_look
 	cd globalmind/ ; make globalmind_json
 
+reverb_json: force_look
+	cd reverb/ ; make reverb_json 
+
+verbosity_json: force_look
+	cd verbosity/ ; make verbosity_json
+
+wordnet_json: force_look
+	cd wordnet/ ; make wordnet_json
+
 wiktionary_json: force_look
 	cd wiktionary/ ; make wiktionary_json
 
 
-all_csv: reverb_csv wordnet_csv verbosity_csv dbpedia_csv globalmind_csv wiktionary_csv
+all_csv: conceptnet4_csv conceptnet4_zh_csv reverb_csv wordnet_csv verbosity_csv dbpedia_csv globalmind_csv wiktionary_csv
+
+conceptnet4_csv: force_look
+	cd conceptnet4/ ; make conceptnet4_csv
+
+conceptnet4_zh_csv: force_look 
+	cd conceptnet_zh/ ; make conceptnet_zh_csv
 
 reverb_csv: force_look
 	cd reverb/ ; make reverb_csv
@@ -41,6 +53,9 @@ globalmind_csv: force_look
 
 wiktionary_csv: force_look
 	cd wiktionary/ ; make wiktionary_csv
+
+build_core: $(CSV_FILES)
+	python scripts/flat_assertions.py $(CSV_FILES)
 
 force_look:
 	true

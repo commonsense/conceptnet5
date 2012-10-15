@@ -120,8 +120,7 @@ for line in open('raw_data/verbosity.txt'):
         print (rel, left, right, score)
     
     if make_json:
-        print "text: " + str(text)
-        edge = make_edge(rel, left, 'en', right, 'en', '/d/verbosity',
+        edge = make_edge(rel, left, right, '/d/verbosity',
                          '/l/CC/By', sources, surfaceText=text,
                          weight = score/10.0)
         writer.write(edge)

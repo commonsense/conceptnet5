@@ -25,6 +25,7 @@ digitial-intuition@digitialintuition-Inspiron-620:~/ConceptNet5$ scp -r jvarley@
 good resource for recursive make:
 http://www.makelinux.net/make3/make3-CHP-6-SECT-1
 
+CORE is just all the csv's concatenated together
 
 
 ###########################################
@@ -61,32 +62,44 @@ http://www.makelinux.net/make3/make3-CHP-6-SECT-1
 1) ask lots of questions
 2) need to move ENV inside of ConceptNet5
 
+#######################From Wednesdat October 10th
+#I did the following
+1) added to git
+2) installed mecab, so read_globalmind.py now runs correctly
+3) read_verbosity.py had an incorrect method signature, now runs correctly
+
+#next steps
+1) still need to fix Django DB erros, someone has a patch,
+	Django 1.4 can support multiple DB's 1.3 could not.
+2) change flat_assertions.py to build from all the smaller csvs
+
+#######################From Friday October 12th
+#I did the following
+1) reverted back to django 1.3 this fixed read_zh.py
+
+#next steps
+1) working with flat_assertions.py to just take all the smaller .csv files,
+having trouble with second part of this conditional, it is never true, think it just needs
+to be removed
+
+if uri != 'uri' and context == '/ctx/all':
+
+
+
+
+
 ##########################################
 #Questions for Catherine/Rob
 ##########################################
 
-1)how to build global mind?  I run the read_globalmind.py and:
-
-	    raise MeCabError("`mecab` didn't start. See README.txt for details "
-		metanl.japanese.MeCabError: `mecab` didn't start. See README.txt for details about installing MeCab and other Japanese NLP tools.
-
- but there is no readme. 
-
- 	ANS: Need to download/setup mecab-ipadic-utf8
-
-
-5) read_verbosity.py does not work
-
-6) read_zh.py does not work.  Throws Django error:
+1) read_zh.py and read_conceptnet.py do not work.  Throws Django error:
 
   		raise ImproperlyConfigured("settings.DATABASES is improperly configured. "
 		django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.
 
 	more info about how it builds would be helpful.  What is inside the Django DB, ConceptNet4?
 
+	ANS: Either figure it our or install Django 1.3.3
 
-7)read_conceptnet.py throws the same error.
 
-8) What creates CORE? flat_assertions.py takes it as input to build larger .json files, but how does core get updated when something like wordnet changes? 
 
-	ANS: Just all the csv's concatenated together
