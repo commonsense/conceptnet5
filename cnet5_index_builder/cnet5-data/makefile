@@ -1,13 +1,16 @@
 DATE = $$(date +%Y%m%d_%H%M%S)
 CSV_FILES = */data/flat/*.csv
 
-all_json: conceptnet4_json conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
+all_json: conceptnet4_json conceptnet4_nadya_json conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
 
 conceptnet4_json: force_look
 	cd conceptnet4/ ; make conceptnet4_json
 
+conceptnet4_nadya_json: force_look
+	cd conceptnet4_nadya/ ; make conceptnet4_nadya_json
+
 conceptnet4_zh_json: force_look 
-	cd conceptnet4_zh/ ; make conceptnet_zh_json
+	cd conceptnet4_zh/ ; make conceptnet4_zh_json
 
 dbpedia_json: force_look
 	cd dbpedia/ ; make dbpedia_json
@@ -28,13 +31,16 @@ wiktionary_json: force_look
 	cd wiktionary/ ; make wiktionary_json
 
 
-all_csv: conceptnet4_csv conceptnet4_zh_csv reverb_csv wordnet_csv verbosity_csv dbpedia_csv globalmind_csv wiktionary_csv
+all_csv: conceptnet4_csv conceptnet4_nadya_json conceptnet4_zh_csv reverb_csv wordnet_csv verbosity_csv dbpedia_csv globalmind_csv wiktionary_csv
 
 conceptnet4_csv: force_look
 	cd conceptnet4/ ; make conceptnet4_csv
 
+conceptnet4_nadya_csv:
+	cd conceptnet4_nadya/ ; make conceptnet4_nadya_csv
+
 conceptnet4_zh_csv: force_look 
-	cd conceptnet_zh/ ; make conceptnet_zh_csv
+	cd conceptnet_zh/ ; make conceptnet4_zh_csv
 
 reverb_csv: force_look
 	cd reverb/ ; make reverb_csv
