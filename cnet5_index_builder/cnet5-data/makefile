@@ -1,8 +1,11 @@
 DATE = $$(date +%Y%m%d_%H%M%S)
 CSV_FILES = */data/flat/*.csv
 
-all_json: conceptnet4_json conceptnet4_nadya_json conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
-
+#this distinction is made since cnet4 does not depend on any files 
+#in the raw_data folder so it is rebuilt everytime
+all_non_cnet4_json: conceptnet4_zh_json dbpedia_json globalmind_json reverb_json verbosity_json wordnet_json wiktionary_json
+all_cnet4_json: conceptnet4_json conceptnet4_nadya_json
+	
 conceptnet4_json: force_look
 	cd conceptnet4/ ; make conceptnet4_json
 
@@ -61,10 +64,10 @@ wiktionary_csv: force_look
 	cd wiktionary/ ; make wiktionary_csv
 
 
-core: $(CSV_FILES)
+core: all_csv
 	python scripts/flat_assertions.py $(CSV_FILES)
 
-tar_bz_from_json: force_look
+tar_bz_from_json: core
 	tar -cjf solr_json_$(DATE).tar.bz2 */data/solr/*.json core_data/solr/*.json
 
 force_look:

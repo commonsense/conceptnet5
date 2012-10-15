@@ -13,8 +13,6 @@ import json
 # same floating-point number as their score and appear adjacent in the file.
 
 
-
-writer = MultiWriter('reverb-wp-frontpage')
 def output_edge(obj):
     objsource = obj['sources'][0]
     if obj['arg1'].startswith(objsource):
@@ -48,30 +46,34 @@ def output_edge(obj):
     print weight, rel, surfaceText.encode('utf-8')
     writer.write(edge)
 
-current_obj = None
-current_score = None
-for line in codecs.open('raw_data/reverb_featured_triples.txt', encoding='utf-8', errors='replace'):
-    line = line.strip()
-    if line and not line.startswith('['):
-        obj = json.loads(line)
-        if current_obj is None:
-            current_obj = obj
-            current_score = obj['weight']
-            obj['surfaceRel'] = obj['rel']
-        elif obj['weight'] == current_score:
-            if normalize(obj['arg1']) == normalize(current_obj['arg1']) and normalize(obj['arg2']) == normalize(current_obj['arg2']):
-                current_obj['rel'] = obj['rel']
-            output_edge(current_obj)
-            current_obj = None
-            current_score = None
-        else:
-            if current_obj is not None:
+def main():
+    writer = MultiWriter('reverb-wp-frontpage')
+    current_obj = None
+    current_score = None
+    for line in codecs.open('raw_data/reverb_featured_triples.txt', encoding='utf-8', errors='replace'):
+        line = line.strip()
+        if line and not line.startswith('['):
+            obj = json.loads(line)
+            if current_obj is None:
+                current_obj = obj
+                current_score = obj['weight']
+                obj['surfaceRel'] = obj['rel']
+            elif obj['weight'] == current_score:
+                if normalize(obj['arg1']) == normalize(current_obj['arg1']) and normalize(obj['arg2']) == normalize(current_obj['arg2']):
+                    current_obj['rel'] = obj['rel']
                 output_edge(current_obj)
-            current_obj = obj
-            current_score = obj['weight']
-            obj['surfaceRel'] = obj['rel']
-if current_obj is not None:
-    output_edge(current_obj)
+                current_obj = None
+                current_score = None
+            else:
+                if current_obj is not None:
+                    output_edge(current_obj)
+                current_obj = obj
+                current_score = obj['weight']
+                obj['surfaceRel'] = obj['rel']
+    if current_obj is not None:
+        output_edge(current_obj)
 
-writer.close()
+    writer.close()
 
+if __name__ == '__main__':
+    main()
