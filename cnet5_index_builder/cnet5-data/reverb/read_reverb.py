@@ -12,6 +12,7 @@ import json
 # that a normalized and unnormalized statement are related if they have the
 # same floating-point number as their score and appear adjacent in the file.
 
+writer = MultiWriter('reverb-wp-frontpage')
 
 def output_edge(obj):
     objsource = obj['sources'][0]
@@ -47,7 +48,6 @@ def output_edge(obj):
     writer.write(edge)
 
 def main():
-    writer = MultiWriter('reverb-wp-frontpage')
     current_obj = None
     current_score = None
     for line in codecs.open('raw_data/reverb_featured_triples.txt', encoding='utf-8', errors='replace'):
