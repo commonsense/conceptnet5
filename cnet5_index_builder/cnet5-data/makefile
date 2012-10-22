@@ -6,6 +6,8 @@ CSV_FILES = */data/flat/*.csv
 ALL_NON_CNET4_DATA_SOURCES  = conceptnet4_zh dbpedia globalmind reverb verbosity wordnet wiktionary
 ALL_CNET4_DATA_SOURCES = conceptnet4 conceptnet4_nadya
 
+DATA_SOURCES = $(ALL_CNET4_DATA_SOURCES) $(ALL_NON_CNET4_DATA_SOURCES)
+
 non_cnet4_json:
 	@for subdir in $(ALL_NON_CNET4_DATA_SOURCES);\
 	do\
@@ -18,9 +20,8 @@ cnet4_json:
 	    cd $$subdir/ ; make $$subdir_json;\
 	done
 
-
 csv:
-	@for subdir in $(ALL_CNET4_DATA_SOURCES) $(ALL_NON_CNET4_DATA_SOURCES);\
+	@for subdir in $(DATA_SOURCES);\
 	do\
 	    cd $$subdir/ ; make $$subdir_csv;\
 	done
@@ -32,7 +33,7 @@ tar_bz_from_json: core
 	tar -cjf solr_json_$(DATE).tar.bz2 */data/solr/*.json core_data/solr/*.json
 
 clean: force_look
-	@for subdir in $(ALL_CNET4_DATA_SOURCES) $(ALL_NON_CNET4_DATA_SOURCES);\
+	@for subdir in $(DATA_SOURCES);\
 	do\
 	    cd $$subdir/ ; make clean;\
 	done
