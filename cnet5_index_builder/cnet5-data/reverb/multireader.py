@@ -38,12 +38,13 @@ class MultiReader():
 	def fill_queue(self):
 		chunksize = max(1, os.path.getsize(self.file_name) / NUMBER_OF_WORKERS / (1024*1024))
 
+		chunk_number = 0
 		# distribute the chunks
 		for chunk in self.getchunks(self.file_name, chunksize*1024*1024):
 			chunk_start = chunk[0]
 			chunk_size = chunk[1]
-			self.queue.put((self.file_name, chunk_start,chunk_size,self.multiwriter_filename))
-
+			self.queue.put((self.file_name, chunk_start,chunk_size,chunk_number,self.multiwriter_filename))
+			chunk_number += 1
 	def getchunks(self,file, size=1024*1024):
 	    # yield sequence of (start, size) chunk descriptors
 		f = open(file, "r")
@@ -103,7 +104,9 @@ class SubprocessManagerWorker(threading.Thread):
             return None
         return marshal.loads(stdout.read(n))
 
-
+#this class is what is run by the subprocess,
+#it is delegated chunks to handle by a subprocessManagerWorker
+#there is one of these for each subprocessManagerWorker
 class FileChunkProcessor(object):
 	def __init__(self,handle_lines):
 		#this is the method used to create edges from the lines
@@ -125,19 +128,20 @@ class FileChunkProcessor(object):
 			file_name = args[0]
 			chunk_start= args[1]
 			chunk_size = args[2]
-			multi_writer_filename = args[3]
+			chunk_number = args[3]
+			multi_writer_filename = args[4]
 
 			#process the chunk given by the args
-			self.processChunk(file_name,chunk_start,chunk_size,multi_writer_filename)
+			self.processChunk(file_name,chunk_start,chunk_size,chunk_number,multi_writer_filename)
 
 			#let the multireader know we have finished our chunk
 			#and are ready for another one
 			self.putobject(sys.stdout, "finished with chunk")
 
-	def processChunk(self,file_name,chunk_start,chunk_size,multi_writer_filename):
+	def processChunk(self,file_name,chunk_start,chunk_size,chunk_number,multi_writer_filename):
 		my_file = open(file_name)
 
-		writer = MultiWriter(str(multi_writer_filename) + str(chunk_start)+ '.txt')
+		writer = MultiWriter(str(multi_writer_filename) + "_"+ str(chunk_number))
 		my_file.seek(chunk_start)
 		lines = my_file.readlines(chunk_size)
 
