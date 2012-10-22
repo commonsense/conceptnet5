@@ -1,8 +1,14 @@
 import codecs, string
+import json
+import sys
+import os
+
 from metanl.english import normalize
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import make_edge, MultiWriter
-import json
+from multireader import MultiReader, FileChunkProcessor
+
+#from file_chunk_processor import FileChunkProcessor
 
 # Unfortunately, the current file contains a mix of normalized and unnormalized
 # output, based on the way things worked in the beta of ConceptNet 5. In fact,
@@ -12,9 +18,11 @@ import json
 # that a normalized and unnormalized statement are related if they have the
 # same floating-point number as their score and appear adjacent in the file.
 
-writer = MultiWriter('reverb-wp-frontpage')
+REVERB_FILES = ['raw_data/reverb_featured_triples.txt']
 
-def output_edge(obj):
+
+
+def output_edge(obj,writer):
     objsource = obj['sources'][0]
     if obj['arg1'].startswith(objsource):
         obj['arg1'] = objsource
@@ -44,13 +52,12 @@ def output_edge(obj):
                      context=context,
                      surfaceText=surfaceText,
                      weight=weight)
-    print weight, rel, surfaceText.encode('utf-8')
     writer.write(edge)
 
-def main():
+def handle_lines(lines,writer):
     current_obj = None
     current_score = None
-    for line in codecs.open('raw_data/reverb_featured_triples.txt', encoding='utf-8', errors='replace'):
+    for line in lines:
         line = line.strip()
         if line and not line.startswith('['):
             obj = json.loads(line)
@@ -61,19 +68,41 @@ def main():
             elif obj['weight'] == current_score:
                 if normalize(obj['arg1']) == normalize(current_obj['arg1']) and normalize(obj['arg2']) == normalize(current_obj['arg2']):
                     current_obj['rel'] = obj['rel']
-                output_edge(current_obj)
+                output_edge(current_obj,writer)
                 current_obj = None
                 current_score = None
             else:
                 if current_obj is not None:
-                    output_edge(current_obj)
+                    output_edge(current_obj,writer)
                 current_obj = obj
                 current_score = obj['weight']
                 obj['surfaceRel'] = obj['rel']
     if current_obj is not None:
-        output_edge(current_obj)
+        output_edge(current_obj,writer)
 
     writer.close()
 
+
 if __name__ == '__main__':
-    main()
+
+    #normal writer I have not changed it.
+    if len(sys.argv) == 0:
+        writer = MultiWriter('reverb-wp-frontpage')
+        for file_to_read in REVERB_FILES:
+            lines = codecs.open(file_to_read, encoding='utf-8', errors='replace')
+            handle_lines(lines,writer)
+
+    #if you want to use the multi-threaded writer to write quickly, put --quick_write 
+    #in the args.
+    #ex:
+    #   python read_reverb.py --quick_write
+    elif "--quick_write" in sys.argv:
+        reader_file_path = os.path.abspath( __file__ )
+
+        for file_to_read in REVERB_FILES:
+            mulitwriter_file_name ="reverb"
+            multiReader = MultiReader(file_to_read, mulitwriter_file_name,reader_file_path)
+    
+    #this is called by subprocess of the quick_write method, dont ever call this yourself
+    elif "--subprocess" in sys.argv:
+        FileChunkProcessor(handle_lines)
