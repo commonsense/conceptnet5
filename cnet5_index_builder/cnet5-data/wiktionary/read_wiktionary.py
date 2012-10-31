@@ -244,7 +244,7 @@ class FindTranslations(ContentHandler):
         else:
             target = make_concept_uri(term2, lang)
         surfaceText = "[[%s]] %s [[%s]]" % (term1, relation, term2)
-        print surfaceText
+        #print surfaceText
 
         edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
                          license='/l/CC/By-SA',
@@ -273,7 +273,7 @@ class FindTranslations(ContentHandler):
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
         surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
-        print surfaceText
+        #print surfaceText
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
                          license='/l/CC/By-SA',
                          sources=[SOURCE, TRANSLATE],

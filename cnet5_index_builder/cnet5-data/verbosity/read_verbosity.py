@@ -59,7 +59,7 @@ for line in open('raw_data/verbosity.txt'):
             flagged = True
             break
     if flagged:
-        print "FLAGGED:", right
+        #print "FLAGGED:", right
         counts['flag word'] += 1
         flag_out.write(line)
         continue
@@ -116,8 +116,8 @@ for line in open('raw_data/verbosity.txt'):
     count += 1
     counts['success'] += 1
     good_out.write(line)
-    if count % 100 == 0:
-        print (rel, left, right, score)
+    #if count % 100 == 0:
+        #print (rel, left, right, score)
     
     if make_json:
         edge = make_edge(rel, left, right, '/d/verbosity',
@@ -125,7 +125,7 @@ for line in open('raw_data/verbosity.txt'):
                          weight = score/10.0)
         writer.write(edge)
 
-print counts
+#print counts
 
 if make_json:
     writer.close()
