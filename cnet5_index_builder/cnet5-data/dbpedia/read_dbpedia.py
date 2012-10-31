@@ -22,11 +22,6 @@ def cycle_writer():
     WRITER_NUM += 1
     writer = MultiWriter('dbpedia.%d' % WRITER_NUM)
 
-VERBOSE = True
-def show_message(message):
-  if VERBOSE:
-    print message
-
 def translate_wp_url(url):
     url = urllib.unquote(url).decode('utf-8', 'ignore')
     return un_camel_case(url.strip('/').split('/')[-1].split('#')[-1])

@@ -95,7 +95,6 @@ for assertion in assertiondata:
                      sources=sources,
                      surfaceText=surfaceText,
                      weight=1)
-    print surfaceText.encode('utf-8')
     assertions[assertion['pk']] = edge
     writer.write(edge)
 
@@ -130,7 +129,6 @@ for translation in translationdata:
                      sources=sources,
                      surfaceText=surfaceText,
                      weight=1)
-    print surfaceText.encode('utf-8')
     writer.write(edge)
 
 writer.close()
