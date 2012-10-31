@@ -1,18 +1,19 @@
 JSON_DEPENDENCIES = read_globalmind.py raw_data/GMUser.yaml raw_data/GMFrame.yaml raw_data/GMAssertion.yaml raw_data/GMTranslation.yaml
-CSV_DEPENDENCIES = data/flat/globalmind.json
-JSON_TARGET = data/flat/globalmind.json
-CSV_TARGET = data/flat/globalmind.csv
+JSON_TARGET = data/flat/*.json
+CSV_TARGET = data/flat/*.csv
 
-globalmind_json: $(JSON_TARGET)
+all: csv
 
-globalmind_csv: $(CSV_TARGET)
+json: $(JSON_TARGET)
+
+csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	python read_globalmind.py
 
-$(CSV_TARGET): $(CSV_DEPENDENCIES)
-	python ../scripts/flatten_json_to_csv.py data/flat/globalmind.json
+$(CSV_TARGET): $(JSON_TARGET)
+	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 
 clean: 

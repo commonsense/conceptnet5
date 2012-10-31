@@ -86,7 +86,7 @@ def handle_lines(lines,writer):
 if __name__ == '__main__':
 
     #normal writer I have not changed it.
-    if len(sys.argv) == 0:
+    if len(sys.argv) == 1:
         writer = MultiWriter('reverb-wp-frontpage')
         for file_to_read in REVERB_FILES:
             lines = codecs.open(file_to_read, encoding='utf-8', errors='replace')

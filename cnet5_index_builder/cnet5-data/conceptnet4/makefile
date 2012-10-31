@@ -1,18 +1,18 @@
 JSON_DEPENDENCIES = read_conceptnet4.py
-CSV_DEPENDENCIES = data/flat/conceptnet4.json
-JSON_TARGET = data/flat/conceptnet4.json
-CSV_TARGET = data/flat/conceptnet4.csv
+JSON_TARGET = data/flat/*.json
+CSV_TARGET = data/flat/*.csv
 
-conceptnet4_json: $(JSON_TARGET)
+all: csv
 
-conceptnet4_csv: $(CSV_TARGET)
+json: $(JSON_TARGET)
 
+csv: $(CSV_TARGET) 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	python read_conceptnet4.py
 
-$(CSV_TARGET): $(CSV_DEPENDENCIES)
-	python ../scripts/flatten_json_to_csv.py data/flat/*.json
+$(CSV_TARGET): $(JSON_TARGET)
+	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 
 clean: 

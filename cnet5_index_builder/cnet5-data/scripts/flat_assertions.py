@@ -18,7 +18,7 @@ def build_core_from_csvs(csv_files):
             if uri != 'uri' and context == '/ctx/all':
                 weight = float(weight)
                 weights[uri] += float(weight)
-                assertions[uri] = (rel, start, end, context, weight)
+                assertions[uri] = (rel, start, end, context, weights[uri])
                 if not (dataset.startswith('/d/reverb') or dataset.startswith('/d/wiktionary') or dataset.startswith('/d/dbpedia')):
                     ccby[uri] = True
 

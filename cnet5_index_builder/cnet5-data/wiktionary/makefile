@@ -1,18 +1,19 @@
 JSON_DEPENDENCIES = read_wiktionary.py raw_data/enwiktionary.xml
-CSV_DEPENDENCIES = data/flat/wiktionary.json
-JSON_TARGET = data/flat/wiktionary.json
-CSV_TARGET = data/flat/wiktionary.csv
+JSON_TARGET = data/flat/*.json
+CSV_TARGET = data/flat/*.csv
 
-wiktionary_json: $(JSON_TARGET)
+all: csv 
 
-wiktionary_csv: $(CSV_TARGET)
+json: $(JSON_TARGET)
+
+csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	python read_wiktionary.py
 
-$(CSV_TARGET): $(CSV_DEPENDENCIES)
-	python ../scripts/flatten_json_to_csv.py $(CSV_DEPENDENCIES)
+$(CSV_TARGET): $(JSON_TARGET)
+	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 	
 clean: 

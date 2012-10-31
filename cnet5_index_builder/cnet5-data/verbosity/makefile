@@ -1,18 +1,19 @@
 JSON_DEPENDENCIES = read_verbosity.py raw_data/verbosity.txt
-CSV_DEPENDENCIES = data/flat/verbosity.json
-JSON_TARGET = data/flat/verbosity.json
-CSV_TARGET = data/flat/verbosity.csv 
+JSON_TARGET = data/flat/*.json
+CSV_TARGET = data/flat/*.csv 
 
-verbosity_json: $(JSON_TARGET)
+all: csv
 
-verbosity_csv: $(CSV_TARGET)
+json: $(JSON_TARGET)
+
+csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	python read_verbosity.py
 
-$(CSV_TARGET): $(CSV_DEPENDENCIES)
-	python ../scripts/flatten_json_to_csv.py $(CSV_DEPENDENCIES)
+$(CSV_TARGET): $(JSON_TARGET)
+	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 
 clean: 

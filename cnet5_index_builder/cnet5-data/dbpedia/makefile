@@ -1,18 +1,19 @@
 JSON_DEPENDENCIES = read_dbpedia.py raw_data/wikipedia.txt raw_data/mappingbased_properties_en.nt raw_data/instance_types_en.nt
-CSV_DEPENDENCIES = data/flat/dbpedia.1.json
-JSON_TARGET = data/flat/dbpedia.1.json
-CSV_TARGET = data/flat/dbpedia.1.csv
+JSON_TARGET = data/flat/*.json
+CSV_TARGET = data/flat/*.csv
 
-dbpedia_json: $(JSON_TARGET)
+all: csv 
 
-dbpedia_csv: $(CSV_TARGET)
+json: $(JSON_TARGET)
+
+csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	python read_dbpedia.py
 
-$(CSV_TARGET): $(CSV_DEPENDENCIES)
-	python ../scripts/flatten_json_to_csv.py data/flat/*.json
+$(CSV_TARGET): $(JSON_TARGET)
+	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 
 clean: 
