@@ -9,7 +9,7 @@ json: $(JSON_TARGET)
 csv: $(CSV_TARGET) 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
-	python read_conceptnet4.py
+	python read_conceptnet4.py --quick_write
 
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)

@@ -10,7 +10,7 @@ csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
-	python read_zh.py
+	python read_zh.py --quick_write
 
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)

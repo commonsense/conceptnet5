@@ -1,32 +1,51 @@
 from conceptnet.models import *
 import os
 import codecs
+import sys
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import make_edge, MultiWriter
+from conceptnet5.quick_reader import QuickReader
 
-path = "./raw_data/"
-sparse_pieces = []
-for filename in os.listdir(path):
-    if filename.startswith('conceptnet_zh_'):
-        print filename
-        writer = MultiWriter(filename.split('.')[0])
+
+def handle_raw_assertion(raw_assertion):
+    line = raw_assertion.strip()
+    if line:
+        parts = line.split(', ')
+        user, frame_id, concept1, concept2 = parts
+        frame = Frame.objects.get(id=int(frame_id))
+        ftext = frame.text
+        relation = frame.relation.name
+        rel = '/r/'+relation
+
+        surfaceText = ftext.replace(u'{1}', u'[['+concept1+u']]').replace(u'{2}', u'[['+concept2+u']]')
+        start = make_concept_uri(concept1, 'zh_TW')
+        end = make_concept_uri(concept2, 'zh_TW')
+        sources = ['/s/contributor/petgame/'+user, '/s/activity/ntt/petgame']
+        edge = make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
+                         license='/l/CC/By', sources=sources,
+                         surfaceText=surfaceText, weight=1)
+        return [edge]
+
+def add_lines_to_queue(q):
+    path = "./raw_data/"
+    for filename in os.listdir(path):
         for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            line = line.strip()
-            if line:
-                parts = line.split(', ')
-                user, frame_id, concept1, concept2 = parts
-                frame = Frame.objects.get(id=int(frame_id))
-                ftext = frame.text
-                relation = frame.relation.name
-                rel = '/r/'+relation
+            q.put(line)
 
-                surfaceText = ftext.replace(u'{1}', u'[['+concept1+u']]').replace(u'{2}', u'[['+concept2+u']]')
-                start = make_concept_uri(concept1, 'zh_TW')
-                end = make_concept_uri(concept2, 'zh_TW')
-                sources = ['/s/contributor/petgame/'+user, '/s/activity/ntt/petgame']
-                edge = make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
-                                 license='/l/CC/By', sources=sources,
-                                 surfaceText=surfaceText, weight=1)
+def run_single_process():
+    writer = MultiWriter('conceptnet4_zh')
+    path = "./raw_data/"
+    for filename in os.listdir(path):
+        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            edge = handle_raw_assertion(line)
+            if edge != None:
                 writer.write(edge)
-        writer.close()
 
+
+if __name__ == '__main__':
+    if "--quick_write" in sys.argv:
+        quickReader = QuickReader("conceptnet4_zh", handle_raw_assertion,add_lines_to_queue)
+        quickReader.start()
+
+    else:
+        run_single_process()
