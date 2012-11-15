@@ -26,24 +26,25 @@ bad_regex_no_biscuit =\
 
 maxscore = 0
 count = 0
-skipcount = 0
+
 counts = defaultdict(int)
 text_similarities = []
 
-flag_out = open('raw_data/output/flagged_assertions.txt', 'w')
-similar_out = open('raw_data/output/text_similarity.txt', 'w')
-weak_out = open('raw_data/output/weak_assertions.txt', 'w')
-good_out = open('raw_data/output/ok_assertions.txt', 'w')
+flag_out = open('data/output/flagged_assertions.txt', 'w')
+similar_out = open('data/output/text_similarity.txt', 'w')
+weak_out = open('data/output/weak_assertions.txt', 'w')
+good_out = open('data/output/ok_assertions.txt', 'w')
 sources = ['/s/site/verbosity']
+
+
+
 
 writer = None
 if make_json:
     writer = MultiWriter('verbosity')
 
 for line in open('raw_data/verbosity.txt'):
-    if skipcount > 0:
-        skipcount -= 1
-        continue
+
     parts = line.strip().split('\t')
     if not parts:
         counts['blank'] += 1
@@ -116,8 +117,6 @@ for line in open('raw_data/verbosity.txt'):
     count += 1
     counts['success'] += 1
     good_out.write(line)
-    #if count % 100 == 0:
-        #print (rel, left, right, score)
     
     if make_json:
         edge = make_edge(rel, left, right, '/d/verbosity',
@@ -125,7 +124,6 @@ for line in open('raw_data/verbosity.txt'):
                          weight = score/10.0)
         writer.write(edge)
 
-#print counts
 
 if make_json:
     writer.close()
@@ -135,7 +133,7 @@ good_out.close()
 weak_out.close()
 similar_out.close()
 
-simout = open('raw_data/similarity-scores.txt', 'w')
+simout = open('data/output/similarity-scores.txt', 'w')
 for sim in text_similarities:
     print >> simout, sim
 simout.close()

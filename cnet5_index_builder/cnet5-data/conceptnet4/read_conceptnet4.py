@@ -114,7 +114,7 @@ def by_bedume_and_bad(source_list,start,end,raw_assertion):
         for flagged in BEDUME_FLAGGED_CONCEPTS + BEDUME_FLAGGED_PLACES:
             check = '/'+flagged.replace(' ', '_')
             if start.endswith(check) or end.endswith(check):
-                print "flagged:", str(raw_assertion)
+                #print "flagged:", str(raw_assertion)
                 return True
     return False
 
@@ -145,7 +145,7 @@ def handle_raw_assertion(raw_assertion):
         return edges
     except Exception:
         import traceback
-        traceback.print_exc()
+        #traceback.print_exc()
         return []
 
 

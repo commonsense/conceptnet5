@@ -11,6 +11,8 @@ data_sources: $(DATA_SOURCES)
 $(DATA_SOURCES):
 	$(MAKE) -C $@ all
 
+conceptnet4_nadya: conceptnet4
+
 core: data_sources
 	python scripts/flat_assertions.py $(CSV_FILES)
 

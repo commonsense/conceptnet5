@@ -6,7 +6,7 @@ import os
 from metanl.english import normalize
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import make_edge, MultiWriter
-from multireader import MultiReader, FileChunkProcessor
+
 
 #from file_chunk_processor import FileChunkProcessor
 

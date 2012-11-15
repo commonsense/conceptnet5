@@ -13,7 +13,7 @@ import urllib2
 source = '/s/web/dbpedia.org'
 WRITER_NUM = 1
 writer = MultiWriter('dbpedia.%d' % WRITER_NUM)
-sw_map = FlatEdgeWriter('raw_data/sw/dbpedia.map.json')
+sw_map = FlatEdgeWriter('data/sw/dbpedia.map.json')
 sw_map_used = set()
 
 def cycle_writer():

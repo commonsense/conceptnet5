@@ -2,7 +2,7 @@ from multiprocessing import Process, JoinableQueue
 from conceptnet5.edges import MultiWriter, make_edge
 
 class QuickReader():
-	def __init__(self, writer_name,handle_raw_assertion,add_lines_to_queue, num_threads = 10):
+	def __init__(self, writer_name,handle_raw_assertion,add_lines_to_queue, num_threads = 5):
 		self.handle_raw_assertion = handle_raw_assertion
 		self.add_lines_to_queue = add_lines_to_queue
 		self.writer_name = writer_name
@@ -27,7 +27,7 @@ class QuickReader():
 
 	def create_processes(self):
 	    processes = []
-	    for i in range(10):
+	    for i in range(self.num_threads):
 	        writer = MultiWriter(self.writer_name + "_" + str(i))
 	        p = Process(target = self.pull_lines, args = (self.queue, writer))
 	        p.daemon=True

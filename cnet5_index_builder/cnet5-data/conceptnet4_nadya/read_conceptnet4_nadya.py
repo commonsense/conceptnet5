@@ -87,7 +87,7 @@ def handle_raw_assertion(raw_assertion):
         return edges
     except Exception:
         import traceback
-        traceback.print_exc()
+        #traceback.print_exc()
         return []
 
 def add_lines_to_queue(q):

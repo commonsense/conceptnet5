@@ -18,9 +18,6 @@ $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
 
-reverb_quick_json: $(JSON_DEPENDENCIES)
-	python read_reverb.py --quick_write
-
 clean: 
 	#touch is used in case folders are already empty so no error is thrown
 	touch data/flat/abc123xzy456

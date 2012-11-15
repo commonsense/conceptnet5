@@ -9,6 +9,7 @@ from conceptnet5.quick_reader import QuickReader
 
 def handle_raw_assertion(raw_assertion):
     line = raw_assertion.strip()
+    edges = []
     if line:
         parts = line.split(', ')
         user, frame_id, concept1, concept2 = parts
@@ -24,7 +25,8 @@ def handle_raw_assertion(raw_assertion):
         edge = make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
                          license='/l/CC/By', sources=sources,
                          surfaceText=surfaceText, weight=1)
-        return [edge]
+        edges.append(edge)
+    return edges
 
 def add_lines_to_queue(q):
     path = "./raw_data/"
@@ -37,8 +39,8 @@ def run_single_process():
     path = "./raw_data/"
     for filename in os.listdir(path):
         for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            edge = handle_raw_assertion(line)
-            if edge != None:
+            edges = handle_raw_assertion(line)
+            for edge in edges:
                 writer.write(edge)
 
 
