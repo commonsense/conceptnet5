@@ -15,6 +15,8 @@ $(JSON_TARGET): $(JSON_DEPENDENCIES)
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
+flat_files: read_conceptnet4_into_flat_files.py
+	python read_conceptnet4_into_flat_files.py --build_flat_files
 
 clean: 
 	#touch is used in case folders are already empty so no error is thrown

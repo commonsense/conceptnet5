@@ -26,19 +26,19 @@ def build_core_from_csvs(csv_files):
     writer_core = MultiWriter('assertion_totals_core')
     #writer_sa = MultiWriter('assertion_totals_sa')
 
-    for uri, weight in assertions.iteritems():
+    for uri, values in assertions.iteritems():
+        relation, start, end, context, weight = values
         if ccby[uri]:
             license = '/l/CC/By'
             dataset = '/d/conceptnet/5/combined-core'
         else:
             license = '/l/CC/By-SA'
             dataset = '/d/conceptnet/5/combined-sa'
-        relation, start, end, context, weight = assertions[uri]
         edge = make_edge(relation, start, end, dataset, license, ['/s/rule/sum_edges'], '/ctx/all', weight=weight)
         if license == '/l/CC/By':
             writer_core.write(edge)
         #else:
-        #    writer_sa.write(edge)
+            #writer_sa.write(edge)
     writer_core.close()
     #writer_sa.close()
 

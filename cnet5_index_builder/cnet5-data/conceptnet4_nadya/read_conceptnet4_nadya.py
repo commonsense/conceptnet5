@@ -95,6 +95,21 @@ def add_lines_to_queue(q):
     for raw_assertion in raw_assertions:
         q.put(raw_assertion)
 
+def build_raw():
+  writer_number = 0
+  count = 0
+  raw_assertions = RawAssertion.objects.filter()
+  output = open("raw_data/conceptnet4_nadya_"+ str(writer_number)+".txt", 'w')
+  for raw_assertion in raw_assertions:
+    lang = raw_assertion.language_id
+    if not can_skip(raw_assertion):
+        output.write(str(raw_assertion) + "\n")
+        count +=1
+        if count % 100000 == 0:
+          writer_number +=1
+          output.close()
+          output = open("raw_data/conceptnet4_nadya_"+ str(writer_number)+".txt", 'w')
+
 def run_single_process():
     writer = MultiWriter('conceptnet4_nadya')
     raw_assertions = RawAssertion.objects.filter()
@@ -108,6 +123,7 @@ if __name__ == '__main__':
     if "--quick_write" in sys.argv:
         quickReader = QuickReader("conceptnet_nadya", handle_raw_assertion,add_lines_to_queue)
         quickReader.start()
-
+    elif "--build_raw" in sys.argv:
+      build_raw()
     else:
         run_single_process()
