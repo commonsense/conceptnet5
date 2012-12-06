@@ -1,0 +1,3 @@
+Wiktionary TODO:
+- get disambiguated translations from infoboxes
+- handle Chinese -- scan for cmn-noun|t, cmn-verb|s, etc.
