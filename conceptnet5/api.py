@@ -155,7 +155,7 @@ def search(query_args=None):
         return see_documentation()
     return get_query_result(params)
 
-SOLR_BASE = 'http://amalthea.csc.media.mit.edu:8983/solr/select?'
+SOLR_BASE = 'http://himalia.csc.media.mit.edu:8983/solr/select?'
 
 def get_link(params):
     return SOLR_BASE + urllib.urlencode(params)
