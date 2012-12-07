@@ -15,26 +15,26 @@ JA = japanese.NoStopwordMeCabWrapper()
 
 LICENSE = '/l/CC/By'
 
-def can_skip(raw_assertion):
-    lang = raw_assertion.language_id
+def can_skip(parts_dict):
+    lang = parts_dict['lang']
     if lang != 'ja':
         return True
-    if raw_assertion.frame.goodness < 1:
+    if parts_dict["goodness"] < 1:
         return True
 
-    activity = raw_assertion.sentence.activity.name
+    activity = parts_dict["activity"]
     if 'rubycommons' in activity: 
         return True
     return False
 
-def build_frame_text(raw_assertion):
-    frame_text = raw_assertion.frame.text
-    frame_text = frame_text.replace('{1}', '[[%s]]' % raw_assertion.text1).replace('{2}', '[[%s]]' % raw_assertion.text2)
+def build_frame_text(parts_dict):
+    frame_text = parts_dict["frame_text"]
+    frame_text = frame_text.replace('{1}', '[[%s]]' % parts_dict["startText"]).replace('{2}', '[[%s]]' % parts_dict["endText"])
     return frame_text
 
-def build_relation(raw_assertion):
-    polarity = raw_assertion.frame.frequency.value
-    relname = raw_assertion.frame.relation.name
+def build_relation(parts_dict):
+    polarity = parts_dict["polarity"]
+    relname = parts_dict["relname"]
     if relname == 'ConceptuallyRelatedTo':
         relname = 'RelatedTo'
 
@@ -44,20 +44,20 @@ def build_relation(raw_assertion):
         relation = normalize_uri('/r/Not'+relname)
     return relation
 
-def build_start(raw_assertion):
-    lang = raw_assertion.language_id
-    startText = ' '.join(JA.normalize_list(raw_assertion.text1))
+def build_start(parts_dict):
+    lang = parts_dict['lang']
+    startText = ' '.join(JA.normalize_list(parts_dict["startText"]))
     start = make_concept_uri(startText, lang)
     return start
 
-def build_end(raw_assertion):
-    lang = raw_assertion.language_id
-    endText = ' '.join(JA.normalize_list(raw_assertion.text2))
+def build_end(parts_dict):
+    lang = parts_dict['lang']
+    endText = ' '.join(JA.normalize_list(parts_dict["endText"]))
     end = make_concept_uri(endText, lang)
     return end
 
-def build_sources(raw_assertion):
-    score = raw_assertion.score
+def build_sources(parts_dict):
+    score = parts_dict["score"]
     activity_node = normalize_uri(u'/s/site/nadya.jp')
     sources = [([activity_node], score/5.)]
     return sources
@@ -65,65 +65,83 @@ def build_sources(raw_assertion):
 def build_data_set():
     return normalize_uri('/d/nadya.jp')
 
-def handle_raw_assertion(raw_assertion):
+
+def extract_parts(flat_assertion):
+    parts_dict = {}
+    
+    parts_dict["lang"] = re.findall('(?<=<lang>).*(?=</lang>)', flat_assertion)[0]
+    parts_dict["creator"] = re.findall('(?<=<creator>).*(?=</creator>)', flat_assertion)[0]
+    parts_dict["frame_id"] = int(re.findall('(?<=<frame_id>).*(?=</frame_id>)', flat_assertion)[0])
+    parts_dict["startText"] = re.findall('(?<=<startText>).*(?=</startText>)', flat_assertion)[0]
+    parts_dict["endText"] = re.findall('(?<=<endText>).*(?=</endText>)', flat_assertion)[0]
+    parts_dict["activity"] = re.findall('(?<=<activity>).*(?=</activity>)', flat_assertion)[0]
+    parts_dict["relname"] = re.findall('(?<=<relname>).*(?=</relname>)', flat_assertion)[0]
+    parts_dict["polarity"] = float(re.findall('(?<=<polarity>).*(?=</polarity>)', flat_assertion)[0])
+    parts_dict["goodness"] = float(re.findall('(?<=<goodness>).*(?=</goodness>)', flat_assertion)[0])
+    parts_dict["frame_text"] = re.findall('(?<=<frame_text>).*(?=</frame_text>)', flat_assertion)[0]
+    parts_dict["cnet4_id"] = int(re.findall('(?<=<cnet4_id>).*(?=</cnet4_id>)', flat_assertion)[0])
+    parts_dict["score"] = float(re.findall('(?<=<score>).*(?=</score>)', flat_assertion)[0])
+    raw_votes = re.findall('(?<=<votes>).*(?=</votes>)', flat_assertion)[0].split("<vote>")[1:]
+    votes_list = []
+    for raw_vote in raw_votes:
+        raw_vote = raw_vote[:-7]
+        parts = raw_vote.split(": ")
+        vote_username = parts[0]
+        vote_int = int(parts[1].split(" ")[0])
+       
+        votes_list.append((vote_username, vote_int))
+
+    parts_dict["votes"] = votes_list
+
+    return parts_dict
+
+
+
+def handle_raw_flat_assertion(flat_assertion):
     try:
-        if can_skip(raw_assertion):
+        parts_dict = extract_parts(flat_assertion)
+        
+        if can_skip(parts_dict):
             return []
 
-        frame_text = build_frame_text(raw_assertion)
-        relation = build_relation(raw_assertion)
-        start = build_start(raw_assertion)
-        end = build_end(raw_assertion)
-        dataset = build_data_set()
-        sources = build_sources(raw_assertion)
+        # build the assertion
+        frame_text = build_frame_text(parts_dict)
+        relation = build_relation(parts_dict)
+        start = build_start(parts_dict)
+        end = build_end(parts_dict)
+        dataset = build_data_set(parts_dict)
+        sources = build_sources(parts_dict)
 
         edges = []
         for source_list, weight in sources:
             if 'commons2_reject' in ' '.join(source_list):
                 weight = -1
+            
+            if by_bedume_and_bad(source_list,start,end):
+                return []
+            else:
+                edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
+                edges.append(edge)
 
-            edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
-            edges.append(edge)
         return edges
     except Exception:
         import traceback
-        #traceback.print_exc()
+        print "failed on flat_assertion: " + str(flat_assertion)
+        traceback.print_exc()
         return []
 
-def add_lines_to_queue(q):
-    raw_assertions = RawAssertion.objects.filter()
-    for raw_assertion in raw_assertions:
-        q.put(raw_assertion)
 
-def build_raw():
-  writer_number = 0
-  count = 0
-  raw_assertions = RawAssertion.objects.filter()
-  output = open("raw_data/conceptnet4_nadya_"+ str(writer_number)+".txt", 'w')
-  for raw_assertion in raw_assertions:
-    lang = raw_assertion.language_id
-    if not can_skip(raw_assertion):
-        output.write(str(raw_assertion) + "\n")
-        count +=1
-        if count % 100000 == 0:
-          writer_number +=1
-          output.close()
-          output = open("raw_data/conceptnet4_nadya_"+ str(writer_number)+".txt", 'w')
 
-def run_single_process():
-    writer = MultiWriter('conceptnet4_nadya')
-    raw_assertions = RawAssertion.objects.filter()
-    for raw_assertion in raw_assertions:
-        edges = handle_raw_assertion(raw_assertion)
-        for edge in edges:
-            writer.write(edge)
+def pull_lines_from_raw_flat_files(q):
+    path = "./raw_data/"
+    for filename in os.listdir(path):
+        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            q.put(line)
+
 
 
 if __name__ == '__main__':
-    if "--quick_write" in sys.argv:
-        quickReader = QuickReader("conceptnet_nadya", handle_raw_assertion,add_lines_to_queue)
+    if "--build_from_flat" in sys.argv:
+        quickReader = QuickReader("conceptnet_nadya", handle_raw_flat_assertion,pull_lines_from_raw_flat_files)
         quickReader.start()
-    elif "--build_raw" in sys.argv:
-      build_raw()
-    else:
-        run_single_process()
+   

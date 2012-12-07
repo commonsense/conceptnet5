@@ -67,6 +67,7 @@ class FlatFileWriter():
       goodness = float(raw_assertion.frame.goodness)
       frame_text = unicode(raw_assertion.frame.text)
       cnet4_id = int(raw_assertion.id)
+      score = float(raw_assertion.score)
       votes = list(raw_assertion.votes.all())
 
       
@@ -117,6 +118,10 @@ class FlatFileWriter():
       line.append("<cnet4_id>")
       line.append(str(cnet4_id))
       line.append("</cnet4_id>")
+
+      line.append("<score>")
+      line.append(str(score))
+      line.append("</score>")
 
       line.append("<votes>")
       for vote in votes:

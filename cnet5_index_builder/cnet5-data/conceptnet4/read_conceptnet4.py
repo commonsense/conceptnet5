@@ -198,18 +198,12 @@ def pull_lines_from_raw_flat_files(q):
         for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
             q.put(line)
 
-def test_single_process():
-    path = "./raw_data/"
-    for filename in os.listdir(path):
-        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            handle_raw_flat_assertion(line)
 
 if __name__ == '__main__':
     if "--build_from_flat" in sys.argv:
         quickReader = QuickReader("conceptnet4", handle_raw_flat_assertion,pull_lines_from_raw_flat_files)
         quickReader.start()
-    else:
-        test_single_process()
+
 
 
 
