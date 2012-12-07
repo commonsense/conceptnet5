@@ -18,7 +18,6 @@ $(JSON_TARGET): $(JSON_DEPENDENCIES)
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
 
-
 clean: 
 	#touch is used in case folders are already empty so no error is thrown
 	touch data/flat/abc123xzy456

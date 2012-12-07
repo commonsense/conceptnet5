@@ -144,11 +144,14 @@ def extract_parts(flat_assertion):
     parts_dict["frame_text"] = re.findall('(?<=<frame_text>).*(?=</frame_text>)', flat_assertion)[0]
     parts_dict["cnet4_id"] = int(re.findall('(?<=<cnet4_id>).*(?=</cnet4_id>)', flat_assertion)[0])
     
-    raw_votes = re.findall('(?<=<vote>).*(?=</vote>)', flat_assertion)
+    raw_votes = re.findall('(?<=<votes>).*(?=</votes>)', flat_assertion)[0].split("<vote>")[1:]
     votes_list = []
     for raw_vote in raw_votes:
-        vote_username = raw_vote.split(": ")[0]
-        vote_int = int(re.findall('(?<=: ).*(?= on)', raw_vote)[0])
+        raw_vote = raw_vote[:-7]
+        parts = raw_vote.split(": ")
+        vote_username = parts[0]
+        vote_int = int(parts[1].split(" ")[0])
+       
         votes_list.append((vote_username, vote_int))
 
     parts_dict["votes"] = votes_list
@@ -184,6 +187,7 @@ def handle_raw_flat_assertion(flat_assertion):
         return edges
     except Exception:
         import traceback
+        print "failed on flat_assertion: " + str(flat_assertion)
         traceback.print_exc()
         return []
 
@@ -194,13 +198,18 @@ def pull_lines_from_raw_flat_files(q):
         for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
             q.put(line)
 
-
+def test_single_process():
+    path = "./raw_data/"
+    for filename in os.listdir(path):
+        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            handle_raw_flat_assertion(line)
 
 if __name__ == '__main__':
     if "--build_from_flat" in sys.argv:
         quickReader = QuickReader("conceptnet4", handle_raw_flat_assertion,pull_lines_from_raw_flat_files)
         quickReader.start()
-
+    else:
+        test_single_process()
 
 
 

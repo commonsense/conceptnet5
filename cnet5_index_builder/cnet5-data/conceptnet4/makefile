@@ -10,7 +10,7 @@ csv: $(CSV_TARGET)
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
 	export PYTHONPATH=/conceptnet5/cnet5_index_builder/cnet5-data/conceptnet4/db_config/
-	python read_conceptnet4.py --quick_write
+	python read_conceptnet4.py --build_from_flat
 
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)

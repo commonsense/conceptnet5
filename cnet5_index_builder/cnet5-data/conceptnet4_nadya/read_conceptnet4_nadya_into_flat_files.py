@@ -14,6 +14,5 @@ the conceptnet5 edges with the conceptnet4 data.
 if __name__ == '__main__':
 
     if "--build_flat_files" in sys.argv:
-        quickWriter = FlatFileWriter()
+        quickWriter = FlatFileWriter("raw_data/conceptnet4_nadya_flat_")
         quickWriter.start()
-
