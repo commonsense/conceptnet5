@@ -1,15 +1,11 @@
-# This file must be run while config.py points to the "nadya" database instead
-# of "ConceptNet".
-#
-# Unfortunately, all of this was done before Django had multi-database support.
-
-from csc_utils.batch import queryset_foreach
-from conceptnet.models import Sentence, Assertion, RawAssertion
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
 from metanl import japanese
-from conceptnet5.quick_reader import QuickReader
+from quick_reader import QuickReader
 import sys
+import os
+import codecs
+import re
 
 JA = japanese.NoStopwordMeCabWrapper()
 
@@ -109,7 +105,7 @@ def handle_raw_flat_assertion(flat_assertion):
         relation = build_relation(parts_dict)
         start = build_start(parts_dict)
         end = build_end(parts_dict)
-        dataset = build_data_set(parts_dict)
+        dataset = build_data_set()
         sources = build_sources(parts_dict)
 
         edges = []
@@ -117,8 +113,6 @@ def handle_raw_flat_assertion(flat_assertion):
             if 'commons2_reject' in ' '.join(source_list):
                 weight = -1
             
-            if by_bedume_and_bad(source_list,start,end):
-                return []
             else:
                 edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
                 edges.append(edge)
@@ -126,7 +120,7 @@ def handle_raw_flat_assertion(flat_assertion):
         return edges
     except Exception:
         import traceback
-        print "failed on flat_assertion: " + str(flat_assertion)
+        print "failed on flat_assertion: " + unicode(flat_assertion)
         traceback.print_exc()
         return []
 
