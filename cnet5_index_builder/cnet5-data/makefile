@@ -3,8 +3,6 @@ CSV_FILES = */data/flat/*.csv
 DATA_SOURCES = conceptnet4 conceptnet4_nadya conceptnet4_zh dbpedia globalmind reverb verbosity wordnet wiktionary
 TRANSFORM = --transform='s\#.*/\#\#'
 OUTPUT_FILE = conceptnet5_output_$(DATE)
-CORE = data/flat/*.json
-
 
 all: data_sources core package_all
 
@@ -17,21 +15,23 @@ $(DATA_SOURCES):
 
 conceptnet4_nadya: conceptnet4
 
-$(CORE): data_sources
+core: data_sources
 	python scripts/flat_assertions.py $(CSV_FILES)
 
-package_all: $(CORE) output_directory tar_bz_solr tar_bz_flat tar_bz_csv
+package_all: make_output_directory tar_bz_solr tar_bz_flat tar_bz_csv
 
-output_directory: $(CORE)
+tar_bz_solr tar_bz_flat tar_bz_csv: make_output_directory
+
+output_directory: force_look
 	mkdir $(OUTPUT_FILE)
 
-tar_bz_solr: output_directory
+tar_bz_solr: core
 	tar -cjf $(OUTPUT_FILE)/solr_json_$(DATE).tar.bz2 */data/solr/*.json data/solr/*.json $(TRANSFORM)
 
-tar_bz_flat: output_directory
+tar_bz_flat: core
 	tar -cjf $(OUTPUT_FILE)/flat_json_$(DATE).tar.bz2 */data/flat/*.json data/flat/*.json $(TRANSFORM)
 
-tar_bz_csv: output_directory
+tar_bz_csv: core
 	tar -cjf $(OUTPUT_FILE)/csv_$(DATE).tar.bz2 */data/flat/*.csv $(TRANSFORM)
 
 clean: force_look
