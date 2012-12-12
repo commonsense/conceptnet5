@@ -2,10 +2,11 @@ from multiprocessing import Process, JoinableQueue
 from conceptnet5.edges import MultiWriter, make_edge
 
 class QuickReader():
-	def __init__(self, writer_name, isTest = False, num_threads = 5):
+	def __init__(self, writer_name,handle_raw_assertion,add_lines_to_queue, isTest = False, num_threads = 5):
 		self.writer_name = writer_name
 		self.num_threads = num_threads
-		
+		self.handle_raw_assertion = handle_raw_assertion
+		self.add_lines_to_queue = add_lines_to_queue
 		self.queue = JoinableQueue()
 		self.isTest = isTest
 
@@ -31,10 +32,10 @@ class QuickReader():
 	        p.daemon=True
 	        p.start()
 
-	#override in subclass
-	def add_lines_to_queue(self,queue):
-		raise NotImplementedError()
+	# #override in subclass
+	# def add_lines_to_queue(self,queue):
+	# 	raise NotImplementedError()
 
-	#override in subclass
-	def handle_raw_assertion(self,raw_assertion):
-		raise NotImplementedError()
+	# #override in subclass
+	# def handle_raw_assertion(self,raw_assertion):
+	# 	raise NotImplementedError()

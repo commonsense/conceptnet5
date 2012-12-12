@@ -1,7 +1,7 @@
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
 from metanl import japanese
-from quick_reader import QuickReader
+from conceptnet5.quick_reader import QuickReader
 import sys
 import os
 import codecs

@@ -9,7 +9,7 @@ from csc_utils.batch import queryset_foreach
 from conceptnet.models import Sentence, Assertion, RawAssertion
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
-from quick_reader import QuickReader
+from conceptnet5.quick_reader import QuickReader
 
 
 """

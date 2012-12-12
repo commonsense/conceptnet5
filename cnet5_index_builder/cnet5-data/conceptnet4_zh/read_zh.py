@@ -4,7 +4,7 @@ import codecs
 import sys
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import make_edge, MultiWriter
-from quick_reader import QuickReader
+from conceptnet5.quick_reader import QuickReader
 
 
 def handle_raw_assertion(raw_assertion):
