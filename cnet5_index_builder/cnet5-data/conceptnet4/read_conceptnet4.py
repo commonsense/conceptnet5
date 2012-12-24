@@ -6,10 +6,8 @@ import simplenlp
 import re
 
 from csc_utils.batch import queryset_foreach
-from conceptnet.models import Sentence, Assertion, RawAssertion
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
-from conceptnet5.quick_reader import QuickReader
 
 
 """
@@ -158,7 +156,9 @@ def extract_parts(flat_assertion):
 
     return parts_dict
 
-def handle_raw_flat_assertion(flat_assertion):
+
+
+def handle_raw_assertion(flat_assertion):
     try:
         parts_dict = extract_parts(flat_assertion)
         
@@ -191,18 +191,18 @@ def handle_raw_flat_assertion(flat_assertion):
         traceback.print_exc()
         return []
 
-
-def pull_lines_from_raw_flat_files(q):
+def run_single_process():
+    writer = MultiWriter('conceptnet4')
     path = "./raw_data/"
     for filename in os.listdir(path):
-        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            q.put(line)
-
+        for raw_assertion in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            edges = handle_raw_assertion(raw_assertion)
+            for edge in edges:
+                writer.write(edge)
 
 if __name__ == '__main__':
-    if "--build_from_flat" in sys.argv:
-        quickReader = QuickReader("conceptnet4", handle_raw_flat_assertion,pull_lines_from_raw_flat_files)
-        quickReader.start()
+    if "--single_process" in sys.argv:
+        run_single_process()
 
 
 

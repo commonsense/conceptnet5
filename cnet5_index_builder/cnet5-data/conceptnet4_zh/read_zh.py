@@ -28,12 +28,6 @@ def handle_raw_assertion(raw_assertion):
         edges.append(edge)
     return edges
 
-def add_lines_to_queue(q):
-    path = "./raw_data/"
-    for filename in os.listdir(path):
-        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            q.put(line)
-
 def run_single_process():
     writer = MultiWriter('conceptnet4_zh')
     path = "./raw_data/"
@@ -45,9 +39,5 @@ def run_single_process():
 
 
 if __name__ == '__main__':
-    if "--quick_write" in sys.argv:
-        quickReader = QuickReader("conceptnet4_zh", handle_raw_assertion,add_lines_to_queue)
-        quickReader.start()
-
-    else:
+    if "--single_process" in sys.argv:
         run_single_process()

@@ -29,7 +29,7 @@ class QuickReader():
 	    for i in range(self.num_threads):
 	        writer = MultiWriter(self.writer_name + "_" + str(i),self.isTest)
 	        p = Process(target = self.pull_lines, args = (self.queue, writer))
-	        p.daemon=True
+	        #p.daemon=True
 	        p.start()
 
 	# #override in subclass

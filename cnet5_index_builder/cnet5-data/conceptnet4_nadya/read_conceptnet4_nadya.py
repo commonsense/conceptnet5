@@ -1,7 +1,6 @@
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.nodes import normalize_uri, make_concept_uri
 from metanl import japanese
-from conceptnet5.quick_reader import QuickReader
 import sys
 import os
 import codecs
@@ -126,16 +125,16 @@ def handle_raw_flat_assertion(flat_assertion):
 
 
 
-def pull_lines_from_raw_flat_files(q):
+def run_single_process():
+    writer = MultiWriter('conceptnet4_nadya')
     path = "./raw_data/"
     for filename in os.listdir(path):
-        for line in codecs.open(path + filename, encoding='utf-8', errors='replace'):
-            q.put(line)
-
-
+        for raw_assertion in codecs.open(path + filename, encoding='utf-8', errors='replace'):
+            edges = handle_raw_flat_assertion(raw_assertion)
+            for edge in edges:
+                writer.write(edge)
 
 if __name__ == '__main__':
-    if "--build_from_flat" in sys.argv:
-        quickReader = QuickReader("conceptnet_nadya", handle_raw_flat_assertion,pull_lines_from_raw_flat_files)
-        quickReader.start()
+    if "--single_process" in sys.argv:
+        run_single_process()
    
