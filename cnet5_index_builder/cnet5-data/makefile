@@ -3,7 +3,7 @@ CSV_FILES = */data/flat/*.csv
 DATA_SOURCES = conceptnet4 conceptnet4_nadya conceptnet4_zh dbpedia globalmind reverb verbosity wordnet wiktionary
 TRANSFORM = --transform='s\#.*/\#\#'
 OUTPUT_FILE = conceptnet5_output_$(DATE)
-$(CORE) = data/flat/*.json
+CORE = data/flat/*.json
 
 all: data_sources $(CORE) package_all
 
