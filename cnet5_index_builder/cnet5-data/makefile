@@ -22,7 +22,7 @@ $(CORE): data_sources
 package_all: output_directory tar_bz_solr tar_bz_flat tar_bz_csv
 
 output_directory: force_look
-	mkdir $(OUTPUT_FILE)
+	mkdir -p $(OUTPUT_FILE)
 
 tar_bz_solr: output_directory
 	tar -cjf $(OUTPUT_FILE)/solr_json_$(DATE).tar.bz2 */data/solr/*.json data/solr/*.json $(TRANSFORM)
