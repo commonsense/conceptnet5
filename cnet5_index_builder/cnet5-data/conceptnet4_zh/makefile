@@ -10,7 +10,7 @@ csv: $(CSV_TARGET)
 
 
 $(JSON_TARGET): $(JSON_DEPENDENCIES)
-	python read_zh.py --single_process
+	python read_zh.py
 
 $(CSV_TARGET): $(JSON_TARGET)
 	python ../scripts/flatten_json_to_csv.py $(JSON_TARGET)
