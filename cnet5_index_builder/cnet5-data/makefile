@@ -17,6 +17,7 @@ $(DATA_SOURCES):
 conceptnet4_nadya: conceptnet4
 
 $(CORE): data_sources
+	rm data/temp/*
 	python scripts/flat_assertions.py $(CSV_FILES)
 
 package_all: output_directory tar_bz_solr tar_bz_flat tar_bz_csv
@@ -43,6 +44,7 @@ clean: force_look
 	touch data/solr/abc123xyz456
 	-rm data/flat/*
 	-rm data/solr/*
+	-rm data/temp/*
 
 force_look:
 	true
