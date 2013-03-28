@@ -16,4 +16,4 @@ run_make_command_with_log_and_timer(){
  	return $TRUE
 }
 
-nohup $(run_make_command_with_log_and_timer) &
+nohup $(run_make_command_with_log_and_timer) >> make_runner_log.txt &

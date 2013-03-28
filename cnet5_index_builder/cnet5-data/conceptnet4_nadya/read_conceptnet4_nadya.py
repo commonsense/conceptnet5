@@ -118,9 +118,9 @@ def handle_raw_flat_assertion(flat_assertion):
 
         return edges
     except Exception:
-        import traceback
-        print "failed on flat_assertion: " + unicode(flat_assertion)
-        traceback.print_exc()
+        #import traceback
+        #print "failed on a flat_assertion"
+        #traceback.print_exc()
         return []
 
 
