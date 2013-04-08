@@ -1,11 +1,12 @@
 #all the csv files used to build the core
 CSV_FILES_TO_MAKE_CORE = */data/flat/*.csv
 #all the data sources that conceptnet5 builds from
-DATA_SOURCES = conceptnet4 conceptnet4_nadya conceptnet4_zh dbpedia globalmind reverb verbosity wordnet wiktionary
+DATA_SOURCES = conceptnet4 conceptnet4_nadya conceptnet4_zh dbpedia globalmind reverb verbosity wordnet wiktionary wiktionary_ja
 #used to get rid of the directory structure inside the tar files, so the tar file is just a list of files
 FORMAT_TAR_FILES = --transform='s\#.*/\#\#'
 #this folder will be something like 20130304 which contains 3 tars and md5sum.txt
-OUTPUT_FOLDER = $$(date +%Y%m%d)
+DATE= $$(date +%Y%m%d)
+OUTPUT_FOLDER = $(DATE)
 #This is where we place the finished build so that it can be downloaded by anyone
 DOWNLOAD_SERVER_AND_DIRECTORY = jvarley@salmon.media.mit.edu:/var/www/conceptnet5/downloads/
 #these are the files that we want to upload to solr.
@@ -17,7 +18,7 @@ SOLR_UPLOAD_FILES =  */data/solr/*.json data/solr/*.json
 
 ########################################################
 # This runs through the 3 main parts of the build process
-all: data_sources core package_all
+all: data_sources core package_all export_output_for_download
 
 ########################################################
 # This goes through all the directories for the different sources.
@@ -110,6 +111,7 @@ upload_solr_claret:
 		echo Importing $$solr_file;\
 		curl 'http://claret.media.mit.edu:8983/solr/update/json?commit=true' --data-binary $$solr_file -H 'Content-type:application/json';\
 	done
+
 
 ########################################################	
 # This gets rid of all intermediate files

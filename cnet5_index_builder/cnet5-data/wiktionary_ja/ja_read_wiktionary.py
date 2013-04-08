@@ -324,5 +324,5 @@ if __name__ == '__main__':
     parser.setContentHandler(dh)
 
     # Parse the input
-    parser.parse(open("raw_data/temp3.xml"))
+    parser.parse(open("raw_data/jawiktionary.xml"))
 
