@@ -7,6 +7,7 @@ from metanl import english
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.iso639 import langs
+from languages_3_to_2 import LANGUAGES_3_TO_2
 import unicodedata
 import string
 import re
@@ -115,6 +116,7 @@ LANGUAGES = {
     u'日本語': 'ja'
 }
 
+
 SOURCE = '/s/web/en.wiktionary.org'
 INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
 MONOLINGUAL = '/s/rule/wiktionary_monolingual_definitions'
@@ -185,9 +187,16 @@ class FindTranslations(ContentHandler):
             return
         if self.curSense and line[0:5] == '*[[{{': # get translation
             lang = line[5:8] # get language of translation
+            if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
+                lang = LANGUAGES_3_TO_2[lang]
+            elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
+                lang = 'en'
             # find all translations of that language
             translations = re.findall(r"\[\[(.*?)\]\]", line)[1:] 
             for translation in translations: # iterate over translations
+                open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
+                if open_paren_pos != -1: # contains open paren
+                    translation = translation[:open_paren_pos] # delete after paren
                 self.output_sense_translation(lang, translation, title, \
                                               self.curSense)
             return
@@ -223,8 +232,15 @@ class FindTranslations(ContentHandler):
                 return
             if line.startswith('*{{'):
                 lang = line[3:6]
+                if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
+                    lang = LANGUAGES_3_TO_2[lang]
+                elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
+                    lang = 'en'
                 translations = re.findall(r"\[\[(.*?)\]\]", line)
                 for translation in translations:
+                    open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
+                    if open_paren_pos != -1: # contains open paren
+                        translation = translation[:open_paren_pos] # delete after paren
                     self.output_sense_translation(lang, translation, title, '')
     
     def output_monolingual(self, lang, relation, term1, term2):
