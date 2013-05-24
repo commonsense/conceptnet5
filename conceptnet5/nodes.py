@@ -1,25 +1,37 @@
-def make_concept_uri(text, lang, disambiguation=None):
-    if lang == 'en':
-        from metanl import english
-        normalized, disambig = english.normalize_topic(text)
-    elif lang == 'ja':
-        from metanl import japanese
-        normalized, disambig = japanese.normalize(text), None
-    elif lang in ('pt', 'hu', 'nl', 'es'):
-        # languages where we know the stopword list
-        import simplenlp
-        nlp = simplenlp.get(lang)
-        disambig = None
-        normalized, disambig = nlp.normalize(text), None
+import re
+from metanl import english
+from metanl.general import preprocess_text
+
+def handle_disambig(text):
+    """
+    Get a canonical representation of a Wikipedia topic, which may include
+    a disambiguation string in parentheses.
+
+    Returns (name, disambig), where "name" is the topic name,
+    and "disambig" is a string corresponding to the disambiguation text or
+    None.
+    """
+    # find titles of the form Foo (bar)
+    text = text.replace('_', ' ')
+    match = re.match(r'([^(]+) \(([^)]+)\)', text)
+    if not match:
+        return text, None
     else:
-        normalized = text
-        disambig = None
+        return match.group(1), 'n/' + match.group(2).strip(' _')
+
+def make_concept_uri(text, lang, disambiguation=None):
+    if disambiguation is None:
+        text, disambiguation = handle_disambig(text)
+
+    if lang == 'en':
+        normalized = english.normalize(text)
+    else:
+        normalized = preprocess_text(text).lower()
+
     if disambiguation is not None:
-        disambig = disambiguation
-    if disambig is not None:
-        disambig = disambig.replace(' ', '_')
-    if disambig:
-        return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
+        disambiguation = disambiguation.replace(' ', '_')
+    if disambiguation:
+        return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambiguation)
     else:
         return '/c/%s/%s' % (lang, normalized.replace(' ', '_'))
 
