@@ -66,6 +66,8 @@ def can_skip(parts_dict):
 
 def build_frame_text(parts_dict):
     frame_text = parts_dict["frame_text"]
+    if frame_text.find('{1}') > frame_text.find('{2}'):
+        frame_text = '*' + frame_text
     polarity = parts_dict["polarity"]
     if polarity > 0:
         frame_text = frame_text.replace('{%}', '')

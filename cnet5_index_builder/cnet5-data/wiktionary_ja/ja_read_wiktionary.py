@@ -30,9 +30,9 @@ PARTS_OF_SPEECH = {
     'Interjection': 'i',
     'Conjunction': 'c',
 }
-LANGUAGE_HEADER = re.compile(r'==\s*(.+)\s*==')
-TRANS_TOP = re.compile(r"\{\{trans-top\|(.+)\}\}")
-TRANS_BOTTOM = re.compile(r"\{\{trans-bottom\|(.+)\}\}")
+LANGUAGE_HEADER = re.compile(r'==\s*\{\{(.+)\}\}\s*==')
+TRANS_TOP = re.compile(r"\{\{trans-top(.*?)\}\}")
+TRANS_BOTTOM = re.compile(r"\{\{trans-bottom(.*?)\}\}")
 TRANS = re.compile(r"====\{\{trans\}\}====")
 TRANS_TAG = re.compile(r"\{\{t.?\|([^|}]+)\|([^|}]+)")
 CHINESE_TAG = re.compile(r"\{\{cmn-(noun|verb)+\|(s|t|st|ts)\|")
@@ -117,7 +117,7 @@ LANGUAGES = {
 }
 
 
-SOURCE = '/s/web/en.wiktionary.org'
+SOURCE = '/s/web/ja.wiktionary.org'
 INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
 MONOLINGUAL = '/s/rule/wiktionary_monolingual_definitions'
 TRANSLATE = '/s/rule/wiktionary_translation_tables'
@@ -174,29 +174,34 @@ class FindTranslations(ContentHandler):
         trans_match = TRANS.match(line)
         trans_tag_match = TRANS_TAG.search(line)
         chinese_match = CHINESE_TAG.search(line)
+
+        if language_match:
+            code = language_match.group(1)
+            if code in LANGUAGES_3_TO_2:
+                code = LANGUAGES_3_TO_2[code]
+            self.lang = self.langcode = code
         
         ### Get sense-specific translation
         if trans_top_match: # start translation part
             pos = self.pos or 'n'
             # get translation sense
-            sense = trans_top_match.group(1).split(';')[0].strip('.')
-            self.curSense = pos+'/'+sense
-            return
+            if trans_top_match.group(1):
+                sense = trans_top_match.group(1).lstrip('|')
+                self.curSense = pos+'/'+sense
+                return
+            else:
+                self.curSense = pos
+                return
         if trans_bottom_match: # end translation part
             self.curSense = None
             return
         if self.curSense and line[0:5] == '*[[{{': # get translation
-            lang = line[5:8] # get language of translation
-            if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
+            lang = line[5:].split('}')[0]  # get language of translation
+            if lang in LANGUAGES_3_TO_2:   # convert 3-letter code to 2-letter code
                 lang = LANGUAGES_3_TO_2[lang]
-            elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
-                lang = 'en'
             # find all translations of that language
             translations = re.findall(r"\[\[(.*?)\]\]", line)[1:] 
             for translation in translations: # iterate over translations
-                open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
-                if open_paren_pos != -1: # contains open paren
-                    translation = translation[:open_paren_pos] # delete after paren
                 self.output_sense_translation(lang, translation, title, \
                                               self.curSense)
             return
@@ -215,7 +220,7 @@ class FindTranslations(ContentHandler):
                         self.curRelation = 'Derivative'                    
                 related_words = re.findall(r"\[\[(.*?)\]\]", line)
                 for related_word in related_words:
-                    self.output_monolingual('jpn', self.curRelation, \
+                    self.output_monolingual(self.langcode, self.curRelation, \
                                             related_word, title)
                 self.curRelation = 'ConceptuallyRelatedTo' # back to default
             else:
@@ -231,21 +236,22 @@ class FindTranslations(ContentHandler):
                 self.nosensetrans = None
                 return
             if line.startswith('*{{'):
-                lang = line[3:6]
+                lang = line[3:].split('}')[0]
                 if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
                     lang = LANGUAGES_3_TO_2[lang]
-                elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
-                    lang = 'en'
                 translations = re.findall(r"\[\[(.*?)\]\]", line)
                 for translation in translations:
-                    open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
-                    if open_paren_pos != -1: # contains open paren
-                        translation = translation[:open_paren_pos] # delete after paren
                     self.output_sense_translation(lang, translation, title, '')
     
     def output_monolingual(self, lang, relation, term1, term2):
-        if 'Wik' in term1 or 'Wik' in term2:
+        # skip Wiktionary: links and templates
+        if u'ウィク' in term1 or u'ウィク' in term2:
             return
+        if u'テンプレート' in term1 or u'テンプレート' in term2:
+            return
+
+        if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
+            lang = LANGUAGES_3_TO_2[lang]
         source = make_concept_uri(term1, lang)
         if self.pos:
             target = make_concept_uri(term2, lang, self.pos)
@@ -262,8 +268,12 @@ class FindTranslations(ContentHandler):
                          surfaceText=surfaceText)
         self.writer.write(edge)
 
-    def output_sense_translation(self, lang, foreign, japanese, disambiguation):
-        if 'Wik' in foreign or 'Wik' in japanese:
+    def output_sense_translation(self, lang, foreign, translated, disambiguation):
+        foreign = foreign.rsplit(r'|')[-1]
+        foreign = foreign.split(r'#')[0]
+        if not foreign:
+            return
+        if 'Wik' in foreign or 'Wik' in translated:
             return
         if lang == 'zh-cn':
             lang = 'zh_CN'
@@ -273,16 +283,19 @@ class FindTranslations(ContentHandler):
           unicodedata.normalize('NFKC', foreign), lang
         )
         target = make_concept_uri(
-          japanese, 'ja', disambiguation
+          translated, self.langcode, disambiguation
         )
         relation = '/r/TranslationOf'
         try:
             surfaceRel = "is %s for" % (langs.english_name(lang))
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
-        surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
+        if disambiguation and '/' in disambiguation:
+            surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, translated, disambiguation.split('/')[-1].replace('_', ' '))
+        else:
+            surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, translated)
         #print surfaceText
-        edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
+        edge = make_edge(relation, source, target, '/d/wiktionary/%s/%s' % (self.langcode, lang),
                          license='/l/CC/By-SA',
                          sources=[SOURCE, TRANSLATE],
                          context='/ctx/all',
@@ -290,21 +303,21 @@ class FindTranslations(ContentHandler):
                          surfaceText=surfaceText)
         self.writer.write(edge)
         
-    def output_translation(self, foreign, english, locale=''):
+    def output_translation(self, foreign, japanese, locale=''):
         source = make_concept_uri(
           unicodedata.normalize('NFKC', foreign),
           self.langcode+locale
         )
         target = make_concept_uri(
-          english, 'en'
+          japanese, 'ja'
         )
         relation = '/r/TranslationOf'
         try:
             surfaceRel = "is %s for" % (langs.english_name(self.langcode))
         except KeyError:
             surfaceRel = "is [language %s] for" % self.langcode
-        surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)
-        edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % self.langcode,
+        surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, japanese)
+        edge = make_edge(relation, source, target, '/d/wiktionary/ja/%s' % self.langcode,
                          license='/l/CC/By-SA',
                          sources=[SOURCE, INTERLINGUAL],
                          context='/ctx/all',

@@ -1,6 +1,16 @@
+# -*- coding: utf-8 -*-
+
 import re
+import ftfy
 from metanl import english
 from metanl.general import preprocess_text
+
+JAPANESE_PARTS_OF_SPEECH = {
+    u'名詞': u'n',
+    u'副詞': u'r',
+    u'形容詞': u'a',
+    u'動詞': u'v',
+}
 
 def handle_disambig(text):
     """
@@ -13,18 +23,34 @@ def handle_disambig(text):
     """
     # find titles of the form Foo (bar)
     text = text.replace('_', ' ')
-    match = re.match(r'([^(]+) \(([^)]+)\)', text)
+    match = re.match(r'([^(]+) \((.+)\)', text)
     if not match:
         return text, None
     else:
         return match.group(1), 'n/' + match.group(2).strip(' _')
 
 def make_concept_uri(text, lang, disambiguation=None):
+    text = ftfy.ftfy(text)
     if disambiguation is None:
         text, disambiguation = handle_disambig(text)
+    if disambiguation is not None:
+        if isinstance(disambiguation, str):
+            disambiguation = disambiguation.decode('utf-8')
+        disambiguation = ftfy.ftfy(disambiguation)
 
     if lang == 'en':
         normalized = english.normalize(text)
+    elif lang == 'ja' and disambiguation is not None:
+        match = re.search(r'\((.*?)\)', disambiguation)
+        if match:
+            parenthesized = match.group(1)
+            pos, rest = disambiguation.split('/', 1)
+            if parenthesized in JAPANESE_PARTS_OF_SPEECH:
+                pos = JAPANESE_PARTS_OF_SPEECH[parenthesized]
+            else:
+                pos = 'n'
+            disambiguation = pos + '/' + re.sub(r'\s*\((.*?)\)\s*', '', rest)
+        normalized = preprocess_text(text).lower()
     else:
         normalized = preprocess_text(text).lower()
 
