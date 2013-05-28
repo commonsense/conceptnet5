@@ -7,7 +7,6 @@ from metanl import english
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import MultiWriter, make_edge
 from conceptnet5.iso639 import langs
-from languages_3_to_2 import LANGUAGES_3_TO_2
 import unicodedata
 import string
 import re
@@ -31,9 +30,8 @@ PARTS_OF_SPEECH = {
     'Conjunction': 'c',
 }
 LANGUAGE_HEADER = re.compile(r'==\s*(.+)\s*==')
-TRANS_TOP = re.compile(r"\{\{trans-top\|(.+)\}\}")
-TRANS_BOTTOM = re.compile(r"\{\{trans-bottom\|(.+)\}\}")
-TRANS = re.compile(r"====\{\{trans\}\}====")
+TRANS_TOP = re.compile(u"\{\{Ü-links\}\}")
+TRANS_BOTTOM = re.compile(u"\{\{Ü-rechts\}\}")
 TRANS_TAG = re.compile(r"\{\{t.?\|([^|}]+)\|([^|}]+)")
 CHINESE_TAG = re.compile(r"\{\{cmn-(noun|verb)+\|(s|t|st|ts)\|")
 WIKILINK = re.compile(r"\[\[([^|\]#]+)")
@@ -116,7 +114,6 @@ LANGUAGES = {
     u'日本語': 'ja'
 }
 
-
 SOURCE = '/s/web/en.wiktionary.org'
 INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
 MONOLINGUAL = '/s/rule/wiktionary_monolingual_definitions'
@@ -135,7 +132,7 @@ class FindTranslations(ContentHandler):
         self.locales = []
         self.curRelation = None
         self.writer = MultiWriter('wiktionary')
-        self.nosensetrans = None # non-sense-specific translation
+        self.trans = False # in translation mode
 
     def startElement(self, name, attrs):
         if name == 'page':
@@ -171,78 +168,46 @@ class FindTranslations(ContentHandler):
         language_match = LANGUAGE_HEADER.match(line)
         trans_top_match = TRANS_TOP.match(line)
         trans_bottom_match = TRANS_BOTTOM.match(line)
-        trans_match = TRANS.match(line)
         trans_tag_match = TRANS_TAG.search(line)
         chinese_match = CHINESE_TAG.search(line)
         
-        ### Get sense-specific translation
+        ### Get translation        
         if trans_top_match: # start translation part
-            pos = self.pos or 'n'
-            # get translation sense
-            sense = trans_top_match.group(1).split(';')[0].strip('.')
-            self.curSense = pos+'/'+sense
-            return
-        if trans_bottom_match: # end translation part
-            self.curSense = None
-            return
-        if self.curSense and line[0:5] == '*[[{{': # get translation
-            lang = line[5:8] # get language of translation
-            if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
-                lang = LANGUAGES_3_TO_2[lang]
-            elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
-                lang = 'en'
+            self.trans = True
+        if self.trans and trans_bottom_match: # end translation part
+            self.trans = False
+        if self.trans and line.startswith('*{{'): # get translation
+            lang = line[3:5] # get language of translation
             # find all translations of that language
-            translations = re.findall(r"\[\[(.*?)\]\]", line)[1:] 
+            translations = re.findall(u"\{\{Ü.*?\|.*?\|(.*?)\}\}", line)
             for translation in translations: # iterate over translations
-                open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
-                if open_paren_pos != -1: # contains open paren
-                    translation = translation[:open_paren_pos] # delete after paren
-                self.output_sense_translation(lang, translation, title, \
-                                              self.curSense)
-            return
-
+                self.output_sense_translation(lang, translation, title, '')
+        
         ### Get relation
-        if line.startswith('===={{rel}}===='): # start relation part
-            self.curRelation = 'ConceptuallyRelatedTo'
-            return
-        if self.curRelation: # within relation part
-            if line.startswith('*'): # get relation
-                relations = re.findall(r"\{\{(.*?)\}\}", line)
-                if len(relations) > 0:
-                    if relations[0] == 'syn': # synonym
-                        self.curRelation = 'Synonym'
-                    if relations[0] == 'drv': # derivative
-                        self.curRelation = 'Derivative'                    
-                related_words = re.findall(r"\[\[(.*?)\]\]", line)
-                for related_word in related_words:
-                    self.output_monolingual('jpn', self.curRelation, \
-                                            related_word, title)
-                self.curRelation = 'ConceptuallyRelatedTo' # back to default
-            else:
-                self.curRelation = None
-
-        ### Get non-sense-specific translation
-        if trans_match: 
-            self.nosensetrans = 1 # *maybe* start non-sense-specific translation
-        if self.nosensetrans == 1 and line.startswith('{{top}}'):
-            self.nosensetrans = 2 # start non-sense-specific translation            
-        if self.nosensetrans == 2:
-            if line.startswith('{{bottom}}'):
-                self.nosensetrans = None
-                return
-            if line.startswith('*{{'):
-                lang = line[3:6]
-                if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
-                    lang = LANGUAGES_3_TO_2[lang]
-                elif lang not in LANGUAGES_3_TO_2.values(): # if 3-letter code not found, guess english
-                    lang = 'en'
-                translations = re.findall(r"\[\[(.*?)\]\]", line)
-                for translation in translations:
-                    open_paren_pos = translation.find('(') # look for open paren -- maybe part of speech
-                    if open_paren_pos != -1: # contains open paren
-                        translation = translation[:open_paren_pos] # delete after paren
-                    self.output_sense_translation(lang, translation, title, '')
-    
+        if line.startswith('{{Synonyme}}'): # synonym
+            self.curRelation = 'synonym'
+        elif line.startswith(u'{{Gegenwörter}}'): # antonym
+            self.curRelation = 'antonym'
+        elif line.startswith('{{Oberbegriffe}}'): # hypernym
+            self.curRelation = 'hypernym'
+        elif line.startswith('{{Unterbegriffe}}'): # hyponym
+            self.curRelation = 'hyponym'
+        elif line.startswith('{{Redewendungen}}'): # idiom
+            self.curRelation = 'idiom'
+        elif line.startswith('{{Charakteristische Wortkombinationen}}'): \
+             # word combination
+            self.curRelation = 'word combination'
+        elif line.startswith('{{Wortbildungen}}'): # morphology
+            self.curRelation = 'morphology'
+        if self.curRelation and line == '': # end relation
+            self.curRelation = None
+        if self.curRelation:
+            related_words_or_phrases = re.findall(r"\[\[(.*?)\]\]", line)
+            for related_word in related_words_or_phrases:
+                self.output_monolingual('deu', self.curRelation, \
+                                            related_word, title)    
+        
+                
     def output_monolingual(self, lang, relation, term1, term2):
         if 'Wik' in term1 or 'Wik' in term2:
             return
@@ -262,8 +227,8 @@ class FindTranslations(ContentHandler):
                          surfaceText=surfaceText)
         self.writer.write(edge)
 
-    def output_sense_translation(self, lang, foreign, japanese, disambiguation):
-        if 'Wik' in foreign or 'Wik' in japanese:
+    def output_sense_translation(self, lang, foreign, german, disambiguation):
+        if 'Wik' in foreign or 'Wik' in german:
             return
         if lang == 'zh-cn':
             lang = 'zh_CN'
@@ -273,7 +238,7 @@ class FindTranslations(ContentHandler):
           unicodedata.normalize('NFKC', foreign), lang
         )
         target = make_concept_uri(
-          japanese, 'ja', disambiguation
+          german, 'de', disambiguation
         )
         relation = '/r/TranslationOf'
         try:
@@ -340,5 +305,5 @@ if __name__ == '__main__':
     parser.setContentHandler(dh)
 
     # Parse the input
-    parser.parse(open("raw_data/jawiktionary.xml"))
+    parser.parse(open("raw_data/temp3.xml"))
 
