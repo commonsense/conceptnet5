@@ -134,7 +134,7 @@ class FindTranslations(ContentHandler):
         self.curText = ''
         self.locales = []
         self.curRelation = None
-        self.writer = MultiWriter('wiktionary')
+        self.writer = MultiWriter('wiktionary_ja')
         self.nosensetrans = None # non-sense-specific translation
 
     def startElement(self, name, attrs):
