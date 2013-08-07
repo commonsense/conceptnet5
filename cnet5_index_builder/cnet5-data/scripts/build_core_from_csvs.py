@@ -48,7 +48,7 @@ def sum_assertions(file_index):
 
 
     writer_core = MultiWriter('assertion_totals_core')
-    #writer_sa = MultiWriter('assertion_totals_sa')
+    writer_sa = MultiWriter('assertion_totals_sa')
     for uri, values in assertions.iteritems():
         relation, start, end, context, weight = values
         if ccby[uri]:
@@ -60,14 +60,16 @@ def sum_assertions(file_index):
         edge = make_edge(relation, start, end, dataset, license, ['/s/rule/sum_edges'], '/ctx/all', weight=weight)
         if license == '/l/CC/By':
             writer_core.write(edge)
-        #else:
-            #writer_sa.write(edge)
+            writer_sa.write(edge)
+        else:
+            writer_sa.write(edge)
     writer_core.close()
-    #writer_sa.close()
+    writer_sa.close()
 
 
 if __name__ == '__main__':
-    csv_files = sys.argv[1:]
+    # skip dbpedia in this build, it's too large and sparse
+    csv_files = [filename for filename in sys.argv[1:] if 'dbpedia' not in filename]
     print "building core from the following: \n" + str(csv_files)
     build_core_from_csvs(csv_files)
     print "finished building the core"

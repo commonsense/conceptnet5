@@ -92,7 +92,7 @@ for line in open('raw_data/verbosity.txt'):
     rel = mapping.get(relation)
     reltext = relation[3:]
     if rel is None:
-        rel = make_concept_uri(reltext, 'en')
+        rel = make_concept_uri(unicode(reltext), 'en')
     text = '[[%s]] %s [[%s]]' % (left, reltext, right)
     
     if relation == 'it is' and\
@@ -119,6 +119,8 @@ for line in open('raw_data/verbosity.txt'):
     good_out.write(line)
     
     if make_json:
+        left = make_concept_uri(unicode(left), 'en')
+        right = make_concept_uri(unicode(right), 'en')
         edge = make_edge(rel, left, right, '/d/verbosity',
                          '/l/CC/By', sources, surfaceText=text,
                          weight = score/10.0)

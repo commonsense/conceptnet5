@@ -13,10 +13,18 @@ import string
 import re
 import sys
 
-def ascii_enough(text):
-    # cheap assumption: if it's ASCII, and it's meant to be in English, it's
-    # probably actually in English.
-    return text.encode('ascii', 'replace') == text
+
+def make_concept_uri_safe(term, lang, disambiguation=None):
+    if term is None:
+        raise ValueError('term must not be None')
+    if lang is None:
+        raise ValueError('lang must not be None')
+    if '|' in term:
+        term = term.split('|')[0]
+    if '#' in term:
+        term = term.split('#')[0]
+    return make_concept_uri(term, lang, disambiguation)
+
 
 PARTS_OF_SPEECH = {
     'Noun': 'n',
@@ -30,7 +38,7 @@ PARTS_OF_SPEECH = {
     'Interjection': 'i',
     'Conjunction': 'c',
 }
-LANGUAGE_HEADER = re.compile(r'==\s*\{\{(.+)\}\}\s*==')
+LANGUAGE_HEADER = re.compile(r'==\s*([^=]+)\s*==')
 TRANS_TOP = re.compile(r"\{\{trans-top(.*?)\}\}")
 TRANS_BOTTOM = re.compile(r"\{\{trans-bottom(.*?)\}\}")
 TRANS = re.compile(r"====\{\{trans\}\}====")
@@ -116,7 +124,19 @@ LANGUAGES = {
     u'日本語': 'ja'
 }
 
-
+def get_language_code(lname):
+    lname = lname.strip()
+    if lname.startswith('{{'):
+        code = lname.strip('{}')
+        if code in LANGUAGES_3_TO_2:
+            return LANGUAGES_3_TO_2[code]
+        else:
+            return code
+    elif lname in LANGUAGES:
+        return LANGUAGES[lname]
+    else:
+        return 'ja'
+    
 SOURCE = '/s/web/ja.wiktionary.org'
 INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
 MONOLINGUAL = '/s/rule/wiktionary_monolingual_definitions'
@@ -176,10 +196,7 @@ class FindTranslations(ContentHandler):
         chinese_match = CHINESE_TAG.search(line)
 
         if language_match:
-            code = language_match.group(1)
-            if code in LANGUAGES_3_TO_2:
-                code = LANGUAGES_3_TO_2[code]
-            self.lang = self.langcode = code
+            self.langcode = get_language_code(language_match.group(1))
         
         ### Get sense-specific translation
         if trans_top_match: # start translation part
@@ -210,7 +227,7 @@ class FindTranslations(ContentHandler):
         if line.startswith('===={{rel}}===='): # start relation part
             self.curRelation = 'ConceptuallyRelatedTo'
             return
-        if self.curRelation: # within relation part
+        if self.curRelation and self.langcode: # within relation part
             if line.startswith('*'): # get relation
                 relations = re.findall(r"\{\{(.*?)\}\}", line)
                 if len(relations) > 0:
@@ -252,15 +269,15 @@ class FindTranslations(ContentHandler):
 
         if lang in LANGUAGES_3_TO_2: # convert 3-letter code to 2-letter code
             lang = LANGUAGES_3_TO_2[lang]
-        source = make_concept_uri(term1, lang)
+        source = make_concept_uri_safe(term1, lang)
         if self.pos:
-            target = make_concept_uri(term2, lang, self.pos)
+            target = make_concept_uri_safe(term2, lang, self.pos)
         else:
-            target = make_concept_uri(term2, lang)
+            target = make_concept_uri_safe(term2, lang)
         surfaceText = "[[%s]] %s [[%s]]" % (term1, relation, term2)
         #print surfaceText
 
-        edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
+        edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/ja/%s' % (lang),
                          license='/l/CC/By-SA',
                          sources=[SOURCE, MONOLINGUAL],
                          context='/ctx/all',
@@ -269,20 +286,16 @@ class FindTranslations(ContentHandler):
         self.writer.write(edge)
 
     def output_sense_translation(self, lang, foreign, translated, disambiguation):
-        foreign = foreign.rsplit(r'|')[-1]
-        foreign = foreign.split(r'#')[0]
-        if not foreign:
-            return
-        if 'Wik' in foreign or 'Wik' in translated:
+        if u':' in foreign or u':' in translated:
             return
         if lang == 'zh-cn':
             lang = 'zh_CN'
         elif lang == 'zh-tw':
             lang = 'zh_TW'
-        source = make_concept_uri(
+        source = make_concept_uri_safe(
           unicodedata.normalize('NFKC', foreign), lang
         )
-        target = make_concept_uri(
+        target = make_concept_uri_safe(
           translated, self.langcode, disambiguation
         )
         relation = '/r/TranslationOf'
@@ -295,7 +308,7 @@ class FindTranslations(ContentHandler):
         else:
             surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, translated)
         #print surfaceText
-        edge = make_edge(relation, source, target, '/d/wiktionary/%s/%s' % (self.langcode, lang),
+        edge = make_edge(relation, source, target, '/d/wiktionary/ja/%s' % (self.langcode),
                          license='/l/CC/By-SA',
                          sources=[SOURCE, TRANSLATE],
                          context='/ctx/all',
@@ -304,11 +317,11 @@ class FindTranslations(ContentHandler):
         self.writer.write(edge)
         
     def output_translation(self, foreign, japanese, locale=''):
-        source = make_concept_uri(
+        source = make_concept_uri_safe(
           unicodedata.normalize('NFKC', foreign),
           self.langcode+locale
         )
-        target = make_concept_uri(
+        target = make_concept_uri_safe(
           japanese, 'ja'
         )
         relation = '/r/TranslationOf'
