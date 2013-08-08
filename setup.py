@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 packages = find_packages()
-version_str = '5.1.3'
+version_str = '5.1.4'
 
 setup(
     name = 'ConceptNet5',
@@ -11,7 +11,7 @@ setup(
     author = "Rob Speer, Commonsense Computing Group",
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
-    install_requires=['simplenlp', 'metanl'],
+    install_requires=['metanl', 'assoc-space'],
     license = 'GPLv3'
 )
 
