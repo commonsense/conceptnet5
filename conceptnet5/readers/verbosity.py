@@ -106,7 +106,5 @@ def run_verbosity(infile, outfile):
                          weight = score/10.0)
         writer.write(edge)
 
-        writer.close()
-
 if __name__ == '__main__':
     run_verbosity(sys.argv[1], sys.argv[2])
