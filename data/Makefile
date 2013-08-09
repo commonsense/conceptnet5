@@ -5,6 +5,7 @@ conceptnet4_edges: $(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons)
 conceptnet_zh_edges: $(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
 globalmind_edges: edges/globalmind/globalmind.jsons
 wiktionary_edges: edges/wiktionary/wiktionary_en.jsons edges/wiktionary/wiktionary_ja.jsons
+verbosity_edges: edges/verbosity/verbosity.jsons
 
 # Read edges from ConceptNet raw files.
 edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons
@@ -36,4 +37,6 @@ edges/wiktionary/wiktionary_ja.jsons: raw/wiktionary/jawiktionary.xml
 	mkdir -p edges/wiktionary
 	$(PYTHON) -m conceptnet5.readers.wiktionary_ja $< $@ || rm $@
 
-
+edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt
+	mkdir -p edges/verbosity
+	$(PYTHON) -m conceptnet5.readers.verbosity $< $@
