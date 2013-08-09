@@ -1,0 +1,246 @@
+{
+  "3353": {
+    "text": "{1} 會讓你想要 {2} 。", 
+    "relation": "/r/CausesDesire"
+  }, 
+  "3354": {
+    "text": "{1} 會讓你 {2}。", 
+    "relation": "/r/Causes"
+  }, 
+  "3355": {
+    "text": "{1} 之後可能會發生的事情是 {2}。", 
+    "relation": "/r/Causes"
+  }, 
+  "3356": {
+    "text": "因為 {1} 所以 {2}。", 
+    "relation": "/r/Causes"
+  }, 
+  "3357": {
+    "text": "{1} 可能會帶來 {2}。", 
+    "relation": "/r/Causes"
+  }, 
+  "3358": {
+    "text": "{1} 可能會引起 {2}。", 
+    "relation": "/r/Causes"
+  }, 
+  "3359": {
+    "text": "{1} 剛開始的時候會 {2} 。", 
+    "relation": "/r/HasFirstSubevent"
+  }, 
+  "3360": {
+    "text": "{1} 的時候，首先要 {2} 。", 
+    "relation": "/r/HasFirstSubevent"
+  }, 
+  "3361": {
+    "text": "{1} 的最後一個步驟是 {2}。", 
+    "relation": "/r/HasLastSubevent"
+  }, 
+  "3362": {
+    "text": "{1} 最後會做的事情是 {2}。", 
+    "relation": "/r/HasLastSubevent"
+  }, 
+  "3363": {
+    "text": "{1} 的結局是 {2}。", 
+    "relation": "/r/HasLastSubevent"
+  }, 
+  "3364": {
+    "text": "{1} 前要先 {2} 。", 
+    "relation": "/r/HasPrerequisite"
+  }, 
+  "3365": {
+    "text": "{1} 是 {2} 的一部分。", 
+    "relation": "/r/PartOf"
+  }, 
+  "3366": {
+    "text": "{1} 可以用 {2} 製成。", 
+    "relation": "/r/MadeOf"
+  }, 
+  "3367": {
+    "text": "{1} 由 {2} 組成。", 
+    "relation": "/r/MadeOf"
+  }, 
+  "3368": {
+    "text": "{2} 可以拿來做成 {1}。", 
+    "relation": "/r/MadeOf"
+  }, 
+  "3369": {
+    "text": "{1} 的原料是 {2}。", 
+    "relation": "/r/MadeOf"
+  }, 
+  "3370": {
+    "text": "{1} 是一種 {2}。", 
+    "relation": "/r/IsA"
+  }, 
+  "3371": {
+    "text": "{1} 在 {2}裡。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3372": {
+    "text": "{1} 在 {2}上。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3373": {
+    "text": "{1} 在 {2}下。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3374": {
+    "text": "{1} 在 {2}旁。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3375": {
+    "text": "{1} 在 {2}外。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3376": {
+    "text": "{1} 在 {2}。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3377": {
+    "text": "你可以在 {2} 找到 {1}。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3378": {
+    "text": "{2} 有 {1}。", 
+    "relation": "/r/AtLocation"
+  }, 
+  "3379": {
+    "text": "{1} 是用來 {2} 的。", 
+    "relation": "/r/UsedFor"
+  }, 
+  "3380": {
+    "text": "{2} 的時候可能會用到 {1}。", 
+    "relation": "/r/UsedFor"
+  }, 
+  "3381": {
+    "text": "要 {2} 可以用 {1}。", 
+    "relation": "/r/UsedFor"
+  }, 
+  "3382": {
+    "text": "你可以用 {1} 來 {2}。", 
+    "relation": "/r/UsedFor"
+  }, 
+  "3383": {
+    "text": "{1} 能做的事情有 {2}。", 
+    "relation": "/r/CapableOf"
+  }, 
+  "3384": {
+    "text": "{1} 會 {2}。", 
+    "relation": "/r/CapableOf"
+  }, 
+  "3385": {
+    "text": "你會 {1} 因為你 {2}。", 
+    "relation": "/r/MotivatedByGoal"
+  }, 
+  "3386": {
+    "text": "{1} 是為了 {2}。", 
+    "relation": "/r/MotivatedByGoal"
+  }, 
+  "3387": {
+    "text": "想要有 {2} 應該要 {1}。", 
+    "relation": "/r/MotivatedByGoal"
+  }, 
+  "3388": {
+    "text": "當你想要 {2} 的時候你可能會 {1}。", 
+    "relation": "/r/MotivatedByGoal"
+  }, 
+  "3389": {
+    "text": "{2} 的時候會想要 {1}。", 
+    "relation": "/r/MotivatedByGoal"
+  }, 
+  "3390": {
+    "text": "{1} 喜歡 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3391": {
+    "text": "{1} 想要 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3392": {
+    "text": "{1} 不想要 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3393": {
+    "text": "{1} 懼怕 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3394": {
+    "text": "{1} 不想得到 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3395": {
+    "text": "{1} 痛恨 {2}。", 
+    "relation": "/r/Desires"
+  }, 
+  "3396": {
+    "text": "{1} 和 {2} 通常會一起出現。", 
+    "relation": "/r/ConceptuallyRelatedTo"
+  }, 
+  "3397": {
+    "text": "當你想到 {1}，你通常會聯想到 {2}。", 
+    "relation": "/r/ConceptuallyRelatedTo"
+  }, 
+  "3398": {
+    "text": "{1} 可以被定義為 {2}。", 
+    "relation": "/r/DefinedAs"
+  }, 
+  "3399": {
+    "text": "{1} 是 {2} 的。", 
+    "relation": "/r/HasProperty"
+  }, 
+  "3400": {
+    "text": "{2} 的一個例子: {1}。", 
+    "relation": "/r/InstanceOf"
+  }, 
+  "3401": {
+    "text": "{2} 是 {1} 的一部分。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3402": {
+    "text": "{1} 的時候可能會 {2} 。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3403": {
+    "text": "{1} 包括 {2}。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3404": {
+    "text": "{2} 可能代表 {1} 。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3405": {
+    "text": "{1} 的第一個步驟是 {2} 。", 
+    "relation": "/r/HasFirstSubevent"
+  }, 
+  "3408": {
+    "text": "{1} 可以作為 {2} 的象徵。", 
+    "relation": "/r/SymbolOf"
+  }, 
+  "3409": {
+    "text": "{1} 代表 {2}。", 
+    "relation": "/r/SymbolOf"
+  }, 
+  "3410": {
+    "text": "{1} 的意思是 {2}。", 
+    "relation": "/r/SymbolOf"
+  }, 
+  "3411": {
+    "text": "{1} 表示 {2}。", 
+    "relation": "/r/SymbolOf"
+  }, 
+  "3412": {
+    "text": "{1} 的時候，你會 {2}。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3413": {
+    "text": "{1} 的時候可以 {2}。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3414": {
+    "text": "在 {1} 的時候，{2}。", 
+    "relation": "/r/HasSubevent"
+  }, 
+  "3415": {
+    "text": "在 {1}，你會 {2}。", 
+    "relation": "/r/HasSubevent"
+  }
+}
