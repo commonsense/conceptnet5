@@ -127,9 +127,11 @@ def by_bedume_and_bad(source_list,start,end):
                 return True
     return False
 
+class CN4Builder(object):
+    def __init__(self):
+        self.seen_sources = set()
 
-def handle_raw_assertion(flat_assertion):
-    try:
+    def handle_raw_assertion(self, flat_assertion):
         parts_dict = json.loads(flat_assertion)
         
         if can_skip(parts_dict):
@@ -151,15 +153,22 @@ def handle_raw_assertion(flat_assertion):
         if not reject:
             for source_list, weight in sources:
                 if not by_bedume_and_bad(source_list,start,end):
+                    contributors = [s for s in source_list if s.startswith('/s/contributor')]
+                    assert len(contributors) <= 1, contributors
                     edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
-                    yield json.dumps(edge, ensure_ascii=False)
-
-    except Exception:
-        import traceback
-        print "failed on flat_assertion: " + str(flat_assertion)
-        traceback.print_exc()
+                    okay = True
+                    if contributors:
+                        uri = edge['uri']
+                        contributor = contributors[0]
+                        if (uri, contributor) in self.seen_sources:
+                            okay = False
+                        else:
+                            self.seen_sources.add((uri, contributor))
+                    if okay:
+                        yield json.dumps(edge, ensure_ascii=False)
 
 
 if __name__ == '__main__':
     from conceptnet5.readers import transform_stream
-    transform_stream(handle_raw_assertion)
+    builder = CN4Builder()
+    transform_stream(builder.handle_raw_assertion)
