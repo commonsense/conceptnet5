@@ -11,7 +11,10 @@ $(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons) $(wildcard raw/con
 $(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
 
 CSV_FILES = $(patsubst edges/%.jsons,edges/%.csv, $(EDGE_FILES))
+PIECES := $$(seq 0 255)
+SPLIT_FILES = $(patsubst edges/split/edges_%.csv,%, $(PIECES))
 
+build_splits: $(SPLIT_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 
@@ -55,13 +58,18 @@ edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)
 	mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.jsons
 
-edges/dbpedia/instances.jsons : raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py
 	mkdir -p edges/dbpedia
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.jsons
 
-edges/dbpedia/properties.jsons : raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py
 	mkdir -p edges/dbpedia
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.jsons
 
-edges/%.csv : edges/%.jsons
+edges/%.csv: edges/%.jsons
 	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@
+
+$(SPLIT_FILES): $(CSV_FILES)
+	mkdir -p edges/split
+	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 256
+
