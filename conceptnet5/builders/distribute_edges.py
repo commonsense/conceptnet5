@@ -6,7 +6,7 @@ class EdgeDistributor(object):
     def __init__(self, output_dir, n):
         self.n = n
         self.files = [
-            open(output_dir + '/edges_%03d.csv' % i, 'w')
+            open(output_dir + '/edges_%02d.csv' % i, 'w')
             for i in range(n)
         ]
 
@@ -23,7 +23,7 @@ class EdgeDistributor(object):
 def run_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', default='./split', help='the directory in which to write output files')
-    parser.add_argument('-n', type=int, default=256, help='the number of separate files to write')
+    parser.add_argument('-n', type=int, default=20, help='the number of separate files to write')
     args = parser.parse_args()
 
     sorter = EdgeDistributor(args.o, args.n)
