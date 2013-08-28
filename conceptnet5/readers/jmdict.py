@@ -1,9 +1,11 @@
 import xmltodict
 import sys
 import re
+import json
 import codecs
 import pycountry
 from conceptnet5.nodes import make_concept_uri
+from conceptnet5.edges import make_edge
 
 # I took the time to record these, but in the end I don't think I plan
 # to use them. Japanese parts of speech don't fit neatly into
@@ -114,13 +116,14 @@ def read_jmdict(filename, outfilename):
     outfile.close()
 
 def output_edge(outfile, subj_concept, obj_concept):
+    rel = '/r/TranslationOf'
     edge = make_edge(rel, subj_concept, obj_concept,
                      dataset='/d/jmdict',
                      license='/l/CC/By-SA',
                      sources=['/s/jmdict/1.07'],
                      context='/ctx/all',
                      weight=0.5)
-    print >> outfile, json.dumps(obj, ensure_ascii=False)
+    print >> outfile, json.dumps(edge, ensure_ascii=False)
 
 if __name__ == '__main__':
     read_jmdict(sys.argv[1], sys.argv[2])
