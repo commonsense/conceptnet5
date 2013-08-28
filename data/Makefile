@@ -81,7 +81,7 @@ edges/%.csv: edges/%.jsons
 
 $(SPLIT_PATTERNS): $(CSV_FILES)
 	mkdir -p edges/split
-	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 256
+	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 20
 
 edges/sorted/%.csv: edges/split/%.csv
 	mkdir -p edges/sorted

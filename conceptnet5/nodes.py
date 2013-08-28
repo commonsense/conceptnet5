@@ -22,7 +22,9 @@ def handle_disambig(text):
     None.
     """
     # find titles of the form Foo (bar)
-    text = text.replace('_', ' ')
+    text = text.replace('_', ' ').replace('/', ' ')
+    while '  ' in text:
+        text = text.replace('  ', ' ')
     match = re.match(r'([^(]+) \((.+)\)', text)
     if not match:
         return text, None
@@ -30,7 +32,7 @@ def handle_disambig(text):
         return match.group(1), 'n/' + match.group(2).strip(' _')
 
 def make_concept_uri(text, lang, disambiguation=None):
-    text = ftfy.ftfy(text)
+    text = ftfy.ftfy(text).strip()
     if disambiguation is None:
         text, disambiguation = handle_disambig(text)
     if disambiguation is not None:
