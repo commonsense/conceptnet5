@@ -12,6 +12,7 @@ edges/wiktionary/wiktionary_ja.jsons \
 edges/wordnet/wordnet.jsons \
 edges/verbosity/verbosity.jsons \
 edges/globalmind/globalmind.jsons \
+edges/jmdict/jmdict.jsons \
 $(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons) $(wildcard raw/conceptnet4_nadya/*.jsons)) \
 $(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
 
@@ -75,6 +76,10 @@ edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbped
 edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py
 	mkdir -p edges/dbpedia
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.jsons
+
+edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py
+	mkdir -p edges/jmdict
+	$(PYTHON) -m conceptnet5.readers.jmdict $< $@
 
 edges/%.csv: edges/%.jsons
 	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@

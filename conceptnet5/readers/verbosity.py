@@ -5,7 +5,9 @@ import math, re
 import sys
 from conceptnet5.readers.rhyme import sounds_like_score
 
-
+# We were using this at one point, but it turns out that people don't use any
+# relation on Verbosity consistently. Instead we make them all /r/RelatedTo,
+# the most general one, except for the negated ones which we make /r/Antonym.
 mapping = {
     "it is typically near": '/c/en/be_near',
     "it is typically in": '/c/en/be_in',
@@ -61,50 +63,49 @@ def run_verbosity(infile, outfile):
             counts['flag word'] += 1
             continue
 
-        if right.startswith('not '):
-            right = right[4:]
-            relation = 'it is not'
-        if relation == 'it is the opposite of':
-            relation = 'it is not'
-
         freq = int(freq)
         orderscore = int(orderscore)
-        if relation == 'about the same size as':
-            relation = 'it is about the same size as'
-        elif relation == 'it looks like':
-            relation = 'it is related to'
-        rel = mapping.get(relation)
-        reltext = relation[3:]
-        if rel is None:
-            rel = make_concept_uri(unicode(reltext), 'en')
-        text = '[[%s]] %s [[%s]]' % (left, reltext, right)
-        
-        if relation == 'it is' and\
-           (right.startswith('a ') or right.startswith('an ')
-            or right.startswith('the ')):
-            rel = '/r/IsA'
-        
-        sls = sounds_like_score(left, right)
-        text_similarities.append(sls)
-        if sls > 0.35:
-            #print "* %s sounds like %s (%4.4f)" % (left, right, sls)
-            counts['text similarity'] += 1
-            continue
-        
-        score = (freq*2-1) * (1000-orderscore) * (1-sls) / 1000
-        if score <= 0:
-            counts['low score'] += 1
-            continue
+        rel = '/r/RelatedTo'
+        reltext = 'is related to'
+        if right.startswith('not '):
+            rel = '/r/Antonym'
+            right = right[4:]
+            reltext = 'is not'
+        if relation == 'it is the opposite of':
+            rel = '/r/Antonym'
+            reltext = 'is the opposite of'
 
-        count += 1
-        counts['success'] += 1
-        
-        left = make_concept_uri(unicode(left), 'en')
-        right = make_concept_uri(unicode(right), 'en')
-        edge = make_edge(rel, left, right, '/d/verbosity',
-                         '/l/CC/By', sources, surfaceText=text,
-                         weight = score/10.0)
-        writer.write(edge)
+        rightwords = [right]
+        if ' ' in right:
+            rightwords.extend(right.split(' '))
+
+        for i, right in enumerate(rightwords):
+            edge_sources = list(sources)
+            if i > 0:
+                edge_sources.append('/s/rule/split_words')
+            text = '[[%s]] %s [[%s]]' % (left, reltext, right)
+            
+            sls = sounds_like_score(left, right)
+            text_similarities.append(sls)
+            if sls > 0.35:
+                #print "* %s sounds like %s (%4.4f)" % (left, right, sls)
+                counts['text similarity'] += 1
+                continue
+            
+            score = (freq*2-1) * (1000-orderscore) * (1-sls) / 1000
+            if score <= 0:
+                counts['low score'] += 1
+                continue
+
+            count += 1
+            counts['success'] += 1
+            
+            left = make_concept_uri(unicode(left), 'en')
+            right = make_concept_uri(unicode(right), 'en')
+            edge = make_edge(rel, left, right, '/d/verbosity',
+                             '/l/CC/By', sources, surfaceText=text,
+                             weight = score/10.0)
+            writer.write(edge)
 
 if __name__ == '__main__':
     run_verbosity(sys.argv[1], sys.argv[2])
