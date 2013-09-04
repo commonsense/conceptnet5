@@ -20,7 +20,7 @@ def convert_to_tab_separated(in_stream=None, out_stream=None):
             'end': info[u'end'],
             'context': info[u'context'],
             'weight': info[u'weight'],
-            'sources': ','.join(info[u'sources']),
+            'sources': info[u'sources'],
             'id': info[u'id'],
             'text': text,
             'dataset': info[u'dataset'],
