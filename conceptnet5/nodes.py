@@ -136,6 +136,28 @@ def make_list_uri(_type, args):
     arglist = list_to_uri_piece(args)
     return '/%s/%s' % (_type, arglist)
 
+def make_operator_uri(sources, op='and'):
+    sources = sorted(sources)
+    assert len(sources) >= 1
+    if len(sources) == 1:
+        return sources[0]
+    else:
+        return [make_list_uri(op, sources)]
+
+def make_conjunction_uri(sources):
+    return make_operator_uri(sources, 'and')
+
+def make_disjunction_uri(sources):
+    return make_operator_uri(sources, 'or')
+
+def make_and_or_tree(list_of_lists):
+    ands = [make_conjunction_uri(sublist) for sublist in list_of_lists]
+    if len(ands) == 1:
+        return ands[0]
+    else:
+        tree = [make_list_uri('or', ands)]
+        return tree
+
 def normalize_uri(uri):
     """
     Ensure that a URI is in Unicode, strip whitespace that may have crept

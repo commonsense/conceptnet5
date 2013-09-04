@@ -11,7 +11,7 @@ def convert_to_tab_separated(in_stream=None, out_stream=None):
         if not line.strip():
             continue
         info = json.loads(line.strip().decode('utf-8'))
-        text = info.get(u'surfaceText', '')
+        text = info.get(u'surfaceText') or ''
 
         line = "%(uri)s\t%(rel)s\t%(start)s\t%(end)s\t%(context)s\t%(weight)s\t%(sources)s\t%(id)s\t%(dataset)s\t%(text)s" % {
             'uri': info[u'uri'],

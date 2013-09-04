@@ -1,4 +1,6 @@
-from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas
+from conceptnet5.nodes import (list_to_uri_piece, uri_piece_to_list,
+    make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas,
+    make_conjunction_uri, make_disjunction_uri)
 from hashlib import sha1
 import json, os
 
@@ -15,8 +17,9 @@ def make_edge(rel, start, end,
         "- %s %s" % (rel, end)
     ]
     uri = make_assertion_uri(rel, [start, end], short=True)
-    sources.sort()
-    edge_unique_data = [uri, context] + sources
+    if isinstance(sources, list):
+        sources = make_conjunction_uri(sources)
+    edge_unique_data = [uri, context, sources]
     edge_unique = u' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     obj = {
@@ -34,6 +37,7 @@ def make_edge(rel, start, end,
         'surfaceText': surfaceText
     }
     return obj
+
 
 class FlatEdgeWriter(object):
     """

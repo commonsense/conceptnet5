@@ -22,7 +22,7 @@ mapping = {
 }
 
 bad_regex_no_biscuit =\
-  re.compile(r'(^letter|^rhyme|^blank$|^word$|^syllable$|^spell$|^tense$|^prefix|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$)')
+  re.compile(r'(^letter|^rhyme|^blank$|^word$|^syllable$|^spell|^tense$|^prefix|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$)')
 
 def run_verbosity(infile, outfile):
     maxscore = 0
@@ -79,16 +79,21 @@ def run_verbosity(infile, outfile):
         if ' ' in right:
             rightwords.extend(right.split(' '))
 
-        for i, right in enumerate(rightwords):
+        sls = sounds_like_score(left, right)
+        text_similarities.append(sls)
+        if sls > 0.35:
+            counts['text similarity'] += 1
+            continue
+        
+        for i, rightword in enumerate(rightwords):
             edge_sources = list(sources)
             if i > 0:
                 edge_sources.append('/s/rule/split_words')
-            text = '[[%s]] %s [[%s]]' % (left, reltext, right)
+            text = '[[%s]] %s [[%s]]' % (left, reltext, rightword)
             
-            sls = sounds_like_score(left, right)
+            sls = sounds_like_score(left, rightword)
             text_similarities.append(sls)
             if sls > 0.35:
-                #print "* %s sounds like %s (%4.4f)" % (left, right, sls)
                 counts['text similarity'] += 1
                 continue
             
@@ -100,9 +105,9 @@ def run_verbosity(infile, outfile):
             count += 1
             counts['success'] += 1
             
-            left = make_concept_uri(unicode(left), 'en')
-            right = make_concept_uri(unicode(right), 'en')
-            edge = make_edge(rel, left, right, '/d/verbosity',
+            leftc = make_concept_uri(unicode(left), 'en')
+            rightc = make_concept_uri(unicode(rightword), 'en')
+            edge = make_edge(rel, leftc, rightc, '/d/verbosity',
                              '/l/CC/By', sources, surfaceText=text,
                              weight = score/10.0)
             writer.write(edge)
