@@ -19,7 +19,7 @@ def combine_assertions(csv_filename, out_filename, dataset, license):
     current_sources = []
     out = codecs.open(out_filename, 'w', encoding='utf-8')
     for line in codecs.open(csv_filename, encoding='utf-8'):
-        uri, rel, start, end, context, weight, source_uri, id, dataset, surface = line.split('\t')[:10]
+        uri, rel, start, end, context, weight, source_uri, id, this_dataset, surface = line.split('\t')[:10]
         weight = float(weight)
         surface = surface.strip()
         if uri == 'uri':

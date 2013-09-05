@@ -23,9 +23,10 @@ SPLIT_PATTERNS := $(addprefix edges/split/%_, $(PIECES))
 SPLIT_FILES = $(patsubst %,edges/split/edges_%, $(PIECES))
 SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/%.csv,assertions/%.jsons, $(SORTED_FILES))
+COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2
 
-build_assertions: $(ASSERTION_FILES)
+build_assertions: $(COMBINED_CSVS)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
@@ -97,6 +98,9 @@ edges/sorted/%.csv: edges/split/%.csv
 assertions/%.jsons: edges/sorted/%.csv
 	mkdir -p assertions
 	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -d /d/conceptnet/5/combined-sa -l /l/CC/By-SA
+
+assertions/%.csv: assertions/%.jsons
+	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@
 
 $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2: raw/*/*
 	mkdir -p $(OUTPUT_FOLDER)
