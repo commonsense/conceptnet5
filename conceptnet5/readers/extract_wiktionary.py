@@ -83,7 +83,8 @@ TRANS_DIVIDER_RE = re.compile(
 SENSE_RE = re.compile(r'\{\{sense\|(.*?)\}\}')
 
 def safe_path_component(text):
-    return text.replace('/', '_').replace(' ', '_').replace(':', '_')
+    return text.replace('/', '_').replace(' ', '_').replace(':',
+        '_').replace('!', '_')
 
 def fix_heading(heading):
     return ftfy(heading).strip('[]')
