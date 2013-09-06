@@ -36,17 +36,19 @@ BEDUME_FLAGGED_CONCEPTS = [
   'intoxicate', 'eat hamburger', 'wok'
 ]
 BEDUME_FLAGGED_PLACES = [
-  'alaska', 'kansa', 'utah', 'austria', 'delaware', 'pennsylvania', 
-  'italy', 'cuba', 'norway', 'idaho', 'france', 'utha', 'mexico',
-  'connecticut', 'massachusetts', 'montana', 'wyoming', 'every state',
-  'new york', 'maine', 'suface of moon', 'germany', 'nebraska',
-  'finland', 'louisiana', 'belgium', 'morrocco', 'ireland', 'ceylon',
-  'california', 'oregon', 'florida', 'uraguay', 'egypt', 'maryland',
-  'washington', 'morocco', 'south dakota', 'tuscon', 'panama', 'alberta',
-  'arizona', 'texas', 'new jersey', 'colorado', 'jamaica', 'vermont',
-  'nevada', 'delawere', 'hawaii', 'minnesota', 'tuscony', 'costa rica',
-  'south dakato', 'china', 'argentina', 'venazuela', 'honduras',
-  'opera', 'wisconsin', 'great britain',
+  'alaska', 'kansa', 'utah', 'austria', 'delaware', 'pennsylvania', 'italy',
+  'cuba', 'norway', 'idaho', 'france', 'utha', 'mexico', 'connecticut',
+  'massachusetts', 'montana', 'wyoming', 'every state', 'new york', 'maine',
+  'suface of moon', 'germany', 'nebraska', 'finland', 'louisiana', 'belgium',
+  'morrocco', 'ireland', 'ceylon', 'california', 'oregon', 'florida',
+  'uraguay', 'egypt', 'maryland', 'washington', 'morocco', 'south dakota',
+  'tuscon', 'panama', 'alberta', 'arizona', 'texas', 'new jersey', 'colorado',
+  'jamaica', 'vermont', 'nevada', 'delawere', 'hawaii', 'minnesota', 'tuscony',
+  'costa rica', 'south dakato', 'south dakota', 'china', 'argentina',
+  'venazuela', 'honduras', 'opera', 'wisconsin', 'great britain',
+]
+AROUND_PREPOSITIONS = [
+  'in', 'on', 'at', 'under', 'near'
 ]
 
 def can_skip(parts_dict):
@@ -57,7 +59,10 @@ def can_skip(parts_dict):
         return True
     if parts_dict["goodness"] < 1:
         return True
-
+    if 'spatial concept' in parts_dict["startText"]:
+        return True
+    if not parts_dict["startText"] or not parts_dict["endText"]:
+        return True
     if 'rubycommons' in parts_dict["activity"]: 
         return True
     return False
@@ -105,12 +110,15 @@ def build_data_set(parts_dict):
     dataset = normalize_uri('/d/conceptnet/4/'+lang)
     return dataset
 
-def build_sources(parts_dict):
+def build_sources(parts_dict, preposition_fix=False):
     activity = parts_dict["activity"]
 
     creator_node = normalize_uri(u'/s/contributor/omcs/'+parts_dict["creator"])
     activity_node = normalize_uri(u'/s/activity/omcs/'+activity)
-    sources = [([creator_node, activity_node], 1)]
+    if preposition_fix:
+        sources = [([creator_node, activity_node, '/s/rule/preposition_fix'], 1)]
+    else:
+        sources = [([creator_node, activity_node], 1)]
 
     for vote in parts_dict["votes"]:
         username = vote[0]
@@ -137,13 +145,29 @@ class CN4Builder(object):
         if can_skip(parts_dict):
             return
 
+        # fix the result of some process that broke prepositions ages ago
+        preposition_fix = False
+        if '} around {' in parts_dict['frame_text']:
+            for prep in AROUND_PREPOSITIONS:
+                if parts_dict['endText'].startswith(prep + ' '):
+                    parts_dict['endText'] = \
+                        parts_dict['endText'][len(prep) + 1:]
+                    replacement = '} %s {' % prep
+                    parts_dict['frame_text'] = \
+                        parts_dict['frame_text'].replace(
+                            '} around {',
+                            replacement
+                        )
+                    preposition_fix = True
+                    break
+            
         # build the assertion
         frame_text = build_frame_text(parts_dict)
         relation = build_relation(parts_dict)
         start = build_start(parts_dict)
         end = build_end(parts_dict)
         dataset = build_data_set(parts_dict)
-        sources = build_sources(parts_dict)
+        sources = build_sources(parts_dict, preposition_fix)
 
         reject = False
         for source_list, weight in sources:
