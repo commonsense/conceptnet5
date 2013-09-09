@@ -1,5 +1,6 @@
 PYTHON = python
-READERS = readers
+READERS = ../conceptnet5/readers
+BUILDERS = ../conceptnet5/builders
 DATE := $$(date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = salmon.media.mit.edu:/var/www/conceptnet5/downloads
@@ -23,14 +24,19 @@ SPLIT_PATTERNS := $(addprefix edges/split/%_, $(PIECES))
 SPLIT_FILES = $(patsubst %,edges/split/edges_%, $(PIECES))
 SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/%.csv,assertions/%.jsons, $(SORTED_FILES))
+ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
 COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2
 
+build_assoc: assoc/all.csv
 build_assertions: $(COMBINED_CSVS)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 distribute: $(DIST_FILES)
+
+# A Makefile idiom that means "don't delete intermediate files"
+.SECONDARY:
 
 # Read edges from ConceptNet raw files.
 edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py
@@ -72,6 +78,8 @@ edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)
 	mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.jsons
 
+# I apologize for the fact that I have stopped commenting the Makefile around
+# here.
 edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py
 	mkdir -p edges/dbpedia
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.jsons
@@ -84,10 +92,10 @@ edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py
 	mkdir -p edges/jmdict
 	$(PYTHON) -m conceptnet5.readers.jmdict $< $@
 
-edges/%.csv: edges/%.jsons
+edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
 	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@
 
-$(SPLIT_PATTERNS): $(CSV_FILES)
+$(SPLIT_PATTERNS): $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 	mkdir -p edges/split
 	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 20
 
@@ -95,7 +103,7 @@ edges/sorted/%.csv: edges/split/%.csv
 	mkdir -p edges/sorted
 	sort $< | uniq > $@
 
-assertions/%.jsons: edges/sorted/%.csv
+assertions/%.jsons: edges/sorted/%.csv $(BUILDERS)/combine_assertions.py
 	mkdir -p assertions
 	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -d /d/conceptnet/5/combined-sa -l /l/CC/By-SA
 
@@ -106,3 +114,12 @@ $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2: raw/*/*
 	mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2 raw/
 
+assoc/%.csv: assertions/%.jsons $(BUILDERS)/json_to_assoc.py
+	mkdir -p assoc
+	$(PYTHON) -m conceptnet5.builders.json_to_assoc < $< > $@
+
+assoc/all.csv: $(ASSOC_FILES)
+	cat $(ASSOC_FILES) > $@
+
+assoc/space/u.npy: assoc/all.csv
+	$(PYTHON) -m assoc_space.build_conceptnet $< $@
