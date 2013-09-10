@@ -118,7 +118,7 @@ LANGUAGES = {
 
 SOURCE = '/s/web/en.wiktionary.org'
 INTERLINGUAL = '/s/rule/wiktionary_interlingual_definitions'
-MONOLINGUAL = '/s/rule/wiktioary_monolingual_definitions'
+MONOLINGUAL = '/s/rule/wiktionary_monolingual_definitions'
 TRANSLATE = '/s/rule/wiktionary_translation_tables'
 DEFINE = '/s/rule/wiktionary_define_senses'
 
