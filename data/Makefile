@@ -122,4 +122,4 @@ assoc/all.csv: $(ASSOC_FILES)
 	cat $(ASSOC_FILES) > $@
 
 assoc/space/u.npy: assoc/all.csv
-	$(PYTHON) -m assoc_space.build_conceptnet $< $@
+	$(PYTHON) -m assoc_space.build_conceptnet $< assoc/space
