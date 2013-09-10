@@ -20,12 +20,16 @@ def convert_to_assoc(in_stream=None, out_stream=None):
         rel = info[u'rel']
         weight = info[u'weight']
 
-        negated = (rel.startswith('/r/Not') or rel.startswith('/r/Antonym'))
-
-        if not negated:
-            pairs = [(startc, endc)]
+        if rel == '/r/Desires':
+            pairs = [('/c/en/good', endc), ('/c/en/bad/neg', endc)]
+        elif rel == '/r/NotDesires':
+            pairs = [('/c/en/bad', endc), ('/c/en/good/neg', endc)]
         else:
-            pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
+            negated = (rel.startswith('/r/Not') or rel.startswith('/r/Antonym'))
+            if not negated:
+                pairs = [(startc, endc)]
+            else:
+                pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
 
         for (start, end) in pairs:
             line = u"%(start)s\t%(end)s\t%(weight)s" % {
