@@ -3,6 +3,9 @@ import sys
 
 def reduce_concept(concept):
     parts = concept.split(u'/')
+    # Unify simplified and traditional Chinese in associations.
+    if parts[2] == 'zh_CN' or parts[2] == 'zh_TW':
+        parts[2] = 'zh'
     return u'/'.join(parts[:4])
 
 def convert_to_assoc(in_stream=None, out_stream=None):
@@ -20,16 +23,22 @@ def convert_to_assoc(in_stream=None, out_stream=None):
         rel = info[u'rel']
         weight = info[u'weight']
 
-        if rel == '/r/Desires':
-            pairs = [('/c/en/good', endc), ('/c/en/bad/neg', endc)]
-        elif rel == '/r/NotDesires':
-            pairs = [('/c/en/bad', endc), ('/c/en/good/neg', endc)]
+        if startc == u'/c/en/person':
+            if rel == u'/r/Desires':
+                pairs = [(u'/c/en/good', endc), (u'/c/en/bad/neg', endc)]
+            elif rel == u'/r/NotDesires':
+                pairs = [(u'/c/en/bad', endc), (u'/c/en/good/neg', endc)]
+        elif startc == u'/c/zh/人':
+            if rel == u'/r/Desires':
+                pairs = [(u'/c/zh/好', endc), (u'/c/zh/不良/neg', endc)]
+            elif rel == '/r/NotDesires':
+                pairs = [(u'/c/zh/好/neg', endc), (u'/c/zh/不良', endc)]
         else:
-            negated = (rel.startswith('/r/Not') or rel.startswith('/r/Antonym'))
+            negated = (rel.startswith(u'/r/Not') or rel.startswith(u'/r/Antonym'))
             if not negated:
                 pairs = [(startc, endc)]
             else:
-                pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
+                pairs = [(startc, endc + u'/neg'), (startc + u'/neg', endc)]
 
         for (start, end) in pairs:
             line = u"%(start)s\t%(end)s\t%(weight)s" % {
