@@ -48,10 +48,14 @@ class FlatEdgeWriter(object):
     The default behavior is simply to write the JSON data to a file, one entry
     per line, without any additional indexing information.
     """
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, file):
+        self.filename = None
+        if isinstance(file, basestring):
+            self.out = open(filename, 'w')
+            self.filename = file
+        else:
+            self.out = file
         self.open = True
-        self.out = open(filename, 'w')
 
     def write_header(self):
         pass
@@ -65,7 +69,8 @@ class FlatEdgeWriter(object):
 
     def close(self):
         self.write_footer()
-        self.out.close()
+        if self.filename is not None:
+            self.out.close()
         self.open = False
 
 class SolrEdgeWriter(FlatEdgeWriter):

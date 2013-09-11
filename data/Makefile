@@ -26,9 +26,11 @@ SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/%.csv,assertions/%.jsons, $(SORTED_FILES))
 ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
 COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILES))
+SOLR_FILES = $(patsubst assertions/%.jsons,solr/%.json, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2
 
 build_assoc: assoc/all.csv
+build_solr: $(SOLR_FILES)
 build_assertions: $(COMBINED_CSVS)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
@@ -123,3 +125,6 @@ assoc/all.csv: $(ASSOC_FILES)
 
 assoc/space/u.npy: assoc/all.csv
 	$(PYTHON) -m assoc_space.build_conceptnet $< assoc/space
+
+solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
+	$(PYTHON) -m conceptnet5.builders.json_to_solr < $< > $@
