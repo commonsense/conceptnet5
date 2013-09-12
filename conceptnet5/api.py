@@ -15,29 +15,21 @@ import sys
 import json
 import os
 import numpy as np
-
+from assoc_space import AssocSpace
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 
-#if not app.debug:
-#    import logging
-#    file_handler = logging.FileHandler('/srv/conceptnet5.1/logs/flask_errors.log')
-#    file_handler.setLevel(logging.INFO)
-#    app.logger.addHandler(file_handler)
-
 commonsense_assoc = None
-# load Luminoso's assoc code if it's available, because it works very well for
-# this purpose. We may have an open-source alternative in the future.
+ASSOC_DIR = os.environ.get('CONCEPTNET_ASSOC_DATA') or '../data/assoc/space'
 def load_assoc():
+    """
+    Load the association matrix. Requires the open source Python package
+    'assoc_space'.
+    """
     global commonsense_assoc
     if commonsense_assoc: return commonsense_assoc
-    try:
-        from luminoso3.background_space import get_commonsense_assoc
-        app.logger.info("Getting assoc space; env=%s" % os.environ.get('LUMINOSO_DATA'))
-        commonsense_assoc = get_commonsense_assoc('5.1', 150)
-        app.logger.info("Done")
-    except ImportError:
-        app.logger.info("Couldn't import luminoso3; running without similarity measures")
+    dirname = ASSOC_DIR
+    commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
     return commonsense_assoc
 
 if len(sys.argv) == 1:
@@ -69,8 +61,8 @@ def request_limit(ip_address, amount=1):
     """
     if request_cache.get(ip_address) > cache_dict['limit_amount']:
         return True, flask.Response(
-          response=flask.json.dumps({'unauthorized':'rate limit violated'}),
-          status=401, mimetype='json')
+          response=flask.json.dumps({'error': 'rate limit exceeded'}),
+          status=429, mimetype='json')
     else:
         request_cache.inc(ip_address, amount)
         return False, None
@@ -150,12 +142,12 @@ def search(query_args=None):
     params['wt'] = 'json'
     params['indent'] = 'on'
     if sharded:
-        params['shards'] = 'localhost:8983/solr,callisto.csc.media.mit.edu:8983/solr'
+        params['shards'] = 'localhost:8983/solr,claret.csc.media.mit.edu:8983/solr'
     if params['q'] == '':
         return see_documentation()
     return get_query_result(params)
 
-SOLR_BASE = 'http://himalia.csc.media.mit.edu:8983/solr/select?'
+SOLR_BASE = 'http://salmon.csc.media.mit.edu:8983/solr/select?'
 
 def get_link(params):
     return SOLR_BASE + urllib.urlencode(params)
