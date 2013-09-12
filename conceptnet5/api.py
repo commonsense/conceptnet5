@@ -19,7 +19,12 @@ from assoc_space import AssocSpace
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 
-commonsense_assoc = None
+if not app.debug:
+    import logging
+    file_handler = logging.FileHandler('/srv/conceptnet5/logs/flask_errors.log')
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
 ASSOC_DIR = os.environ.get('CONCEPTNET_ASSOC_DATA') or '../data/assoc/space'
 def load_assoc():
     """
@@ -142,12 +147,12 @@ def search(query_args=None):
     params['wt'] = 'json'
     params['indent'] = 'on'
     if sharded:
-        params['shards'] = 'localhost:8983/solr,claret.csc.media.mit.edu:8983/solr'
+        params['shards'] = 'burgundy.media.mit.edu:8983/solr,claret.media.mit.edu:8983/solr'
     if params['q'] == '':
         return see_documentation()
     return get_query_result(params)
 
-SOLR_BASE = 'http://salmon.csc.media.mit.edu:8983/solr/select?'
+SOLR_BASE = 'http://salmon.media.mit.edu:8983/solr/select?'
 
 def get_link(params):
     return SOLR_BASE + urllib.urlencode(params)
@@ -172,7 +177,10 @@ def see_documentation():
 
 @app.errorhandler(404)
 def not_found(error):
-    return flask.jsonify({'error':'invalid request'})
+    return flask.jsonify({
+       'error': 'invalid request',
+       'details': str(error)
+    })
 
 @app.route('/assoc/list/<lang>/<termlist>')
 def list_assoc(lang, termlist):
@@ -224,8 +232,5 @@ def concept_assoc(uri):
     return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
 
 if __name__ == '__main__':
-    if '--unsafe' in sys.argv:
-        app.debug = True
-        app.run(debug=True, host='0.0.0.0', port=8084)
-    else:
-        app.run(debug=True, port=8084)
+    app.debug = True
+    app.run('127.0.0.1', debug=True, port=8084)
