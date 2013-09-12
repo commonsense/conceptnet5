@@ -23,13 +23,16 @@ for level in range(2, 8):
     equals = '=' * level
     regex = re.compile(
         r'''
-        \s{equals}           # N equals signs, after whitespace
+        ^{equals}            # N equals signs, after start or newline
         \s*                  # There might be whitespace around the section title
         ([^=]+?)             # The section title, with no more = signs
         \s*
         {equals}\s           # End with N more equals signs and whitespace
         '''.format(equals=equals),
-        re.VERBOSE           # This is a verbose regex; ignore spaces and comments
+        # This is a verbose regex (ignore spaces and comments); this is a
+        # multiline regex (the ^ should match any line start as well as the
+        # start of the string)
+        re.VERBOSE | re.MULTILINE
     )
     SECTION_HEADER_RES[level] = regex
 
