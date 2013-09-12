@@ -23,6 +23,11 @@ def convert_to_assoc(in_stream=None, out_stream=None):
         rel = info[u'rel']
         weight = info[u'weight']
 
+        if u'dbpedia' in info[u'sources'] and u'/or/' not in info[u'sources']:
+            # DBPedia associations are still too numerous and too weird to
+            # associate.
+            continue
+
         if startc == u'/c/en/person':
             if rel == u'/r/Desires':
                 pairs = [(u'/c/en/good', endc), (u'/c/en/bad/neg', endc)]
@@ -30,9 +35,9 @@ def convert_to_assoc(in_stream=None, out_stream=None):
                 pairs = [(u'/c/en/bad', endc), (u'/c/en/good/neg', endc)]
         elif startc == u'/c/zh/人':
             if rel == u'/r/Desires':
-                pairs = [(u'/c/zh/好', endc), (u'/c/zh/不良/neg', endc)]
+                pairs = [(u'/c/zh/良好', endc), (u'/c/zh/不良/neg', endc)]
             elif rel == '/r/NotDesires':
-                pairs = [(u'/c/zh/好/neg', endc), (u'/c/zh/不良', endc)]
+                pairs = [(u'/c/zh/良好/neg', endc), (u'/c/zh/不良', endc)]
         else:
             negated = (rel.startswith(u'/r/Not') or rel.startswith(u'/r/Antonym'))
             if not negated:
