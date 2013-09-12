@@ -29,7 +29,8 @@ COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILE
 SOLR_FILES = $(patsubst assertions/%.jsons,solr/%.json, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/conceptnet5-raw-data.tar.bz2
 
-build_assoc: assoc/all.csv
+all: build_assoc build_solr
+build_assoc: assoc/space/u.npy
 build_solr: $(SOLR_FILES)
 build_assertions: $(COMBINED_CSVS)
 build_splits: $(SORTED_FILES)
