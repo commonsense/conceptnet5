@@ -20,6 +20,8 @@ def convert_to_word2vec(in_stream=None, out_stream=None):
     for line in in_stream:
         if not line.strip():
             continue
+        if 'dbpedia' in line:
+            continue
         entry = json.loads(line.strip().decode('utf-8'))
         weight = float(entry['weight']) * 2
         if weight < 1:

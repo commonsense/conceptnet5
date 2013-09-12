@@ -56,6 +56,7 @@ class FlatEdgeWriter(object):
         else:
             self.out = file
         self.open = True
+        self.write_header()
 
     def write_header(self):
         pass
