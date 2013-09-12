@@ -95,13 +95,13 @@ class SolrEdgeWriter(FlatEdgeWriter):
         self.out.write(json_struct[2:-2]+',\n')
 
 class MultiWriter(object):
-    def __init__(self, basename,core=False):
+    def __init__(self, basename,isTest = False):
         flat_file_path = 'data/flat/%s.json' % basename
         solr_file_path = 'data/solr/%s.json' % basename
 
-        if core:
-            flat_file_path = 'core_data/flat/%s.json' % basename
-            solr_file_path = 'core_data/solr/%s.json' % basename
+        if isTest:
+            flat_file_path = 'data/flat_test/%s.json' % basename
+            solr_file_path = 'data/solr_test/%s.json' % basename
 
         self.flat_writer = FlatEdgeWriter(flat_file_path)
         self.solr_writer = SolrEdgeWriter(solr_file_path)

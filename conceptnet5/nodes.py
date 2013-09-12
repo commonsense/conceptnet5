@@ -1,25 +1,63 @@
-def make_concept_uri(text, lang, disambiguation=None):
-    if lang == 'en':
-        from metanl import english
-        normalized, disambig = english.normalize_topic(text)
-    elif lang == 'ja':
-        from metanl import japanese
-        normalized, disambig = japanese.normalize(text), None
-    elif lang in ('pt', 'hu', 'nl', 'es'):
-        # languages where we know the stopword list
-        import simplenlp
-        nlp = simplenlp.get(lang)
-        disambig = None
-        normalized, disambig = nlp.normalize(text), None
+# -*- coding: utf-8 -*-
+
+import re
+import ftfy
+from metanl import english
+from metanl.general import preprocess_text
+
+JAPANESE_PARTS_OF_SPEECH = {
+    u'名詞': u'n',
+    u'副詞': u'r',
+    u'形容詞': u'a',
+    u'動詞': u'v',
+}
+
+def handle_disambig(text):
+    """
+    Get a canonical representation of a Wikipedia topic, which may include
+    a disambiguation string in parentheses.
+
+    Returns (name, disambig), where "name" is the topic name,
+    and "disambig" is a string corresponding to the disambiguation text or
+    None.
+    """
+    # find titles of the form Foo (bar)
+    text = text.replace('_', ' ')
+    match = re.match(r'([^(]+) \((.+)\)', text)
+    if not match:
+        return text, None
     else:
-        normalized = text
-        disambig = None
+        return match.group(1), 'n/' + match.group(2).strip(' _')
+
+def make_concept_uri(text, lang, disambiguation=None):
+    text = ftfy.ftfy(text)
+    if disambiguation is None:
+        text, disambiguation = handle_disambig(text)
     if disambiguation is not None:
-        disambig = disambiguation
-    if disambig is not None:
-        disambig = disambig.replace(' ', '_')
-    if disambig:
-        return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambig)
+        if isinstance(disambiguation, str):
+            disambiguation = disambiguation.decode('utf-8')
+        disambiguation = ftfy.ftfy(disambiguation)
+
+    if lang == 'en':
+        normalized = english.normalize(text)
+    elif lang == 'ja' and disambiguation is not None:
+        match = re.search(r'\((.*?)\)', disambiguation)
+        if match:
+            parenthesized = match.group(1)
+            pos, rest = disambiguation.split('/', 1)
+            if parenthesized in JAPANESE_PARTS_OF_SPEECH:
+                pos = JAPANESE_PARTS_OF_SPEECH[parenthesized]
+            else:
+                pos = 'n'
+            disambiguation = pos + '/' + re.sub(r'\s*\((.*?)\)\s*', '', rest)
+        normalized = preprocess_text(text).lower()
+    else:
+        normalized = preprocess_text(text).lower()
+
+    if disambiguation is not None:
+        disambiguation = disambiguation.replace(' ', '_')
+    if disambiguation:
+        return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambiguation)
     else:
         return '/c/%s/%s' % (lang, normalized.replace(' ', '_'))
 
