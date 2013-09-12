@@ -19,11 +19,11 @@ import numpy as np
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 
-#if not app.debug:
-#    import logging
-#    file_handler = logging.FileHandler('/srv/conceptnet5.1/logs/flask_errors.log')
-#    file_handler.setLevel(logging.INFO)
-#    app.logger.addHandler(file_handler)
+if not app.debug:
+    import logging
+    file_handler = logging.FileHandler('/srv/conceptnet5/logs/flask_errors.log')
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
 
 commonsense_assoc = None
 # load Luminoso's assoc code if it's available, because it works very well for
@@ -36,8 +36,9 @@ def load_assoc():
         app.logger.info("Getting assoc space; env=%s" % os.environ.get('LUMINOSO_DATA'))
         commonsense_assoc = get_commonsense_assoc('5.1', 150)
         app.logger.info("Done")
-    except ImportError:
+    except ImportError as e:
         app.logger.info("Couldn't import luminoso3; running without similarity measures")
+        print e
     return commonsense_assoc
 
 if len(sys.argv) == 1:
@@ -150,12 +151,12 @@ def search(query_args=None):
     params['wt'] = 'json'
     params['indent'] = 'on'
     if sharded:
-        params['shards'] = 'localhost:8983/solr,callisto.csc.media.mit.edu:8983/solr'
+        params['shards'] = 'localhost:8983/solr,burgundy.media.mit.edu:8983/solr,claret.media.mit.edu:8983/solr'
     if params['q'] == '':
         return see_documentation()
     return get_query_result(params)
 
-SOLR_BASE = 'http://himalia.csc.media.mit.edu:8983/solr/select?'
+SOLR_BASE = 'http://salmon.media.mit.edu:8983/solr/select?'
 
 def get_link(params):
     return SOLR_BASE + urllib.urlencode(params)
@@ -180,7 +181,10 @@ def see_documentation():
 
 @app.errorhandler(404)
 def not_found(error):
-    return flask.jsonify({'error':'invalid request'})
+    return flask.jsonify({
+       'error': 'invalid request',
+       'details': str(error)
+    })
 
 @app.route('/assoc/list/<lang>/<termlist>')
 def list_assoc(lang, termlist):
@@ -232,8 +236,5 @@ def concept_assoc(uri):
     return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
 
 if __name__ == '__main__':
-    if '--unsafe' in sys.argv:
-        app.debug = True
-        app.run(debug=True, host='0.0.0.0', port=8084)
-    else:
-        app.run(debug=True, port=8084)
+    app.debug = True
+    app.run('127.0.0.1', debug=True, port=8084)
