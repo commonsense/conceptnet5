@@ -23,6 +23,9 @@ cnet5_index_builder/JAKE_LOG.txt
 cnet5_index_builder/cnet5_data/conceptnet4/db_config/
 cnet5_index_builder/cnet5_data/conceptnet4_nadya/db_config/
 env/
+data/assoc
+data/assertions
 data/edges
 data/raw
+data/solr
 data/sw_map
