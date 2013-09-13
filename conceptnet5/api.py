@@ -26,6 +26,7 @@ if not app.debug:
     app.logger.addHandler(file_handler)
 
 ASSOC_DIR = os.environ.get('CONCEPTNET_ASSOC_DATA') or '../data/assoc/space'
+commonsense_assoc = None
 def load_assoc():
     """
     Load the association matrix. Requires the open source Python package
