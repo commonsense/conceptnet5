@@ -143,19 +143,19 @@ solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
 
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ $<
+	tar jcvf $@ raw/*/*
 
 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: assertions/*.jsons
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ $<
+	tar jcvf $@ assertions/*.jsons
 
 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2: solr/*.json
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ $<
+	tar jcvf $@ solr
 
 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: assertions/*.csv
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ $<
+	tar jcvf $@ assertions/*.csv
 
 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2: $(ASSOC_DIR)/*
 	@mkdir -p $(OUTPUT_FOLDER)
