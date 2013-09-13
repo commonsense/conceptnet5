@@ -51,7 +51,7 @@ class FlatEdgeWriter(object):
     def __init__(self, file):
         self.filename = None
         if isinstance(file, basestring):
-            self.out = open(filename, 'w')
+            self.out = open(file, 'w')
             self.filename = file
         else:
             self.out = file
