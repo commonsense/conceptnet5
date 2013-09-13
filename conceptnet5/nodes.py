@@ -22,7 +22,9 @@ def handle_disambig(text):
     None.
     """
     # find titles of the form Foo (bar)
-    text = text.replace('_', ' ')
+    text = text.replace('_', ' ').replace('/', ' ')
+    while '  ' in text:
+        text = text.replace('  ', ' ')
     match = re.match(r'([^(]+) \((.+)\)', text)
     if not match:
         return text, None
@@ -30,7 +32,7 @@ def handle_disambig(text):
         return match.group(1), 'n/' + match.group(2).strip(' _')
 
 def make_concept_uri(text, lang, disambiguation=None):
-    text = ftfy.ftfy(text)
+    text = ftfy.ftfy(text).strip()
     if disambiguation is None:
         text, disambiguation = handle_disambig(text)
     if disambiguation is not None:
@@ -55,7 +57,7 @@ def make_concept_uri(text, lang, disambiguation=None):
         normalized = preprocess_text(text).lower()
 
     if disambiguation is not None:
-        disambiguation = disambiguation.replace(' ', '_')
+        disambiguation = disambiguation.strip().replace(' ', '_').lower()
     if disambiguation:
         return '/c/%s/%s/%s' % (lang, normalized.replace(' ', '_'), disambiguation)
     else:
@@ -133,6 +135,28 @@ def make_list_uri(_type, args):
     """
     arglist = list_to_uri_piece(args)
     return '/%s/%s' % (_type, arglist)
+
+def make_operator_uri(sources, op='and'):
+    sources = sorted(sources)
+    assert len(sources) >= 1
+    if len(sources) == 1:
+        return sources[0]
+    else:
+        return make_list_uri(op, sources)
+
+def make_conjunction_uri(sources):
+    return make_operator_uri(sources, 'and')
+
+def make_disjunction_uri(sources):
+    return make_operator_uri(sources, 'or')
+
+def make_and_or_tree(list_of_lists):
+    ands = [make_conjunction_uri(sublist) for sublist in list_of_lists]
+    if len(ands) == 1:
+        return ands[0]
+    else:
+        tree = make_list_uri('or', ands)
+        return tree
 
 def normalize_uri(uri):
     """

@@ -1,4 +1,6 @@
-from conceptnet5.nodes import list_to_uri_piece, uri_piece_to_list, make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas
+from conceptnet5.nodes import (list_to_uri_piece, uri_piece_to_list,
+    make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas,
+    make_conjunction_uri, make_disjunction_uri)
 from hashlib import sha1
 import json, os
 
@@ -15,8 +17,9 @@ def make_edge(rel, start, end,
         "- %s %s" % (rel, end)
     ]
     uri = make_assertion_uri(rel, [start, end], short=True)
-    sources.sort()
-    edge_unique_data = [uri, context] + sources
+    if isinstance(sources, list):
+        sources = make_conjunction_uri(sources)
+    edge_unique_data = [uri, context, sources]
     edge_unique = u' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     obj = {
@@ -35,6 +38,7 @@ def make_edge(rel, start, end,
     }
     return obj
 
+
 class FlatEdgeWriter(object):
     """
     This class and its subclasses give you objects you can use to write
@@ -44,10 +48,15 @@ class FlatEdgeWriter(object):
     The default behavior is simply to write the JSON data to a file, one entry
     per line, without any additional indexing information.
     """
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self, file):
+        self.filename = None
+        if isinstance(file, basestring):
+            self.out = open(filename, 'w')
+            self.filename = file
+        else:
+            self.out = file
         self.open = True
-        self.out = open(filename, 'w')
+        self.write_header()
 
     def write_header(self):
         pass
@@ -61,7 +70,8 @@ class FlatEdgeWriter(object):
 
     def close(self):
         self.write_footer()
-        self.out.close()
+        if self.filename is not None:
+            self.out.close()
         self.open = False
 
 class SolrEdgeWriter(FlatEdgeWriter):
@@ -95,9 +105,9 @@ class SolrEdgeWriter(FlatEdgeWriter):
         self.out.write(json_struct[2:-2]+',\n')
 
 class MultiWriter(object):
-    def __init__(self, basename,isTest = False):
-        flat_file_path = 'data/flat/%s.json' % basename
-        solr_file_path = 'data/solr/%s.json' % basename
+    def __init__(self, basename, flat_dir='data/flat', solr_dir='data/solr', isTest=False):
+        flat_file_path = '%s/%s.json' % (flat_dir, basename)
+        solr_file_path = '%s/%s.json' % (solr_dir, basename)
 
         if isTest:
             flat_file_path = 'data/flat_test/%s.json' % basename

@@ -1,4 +1,0 @@
-simplenlp
-flask
-ipython
--e git+https://github.com/commonsense/metanl.git#egg=metanl
