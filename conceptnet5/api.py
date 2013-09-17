@@ -39,7 +39,7 @@ def load_assoc():
     return commonsense_assoc
 
 if len(sys.argv) == 1:
-    root_url = 'http://conceptnet5.media.mit.edu/data/5.1'
+    root_url = 'http://conceptnet5.media.mit.edu/data/5.2'
 else:
     root_url = sys.argv[1]
 
