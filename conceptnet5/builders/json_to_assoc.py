@@ -28,16 +28,21 @@ def convert_to_assoc(in_stream=None, out_stream=None):
             # associate.
             continue
 
+        pairs = []
         if startc == u'/c/en/person':
             if rel == u'/r/Desires':
                 pairs = [(u'/c/en/good', endc), (u'/c/en/bad/neg', endc)]
             elif rel == u'/r/NotDesires':
                 pairs = [(u'/c/en/bad', endc), (u'/c/en/good/neg', endc)]
+            else:
+                pairs = [(startc, endc)]
         elif startc == u'/c/zh/人':
             if rel == u'/r/Desires':
                 pairs = [(u'/c/zh/良好', endc), (u'/c/zh/不良/neg', endc)]
             elif rel == '/r/NotDesires':
                 pairs = [(u'/c/zh/良好/neg', endc), (u'/c/zh/不良', endc)]
+            else:
+                pairs = [(startc, endc)]
         else:
             negated = (rel.startswith(u'/r/Not') or rel.startswith(u'/r/Antonym'))
             if not negated:

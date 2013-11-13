@@ -6,7 +6,7 @@ OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
 RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
-ASSOC_DIR = assoc/space
+ASSOC_DIR = assoc/assoc-space-5.2
 
 EDGE_FILES = \
 edges/dbpedia/instances.jsons edges/dbpedia/properties.jsons \
