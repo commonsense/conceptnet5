@@ -7,6 +7,7 @@ import time
 import os
 import sys
 import json
+import math
 
 N = 100
 CURRENT_DIR = os.getcwd()
@@ -63,6 +64,10 @@ def output_assertion(out, **kwargs):
     uri = kwargs.pop('uri')
     source_tree = make_disjunction_uri(set(kwargs.pop('sources')))
     assertion = make_edge(sources=source_tree, **kwargs)
+    current_weight = assertion['weight']
+    log_weight = math.log(max(1, current_weight + 1)) / math.log(2)
+    assertion['weight'] = log_weight
+    
     assert assertion['uri'] == uri, (assertion['uri'], uri)
     line = json.dumps(assertion, ensure_ascii=False)
     print >> out, line

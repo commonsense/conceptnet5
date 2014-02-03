@@ -102,6 +102,9 @@ def run_verbosity(infile, outfile):
                 counts['low score'] += 1
                 continue
 
+            #weight = math.log(1 + score/10.0) / math.log(2)
+            weight = score / 100.0
+
             count += 1
             counts['success'] += 1
             
@@ -109,7 +112,7 @@ def run_verbosity(infile, outfile):
             rightc = make_concept_uri(unicode(rightword), 'en')
             edge = make_edge(rel, leftc, rightc, '/d/verbosity',
                              '/l/CC/By', sources, surfaceText=text,
-                             weight = score/10.0)
+                             weight=weight)
             writer.write(edge)
 
 if __name__ == '__main__':
