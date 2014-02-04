@@ -11,7 +11,7 @@ setup(
     author = "Rob Speer, Commonsense Computing Group",
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
-    install_requires=['metanl', 'assoc-space'],
+    install_requires=['metanl', 'assoc-space', 'pycountry'],
     license = 'GPLv3'
 )
 
