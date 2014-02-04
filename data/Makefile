@@ -192,6 +192,7 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 # Solr's input is made of peculiarly-structured JSON files. Build those
 # files from our files of multiple JSON assertions.
 solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
+	@mkdir -p solr
 	$(PYTHON) -m conceptnet5.builders.json_to_solr < $< > $@
 
 # The following rules are for building the DIST_FILES to be uploaded.
