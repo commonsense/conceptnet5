@@ -3,7 +3,6 @@
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
-from metanl import english
 from conceptnet5.nodes import make_concept_uri
 from conceptnet5.edges import FlatEdgeWriter, make_edge
 from conceptnet5.iso639 import langs

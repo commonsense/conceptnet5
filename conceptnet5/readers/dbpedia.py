@@ -4,11 +4,10 @@ Get data from DBPedia.
 
 __author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
-from metanl.english import normalize_topic, un_camel_case
+from metanl.token_utils import un_camel_case
 from conceptnet5.nodes import make_concept_uri, normalize_uri
 from conceptnet5.edges import make_edge
 import urllib
-import urllib2
 import json
 import sys
 import codecs

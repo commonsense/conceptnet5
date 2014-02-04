@@ -2,7 +2,7 @@
 
 import re
 import ftfy
-from metanl import english
+from metanl.nltk_morphy import normalize
 from metanl.general import preprocess_text
 
 JAPANESE_PARTS_OF_SPEECH = {
@@ -41,7 +41,7 @@ def make_concept_uri(text, lang, disambiguation=None):
         disambiguation = ftfy.ftfy(disambiguation)
 
     if lang == 'en':
-        normalized = english.normalize(text)
+        normalized = normalize(text)
     elif lang == 'ja' and disambiguation is not None:
         match = re.search(r'\((.*?)\)', disambiguation)
         if match:
