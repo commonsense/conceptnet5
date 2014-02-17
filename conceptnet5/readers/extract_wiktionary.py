@@ -115,7 +115,8 @@ def safe_path(origtitle):
             charname2 = safe_path_component(unicodedata.name(origtitle[1]))
         except ValueError:
             charname2 = u'UNKNOWN'
-        finalpart = safe_path_component(title[:64]).encode('punycode').rstrip('-')
+        text_to_encode = unicodedata.normalize("NFKD", safe_path_component(title[:64]))
+        finalpart = text_to_encode.encode('punycode').rstrip('-')
         pieces = [charname, charname2, finalpart + '.json']
     path = u'/'.join(pieces)
     return path
@@ -275,4 +276,4 @@ def parse_wiktionary_file(filename):
     parser.parse(open(filename))
 
 if __name__ == '__main__':
-    parse_wiktionary_file('/di/data/enwiktionary.xml')
+    parse_wiktionary_file('../../data/raw/wiktionary/enwiktionary.xml')
