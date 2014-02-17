@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+# This was a test for ConceptNet 5.0 code. It won't work anymore, but it still needs to be adapted.
 
 from conceptnet5.graph import *
+
 def test_create_assertions_twice():
     g = get_graph()
     root = g.get_node('/')

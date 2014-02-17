@@ -1,4 +1,4 @@
-from conceptnet5.english_nlp import normalize
+from conceptnet5.nodes import normalize
 
 def test_normalize():
     assert normalize('this is a test') == 'this be test'

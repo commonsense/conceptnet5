@@ -3,7 +3,6 @@
 import re
 import ftfy
 from metanl.nltk_morphy import normalize
-from metanl.general import preprocess_text
 
 JAPANESE_PARTS_OF_SPEECH = {
     u'名詞': u'n',
@@ -52,9 +51,9 @@ def make_concept_uri(text, lang, disambiguation=None):
             else:
                 pos = 'n'
             disambiguation = pos + '/' + re.sub(r'\s*\((.*?)\)\s*', '', rest)
-        normalized = preprocess_text(text).lower()
+        normalized = text.lower()
     else:
-        normalized = preprocess_text(text).lower()
+        normalized = text.lower()
 
     if disambiguation is not None:
         disambiguation = disambiguation.strip().replace(' ', '_').lower()
