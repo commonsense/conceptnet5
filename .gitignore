@@ -4,6 +4,7 @@
 .coverage
 .achievements
 conceptnet5/import*/*.txt
+*.wiktionary.org
 evaluation/responses
 evaluation/data
 enwiktionary.xml
