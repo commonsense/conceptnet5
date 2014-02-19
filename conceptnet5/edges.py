@@ -1,8 +1,7 @@
-from conceptnet5.nodes import (list_to_uri_piece, uri_piece_to_list,
-    make_assertion_uri, normalize_uri, make_concept_uri, concept_to_lemmas,
-    make_conjunction_uri, make_disjunction_uri)
+from conceptnet5.nodes import (make_assertion_uri, concept_to_lemmas,
+    make_conjunction_uri)
 from hashlib import sha1
-import json, os
+import json
 
 def make_edge(rel, start, end,
               dataset, license, sources, context='/ctx/all',

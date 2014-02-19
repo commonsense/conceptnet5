@@ -1,3 +1,6 @@
+"""
+Stuff left over from nodes.py that needs to go somewhere appropriate.
+"""
 import re
 
 JAPANESE_PARTS_OF_SPEECH = {
