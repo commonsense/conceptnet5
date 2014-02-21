@@ -4,10 +4,9 @@ from.
 """
 
 import os
-import sys
 
 def module_path():
-    return os.path.dirname(unicode(__file__, sys.getfilesystemencoding()))
+    return os.path.dirname(__file__)
 
 # Define the top-level conceptnet5/ directory, where data files can be found.
 PACKAGE_DIR = os.path.dirname(module_path())

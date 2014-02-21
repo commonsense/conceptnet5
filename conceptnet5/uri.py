@@ -228,6 +228,19 @@ def disjunction_uri(*sources):
         return compound_uri('/or', sources)
 
 
+def assertion_uri(rel, *args):
+    """
+    Make a URI for an assertion.
+
+    There will usually be two items in *args, the 'start' and 'end' of the
+    assertion. However, this can support relations with different number
+    of arguments.
+
+        >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
+        '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
+    """
+
+
 def and_or_tree(list_of_lists):
     """
     An and-or tree represents a disjunction of conjunctions. In ConceptNet terms,
