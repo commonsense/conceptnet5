@@ -26,7 +26,9 @@ cnet5_index_builder/cnet5_data/conceptnet4_nadya/db_config/
 env/
 data/assoc
 data/assertions
+data/download
 data/edges
 data/raw
+data/sandbox
 data/solr
 data/sw_map
