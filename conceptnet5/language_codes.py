@@ -5,15 +5,19 @@ from __future__ import print_function, unicode_literals
 In building ConceptNet, we often need to be able to map from language
 names to language codes, or vice versa.
 
-This is relevant, and complicated, when parsing Wiktionary. Entries identify
-what language they're in using the name of the language. However, it's the
-name of the language *in the language of the Wiktionary entry*.
+So far, this is only supported for English names of languages, although
+we will need translations of these names to say, parse entries from the
+Japanese-language Wiktionary.
 
-So, for example, we will need to recognize that both 'English' and '古英語'
-are English (en), and both 'Japanese' and '日本語' are Japanese.
+>>> CODE_TO_ENGLISH_NAME['fr']
+'French'
+>>> CODE_TO_ENGLISH_NAME['fra']
+'French'
+>>> ENGLISH_NAME_TO_CODE['French']
+'fr'
 """
 
-from whereami import get_project_filename
+from conceptnet5.whereami import get_project_filename
 import codecs
 import re
 
@@ -22,6 +26,10 @@ ISO_DATA_FILENAME = get_project_filename('data/codes/iso639.txt')
 CODE_TO_ENGLISH_NAME = {}
 ENGLISH_NAME_TO_CODE = {}
 
+# The SUPPORTED_LANGUAGE_CODES are the ones that should appear in the
+# browsable Web interface.
+#
+# This might be too many.
 SUPPORTED_LANGUAGE_CODES = [
     'aa', 'ab', 'ae', 'af', 'ak', 'am', 'an', 'ar', 'as', 'ase', 'av', 'ay',
     'az', 'ba', 'be', 'bg', 'bh', 'bi', 'bm', 'bn', 'bo', 'br', 'bs', 'ca',
@@ -42,6 +50,10 @@ SUPPORTED_LANGUAGE_CODES = [
 ]
 
 def _setup():
+    """
+    Read the tab-separated text file of language names, and create the
+    forward and backward mappings between language codes and language names.
+    """
     first_line = True
     for line in codecs.open(ISO_DATA_FILENAME, encoding='utf-8'):
         if first_line:
