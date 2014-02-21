@@ -1,31 +1,19 @@
-from conceptnet5.nodes import normalize_uri, make_concept_uri
-from conceptnet5.edges import FlatEdgeWriter, make_edge
+from conceptnet5.uri import concept_uri
+from conceptnet5.edges import make_edge
+from conceptnet5.json_writer import FlatEdgeWriter
+from conceptnet5.readers.sounds_like import sounds_like_score
 from collections import defaultdict
-import math, re
+import re
 import sys
-from conceptnet5.readers.rhyme import sounds_like_score
 
-# We were using this at one point, but it turns out that people don't use any
-# relation on Verbosity consistently. Instead we make them all /r/RelatedTo,
-# the most general one, except for the negated ones which we make /r/Antonym.
-mapping = {
-    "it is typically near": '/c/en/be_near',
-    "it is typically in": '/c/en/be_in',
-    "it is used for": '/r/UsedFor',
-    "it is a kind of": '/r/IsA',
-    "it is a type of": '/r/IsA',
-    "it is about the same size as": '/r/RelatedTo',
-    "it is related to": '/r/RelatedTo',
-    "it has": '/c/en/have_or_involve',
-    "it is": '/r/HasProperty',
-    "it looks like": '/c/en/look_like',
-}
-
-bad_regex_no_biscuit =\
-  re.compile(r'(^letter|^rhyme|^blank$|^word$|^syllable$|^spell|^tense$|^prefix|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$)')
+BAD_CLUE_REGEX = re.compile(
+    r'(^letter|^rhyme|^blank$|^word$|^syllable$|^spell|^tense$|^prefix'
+    r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
+    r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
+    r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$)'
+)
 
 def run_verbosity(infile, outfile):
-    maxscore = 0
     count = 0
     counts = defaultdict(int)
     text_similarities = []
@@ -46,7 +34,7 @@ def run_verbosity(infile, outfile):
         flagged = False
 
         for rword in right.split():
-            if bad_regex_no_biscuit.match(rword):
+            if BAD_CLUE_REGEX.match(rword):
                 flagged = True
                 break
         if flagged:
@@ -108,8 +96,8 @@ def run_verbosity(infile, outfile):
             count += 1
             counts['success'] += 1
             
-            leftc = make_concept_uri(unicode(left), 'en')
-            rightc = make_concept_uri(unicode(rightword), 'en')
+            leftc = concept_uri('en', left)
+            rightc = concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, '/d/verbosity',
                              '/l/CC/By', sources, surfaceText=text,
                              weight=weight)
