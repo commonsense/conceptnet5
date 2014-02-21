@@ -338,7 +338,7 @@ anc			Ngas
 and			Ansus
 ane			Xârâcùù
 anf			Animere
-ang	ang		Old English (ca. 450-1100)
+ang	ang		Old English
 anh			Nend
 ani			Andi
 anj			Anor
@@ -411,7 +411,7 @@ aqr			Arhâ
 aqz			Akuntsu
 ara	ara	ar	Arabic
 arb			Standard Arabic
-arc	arc		Official Aramaic (700-300 BCE)
+arc	arc		Official Aramaic
 ard			Arabana
 are			Western Arrarnta
 arg	arg	an	Aragonese
@@ -1711,7 +1711,7 @@ doc			Northern Dong
 doe			Doe
 dof			Domu
 doh			Dong
-doi	doi		Dogri (macrolanguage)
+doi	doi		Dogri
 dok			Dondo
 dol			Doso
 don			Toura (Papua New Guinea)
@@ -1771,7 +1771,7 @@ dui			Dumun
 duj			Dhuwal
 duk			Duduela
 dul			Alabat Island Agta
-dum	dum		Middle Dutch (ca. 1050-1350)
+dum	dum		Middle Dutch
 dun			Dusun Deyah
 duo			Dupaninan Agta
 dup			Duano
@@ -1842,7 +1842,7 @@ ele			Elepi
 elh			El Hugeirat
 eli			Nding
 elk			Elkei
-ell	ell / gre* 	el	Modern Greek (1453-)
+ell	ell / gre* 	el	Greek
 elm			Eleme
 elo			El Molo
 elp			Elpaputih
@@ -1870,7 +1870,7 @@ end			Ende
 enf			Forest Enets
 eng	eng	en	English
 enh			Tundra Enets
-enm	enm		Middle English (1100-1500)
+enm	enm		Middle English
 enn			Engenni
 eno			Enggano
 enq			Enga
@@ -1984,8 +1984,8 @@ fra	fra / fre* 	fr	French
 frc			Cajun French
 frd			Fordata
 frk			Frankish
-frm	frm		Middle French (ca. 1400-1600)
-fro	fro		Old French (842-ca. 1400)
+frm	frm		Middle French
+fro	fro		Old French
 frp			Arpitan
 frq			Forak
 frr			Northern Frisian
@@ -2177,7 +2177,7 @@ gly			Gule
 gma			Gambera
 gmb			Gula'alaa
 gmd			Mághdì
-gmh	gmh		Middle High German (ca. 1050-1500)
+gmh	gmh		Middle High German
 gml			Middle Low German
 gmm			Gbaya-Mbodomo
 gmn			Gimnime
@@ -2211,7 +2211,7 @@ god			Godié
 goe			Gongduk
 gof			Gofa
 gog			Gogo
-goh	goh		Old High German (ca. 750-1050)
+goh	goh		Old High German
 goi			Gobasi
 goj			Gowlan
 gok			Gowli
@@ -2237,7 +2237,7 @@ gqn			Guana (Brazil)
 gqr			Gor
 gra			Rajput Garasia
 grb	grb		Grebo
-grc	grc		Ancient Greek (to 1453)
+grc	grc		Ancient Greek
 grd			Guruntum-Mbaaru
 grg			Madi
 grh			Gbiri-Niragu
@@ -3180,7 +3180,7 @@ kog			Cogui
 koh			Koyo
 koi			Komi-Permyak
 koj			Sara Dunjo
-kok	kok		Konkani (macrolanguage)
+kok	kok		Konkani
 kol			Kol (Papua New Guinea)
 kom	kom	kv	Komi
 kon	kon	kg	Kongo
@@ -3963,7 +3963,7 @@ mfw			Mulaha
 mfx			Melo
 mfy			Mayo
 mfz			Mabaan
-mga	mga		Middle Irish (900-1200)
+mga	mga		Middle Irish
 mgb			Mararit
 mgc			Morokodo
 mgd			Moru
@@ -4261,7 +4261,7 @@ mrw			Maranao
 mrx			Maremgi
 mry			Mandaya
 mrz			Marind
-msa	msa / may* 	ms	Malay (macrolanguage)
+msa	msa / may* 	ms	Malay
 msb			Masbatenyo
 msc			Sankaran Maninka
 msd			Yucatec Maya Sign Language
@@ -4935,7 +4935,7 @@ nzy			Nzakambay
 nzz			Nanga Dama Dogon
 oaa			Orok
 oac			Oroch
-oar			Old Aramaic (up to 700 BCE)
+oar			Old Aramaic
 oav			Old Avar
 obi			Obispeño
 obk			Southern Bontok
@@ -4947,7 +4947,7 @@ obt			Old Breton
 obu			Obulom
 oca			Ocaina
 och			Old Chinese
-oci	oci	oc	Occitan (post 1500)
+oci	oci	oc	Occitan
 oco			Old Cornish
 ocu			Atzingo Matlatzinca
 oda			Odut
@@ -4984,9 +4984,9 @@ oki			Okiek
 okj			Oko-Juwoi
 okk			Kwamtim One
 okl			Old Kentish Sign Language
-okm			Middle Korean (10th-16th cent.)
+okm			Middle Korean
 okn			Oki-No-Erabu
-oko			Old Korean (3rd-9th cent.)
+oko			Old Korean
 okr			Kirike
 oks			Oko-Eni-Osayen
 oku			Oku
@@ -5067,7 +5067,7 @@ oss	oss	os	Ossetian
 ost			Osatu
 osu			Southern One
 osx			Old Saxon
-ota	ota		Ottoman Turkish (1500-1928)
+ota	ota		Ottoman Turkish
 otb			Old Tibetan
 otd			Ot Danum
 ote			Mezquital Otomi
@@ -5176,7 +5176,7 @@ pej			Northern Pomo
 pek			Penchal
 pel			Pekal
 pem			Phende
-peo	peo		Old Persian (ca. 600-400 B.C.)
+peo	peo		Old Persian
 pep			Kunja
 peq			Southern Pomo
 pes			Iranian Persian
@@ -5362,7 +5362,7 @@ prk			Parauk
 prl			Peruvian Sign Language
 prm			Kibiri
 prn			Prasuni
-pro	pro		Old Provençal (to 1500)
+pro	pro		Old Provençal
 prp			Parsi
 prq			Ashéninka Perené
 prr			Puri
@@ -5768,7 +5768,7 @@ sfb			Langue des signes de Belgique Francophone
 sfm			Small Flowery Miao
 sfs			South African Sign Language
 sfw			Sehwi
-sga	sga		Old Irish (to 900)
+sga	sga		Old Irish
 sgb			Mag-antsi Ayta
 sgc			Kipsigis
 sgd			Surigaonon
@@ -6102,7 +6102,7 @@ svk			Slovakian Sign Language
 svr			Savara
 svs			Savosavo
 svx			Skalvian
-swa	swa	sw	Swahili (macrolanguage)
+swa	swa	sw	Swahili
 swb			Maore Comorian
 swc			Congo Swahili
 swe	swe	sv	Swedish
@@ -6424,7 +6424,7 @@ tmn			Taman (Indonesia)
 tmo			Temoq
 tmp			Tai Mène
 tmq			Tumleo
-tmr			Jewish Babylonian Aramaic (ca. 200-1200 CE)
+tmr			Jewish Babylonian Aramaic
 tms			Tima
 tmt			Tasmate
 tmu			Iau
