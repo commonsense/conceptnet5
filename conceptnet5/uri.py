@@ -249,3 +249,7 @@ def and_or_tree(list_of_lists):
     ands = [conjunction_uri(sublist) for sublist in list_of_lists]
     return disjunction_uri(ands)
 
+
+class License(object):
+    cc_attribution = '/l/CC/By'
+    cc_sharealike = '/l/CC/By-SA'
