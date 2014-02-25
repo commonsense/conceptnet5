@@ -109,7 +109,7 @@ def output_assertion(out, **kwargs):
 
     # Output the result in a JSON stream.
     line = json.dumps(assertion, ensure_ascii=False)
-    print(line, out=out)
+    print(line, file=out)
 
 
 if __name__ == '__main__':

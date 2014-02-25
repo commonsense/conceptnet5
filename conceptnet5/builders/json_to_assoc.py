@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.uri import join_uri, split_uri
+import codecs
 import json
 import sys
+
 
 def reduce_concept(concept):
     """
@@ -13,6 +15,11 @@ def reduce_concept(concept):
     considered simply as assertions about Chinese regardless of whether it is
     Traditional or Simplified Chinese. In the cases where they overlap, this
     helps to make the information more complete.
+
+    >>> reduce_concept('/c/en/cat/n/feline')
+    '/c/en/cat'
+    >>> reduce_concept('/c/zh_TW/良好')
+    '/c/zh/良好'
     """
     parts = split_uri(concept)
     # Unify simplified and traditional Chinese in associations.
@@ -20,16 +27,32 @@ def reduce_concept(concept):
         parts[1] = 'zh'
     return join_uri(*parts[:3])
 
-def convert_to_assoc(in_stream=None, out_stream=None):
-    if in_stream is None:
-        in_stream = sys.stdin
-    if out_stream is None:
-        out_stream = sys.stdout
+
+def convert_to_assoc(input_filename, output_filename):
+    """
+    Convert a JSON stream to a tab-separated "CSV" of concept-to-concept associations.
+
+    The relation is mostly ignored, except:
+
+    - Negative relations create associations between concepts suffixed with '/neg'
+    - An assertion that means "People want X" in English or Chinese is converted to
+      an assertion between X and "good", and also X and the negation of "bad"
+    - Combining both of these, an assertion that "People don't want X" moves the
+      negation so that X is associated with "not good" and "bad".
+
+    The result can be used to predict word associations using ConceptNet by using
+    dimensionality reduction, as in the `assoc_space` package.
+    
+    The relation is mostly ignored because we have not yet found a good way to
+    take the relation into account in dimensionality reduction.
+    """
+    in_stream = codecs.open(input_filename, encoding='utf-8')
+    out_stream = codecs.open(output_filename, encoding='utf-8')
     
     for line in in_stream:
         if not line.strip():
             continue
-        info = json.loads(line.strip().decode('utf-8'))
+        info = json.loads(line)
         startc = reduce_concept(info['start'])
         endc = reduce_concept(info['end'])
         rel = info['rel']
@@ -68,7 +91,16 @@ def convert_to_assoc(in_stream=None, out_stream=None):
                 'end': end,
                 'weight': weight,
             }
-            print >> out_stream, line.encode('utf-8')
+            print(line, file=out_stream)
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='jsons file of input')
+    parser.add_argument('output', help='csv file to output to')
+    args = parser.parse_args()
+    convert_to_assoc(args.input, args.output)
 
 if __name__ == '__main__':
-    convert_to_assoc()
+    main()
+

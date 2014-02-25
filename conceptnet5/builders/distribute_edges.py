@@ -12,7 +12,7 @@ else:
 
 class EdgeDistributor(object):
     """
-    Takes a tab-separated "CSV" file as input, and distributes its lines
+    Takes in lines of a tab-separated "CSV" file, and distributes them
     between `n` output files.
 
     The file to write to is determined by a hash of the first item in
@@ -53,7 +53,12 @@ class EdgeDistributor(object):
 
 def run_args():
     """
-    Handle command-line arguments, and run the EdgeDistributor on standard input.
+    Handle command-line arguments, and run the EdgeDistributor on lines read
+    from standard input.
+    
+    Unlike other builder commands, this uses standard input instead of
+    taking a filename, because we often simply want to run the output of
+    another step through it as a pipe.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', default='./split', help='the directory in which to write output files')

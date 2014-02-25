@@ -33,7 +33,7 @@ class JSONStreamWriter(object):
 
     def write(self, edge):
         line = json.dumps(edge, ensure_ascii=False)
-        print(line, out=self.stream)
+        print(line, file=self.stream)
 
     def close(self):
         if self.stream is not sys.stdout:
