@@ -93,8 +93,8 @@ def convert_to_assoc(input_filename, output_filename):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='jsons file of input')
-    parser.add_argument('output', help='csv file to output to')
+    parser.add_argument('input', help='JSON-stream file of input')
+    parser.add_argument('output', help='CSV file to output to')
     args = parser.parse_args()
     convert_to_assoc(args.input, args.output)
 
