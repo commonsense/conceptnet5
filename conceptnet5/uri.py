@@ -266,6 +266,6 @@ def and_or_tree(list_of_lists):
     return disjunction_uri(ands)
 
 
-class License(object):
+class Licenses(object):
     cc_attribution = '/l/CC/By'
     cc_sharealike = '/l/CC/By-SA'

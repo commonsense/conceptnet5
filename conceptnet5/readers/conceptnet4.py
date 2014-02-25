@@ -1,20 +1,14 @@
 """
-This script reads the conceptnet4 data out of the flat files in raw_data
-and builds conceptnet5 edges from the data.  
+This script reads the ConceptNet 4 data out of the flat files in raw_data,
+and builds ConceptNet 5 edges from the data.
 """
 
-import os
-import codecs
-import sys
-import re
-import argparse
 import json
 
-from conceptnet5.edges import MultiWriter, make_edge
-from conceptnet5.nodes import normalize_uri, make_concept_uri
-
-
-LICENSE = '/l/CC/By'
+from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
+from conceptnet5.edges import make_edge
+from conceptnet5.uri import join_uri, Licenses, normalize_text
+from conceptnet5.stemmers import stem_and_normalize
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -51,7 +45,25 @@ AROUND_PREPOSITIONS = [
   'in', 'on', 'at', 'under', 'near'
 ]
 
+
+def make_concept_uri(text, lang):
+    """
+    Make the appropriate URI for a concept in a particular language, including
+    stemming the text if necessary, normalizing it, and joining it into a
+    concept URI.
+    """
+    norm_text = stem_and_normalize(text, lang)
+    return join_uri(lang, norm_text)
+
+
 def can_skip(parts_dict):
+    """
+    Skip the kinds of data that we don't want to import from ConceptNet 4's
+    database dump.
+
+    This includes Chinese and Japanese, because better versions of these were
+    developed by groups we collaborate with, in separate databases.
+    """
     lang = parts_dict['lang']
     if lang.startswith('zh'):
         return True
@@ -63,11 +75,16 @@ def can_skip(parts_dict):
         return True
     if not parts_dict["startText"] or not parts_dict["endText"]:
         return True
-    if 'rubycommons' in parts_dict["activity"]: 
+    if 'rubycommons' in parts_dict["activity"]:
         return True
     return False
 
+
 def build_frame_text(parts_dict):
+    """
+    Make a ConceptNet 5 surfaceText out of the ConceptNet 4 assertion's
+    frame and surface texts.
+    """
     frame_text = parts_dict["frame_text"]
     # Mark frames where {2} precedes {1} with an asterisk.
     if frame_text.find('{1}') > frame_text.find('{2}'):
@@ -80,18 +97,26 @@ def build_frame_text(parts_dict):
     frame_text = frame_text.replace('{1}', '[[%s]]' % parts_dict["startText"]).replace('{2}', '[[%s]]' % parts_dict["endText"])
     return frame_text
 
+
 def build_relation(parts_dict):
+    """
+    Update relation names to ConceptNet 5's names. Mostly we preserve the same
+    names, but any instance of "ConceptuallyRelatedTo" left over from
+    ConceptNet 3 becomes "RelatedTo". Statements with negative polarity get
+    new negative relations.
+    """
     relname = parts_dict["relname"]
     polarity = polarity = parts_dict["polarity"]
     if relname == 'ConceptuallyRelatedTo':
         relname = 'RelatedTo'
 
     if polarity > 0:
-        relation = normalize_uri('/r/'+relname)
+        relation = join_uri('/r', relname)
     else:
-        relation = normalize_uri('/r/Not'+relname)
+        relation = join_uri('/r', 'Not' + relname)
 
     return relation
+
 
 def build_start(parts_dict):
     lang = parts_dict['lang']
@@ -99,33 +124,49 @@ def build_start(parts_dict):
     start = make_concept_uri(startText, lang)
     return start
 
+
 def build_end(parts_dict):
     lang = parts_dict['lang']
     endText = parts_dict["endText"]
     end = make_concept_uri(endText, lang)
     return end
 
+
 def build_data_set(parts_dict):
     lang = parts_dict['lang']
-    dataset = normalize_uri('/d/conceptnet/4/'+lang)
+    dataset = join_uri('/d/conceptnet/4', lang)
     return dataset
 
+
 def build_sources(parts_dict, preposition_fix=False):
+    """
+    Create the 'source' information for an assertion.
+
+    The output is a list of (conjunction, weight) tuples, where 'conjunction'
+    is a list of sources that combined to produce this assertion. Later,
+    inside the 'make_edge' function, these will be combined into an '/and'
+    node.
+    """
     activity = parts_dict["activity"]
 
-    creator_node = normalize_uri(u'/s/contributor/omcs/'+parts_dict["creator"])
-    activity_node = normalize_uri(u'/s/activity/omcs/'+activity)
+    creator_node = join_uri(u'/s/contributor/omcs', normalize_text(parts_dict["creator"]))
+    activity_node = join_uri(u'/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
-        sources = [([creator_node, activity_node, '/s/rule/preposition_fix'], 1)]
+        conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
     else:
-        sources = [([creator_node, activity_node], 1)]
+        conjunction = [creator_node, activity_node]
+    weighted_sources = [(conjunction, 1)]
 
     for vote in parts_dict["votes"]:
         username = vote[0]
         vote_int = vote[1]
-        sources.append(([normalize_uri('/s/contributor/omcs/'+username),
-                     normalize_uri(u'/s/activity/omcs/vote')], vote_int))
-    return sources
+        conjunction = [
+            join_uri('/s/contributor/omcs', username),
+            '/s/activity/omcs/vote'
+        ]
+        weighted_sources.append((conjunction, vote_int))
+    return weighted_sources
+
 
 def by_bedume_and_bad(source_list,start,end):
     if 'bedume' in ' '.join(source_list):
@@ -135,13 +176,20 @@ def by_bedume_and_bad(source_list,start,end):
                 return True
     return False
 
+
 class CN4Builder(object):
     def __init__(self):
         self.seen_sources = set()
 
     def handle_raw_assertion(self, flat_assertion):
+        """
+        Process one unit of ConceptNet 4 knowledge, which was known as a
+        "raw assertion" -- a relation between surface texts, not yet reduced
+        to a normalized form.
+
+        Each raw assertion becomes
+        """
         parts_dict = json.loads(flat_assertion)
-        
         if can_skip(parts_dict):
             return
 
@@ -160,26 +208,30 @@ class CN4Builder(object):
                         )
                     preposition_fix = True
                     break
-            
+
         # build the assertion
         frame_text = build_frame_text(parts_dict)
         relation = build_relation(parts_dict)
         start = build_start(parts_dict)
         end = build_end(parts_dict)
         dataset = build_data_set(parts_dict)
-        sources = build_sources(parts_dict, preposition_fix)
+        weighted_sources = build_sources(parts_dict, preposition_fix)
 
         reject = False
-        for source_list, weight in sources:
+        for source_list, weight in weighted_sources:
             if 'commons2_reject' in ' '.join(source_list):
                 reject = True
 
         if not reject:
-            for source_list, weight in sources:
-                if not by_bedume_and_bad(source_list,start,end):
+            for source_list, weight in weighted_sources:
+                if not by_bedume_and_bad(source_list, start, end):
                     contributors = [s for s in source_list if s.startswith('/s/contributor')]
                     assert len(contributors) <= 1, contributors
-                    edge = make_edge(relation, start, end, dataset, LICENSE, source_list, '/ctx/all', frame_text, weight=weight)
+                    edge = make_edge(
+                        rel=relation, start=start, end=end,
+                        dataset=dataset, license=Licenses.cc_attribution,
+                        sources=source_list, surfaceText=frame_text,
+                        weight=weight)
                     okay = True
                     if contributors:
                         uri = edge['uri']
@@ -192,7 +244,22 @@ class CN4Builder(object):
                         yield json.dumps(edge, ensure_ascii=False)
 
 
-if __name__ == '__main__':
-    from conceptnet5.readers import transform_stream
+    def transform_file(self, input_filename, output_filename):
+        out = JSONStreamWriter(output_filename)
+        for obj in read_json_stream(input_filename):
+            for new_obj in self.handle_raw_assertion(obj):
+                out.write(new_obj)
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='JSON-stream file of input')
+    parser.add_argument('output', help='JSON-stream file to output to')
+    args = parser.parse_args()
     builder = CN4Builder()
-    transform_stream(builder.handle_raw_assertion)
+    builder.transform_file(args.input, args.output)
+
+if __name__ == '__main__':
+    main()
+

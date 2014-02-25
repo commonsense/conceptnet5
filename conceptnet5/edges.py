@@ -1,5 +1,5 @@
 from hashlib import sha1
-from uri import conjunction_uri, assertion_uri
+from uri import conjunction_uri, assertion_uri, Licenses
 from pprint import pprint
 
 def make_edge(rel, start, end, dataset, license, sources,
@@ -62,9 +62,3 @@ def make_edge(rel, start, end, dataset, license, sources,
         'surfaceText': surfaceText
     }
     return obj
-
-
-class Licenses(object):
-    cc_attribution = '/l/CC/By'
-    cc_sharealike = '/l/CC/By-SA'
-
