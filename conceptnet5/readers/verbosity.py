@@ -1,5 +1,5 @@
 from __future__ import print_function, unicode_literals, division
-from conceptnet5.uri import concept_uri, License
+from conceptnet5.uri import concept_uri, Licenses
 from conceptnet5.edges import make_edge
 from conceptnet5.json_writer import JSONStreamWriter
 from conceptnet5.readers.sounds_like import sounds_like_score
@@ -155,7 +155,7 @@ def run_verbosity(infile, outfile):
             leftc = concept_uri('en', left)
             rightc = concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
-                             license=License.cc_attribution,
+                             license=Licenses.cc_attribution,
                              sources=sources, surfaceText=text,
                              weight=weight)
             writer.write(edge)
