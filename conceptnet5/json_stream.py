@@ -50,5 +50,7 @@ def read_json_stream(filename_or_stream):
     else:
         stream = filename_or_stream
     for line in stream:
-        yield json.loads(line.rstrip('\n'))
+        line = line.strip()
+        if line:
+            yield json.loads(line)
 

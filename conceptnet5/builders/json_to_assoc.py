@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.uri import join_uri, split_uri
+from conceptnet5.json_stream import read_json_stream
 import codecs
 import json
 import sys
@@ -46,13 +47,9 @@ def convert_to_assoc(input_filename, output_filename):
     The relation is mostly ignored because we have not yet found a good way to
     take the relation into account in dimensionality reduction.
     """
-    in_stream = codecs.open(input_filename, encoding='utf-8')
     out_stream = codecs.open(output_filename, encoding='utf-8')
     
-    for line in in_stream:
-        if not line.strip():
-            continue
-        info = json.loads(line)
+    for info in read_json_stream(input_filename):
         startc = reduce_concept(info['start'])
         endc = reduce_concept(info['end'])
         rel = info['rel']
