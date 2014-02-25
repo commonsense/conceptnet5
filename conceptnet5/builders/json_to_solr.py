@@ -26,12 +26,13 @@ def convert_to_solr(input_filename, output_filename):
     print("{", file=out)
     for info in read_json_stream(input_filename):
         boost = info['weight']
-        if 'surfaceText' in info and info['surfaceText'] is None:
-            del info['surfaceText']
+        if boost > 0:
+            if 'surfaceText' in info and info['surfaceText'] is None:
+                del info['surfaceText']
 
-        solr_struct = {'doc': info, 'boost': boost}
-        solr_fragment = '\t"add": %s,' % json.dumps(solr_struct)
-        print(solr_fragment, file=out)
+            solr_struct = {'doc': info, 'boost': boost}
+            solr_fragment = '\t"add": %s,' % json.dumps(solr_struct)
+            print(solr_fragment, file=out)
     print('\t"commit": {}', file=out)
     print('}', file=out)
 
