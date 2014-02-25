@@ -150,6 +150,21 @@ def compound_uri(op, args):
     return join_uri(*items)
 
 
+def split_uri(uri):
+    """
+    Get the slash-delimited pieces of a URI.
+        
+        >>> split_uri('/c/en/cat/n/feline')
+        ['c', 'en', 'cat', 'n', 'feline']
+        >>> split_uri('/')
+        []
+    """
+    uri2 = uri.lstrip('/')
+    if not uri2:
+        return []
+    return uri.lstrip('/').split('/')
+
+
 def parse_compound_uri(uri):
     """
     Given a compound URI, extract its operator and its list of arguments.
@@ -159,7 +174,7 @@ def parse_compound_uri(uri):
         >>> parse_compound_uri('/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]')
         ('/a', ['/r/CapableOf', '/c/en/cat', '/c/en/sleep'])
     """
-    pieces = uri.lstrip('/').split('/')
+    pieces = split_uri(uri)
     if pieces[-1] != ']':
         raise ValueError("Compound URIs must end with /]")
     if '[' not in pieces:
@@ -239,6 +254,7 @@ def assertion_uri(rel, *args):
         >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
         '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
+    return compound_uri('/a', (rel,) + args)
 
 
 def and_or_tree(list_of_lists):

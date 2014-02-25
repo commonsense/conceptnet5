@@ -1,12 +1,24 @@
+from __future__ import unicode_literals, print_function
+from conceptnet5.uri import join_uri, split_uri
 import json
 import sys
 
 def reduce_concept(concept):
-    parts = concept.split(u'/')
+    """
+    Remove the part of speech and disambiguation (if present) from a concept,
+    leaving a potentially ambiguous concept that can be matched against surface
+    text.
+
+    Additionally, remove the region tag from Chinese assertions, so they are
+    considered simply as assertions about Chinese regardless of whether it is
+    Traditional or Simplified Chinese. In the cases where they overlap, this
+    helps to make the information more complete.
+    """
+    parts = split_uri(concept)
     # Unify simplified and traditional Chinese in associations.
-    if parts[2] == 'zh_CN' or parts[2] == 'zh_TW':
-        parts[2] = 'zh'
-    return u'/'.join(parts[:4])
+    if parts[1] == 'zh_CN' or parts[1] == 'zh_TW':
+        parts[1] = 'zh'
+    return join_uri(*parts[:3])
 
 def convert_to_assoc(in_stream=None, out_stream=None):
     if in_stream is None:
@@ -18,43 +30,43 @@ def convert_to_assoc(in_stream=None, out_stream=None):
         if not line.strip():
             continue
         info = json.loads(line.strip().decode('utf-8'))
-        startc = reduce_concept(info[u'start'])
-        endc = reduce_concept(info[u'end'])
-        rel = info[u'rel']
-        weight = info[u'weight']
+        startc = reduce_concept(info['start'])
+        endc = reduce_concept(info['end'])
+        rel = info['rel']
+        weight = info['weight']
 
-        if u'dbpedia' in info[u'sources'] and u'/or/' not in info[u'sources']:
+        if 'dbpedia' in info['sources'] and '/or/' not in info['sources']:
             # DBPedia associations are still too numerous and too weird to
             # associate.
             continue
 
         pairs = []
-        if startc == u'/c/en/person':
-            if rel == u'/r/Desires':
-                pairs = [(u'/c/en/good', endc), (u'/c/en/bad/neg', endc)]
-            elif rel == u'/r/NotDesires':
-                pairs = [(u'/c/en/bad', endc), (u'/c/en/good/neg', endc)]
+        if startc == '/c/en/person':
+            if rel == '/r/Desires':
+                pairs = [('/c/en/good', endc), ('/c/en/bad/neg', endc)]
+            elif rel == '/r/NotDesires':
+                pairs = [('/c/en/bad', endc), ('/c/en/good/neg', endc)]
             else:
                 pairs = [(startc, endc)]
-        elif startc == u'/c/zh/人':
-            if rel == u'/r/Desires':
-                pairs = [(u'/c/zh/良好', endc), (u'/c/zh/不良/neg', endc)]
+        elif startc == '/c/zh/人':
+            if rel == '/r/Desires':
+                pairs = [('/c/zh/良好', endc), ('/c/zh/不良/neg', endc)]
             elif rel == '/r/NotDesires':
-                pairs = [(u'/c/zh/良好/neg', endc), (u'/c/zh/不良', endc)]
+                pairs = [('/c/zh/良好/neg', endc), ('/c/zh/不良', endc)]
             else:
                 pairs = [(startc, endc)]
         else:
-            negated = (rel.startswith(u'/r/Not') or rel.startswith(u'/r/Antonym'))
+            negated = (rel.startswith('/r/Not') or rel.startswith('/r/Antonym'))
             if not negated:
                 pairs = [(startc, endc)]
             else:
-                pairs = [(startc, endc + u'/neg'), (startc + u'/neg', endc)]
+                pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
 
         for (start, end) in pairs:
-            line = u"%(start)s\t%(end)s\t%(weight)s" % {
-                u'start': start,
-                u'end': end,
-                u'weight': weight,
+            line = "%(start)s\t%(end)s\t%(weight)s" % {
+                'start': start,
+                'end': end,
+                'weight': weight,
             }
             print >> out_stream, line.encode('utf-8')
 
