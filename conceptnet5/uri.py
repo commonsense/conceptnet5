@@ -21,6 +21,11 @@ if sys.version_info.major >= 3:
     unicode = str
 
 
+# All URIs are conceptually appended to this URL, when we need to interoperate
+# with Semantic Web-style resources.
+ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.2'
+
+
 def normalize_text(text):
     """
     When a piece of a URI is an arbitrary string, we standardize it in the

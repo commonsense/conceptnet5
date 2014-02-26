@@ -8,7 +8,7 @@ import json
 from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses, normalize_text
-from conceptnet5.stemmers import stem_and_normalize
+from conceptnet5.stemmers import normalized_concept_uri
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -44,16 +44,6 @@ BEDUME_FLAGGED_PLACES = [
 AROUND_PREPOSITIONS = [
   'in', 'on', 'at', 'under', 'near'
 ]
-
-
-def make_concept_uri(text, lang):
-    """
-    Make the appropriate URI for a concept in a particular language, including
-    stemming the text if necessary, normalizing it, and joining it into a
-    concept URI.
-    """
-    norm_text = stem_and_normalize(text, lang)
-    return join_uri(lang, norm_text)
 
 
 def can_skip(parts_dict):
@@ -121,14 +111,14 @@ def build_relation(parts_dict):
 def build_start(parts_dict):
     lang = parts_dict['lang']
     startText = parts_dict["startText"]
-    start = make_concept_uri(startText, lang)
+    start = normalized_concept_uri(lang, startText)
     return start
 
 
 def build_end(parts_dict):
     lang = parts_dict['lang']
     endText = parts_dict["endText"]
-    end = make_concept_uri(endText, lang)
+    end = normalized_concept_uri(lang, endText)
     return end
 
 

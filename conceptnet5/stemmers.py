@@ -7,15 +7,30 @@ Currently, the only stemmer we use is Morphy, the built-in stemmer in WordNet,
 which we apply to English concept names. Other languages are left alone.
 """
 from metanl.nltk_morphy import normalize
-from conceptnet5.uri import normalize_text
+from conceptnet5.uri import normalize_text, join_uri
 
 
 def stem_english(text):
     return normalize(text)
 
 
-def stem_and_normalize(text, language):
-    if language == 'en':
+def stem_and_normalize(lang, text):
+    if lang == 'en':
         return normalize_text(stem_english(text))
     else:
         return normalize_text(text)
+
+
+def normalized_concept_uri(lang, text, *more):
+    """
+    Make the appropriate URI for a concept in a particular language, including
+    stemming the text if necessary, normalizing it, and joining it into a
+    concept URI.
+
+    Items in 'more' will not be stemmed, but will go through the other
+    normalization steps.
+    """
+    norm_text = stem_and_normalize(lang, text)
+    more_text = normalize_text([item for item in more])
+    return join_uri(lang, norm_text, *more_text)
+
