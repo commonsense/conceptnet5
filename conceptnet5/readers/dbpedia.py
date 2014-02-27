@@ -92,7 +92,6 @@ def map_dbpedia_relation(url):
         return None
 
 
-
 def handle_file(filename, out_filename, map_filename):
     out = JSONStreamWriter(out_filename)
     map_out = NTriplesWriter(map_filename)
@@ -107,9 +106,6 @@ def handle_triple(line, out, map_out):
         # line.
         if not (items[i].startswith('<') and items[i].endswith('>')):
             return
-
-        # Otherwise, strip off the < and > characters that delimit the URL.
-        items[i] = items[i][1:-1]
     subj, pred, obj = items[:3]
 
     # Ignore types of edges that we don't care about:
@@ -123,19 +119,19 @@ def handle_triple(line, out, map_out):
     if ('foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or
         '__' in subj or '__' in obj or 'List_of' in subj or 'List_of' in obj):
         return
-    
+
     # We don't try to parse URIs from outside of dbpedia.org's namespace.
     if 'dbpedia.org' not in obj:
         return
 
     subj_concept = translate_dbpedia_url(subj, 'en')
     obj_concept = translate_dbpedia_url(obj, 'en')
-    
+
     # DBPedia categorizes a lot of things as 'works', which causes unnecessary
     # ambiguity. It almost always means 'creative work'.
     if obj_concept == '/c/en/work':
         obj_concept = '/c/en/creative_work'
-    
+
     rel = map_dbpedia_relation(pred)
     if rel is None:
         return
@@ -157,7 +153,7 @@ def handle_triple(line, out, map_out):
                      license=Licenses.cc_sharealike,
                      sources=['/s/dbpedia/3.7'],
                      weight=0.5)
-    
+
     out.write(edge)
 
 
