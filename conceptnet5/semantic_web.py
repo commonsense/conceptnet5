@@ -24,6 +24,9 @@ def decode_url(url):
     """
     Take in a URL that is percent-encoded for use in a format such as HTML or
     N-triples, and convert it to a Unicode URL.
+    
+    >>> decode_url('http://dbpedia.org/resource/N%C3%BAria_Espert')
+    'http://dbpedia.org/resource/Núria_Espert'
     """
     return unquote(url).decode('utf-8', 'replace')
 
@@ -40,6 +43,9 @@ def resource_name(url):
     
     On a Semantic Web URL, this has the effect of getting an object's effective
     "name" while ignoring the namespace and details of where it is stored.
+
+    >>> resource_name('http://dbpedia.org/resource/N%C3%BAria_Espert')
+    'Núria_Espert'
     """
     parsed = urlsplit(decode_url(url))
     if parsed.fragment:
@@ -61,14 +67,6 @@ def full_conceptnet_url(uri):
     """
     assert uri.startswith('/')
     return ROOT_URL + quote(uri)
-
-
-def same_as_triple(node1, node2):
-    """
-    Output a Semantic Web triple, as a line in N-triples format,
-    saying that node1 and node2 are the same.
-    """
-    return '<%s> <%s> <%s>' % (node1, SAME_AS, node2)
 
 
 class NTriplesWriter(object):
@@ -98,7 +96,7 @@ class NTriplesWriter(object):
         """
         if triple not in self.seen:
             self.seen.add(triple)
-            line = '<%s> <%s> <%s>' % triple
+            line = '<%s> <%s> <%s> .' % triple
             print(line, file=self.stream)
     
     def write_same_as(self, node1, node2):
