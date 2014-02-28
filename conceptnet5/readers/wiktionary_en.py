@@ -8,10 +8,10 @@ This Wiktionary reader should be refactored, but it does the job for now.
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 from conceptnet5.uri import Licenses
-from conceptnet5.stemmers import normalized_concept_uri
+from conceptnet5.stem import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
-from conceptnet5.iso639 import langs
+from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME
 import unicodedata
 import re
 import sys
@@ -264,14 +264,14 @@ class FindTranslations(ContentHandler):
         elif lang == 'zh-tw':
             lang = 'zh_TW'
         source = normalized_concept_uri(
-          unicodedata.normalize('NFKC', foreign), lang
+          lang, unicodedata.normalize('NFKC', foreign)
         )
         target = normalized_concept_uri(
-          english, 'en', disambiguation
+          'en', english, disambiguation
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (langs.english_name(lang))
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[lang])
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
         surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
@@ -284,15 +284,15 @@ class FindTranslations(ContentHandler):
         
     def output_translation(self, foreign, english, locale=''):
         source = normalized_concept_uri(
-          unicodedata.normalize('NFKC', foreign),
-          self.langcode+locale
+            self.langcode + locale,
+            unicodedata.normalize('NFKC', foreign),
         )
         target = normalized_concept_uri(
-          english, 'en'
+          'en', english
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (langs.english_name(self.langcode))
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[self.langcode])
         except KeyError:
             surfaceRel = "is [language %s] for" % self.langcode
         surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)

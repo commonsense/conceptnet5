@@ -8,7 +8,7 @@ import json
 from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses, normalize_text
-from conceptnet5.stemmers import normalized_concept_uri
+from conceptnet5.stem import normalized_concept_uri
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to

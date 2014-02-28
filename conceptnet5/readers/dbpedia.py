@@ -6,7 +6,7 @@ Get data from DBPedia.
 __author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
 from metanl.token_utils import un_camel_case
-from conceptent5.stemmers import normalized_concept_uri
+from conceptent5.stem import normalized_concept_uri
 from conceptnet5.uri import Licenses
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
