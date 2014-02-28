@@ -8,7 +8,7 @@ from conceptnet5.whereami import get_project_filename
 
 
 FRAME_DATA = json.load(
-    codecs.open(get_project_filename('data/info/zh_frames.json'))
+    codecs.open(get_project_filename('data/info/zh_frames.json'), encoding='utf-8')
 )
 
 
@@ -30,8 +30,10 @@ def handle_raw_assertion(line):
 def transform_file(input_filename, output_filename):
     out = JSONStreamWriter(output_filename)
     for line in codecs.open(input_filename, encoding='utf-8'):
-        for new_obj in handle_raw_assertion(line):
-            out.write(new_obj)
+        line = line.strip()
+        if line:
+            for new_obj in handle_raw_assertion(line):
+                out.write(new_obj)
 
 def main():
     import argparse

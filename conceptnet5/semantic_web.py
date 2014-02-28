@@ -34,6 +34,17 @@ def decode_url(url):
     return unquote(url.strip('<>')).decode('utf-8', 'replace')
 
 
+def encode_url(url):
+    """
+    Reverses the operation of `decode_url` by using percent-encoding and
+    surrounding the URL in angle brackets.
+
+    >>> encode_url('http://dbpedia.org/resource/Núria_Espert')
+    '<http://dbpedia.org/resource/N%C3%BAria_Espert>'
+    """
+    return '<%s>' % quote(url.encode('utf-8'))
+
+
 def resource_name(url):
     """
     Get a concise name for a Semantic Web resource, given its URL.
@@ -100,7 +111,8 @@ class NTriplesWriter(object):
         """
         if triple not in self.seen:
             self.seen.add(triple)
-            line = '<%s> <%s> <%s> .' % triple
+            line_pieces = [encode_url(item) for item in triple] + ['.']
+            line = ' '.join(line_pieces)
             print(line, file=self.stream)
 
     def write_same_as(self, node1, node2):
@@ -174,10 +186,18 @@ class NTriplesReader(object):
             # This is a literal URL, so decode_url will handle it directly.
             return 'URL', decode_url(node_text)
         elif node_text.startswith('"'):
-            quoted_string, lang_code = node_text.rsplit('@', 1)
-            assert quoted_string.startswith('"') and quoted_string.endswith('"')
-            lang = lang_code.split('-')[0]
-            return lang, quoted_string[1:-1]
+            if '^^' in node_text:
+                quoted_string, type_tag = node_text.split('^^', 1)
+                type_tag = resource_name(decode_url(type_tag))
+                assert quoted_string.startswith('"') and quoted_string.endswith('"')
+                return type_tag, quoted_string[1:-1]
+            elif '@' in node_text:
+                quoted_string, lang_code = node_text.rsplit('@', 1)
+                assert quoted_string.startswith('"') and quoted_string.endswith('"')
+                lang = lang_code.split('-')[0]
+                return lang, quoted_string[1:-1]
+            else:
+                raise ValueError("Can't understand value: %s" % node_text)
         elif ':' in node_text:
             prefix, resource = node_text.split(':', 1)
             if prefix not in self.prefixes:

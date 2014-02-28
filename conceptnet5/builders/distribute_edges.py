@@ -42,6 +42,7 @@ class EdgeDistributor(object):
         key_bytes = line.split(b'\t')[0]
         bucket = hash(key_bytes) % self.n
         self.files[bucket].write(line)
+        self.files[bucket].flush()
 
     def close(self):
         """

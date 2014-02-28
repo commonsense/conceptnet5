@@ -6,11 +6,11 @@ Get data from DBPedia.
 __author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
 from metanl.token_utils import un_camel_case
-from conceptent5.stem import normalized_concept_uri
+from conceptnet5.stem import normalized_concept_uri
 from conceptnet5.uri import Licenses
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
-from conceptnet5.semantic_web import NTriplesWriter, full_conceptnet_url, resource_name
+from conceptnet5.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
 import urllib
 import sys
 import re
@@ -93,20 +93,17 @@ def map_dbpedia_relation(url):
 
 
 def handle_file(filename, out_filename, map_filename):
+    reader = NTriplesReader()
     out = JSONStreamWriter(out_filename)
     map_out = NTriplesWriter(map_filename)
     for line in open(filename, 'rb'):
-        handle_triple(line.strip(), out, map_out)
+        handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
 
 
-def handle_triple(line, out, map_out):
-    items = line.split()
-    for i in range(3):
-        # If any of the relevant nodes is a bare string, not a URL, skip this
-        # line.
-        if not (items[i].startswith('<') and items[i].endswith('>')):
-            return
-    subj, pred, obj = items[:3]
+def handle_triple(line, reader, out, map_out):
+    subj, pred, obj, tag = reader.parse_line(line)
+    if tag != 'URL':
+        return
 
     # Ignore types of edges that we don't care about:
     #   - Homepage links
@@ -128,9 +125,10 @@ def handle_triple(line, out, map_out):
     obj_concept = translate_dbpedia_url(obj, 'en')
 
     # DBPedia categorizes a lot of things as 'works', which causes unnecessary
-    # ambiguity. It almost always means 'creative work'.
+    # ambiguity. Disregard these edges; there will almost always be a more
+    # specific edge calling it a 'creative work' anyway.
     if obj_concept == '/c/en/work':
-        obj_concept = '/c/en/creative_work'
+        return
 
     rel = map_dbpedia_relation(pred)
     if rel is None:

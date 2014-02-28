@@ -1,8 +1,8 @@
 from __future__ import print_function, unicode_literals, division
 from conceptnet5.uri import concept_uri, Licenses
 from conceptnet5.edges import make_edge
-from conceptnet5.json_writer import JSONStreamWriter
-from conceptnet5.readers.sounds_like import sounds_like_score
+from conceptnet5.json_stream import JSONStreamWriter
+from conceptnet5.util.sounds_like import sounds_like_score
 from collections import defaultdict
 import re
 import sys
@@ -160,9 +160,9 @@ def run_verbosity(infile, outfile):
                              weight=weight)
             writer.write(edge)
 
-        # Count the various outcomes. This can be used as a sanity-check. It
-        # also was used for a graph in a ConceptNet 5 paper.
-        print("Verbosity outcomes: %s" % outcomes)
+    # Count the various outcomes. This can be used as a sanity-check. It
+    # also was used for a graph in a ConceptNet 5 paper.
+    print("Verbosity outcomes: %s" % outcomes)
 
 if __name__ == '__main__':
     run_verbosity(sys.argv[1], sys.argv[2])

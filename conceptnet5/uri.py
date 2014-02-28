@@ -259,6 +259,7 @@ def assertion_uri(rel, *args):
         >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
         '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
+    assert rel.startswith('/r')
     return compound_uri('/a', (rel,) + args)
 
 

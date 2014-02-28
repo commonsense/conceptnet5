@@ -3,8 +3,6 @@ This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
 """
 
-import json
-
 from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses, normalize_text
@@ -171,15 +169,15 @@ class CN4Builder(object):
     def __init__(self):
         self.seen_sources = set()
 
-    def handle_raw_assertion(self, flat_assertion):
+    def handle_raw_assertion(self, parts_dict):
         """
         Process one unit of ConceptNet 4 knowledge, which was known as a
         "raw assertion" -- a relation between surface texts, not yet reduced
         to a normalized form.
 
-        Each raw assertion becomes
+        Each raw assertion becomes a number of ConceptNet 5 edges, which will
+        probably be groupd together into an assertion again.
         """
-        parts_dict = json.loads(flat_assertion)
         if can_skip(parts_dict):
             return
 
@@ -231,7 +229,7 @@ class CN4Builder(object):
                         else:
                             self.seen_sources.add((uri, contributor))
                     if okay:
-                        yield json.dumps(edge, ensure_ascii=False)
+                        yield edge
 
 
     def transform_file(self, input_filename, output_filename):

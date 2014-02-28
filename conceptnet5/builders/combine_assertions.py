@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, print_function
 import codecs
 from conceptnet5.edges import make_edge
-from conceptnet5.nodes import disjunction_uri
+from conceptnet5.uri import disjunction_uri
+from conceptnet5.json_stream import JSONStreamWriter
 import os
 import json
 import math
@@ -38,12 +39,22 @@ def combine_assertions(csv_filename, out_filename, dataset, license):
     current_weight = 0.
     current_sources = []
 
-    out = codecs.open(out_filename, 'w', encoding='utf-8')
+    out = JSONStreamWriter(out_filename)
     for line in codecs.open(csv_filename, encoding='utf-8'):
+        line = line.rstrip()
+        if not line:
+            continue
         # Interpret the columns of the file.
-        uri, rel, start, end, context, weight, source_uri, id, this_dataset, surface = line.split('\t')[:10]
+        parts = line.split('\t')
+        if len(parts) >= 10:
+            uri, rel, start, end, context, weight, source_uri, id, this_dataset, surface = parts[:10]
+            surface = surface.strip()
+        elif len(parts) == 9:
+            uri, rel, start, end, context, weight, source_uri, id, this_dataset = parts[:9]
+            surface = None
+        else:
+            raise ValueError("Malformed line in %r:\n\t%s" % (csv_filename, line))
         weight = float(weight)
-        surface = surface.strip()
 
         # If the uri is 'uri', this was a header line, so ignore it.
         if uri == 'uri':
@@ -103,13 +114,12 @@ def output_assertion(out, **kwargs):
 
     # Build the assertion object.
     assertion = make_edge(sources=source_tree, **kwargs)
-    
+
     # Make sure the computed URI is the same as the one we had.
     assert assertion['uri'] == uri, (assertion['uri'], uri)
 
     # Output the result in a JSON stream.
-    line = json.dumps(assertion, ensure_ascii=False)
-    print(line, file=out)
+    out.write(assertion)
 
 
 if __name__ == '__main__':

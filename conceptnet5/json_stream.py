@@ -31,8 +31,14 @@ class JSONStreamWriter(object):
         else:
             self.stream = filename_or_stream
 
-    def write(self, edge):
-        line = json.dumps(edge, ensure_ascii=False)
+    def write(self, obj):
+        if isinstance(obj, string_type):
+            raise ValueError(
+                "%r is already a string. It shouldn't be written to a JSON stream."
+                % obj
+            )
+
+        line = json.dumps(obj, ensure_ascii=False)
         print(line, file=self.stream)
 
     def close(self):

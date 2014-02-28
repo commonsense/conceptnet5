@@ -22,7 +22,6 @@ ASSOC_DIR = assoc/assoc-space-5.2
 EDGE_FILES = \
 	edges/dbpedia/instances.jsons edges/dbpedia/properties.jsons \
 	edges/wiktionary/wiktionary_en.jsons \
-	edges/wiktionary/wiktionary_ja.jsons \
 	edges/wordnet/wordnet.jsons \
 	edges/verbosity/verbosity.jsons \
 	edges/globalmind/globalmind.jsons \
@@ -116,10 +115,6 @@ edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.p
 edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py
 	@mkdir -p edges/wiktionary
 	$(PYTHON) -m conceptnet5.readers.wiktionary_en $< $@
-
-edges/wiktionary/wiktionary_ja.jsons: raw/wiktionary/jawiktionary.xml $(READERS)/wiktionary_ja.py
-	@mkdir -p edges/wiktionary
-	$(PYTHON) -m conceptnet5.readers.wiktionary_ja $< $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
