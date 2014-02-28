@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 """
 Concept Net 5
 api.py file from conceptnet5 module
@@ -8,13 +9,16 @@ Massachusetts Institute of Technology
 Fall 2011
 """
 
+# This file should be rewritten, but if we're going to change the search
+# system soon, that should wait. Much of this file is just about dealing
+# with the idiosyncrasies of Solr.
+
 import flask
 import urllib, urllib2
 import re
 import sys
 import json
 import os
-import numpy as np
 from assoc_space import AssocSpace
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
@@ -34,7 +38,6 @@ def load_assoc():
     """
     global commonsense_assoc
     if commonsense_assoc: return commonsense_assoc
-    dirname = ASSOC_DIR
     commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
     return commonsense_assoc
 
