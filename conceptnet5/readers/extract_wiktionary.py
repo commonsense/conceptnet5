@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+# A work in progress on a better first step for reading Wiktionary.
+# Right now it puts its results into a bunch of files under "./en.wiktionary.org".
+#
 # TODO: when extracting links, try to determine what language they're in. It's
 # annoying because it differs by section, and even by template:
 #   {{sl-adv|head=[[na]] [[primer]]}}\n\n# [[for example]]
@@ -9,10 +12,8 @@ from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 import re
 import os
-import string
 import unicodedata
 import json
-from urllib import quote
 from ftfy import ftfy
 import logging
 logger = logging.getLogger(__name__)
@@ -185,7 +186,6 @@ def handle_language_section(site, title, heading, text):
 
 def handle_section(text, heading, level):
     section_finder = SECTION_HEADER_RES[level + 1]
-    subsections = []
     found = section_finder.split(text)
     headings = found[1::2]
     texts = found[2::2]
@@ -205,7 +205,6 @@ def handle_section(text, heading, level):
 
 def parse_links(text):
     return [found[0] for found in WIKILINK_RE.findall(text)]
-
 
 
 def extract_translations(text):
