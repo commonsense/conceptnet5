@@ -1,5 +1,5 @@
 from hashlib import sha1
-from uri import conjunction_uri, assertion_uri, Licenses
+from conceptnet5.uri import conjunction_uri, assertion_uri, Licenses
 from pprint import pprint
 
 def make_edge(rel, start, end, dataset, license, sources,
