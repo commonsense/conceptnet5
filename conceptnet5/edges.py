@@ -39,7 +39,7 @@ def make_edge(rel, start, end, dataset, license, sources,
     ]
     uri = assertion_uri(rel, start, end)
     if isinstance(sources, list):
-        sources = conjunction_uri(sources)
+        sources = conjunction_uri(*sources)
 
     # Generate a unique ID for the edge. This is the only opaque ID
     # that appears in ConceptNet objects. You can use it as a

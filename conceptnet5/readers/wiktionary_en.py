@@ -1,16 +1,18 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 """
 This Wiktionary reader should be refactored, but it does the job for now.
 """
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
-from conceptnet5.nodes import make_concept_uri
-from conceptnet5.edges import FlatEdgeWriter, make_edge
+from conceptnet5.uri import Licenses
+from conceptnet5.stemmers import normalized_concept_uri
+from conceptnet5.edges import make_edge
+from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.iso639 import langs
 import unicodedata
-import string
 import re
 import sys
 
@@ -111,8 +113,8 @@ LANGUAGES = {
     'Urdu': 'ur',
     'Uzbek': 'uz',
     'Vietnamese': 'vi',
-    u'英語': 'en',
-    u'日本語': 'ja'
+    '英語': 'en',
+    '日本語': 'ja'
 }
 
 SOURCE = '/s/web/en.wiktionary.org'
@@ -132,7 +134,7 @@ class FindTranslations(ContentHandler):
         self.curText = ''
         self.locales = []
         self.curRelation = None
-        self.writer = FlatEdgeWriter(out_filename)
+        self.writer = JSONStreamWriter(out_filename)
 
     def startElement(self, name, attrs):
         if name == 'page':
@@ -240,18 +242,16 @@ class FindTranslations(ContentHandler):
     def output_monolingual(self, lang, relation, term1, term2):
         if 'Wik' in term1 or 'Wik' in term2:
             return
-        source = make_concept_uri(term1, lang)
+        source = normalized_concept_uri(lang, term1)
         if self.pos:
-            target = make_concept_uri(term2, lang, self.pos)
+            target = normalized_concept_uri(lang, term2, self.pos)
         else:
-            target = make_concept_uri(term2, lang)
+            target = normalized_concept_uri(lang, term2)
         surfaceText = "[[%s]] %s [[%s]]" % (term1, relation, term2)
-        #print surfaceText
 
         edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, MONOLINGUAL],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
@@ -263,10 +263,10 @@ class FindTranslations(ContentHandler):
             lang = 'zh_CN'
         elif lang == 'zh-tw':
             lang = 'zh_TW'
-        source = make_concept_uri(
+        source = normalized_concept_uri(
           unicodedata.normalize('NFKC', foreign), lang
         )
-        target = make_concept_uri(
+        target = normalized_concept_uri(
           english, 'en', disambiguation
         )
         relation = '/r/TranslationOf'
@@ -275,21 +275,19 @@ class FindTranslations(ContentHandler):
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
         surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
-        #print surfaceText
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, TRANSLATE],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
         
     def output_translation(self, foreign, english, locale=''):
-        source = make_concept_uri(
+        source = normalized_concept_uri(
           unicodedata.normalize('NFKC', foreign),
           self.langcode+locale
         )
-        target = make_concept_uri(
+        target = normalized_concept_uri(
           english, 'en'
         )
         relation = '/r/TranslationOf'
@@ -299,9 +297,8 @@ class FindTranslations(ContentHandler):
             surfaceRel = "is [language %s] for" % self.langcode
         surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % self.langcode,
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, INTERLINGUAL],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
