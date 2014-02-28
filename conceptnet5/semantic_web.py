@@ -134,17 +134,25 @@ class NTriplesReader(object):
         # Handle prefix definitions, which are lines that look like:
         # @prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
         if line.startswith('@prefix'):
-            _operator, prefix, url, dot = line.split(' ')
+            _operator, prefix, urldot = line.split(' ', 2)
+            url, dot = urldot.rsplit(' ', 1)
             assert dot == '.'
             prefixname = prefix.rstrip(':')
             self.prefixes[prefixname] = decode_url(url)
             return None
         else:
-            subj, rel, obj, dot = line.split(' ')
+            subj, rel, objdot = line.split(' ', 2)
+            obj, dot = objdot.rsplit(' ', 1)
             assert dot == '.'
-            return self.resolve_node(subj), self.resolve_node(rel), self.resolve_node(obj)
+            # We assume that `subj` and `rel` are URLs, or can be treated as URLs.
+            # `obj` might be a literal text, however, so we need to actually look
+            # at what it's tagged with.
+            subj_url = self.resolve_node(subj)[1]
+            rel_url = self.resolve_node(rel)[1]
+            obj_tag, obj_url = self.resolve_node(obj)
+            return subj_url, rel_url, obj_url, obj_tag
 
-    def resolve_node(self, encoded_url):
+    def resolve_node(self, node_text):
         """
         Given a Semantic Web node expressed in the N-Triples syntax, expand
         it to either its full, decoded URL or its natural language text
@@ -162,17 +170,19 @@ class NTriplesReader(object):
         >>> reader.resolve_node('"Abelian group"@en-us')
         ('en', 'Abelian group')
         """
-        if encoded_url.startswith('<') and encoded_url.endswith('>'):
+        if node_text.startswith('<') and node_text.endswith('>'):
             # This is a literal URL, so decode_url will handle it directly.
-            return 'URL', decode_url(encoded_url)
-        elif encoded_url.startswith('"'):
-            quoted_string, lang_code = encoded_url.rsplit('@', 1)
+            return 'URL', decode_url(node_text)
+        elif node_text.startswith('"'):
+            quoted_string, lang_code = node_text.rsplit('@', 1)
             assert quoted_string.startswith('"') and quoted_string.endswith('"')
             lang = lang_code.split('-')[0]
             return lang, quoted_string[1:-1]
-        else:
-            prefix, resource = encoded_url.split(':', 1)
+        elif ':' in node_text:
+            prefix, resource = node_text.split(':', 1)
             if prefix not in self.prefixes:
                 raise KeyError("Unknown prefix: %r" % prefix)
             url_base = self.prefixes[prefix]
             return 'URL', decode_url(url_base + resource)
+        else:
+            return (None, node_text)
