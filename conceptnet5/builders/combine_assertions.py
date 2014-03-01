@@ -63,7 +63,8 @@ def combine_assertions(csv_filename, out_filename, dataset, license):
         # If the uri is the same as current_uri, accumulate more information.
         if uri == current_uri:
             current_weight += weight
-            current_sources.append(source_uri)
+            if source_uri not in current_sources:
+                current_sources.append(source_uri)
             # We use the first surface form we see as the surface form for the whole assertion.
             if (current_surface is None) and surface:
                 current_surface = surface
@@ -89,15 +90,16 @@ def combine_assertions(csv_filename, out_filename, dataset, license):
             current_sources = [source_uri]
             current_surface = surface or None
 
-    output_assertion(out,
-        rel=rel, start=start, end=end,
-        dataset=dataset, license=license,
-        sources=current_sources,
-        surfaceText=current_surface,
-        weight=weight_scale(current_weight),
-        uri=current_uri
-    )
-    out.close()
+    if current_uri is not None:
+        output_assertion(out,
+            rel=rel, start=start, end=end,
+            dataset=dataset, license=license,
+            sources=current_sources,
+            surfaceText=current_surface,
+            weight=weight_scale(current_weight),
+            uri=current_uri
+        )
+        out.close()
 
 
 def output_assertion(out, **kwargs):

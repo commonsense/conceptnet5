@@ -44,7 +44,7 @@ PIECES := 00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
 SPLIT_PATTERNS := $(addprefix edges/split/%_, $(PIECES))
 
 # Build other filenames in similar ways.
-SPLIT_FILES = $(patsubst %,edges/split/edges_%, $(PIECES))
+SPLIT_FILES := $(patsubst %,edges/split/edges_%, $(PIECES))
 SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/edges_%.csv,assertions/part_%.jsons, $(SORTED_FILES))
 ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
@@ -151,14 +151,22 @@ edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
 	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
 
 # Gather all the csv files and split them into 20 pieces.
-$(SPLIT_FILES): $(CSV_FILES) $(BUILDERS)/distribute_edges.py
+# 
+# We can't list these 20 pieces as the outputs of this rule, because then it would run 20 times.
+# Instead, we make a file called ".done" that gets updated after the split command has finished.
+edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 	@mkdir -p edges/split
 	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 20
+	touch edges/split/.done
 
 # Make sorted, uniquified versions of the split-up edge files.
-edges/sorted/%.csv: edges/split/%.csv
+#
+# Because we didn't make a rule that has these split-up files as targets -- the
+# previous rule has a fake target -- we need to deduce the input filenames here
+# using $(patsubst).
+edges/sorted/%.csv: edges/split/.done
 	@mkdir -p edges/sorted
-	sort $< | uniq > $@
+	sort $(patsubst edges/sorted/%,edges/split/%,$@) | uniq > $@
 
 # An assertion may be built from multiple similar edges, where the only
 # difference between them is the knowledge source. Combine edges with the same
