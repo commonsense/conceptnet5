@@ -7,10 +7,6 @@ def convert_to_tab_separated(input_filename, output_filename):
     out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
     for info in read_json_stream(input_filename):
         text = info.get('surfaceText') or ''
-        uri = info['uri']
-        if uri.startswith('/a/[/a/'):
-            assert uri.count('/[') == uri.count('/]'), info
-
         line = "%(uri)s\t%(rel)s\t%(start)s\t%(end)s\t%(context)s\t%(weight)s\t%(sources)s\t%(id)s\t%(dataset)s\t%(text)s" % {
             'uri': info['uri'],
             'rel': info['rel'],

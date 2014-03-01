@@ -21,8 +21,8 @@ def convert_to_solr(input_filename, output_filename):
     dictionaries, but is technically allowed by the JSON grammar. To create the
     output JSON file in Python, we have to write its components incrementally.
     """
-    out = codecs.open(output_filename, encoding='utf-8')
-    
+    out = codecs.open(output_filename, 'w', encoding='utf-8')
+
     print("{", file=out)
     for info in read_json_stream(input_filename):
         boost = info['weight']

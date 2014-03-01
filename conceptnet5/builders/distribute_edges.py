@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import sys
 import argparse
-
+import codecs
 
 # Get the version of sys.stdin that contains bytes, not Unicode.
 if sys.version_info.major >= 3:
@@ -31,7 +31,7 @@ class EdgeDistributor(object):
         """
         self.n = n
         self.files = [
-            open(output_dir + '/edges_%02d.csv' % i, 'wb')
+            codecs.open(output_dir + '/edges_%02d.csv' % i, 'w', encoding='utf-8')
             for i in range(n)
         ]
 
@@ -39,10 +39,9 @@ class EdgeDistributor(object):
         """
         Read a line (as bytes), and split based on the hash of its first item.
         """
-        key_bytes = line.split(b'\t')[0]
-        bucket = hash(key_bytes) % self.n
+        key = line.split('\t')[0]
+        bucket = hash(key) % self.n
         self.files[bucket].write(line)
-        self.files[bucket].flush()
 
     def close(self):
         """
@@ -68,7 +67,7 @@ def run_args():
 
     sorter = EdgeDistributor(args.o, args.n)
     for line in STDIN:
-        sorter.handle_line(line)
+        sorter.handle_line(line.decode('utf-8'))
 
     sorter.close()
 
