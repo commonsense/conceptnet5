@@ -56,13 +56,13 @@ def get_lang(assertion):
     return assertion['start'].split('/')[2]
 
 
-def build_from_dir(dirname, filename_out):
+def build_from_dir(dirname, output_file):
     """
     Read a GlobalMind database exported in YAML files, translate
     it into ConceptNet 5 edges, and write those edges to disk using
     a JSONStreamWriter.
     """
-    out = JSONStreamWriter(filename_out)
+    out = JSONStreamWriter(output_file)
     userdata = yaml.load_all(open(dirname + '/GMUser.yaml'))
     users = {}
 
@@ -164,13 +164,6 @@ def build_from_dir(dirname, filename_out):
                          surfaceText=surfaceText,
                          weight=1)
         out.write(edge)
-
-
-def run_stream(dirname, stream_out=None):
-    if stream_out is None:
-        stream_out = sys.stdout
-    for result in build_from_dir(dirname):
-        print >> stream_out, result.encode('utf-8')
 
 
 def main():

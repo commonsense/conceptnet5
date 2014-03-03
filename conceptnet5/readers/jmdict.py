@@ -98,9 +98,9 @@ def parse_gloss(text):
 
 
 # TODO: write comments and a docstring.
-def read_jmdict(filename, outfilename):
+def read_jmdict(filename, output_file):
     file = codecs.open(filename, encoding='utf-8')
-    out = JSONStreamWriter(outfilename)
+    out = JSONStreamWriter(output_file)
     data = file.read()
     file.close()
 
@@ -123,7 +123,6 @@ def read_jmdict(filename, outfilename):
                             other_concept = concept_uri(lang, text)
                             if len(other_concept.split('_')) <= 5:
                                 output_edge(out, ja_concept, other_concept)
-    out.close()
 
 
 def output_edge(out, subj_concept, obj_concept):

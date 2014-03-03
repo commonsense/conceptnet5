@@ -6,10 +6,12 @@ import codecs
 # Python 2/3 compatibility
 if sys.version_info.major >= 3:
     string_type = str
+    from io import StringIO
 else:
     string_type = basestring
     sys.stdin = codecs.getreader('utf8')(sys.stdin)
     sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+    from StringIO import StringIO
 
 
 class JSONStreamWriter(object):
@@ -26,10 +28,10 @@ class JSONStreamWriter(object):
     and causes things to crash.
     """
     def __init__(self, filename_or_stream):
-        if isinstance(filename_or_stream, string_type):
-            self.stream = codecs.open(filename_or_stream, 'w', encoding='utf-8')
-        else:
+        if hasattr(filename_or_stream, 'write'):
             self.stream = filename_or_stream
+        else:
+            self.stream = codecs.open(filename_or_stream, 'w', encoding='utf-8')
 
     def write(self, obj):
         if isinstance(obj, string_type):
@@ -44,6 +46,11 @@ class JSONStreamWriter(object):
     def close(self):
         if self.stream is not sys.stdout:
             self.stream.close()
+
+    @classmethod
+    def io_writer(cls):
+        io = StringIO()
+        return JSONStreamWriter(io)
 
 
 def read_json_stream(filename_or_stream):

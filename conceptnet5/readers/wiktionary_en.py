@@ -124,7 +124,7 @@ TRANSLATE = '/s/rule/wiktionary_translation_tables'
 DEFINE = '/s/rule/wiktionary_define_senses'
 
 class FindTranslations(ContentHandler):
-    def __init__(self, out_filename='wiktionary.json'):
+    def __init__(self, output_file='wiktionary.json'):
         self.lang = None
         self.langcode = None
         self.inArticle = False
@@ -134,7 +134,7 @@ class FindTranslations(ContentHandler):
         self.curText = ''
         self.locales = []
         self.curRelation = None
-        self.writer = JSONStreamWriter(out_filename)
+        self.writer = JSONStreamWriter(output_file)
 
     def startElement(self, name, attrs):
         if name == 'page':
@@ -317,7 +317,8 @@ def filter_line(line):
             remain = part.strip().strip('.').strip()
             if remain: yield remain
 
-if __name__ == '__main__':
+
+def process_wiktionary(input_file, output_file):
     # Create a parser
     parser = make_parser()
 
@@ -325,11 +326,23 @@ if __name__ == '__main__':
     parser.setFeature(feature_namespaces, 0)
 
     # Create the handler
-    dh = FindTranslations(out_filename=sys.argv[2])
+    dh = FindTranslations(output_file=output_file)
 
     # Tell the parser to use our handler
     parser.setContentHandler(dh)
 
     # Parse the input
-    parser.parse(open(sys.argv[1]))
+    if hasattr(input_file, 'read'):
+        input_stream = input_file
+    else:
+        input_stream = open(input_file)
+    parser.parse(input_stream)
 
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='XML file of input')
+    parser.add_argument('output', help='JSON-stream file to output to')
+    args = parser.parse_args()
+    process_wiktionary(args.input, args.output)

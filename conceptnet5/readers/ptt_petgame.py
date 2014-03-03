@@ -27,8 +27,8 @@ def handle_raw_assertion(line):
                     license='/l/CC/By', sources=sources,
                     surfaceText=surfaceText, weight=1)
 
-def transform_file(input_filename, output_filename):
-    out = JSONStreamWriter(output_filename)
+def transform_file(input_filename, output_file):
+    out = JSONStreamWriter(output_file)
     for line in codecs.open(input_filename, encoding='utf-8'):
         line = line.strip()
         if line:

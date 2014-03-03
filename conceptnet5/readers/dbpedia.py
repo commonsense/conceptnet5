@@ -92,10 +92,10 @@ def map_dbpedia_relation(url):
         return None
 
 
-def handle_file(filename, out_filename, map_filename):
+def handle_file(filename, output_file, sw_map_file):
     reader = NTriplesReader()
-    out = JSONStreamWriter(out_filename)
-    map_out = NTriplesWriter(map_filename)
+    out = JSONStreamWriter(output_file)
+    map_out = NTriplesWriter(sw_map_file)
     for line in open(filename, 'rb'):
         handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
 

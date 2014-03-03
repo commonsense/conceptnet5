@@ -232,8 +232,8 @@ class CN4Builder(object):
                         yield edge
 
 
-    def transform_file(self, input_filename, output_filename):
-        out = JSONStreamWriter(output_filename)
+    def transform_file(self, input_filename, output_file):
+        out = JSONStreamWriter(output_file)
         for obj in read_json_stream(input_filename):
             for new_obj in self.handle_raw_assertion(obj):
                 out.write(new_obj)
