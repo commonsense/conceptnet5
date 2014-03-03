@@ -271,7 +271,7 @@ class FindTranslations(ContentHandler):
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[lang])
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[lang.split('_')[0]])
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
         surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
@@ -292,7 +292,7 @@ class FindTranslations(ContentHandler):
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[self.langcode])
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[self.langcode.split('_')[0]])
         except KeyError:
             surfaceRel = "is [language %s] for" % self.langcode
         surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)

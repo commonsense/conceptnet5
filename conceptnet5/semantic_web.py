@@ -186,7 +186,7 @@ class NTriplesReader(object):
             # This is a literal URL, so decode_url will handle it directly.
             return 'URL', decode_url(node_text)
         elif node_text.startswith('"'):
-            if '^^' in node_text:
+            if '"^^' in node_text:
                 quoted_string, type_tag = node_text.split('^^', 1)
                 type_tag = resource_name(decode_url(type_tag))
                 assert quoted_string.startswith('"') and quoted_string.endswith('"')

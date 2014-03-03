@@ -46,7 +46,7 @@ SUPPORTED_LANGUAGE_CODES = [
     'se', 'sg', 'si', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 'ss', 'st',
     'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to',
     'tr', 'ts', 'tt', 'tw', 'ty', 'ug', 'uk', 'ur', 'uz', 've', 'vi', 'vo',
-    'wa', 'wo', 'xh', 'yi', 'yo', 'za', 'zh', 'zu'
+    'wa', 'wo', 'xh', 'yi', 'yo', 'za', 'zh', 'zh_CN', 'zh_TW', 'zu'
 ]
 
 def _setup():
