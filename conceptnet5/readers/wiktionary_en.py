@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 """
@@ -19,7 +18,7 @@ import sys
 def ascii_enough(text):
     # cheap assumption: if it's ASCII, and it's meant to be in English, it's
     # probably actually in English.
-    return text.encode('ascii', 'replace') == text
+    return text.encode('ascii', 'replace') == text.encode('ascii', 'ignore')
 
 PARTS_OF_SPEECH = {
     'Noun': 'n',
@@ -41,7 +40,7 @@ WIKILINK = re.compile(r"\[\[([^|\]#]+)")
 
 LANGUAGES = {
     'English': 'en',
-    
+
     'Afrikaans': 'af',
     'Arabic': 'ar',
     'Armenian': 'hy',
@@ -150,7 +149,7 @@ class FindTranslations(ContentHandler):
             self.handleArticle(self.curTitle, ''.join(self.curText))
         elif name == 'title':
             self.inTitle = False
-    
+
     def characters(self, text):
         if self.inTitle:
             self.curTitle += text
@@ -238,7 +237,7 @@ class FindTranslations(ContentHandler):
                 related = relatedmatch.group(1)
                 self.output_monolingual(self.langcode, self.curRelation,
                                         related, title)
-    
+
     def output_monolingual(self, lang, relation, term1, term2):
         if 'Wik' in term1 or 'Wik' in term2:
             return
@@ -281,7 +280,7 @@ class FindTranslations(ContentHandler):
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
-        
+
     def output_translation(self, foreign, english, locale=''):
         source = normalized_concept_uri(
             self.langcode + locale,
