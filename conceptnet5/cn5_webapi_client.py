@@ -64,7 +64,7 @@ class ConceptNetGraph(object):
 
     def get_nodes(self, uri_list):
         """fetches a series of nodes given a list of uris"""
-        nodes = json.loads(urllib.urlopen(self.root + '/' + str(uri_list).read())
+        nodes = json.loads(urllib.urlopen(self.root + '/' + str(uri_list).read()))
         return_dict = {}
         for node in nodes['nodes']:
             return_dict[uri] = _base_node(self,node['uri'],properties = node)
