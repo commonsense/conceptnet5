@@ -65,6 +65,8 @@ def can_skip(parts_dict):
         return True
     if 'rubycommons' in parts_dict["activity"]:
         return True
+    if 'Verbosity' in parts_dict["activity"]:
+        return True
     return False
 
 
@@ -137,7 +139,7 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     activity = parts_dict["activity"]
 
-    creator_node = join_uri(u'/s/contributor/omcs', normalize_text(parts_dict["creator"]))
+    creator_node = join_uri(u'/s/contributor/omcs', parts_dict["creator"])
     activity_node = join_uri(u'/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
@@ -215,6 +217,7 @@ class CN4Builder(object):
                 if not by_bedume_and_bad(source_list, start, end):
                     contributors = [s for s in source_list if s.startswith('/s/contributor')]
                     assert len(contributors) <= 1, contributors
+
                     edge = make_edge(
                         rel=relation, start=start, end=end,
                         dataset=dataset, license=Licenses.cc_attribution,

@@ -80,6 +80,11 @@ def map_dbpedia_relation(url):
     """
     Recognize three relations that we can extract from DBPedia, and convert
     them to ConceptNet relations.
+
+    >>> map_dbpedia_relation('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
+    '/r/IsA'
+    >>> map_dbpedia_relation('http://dbpedia.org/ontology/location')
+    '/r/AtLocation'
     """
     name = resource_name(url)
     if name == 'type':

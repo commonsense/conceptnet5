@@ -1,6 +1,7 @@
 PYTHON = python
 READERS = ../conceptnet5/readers
 BUILDERS = ../conceptnet5/builders
+CORE = ../conceptnet5/uri.py ../conceptnet5/edges.py
 DATE = $(shell date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
@@ -91,57 +92,57 @@ upload : $(DIST_FILES)
 # code changes.
 
 # Read edges from ConceptNet raw files.
-edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py
+edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # nadya.jp output is in the same format as ConceptNet.
-edges/conceptnet4_nadya/%.jsons : raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py
+edges/conceptnet4_nadya/%.jsons : raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # zh-TW data from the PTT Pet Game is in a different format, in .txt files.
-edges/conceptnet_zh/%.jsons : raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py
+edges/conceptnet_zh/%.jsons : raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.ptt_petgame $< $@
 
 # GlobalMind objects refer to each other, so the reader has to handle them all
 # in the same process.
-edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.py
+edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.py $(CORE)
 	@mkdir -p edges/globalmind
 	$(PYTHON) -m conceptnet5.readers.globalmind raw/globalmind $@
 
 # One day, this will be replaced by a better Wiktionary reader.
-edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py
+edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py $(CORE)
 	@mkdir -p edges/wiktionary
 	$(PYTHON) -m conceptnet5.readers.wiktionary_en $< $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
-edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosity.py
+edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosity.py $(CORE)
 	@mkdir -p edges/verbosity
 	$(PYTHON) -m conceptnet5.readers.verbosity $< $@
 
 # The WordNet script has an additional output, which goes into 'sw_map':
 # a mapping of Semantic Web URLs to ConceptNet 5 nodes.
-edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py
+edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py $(CORE)
 	@mkdir -p edges/wordnet
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.jsons
 
 # Read edges from DBPedia. This script also produces an sw_map.
-edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.jsons
 
-edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.jsons
 
 # Read Japanese translations from JMDict.
-edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py
+edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
 	@mkdir -p edges/jmdict
 	$(PYTHON) -m conceptnet5.readers.jmdict $< $@
 

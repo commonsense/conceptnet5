@@ -178,7 +178,7 @@ class FindTranslations(ContentHandler):
             elif pos == 'Antonym':
                 self.curRelation = 'Antonym'
             elif pos == 'Related terms':
-                self.curRelation = 'ConceptuallyRelatedTo'
+                self.curRelation = 'RelatedTo'
             elif pos == 'Derived terms':
                 if not line.startswith('===='):
                     # this is at the same level as the part of speech;

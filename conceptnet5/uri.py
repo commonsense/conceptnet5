@@ -209,13 +209,13 @@ def parse_compound_uri(uri):
 def conjunction_uri(*sources):
     """
     Make a URI representing a conjunction of sources that work together to provide
-    an assertion.
+    an assertion. The sources will be sorted in lexicographic order.
 
         >>> conjunction_uri('/s/contributor/omcs/dev')
         '/s/contributor/omcs/dev'
         
         >>> conjunction_uri('/s/contributor/omcs/dev', '/rule/some_kind_of_parser')
-        '/and/[/s/contributor/omcs/dev/,/rule/some_kind_of_parser/]'
+        '/and/[/rule/some_kind_of_parser/,/s/contributor/omcs/dev/]'
     """
     if len(sources) == 0:
         # Logically, a conjunction with 0 inputs represents 'True', a
@@ -227,17 +227,18 @@ def conjunction_uri(*sources):
     elif len(sources) == 1:
         return sources[0]
     else:
-        return compound_uri('/and', sources)
+        return compound_uri('/and', sorted(sources))
 
 
 def disjunction_uri(*sources):
     """
-    Make a URI representing a choice of sources that provide the same assertion.
+    Make a URI representing a choice of sources that provide the same assertion. The
+    sources will be sorted in lexicographic order.
 
         >>> disjunction_uri('/s/contributor/omcs/dev')
         '/s/contributor/omcs/dev'
 
-        >>> disjunction_uri('/s/contributor/omcs/dev', '/s/contributor/omcs/rspeer')
+        >>> disjunction_uri('/s/contributor/omcs/rspeer', '/s/contributor/omcs/dev')
         '/or/[/s/contributor/omcs/dev/,/s/contributor/omcs/rspeer/]'
     """
     if len(sources) == 0:
@@ -245,7 +246,7 @@ def disjunction_uri(*sources):
     elif len(sources) == 1:
         return sources[0]
     else:
-        return compound_uri('/or', sources)
+        return compound_uri('/or', sorted(sources))
 
 
 def assertion_uri(rel, *args):

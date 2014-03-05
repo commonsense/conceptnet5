@@ -1,5 +1,6 @@
 from __future__ import print_function, unicode_literals, division
-from conceptnet5.uri import concept_uri, Licenses
+from conceptnet5.uri import Licenses
+from conceptnet5.stem import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
@@ -122,13 +123,13 @@ def run_verbosity(infile, outfile):
         # The penalties are multiplicative factors from 0 to 1, which decrease
         # linearly as the relevant penalties increase. If a clue is given N
         # times, with a sounds-like score of 0 and an orderscore of 0, it will
-        # get an overall score of 2N. This is a formula we should probably
+        # get an overall score of 2N - 1. This is a formula we should probably
         # revisit.
         #
         # The weight is the score divided by 100. All divisions are floating
         # point, as defined by the __future__ import at the top of this module.
-        score = (freq * 2) * (1 - sls) * (1 - orderscore / 1000)
-        if score <= 1:
+        score = (freq * 2 - 1) * (1 - sls) * (1 - orderscore / 1000)
+        if score <= 0:
             outcomes['low score'] += 1
             continue
 
@@ -152,8 +153,8 @@ def run_verbosity(infile, outfile):
             count += 1
             outcomes['success'] += 1
             
-            leftc = concept_uri('en', left)
-            rightc = concept_uri('en', rightword)
+            leftc = normalized_concept_uri('en', left)
+            rightc = normalized_concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
                              license=Licenses.cc_attribution,
                              sources=sources, surfaceText=text,

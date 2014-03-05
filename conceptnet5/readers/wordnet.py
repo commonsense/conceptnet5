@@ -1,5 +1,6 @@
 from collections import defaultdict
-from conceptnet5.uri import concept_uri, join_uri
+from conceptnet5.uri import join_uri
+from conceptnet5.stem import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
@@ -49,6 +50,7 @@ def run_wordnet(input_dir, output_file, sw_map_file):
     labels = {}
     glossary = {}
     concept_map = {}
+    sense_to_synset = {}
 
     # Parse lines such as:
     #   wn30:synset-Aeolian-noun-2 rdfs:label "Aeolian"@en-us .
@@ -94,14 +96,12 @@ def run_wordnet(input_dir, output_file, sw_map_file):
         pos = PARTS_OF_SPEECH[synset_pos]
         disambig = glossary[synset]
 
-        concept = concept_uri('en', synset_name, pos, disambig)
+        concept = normalized_concept_uri('en', synset_name, pos, disambig)
         concept_map[synset] = concept
-        #map_out.write_same_as(synset, full_conceptnet_url(concept))
 
-    # Map senses to the same nodes.
+    # Map senses to their synsets.
     for sense, synset in sense_synsets.items():
-        concept_map[sense] = concept_map[synset]
-
+        sense_to_synset[sense] = synset
 
     for filename in (
         'wordnet-attribute.ttl', 'wordnet-causes.ttl',
@@ -117,6 +117,12 @@ def run_wordnet(input_dir, output_file, sw_map_file):
     ):
         filepath = os.path.join(input_dir, filename)
         for web_subj, web_rel, web_obj, objtag in reader.parse_file(filepath):
+            # If this relation involves word senses, map them to their synsets
+            # first.
+            if web_subj in sense_to_synset:
+                web_subj = sense_to_synset[web_subj]
+            if web_obj in sense_to_synset:
+                web_obj = sense_to_synset[web_obj]
             subj = concept_map[web_subj]
             obj = concept_map[web_obj]
             pred_label = resource_name(web_rel)

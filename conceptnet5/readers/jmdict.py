@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, print_function
 import xmltodict
 import re
-import json
 import codecs
 from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME, ENGLISH_NAME_TO_CODE
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.uri import concept_uri, Licenses
+from conceptnet5.stem import normalized_concept_uri
 from conceptnet5.edges import make_edge
 
 # I took the time to record these, but in the end I don't think I plan
@@ -120,7 +120,7 @@ def read_jmdict(filename, output_file):
                         lang = convert_lang_code(gloss['@xml:lang'])
                         for head in headwords:
                             ja_concept = concept_uri('ja', head)
-                            other_concept = concept_uri(lang, text)
+                            other_concept = normalized_concept_uri(lang, text)
                             if len(other_concept.split('_')) <= 5:
                                 output_edge(out, ja_concept, other_concept)
 

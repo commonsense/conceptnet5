@@ -42,7 +42,7 @@ def encode_url(url):
     >>> encode_url('http://dbpedia.org/resource/Núria_Espert')
     '<http://dbpedia.org/resource/N%C3%BAria_Espert>'
     """
-    return '<%s>' % quote(url.encode('utf-8'))
+    return '<%s>' % quote(url.encode('utf-8'), safe=':#/')
 
 
 def resource_name(url):
