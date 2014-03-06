@@ -116,39 +116,40 @@ def run_wordnet(input_dir, output_file, sw_map_file):
         'full/wordnet-seealso.ttl'
     ):
         filepath = os.path.join(input_dir, filename)
-        for web_subj, web_rel, web_obj, objtag in reader.parse_file(filepath):
-            # If this relation involves word senses, map them to their synsets
-            # first.
-            if web_subj in sense_to_synset:
-                web_subj = sense_to_synset[web_subj]
-            if web_obj in sense_to_synset:
-                web_obj = sense_to_synset[web_obj]
-            subj = concept_map[web_subj]
-            obj = concept_map[web_obj]
-            pred_label = resource_name(web_rel)
-            if pred_label in REL_MAPPING:
-                mapped_rel = REL_MAPPING[pred_label]
+        if os.path.exists(filepath):
+            for web_subj, web_rel, web_obj, objtag in reader.parse_file(filepath):
+                # If this relation involves word senses, map them to their synsets
+                # first.
+                if web_subj in sense_to_synset:
+                    web_subj = sense_to_synset[web_subj]
+                if web_obj in sense_to_synset:
+                    web_obj = sense_to_synset[web_obj]
+                subj = concept_map[web_subj]
+                obj = concept_map[web_obj]
+                pred_label = resource_name(web_rel)
+                if pred_label in REL_MAPPING:
+                    mapped_rel = REL_MAPPING[pred_label]
 
-                # Handle WordNet relations that are the reverse of ConceptNet
-                # relations. Change the word 'meronym' to 'holonym' if
-                # necessary.
-                if mapped_rel.startswith('~'):
-                    subj, obj = obj, subj
-                    web_subj, web_obj = web_obj, web_subj
-                    web_rel = web_rel.replace('meronym', 'holonym')
-                    mapped_rel = mapped_rel[1:]
-                rel = join_uri('r', mapped_rel)
-            else:
-                rel = join_uri('r', 'wordnet', pred_label)
+                    # Handle WordNet relations that are the reverse of ConceptNet
+                    # relations. Change the word 'meronym' to 'holonym' if
+                    # necessary.
+                    if mapped_rel.startswith('~'):
+                        subj, obj = obj, subj
+                        web_subj, web_obj = web_obj, web_subj
+                        web_rel = web_rel.replace('meronym', 'holonym')
+                        mapped_rel = mapped_rel[1:]
+                    rel = join_uri('r', mapped_rel)
+                else:
+                    rel = join_uri('r', 'wordnet', pred_label)
 
-            map_out.write_same_as(web_rel, full_conceptnet_url(rel))
-            map_out.write_same_as(web_subj, full_conceptnet_url(subj))
-            map_out.write_same_as(web_obj, full_conceptnet_url(obj))
-            edge = make_edge(
-                rel, subj, obj, dataset='/d/wordnet/3.0',
-                license='/l/CC/By', sources=SOURCE, weight=2.0
-            )
-            out.write(edge)
+                map_out.write_link(web_rel, full_conceptnet_url(rel))
+                map_out.write_link(web_subj, full_conceptnet_url(subj))
+                map_out.write_link(web_obj, full_conceptnet_url(obj))
+                edge = make_edge(
+                    rel, subj, obj, dataset='/d/wordnet/3.0',
+                    license='/l/CC/By', sources=SOURCE, weight=2.0
+                )
+                out.write(edge)
 
 def main():
     import argparse

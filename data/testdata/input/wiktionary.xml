@@ -1,0 +1,118 @@
+<wiktionary>
+  <page>
+    <title>河豚</title>
+    <id>507871</id>
+    <revision>
+      <id>13543812</id>
+      <timestamp>2011-07-19T22:42:01Z</timestamp>
+      <contributor>
+        <ip>71.66.97.228</ip>
+      </contributor>
+      <comment>/* Mandarin */</comment>
+      <text xml:space="preserve">==Japanese==
+{{ja-kanjitab|河|豚}}
+{{wikipedia|fugu}}
+
+===Noun===
+{{ja-noun|k|hira=ふぐ|rom=fugu}}
+
+# [[blowfish]]
+
+====Alternative forms====
+*[[フグ]]
+*{{term|鰒|lang=ja|sc=Jpan}}
+
+====Synonyms====
+* {{qualifier|Kansai}} {{term|鉄砲|tr=てっぽう, teppō|lang=ja|sc=Jpan}}
+
+[[Category:ja:Fish|ふぐ]]
+
+----
+
+==Mandarin==
+{{zh-hanzi|[[河]][[豚]]}}
+
+===Etymology===
+{{rfe|lang=zh}}
+
+===Noun===
+{{cmn-noun|ts|pin=hétún|pint=he2tun2|rs=水05}}
+
+# [[blowfish]]; [[puffer]]
+
+[[Category:zh-cn:Fish|he2tun2]]
+[[Category:zh-tw:Fish|水05河豚]]
+
+
+[[ko:河豚]]
+[[lo:河豚]]
+[[fi:河豚]]
+[[zh:河豚]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>blowfish</title>
+    <id>77618</id>
+    <revision>
+      <id>13478003</id>
+      <timestamp>2011-07-06T21:03:53Z</timestamp>
+      <contributor>
+        <username>Flubot</username>
+        <id>478721</id>
+      </contributor>
+      <minor />
+      <comment>adding en to topical categories</comment>
+      <text xml:space="preserve">{{also|Blowfish}}
+==English==
+{{wikipedia}}
+
+===Etymology===
+{{compound|blow|fish}}
+
+===Noun===
+{{en-noun|es}}
+
+#Any [[species]] of [[fish]] of the [[family]] ''[[Tetraodontidae]]'' that have the ability to [[inflate]] themselves to a [[globe]] several times their normal size by [[swallow]]ing water or air when [[threaten]]ed.
+# {{sense|food}} A [[delicacy]] popular in [[Japan]] served [[raw]] as [[sushi]] that may, if improperly [[prepare]]d, contain [[deadly]] levels of [[neurotoxin]]s
+
+====Synonyms====
+;fish
+{{top2}}
+* [[balloonfish]]
+* [[globefish]]
+* [[puffer]]
+{{mid2}}
+* [[pufferfish]]
+* [[swellfish]]
+{{bottom}}
+
+;food
+* [[fugu]]
+
+====Translations====
+{{trans-top|fish}}
+* Finnish: {{t|fi|pallokala}}
+{{trans-mid}}
+{{trans-bottom}}
+
+{{trans-top|food}}
+* Finnish: {{t|fi|fugu}}
+{{trans-mid}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* {{ttbc|ja}}: [[河豚]] (ふぐ, fugu)
+{{trans-mid}}
+* {{ttbc|es}}: [[pez globo]] {{m}}
+{{trans-bottom}}
+
+===Anagrams===
+* [[fishbowl#English|fishbowl]], [[fish bowl#English|fish bowl]]
+
+[[Category:en:Fish]]
+[[ko:blowfish]]
+[[ja:blowfish]]
+[[ta:blowfish]]</text>
+    </revision>
+  </page>
+</wiktionary>
