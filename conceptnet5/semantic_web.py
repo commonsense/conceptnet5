@@ -4,7 +4,7 @@ import sys
 import urllib
 import codecs
 
-SAME_AS = 'http://www.w3.org/2002/07/owl#sameAs'
+SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
 
 
 if sys.version_info.major >= 3:
@@ -115,11 +115,12 @@ class NTriplesWriter(object):
             line = ' '.join(line_pieces)
             print(line, file=self.stream)
 
-    def write_same_as(self, node1, node2):
+    def write_link(self, node1, node2):
         """
-        Write a line expressing that node1 is the same as node2.
+        Write a line expressing that node1 is linked to node2, using the RDF
+        "seeAlso" property.
         """
-        self.write((node1, SAME_AS, node2))
+        self.write((node1, SEE_ALSO, node2))
 
     def close(self):
         if self.stream is not sys.stdout:

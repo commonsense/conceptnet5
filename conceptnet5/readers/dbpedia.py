@@ -149,7 +149,7 @@ def handle_triple(line, reader, out, map_out):
     ]
     for sw_url, conceptnet_uri in mapped_pairs:
         conceptnet_url = full_conceptnet_url(conceptnet_uri)
-        map_out.write_same_as(sw_url, conceptnet_url)
+        map_out.write_link(conceptnet_url, sw_url)
 
     edge = make_edge(rel, subj_concept, obj_concept,
                      dataset='/d/dbpedia/en',

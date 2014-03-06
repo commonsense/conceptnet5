@@ -34,7 +34,7 @@ def normalize_text(text):
     - Ensure it is in Unicode, and standardize its Unicode representation
       with the `ftfy.fix_text` function.
     - Erase case distinctions by converting cased characters to lowercase.
-    - Strip surrounding whitespace.
+    - Strip common punctuation, unless that would make the string empty.
     - Replace spaces with underscores.
 
     The result will be a Unicode string that can be used within a URI.
@@ -45,12 +45,20 @@ def normalize_text(text):
         >>> normalize_text('Italian supercat')
         'italian_supercat'
 
+        >>> normalize_text('Test?!')
+        'test'
+
+        >>> normalize_text('TEST.')
+        'test'
+
         >>> normalize_text('   u\N{COMBINING DIAERESIS}ber\\n')
         'über'
     """
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
-    text = fix_text(text).strip().lower().replace(' ', '_')
+    text = fix_text(text).strip()
+    text = text.strip('.,?!"') or text
+    text = text.lower().replace(' ', '_')
     return text
 
 
