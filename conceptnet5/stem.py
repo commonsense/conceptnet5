@@ -16,7 +16,8 @@ def stem_english(text):
 
 def stem_and_normalize(lang, text):
     if lang == 'en':
-        return normalize_text(stem_english(text))
+        stem = stem_english(text) or text
+        return normalize_text(stem)
     else:
         return normalize_text(text)
 
