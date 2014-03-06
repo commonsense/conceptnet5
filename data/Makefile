@@ -1,7 +1,7 @@
 PYTHON = python
 READERS = ../conceptnet5/readers
 BUILDERS = ../conceptnet5/builders
-CORE = ../conceptnet5/uri.py ../conceptnet5/edges.py
+CORE = ../conceptnet5/uri.py ../conceptnet5/edges.py ../conceptnet5/stem.py
 DATE = $(shell date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
