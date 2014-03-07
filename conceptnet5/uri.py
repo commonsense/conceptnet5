@@ -235,7 +235,7 @@ def conjunction_uri(*sources):
     elif len(sources) == 1:
         return sources[0]
     else:
-        return compound_uri('/and', sorted(sources))
+        return compound_uri('/and', sorted(set(sources)))
 
 
 def disjunction_uri(*sources):

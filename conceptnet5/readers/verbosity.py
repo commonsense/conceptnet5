@@ -18,12 +18,23 @@ import sys
 # I have no idea why the word 'mince' shows up in so many bad assertions, but
 # it does.
 BAD_CLUE_REGEX = re.compile(
-    r'(^letter|^rhyme|^blank$|^word$|^syllable$|^spell|^tense$|^prefix'
+    r'(^letter|^rhyme|^blank$|^words?$|^syllable$|^spell|^tense$|^prefix'
     r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
     r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
     r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$|'
-    r'^delete|^remove|^add$)'
+    r'^delete|^remove|^add$|^plus$|^more$|^less$|^clue$)'
 )
+
+# These are words we won't pull out of phrases in order to make individual
+# assertions. The list is much more extensive than the three and a half
+# stopwords that ConceptNet uses for English in general.
+STOPWORDS = {
+    'a', 'an', 'the', 'to', 'of', 'for', 'in', 'on', 'at', 'by', 'with', 'and',
+    'or', 'far', 'near', 'away', 'from', 'thing', 'something', 'things', 'be',
+    'is', 'are', 'was', 'were', 'as', 'so', 'get', 'me', 'you', 'it', 'he',
+    'she', 'him', 'her', 'this', 'that', 'they', 'them', 'some', 'many', 'no',
+    'one', 'all', 'either', 'both', 'er'
+}
 
 def run_verbosity(infile, outfile):
     count = 0
@@ -129,7 +140,7 @@ def run_verbosity(infile, outfile):
         # The weight is the score divided by 100. All divisions are floating
         # point, as defined by the __future__ import at the top of this module.
         score = (freq * 2 - 1) * (1 - sls) * (1 - orderscore / 1000)
-        if score <= 0:
+        if score <= 0.5:
             outcomes['low score'] += 1
             continue
 
@@ -140,7 +151,8 @@ def run_verbosity(infile, outfile):
         # rule-based source '/s/rule/split_words' to track that this happened.
         rightwords = [right]
         if ' ' in right:
-            rightwords.extend(right.split(' '))
+            morewords = [word for word in right.split(' ') if word not in STOPWORDS]
+            rightwords.extend(morewords)
 
         for i, rightword in enumerate(rightwords):
             edge_sources = list(sources)
