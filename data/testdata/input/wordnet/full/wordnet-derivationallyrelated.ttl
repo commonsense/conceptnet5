@@ -1,0 +1,4 @@
+@prefix wn20schema: <http://www.w3.org/2006/03/wn/wn20/schema/> .
+@prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
+wn30:wordsense-annotation-noun-2 wn20schema:derivationallyRelated wn30:wordsense-annotate-verb-1 .
+wn30:wordsense-note-noun-7 wn20schema:derivationallyRelated wn30:wordsense-annotate-verb-1 .

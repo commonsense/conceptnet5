@@ -166,6 +166,10 @@ def build_from_dir(dirname, output_file):
         out.write(edge)
 
 
+# Entry point for testing
+handle_file = build_from_dir
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser()

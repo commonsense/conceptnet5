@@ -27,7 +27,7 @@ def handle_raw_assertion(line):
                     license='/l/CC/By', sources=sources,
                     surfaceText=surfaceText, weight=1)
 
-def transform_file(input_filename, output_file):
+def handle_file(input_filename, output_file):
     out = JSONStreamWriter(output_file)
     for line in codecs.open(input_filename, encoding='utf-8'):
         line = line.strip()
@@ -41,7 +41,7 @@ def main():
     parser.add_argument('input', help='JSON-stream file of input')
     parser.add_argument('output', help='JSON-stream file to output to')
     args = parser.parse_args()
-    transform_file(args.input, args.output)
+    handle_file(args.input, args.output)
 
 
 if __name__ == '__main__':

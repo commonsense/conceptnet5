@@ -151,6 +151,11 @@ def run_wordnet(input_dir, output_file, sw_map_file):
                 )
                 out.write(edge)
 
+
+# Entry point for testing
+handle_file = run_wordnet
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser()

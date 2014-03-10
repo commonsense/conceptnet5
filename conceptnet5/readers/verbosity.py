@@ -36,7 +36,7 @@ STOPWORDS = {
     'one', 'all', 'either', 'both', 'er'
 }
 
-def run_verbosity(infile, outfile):
+def handle_file(infile, outfile):
     count = 0
     outcomes = defaultdict(int)
 
@@ -178,4 +178,9 @@ def run_verbosity(infile, outfile):
     print("Verbosity outcomes: %s" % outcomes)
 
 if __name__ == '__main__':
-    run_verbosity(sys.argv[1], sys.argv[2])
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='JSON-stream file of input')
+    parser.add_argument('output', help='JSON-stream file to output to')
+    args = parser.parse_args()
+    handle_file(args.input, args.output)

@@ -317,7 +317,7 @@ def filter_line(line):
             if remain: yield remain
 
 
-def process_wiktionary(input_file, output_file):
+def handle_file(input_file, output_file):
     # Create a parser
     parser = make_parser()
 
@@ -344,4 +344,4 @@ if __name__ == '__main__':
     parser.add_argument('input', help='XML file of input')
     parser.add_argument('output', help='JSON-stream file to output to')
     args = parser.parse_args()
-    process_wiktionary(args.input, args.output)
+    handle_file(args.input, args.output)

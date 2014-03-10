@@ -242,14 +242,18 @@ class CN4Builder(object):
                 out.write(new_obj)
 
 
+def handle_file(input_filename, output_file):
+    builder = CN4Builder()
+    builder.transform_file(input_filename, output_file)
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='JSON-stream file of input')
     parser.add_argument('output', help='JSON-stream file to output to')
     args = parser.parse_args()
-    builder = CN4Builder()
-    builder.transform_file(args.input, args.output)
+    handle_file(args.input, args.output)
 
 if __name__ == '__main__':
     main()

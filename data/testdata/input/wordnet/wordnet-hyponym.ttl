@@ -1,0 +1,3 @@
+@prefix wn20schema: <http://www.w3.org/2006/03/wn/wn20/schema/> .
+@prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
+wn30:synset-annotate-verb-1 wn20schema:hyponymOf wn30:synset-write-verb-1 .

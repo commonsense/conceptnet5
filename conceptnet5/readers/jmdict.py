@@ -98,7 +98,7 @@ def parse_gloss(text):
         return None
 
 
-def read_jmdict(filename, output_file):
+def handle_file(filename, output_file):
     """
     JMdict is a Japanese translation dictionary, targeting multiple languages,
     released under a Creative Commons Attribution-ShareAlike license. That's
@@ -214,7 +214,7 @@ def main():
     parser.add_argument('input', help='XML copy of JMDict to read')
     parser.add_argument('output', help='JSON-stream file to output to')
     args = parser.parse_args()
-    read_jmdict(args.input, args.output)
+    handle_file(args.input, args.output)
 
 
 if __name__ == '__main__':

@@ -11,8 +11,6 @@ enwiktionary.xml
 wikipedia.txt
 secrets.py
 gremlin_data
-*.ttl
-*.nt
 *.zip
 *.csv
 cnet5_index_builder/cnet5-data/*/data/*
