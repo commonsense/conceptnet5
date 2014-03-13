@@ -7,13 +7,13 @@ This Wiktionary reader should be refactored, but it does the job for now.
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 from conceptnet5.uri import Licenses
-from conceptnet5.stem import normalized_concept_uri
+from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME
 import unicodedata
 import re
-import sys
+
 
 def ascii_enough(text):
     # cheap assumption: if it's ASCII, and it's meant to be in English, it's

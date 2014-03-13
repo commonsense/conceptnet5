@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from conceptnet5.uri import Licenses
-from conceptnet5.stem import normalized_concept_uri
+from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
 

@@ -1,6 +1,6 @@
 from collections import defaultdict
 from conceptnet5.uri import join_uri
-from conceptnet5.stem import normalized_concept_uri
+from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url

@@ -94,7 +94,7 @@ def query_node(query):
     if key is None:
         flask.abort(404)
     query_args = {key: path}
-    
+
     # Take some parameters that will be passed on to /search
     query_args['offset'] = req_args.get('offset', '0')
     query_args['limit'] = req_args.get('limit', '50')
@@ -223,7 +223,7 @@ def assoc_for_termlist(terms, assoc):
     similar = assoc.terms_similar_to_vector(vec)
     similar = [item for item in similar if item[1] > 0 and
                passes_filter(item[0])][:limit]
-    
+
     return flask.jsonify({'terms': terms, 'similar': similar})
 
 @app.route('/assoc/<path:uri>')
@@ -232,7 +232,7 @@ def concept_assoc(uri):
     uri = '/' + uri.rstrip('/')
     if commonsense_assoc is None:
         flask.abort(404)
-    
+
     return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
 
 if __name__ == '__main__':

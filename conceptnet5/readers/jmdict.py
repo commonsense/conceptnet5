@@ -5,7 +5,7 @@ import codecs
 from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME, ENGLISH_NAME_TO_CODE
 from conceptnet5.json_stream import JSONStreamWriter
 from conceptnet5.uri import concept_uri, Licenses
-from conceptnet5.stem import normalized_concept_uri
+from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 
 
