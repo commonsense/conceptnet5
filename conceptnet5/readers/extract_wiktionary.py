@@ -170,7 +170,6 @@ def handle_language_section(site, title, heading, text):
         os.makedirs(os.path.dirname(path))
     except OSError:
         pass
-    print path
     sec_data = handle_section(text, heading, level=2)
     data = {
         'site': site,

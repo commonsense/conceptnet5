@@ -4,7 +4,6 @@ from conceptnet5.edges import make_edge
 from conceptnet5.uri import disjunction_uri
 from conceptnet5.json_stream import JSONStreamWriter
 import os
-import json
 import math
 
 N = 100

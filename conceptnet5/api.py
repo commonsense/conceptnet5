@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 """
-Concept Net 5
-api.py file from conceptnet5 module
-written by Rob Speer, Julian Chaidez
-Common Sense Computing Group, Medialab
-Massachusetts Institute of Technology
-Fall 2011
+This file serves the ConceptNet 5 JSON API, by connecting to a Solr
+index of all of ConceptNet 5.
+
+It was written in Fall 2011 by Julian Chaidez and Rob Speer, and
+updated in March 2014 to account for Python 3 and the code refactor.
+
+It should probably be revised more, but there's a good chance that
+we will be replacing the Solr index with something else.
 """
 
-# This file should be rewritten, but if we're going to change the search
-# system soon, that should wait. Much of this file is just about dealing
-# with the idiosyncrasies of Solr.
+# Python 2/3 compatibility
+import sys
+if sys.version_info.major < 3:
+    from urllib import urlencode
+    from urllib2 import urlopen
+else:
+    from urllib.parse import urlencode
+    from urllib.request import urlopen
 
 import flask
-import urllib, urllib2
 import re
-import sys
 import json
 import os
-from assoc_space import AssocSpace
 from werkzeug.contrib.cache import SimpleCache
 app = flask.Flask(__name__)
 
 if not app.debug:
     import logging
-    file_handler = logging.FileHandler('/srv/conceptnet5/logs/flask_errors.log')
+    file_handler = logging.FileHandler('logs/flask_errors.log')
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
@@ -36,6 +40,7 @@ def load_assoc():
     Load the association matrix. Requires the open source Python package
     'assoc_space'.
     """
+    from assoc_space import AssocSpace
     global commonsense_assoc
     if commonsense_assoc: return commonsense_assoc
     commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
@@ -51,7 +56,7 @@ cache_dict = {
     'limit_amount': 10000
 }
 
-request_cache = SimpleCache(default_timeout = cache_dict['limit_timeout'])
+request_cache = SimpleCache(default_timeout=cache_dict['limit_timeout'])
 
 def add_slash(uri):
     """
@@ -101,6 +106,7 @@ def query_node(query):
     query_args['filter'] = req_args.get('filter', '')
     return search(query_args)
 
+# This is one reason I want to get away from Solr.
 LUCENE_SPECIAL_RE = re.compile(r'([-+!(){}\[\]^"~*?:\\])')
 
 def lucene_escape(text):
@@ -159,12 +165,11 @@ def search(query_args=None):
 SOLR_BASE = 'http://salmon.media.mit.edu:8983/solr/select?'
 
 def get_link(params):
-    return SOLR_BASE + urllib.urlencode(params)
+    return SOLR_BASE + urlencode(params)
 
 def get_query_result(params):
     link = get_link(params)
-    print "Loading %s" % link
-    fp = urllib2.urlopen(link)
+    fp = urlopen(link)
     obj = json.load(fp)
     #obj['response']['params'] = params
     obj['response']['edges'] = obj['response']['docs']
@@ -191,7 +196,7 @@ def list_assoc(lang, termlist):
     load_assoc()
     if commonsense_assoc is None:
         flask.abort(404)
-    if isinstance(termlist, basestring):
+    if isinstance(termlist, bytes):
         termlist = termlist.decode('utf-8')
 
     terms = []
