@@ -80,10 +80,14 @@ def build_frame_text(parts_dict):
     if frame_text.find('{1}') > frame_text.find('{2}'):
         frame_text = '*' + frame_text
     polarity = parts_dict["polarity"]
+    
+    # If this is a negative frame, then it should either have the negative
+    # phrasing baked in, or (in English) the symbol {%} where we can insert
+    # the word "not".
     if polarity > 0:
         frame_text = frame_text.replace('{%}', '')
     else:
-        frame_text = frame_text.replace('{%}', 'not')
+        frame_text = frame_text.replace('{%}', 'not ')
     frame_text = frame_text.replace('{1}', '[[%s]]' % parts_dict["startText"]).replace('{2}', '[[%s]]' % parts_dict["endText"])
     return frame_text
 
@@ -139,8 +143,8 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     activity = parts_dict["activity"]
 
-    creator_node = join_uri(u'/s/contributor/omcs', parts_dict["creator"])
-    activity_node = join_uri(u'/s/activity/omcs', normalize_text(activity))
+    creator_node = join_uri('/s/contributor/omcs', parts_dict["creator"])
+    activity_node = join_uri('/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
     else:
@@ -171,14 +175,16 @@ class CN4Builder(object):
     def __init__(self):
         self.seen_sources = set()
 
-    def handle_raw_assertion(self, parts_dict):
+    def handle_assertion(self, parts_dict):
         """
-        Process one unit of ConceptNet 4 knowledge, which was known as a
-        "raw assertion" -- a relation between surface texts, not yet reduced
-        to a normalized form.
-
-        Each raw assertion becomes a number of ConceptNet 5 edges, which will
-        probably be groupd together into an assertion again.
+        Process one assertion from ConceptNet 4, which appears in the input
+        file as a dictionary.
+        
+        Use the 'raw' text -- the text that's not yet reduced to a normalized
+        form -- so we can run ConceptNet 5's normalization on it instead.
+        
+        Each assertion becomes a number of ConceptNet 5 edges, which will
+        probably be grouped together into an assertion again.
         """
         if can_skip(parts_dict):
             return
@@ -207,38 +213,36 @@ class CN4Builder(object):
         dataset = build_data_set(parts_dict)
         weighted_sources = build_sources(parts_dict, preposition_fix)
 
-        reject = False
         for source_list, weight in weighted_sources:
             if 'commons2_reject' in ' '.join(source_list):
-                reject = True
+                return
 
-        if not reject:
-            for source_list, weight in weighted_sources:
-                if not by_bedume_and_bad(source_list, start, end):
-                    contributors = [s for s in source_list if s.startswith('/s/contributor')]
-                    assert len(contributors) <= 1, contributors
+        for source_list, weight in weighted_sources:
+            if not by_bedume_and_bad(source_list, start, end):
+                contributors = [s for s in source_list if s.startswith('/s/contributor')]
+                assert len(contributors) <= 1, contributors
 
-                    edge = make_edge(
-                        rel=relation, start=start, end=end,
-                        dataset=dataset, license=Licenses.cc_attribution,
-                        sources=source_list, surfaceText=frame_text,
-                        weight=weight)
-                    okay = True
-                    if contributors:
-                        uri = edge['uri']
-                        contributor = contributors[0]
-                        if (uri, contributor) in self.seen_sources:
-                            okay = False
-                        else:
-                            self.seen_sources.add((uri, contributor))
-                    if okay:
-                        yield edge
+                edge = make_edge(
+                    rel=relation, start=start, end=end,
+                    dataset=dataset, license=Licenses.cc_attribution,
+                    sources=source_list, surfaceText=frame_text,
+                    weight=weight)
+                okay = True
+                if contributors:
+                    uri = edge['uri']
+                    contributor = contributors[0]
+                    if (uri, contributor) in self.seen_sources:
+                        okay = False
+                    else:
+                        self.seen_sources.add((uri, contributor))
+                if okay:
+                    yield edge
 
 
     def transform_file(self, input_filename, output_file):
         out = JSONStreamWriter(output_file)
         for obj in read_json_stream(input_filename):
-            for new_obj in self.handle_raw_assertion(obj):
+            for new_obj in self.handle_assertion(obj):
                 out.write(new_obj)
 
 

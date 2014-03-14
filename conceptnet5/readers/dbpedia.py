@@ -18,13 +18,11 @@ import re
 
 # Python 2/3 compatibility
 if sys.version_info.major >= 3:
-    unquote = urllib.parse.unquote_to_bytes
     quote = urllib.parse.quote
     urlsplit = urllib.parse.urlsplit
 else:
     import urlparse
     urlsplit = urlparse.urlsplit
-    unquote = urllib.unquote
     quote = urllib.quote
 
 
@@ -40,7 +38,7 @@ def parse_topic_name(text):
     [name, pos], or [name, pos, disambiguation].
     """
     # Convert space-substitutes to spaces, and eliminate redundant spaces
-    text = text.replace('_', ' ').replace('/', ' ')
+    text = text.replace('_', ' ')
     while '  ' in text:
         text = text.replace('  ', ' ')
     # Find titles of the form "Topic (disambiguation)"
@@ -49,7 +47,7 @@ def parse_topic_name(text):
         return [text]
     else:
         # Assume all topics are nouns
-        return [match.group(1), 'n', match.group(2).strip(' _')]
+        return [match.group(1), 'n', match.group(2).strip(' ')]
 
 
 def translate_dbpedia_url(url, lang='en'):
@@ -69,7 +67,7 @@ def translate_dbpedia_url(url, lang='en'):
     The URL itself is a stable thing that we can build a ConceptNet URI from,
     on the other hand.
     """
-    # Semantic Web URLs are camel-cased. ConceptNet URIs use underscores
+    # Some Semantic Web URLs are camel-cased. ConceptNet URIs use underscores
     # between words.
     pieces = parse_topic_name(resource_name(url))
     pieces[0] = un_camel_case(pieces[0])

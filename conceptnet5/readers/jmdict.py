@@ -190,7 +190,7 @@ def handle_file(filename, output_file):
                 # that are more than five words long.
                 if text is not None and '.' not in text and text.count(' ') <= 4:
                     for head in headwords:
-                        ja_concept = concept_uri('ja', head)
+                        ja_concept = normalized_concept_uri('ja', head)
                         other_concept = normalized_concept_uri(lang, text)
                         output_edge(out, ja_concept, other_concept)
 

@@ -220,7 +220,7 @@ class FindTranslations(ContentHandler):
             if 'translations' in sense.lower():
                 self.curSense = None
             else:
-                self.curSense = pos+'/'+sense
+                self.curSense = (pos, sense)
         elif trans_tag_match:
             lang = trans_tag_match.group(1)
             translation = trans_tag_match.group(2)
@@ -255,7 +255,8 @@ class FindTranslations(ContentHandler):
                          surfaceText=surfaceText)
         self.writer.write(edge)
 
-    def output_sense_translation(self, lang, foreign, english, disambiguation):
+    def output_sense_translation(self, lang, foreign, english, sense):
+        pos, disambiguation = sense
         if 'Wik' in foreign or 'Wik' in english:
             return
         if lang == 'zh-cn':
@@ -266,7 +267,7 @@ class FindTranslations(ContentHandler):
           lang, unicodedata.normalize('NFKC', foreign)
         )
         target = normalized_concept_uri(
-          'en', english, disambiguation
+          'en', english, pos, disambiguation
         )
         relation = '/r/TranslationOf'
         try:

@@ -25,6 +25,9 @@ if sys.version_info.major >= 3:
 # with Semantic Web-style resources.
 ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.2'
 
+# If we end up trying to fit a piece of text that looks like these into a URI,
+# it will mess up our patterns of URIs.
+BAD_NAMES_FOR_THINGS = {'', ',', '[', ']'}
 
 def normalize_text(text):
     """
@@ -51,12 +54,21 @@ def normalize_text(text):
         >>> normalize_text('TEST.')
         'test'
 
+        >>> normalize_text('test/test')
+        'test_test'
+        
         >>> normalize_text('   u\N{COMBINING DIAERESIS}ber\\n')
         'über'
     """
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
+
+    # Replace slashes with spacesi, which will become underscores later.
+    # Slashes should separate pieces of a URI, and shouldn't appear within
+    # a piece.
+    text = text.replace('/', ' ')
     text = fix_text(text).strip()
+    assert text not in BAD_NAMES_FOR_THINGS
     text = text.strip('.,?!"') or text
     text = text.lower().replace(' ', '_')
     return text
@@ -71,28 +83,27 @@ def join_uri(*pieces):
     The resulting URI will always begin with a slash and have its pieces
     separated by a single slash.
 
-    The pieces do not have `normalize_text` applied to it; to make sure your
+    The pieces do not have `normalize_text` applied to them; to make sure your
     URIs are in normal form, run `normalize_text` on each piece that represents
     arbitrary text.
 
-        >>> join_uri('/c', 'en', 'cat')
-        '/c/en/cat'
+    >>> join_uri('/c', 'en', 'cat')
+    '/c/en/cat'
 
-        >>> join_uri('c', 'en', ' spaces ')
-        '/c/en/ spaces '
+    >>> join_uri('c', 'en', ' spaces ')
+    '/c/en/ spaces '
 
-        >>> join_uri('/r/', 'AtLocation/')
-        '/r/AtLocation'
+    >>> join_uri('/r/', 'AtLocation/')
+    '/r/AtLocation'
 
-        >>> join_uri('/test')
-        '/test'
+    >>> join_uri('/test')
+    '/test'
 
-        >>> join_uri('test')
-        '/test'
-        
-        >>> join_uri('/test', '/more/')
-        '/test/more'
-
+    >>> join_uri('test')
+    '/test'
+    
+    >>> join_uri('/test', '/more/')
+    '/test/more'
     """
     joined = '/' + ('/'.join([piece.strip('/') for piece in pieces]))
     return joined
@@ -109,24 +120,34 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     have a disambiguation, a string that distinguishes it from other concepts
     with the same text.
 
-        >>> concept_uri('en', 'cat')
-        '/c/en/cat'
-        >>> concept_uri('en', 'cat', 'n')
-        '/c/en/cat/n'
-        >>> concept_uri('en', 'cat', 'n', 'feline')
-        '/c/en/cat/n/feline'
+    `text` and `disambiguation` should be strings that have already been run
+    through `normalize_text`. See `normalized_concept_uri` in nodes.py for
+    a more generally applicable function that also deals with special
+    per-language handling.
+
+    >>> concept_uri('en', 'cat')
+    '/c/en/cat'
+    >>> concept_uri('en', 'cat', 'n')
+    '/c/en/cat/n'
+    >>> concept_uri('en', 'cat', 'n', 'feline')
+    '/c/en/cat/n/feline'
+    >>> concept_uri('en', 'this is wrong')
+    Traceback (most recent call last):
+        ...
+    AssertionError: 'this is wrong' is not in normalized form
     """
-    n_text = normalize_text(text)
+    assert text == normalize_text(text), "%r is not in normalized form" % text
     if pos is None:
         if disambiguation is not None:
             raise ValueError("Disambiguated concepts must have a part of speech")
-        return join_uri('/c', lang, n_text)
+        return join_uri('/c', lang, text)
     else:
         if disambiguation is None:
-            return join_uri('/c', lang, n_text, pos)
+            return join_uri('/c', lang, text, pos)
         else:
-            n_disambig = normalize_text(disambiguation)
-            return join_uri('/c', lang, n_text, pos, n_disambig)
+            assert disambiguation == normalize_text(disambiguation),\
+                "%r is not in normalized form" % disambiguation
+            return join_uri('/c', lang, text, pos, disambiguation)
 
 
 def compound_uri(op, args):
@@ -145,10 +166,10 @@ def compound_uri(op, args):
     `/[/` and `/]/`, so that compound URIs can contain other compound URIs
     without ambiguity.
 
-        >>> compound_uri('/nothing', [])
-        '/nothing/[/]'
-        >>> compound_uri('/a', ['/r/CapableOf', '/c/en/cat', '/c/en/sleep'])
-        '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
+    >>> compound_uri('/nothing', [])
+    '/nothing/[/]'
+    >>> compound_uri('/a', ['/r/CapableOf', '/c/en/cat', '/c/en/sleep'])
+    '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
     items = [op]
     first_item = True
@@ -167,25 +188,27 @@ def split_uri(uri):
     """
     Get the slash-delimited pieces of a URI.
         
-        >>> split_uri('/c/en/cat/n/feline')
-        ['c', 'en', 'cat', 'n', 'feline']
-        >>> split_uri('/')
-        []
+    >>> split_uri('/c/en/cat/n/feline')
+    ['c', 'en', 'cat', 'n', 'feline']
+    >>> split_uri('/')
+    []
     """
     uri2 = uri.lstrip('/')
     if not uri2:
         return []
-    return uri.lstrip('/').split('/')
+    return uri2.split('/')
 
 
 def parse_compound_uri(uri):
     """
     Given a compound URI, extract its operator and its list of arguments.
 
-        >>> parse_compound_uri('/nothing/[/]')
-        ('/nothing', [])
-        >>> parse_compound_uri('/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]')
-        ('/a', ['/r/CapableOf', '/c/en/cat', '/c/en/sleep'])
+    >>> parse_compound_uri('/nothing/[/]')
+    ('/nothing', [])
+    >>> parse_compound_uri('/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]')
+    ('/a', ['/r/CapableOf', '/c/en/cat', '/c/en/sleep'])
+    >>> parse_compound_uri('/or/[/and/[/s/one/,/s/two/]/,/and/[/s/three/,/s/four/]/]')
+    ('/or', ['/and/[/s/one/,/s/two/]', '/and/[/s/three/,/s/four/]'])
     """
     pieces = split_uri(uri)
     if pieces[-1] != ']':
@@ -199,6 +222,8 @@ def parse_compound_uri(uri):
     chunks = []
     current = []
     depth = 0
+
+    # Split on commas, but not if they're within additional pairs of brackets.
     for piece in pieces[(list_start + 1):-1]:
         if piece == ',' and depth == 0:
             chunks.append('/' + ('/'.join(current)).strip('/'))
@@ -209,6 +234,8 @@ def parse_compound_uri(uri):
                 depth += 1
             elif piece == ']':
                 depth -= 1
+
+    assert depth == 0, "Unmatched brackets in %r" % uri
     if current:
         chunks.append('/' + ('/'.join(current)).strip('/'))
     return op, chunks
@@ -219,18 +246,18 @@ def conjunction_uri(*sources):
     Make a URI representing a conjunction of sources that work together to provide
     an assertion. The sources will be sorted in lexicographic order.
 
-        >>> conjunction_uri('/s/contributor/omcs/dev')
-        '/s/contributor/omcs/dev'
-        
-        >>> conjunction_uri('/s/contributor/omcs/dev', '/rule/some_kind_of_parser')
-        '/and/[/rule/some_kind_of_parser/,/s/contributor/omcs/dev/]'
+    >>> conjunction_uri('/s/contributor/omcs/dev')
+    '/s/contributor/omcs/dev'
+    
+    >>> conjunction_uri('/s/rule/some_kind_of_parser', '/s/contributor/omcs/dev')
+    '/and/[/s/contributor/omcs/dev/,/s/rule/some_kind_of_parser/]'
     """
     if len(sources) == 0:
         # Logically, a conjunction with 0 inputs represents 'True', a
-        # proposition that cannot be denied. This could be useful for
-        # discussing, say, mathematical axioms, but when it comes to
-        # ConceptNet, that kind of thing makes us uncomfortable and
-        # shouldn't appear in the data.
+        # proposition that cannot be denied. This could be useful as a
+        # justification for, say, mathematical axioms, but when it comes to
+        # ConceptNet, that kind of thing makes us uncomfortable and shouldn't
+        # appear in the data.
         raise ValueError("Conjunctions of 0 things are not allowed")
     elif len(sources) == 1:
         return sources[0]
@@ -243,18 +270,20 @@ def disjunction_uri(*sources):
     Make a URI representing a choice of sources that provide the same assertion. The
     sources will be sorted in lexicographic order.
 
-        >>> disjunction_uri('/s/contributor/omcs/dev')
-        '/s/contributor/omcs/dev'
+    >>> disjunction_uri('/s/contributor/omcs/dev')
+    '/s/contributor/omcs/dev'
 
-        >>> disjunction_uri('/s/contributor/omcs/rspeer', '/s/contributor/omcs/dev')
-        '/or/[/s/contributor/omcs/dev/,/s/contributor/omcs/rspeer/]'
+    >>> disjunction_uri('/s/contributor/omcs/rspeer', '/s/contributor/omcs/dev')
+    '/or/[/s/contributor/omcs/dev/,/s/contributor/omcs/rspeer/]'
     """
     if len(sources) == 0:
+        # If something has a disjunction of 0 sources, we have no reason to
+        # believe it, and therefore it shouldn't be here.
         raise ValueError("Disjunctions of 0 things are not allowed")
     elif len(sources) == 1:
         return sources[0]
     else:
-        return compound_uri('/or', sorted(sources))
+        return compound_uri('/or', sorted(set(sources)))
 
 
 def assertion_uri(rel, *args):
@@ -265,8 +294,8 @@ def assertion_uri(rel, *args):
     assertion. However, this can support relations with different number
     of arguments.
 
-        >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
-        '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
+    >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
+    '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
     assert rel.startswith('/r')
     return compound_uri('/a', (rel,) + args)
@@ -276,9 +305,12 @@ def and_or_tree(list_of_lists):
     """
     An and-or tree represents a disjunction of conjunctions. In ConceptNet terms,
     it represents all the reasons we might believe a particular assertion.
+
+    >>> and_or_tree([['/s/one', '/s/two'], ['/s/three', '/s/four']])
+    '/or/[/and/[/s/four/,/s/three/]/,/and/[/s/one/,/s/two/]/]'
     """
-    ands = [conjunction_uri(sublist) for sublist in list_of_lists]
-    return disjunction_uri(ands)
+    conjunctions = [conjunction_uri(*sublist) for sublist in list_of_lists]
+    return disjunction_uri(*conjunctions)
 
 
 class Licenses(object):

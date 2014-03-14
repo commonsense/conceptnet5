@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from collections import defaultdict
 from conceptnet5.uri import join_uri
 from conceptnet5.nodes import normalized_concept_uri

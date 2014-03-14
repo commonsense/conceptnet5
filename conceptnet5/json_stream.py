@@ -9,8 +9,6 @@ if sys.version_info.major >= 3:
     from io import StringIO
 else:
     string_type = basestring
-    sys.stdin = codecs.getreader('utf8')(sys.stdin)
-    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
     from StringIO import StringIO
 
 
@@ -47,21 +45,16 @@ class JSONStreamWriter(object):
         if self.stream is not sys.stdout:
             self.stream.close()
 
-    @classmethod
-    def io_writer(cls):
-        io = StringIO()
-        return JSONStreamWriter(io)
-
 
 def read_json_stream(filename_or_stream):
     """
     Read a stream of data in "JSON stream" format. Returns a generator of the
     decoded objects.
     """
-    if isinstance(filename_or_stream, string_type):
-        stream = codecs.open(filename_or_stream, encoding='utf-8')
-    else:
+    if hasattr(filename_or_stream, 'read'):
         stream = filename_or_stream
+    else:
+        stream = codecs.open(filename_or_stream, encoding='utf-8')
     for line in stream:
         line = line.strip()
         if line:

@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import print_function, unicode_literals
 from conceptnet5.uri import ROOT_URL
 import sys
@@ -31,7 +32,26 @@ def decode_url(url):
     >>> decode_url('<http://dbpedia.org/resource/N%C3%BAria_Espert>')
     'http://dbpedia.org/resource/Núria_Espert'
     """
-    return unquote(url.strip('<>')).decode('utf-8', 'replace')
+    url_bytes = url.strip('<>').encode('utf-8')
+    return unquote(url_bytes).decode('utf-8', 'replace')
+
+
+def safe_quote(uri):
+    """
+    Represent a URL in a form that no system should find objectionable.
+
+    Encode non-ASCII characters as UTF-8 and then quote them. Consider
+    the special URL characters :, #, and / to be "safe" to represent
+    as themselves, because we want them to have their URL meaning.
+
+    This can be used on both DBPedia URLs and ConceptNet URIs.
+
+    >>> safe_quote('http://dbpedia.org/resource/Núria_Espert')
+    'http://dbpedia.org/resource/N%C3%BAria_Espert'
+    >>> safe_quote('/c/en/Núria_Espert')
+    '/c/en/N%C3%BAria_Espert'
+    """
+    return quote(uri.encode('utf-8'), safe=':#/')
 
 
 def encode_url(url):
@@ -42,7 +62,7 @@ def encode_url(url):
     >>> encode_url('http://dbpedia.org/resource/Núria_Espert')
     '<http://dbpedia.org/resource/N%C3%BAria_Espert>'
     """
-    return '<%s>' % quote(url.encode('utf-8'), safe=':#/')
+    return '<%s>' % safe_quote(url)
 
 
 def resource_name(url):
@@ -80,7 +100,7 @@ def full_conceptnet_url(uri):
     'http://conceptnet5.media.mit.edu/data/5.2/c/en/dog'
     """
     assert uri.startswith('/')
-    return ROOT_URL + quote(uri)
+    return ROOT_URL + safe_quote(uri)
 
 
 class NTriplesWriter(object):
@@ -98,10 +118,10 @@ class NTriplesWriter(object):
     The suggested extension for this format is '.nt'.
     """
     def __init__(self, filename_or_stream):
-        if isinstance(filename_or_stream, string_type):
-            self.stream = codecs.open(filename_or_stream, 'w', encoding='ascii')
-        else:
+        if hasattr(filename_or_stream, 'write'):
             self.stream = filename_or_stream
+        else:
+            self.stream = codecs.open(filename_or_stream, 'w', encoding='ascii')
         self.seen = set()
 
     def write(self, triple):
@@ -144,19 +164,17 @@ class NTriplesReader(object):
                     yield result
 
     def parse_line(self, line):
-        # Handle prefix definitions, which are lines that look like:
-        # @prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
-        if line.startswith('@prefix'):
-            _operator, prefix, urldot = line.split(' ', 2)
-            url, dot = urldot.rsplit(' ', 1)
-            assert dot == '.'
+        subj, rel, objdot = line.split(' ', 2)
+        obj, dot = objdot.rsplit(' ', 1)
+        assert dot == '.'
+        if subj == '@prefix':
+            # Handle prefix definitions, which are lines that look like:
+            # @prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
+            prefix = rel
             prefixname = prefix.rstrip(':')
-            self.prefixes[prefixname] = decode_url(url)
+            self.prefixes[prefixname] = decode_url(obj)
             return None
         else:
-            subj, rel, objdot = line.split(' ', 2)
-            obj, dot = objdot.rsplit(' ', 1)
-            assert dot == '.'
             # We assume that `subj` and `rel` are URLs, or can be treated as URLs.
             # `obj` might be a literal text, however, so we need to actually look
             # at what it's tagged with.
@@ -188,7 +206,7 @@ class NTriplesReader(object):
             return 'URL', decode_url(node_text)
         elif node_text.startswith('"'):
             if '"^^' in node_text:
-                quoted_string, type_tag = node_text.split('^^', 1)
+                quoted_string, type_tag = node_text.rsplit('^^', 1)
                 type_tag = resource_name(decode_url(type_tag))
                 assert quoted_string.startswith('"') and quoted_string.endswith('"')
                 return type_tag, quoted_string[1:-1]

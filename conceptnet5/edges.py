@@ -45,7 +45,7 @@ def make_edge(rel, start, end, dataset, license, sources,
     # that appears in ConceptNet objects. You can use it as a
     # pseudo-random sort order over edges.
     edge_unique_data = [uri, context, sources]
-    edge_unique = u' '.join(edge_unique_data).encode('utf-8')
+    edge_unique = ' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     obj = {
         'id': id,
