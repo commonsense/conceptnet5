@@ -1,6 +1,7 @@
 from __future__ import with_statement, print_function, unicode_literals, division
 from conceptnet5.whereami import get_project_filename
 
+
 PHONETIC_DICT = {}
 def _setup():
     """
@@ -16,6 +17,7 @@ def _setup():
             phon = phon.split(' ')
             PHONETIC_DICT[word] = phon
 _setup()
+
 
 def get_phonetic(text):
     """
@@ -69,6 +71,7 @@ def edit_distance(list1, list2):
                 data[a][b] = 1 + min(data[a-1][b], data[a][b-1], data[a-1][b-1])
     return data[m][n]
 
+
 def longest_match(list1, list2):
     """
     Find the length of the longest substring match between list1 and list2.
@@ -94,6 +97,7 @@ def longest_match(list1, list2):
     maxes = [max(row) for row in data]
     return max(maxes)
 
+
 def prefix_match(list1, list2):
     """
     Find the length of the longest common prefix of list1 and list2.
@@ -114,6 +118,7 @@ def prefix_match(list1, list2):
             return i
     return 0
 
+
 def suffix_match(list1, list2):
     """
     Find the length of the longest common suffix of list1 and list2.
@@ -133,6 +138,7 @@ def suffix_match(list1, list2):
             return i
     return 0
 
+
 def scaled_edit_distance_match(list1, list2):
     """
     The inverse edit distance between two lists, as a proportion of their
@@ -144,6 +150,7 @@ def scaled_edit_distance_match(list1, list2):
     """
     return 1 - edit_distance(list1, list2) / min(len(list1), len(list2))
 
+
 def scaled_suffix_match(list1, list2):
     """
     The length of the longest common suffix between two lists, as a
@@ -153,6 +160,7 @@ def scaled_suffix_match(list1, list2):
     0.5
     """
     return suffix_match(list1, list2) / min(len(list1), len(list2))
+
 
 def scaled_prefix_match(list1, list2):
     """
@@ -164,6 +172,7 @@ def scaled_prefix_match(list1, list2):
     """
     return float(prefix_match(list1, list2)) / min(len(list1), len(list2))
 
+
 def scaled_longest_match(list1, list2):
     """
     The length of the longest substring match between two lists, as a
@@ -173,6 +182,7 @@ def scaled_longest_match(list1, list2):
     0.5
     """
     return longest_match(list1, list2) / min(len(list1), len(list2))
+
 
 def combined_score(list1, list2):
     """
@@ -185,6 +195,7 @@ def combined_score(list1, list2):
             + scaled_prefix_match(list1, list2)
             + scaled_longest_match(list1, list2)) / 4
 
+
 def _sounds_like_score(text1, text2):
     """
     A measure of the similarity between two texts, via either their
@@ -194,6 +205,7 @@ def _sounds_like_score(text1, text2):
     result = max(combined_score(text1.replace(' ', ''), text2.replace(' ', '')),
                  combined_score(get_phonetic(text1), get_phonetic(text2)))
     return result
+
 
 def sounds_like_score(target, clue):
     """
@@ -213,6 +225,7 @@ def sounds_like_score(target, clue):
     scores = [_sounds_like_score(target, clue),
               sum(subscores) / len(subscores)]
     return max(scores)
+
 
 def test(cutoff=0.35):
     """
@@ -239,6 +252,7 @@ def test(cutoff=0.35):
     assert sounds_like_score('name', 'nomenclature') < cutoff 
     assert sounds_like_score('clothing', 'covering') < cutoff 
     assert sounds_like_score('love', 'of another') < cutoff
+
 
 if __name__ == '__main__':
     test()

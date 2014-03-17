@@ -61,7 +61,7 @@ def handle_file(infile, outfile):
         #
         # 'orderscore' is a number from 0 to 999, representing the average
         # quantile of its position in the list of clues. (It's like a
-        # percentile, except there are 1000 fo them, not 100.)
+        # percentile, except there are 1000 of them, not 100.)
         #
         # A clue that's always given first has an orderscore of 0. A clue
         # that always appears halfway through the list has an orderscore of

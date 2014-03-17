@@ -26,8 +26,7 @@ class EdgeDistributor(object):
     """
     def __init__(self, output_dir, n):
         """
-        Take in parameters and open the appropriate output files. Use
-        binary mode so that we can pass bytes through directly.
+        Take in parameters and open the appropriate output files.
         """
         self.n = n
         self.files = [
@@ -37,9 +36,9 @@ class EdgeDistributor(object):
 
     def handle_line(self, line):
         """
-        Read a line (as bytes), and split based on the hash of its first item.
+        Read a line, and split based on the hash of its first item.
         """
-        key = line.split('\t')[0]
+        key = line.split('\t', 1)[0]
         bucket = hash(key) % self.n
         self.files[bucket].write(line)
 

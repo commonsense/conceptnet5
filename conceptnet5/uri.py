@@ -68,7 +68,7 @@ def normalize_text(text):
     # a piece.
     text = text.replace('/', ' ')
     text = fix_text(text).strip()
-    assert text not in BAD_NAMES_FOR_THINGS
+    assert text not in BAD_NAMES_FOR_THINGS, text
     text = text.strip('.,?!"') or text
     text = text.lower().replace(' ', '_')
     return text
