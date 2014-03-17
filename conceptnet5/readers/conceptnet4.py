@@ -218,19 +218,12 @@ class CN4Builder(object):
 
         for source_list, weight in weighted_sources:
             if not by_bedume_and_bad(source_list, start, end):
-                contributors = [s for s in source_list if s.startswith('/s/contributor')]
-                assert len(contributors) == 1, contributors
-                contributor = contributors[0]
-
-                edge = make_edge(
+                yield make_edge(
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
                     sources=source_list, surfaceText=frame_text,
-                    weight=weight)
-                uri = edge['uri']
-                if (uri, contributor) not in self.seen_sources:
-                    self.seen_sources.add((uri, contributor))
-                    yield edge
+                    weight=weight
+                )
 
 
     def transform_file(self, input_filename, output_file):

@@ -2,6 +2,7 @@ from conceptnet5.whereami import get_project_filename
 from conceptnet5.readers import (
     conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, wiktionary_en, wordnet
 )
+from conceptnet5.builders.combine_assertions import AssertionCombiner
 import codecs
 import os
 import sys
@@ -23,6 +24,7 @@ def data_path(filename):
 # function to run and the arguments to give it. nosetests knows how to run
 # tests with this structure.
 def test_reader_modules():
+    combiner = AssertionCombiner('/d/conceptnet/5/combined-sa', '/l/CC/By-SA')
     io_mappings = [
         (conceptnet4, 'input/conceptnet4.jsons', ['output/conceptnet4.jsons']),
         (dbpedia, 'input/dbpedia.nt', ['output/dbpedia.jsons', 'output/dbpedia_map.nt']),
@@ -30,7 +32,8 @@ def test_reader_modules():
         (ptt_petgame, 'input/ptt_petgame.csv', ['output/ptt_petgame.jsons']),
         (verbosity, 'input/verbosity.txt', ['output/verbosity.jsons']),
         (wiktionary_en, 'input/wiktionary.xml', ['output/wiktionary.jsons']),
-        (wordnet, 'input/wordnet', ['output/wordnet.jsons', 'output/wordnet_map.nt'])
+        (wordnet, 'input/wordnet', ['output/wordnet.jsons', 'output/wordnet_map.nt']),
+        (combiner, 'input/combiner.csv', ['output/combiner.jsons'])
     ]
     for (reader_module, input, outputs) in io_mappings:
         yield compare_input_and_output, reader_module, input, outputs

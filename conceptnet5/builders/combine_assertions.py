@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 import codecs
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import disjunction_uri
+from conceptnet5.uri import disjunction_uri, parse_compound_uri
 from conceptnet5.json_stream import JSONStreamWriter
 import os
 import math
@@ -15,6 +15,30 @@ def weight_scale(weight):
     Put the weight of an assertion on a log_2 scale.
     """
     return math.log(max(1, weight + 1), 2)
+
+
+def extract_contributors(source):
+    """
+    Extract the set of human contributors from a 'source' URI. This is used
+    in making sure we haven't duplicated the same person's contribution of
+    the same assertion.
+    
+    This has to happen during the combining step, not when extracting the
+    ConceptNet edges in the first place, because the duplicate contributions
+    may appear in different files.
+
+    >>> extract_contributors('/s/contributor/omcs/dev')
+    set(['/s/contributor/omcs/dev'])
+    >>> extract_contributors('/and/[/s/contributor/omcs/dev/,/s/activity/omcs1/]')
+    set(['/s/contributor/omcs/dev'])
+    >>> extract_contributors('/s/robot/johnny5')
+    set()
+    """
+    if source.startswith('/s/contributor/'):
+        return {source}
+    elif source.startswith('/and/'):
+        head, items = parse_compound_uri(source)
+        return set(item for item in items if item.startswith('/s/contributor/'))
 
 
 def combine_assertions(csv_filename, output_file, dataset, license):
@@ -34,6 +58,7 @@ def combine_assertions(csv_filename, output_file, dataset, license):
     # assertion. When the URI changes, we can output this assertion.
     current_uri = None
     current_data = {}
+    current_contributors = set()
     current_surface = None
     current_weight = 0.
     current_sources = []
@@ -58,7 +83,10 @@ def combine_assertions(csv_filename, output_file, dataset, license):
         if uri == current_uri:
             current_weight += weight
             if source_uri not in current_sources:
-                current_sources.append(source_uri)
+                contributors = extract_contributors(source_uri)
+                if not contributors & current_contributors:
+                    current_sources.append(source_uri)
+                    current_contributors |= contributors
             # We use the first surface form we see as the surface form for
             # the whole assertion.
             if (current_surface is None) and surface:
@@ -83,6 +111,7 @@ def combine_assertions(csv_filename, output_file, dataset, license):
             }
             current_weight = weight
             current_sources = [source_uri]
+            current_contributors = extract_contributors(source_uri)
             current_surface = surface or None
 
     if current_uri is not None:
@@ -94,7 +123,6 @@ def combine_assertions(csv_filename, output_file, dataset, license):
             weight=weight_scale(current_weight),
             uri=current_uri
         )
-        out.close()
 
 
 def output_assertion(out, **kwargs):
@@ -119,6 +147,19 @@ def output_assertion(out, **kwargs):
     out.write(assertion)
 
 
+class AssertionCombiner(object):
+    """
+    A class that wraps the combine_assertions function, so it can be tested in
+    the same way as the readers, despite its extra parameters.
+    """
+    def __init__(self, dataset, license):
+        self.dataset = dataset
+        self.license = license
+
+    def handle_file(self, input_filename, output_file):
+        combine_assertions(input_filename, output_file, self.dataset, self.license)
+
+
 if __name__ == '__main__':
     # This is the main command-line entry point, used in steps of building
     # ConceptNet that need to combine edges into assertions. See data/Makefile
@@ -134,5 +175,6 @@ if __name__ == '__main__':
         help='URI of the license to use, such as /l/CC/By-SA'
     )
     args = parser.parse_args()
-    combine_assertions(args.input, args.output, args.dataset, args.license)
+    combiner = AssertionCombiner(args.dataset, args.license)
+    combiner.handle_file(args.input, args.output)
 
