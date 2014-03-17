@@ -6,7 +6,7 @@ This Wiktionary reader should be refactored, but it does the job for now.
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
-from conceptnet5.uri import Licenses
+from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.json_stream import JSONStreamWriter
@@ -239,7 +239,7 @@ class FindTranslations(ContentHandler):
                                         related, title)
 
     def output_monolingual(self, lang, relation, term1, term2):
-        if 'Wik' in term1 or 'Wik' in term2:
+        if 'Wik' in term1 or 'Wik' in term2 or term1.strip() == '' or term2.strip() == '':
             return
         source = normalized_concept_uri(lang, term1)
         if self.pos:
@@ -287,6 +287,8 @@ class FindTranslations(ContentHandler):
             self.langcode + locale,
             unicodedata.normalize('NFKC', foreign),
         )
+        if english in BAD_NAMES_FOR_THINGS:
+            return
         target = normalized_concept_uri(
           'en', english
         )

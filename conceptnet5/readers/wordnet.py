@@ -67,17 +67,20 @@ def run_wordnet(input_dir, output_file, sw_map_file):
 
             # Take the definition up to the first semicolon
             text = obj.split(';')[0]
+            assert text
 
             # Remove introductory phrases with a colon
-            text = text.split(':', 1)[-1]
+            text = text.split(': ', 1)[-1]
+            assert text
 
             # Remove parenthesized expressions
             while True:
                 newtext = re.sub(r'\(.+?\) ?', '', text).strip()
-                if newtext == text:
+                if newtext == text or newtext == '':
                     break
                 else:
                     text = newtext
+            assert text
 
             glossary[subj] = text.replace('/', '_')
 

@@ -1,13 +1,16 @@
+# Globals
+# =======
 PYTHON = python
 READERS = ../conceptnet5/readers
 BUILDERS = ../conceptnet5/builders
-CORE = ../conceptnet5/uri.py ../conceptnet5/edges.py ../conceptnet5/stem.py
+CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
 DATE = $(shell date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
 RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
 ASSOC_DIR = assoc/assoc-space-5.2
+
 
 # File names
 # ==========
@@ -57,6 +60,9 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 
+
+# High-level build tasks
+# ======================
 # By default, our goal is to build the Solr data files. (build_assoc used to
 # be here, but now I think it should be run explicitly -- it's a huge memory
 # hog.)
@@ -83,6 +89,7 @@ download :
 # on conceptnet5.media.mit.edu.
 upload : $(DIST_FILES)
 	rsync -Pav $(OUTPUT_FOLDER) $(DOWNLOAD_SSH_LOC)
+
 
 # Build steps
 # ===========
