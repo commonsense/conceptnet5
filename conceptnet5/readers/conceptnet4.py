@@ -95,9 +95,8 @@ def build_frame_text(parts_dict):
 def build_relation(parts_dict):
     """
     Update relation names to ConceptNet 5's names. Mostly we preserve the same
-    names, but any instance of "ConceptuallyRelatedTo" left over from
-    ConceptNet 3 becomes "RelatedTo". Statements with negative polarity get
-    new negative relations.
+    names, but any instance of "ConceptuallyRelatedTo" becomes "RelatedTo".
+    Statements with negative polarity get new negative relations.
     """
     relname = parts_dict["relname"]
     polarity = polarity = parts_dict["polarity"]
@@ -220,22 +219,17 @@ class CN4Builder(object):
         for source_list, weight in weighted_sources:
             if not by_bedume_and_bad(source_list, start, end):
                 contributors = [s for s in source_list if s.startswith('/s/contributor')]
-                assert len(contributors) <= 1, contributors
+                assert len(contributors) == 1, contributors
+                contributor = contributors[0]
 
                 edge = make_edge(
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
                     sources=source_list, surfaceText=frame_text,
                     weight=weight)
-                okay = True
-                if contributors:
-                    uri = edge['uri']
-                    contributor = contributors[0]
-                    if (uri, contributor) in self.seen_sources:
-                        okay = False
-                    else:
-                        self.seen_sources.add((uri, contributor))
-                if okay:
+                uri = edge['uri']
+                if (uri, contributor) not in self.seen_sources:
+                    self.seen_sources.add((uri, contributor))
                     yield edge
 
 

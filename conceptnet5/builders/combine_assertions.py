@@ -14,14 +14,14 @@ def weight_scale(weight):
     """
     Put the weight of an assertion on a log_2 scale.
     """
-    return math.log(max(1, weight + 1)) / math.log(2)
+    return math.log(max(1, weight + 1), 2)
 
 
-def combine_assertions(csv_filename, out_filename, dataset, license):
+def combine_assertions(csv_filename, output_file, dataset, license):
     """
     Take in a tab-separated, sorted "CSV" file, named `csv_filename`, of
     distinct edges which should be grouped together into assertions. Output a
-    JSON stream of assertions to `out_filename`.
+    JSON stream of assertions to `output_file`.
 
     The combined assertions will all have the same dataset and license,
     unlike the edges that comprise them. These are specified as the `dataset`
@@ -38,33 +38,29 @@ def combine_assertions(csv_filename, out_filename, dataset, license):
     current_weight = 0.
     current_sources = []
 
-    out = JSONStreamWriter(out_filename)
+    out = JSONStreamWriter(output_file)
     for line in codecs.open(csv_filename, encoding='utf-8'):
-        line = line.rstrip()
+        line = line.rstrip('\n')
         if not line:
             continue
         # Interpret the columns of the file.
         parts = line.split('\t')
-        if len(parts) >= 10:
-            uri, rel, start, end, context, weight, source_uri, id, this_dataset, surface = parts[:10]
-            surface = surface.strip()
-        elif len(parts) == 9:
-            uri, rel, start, end, context, weight, source_uri, id, this_dataset = parts[:9]
-            surface = None
-        else:
-            raise ValueError("Malformed line in %r:\n\t%s" % (csv_filename, line))
+        (uri, rel, start, end, context, weight, source_uri, id, this_dataset,
+         surface) = parts[:10]
+        surface = surface.strip()
         weight = float(weight)
 
-        # If the uri is 'uri', this was a header line, so ignore it.
-        if uri == 'uri':
-            continue
+        # If the uri is 'uri', this was a header line, which isn't supposed
+        # to be there.
+        assert uri != 'uri'
 
         # If the uri is the same as current_uri, accumulate more information.
         if uri == current_uri:
             current_weight += weight
             if source_uri not in current_sources:
                 current_sources.append(source_uri)
-            # We use the first surface form we see as the surface form for the whole assertion.
+            # We use the first surface form we see as the surface form for
+            # the whole assertion.
             if (current_surface is None) and surface:
                 current_surface = surface
 
