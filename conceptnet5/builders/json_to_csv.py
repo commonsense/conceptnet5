@@ -8,6 +8,7 @@ def convert_to_tab_separated(input_filename, output_filename):
     for info in read_json_stream(input_filename):
         if info['surfaceText'] is None:
             info['surfaceText'] = ''
+        info['weight'] = str(info['weight'])
         columns = [
             'uri', 'rel', 'start', 'end', 'context', 'weight', 'sources',
             'id', 'dataset', 'surfaceText'
