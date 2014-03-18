@@ -16,9 +16,19 @@ import re
 
 
 def ascii_enough(text):
+    """
+    Test whether text is entirely in the ASCII set. We use this as a very rough
+    way to figure out definitions that are supposed to be in English but
+    aren't.
+    """
     # cheap assumption: if it's ASCII, and it's meant to be in English, it's
     # probably actually in English.
     return text.encode('ascii', 'replace') == text.encode('ascii', 'ignore')
+
+
+def term_is_bad(term):
+    return (term in BAD_NAMES_FOR_THINGS or 'Wik' in term or ':' in term)
+
 
 PARTS_OF_SPEECH = {
     'Noun': 'n',
@@ -239,7 +249,7 @@ class FindTranslations(ContentHandler):
                                         related, title)
 
     def output_monolingual(self, lang, relation, term1, term2):
-        if 'Wik' in term1 or 'Wik' in term2 or term1.strip() == '' or term2.strip() == '':
+        if term_is_bad(term1) or term_is_bad(term2):
             return
         source = normalized_concept_uri(lang, term1)
         if self.pos:
@@ -283,12 +293,12 @@ class FindTranslations(ContentHandler):
         self.writer.write(edge)
 
     def output_translation(self, foreign, english, locale=''):
+        if term_is_bad(foreign) or term_is_bad(english):
+            return
         source = normalized_concept_uri(
             self.langcode + locale,
-            unicodedata.normalize('NFKC', foreign),
+            foreign
         )
-        if english in BAD_NAMES_FOR_THINGS:
-            return
         target = normalized_concept_uri(
           'en', english
         )

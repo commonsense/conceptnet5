@@ -27,7 +27,7 @@ ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.2'
 
 # If we end up trying to fit a piece of text that looks like these into a URI,
 # it will mess up our patterns of URIs.
-BAD_NAMES_FOR_THINGS = {'', ',', '[', ']'}
+BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
 
 def normalize_text(text):
     """
@@ -63,12 +63,12 @@ def normalize_text(text):
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
 
-    # Replace slashes with spacesi, which will become underscores later.
+    # Replace slashes with spaces, which will become underscores later.
     # Slashes should separate pieces of a URI, and shouldn't appear within
     # a piece.
+    text = fix_text(text, normalization='NFC').strip()
     text = text.replace('/', ' ')
-    text = fix_text(text).strip()
-    assert text not in BAD_NAMES_FOR_THINGS, text
+    assert (text not in BAD_NAMES_FOR_THINGS), text
     text = text.strip('.,?!"') or text
     text = text.lower().replace(' ', '_')
     return text
