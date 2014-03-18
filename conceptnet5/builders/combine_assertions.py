@@ -39,6 +39,8 @@ def extract_contributors(source):
     elif source.startswith('/and/'):
         head, items = parse_compound_uri(source)
         return set(item for item in items if item.startswith('/s/contributor/'))
+    else:
+        return set()
 
 
 def combine_assertions(csv_filename, output_file, dataset, license):
