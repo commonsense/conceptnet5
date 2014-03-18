@@ -6,7 +6,7 @@ and builds ConceptNet 5 edges from the data.
 from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses, normalize_text
+from conceptnet5.uri import join_uri, Licenses, normalize_text, BAD_NAMES_FOR_THINGS
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -67,6 +67,11 @@ def can_skip(parts_dict):
         return True
     if 'Verbosity' in parts_dict["activity"]:
         return True
+    if (
+        parts_dict["startText"].strip() in BAD_NAMES_FOR_THINGS or
+        parts_dict["endText"].strip() in BAD_NAMES_FOR_THINGS
+    ):
+        return True
     return False
 
 
@@ -80,7 +85,7 @@ def build_frame_text(parts_dict):
     if frame_text.find('{1}') > frame_text.find('{2}'):
         frame_text = '*' + frame_text
     polarity = parts_dict["polarity"]
-    
+
     # If this is a negative frame, then it should either have the negative
     # phrasing baked in, or (in English) the symbol {%} where we can insert
     # the word "not".
@@ -178,10 +183,10 @@ class CN4Builder(object):
         """
         Process one assertion from ConceptNet 4, which appears in the input
         file as a dictionary.
-        
+
         Use the 'raw' text -- the text that's not yet reduced to a normalized
         form -- so we can run ConceptNet 5's normalization on it instead.
-        
+
         Each assertion becomes a number of ConceptNet 5 edges, which will
         probably be grouped together into an assertion again.
         """
@@ -204,6 +209,9 @@ class CN4Builder(object):
                     preposition_fix = True
                     break
 
+        if can_skip(parts_dict):
+            return
+        
         # build the assertion
         frame_text = build_frame_text(parts_dict)
         relation = build_relation(parts_dict)
