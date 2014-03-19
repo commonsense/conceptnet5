@@ -12,7 +12,6 @@ wikipedia.txt
 secrets.py
 gremlin_data
 *.zip
-*.csv
 cnet5_index_builder/cnet5-data/*/data/*
 cnet5_index_builder/cnet5-data/*/raw_data/*
 cnet5_index_builder/cnet5-solr/*
