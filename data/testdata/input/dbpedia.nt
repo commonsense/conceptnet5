@@ -1,0 +1,7 @@
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/location> <http://dbpedia.org/resource/Place_Charles_de_Gaulle> .
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/type> <http://dbpedia.org/resource/Triumphal_arch> .
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/height> "50.0"^^<http://www.w3.org/2001/XMLSchema#double> .
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/architecturalStyle> <http://dbpedia.org/resource/Neoclassicism> .
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/architect> <http://dbpedia.org/resource/Jean_Chalgrin> .
+<http://dbpedia.org/resource/Arc_de_Triomphe> <http://dbpedia.org/ontology/architect> <http://dbpedia.org/resource/Louis-%C3%89tienne_H%C3%A9ricart_de_Thury> .
+<http://dbpedia.org/resource/BBC_News_%28TV_channel%29> <http://dbpedia.org/ontology/locationCountry> <http://dbpedia.org/resource/United_Kingdom> .

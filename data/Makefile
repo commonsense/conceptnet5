@@ -1,12 +1,16 @@
+# Globals
+# =======
 PYTHON = python
 READERS = ../conceptnet5/readers
 BUILDERS = ../conceptnet5/builders
+CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
 DATE = $(shell date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
 DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
 RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
 ASSOC_DIR = assoc/assoc-space-5.2
+
 
 # File names
 # ==========
@@ -22,7 +26,6 @@ ASSOC_DIR = assoc/assoc-space-5.2
 EDGE_FILES = \
 	edges/dbpedia/instances.jsons edges/dbpedia/properties.jsons \
 	edges/wiktionary/wiktionary_en.jsons \
-	edges/wiktionary/wiktionary_ja.jsons \
 	edges/wordnet/wordnet.jsons \
 	edges/verbosity/verbosity.jsons \
 	edges/globalmind/globalmind.jsons \
@@ -45,7 +48,7 @@ PIECES := 00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
 SPLIT_PATTERNS := $(addprefix edges/split/%_, $(PIECES))
 
 # Build other filenames in similar ways.
-SPLIT_FILES = $(patsubst %,edges/split/edges_%, $(PIECES))
+SPLIT_FILES := $(patsubst %,edges/split/edges_%, $(PIECES))
 SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/edges_%.csv,assertions/part_%.jsons, $(SORTED_FILES))
 ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
@@ -57,6 +60,9 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 
+
+# High-level build tasks
+# ======================
 # By default, our goal is to build the Solr data files. (build_assoc used to
 # be here, but now I think it should be run explicitly -- it's a huge memory
 # hog.)
@@ -84,6 +90,7 @@ download :
 upload : $(DIST_FILES)
 	rsync -Pav $(OUTPUT_FOLDER) $(DOWNLOAD_SSH_LOC)
 
+
 # Build steps
 # ===========
 # These rules explain how to build various files. Their dependencies
@@ -92,78 +99,82 @@ upload : $(DIST_FILES)
 # code changes.
 
 # Read edges from ConceptNet raw files.
-edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py
+edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
-	$(PYTHON) -m conceptnet5.readers.conceptnet4 < $< > $@
+	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # nadya.jp output is in the same format as ConceptNet.
-edges/conceptnet4_nadya/%.jsons : raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py
+edges/conceptnet4_nadya/%.jsons : raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
-	$(PYTHON) -m conceptnet5.readers.conceptnet4 < $< > $@
+	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # zh-TW data from the PTT Pet Game is in a different format, in .txt files.
-edges/conceptnet_zh/%.jsons : raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py
+edges/conceptnet_zh/%.jsons : raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
 	@mkdir -p $$(dirname $@)
-	$(PYTHON) -m conceptnet5.readers.ptt_petgame < $< > $@
+	$(PYTHON) -m conceptnet5.readers.ptt_petgame $< $@
 
 # GlobalMind objects refer to each other, so the reader has to handle them all
 # in the same process.
-edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.py
+edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.py $(CORE)
 	@mkdir -p edges/globalmind
-	$(PYTHON) -m conceptnet5.readers.globalmind raw/globalmind > $@
+	$(PYTHON) -m conceptnet5.readers.globalmind raw/globalmind $@
 
 # One day, this will be replaced by a better Wiktionary reader.
-edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py
+edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py $(CORE)
 	@mkdir -p edges/wiktionary
 	$(PYTHON) -m conceptnet5.readers.wiktionary_en $< $@
 
-edges/wiktionary/wiktionary_ja.jsons: raw/wiktionary/jawiktionary.xml $(READERS)/wiktionary_ja.py
-	@mkdir -p edges/wiktionary
-	$(PYTHON) -m conceptnet5.readers.wiktionary_ja $< $@
-
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
-edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosity.py
+edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosity.py $(CORE)
 	@mkdir -p edges/verbosity
 	$(PYTHON) -m conceptnet5.readers.verbosity $< $@
 
 # The WordNet script has an additional output, which goes into 'sw_map':
 # a mapping of Semantic Web URLs to ConceptNet 5 nodes.
-edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py
+edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py $(CORE)
 	@mkdir -p edges/wordnet
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.jsons
 
 # Read edges from DBPedia. This script also produces an sw_map.
-edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.jsons
 
-edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py
+edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.jsons
 
 # Read Japanese translations from JMDict.
-edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py
+edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
 	@mkdir -p edges/jmdict
 	$(PYTHON) -m conceptnet5.readers.jmdict $< $@
 
 # This rule covers building any edges/*.csv file from its corresponding
 # .jsons file.
 edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
-	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@
+	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
 
 # Gather all the csv files and split them into 20 pieces.
-$(SPLIT_FILES): $(CSV_FILES) $(BUILDERS)/distribute_edges.py
+# 
+# We can't list these 20 pieces as the outputs of this rule, because then it would run 20 times.
+# Instead, we make a file called ".done" that gets updated after the split command has finished.
+edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 	@mkdir -p edges/split
 	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 20
+	touch edges/split/.done
 
 # Make sorted, uniquified versions of the split-up edge files.
-edges/sorted/%.csv: edges/split/%.csv
+#
+# Because we didn't make a rule that has these split-up files as targets -- the
+# previous rule has a fake target -- we need to deduce the input filenames here
+# using $(patsubst).
+edges/sorted/%.csv: edges/split/.done
 	@mkdir -p edges/sorted
-	sort $< | uniq > $@
+	sort $(patsubst edges/sorted/%,edges/split/%,$@) | uniq > $@
 
 # An assertion may be built from multiple similar edges, where the only
 # difference between them is the knowledge source. Combine edges with the same
@@ -173,12 +184,12 @@ assertions/part_%.jsons: edges/sorted/edges_%.csv $(BUILDERS)/combine_assertions
 	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -d /d/conceptnet/5/combined-sa -l /l/CC/By-SA
 
 assertions/%.csv: assertions/%.jsons
-	$(PYTHON) -m conceptnet5.builders.json_to_csv < $< > $@
+	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
 
 # Convert the assertions into unlabeled associations between concepts.
 assoc/%.csv: assertions/%.jsons $(BUILDERS)/json_to_assoc.py
 	@mkdir -p assoc
-	$(PYTHON) -m conceptnet5.builders.json_to_assoc < $< > $@
+	$(PYTHON) -m conceptnet5.builders.json_to_assoc $< $@
 
 # Combine all associations into one file.
 assoc/all.csv: $(ASSOC_FILES)
@@ -193,7 +204,7 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 # files from our files of multiple JSON assertions.
 solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
 	@mkdir -p solr
-	$(PYTHON) -m conceptnet5.builders.json_to_solr < $< > $@
+	$(PYTHON) -m conceptnet5.builders.json_to_solr $< $@
 
 # The following rules are for building the DIST_FILES to be uploaded.
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*

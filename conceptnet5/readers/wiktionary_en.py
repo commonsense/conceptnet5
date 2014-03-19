@@ -1,23 +1,34 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 """
 This Wiktionary reader should be refactored, but it does the job for now.
 """
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
-from conceptnet5.nodes import make_concept_uri
-from conceptnet5.edges import FlatEdgeWriter, make_edge
-from conceptnet5.iso639 import langs
+from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
+from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.edges import make_edge
+from conceptnet5.json_stream import JSONStreamWriter
+from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME
 import unicodedata
-import string
 import re
-import sys
+
 
 def ascii_enough(text):
+    """
+    Test whether text is entirely in the ASCII set. We use this as a very rough
+    way to figure out definitions that are supposed to be in English but
+    aren't.
+    """
     # cheap assumption: if it's ASCII, and it's meant to be in English, it's
     # probably actually in English.
-    return text.encode('ascii', 'replace') == text
+    return text.encode('ascii', 'replace') == text.encode('ascii', 'ignore')
+
+
+def term_is_bad(term):
+    return (term in BAD_NAMES_FOR_THINGS or 'Wik' in term or ':' in term)
+
 
 PARTS_OF_SPEECH = {
     'Noun': 'n',
@@ -39,7 +50,7 @@ WIKILINK = re.compile(r"\[\[([^|\]#]+)")
 
 LANGUAGES = {
     'English': 'en',
-    
+
     'Afrikaans': 'af',
     'Arabic': 'ar',
     'Armenian': 'hy',
@@ -111,8 +122,8 @@ LANGUAGES = {
     'Urdu': 'ur',
     'Uzbek': 'uz',
     'Vietnamese': 'vi',
-    u'英語': 'en',
-    u'日本語': 'ja'
+    '英語': 'en',
+    '日本語': 'ja'
 }
 
 SOURCE = '/s/web/en.wiktionary.org'
@@ -122,7 +133,7 @@ TRANSLATE = '/s/rule/wiktionary_translation_tables'
 DEFINE = '/s/rule/wiktionary_define_senses'
 
 class FindTranslations(ContentHandler):
-    def __init__(self, out_filename='wiktionary.json'):
+    def __init__(self, output_file='wiktionary.json'):
         self.lang = None
         self.langcode = None
         self.inArticle = False
@@ -132,7 +143,7 @@ class FindTranslations(ContentHandler):
         self.curText = ''
         self.locales = []
         self.curRelation = None
-        self.writer = FlatEdgeWriter(out_filename)
+        self.writer = JSONStreamWriter(output_file)
 
     def startElement(self, name, attrs):
         if name == 'page':
@@ -148,7 +159,7 @@ class FindTranslations(ContentHandler):
             self.handleArticle(self.curTitle, ''.join(self.curText))
         elif name == 'title':
             self.inTitle = False
-    
+
     def characters(self, text):
         if self.inTitle:
             self.curTitle += text
@@ -176,7 +187,7 @@ class FindTranslations(ContentHandler):
             elif pos == 'Antonym':
                 self.curRelation = 'Antonym'
             elif pos == 'Related terms':
-                self.curRelation = 'ConceptuallyRelatedTo'
+                self.curRelation = 'RelatedTo'
             elif pos == 'Derived terms':
                 if not line.startswith('===='):
                     # this is at the same level as the part of speech;
@@ -219,7 +230,7 @@ class FindTranslations(ContentHandler):
             if 'translations' in sense.lower():
                 self.curSense = None
             else:
-                self.curSense = pos+'/'+sense
+                self.curSense = (pos, sense)
         elif trans_tag_match:
             lang = trans_tag_match.group(1)
             translation = trans_tag_match.group(2)
@@ -236,72 +247,70 @@ class FindTranslations(ContentHandler):
                 related = relatedmatch.group(1)
                 self.output_monolingual(self.langcode, self.curRelation,
                                         related, title)
-    
+
     def output_monolingual(self, lang, relation, term1, term2):
-        if 'Wik' in term1 or 'Wik' in term2:
+        if term_is_bad(term1) or term_is_bad(term2):
             return
-        source = make_concept_uri(term1, lang)
+        source = normalized_concept_uri(lang, term1)
         if self.pos:
-            target = make_concept_uri(term2, lang, self.pos)
+            target = normalized_concept_uri(lang, term2, self.pos)
         else:
-            target = make_concept_uri(term2, lang)
+            target = normalized_concept_uri(lang, term2)
         surfaceText = "[[%s]] %s [[%s]]" % (term1, relation, term2)
-        #print surfaceText
 
         edge = make_edge('/r/'+relation, source, target, '/d/wiktionary/%s/%s' % (lang, lang),
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, MONOLINGUAL],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
 
-    def output_sense_translation(self, lang, foreign, english, disambiguation):
+    def output_sense_translation(self, lang, foreign, english, sense):
+        pos, disambiguation = sense
         if 'Wik' in foreign or 'Wik' in english:
             return
         if lang == 'zh-cn':
             lang = 'zh_CN'
         elif lang == 'zh-tw':
             lang = 'zh_TW'
-        source = make_concept_uri(
-          unicodedata.normalize('NFKC', foreign), lang
+        source = normalized_concept_uri(
+          lang, unicodedata.normalize('NFKC', foreign)
         )
-        target = make_concept_uri(
-          english, 'en', disambiguation
+        target = normalized_concept_uri(
+          'en', english, pos, disambiguation
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (langs.english_name(lang))
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[lang.split('_')[0]])
         except KeyError:
             surfaceRel = "is [language %s] for" % lang
         surfaceText = "[[%s]] %s [[%s (%s)]]" % (foreign, surfaceRel, english, disambiguation.split('/')[-1].replace('_', ' '))
-        #print surfaceText
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % lang,
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, TRANSLATE],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
-        
+
     def output_translation(self, foreign, english, locale=''):
-        source = make_concept_uri(
-          unicodedata.normalize('NFKC', foreign),
-          self.langcode+locale
+        if term_is_bad(foreign) or term_is_bad(english):
+            return
+        source = normalized_concept_uri(
+            self.langcode + locale,
+            foreign
         )
-        target = make_concept_uri(
-          english, 'en'
+        target = normalized_concept_uri(
+          'en', english
         )
         relation = '/r/TranslationOf'
         try:
-            surfaceRel = "is %s for" % (langs.english_name(self.langcode))
+            surfaceRel = "is %s for" % (CODE_TO_ENGLISH_NAME[self.langcode.split('_')[0]])
         except KeyError:
             surfaceRel = "is [language %s] for" % self.langcode
         surfaceText = "[[%s]] %s [[%s]]" % (foreign, surfaceRel, english)
         edge = make_edge(relation, source, target, '/d/wiktionary/en/%s' % self.langcode,
-                         license='/l/CC/By-SA',
+                         license=Licenses.cc_sharealike,
                          sources=[SOURCE, INTERLINGUAL],
-                         context='/ctx/all',
                          weight=1.0,
                          surfaceText=surfaceText)
         self.writer.write(edge)
@@ -320,7 +329,8 @@ def filter_line(line):
             remain = part.strip().strip('.').strip()
             if remain: yield remain
 
-if __name__ == '__main__':
+
+def handle_file(input_file, output_file):
     # Create a parser
     parser = make_parser()
 
@@ -328,11 +338,23 @@ if __name__ == '__main__':
     parser.setFeature(feature_namespaces, 0)
 
     # Create the handler
-    dh = FindTranslations(out_filename=sys.argv[2])
+    dh = FindTranslations(output_file=output_file)
 
     # Tell the parser to use our handler
     parser.setContentHandler(dh)
 
     # Parse the input
-    parser.parse(open(sys.argv[1]))
+    if hasattr(input_file, 'read'):
+        input_stream = input_file
+    else:
+        input_stream = open(input_file)
+    parser.parse(input_stream)
 
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='XML file of input')
+    parser.add_argument('output', help='JSON-stream file to output to')
+    args = parser.parse_args()
+    handle_file(args.input, args.output)

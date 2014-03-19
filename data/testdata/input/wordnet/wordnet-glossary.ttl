@@ -1,0 +1,6 @@
+@prefix wn20schema: <http://www.w3.org/2006/03/wn/wn20/schema/> .
+@prefix wn30: <http://purl.org/vocabularies/princeton/wn30/> .
+wn30:synset-annotate-verb-1 wn20schema:gloss "add explanatory notes to or supply with critical comments; \"The scholar annotated the early edition of a famous novel\""@en-us .
+wn30:synset-annotation-noun-2 wn20schema:gloss "the act of adding notes"@en-us .
+wn30:synset-note-noun-7 wn20schema:gloss "a comment or instruction (usually added); \"his notes were appended at the end of the article\"; \"he added a short notation to the address on the envelope\""@en-us .
+wn30:synset-write-verb-1 wn20schema:gloss "produce a literary work; \"She composed a poem\"; \"He wrote four novels\""@en-us .

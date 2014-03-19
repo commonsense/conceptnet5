@@ -1,31 +1,31 @@
-import json
-import sys
+from __future__ import unicode_literals, print_function
+from conceptnet5.json_stream import read_json_stream
+import codecs
 
-def convert_to_tab_separated(in_stream=None, out_stream=None):
-    if in_stream is None:
-        in_stream = sys.stdin
-    if out_stream is None:
-        out_stream = sys.stdout
-    
-    for line in in_stream:
-        if not line.strip():
-            continue
-        info = json.loads(line.strip().decode('utf-8'))
-        text = info.get(u'surfaceText') or ''
 
-        line = "%(uri)s\t%(rel)s\t%(start)s\t%(end)s\t%(context)s\t%(weight)s\t%(sources)s\t%(id)s\t%(dataset)s\t%(text)s" % {
-            'uri': info[u'uri'],
-            'rel': info[u'rel'],
-            'start': info[u'start'],
-            'end': info[u'end'],
-            'context': info[u'context'],
-            'weight': info[u'weight'],
-            'sources': info[u'sources'],
-            'id': info[u'id'],
-            'text': text,
-            'dataset': info[u'dataset'],
-        }
-        print >> out_stream, line.encode('utf-8')
+def convert_to_tab_separated(input_filename, output_filename):
+    out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
+    for info in read_json_stream(input_filename):
+        if info['surfaceText'] is None:
+            info['surfaceText'] = ''
+        info['weight'] = str(info['weight'])
+        columns = [
+            'uri', 'rel', 'start', 'end', 'context', 'weight', 'sources',
+            'id', 'dataset', 'surfaceText'
+        ]
+        column_values = [info.get(col) for col in columns]
+        line = '\t'.join(column_values)
+        print(line, file=out_stream)
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', help='JSON-stream file of input')
+    parser.add_argument('output', help='CSV file to output to')
+    args = parser.parse_args()
+    convert_to_tab_separated(args.input, args.output)
+
 
 if __name__ == '__main__':
-    convert_to_tab_separated()
+    main()

@@ -1,13 +1,16 @@
+from __future__ import unicode_literals
 """
 Utility functions for web interface.
 """
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
 
-from conceptnet5.config import LANGUAGES
+from conceptnet5.util.language_codes import SUPPORTED_LANGUAGE_CODES, CODE_TO_ENGLISH_NAME
+
 
 def data_url(uri):
     return '/web/' + uri.strip('/')
+
 
 def uri2name(arg):
     if arg.startswith('/c/'):
@@ -19,17 +22,10 @@ def uri2name(arg):
     if result.startswith('be ') or result.startswith('to '):
         result = result[3:]
     return result
-    
+
+
 def get_sorted_languages():
-    keys = LANGUAGES.keys()
-    non_ascii = []
-    for key in keys:
-        if ord(key[0]) > 127:
-            non_ascii.append(key)
-            keys.remove(key)
-    sort = sorted(keys, key=str)
-    
-    #Return a dictionary that can be used in a template
-    #containing the sorted list of keys and the actual
-    #dictionary of languages
-    return {"keys": sort, "languages": LANGUAGES}
+    return [
+        (lang, CODE_TO_ENGLISH_NAME[lang])
+        for lang in SUPPORTED_LANGUAGE_CODES
+    ]

@@ -1,0 +1,6 @@
+<http://www.w3.org/2006/03/wn/wn20/schema/hyponymOf> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/r/IsA> .
+<http://purl.org/vocabularies/princeton/wn30/synset-annotate-verb-1> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/c/en/annotate/v/add_explanatory_notes_to_or_supply_with_critical_comments> .
+<http://purl.org/vocabularies/princeton/wn30/synset-write-verb-1> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/c/en/write/v/produce_a_literary_work> .
+<http://www.w3.org/2006/03/wn/wn20/schema/derivationallyRelated> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/r/DerivedFrom> .
+<http://purl.org/vocabularies/princeton/wn30/synset-annotation-noun-2> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/c/en/annotation/n/the_act_of_adding_notes> .
+<http://purl.org/vocabularies/princeton/wn30/synset-note-noun-7> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://conceptnet5.media.mit.edu/data/5.2/c/en/note/n/a_comment_or_instruction> .

@@ -1,0 +1,57 @@
+<JMdict>
+<entry>
+<ent_seq>1000410</ent_seq>
+<r_ele>
+<reb>あどけない</reb>
+</r_ele>
+<sense>
+<pos>adjective (keiyoushi)</pos>
+<gloss>innocent</gloss>
+<gloss xml:lang="dut">onschuldig</gloss>
+<gloss xml:lang="ger">arglos</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1000390</ent_seq>
+<k_ele>
+<keb>あっと言う間に</keb>
+</k_ele>
+<k_ele>
+<keb>あっという間に</keb>
+</k_ele>
+<k_ele>
+<keb>あっとゆう間に</keb>
+</k_ele>
+<r_ele>
+<reb>あっというまに</reb>
+<re_restr>あっと言う間に</re_restr>
+<re_restr>あっという間に</re_restr>
+</r_ele>
+<r_ele>
+<reb>あっとゆうまに</reb>
+<re_restr>あっと言う間に</re_restr>
+<re_restr>あっとゆう間に</re_restr>
+</r_ele>
+<info>
+<audit>
+<upd_date>2012-06-13</upd_date>
+<upd_detl>Entry created</upd_detl>
+</audit>
+<audit>
+<upd_date>2012-06-13</upd_date>
+<upd_detl>Entry amended</upd_detl>
+</audit>
+</info>
+<sense>
+<pos>Expressions</pos>
+<gloss>just like that</gloss>
+<gloss>in the twinkling of an eye</gloss>
+<gloss>in the blink of an eye</gloss>
+<gloss>in the time it takes to say "ah!"</gloss>
+<gloss xml:lang="ger">(n) im Nu</gloss>
+<gloss xml:lang="ger">im Handumdrehen</gloss>
+<gloss xml:lang="ger">in einem Augenblick</gloss>
+<gloss xml:lang="ger">wie mit einem Schlag (etwa: in der Zeit, in der man gerade nur &lt;Transcr.: a&gt; sagt“)</gloss>
+</sense>
+</entry>
+</JMdict>

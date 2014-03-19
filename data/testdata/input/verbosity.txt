@@ -1,0 +1,50 @@
+factor	it looks like	join the	1	500	11	500
+factor	it looks like	tractor	7	297	82	700
+factor	about the same size as	actor	2	500	23	666
+factor	about the same size as	combine words	1	500	11	52
+factor	it has	factor	1	0	11	500
+factor	it has	many divides	4	250	47	4000
+factor	it has	math	1	333	11	90
+factor	it has	math term	1	0	11	100
+factor	it has	six letters	1	200	11	0
+factor	it has	the reason	1	0	11	500
+factor	it is	fact	1	0	11	250
+factor	it is	fact or	2	125	23	1000
+factor	it is	math	1	0	11	9
+factor	it is	multiplication answer	4	0	47	4000
+factor	it is	multiply by	1	0	11	1000
+factor	it is	noun	1	0	11	3
+factor	it is	rhymes tractor	5	433	58	5000
+factor	it is	to divide	1	0	11	31
+factor	it is	tractor f	3	500	35	1500
+factor	it is a kind of	mathematical operation	4	0	47	444
+factor	it is a kind of	operation	1	500	11	166
+factor	it is a type of	component	1	0	11	166
+factor	it is a type of	consideration	1	0	11	500
+factor	it is a type of	dividing	1	250	11	200
+factor	it is a type of	fact	1	0	11	125
+factor	it is a type of	factor	1	333	11	500
+factor	it is a type of	factorial	2	0	23	1000
+factor	it is a type of	fear blank	1	500	11	1000
+factor	it is a type of	math problem	1	250	11	200
+factor	it is a type of	math term	2	0	23	42
+factor	it is a type of	mathematical property	1	0	11	166
+factor	it is a type of	rhymes tractor	1	333	11	1000
+factor	it is a type of	show fear	3	0	35	3000
+factor	it is a type of	tore	1	200	11	1000
+factor	it is related to	fact ot	1	666	11	1000
+factor	it is related to	multiplication	3	166	35	38
+factor	it is the opposite of	distribute	1	250	11	500
+factor	it is typically in	math	1	400	11	13
+factor	it is typically in	math problems	1	0	11	200
+factor	it is typically in	tore	1	600	11	500
+factor	it is typically in	truth	1	0	11	500
+factor	it is typically near	multiplication	2	250	23	250
+factor	it is used for	fraction reduction	1	500	11	500
+factor	it looks like	actor	4	458	47	571
+factor	it looks like	determining thing	1	333	11	500
+factor	it looks like	fact	2	325	23	86
+factor	it looks like	fact her	1	500	11	1000
+factor	it looks like	fact or	2	466	23	400
+factor	it looks like	fact reactor	1	250	11	1000
+factor	it looks like	factorial	1	0	11	1000

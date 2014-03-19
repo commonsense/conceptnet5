@@ -27,13 +27,13 @@
 <form id="search-form-home" class="navbar-form pull-right" method="POST" action="/web/search">
         <input id="search-text" type="text" class="search-query span2" name="keyword" title="Search for a concept..." placeholder="Search for a concept..." />
         <select id="language-select" name="language" title="Select a language">
-          {% for lang in languages['keys'] %}
-          {% if lang == "English" %}
-          <option selected="selected" value={{ languages['languages'][lang] }}>{{ lang }}</option>
-          {% else %}
-                <option value={{ languages['languages'][lang] }}>{{ lang }}</option>
-                {% endif %}
-                {% endfor %}
+          {% for langcode, langname in languages %}
+            {% if langname == "English" %}
+              <option selected="selected" value={{ langcode }}>{{ langname }}</option>
+            {% else %}
+              <option value={{ langcode }}>{{ langname }}</option>
+            {% endif %}
+          {% endfor %}
         </select>
         <input id="search-submit" type="submit" value="Search" />
 </form>
