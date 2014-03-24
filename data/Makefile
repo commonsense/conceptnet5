@@ -59,6 +59,7 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
+STATS_FILES = stats/relations.txt
 
 
 # High-level build tasks
@@ -76,6 +77,7 @@ build_assertions: $(COMBINED_CSVS)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
+build_stats: $(STATS_FILES)
 
 # A Makefile idiom that means "don't delete intermediate files"
 .SECONDARY:
@@ -211,19 +213,33 @@ $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $@ raw/*/*
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: assertions/*.jsons
+$(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $@ assertions/*.jsons
 
-$(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2: solr/*.json
+$(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2: $(SOLR_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $@ solr
 
-$(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: assertions/*.csv
+$(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $@ assertions/*.csv
 
 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2: $(ASSOC_DIR)/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	tar jcvf $@ $(ASSOC_DIR)
+
+
+## Statistics
+
+# This command uses a Unix pipeline to count the occurrences of different
+# relations:
+#
+#     'cat': concatenate these files together
+#     'cut -f 2': take only text in the second column
+#     'sort | uniq -c': group identical strings, and count their occurrences
+#     'sort -nbr': show the results in descending order by count
+stats/relations.txt: $(COMBINED_CSVS) 
+	@mkdir -p stats
+	cat $(COMBINED_CSVS) | cut -f 2 | sort | uniq -c | sort -nbr > stats/relations.txt
 
