@@ -21,3 +21,5 @@ data/sandbox
 data/solr
 data/sw_map
 stats/
+attic/
+logs/*.log
