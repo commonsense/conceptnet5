@@ -1,6 +1,25 @@
 # Globals
 # =======
+# Configuration of Unix programs
 PYTHON = python
+
+# 'sort' and 'uniq' are very useful Unix utilities for working with text.
+# By default, they'll do something crazy and locale-specific when given
+# Unicode text. This will fail utterly when the text really is in more
+# than one language.
+# 
+# LC_ALL=C tells them to ignore Unicode and treat it as arbitrary bytes.
+# The result is both faster and more consistent than what locales do.
+#
+# The COUNT_AND_RANK pipeline is used to count occurrences of things:
+#     'sort | uniq -c': group identical strings, and count their occurrences
+#     'sort -nbr': show the results in descending order by count
+
+SORT = LC_ALL=C sort
+UNIQ = LC_ALL=C uniq
+COUNT_AND_RANK = $(SORT) | $(UNIQ) -c | $(SORT) -nbr
+
+# ConceptNet-related configuration
 READERS = ../conceptnet5/readers
 BUILDERS = ../conceptnet5/builders
 CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
@@ -39,8 +58,8 @@ CSV_FILES = $(patsubst edges/%.jsons,edges/%.csv, $(EDGE_FILES))
 
 # You'd think there would be a better way to do this, such as the shell command
 # `seq`, but I couldn't get a shell command to do the right thing here.
-PIECES := 00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
-          10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
+PIECES  := 	00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
+			10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
 
 # SPLIT_PATTERNS is not a list of filenames; it's a list of Makefile patterns
 # where we're literally sticking in the % symbol. I forget why. This should
@@ -59,7 +78,7 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
-STATS_FILES = stats/relations.txt
+STATS_FILES = stats/relations.txt stats/concepts_per_language.txt
 
 
 # High-level build tasks
@@ -161,7 +180,7 @@ edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
 	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
 
 # Gather all the csv files and split them into 20 pieces.
-# 
+#
 # We can't list these 20 pieces as the outputs of this rule, because then it would run 20 times.
 # Instead, we make a file called ".done" that gets updated after the split command has finished.
 edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
@@ -239,7 +258,21 @@ $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2: $(ASSOC_DIR)/*
 #     'cut -f 2': take only text in the second column
 #     'sort | uniq -c': group identical strings, and count their occurrences
 #     'sort -nbr': show the results in descending order by count
-stats/relations.txt: $(COMBINED_CSVS) 
+stats/relations.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cat $(COMBINED_CSVS) | cut -f 2 | sort | uniq -c | sort -nbr > stats/relations.txt
+	cat $(COMBINED_CSVS) | cut -f 2 | $(COUNT_AND_RANK) > stats/relations.txt
 
+stats/concepts_left_unsorted.txt: $(COMBINED_CSVS)
+	@mkdir -p stats
+	cat $(COMBINED_CSVS) | cut -f 3 > stats/concepts_left_unsorted.txt
+
+stats/concepts_right_unsorted.txt: $(COMBINED_CSVS)
+	@mkdir -p stats
+	cat $(COMBINED_CSVS) | cut -f 4 > stats/concepts_right_unsorted.txt
+
+stats/concepts.txt: stats/concepts_left_unsorted.txt stats/concepts_right_unsorted.txt
+	@mkdir -p stats
+	cat $^ | $(COUNT_AND_RANK) > stats/concepts.txt
+
+stats/concepts_per_language.txt: stats/concepts.txt
+	cut -d / -f 3 stats/concepts.txt | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
