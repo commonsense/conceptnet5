@@ -406,7 +406,7 @@
          id="tspan5362"
          sodipodi:role="line"><svg:tspan
    id="tspan5364"
-   style="font-weight:bold">dataset</svg:tspan>: /d/conceptnet/4/en</svg:tspan><svg:tspan
+   style="font-weight:bold">dataset:</svg:tspan> /d/conceptnet/4/en</svg:tspan><svg:tspan
          id="tspan5366"
          style="font-size:16px"
          y="631.7879"
@@ -561,7 +561,7 @@
          style="font-size:16px"
          id="tspan5602"><svg:tspan
    style="font-weight:bold"
-   id="tspan5604">dataset</svg:tspan>: /d/conceptnet/5</svg:tspan><svg:tspan
+   id="tspan5604">dataset:</svg:tspan> /d/conceptnet/5</svg:tspan><svg:tspan
          sodipodi:role="line"
          x="198.58746"
          y="271.7879"
@@ -573,7 +573,7 @@
          style="font-size:16px"
          id="tspan5408"><svg:tspan
    style="font-weight:bold"
-   id="tspan5410">weight:</svg:tspan> 1.0</svg:tspan><svg:tspan
+   id="tspan5410">weight:</svg:tspan> 2.0</svg:tspan><svg:tspan
          sodipodi:role="line"
          x="198.58746"
          y="311.85632"
@@ -849,7 +849,7 @@
          x="504.58746"
          sodipodi:role="line"><svg:tspan
    id="tspan6063"
-   style="font-weight:bold">dataset</svg:tspan>: /d/conceptnet/5</svg:tspan><svg:tspan
+   style="font-weight:bold">dataset:</svg:tspan> /d/conceptnet/5</svg:tspan><svg:tspan
          style="font-size:16px"
          y="269.7879"
          x="504.58746"
