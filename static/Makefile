@@ -24,7 +24,7 @@ VARS_STEP3 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=inline -DSTEP3A=inlin
 VARS_STEP4 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=inline -DSTEP3A=inline -DSTEP4=inline -DSTEP4A=inline -DSTEP5=none   -DSTEP5A=none   -DSTEP6=none   -DSTEP7=none
 VARS_STEP5 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=inline -DSTEP3A=inline -DSTEP4=inline -DSTEP4A=inline -DSTEP5=inline -DSTEP5A=inline -DSTEP6=none   -DSTEP7=none
 VARS_STEP6 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=inline -DSTEP3A=inline -DSTEP4=inline -DSTEP4A=inline -DSTEP5=inline -DSTEP5A=inline -DSTEP6=inline -DSTEP7=none
-VARS_STEP7 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=none   -DSTEP3A=inline -DSTEP4=inline -DSTEP4A=none   -DSTEP5=inline -DSTEP5A=none   -DSTEP6=inline -DSTEP7=inline
+VARS_STEP7 = -DTEMPLATESTYLE=style -DSTEP1=inline -DSTEP2A=none   -DSTEP3A=none   -DSTEP4=inline -DSTEP4A=none   -DSTEP5=inline -DSTEP5A=none   -DSTEP6=inline -DSTEP7=inline
 
 diagrams: $(CNET_DIAGRAMS)
 
