@@ -2,7 +2,7 @@ from __future__ import unicode_literals, print_function
 import codecs
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import disjunction_uri, parse_compound_uri
-from conceptnet5.json_stream import JSONStreamWriter
+from conceptnet5.formats.json_stream import JSONStreamWriter
 import os
 import math
 

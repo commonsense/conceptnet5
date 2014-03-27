@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.uri import join_uri, split_uri
-from conceptnet5.json_stream import read_json_stream
+from conceptnet5.formats.json_stream import read_json_stream
 import codecs
 import json
 import sys

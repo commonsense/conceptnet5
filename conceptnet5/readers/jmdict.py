@@ -3,7 +3,7 @@ import xmltodict
 import re
 import codecs
 from conceptnet5.util.language_codes import CODE_TO_ENGLISH_NAME, ENGLISH_NAME_TO_CODE
-from conceptnet5.json_stream import JSONStreamWriter
+from conceptnet5.formats.json_stream import JSONStreamWriter
 from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge

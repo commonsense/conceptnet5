@@ -2,7 +2,7 @@ from __future__ import print_function, unicode_literals, division
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.json_stream import JSONStreamWriter
+from conceptnet5.formats.json_stream import JSONStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
 from collections import defaultdict
 import re

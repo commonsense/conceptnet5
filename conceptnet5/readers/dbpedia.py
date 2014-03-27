@@ -9,8 +9,8 @@ from metanl.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.json_stream import JSONStreamWriter
-from conceptnet5.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
+from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
 import urllib
 import sys
 import re

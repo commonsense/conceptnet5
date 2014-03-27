@@ -3,7 +3,7 @@ This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
 """
 
-from conceptnet5.json_stream import JSONStreamWriter, read_json_stream
+from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses, normalize_text, BAD_NAMES_FOR_THINGS
@@ -51,6 +51,10 @@ def can_skip(parts_dict):
 
     This includes Chinese and Japanese, because better versions of these were
     developed by groups we collaborate with, in separate databases.
+
+    The activity called 'testing' was actually collecting preliminary data for
+    a dataset about subjective medical experiences. This data looks really out
+    of place now.
     """
     lang = parts_dict['lang']
     if lang.startswith('zh'):
@@ -66,6 +70,8 @@ def can_skip(parts_dict):
     if 'rubycommons' in parts_dict["activity"]:
         return True
     if 'Verbosity' in parts_dict["activity"]:
+        return True
+    if 'testing' in parts_dict["activity"]:
         return True
     if (
         parts_dict["startText"].strip() in BAD_NAMES_FOR_THINGS or
