@@ -1,35 +1,88 @@
-# Globals
-# =======
-# Configuration of Unix programs
+# ConceptNet-related configuration
+# ================================
+# $(READERS) and $(BUILDERS) specify where the scripts that take in raw
+# data and build ConceptNet are located, so we know to rebuild files when
+# they change.
+READERS = ../conceptnet5/readers
+BUILDERS = ../conceptnet5/builders
+
+# $(CORE) is the set of ConceptNet modules that affect every step of the
+# building process. If one of these modules changes, we need to build from
+# scratch.
+CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
+
+# When building a package to distribute, it will be marked with the current
+# date.
+DATE = $(shell date +%Y%m%d)
+OUTPUT_FOLDER = dist/$(DATE)
+
+# The URL from which to download ConceptNet files, such as the raw data files.
+DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
+RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
+
+# The hostname and path that we use to upload files, so they can be downloaded
+# later.
+#
+# Of course this path only works if you have Media Lab credentials and write
+# access to conceptnet5, so if you're distributing your own version, be sure
+# to change this to a server you control.
+UPLOAD_PATH = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
+
+# The name of the assoc_space directory to build.
+ASSOC_DIR = assoc/assoc-space-5.2
+
+
+# Configuration of Unix tools
+# ===========================
+# $(PYTHON) should point to an installation of Python 3.3 or later, with
+# conceptnet5 installed as a library.
+#
+# If you're in an appropriate virtualenv, this will simply be 'python'.
 PYTHON = python
 
 # 'sort' and 'uniq' are very useful Unix utilities for working with text.
 # By default, they'll do something crazy and locale-specific when given
 # Unicode text. This will fail utterly when the text really is in more
 # than one language.
-# 
+#
 # LC_ALL=C tells them to ignore Unicode and treat it as arbitrary bytes.
 # The result is both faster and more consistent than what locales do.
 #
 # The COUNT_AND_RANK pipeline is used to count occurrences of things:
 #     'sort | uniq -c': group identical strings, and count their occurrences
 #     'sort -nbr': show the results in descending order by count
-
 SORT = LC_ALL=C sort
 UNIQ = LC_ALL=C uniq
 COUNT_AND_RANK = $(SORT) | $(UNIQ) -c | $(SORT) -nbr
 
-# ConceptNet-related configuration
-READERS = ../conceptnet5/readers
-BUILDERS = ../conceptnet5/builders
-CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
-DATE = $(shell date +%Y%m%d)
-OUTPUT_FOLDER = dist/$(DATE)
-DOWNLOAD_SSH_LOC = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
-DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
-RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
-ASSOC_DIR = assoc/assoc-space-5.2
-
+# This is a mini-script that takes in tab-separated data, and truncates
+# all URIs it sees to the first two components. For example,
+# '/c/en/toast' becomes '/c/en'. This is useful for collecting aggregate
+# statistics.
+TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
+#
+# That could have been done in Python in a way that doesn't look like
+# a monkey banged on the keyboard, I know. But, as a way of turning text
+# into other text, sed is convenient and *fast*.
+#
+# The overall sed command is a regular expression substitution, of the
+# form s:PATTERN:REPLACEMENT:g. (The more familiar form of this is
+# s/PATTERN/REPLACEMENT/g, but we need to use a lot of slashes in the
+# pattern.)
+#
+# The "-r" switch means that symbols such as parentheses automatically have
+# their regular expression meaning.
+#
+# The expression (/[^/\t]+) matches a URI component such as /en -- that is,
+# a slash, followed by some characters that aren't slashes or tabs.
+#
+# We ask for this expression to be repeated twice, with {2}, and capture what
+# it matches using the parenthesized expression ((/[^/\t]+){2}).
+#
+# We then consume everything afterward that isn't a tab character: [^\t]*
+#
+# The replacement expression is simply \1 -- the part of the URI that matched
+# the twice-repeated group.
 
 # File names
 # ==========
@@ -78,7 +131,7 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
-STATS_FILES = stats/relations.txt stats/concepts_per_language.txt
+STATS_FILES = stats/relations.txt stats/concepts_per_language.txt stats/dataset_languages.txt stats/morestats.txt
 
 
 # High-level build tasks
@@ -109,7 +162,7 @@ download :
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
 upload : $(DIST_FILES)
-	rsync -Pav $(OUTPUT_FOLDER) $(DOWNLOAD_SSH_LOC)
+	rsync -Pav $(OUTPUT_FOLDER) $(UPLOAD_PATH)
 
 
 # Build steps
@@ -156,18 +209,18 @@ edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosit
 edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py $(CORE)
 	@mkdir -p edges/wordnet
 	@mkdir -p sw_map
-	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.jsons
+	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.nt
 
 # Read edges from DBPedia. This script also produces an sw_map.
 edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
-	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.jsons
+	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.nt
 
 edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
-	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.jsons
+	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.nt
 
 # Read Japanese translations from JMDict.
 edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
@@ -260,19 +313,25 @@ $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2: $(ASSOC_DIR)/*
 #     'sort -nbr': show the results in descending order by count
 stats/relations.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cat $(COMBINED_CSVS) | cut -f 2 | $(COUNT_AND_RANK) > stats/relations.txt
+	cut -f 2 $(SORTED_FILES) | $(COUNT_AND_RANK) > stats/relations.txt
 
-stats/concepts_left_unsorted.txt: $(COMBINED_CSVS)
+stats/concepts_left_datasets.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cat $(COMBINED_CSVS) | cut -f 3 > stats/concepts_left_unsorted.txt
+	cut -f 3,9 $(SORTED_FILES) > stats/concepts_left_datasets.txt
 
-stats/concepts_right_unsorted.txt: $(COMBINED_CSVS)
+stats/concepts_right_datasets.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cat $(COMBINED_CSVS) | cut -f 4 > stats/concepts_right_unsorted.txt
+	cut -f 4,9 $(SORTED_FILES) > stats/concepts_right_datasets.txt
 
-stats/concepts.txt: stats/concepts_left_unsorted.txt stats/concepts_right_unsorted.txt
-	@mkdir -p stats
-	cat $^ | $(COUNT_AND_RANK) > stats/concepts.txt
+stats/concepts.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
+	cut -f 1 $^ | $(COUNT_AND_RANK) > stats/concepts.txt
 
 stats/concepts_per_language.txt: stats/concepts.txt
-	cut -d / -f 3 stats/concepts.txt | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
+	cut -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
+
+stats/dataset_languages.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
+	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > stats/dataset_vs_language.txt
+
+stats/morestats.txt: $(COMBINED_CSVS)
+	@mkdir -p stats
+	cut -f 2,3,4,9 $(SORTED_FILES) | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/morestats.txt
