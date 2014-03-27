@@ -47,7 +47,7 @@ def convert_to_assoc(input_filename, output_filename):
     The relation is mostly ignored because we have not yet found a good way to
     take the relation into account in dimensionality reduction.
     """
-    out_stream = codecs.open(output_filename, encoding='utf-8')
+    out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
     
     for info in read_json_stream(input_filename):
         startc = reduce_concept(info['start'])
