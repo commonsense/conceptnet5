@@ -1,4 +1,4 @@
-from conceptnet5.whereami import get_project_filename
+from conceptnet5.util import get_data_filename
 from conceptnet5.readers import (
     conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, wiktionary_en, wordnet
 )
@@ -15,7 +15,7 @@ else:
     from io import StringIO
 
 
-TESTDATA_DIR = get_project_filename("data/testdata")
+TESTDATA_DIR = get_data_filename("testdata")
 def data_path(filename):
     return os.path.join(TESTDATA_DIR, filename)
 
