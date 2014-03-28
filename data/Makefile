@@ -156,10 +156,10 @@ STATS_FILES = stats/relations.txt stats/concepts_per_language.txt stats/dataset_
 #
 # A complete run, including all steps, might look like this:
 #     make download build_solr build_stats build_assoc upload
-all: build_solr build_stats
+all: build_solr build_assertions build_stats
 build_assoc: $(ASSOC_DIR)/u.npy
 build_solr: $(SOLR_FILES)
-build_assertions: $(COMBINED_CSVS)
+build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
