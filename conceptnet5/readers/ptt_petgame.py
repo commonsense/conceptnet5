@@ -4,11 +4,11 @@ import json
 from conceptnet5.formats.json_stream import JSONStreamWriter
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.whereami import get_project_filename
+from conceptnet5.util import get_data_filename
 
 
 FRAME_DATA = json.load(
-    codecs.open(get_project_filename('data/info/zh_frames.json'), encoding='utf-8')
+    codecs.open(get_data_filename('zh_frames.json'), encoding='utf-8')
 )
 
 

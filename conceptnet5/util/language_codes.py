@@ -17,11 +17,11 @@ Japanese-language Wiktionary.
 'fr'
 """
 
-from conceptnet5.whereami import get_project_filename
+from conceptnet5.util import get_data_filename
 import codecs
 import re
 
-ISO_DATA_FILENAME = get_project_filename('data/info/iso639.txt')
+ISO_DATA_FILENAME = get_data_filename('iso639.txt')
 
 CODE_TO_ENGLISH_NAME = {}
 ENGLISH_NAME_TO_CODE = {}

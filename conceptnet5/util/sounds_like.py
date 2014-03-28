@@ -1,5 +1,5 @@
 from __future__ import with_statement, print_function, unicode_literals, division
-from conceptnet5.whereami import get_project_filename
+from conceptnet5.util import get_data_filename
 
 
 PHONETIC_DICT = {}
@@ -10,7 +10,7 @@ def _setup():
 
     When multiple pronunciations are given, keep the last one.
     """
-    with open(get_project_filename('data/info/cmudict.0.7a')) as rhymelist:
+    with open(get_data_filename('cmudict.0.7a')) as rhymelist:
         for line in rhymelist:
             if line.startswith(';;;'): continue
             word, phon = line.strip().split('  ')

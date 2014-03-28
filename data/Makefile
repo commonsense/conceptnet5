@@ -1,3 +1,5 @@
+# This 
+
 # ConceptNet-related configuration
 # ================================
 # $(READERS) and $(BUILDERS) specify where the scripts that take in raw
@@ -40,6 +42,14 @@ ASSOC_DIR = assoc/assoc-space-5.2
 # If you're in an appropriate virtualenv, this will simply be 'python'.
 PYTHON = python
 
+# Commands for downloading and uploading data
+CURL_DOWNLOAD = curl -O
+RSYNC_UPLOAD = rsync -Pavz
+
+# Commands for working with .tar.bz2 files
+TARBALL_CREATE = tar jcvf
+TARBALL_EXTRACT = tar jxvf
+
 # 'sort' and 'uniq' are very useful Unix utilities for working with text.
 # By default, they'll do something crazy and locale-specific when given
 # Unicode text. This will fail utterly when the text really is in more
@@ -54,6 +64,7 @@ PYTHON = python
 SORT = LC_ALL=C sort
 UNIQ = LC_ALL=C uniq
 COUNT_AND_RANK = $(SORT) | $(UNIQ) -c | $(SORT) -nbr
+CUT = cut
 
 # This is a mini-script that takes in tab-separated data, and truncates
 # all URIs it sees to the first two components. For example,
@@ -83,6 +94,7 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 #
 # The replacement expression is simply \1 -- the part of the URI that matched
 # the twice-repeated group.
+
 
 # File names
 # ==========
@@ -136,13 +148,15 @@ STATS_FILES = stats/relations.txt stats/concepts_per_language.txt stats/dataset_
 
 # High-level build tasks
 # ======================
-# By default, our goal is to build the Solr data files. (build_assoc used to
-# be here, but now I think it should be run explicitly -- it's a huge memory
-# hog.)
+# By default, our goal is to build the Solr data files, the aggregate
+# statistics, and everything they depend on.
 #
-# A complete run might look like this:
-#     make download build_solr build_assoc upload
-all: build_solr
+# The build_assoc step is not run by default, because it's a huge memory
+# hog.
+#
+# A complete run, including all steps, might look like this:
+#     make download build_solr build_stats build_assoc upload
+all: build_solr build_stats
 build_assoc: $(ASSOC_DIR)/u.npy
 build_solr: $(SOLR_FILES)
 build_assertions: $(COMBINED_CSVS)
@@ -156,13 +170,13 @@ build_stats: $(STATS_FILES)
 
 # A phony target that lets you run 'make download' to get the raw data.
 download :
-	curl -O $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
-	tar jxvf $(RAW_DATA_PACKAGE)
+	$(CURL) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
+	$(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
 upload : $(DIST_FILES)
-	rsync -Pav $(OUTPUT_FOLDER) $(UPLOAD_PATH)
+	$(RSYNC_UPLOAD) $(OUTPUT_FOLDER) $(UPLOAD_PATH)
 
 
 # Build steps
@@ -248,7 +262,7 @@ edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 # using $(patsubst).
 edges/sorted/%.csv: edges/split/.done
 	@mkdir -p edges/sorted
-	sort $(patsubst edges/sorted/%,edges/split/%,$@) | uniq > $@
+	$(SORT) $(patsubst edges/sorted/%,edges/split/%,$@) | uniq > $@
 
 # An assertion may be built from multiple similar edges, where the only
 # difference between them is the knowledge source. Combine edges with the same
@@ -283,55 +297,60 @@ solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
 # The following rules are for building the DIST_FILES to be uploaded.
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ raw/*/*
+	$(TARBALL_CREATE) $@ raw/*/*
 
 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ assertions/*.jsons
+	$(TARBALL_CREATE) $@ assertions/*.jsons
 
 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2: $(SOLR_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ solr
+	$(TARBALL_CREATE) $@ solr
 
 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ assertions/*.csv
+	$(TARBALL_CREATE) $@ assertions/*.csv
 
 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2: $(ASSOC_DIR)/*
 	@mkdir -p $(OUTPUT_FOLDER)
-	tar jcvf $@ $(ASSOC_DIR)
+	$(TARBALL_CREATE) $@ $(ASSOC_DIR)
 
 
-## Statistics
-
-# This command uses a Unix pipeline to count the occurrences of different
+# Statistics
+# ==========
+# These commands build aggregate statistics from the data, which are helpful
+# for understanding what kinds of data are in ConceptNet.
+#
+# Here's what happens in the pipeline that counts occurrences of different
 # relations:
 #
-#     'cat': concatenate these files together
-#     'cut -f 2': take only text in the second column
-#     'sort | uniq -c': group identical strings, and count their occurrences
-#     'sort -nbr': show the results in descending order by count
+#     1. 'cut -f 2' takes only text in the second column of all input files.
+#     2. 'sort | uniq -c' groups identical strings, and counts their occurrences.
+#     3. 'sort -nbr' lists the results in descending order by count.
+#
+# Steps 2 and 3 appear repeatedly in many of these build steps, so they've been
+# grouped into the expression $(COUNT_AND_RANK).
 stats/relations.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cut -f 2 $(SORTED_FILES) | $(COUNT_AND_RANK) > stats/relations.txt
+	$(CUT) -f 2 $(SORTED_FILES) | $(COUNT_AND_RANK) > stats/relations.txt
 
 stats/concepts_left_datasets.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cut -f 3,9 $(SORTED_FILES) > stats/concepts_left_datasets.txt
+	$(CUT) -f 3,9 $(SORTED_FILES) > stats/concepts_left_datasets.txt
 
 stats/concepts_right_datasets.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cut -f 4,9 $(SORTED_FILES) > stats/concepts_right_datasets.txt
+	$(CUT) -f 4,9 $(SORTED_FILES) > stats/concepts_right_datasets.txt
 
 stats/concepts.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
-	cut -f 1 $^ | $(COUNT_AND_RANK) > stats/concepts.txt
+	$(CUT) -f 1 $^ | $(COUNT_AND_RANK) > stats/concepts.txt
 
 stats/concepts_per_language.txt: stats/concepts.txt
-	cut -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
+	$(CUT) -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
 
 stats/dataset_languages.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
 	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > stats/dataset_vs_language.txt
 
 stats/morestats.txt: $(COMBINED_CSVS)
 	@mkdir -p stats
-	cut -f 2,3,4,9 $(SORTED_FILES) | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/morestats.txt
+	$(CUT) -f 2,3,4,9 $(SORTED_FILES) | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/morestats.txt
