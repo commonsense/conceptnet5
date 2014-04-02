@@ -267,7 +267,10 @@ class FindTranslations(ContentHandler):
 
     def output_sense_translation(self, lang, foreign, english, sense):
         pos, disambiguation = sense
-        if 'Wik' in foreign or 'Wik' in english:
+        if 'Wik' in foreign or 'Wik' in english or term_is_bad(foreign) or term_is_bad(english):
+            return
+        # Quick fix that drops definitions written in Lojban syntax
+        if lang == 'jbo' and re.search(r'x[1-5]', english):
             return
         if lang == 'zh-cn':
             lang = 'zh_CN'
@@ -294,6 +297,9 @@ class FindTranslations(ContentHandler):
 
     def output_translation(self, foreign, english, locale=''):
         if term_is_bad(foreign) or term_is_bad(english):
+            return
+        # Quick fix that drops definitions written in Lojban syntax
+        if self.langcode == 'jbo' and re.search(r'x[1-5]', english):
             return
         source = normalized_concept_uri(
             self.langcode + locale,
