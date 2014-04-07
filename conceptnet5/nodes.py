@@ -13,7 +13,7 @@ is harder to define.
 """
 
 from metanl.nltk_morphy import normalize as normalize_english
-from conceptnet5.uri import normalize_text, concept_uri
+from conceptnet5.uri import normalize_text, concept_uri, split_uri
 
 
 def normalized_concept_name(lang, text):
@@ -52,4 +52,25 @@ def normalized_concept_uri(lang, text, *more):
     norm_text = normalized_concept_name(lang, text)
     more_text = [normalize_text(item) for item in more]
     return concept_uri(lang, norm_text, *more_text)
+
+
+def uri_to_lemmas(uri):
+    """
+    Given a normalized concept URI, extract the list of words (in their root
+    form) that it contains in its text.
+
+    >>> # This is the lemmatized concept meaning 'United States'
+    >>> uri_to_lemmas('/c/en/unite_state')
+    ['unite', 'state']
+    >>> uri_to_lemmas('/c/en/township/n/united_states')
+    ['township', 'unite', 'state']
+    """
+    uri_pieces = split_uri(uri)
+    lemmas = uri_pieces[2].split('_')
+    if len(uri_pieces) >= 5:
+        lang = uri_pieces[1]
+        text = uri_pieces[4].replace('_', ' ')
+        disambig = normalized_concept_name(lang, text)
+        lemmas.extend(disambig.split('_'))
+    return lemmas
 

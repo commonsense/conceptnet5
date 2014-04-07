@@ -28,9 +28,9 @@ def extract_contributors(source):
     may appear in different files.
 
     >>> extract_contributors('/s/contributor/omcs/dev')
-    set(['/s/contributor/omcs/dev'])
+    {'/s/contributor/omcs/dev'}
     >>> extract_contributors('/and/[/s/contributor/omcs/dev/,/s/activity/omcs1/]')
-    set(['/s/contributor/omcs/dev'])
+    {'/s/contributor/omcs/dev'}
     >>> extract_contributors('/s/robot/johnny5')
     set()
     """

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.formats.json_stream import read_json_stream
+from conceptnet5.nodes import uri_to_lemmas
 import codecs
 import json
 
@@ -26,6 +27,12 @@ def convert_to_solr(input_filename, output_filename):
     print("{", file=out)
     for info in read_json_stream(input_filename):
         boost = info['weight']
+
+        # Handle searchable lemmas
+        info['relLemmas'] = []
+        info['startLemmas'] = uri_to_lemmas[info['start']]
+        info['endLemmas'] = uri_to_lemmas[info['end']]
+
         if boost > 0:
             if 'surfaceText' in info and info['surfaceText'] is None:
                 del info['surfaceText']
