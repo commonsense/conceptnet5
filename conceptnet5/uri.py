@@ -241,6 +241,28 @@ def parse_compound_uri(uri):
     return op, chunks
 
 
+def parse_possible_compound_uri(op, uri):
+    """
+    The AND and OR conjunctions can be expressed as compound URIs, but if they
+    contain only one thing, they are returned as just that single URI, not a
+    compound.
+
+    This function returns the list of things in the compound URI if its operator
+    matches `op`, or a list containing the URI itself if not.
+
+    >>> parse_possible_compound_uri(
+    ...    'or', '/or/[/and/[/s/one/,/s/two/]/,/and/[/s/three/,/s/four/]/]'
+    ... )
+    ['/and/[/s/one/,/s/two/]', '/and/[/s/three/,/s/four/]']
+    >>> parse_possible_compound_uri('or', '/s/contributor/omcs/dev')
+    ['/s/contributor/omcs/dev']
+    """
+    if uri.startswith('/' + op + '/'):
+        return parse_compound_uri(uri)[1]
+    else:
+        return [uri]
+
+
 def conjunction_uri(*sources):
     """
     Make a URI representing a conjunction of sources that work together to provide

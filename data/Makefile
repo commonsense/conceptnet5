@@ -269,7 +269,7 @@ edges/sorted/%.csv: edges/split/.done
 # assertion URI into single assertions.
 assertions/part_%.jsons: edges/sorted/edges_%.csv $(BUILDERS)/combine_assertions.py
 	@mkdir -p assertions
-	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -d /d/conceptnet/5/combined-sa -l /l/CC/By-SA
+	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -l /l/CC/By-SA
 
 assertions/%.csv: assertions/%.jsons
 	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@

@@ -1,5 +1,6 @@
 from hashlib import sha1
-from conceptnet5.uri import conjunction_uri, assertion_uri, Licenses
+from conceptnet5.uri import (conjunction_uri, assertion_uri, Licenses,
+                             parse_possible_compound_uri)
 from pprint import pprint
 
 def make_edge(rel, start, end, dataset, license, sources,
@@ -39,12 +40,23 @@ def make_edge(rel, start, end, dataset, license, sources,
     ]
     uri = assertion_uri(rel, start, end)
     if isinstance(sources, list):
-        sources = conjunction_uri(*sources)
+        source_tree = conjunction_uri(*sources)
+        source_list = sources
+    else:
+        source_tree = sources
+        source_list = parse_possible_compound_uri('or', sources)
+    
+    separate_source_lists = [
+        parse_possible_compound_uri('and', source)
+        for source in source_list
+    ]
+    flat_sources = [inner for outer in separate_source_lists
+                          for inner in outer]
 
     # Generate a unique ID for the edge. This is the only opaque ID
     # that appears in ConceptNet objects. You can use it as a
     # pseudo-random sort order over edges.
-    edge_unique_data = [uri, context, sources]
+    edge_unique_data = [uri, context, source_tree]
     edge_unique = ' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     obj = {
@@ -55,7 +67,8 @@ def make_edge(rel, start, end, dataset, license, sources,
         'end': end,
         'context': context,
         'dataset': dataset,
-        'sources': sources,
+        'sources': flat_sources,
+        'source_uri': source_tree,
         'features': features,
         'license': license,
         'weight': weight,

@@ -24,7 +24,7 @@ def data_path(filename):
 # function to run and the arguments to give it. nosetests knows how to run
 # tests with this structure.
 def test_reader_modules():
-    combiner = AssertionCombiner('/d/conceptnet/5/combined-sa', '/l/CC/By-SA')
+    combiner = AssertionCombiner('/l/CC/By-SA')
     io_mappings = [
         (conceptnet4, 'input/conceptnet4.jsons', ['output/conceptnet4.jsons']),
         (dbpedia, 'input/dbpedia.nt', ['output/dbpedia.jsons', 'output/dbpedia_map.nt']),

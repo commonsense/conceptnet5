@@ -43,15 +43,15 @@ def extract_contributors(source):
         return set()
 
 
-def combine_assertions(csv_filename, output_file, dataset, license):
+def combine_assertions(csv_filename, output_file, license):
     """
     Take in a tab-separated, sorted "CSV" file, named `csv_filename`, of
     distinct edges which should be grouped together into assertions. Output a
     JSON stream of assertions to `output_file`.
 
-    The combined assertions will all have the same dataset and license,
-    unlike the edges that comprise them. These are specified as the `dataset`
-    and `license` arguments.
+    The combined assertions will all have the dataset of the first edge that
+    produces them, and the license of the strongest license being combined
+    (which should be passed in as `license`).
 
     This process requires its input to be a sorted CSV so that all edges for
     the same assertion will appear consecutively.
@@ -62,6 +62,7 @@ def combine_assertions(csv_filename, output_file, dataset, license):
     current_data = {}
     current_contributors = set()
     current_surface = None
+    current_dataset = None
     current_weight = 0.
     current_sources = []
 
@@ -94,11 +95,12 @@ def combine_assertions(csv_filename, output_file, dataset, license):
             if (current_surface is None) and surface:
                 current_surface = surface
 
+
         # Otherwise, it's a new assertion.
         else:
             if current_uri is not None:
                 output_assertion(out,
-                    dataset=dataset, license=license,
+                    dataset=current_dataset, license=license,
                     sources=current_sources,
                     surfaceText=current_surface,
                     weight=weight_scale(current_weight),
@@ -115,11 +117,12 @@ def combine_assertions(csv_filename, output_file, dataset, license):
             current_sources = [source_uri]
             current_contributors = extract_contributors(source_uri)
             current_surface = surface or None
+            current_dataset = this_dataset
 
     if current_uri is not None:
         output_assertion(out,
             rel=rel, start=start, end=end,
-            dataset=dataset, license=license,
+            dataset=current_dataset, license=license,
             sources=current_sources,
             surfaceText=current_surface,
             weight=weight_scale(current_weight),
@@ -154,12 +157,11 @@ class AssertionCombiner(object):
     A class that wraps the combine_assertions function, so it can be tested in
     the same way as the readers, despite its extra parameters.
     """
-    def __init__(self, dataset, license):
-        self.dataset = dataset
+    def __init__(self, license):
         self.license = license
 
     def handle_file(self, input_filename, output_file):
-        combine_assertions(input_filename, output_file, self.dataset, self.license)
+        combine_assertions(input_filename, output_file, self.license)
 
 
 if __name__ == '__main__':
@@ -170,13 +172,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='csv file of input')
     parser.add_argument('output', help='jsons file to output to')
-    parser.add_argument('-d', '--dataset',
-        help='URI of the dataset to build, such as /d/conceptnet/5/combined-core'
-    )
     parser.add_argument('-l', '--license',
         help='URI of the license to use, such as /l/CC/By-SA'
     )
     args = parser.parse_args()
-    combiner = AssertionCombiner(args.dataset, args.license)
+    combiner = AssertionCombiner(args.license)
     combiner.handle_file(args.input, args.output)
 
