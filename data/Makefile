@@ -345,8 +345,10 @@ stats/concepts_right_datasets.txt: $(COMBINED_CSVS)
 stats/concepts.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
 	$(CUT) -f 1 $^ | $(COUNT_AND_RANK) > stats/concepts.txt
 
-stats/concepts_per_language.txt: stats/concepts.txt
-	$(CUT) -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
+## This doesn't work -- concepts.txt already has counts on it, in a format that
+## 'cut' doesn't like.
+#stats/concepts_per_language.txt: stats/concepts.txt
+#	$(CUT) -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
 
 stats/dataset_languages.txt: stats/concepts_left_datasets.txt stats/concepts_right_datasets.txt
 	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > stats/dataset_vs_language.txt
