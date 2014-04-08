@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from hashlib import sha1
 from conceptnet5.uri import (conjunction_uri, assertion_uri, Licenses,
                              parse_possible_compound_uri)

@@ -1,5 +1,3 @@
-# This 
-
 # ConceptNet-related configuration
 # ================================
 # $(READERS) and $(BUILDERS) specify where the scripts that take in raw

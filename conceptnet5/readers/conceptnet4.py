@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 """
 This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
