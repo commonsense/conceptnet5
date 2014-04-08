@@ -127,11 +127,10 @@ def search(query_args=None):
     query_params = []
     filter_params = []
     sharded = True
-    if query_args.get('filter') == 'core-assertions':
-        filter_params.append('dataset:/d/conceptnet/5/combined-core*')
-        sharded = False
-    elif query_args.get('filter') == 'core':
-        sharded = False
+    if query_args.get('filter') in ('core', 'core-assertions'):
+        # core-assertions is equivalent to core, now that assertions are the
+        # only edge-like structures the API returns.
+        filter_params.append('license:/l/CC/By')
     for key in PATH_FIELDS:
         if key in query_args:
             val = lucene_escape(query_args.get(key)).rstrip('/')
