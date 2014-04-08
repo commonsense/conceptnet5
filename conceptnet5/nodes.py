@@ -13,7 +13,7 @@ is harder to define.
 """
 
 from metanl.nltk_morphy import normalize as normalize_english
-from conceptnet5.uri import normalize_text, concept_uri, split_uri
+from conceptnet5.uri import normalize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
 
 
 def normalized_concept_name(lang, text):
@@ -70,7 +70,8 @@ def uri_to_lemmas(uri):
     if len(uri_pieces) >= 5:
         lang = uri_pieces[1]
         text = uri_pieces[4].replace('_', ' ')
-        disambig = normalized_concept_name(lang, text)
-        lemmas.extend(disambig.split('_'))
+        if text not in BAD_NAMES_FOR_THINGS:
+            disambig = normalized_concept_name(lang, text)
+            lemmas.extend(disambig.split('_'))
     return lemmas
 
