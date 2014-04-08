@@ -4,7 +4,6 @@ from conceptnet5.nodes import uri_to_lemmas
 import codecs
 import json
 
-
 def convert_to_solr(input_filename, output_filename):
     """
     Convert a JSON stream to a different JSON file that can be loaded into
@@ -30,8 +29,8 @@ def convert_to_solr(input_filename, output_filename):
 
         # Handle searchable lemmas
         info['relLemmas'] = []
-        info['startLemmas'] = uri_to_lemmas[info['start']]
-        info['endLemmas'] = uri_to_lemmas[info['end']]
+        info['startLemmas'] = uri_to_lemmas(info['start'])
+        info['endLemmas'] = uri_to_lemmas(info['end'])
 
         if boost > 0:
             if 'surfaceText' in info and info['surfaceText'] is None:
