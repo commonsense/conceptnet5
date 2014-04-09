@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 packages = find_packages()
-version_str = '5.2.1rc1'
+version_str = '5.2.1'
 
 setup(
     name = 'ConceptNet',
@@ -12,7 +12,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     package_data={'conceptnet5': ['support_data/*']},
-    install_requires=['metanl', 'assoc-space', 'xmltodict', 'pyyaml', 'flask'],
+    install_requires=['metanl >= 1.0b2', 'assoc-space', 'xmltodict', 'pyyaml', 'flask'],
     license = 'GPLv3'
 )
 

@@ -10,7 +10,7 @@ __author__ = 'Justin Venezuela (jven@mit.edu)'
 # Python 2/3 compatibility
 import sys
 if sys.version_info.major < 3:
-    from urllib import urlencode
+    from urllib import urlencode, quote
     from urllib2 import urlopen
 else:
     from urllib.parse import urlencode, quote
