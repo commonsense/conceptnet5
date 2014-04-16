@@ -50,17 +50,17 @@ def can_skip(parts_dict):
     Skip the kinds of data that we don't want to import from ConceptNet 4's
     database dump.
 
-    This includes Chinese and Japanese, because better versions of these were
-    developed by groups we collaborate with, in separate databases.
-
     The activity called 'testing' was actually collecting preliminary data for
     a dataset about subjective medical experiences. This data looks really out
     of place now.
     """
     lang = parts_dict['lang']
     if lang.startswith('zh'):
+        # Chinese assertions from GlobalMind are not reliable enough. We'll get
+        # Chinese from the `ptt_petgame` module instead.
         return True
-    if lang == 'ja':
+    if lang == 'ja' and parts_dict["activity"] != 'nadya.jp':
+        # Use Japanese data collected from nadya.jp, but not earlier attempts.
         return True
     if parts_dict["goodness"] < 1:
         return True
