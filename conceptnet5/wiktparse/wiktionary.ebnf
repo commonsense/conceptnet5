@@ -1,0 +1,115 @@
+(* Tokens *)
+left_bracket   = "[" ;
+right_bracket  = "]" ;
+left_brackets   = "[[" ;
+right_brackets  = "]]" ;
+left_braces     = "{{" ;
+right_braces    = "}}" ;
+hash_char       = "#" ;
+vertical_bar    = "|" ;
+equals          = "=" ;
+bullet          = "*" ;
+colon           = ":" ;
+comma           = "," ;
+semicolon       = ";" ;
+
+(* Here's our first regex-defined rule, which matches newlines. Regular
+   expressions are indicated with the ?/re/? syntax, which conveys an
+   appropriate subtext of bafflement. *)
+NEWLINE = ?/[ \t]*\n/? .
+
+(* Comments are matched with a non-greedy regex. *)
+comment = ?/<!--(.|\n)+?-->/? ;
+
+(* A "term" is a string with no wiki syntax in it. Basically, anything 
+   whose characters we can consume without worrying about backtracking,
+   because you can't backtrack into a regex. *)
+term = ?/[^\[\]{}<>|:=\n]+/? ;
+safe_term = !bullet !hash_char term ;
+
+(* We don't care at all about the contents of HTML tags. They're just there;
+   So, despite a frothing rant on Stack Overflow, I'll parse HTML tags with
+   a regex. *)
+html_tag = ?/<[^>]+?>/? ;
+
+(* "text" is made of things that are either terms, or things we ignore like
+   comments and HTML tags. It doesn't allow stray brackets and braces,
+   however, because this makes it easy to misparse an entire section. *)
+(* This rule is an example of where order matters in a PEG grammar: a comment
+   looks like an HTML tag, but is more specific and is parsed differently,
+   so we need to match it first. *)
+TEXT = safe_term | comment | html_tag | colon | equals | left_bracket | right_bracket ;
+
+
+(*
+Links look like this:
+
+    [[target]]
+
+Or this:
+
+    [[target|text]]
+*)
+wiki_link = left_brackets [ site:term colon ] target:term [ vertical_bar text:term ] right_brackets ;
+
+
+(*
+External links are something we have to be able to cope with. They look like this:
+
+    [http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]
+*)
+linktext = { term | html_tag | colon | equals }+ ;
+url = schema:term colon path:term ;
+external_link = left_bracket url:url [ text:linktext ] right_bracket ;
+
+
+(*
+A simple template looks like this:
+
+    {{archaic}}
+
+More complex templates take arguments, such as this translation into French:
+
+    {{t+|fr|exemple|m}}
+
+And very complex templates can have both positional and named arguments:
+
+    {{t|ja|例え|tr=[[たとえ]], tatoe}}
+*)
+named_arg = key:term equals value:wikitext ;
+template_arg = vertical_bar { named_arg | value:wikitext } ;
+template_args = { template_arg }+ ;
+template = left_braces name:term [ args:template_args ] right_braces ;
+
+
+(* Rules for parsing translation sections *)
+translation_name = ?/t[^\[\]{}|:=]{0,3}/? ;
+translation_template = left_braces translation_name @template_args right_braces ;
+
+checktrans_top_template = left_braces "checktrans-top" right_braces ;
+sensetrans_top_template = left_braces "trans-top" vertical_bar sense:text_with_links right_braces ;
+trans_top_template = { checktrans:checktrans_top_template | sensetrans:sensetrans_top_template } ;
+trans_mid_template = left_braces "trans-mid" right_braces ;
+trans_bottom_template = left_braces "trans-bottom" right_braces ;
+
+translation_entry = { translation_template | text_with_links }+ ;
+translation_content = { trans_mid_template | translation_entry }+ ;
+
+(* After parsing a translation block, we "cut", indicated by the symbol >>.
+   That means the parser should not backtrack past this point after
+   successfully parsing a block, and therefore it can throw out memoized
+   parses before this point. *)
+translation_block = trans_top_template @translation_content trans_bottom_template >> ;
+translation_section = { translation_block }+ ;
+
+
+(* Rules for parsing definition sections *)
+defn_line = hash_char !bullet @wikitext ;
+defn_details = hash_char bullet @wikitext ;
+definition = defn:defn_line { details+:defn_details }* >> ;
+definition_section = { template }* { definition }+ ;
+
+
+(* Sections of arbitrary text *)
+text_with_links = { wiki_link | TEXT }+ ;
+wikitext = { template | wiki_link | external_link | TEXT }+ ;

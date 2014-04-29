@@ -1,0 +1,1 @@
+from conceptnet5.wiktparse.parser import wiktionarySemantics
