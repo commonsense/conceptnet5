@@ -1,4 +1,9 @@
-from conceptnet5.wiktparse.parser import wiktionarySemantics
+from __future__ import unicode_literals
+from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
+from pprint import pprint
+
+
+string_type = type('')
 
 
 class LinkedText(object):
@@ -38,10 +43,34 @@ class EdgeInfo(object):
         )
 
 
+def join_text(lst, sep=' '):
+    if lst is None:
+        return None
+
+    texts = []
+    for item in lst:
+        if item is None:
+            pass
+        elif isinstance(item, string_type):
+            texts.append(item)
+        elif isinstance(item, LinkedText):
+            if item.text is not None:
+                texts.append(item.text)
+        else:
+            raise TypeError(item)
+
+    return sep.join(texts)
+
+
 class ConceptNetWiktionarySemantics(wiktionarySemantics):
     def __init__(self, language, **kwargs):
         self.default_language = language
         wiktionarySemantics.__init__(self, **kwargs)
+
+    def parse(self, text, rule_name, **kwargs):
+        parser = wiktionaryParser()
+        return parser.parse(text, rule_name=rule_name, semantics=self,
+                            **kwargs)
 
     def wiki_link(self, ast):
         if 'site' in ast:
@@ -50,7 +79,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         else:
             links = [EdgeInfo(
                 language=self.default_language,
-                term=ast['target']
+                target=ast['target']
             )]
         return LinkedText(text=ast['text'], links=links)
 
@@ -59,7 +88,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return LinkedText(text=ast['text'], links=[])
 
     def link_template(self, ast):
-        # This is going to be complicated.
+        # This is going to be complicated. We need to figure out the
+        # argument structure of many different templates.
         raise NotImplementedError
 
     def template_args(self, ast):
@@ -77,7 +107,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             else:
                 key = position
                 position += 1
-            template_value[key] = item['value']
+            template_value[key] = join_text(item['value'])
         return template_value
 
     def template(self, ast):
@@ -93,7 +123,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
     def translation_template(self, ast):
         return EdgeInfo(
             language=ast[1],
-            term=ast[2],
+            target=ast[2],
             rel='TranslationOf'
         )
 
@@ -104,9 +134,42 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
     def checktrans_top_template(self, ast):
         return {'sense': None}
 
+    def translation_entry(self, ast):
+        if isinstance(ast, list):
+            # If there were no translations found, we end up with a list
+            # of all the other junk.
+            return []
+        return ast['translations']
+    
     def translation_block(self, ast):
         sense = ast['top']['sense']
-        return [info.set_sense(sense) for info in ast['translations']]
+        return [info.set_sense(sense) for info in sum(ast['translations'], [])]
 
     def translation_section(self, ast):
-        return sum(ast)
+        return ast
+
+
+def main(filename, startrule, trace=False):
+    with open(filename) as f:
+        text = f.read()
+    semantics = ConceptNetWiktionarySemantics(language='en')
+    ast = semantics.parse(
+        text,
+        startrule,
+        filename=filename,
+        trace=trace
+    )
+    pprint(ast)
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Semantic parser for wiktionary.")
+    parser.add_argument('-t', '--trace', action='store_true',
+                        help="output trace information")
+    parser.add_argument('file', metavar="FILE", help="the input file to parse")
+    parser.add_argument('startrule', metavar="STARTRULE",
+                        help="the start rule for parsing")
+    args = parser.parse_args()
+
+    main(args.file, args.startrule, trace=args.trace)

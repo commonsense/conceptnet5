@@ -108,7 +108,7 @@ link_template = left_braces linktype:link_template_name args:template_args right
 
 
 (* Rules for parsing translation sections *)
-translation_name = ?/t[^\[\]{}|:=]*/? ;
+translation_name = "t-simple" | "t+" | "t" | "t-" | "t0" | "tø" ;
 translation_template = left_braces translation_name @template_args right_braces ;
 
 checktrans_top_template = left_braces "checktrans-top" right_braces ;
@@ -117,7 +117,8 @@ trans_top_template = { checktrans:checktrans_top_template | sensetrans:sensetran
 trans_mid_template = left_braces "trans-mid" right_braces ;
 trans_bottom_template = left_braces "trans-bottom" right_braces ;
 
-translation_content = { trans_mid_template | @+:translation_template | text_with_links }+ ;
+translation_entry = bullet { translations+:translation_template | text_with_links }+ ;
+translation_content = { trans_mid_template | @+:translation_entry | text_with_links }+ ;
 
 (* After parsing a translation block, we "cut", indicated by the symbol >>.
    That means the parser should not backtrack past this point after

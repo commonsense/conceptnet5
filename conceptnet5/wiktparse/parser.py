@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.119.21.36.41'
+__version__ = '14.120.16.18.03'
 
 
 class wiktionaryParser(Parser):
@@ -287,7 +287,7 @@ class wiktionaryParser(Parser):
                 self._token('prefix')
             with self._option():
                 self._token('suffix')
-            self._error('expecting one of: confix suffix term compound l prefix l/ja ko-inline clipping -er named-after l/en back-form etycomp borrowing calque etyltwin blend ja-l term/t')
+            self._error('expecting one of: confix term/t clipping etyltwin l/ja suffix term etycomp l/en ko-inline named-after compound blend l ja-l -er borrowing back-form prefix calque')
 
     @rule_def
     def _link_template_(self):
@@ -300,7 +300,20 @@ class wiktionaryParser(Parser):
 
     @rule_def
     def _translation_name_(self):
-        self._pattern(r't[^\[\]{}|:=]*')
+        with self._choice():
+            with self._option():
+                self._token('t-simple')
+            with self._option():
+                self._token('t+')
+            with self._option():
+                self._token('t')
+            with self._option():
+                self._token('t-')
+            with self._option():
+                self._token('t0')
+            with self._option():
+                self._token('tÃ¸')
+            self._error('expecting one of: t-simple tÃ¸ t t+ t0 t-')
 
     @rule_def
     def _translation_template_(self):
@@ -352,10 +365,12 @@ class wiktionaryParser(Parser):
 
     @rule_def
     def _translation_entry_(self):
+        self._bullet_()
         def block0():
             with self._choice():
                 with self._option():
                     self._translation_template_()
+                    self.ast.add_list('translations', self.last_node)
                 with self._option():
                     self._text_with_links_()
                 self._error('no available options')
@@ -369,14 +384,18 @@ class wiktionaryParser(Parser):
                     self._trans_mid_template_()
                 with self._option():
                     self._translation_entry_()
+                    self.ast.add_list('@', self.last_node)
+                with self._option():
+                    self._text_with_links_()
                 self._error('no available options')
         self._positive_closure(block0)
 
     @rule_def
     def _translation_block_(self):
         self._trans_top_template_()
+        self.ast['top'] = self.last_node
         self._translation_content_()
-        self.ast['@'] = self.last_node
+        self.ast['translations'] = self.last_node
         self._trans_bottom_template_()
         self._cut()
 
