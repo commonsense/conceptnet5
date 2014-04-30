@@ -150,8 +150,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     def translation_template(self, ast):
         return EdgeInfo(
-            language=ast[1],
-            target=ast[2],
+            language=ast[1].text,
+            target=ast[2].text,
             rel='TranslationOf'
         )
 
