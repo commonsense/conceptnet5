@@ -94,10 +94,10 @@ value has no special meaning. These may occur, for example, in links to
 proto-language words.
 *)
 named_arg = key:term equals value:wikitext ;
-arg_value = [bullet | hash_char] @wikitext ;
+arg_value = [ bullet | hash_char ] @wikitext ;
 template_arg = [ named_arg | value:arg_value ] ;
 template_args = { vertical_bar @+:template_arg }+ ;
-template = left_braces name:term [ args:template_args ] right_braces ;
+template = left_braces name:term [args:template_args] right_braces ;
 
 
 (* Templates that become links to words, such as {{term}} and {{l}} *)
@@ -145,7 +145,7 @@ etymology_section = { etym+:etyl_link | etym+:link_template | template | wiki_li
 (* Rules for parsing link sections, such as related terms and synonyms *)
 link_section = { link_line | template }+ ;
 sense_template = left_braces "sense" vertical_bar @text_with_links right_braces ;
-link_line = bullet [ sense:sense_template ] { link+:link_template | link+:wiki_link | template | external_link | text }+ ;
+link_line = bullet [sense:sense_template] { link+:link_template | link+:wiki_link | template | external_link | text }+ ;
 
 
 (* Sections of arbitrary text *)
