@@ -8,8 +8,12 @@ string_type = type('')
 
 class LinkedText(object):
     def __init__(self, text, links):
-        self.text = text
-        self.links = links
+        if isinstance(text, LinkedText):
+            self.text = text.text
+            self.links = text.links + links
+        else:
+            self.text = text
+            self.links = links
 
     def __add__(self, other):
         text = self.text + ' ' + other.text
@@ -48,18 +52,25 @@ def join_text(lst, sep=' '):
         return None
 
     texts = []
+    links = []
     for item in lst:
         if item is None:
             pass
         elif isinstance(item, string_type):
-            texts.append(item)
+            texts.append(item.strip())
         elif isinstance(item, LinkedText):
             if item.text is not None:
-                texts.append(item.text)
+                texts.append(item.text.strip())
+            links.extend(item.links)
+        elif isinstance(item, dict):
+            # This is an unhandled template; we ignore it for the purpose of
+            # extracting text
+            pass
         else:
             raise TypeError(item)
 
-    return sep.join(texts)
+    text = sep.join(texts)
+    return LinkedText(text, links)
 
 
 class ConceptNetWiktionarySemantics(wiktionarySemantics):
@@ -72,8 +83,20 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return parser.parse(text, rule_name=rule_name, semantics=self,
                             **kwargs)
 
+    def linktext(self, ast):
+        assert isinstance(ast, list)
+        return join_text(ast)
+    
+    def wikitext(self, ast):
+        # FIXME: This might be quite inefficient. We throw away a lot of
+        # wikitext, so maybe we should not try to interpret its semantics
+        # yet, or maybe we should have an "ignored_wikitext" rule with no
+        # semantics.
+        value = join_text(ast)
+        return value
+
     def wiki_link(self, ast):
-        if 'site' in ast:
+        if ast['site'] is not None:
             # We don't like off-Wiktionary links
             links = []
         else:
@@ -81,7 +104,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 language=self.default_language,
                 target=ast['target']
             )]
-        return LinkedText(text=ast['text'], links=links)
+        text = ast['text'] or ast['target']
+        return LinkedText(text=text, links=links)
 
     def external_link(self, ast):
         # Keep only the text of external links
@@ -107,7 +131,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             else:
                 key = position
                 position += 1
-            template_value[key] = join_text(item['value'])
+            template_value[key] = item['value']
         return template_value
 
     def template(self, ast):
@@ -138,6 +162,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         if isinstance(ast, list):
             # If there were no translations found, we end up with a list
             # of all the other junk.
+            return []
+        if ast['translations'] is None:
             return []
         return ast['translations']
     

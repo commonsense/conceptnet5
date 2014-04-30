@@ -28,7 +28,7 @@ term = ?/[^\[\]{}<>|:=\n]+/? ;
    those symbols in a few *other* situations, too, but I'd like to try to make
    this work, because the alternative is to try to explain to this grammar where
    newlines are significant and where they aren't. *)
-safe_term = !bullet !hash_char term ;
+safe_term = !bullet !hash_char @term ;
 
 (* We don't care at all about the contents of HTML tags. They're just there;
    So, despite a frothing rant on Stack Overflow, I'll parse HTML tags with
@@ -150,4 +150,4 @@ link_line = bullet [sense:sense_template] { link+:link_template | link+:wiki_lin
 
 (* Sections of arbitrary text *)
 text_with_links = { wiki_link | text }+ ;
-wikitext = { template | wiki_link | external_link | text }+ ;
+wikitext = { @+:template | @+:wiki_link | @+:external_link | @+:text }+ ;
