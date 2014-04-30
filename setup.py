@@ -12,7 +12,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     package_data={'conceptnet5': ['support_data/*']},
-    install_requires=['metanl >= 1.0b2', 'assoc-space', 'xmltodict', 'pyyaml', 'flask'],
+    install_requires=['metanl >= 1.0b2', 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako'],
     license = 'GPLv3'
 )
 
