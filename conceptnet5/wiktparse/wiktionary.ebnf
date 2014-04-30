@@ -165,7 +165,7 @@ translation_section = { translation_block }+ ;
 list_chars = ?/[#*:]+/? ;
 defn_line = hash_char !bullet SP @one_line_wikitext NL WS ;
 defn_details = hash_char list_chars SP @one_line_wikitext NL WS ;
-definition = defn:defn_line { details+:defn_details }* >> ;
+definition = @defn_line { defn_details }* >> ;
 definition_section = { template | image | WS }* { @+:definition }+ ;
 
 
