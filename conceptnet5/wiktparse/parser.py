@@ -13,7 +13,7 @@ from grako.parsing import * # noqa
 from grako.exceptions import * # noqa
 
 
-__version__ = '14.119.18.31.41'
+__version__ = '14.119.21.36.41'
 
 
 class wiktionaryParser(Parser):
@@ -73,10 +73,6 @@ class wiktionaryParser(Parser):
         self._token(';')
 
     @rule_def
-    def _NEWLINE_(self):
-        self._pattern(r'[ \t]*\n')
-
-    @rule_def
     def _comment_(self):
         self._pattern(r'<!--(.|\n)+?-->')
 
@@ -97,22 +93,39 @@ class wiktionaryParser(Parser):
         self._pattern(r'<[^>]+?>')
 
     @rule_def
-    def _TEXT_(self):
+    def _single_left_bracket_(self):
+        self._left_bracket_()
+        with self._ifnot():
+            self._left_bracket_()
+
+    @rule_def
+    def _single_right_bracket_(self):
+        self._right_bracket_()
+        with self._ifnot():
+            self._right_bracket_()
+
+    @rule_def
+    def _text_(self):
         with self._choice():
             with self._option():
                 self._safe_term_()
+                self.ast['@'] = self.last_node
             with self._option():
                 self._comment_()
             with self._option():
                 self._html_tag_()
             with self._option():
                 self._colon_()
+                self.ast['@'] = self.last_node
             with self._option():
                 self._equals_()
+                self.ast['@'] = self.last_node
             with self._option():
-                self._left_bracket_()
+                self._single_left_bracket_()
+                self.ast['@'] = self.last_node
             with self._option():
-                self._right_bracket_()
+                self._single_right_bracket_()
+                self.ast['@'] = self.last_node
             self._error('no available options')
 
     @rule_def
@@ -136,21 +149,28 @@ class wiktionaryParser(Parser):
             with self._choice():
                 with self._option():
                     self._term_()
+                    self.ast.add_list('@', self.last_node)
                 with self._option():
                     self._html_tag_()
                 with self._option():
                     self._colon_()
+                    self.ast.add_list('@', self.last_node)
                 with self._option():
                     self._equals_()
+                    self.ast.add_list('@', self.last_node)
                 self._error('no available options')
         self._positive_closure(block0)
+
+    @rule_def
+    def _urlpath_(self):
+        self._pattern(r'[^ \[\]{}<>|]+')
 
     @rule_def
     def _url_(self):
         self._term_()
         self.ast['schema'] = self.last_node
         self._colon_()
-        self._term_()
+        self._urlpath_()
         self.ast['path'] = self.last_node
 
     @rule_def
@@ -164,6 +184,18 @@ class wiktionaryParser(Parser):
         self._right_bracket_()
 
     @rule_def
+    def _image_(self):
+        self._left_brackets_()
+        self._token('Image:')
+        self._term_()
+        self.ast['filename'] = self.last_node
+        def block1():
+            self._vertical_bar_()
+            self._wikitext_()
+        self._closure(block1)
+        self._right_brackets_()
+
+    @rule_def
     def _named_arg_(self):
         self._term_()
         self.ast['key'] = self.last_node
@@ -172,22 +204,34 @@ class wiktionaryParser(Parser):
         self.ast['value'] = self.last_node
 
     @rule_def
+    def _arg_value_(self):
+        with self._optional():
+            with self._choice():
+                with self._option():
+                    self._bullet_()
+                with self._option():
+                    self._hash_char_()
+                self._error('no available options')
+        self._wikitext_()
+        self.ast['@'] = self.last_node
+
+    @rule_def
     def _template_arg_(self):
-        self._vertical_bar_()
-        def block0():
+        with self._optional():
             with self._choice():
                 with self._option():
                     self._named_arg_()
                 with self._option():
-                    self._wikitext_()
+                    self._arg_value_()
                     self.ast['value'] = self.last_node
                 self._error('no available options')
-        self._closure(block0)
 
     @rule_def
     def _template_args_(self):
         def block0():
+            self._vertical_bar_()
             self._template_arg_()
+            self.ast.add_list('@', self.last_node)
         self._positive_closure(block0)
 
     @rule_def
@@ -201,8 +245,62 @@ class wiktionaryParser(Parser):
         self._right_braces_()
 
     @rule_def
+    def _link_template_name_(self):
+        with self._choice():
+            with self._option():
+                self._token('term/t')
+            with self._option():
+                self._token('term')
+            with self._option():
+                self._token('l')
+            with self._option():
+                self._token('l/en')
+            with self._option():
+                self._token('l/ja')
+            with self._option():
+                self._token('ja-l')
+            with self._option():
+                self._token('ko-inline')
+            with self._option():
+                self._token('blend')
+            with self._option():
+                self._token('borrowing')
+            with self._option():
+                self._token('back-form')
+            with self._option():
+                self._token('etycomp')
+            with self._option():
+                self._token('calque')
+            with self._option():
+                self._token('clipping')
+            with self._option():
+                self._token('compound')
+            with self._option():
+                self._token('confix')
+            with self._option():
+                self._token('-er')
+            with self._option():
+                self._token('etyltwin')
+            with self._option():
+                self._token('named-after')
+            with self._option():
+                self._token('prefix')
+            with self._option():
+                self._token('suffix')
+            self._error('expecting one of: confix suffix term compound l prefix l/ja ko-inline clipping -er named-after l/en back-form etycomp borrowing calque etyltwin blend ja-l term/t')
+
+    @rule_def
+    def _link_template_(self):
+        self._left_braces_()
+        self._link_template_name_()
+        self.ast['linktype'] = self.last_node
+        self._template_args_()
+        self.ast['args'] = self.last_node
+        self._right_braces_()
+
+    @rule_def
     def _translation_name_(self):
-        self._pattern(r't[^\[\]{}|:=]{0,3}')
+        self._pattern(r't[^\[\]{}|:=]*')
 
     @rule_def
     def _translation_template_(self):
@@ -289,6 +387,10 @@ class wiktionaryParser(Parser):
         self._positive_closure(block0)
 
     @rule_def
+    def _list_chars_(self):
+        self._pattern(r'[#*:]+')
+
+    @rule_def
     def _defn_line_(self):
         self._hash_char_()
         with self._ifnot():
@@ -299,7 +401,7 @@ class wiktionaryParser(Parser):
     @rule_def
     def _defn_details_(self):
         self._hash_char_()
-        self._bullet_()
+        self._list_chars_()
         self._wikitext_()
         self.ast['@'] = self.last_node
 
@@ -316,10 +418,94 @@ class wiktionaryParser(Parser):
     @rule_def
     def _definition_section_(self):
         def block0():
-            self._template_()
+            with self._choice():
+                with self._option():
+                    self._template_()
+                with self._option():
+                    self._image_()
+                self._error('no available options')
         self._closure(block0)
-        def block1():
+        def block2():
             self._definition_()
+            self.ast.add_list('@', self.last_node)
+        self._positive_closure(block2)
+
+    @rule_def
+    def _etyl_template_(self):
+        self._left_braces_()
+        self._token('etyl')
+        self._template_args_()
+        self._right_braces_()
+
+    @rule_def
+    def _etyl_link_(self):
+        self._etyl_template_()
+        self.ast['etyl'] = self.last_node
+        self._link_template_()
+        self.ast['link'] = self.last_node
+
+    @rule_def
+    def _etymology_section_(self):
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._etyl_link_()
+                    self.ast.add_list('etym', self.last_node)
+                with self._option():
+                    self._link_template_()
+                    self.ast.add_list('etym', self.last_node)
+                with self._option():
+                    self._template_()
+                with self._option():
+                    self._wiki_link_()
+                with self._option():
+                    self._external_link_()
+                with self._option():
+                    self._text_()
+                self._error('no available options')
+        self._positive_closure(block0)
+
+    @rule_def
+    def _link_section_(self):
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._link_line_()
+                with self._option():
+                    self._template_()
+                self._error('no available options')
+        self._positive_closure(block0)
+
+    @rule_def
+    def _sense_template_(self):
+        self._left_braces_()
+        self._token('sense')
+        self._vertical_bar_()
+        self._text_with_links_()
+        self.ast['@'] = self.last_node
+        self._right_braces_()
+
+    @rule_def
+    def _link_line_(self):
+        self._bullet_()
+        with self._optional():
+            self._sense_template_()
+            self.ast['sense'] = self.last_node
+        def block1():
+            with self._choice():
+                with self._option():
+                    self._link_template_()
+                    self.ast.add_list('link', self.last_node)
+                with self._option():
+                    self._wiki_link_()
+                    self.ast.add_list('link', self.last_node)
+                with self._option():
+                    self._template_()
+                with self._option():
+                    self._external_link_()
+                with self._option():
+                    self._text_()
+                self._error('no available options')
         self._positive_closure(block1)
 
     @rule_def
@@ -329,7 +515,7 @@ class wiktionaryParser(Parser):
                 with self._option():
                     self._wiki_link_()
                 with self._option():
-                    self._TEXT_()
+                    self._text_()
                 self._error('no available options')
         self._positive_closure(block0)
 
@@ -344,7 +530,7 @@ class wiktionaryParser(Parser):
                 with self._option():
                     self._external_link_()
                 with self._option():
-                    self._TEXT_()
+                    self._text_()
                 self._error('no available options')
         self._positive_closure(block0)
 
@@ -393,9 +579,6 @@ class wiktionarySemantics(object):
     def semicolon(self, ast):
         return ast
 
-    def NEWLINE(self, ast):
-        return ast
-
     def comment(self, ast):
         return ast
 
@@ -408,7 +591,13 @@ class wiktionarySemantics(object):
     def html_tag(self, ast):
         return ast
 
-    def TEXT(self, ast):
+    def single_left_bracket(self, ast):
+        return ast
+
+    def single_right_bracket(self, ast):
+        return ast
+
+    def text(self, ast):
         return ast
 
     def wiki_link(self, ast):
@@ -417,13 +606,22 @@ class wiktionarySemantics(object):
     def linktext(self, ast):
         return ast
 
+    def urlpath(self, ast):
+        return ast
+
     def url(self, ast):
         return ast
 
     def external_link(self, ast):
         return ast
 
+    def image(self, ast):
+        return ast
+
     def named_arg(self, ast):
+        return ast
+
+    def arg_value(self, ast):
         return ast
 
     def template_arg(self, ast):
@@ -433,6 +631,12 @@ class wiktionarySemantics(object):
         return ast
 
     def template(self, ast):
+        return ast
+
+    def link_template_name(self, ast):
+        return ast
+
+    def link_template(self, ast):
         return ast
 
     def translation_name(self, ast):
@@ -468,6 +672,9 @@ class wiktionarySemantics(object):
     def translation_section(self, ast):
         return ast
 
+    def list_chars(self, ast):
+        return ast
+
     def defn_line(self, ast):
         return ast
 
@@ -478,6 +685,24 @@ class wiktionarySemantics(object):
         return ast
 
     def definition_section(self, ast):
+        return ast
+
+    def etyl_template(self, ast):
+        return ast
+
+    def etyl_link(self, ast):
+        return ast
+
+    def etymology_section(self, ast):
+        return ast
+
+    def link_section(self, ast):
+        return ast
+
+    def sense_template(self, ast):
+        return ast
+
+    def link_line(self, ast):
         return ast
 
     def text_with_links(self, ast):

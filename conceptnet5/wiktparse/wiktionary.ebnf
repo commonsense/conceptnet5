@@ -13,18 +13,21 @@ colon           = ":" ;
 comma           = "," ;
 semicolon       = ";" ;
 
-(* Here's our first regex-defined rule, which matches newlines. Regular
+(* Here's our first regex-defined rule, which matches comments. Regular
    expressions are indicated with the ?/re/? syntax, which conveys an
    appropriate subtext of bafflement. *)
-NEWLINE = ?/[ \t]*\n/? .
-
-(* Comments are matched with a non-greedy regex. *)
 comment = ?/<!--(.|\n)+?-->/? ;
 
 (* A "term" is a string with no wiki syntax in it. Basically, anything 
    whose characters we can consume without worrying about backtracking,
    because you can't backtrack into a regex. *)
 term = ?/[^\[\]{}<>|:=\n]+/? ;
+
+(* A safe_term is a term that won't go onto the next line and consume a
+   line-starting special character, such as # or *. Now, this prevents consuming
+   those symbols in a few *other* situations, too, but I'd like to try to make
+   this work, because the alternative is to try to explain to this grammar where
+   newlines are significant and where they aren't. *)
 safe_term = !bullet !hash_char term ;
 
 (* We don't care at all about the contents of HTML tags. They're just there;
@@ -38,7 +41,9 @@ html_tag = ?/<[^>]+?>/? ;
 (* This rule is an example of where order matters in a PEG grammar: a comment
    looks like an HTML tag, but is more specific and is parsed differently,
    so we need to match it first. *)
-TEXT = safe_term | comment | html_tag | colon | equals | left_bracket | right_bracket ;
+single_left_bracket = left_bracket !left_bracket ;
+single_right_bracket = right_bracket !right_bracket ;
+text = @safe_term | comment | html_tag | @colon | @equals | @single_left_bracket | @single_right_bracket ;
 
 
 (*
@@ -58,10 +63,18 @@ External links are something we have to be able to cope with. They look like thi
 
     [http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]
 *)
-linktext = { term | html_tag | colon | equals }+ ;
-url = schema:term colon path:term ;
+linktext = { @+:term | html_tag | @+:colon | @+:equals }+ ;
+urlpath = ?/[^ \[\]{}<>|]+/? ;
+url = schema:term colon path:urlpath ;
 external_link = left_bracket url:url [ text:linktext ] right_bracket ;
 
+
+(*
+Images have complex syntax like this:
+
+    [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]]
+*)
+image = left_brackets "Image:" filename:term { vertical_bar wikitext }* right_brackets ;
 
 (*
 A simple template looks like this:
@@ -75,15 +88,27 @@ More complex templates take arguments, such as this translation into French:
 And very complex templates can have both positional and named arguments:
 
     {{t|ja|例え|tr=[[たとえ]], tatoe}}
+
+Unlike general wikitext, a hash sign or asterisk at the start of an argument
+value has no special meaning. These may occur, for example, in links to
+proto-language words.
 *)
 named_arg = key:term equals value:wikitext ;
-template_arg = vertical_bar { named_arg | value:wikitext } ;
-template_args = { template_arg }+ ;
+arg_value = [bullet | hash_char] @wikitext ;
+template_arg = [ named_arg | value:arg_value ] ;
+template_args = { vertical_bar @+:template_arg }+ ;
 template = left_braces name:term [ args:template_args ] right_braces ;
 
 
+(* Templates that become links to words, such as {{term}} and {{l}} *)
+link_template_name = "term/t" | "term" | "l" | "l/en" | "l/ja" | "ja-l" | "ko-inline"
+    | "blend" | "borrowing" | "back-form" | "etycomp" | "calque" | "clipping" | "compound"
+    | "confix" | "-er" | "etyltwin" | "named-after" | "prefix" | "suffix" ;
+link_template = left_braces linktype:link_template_name args:template_args right_braces ;
+
+
 (* Rules for parsing translation sections *)
-translation_name = ?/t[^\[\]{}|:=]{0,3}/? ;
+translation_name = ?/t[^\[\]{}|:=]*/? ;
 translation_template = left_braces translation_name @template_args right_braces ;
 
 checktrans_top_template = left_braces "checktrans-top" right_braces ;
@@ -92,24 +117,36 @@ trans_top_template = { checktrans:checktrans_top_template | sensetrans:sensetran
 trans_mid_template = left_braces "trans-mid" right_braces ;
 trans_bottom_template = left_braces "trans-bottom" right_braces ;
 
-translation_entry = { translation_template | text_with_links }+ ;
-translation_content = { trans_mid_template | translation_entry }+ ;
+translation_content = { trans_mid_template | @+:translation_template | text_with_links }+ ;
 
 (* After parsing a translation block, we "cut", indicated by the symbol >>.
    That means the parser should not backtrack past this point after
    successfully parsing a block, and therefore it can throw out memoized
    parses before this point. *)
-translation_block = trans_top_template @translation_content trans_bottom_template >> ;
+translation_block = top:trans_top_template translations:translation_content trans_bottom_template >> ;
 translation_section = { translation_block }+ ;
 
 
 (* Rules for parsing definition sections *)
+list_chars = ?/[#*:]+/? ;
 defn_line = hash_char !bullet @wikitext ;
-defn_details = hash_char bullet @wikitext ;
+defn_details = hash_char list_chars @wikitext ;
 definition = defn:defn_line { details+:defn_details }* >> ;
-definition_section = { template }* { definition }+ ;
+definition_section = { template | image }* { @+:definition }+ ;
+
+
+(* Rules for parsing etymology sections *)
+etyl_template = left_braces "etyl" template_args right_braces ;
+etyl_link = etyl:etyl_template link:link_template ;
+etymology_section = { etym+:etyl_link | etym+:link_template | template | wiki_link | external_link | text }+ ;
+
+
+(* Rules for parsing link sections, such as related terms and synonyms *)
+link_section = { link_line | template }+ ;
+sense_template = left_braces "sense" vertical_bar @text_with_links right_braces ;
+link_line = bullet [ sense:sense_template ] { link+:link_template | link+:wiki_link | template | external_link | text }+ ;
 
 
 (* Sections of arbitrary text *)
-text_with_links = { wiki_link | TEXT }+ ;
-wikitext = { template | wiki_link | external_link | TEXT }+ ;
+text_with_links = { wiki_link | text }+ ;
+wikitext = { template | wiki_link | external_link | text }+ ;
