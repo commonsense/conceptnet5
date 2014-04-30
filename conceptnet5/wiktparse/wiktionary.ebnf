@@ -14,6 +14,7 @@ bullet          = "*" ;
 colon           = ":" ;
 comma           = "," ;
 semicolon       = ";" ;
+slash           = "/" ;
 
 (* Here's our first regex-defined rule, which matches comments. Regular
    expressions are indicated with the ?/re/? syntax, which conveys an
@@ -51,7 +52,7 @@ WS = NL | SP ;
    because you can't backtrack into a regex. *)
 term = ?/[^\[\]{}<>|:=\n]+/? ;
 
-(* We don't care at all about the contents of HTML tags. They're just there;
+(* We don't care at all about the contents of HTML tags. They're just there.
    So, despite a frothing rant on Stack Overflow, I'll parse HTML tags with
    a regex. *)
 html_tag = ?/<[^>]+?>/? ;
@@ -134,10 +135,10 @@ template = left_braces WS name:term [args:template_args] right_braces ;
 
 (* Templates that become links to words, such as {{term}} and {{l}} *)
 (* TODO: make the semantics work, and include {{w}} as one of these *)
-link_template_name = "term/t" | "term" | "l" | "l/en" | "l/ja" | "ja-l" | "ko-inline"
-    | "blend" | "borrowing" | "back-form" | "etycomp" | "calque" | "clipping" | "compound"
-    | "confix" | "-er" | "etyltwin" | "named-after" | "prefix" | "suffix" ;
-link_template = left_braces WS linktype:link_template_name args:template_args right_braces ;
+link_template_name = "term/t" | "term" | "l" | "ja-l" | "ko-inline"
+    | "blend" | "borrowing" | "back-form" | "calque" | "clipping"
+    | "compound" | "confix" | "-er" | "etycomp" | "prefix" | "suffix" ;
+link_template = left_braces WS linktype:link_template_name { slash subtypes+:term }* args:template_args right_braces ;
 
 
 (* Rules for parsing translation sections *)
@@ -170,8 +171,10 @@ definition_section = { template | image | WS }* { @+:definition }+ ;
 
 
 (* Rules for parsing etymology sections *)
-etyl_template = left_braces WS "etyl" template_args right_braces ;
-etyl_link = etyl:etyl_template WS link:link_template ;
+(* The {{etyl}} template gives the language of the next term, or some list of
+   upcoming terms of unspecified length. *)
+etyl_template = left_braces WS "etyl" WS vertical_bar language:term WS template_args right_braces ;
+etyl_link = etyl:etyl_template WS [ link:link_template | link:wiki_link ] ;
 etymology_section = { etym+:etyl_link | etym+:link_template | template | wiki_link | external_link | text }+ ;
 
 
