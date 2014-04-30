@@ -18,6 +18,10 @@ semicolon       = ";" ;
    appropriate subtext of bafflement. *)
 comment = ?/<!--(.|\n)+?-->/? ;
 
+SP = ?/[ \t]*/? ;
+NL = ?/[\r]*[\n]/? ;
+WS = NL | SP ;
+
 (* A "term" is a string with no wiki syntax in it. Basically, anything 
    whose characters we can consume without worrying about backtracking,
    because you can't backtrack into a regex. *)
@@ -43,8 +47,8 @@ html_tag = ?/<[^>]+?>/? ;
    so we need to match it first. *)
 single_left_bracket = left_bracket !left_bracket ;
 single_right_bracket = right_bracket !right_bracket ;
-text = @safe_term | comment | html_tag | @colon | @equals | @single_left_bracket | @single_right_bracket ;
-
+one_line_text = @term | comment | html_tag | @colon | @equals | @single_left_bracket | @single_right_bracket | @SP ;
+text = @NL | @one_line_text ;
 
 (*
 Links look like this:
@@ -63,10 +67,10 @@ External links are something we have to be able to cope with. They look like thi
 
     [http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]
 *)
-linktext = { @+:term | html_tag | @+:colon | @+:equals }+ ;
+linktext = { @+:term | html_tag | NL | @+:colon | @+:equals }+ ;
 urlpath = ?/[^ \[\]{}<>|]+/? ;
 url = schema:term colon path:urlpath ;
-external_link = left_bracket url:url [ text:linktext ] right_bracket ;
+external_link = left_bracket url:url WS [ text:linktext ] right_bracket ;
 
 
 (*
@@ -74,7 +78,7 @@ Images have complex syntax like this:
 
     [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]]
 *)
-image = left_brackets "Image:" filename:term { vertical_bar wikitext }* right_brackets ;
+image = left_brackets WS "Image:" filename:term { vertical_bar wikitext }* WS right_brackets ;
 
 (*
 A simple template looks like this:
@@ -93,61 +97,63 @@ Unlike general wikitext, a hash sign or asterisk at the start of an argument
 value has no special meaning. These may occur, for example, in links to
 proto-language words.
 *)
-named_arg = key:term equals value:wikitext ;
+named_arg = key:term WS equals WS value:wikitext ;
 arg_value = [ bullet | hash_char ] @wikitext ;
 template_arg = [ named_arg | value:arg_value ] ;
-template_args = { vertical_bar @+:template_arg }+ ;
-template = left_braces name:term [args:template_args] right_braces ;
+template_args = { WS vertical_bar WS @+:template_arg }+ ;
+template = left_braces WS name:term [args:template_args] right_braces ;
 
 
 (* Templates that become links to words, such as {{term}} and {{l}} *)
 link_template_name = "term/t" | "term" | "l" | "l/en" | "l/ja" | "ja-l" | "ko-inline"
     | "blend" | "borrowing" | "back-form" | "etycomp" | "calque" | "clipping" | "compound"
     | "confix" | "-er" | "etyltwin" | "named-after" | "prefix" | "suffix" ;
-link_template = left_braces linktype:link_template_name args:template_args right_braces ;
+link_template = left_braces WS linktype:link_template_name args:template_args right_braces ;
 
 
 (* Rules for parsing translation sections *)
 translation_name = "t-simple" | "t+" | "t" | "t-" | "t0" | "tø" ;
-translation_template = left_braces translation_name @template_args right_braces ;
+translation_template = left_braces WS translation_name @template_args right_braces ;
 
-checktrans_top_template = left_braces "checktrans-top" right_braces ;
-sensetrans_top_template = left_braces "trans-top" vertical_bar sense:text_with_links right_braces ;
+checktrans_top_template = left_braces WS "checktrans-top" WS right_braces ;
+sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar WS sense:text_with_links WS right_braces ;
 trans_top_template = { checktrans:checktrans_top_template | sensetrans:sensetrans_top_template } ;
-trans_mid_template = left_braces "trans-mid" right_braces ;
-trans_bottom_template = left_braces "trans-bottom" right_braces ;
+trans_mid_template = left_braces WS "trans-mid" WS right_braces ;
+trans_bottom_template = left_braces WS "trans-bottom" WS right_braces ;
 
-translation_entry = bullet { translations+:translation_template | text_with_links }+ ;
-translation_content = { trans_mid_template | @+:translation_entry | text_with_links }+ ;
+translation_entry = bullet SP { translations+:translation_template | one_line_text_with_links }+ NL ;
+translation_content = { trans_mid_template | @+:translation_entry | WS }+ ;
 
 (* After parsing a translation block, we "cut", indicated by the symbol >>.
    That means the parser should not backtrack past this point after
    successfully parsing a block, and therefore it can throw out memoized
    parses before this point. *)
-translation_block = top:trans_top_template translations:translation_content trans_bottom_template >> ;
+translation_block = top:trans_top_template WS translations:translation_content WS trans_bottom_template WS >> ;
 translation_section = { translation_block }+ ;
 
 
 (* Rules for parsing definition sections *)
 list_chars = ?/[#*:]+/? ;
-defn_line = hash_char !bullet @wikitext ;
-defn_details = hash_char list_chars @wikitext ;
+defn_line = hash_char !bullet @one_line_wikitext NL WS ;
+defn_details = hash_char list_chars @one_line_wikitext NL WS ;
 definition = defn:defn_line { details+:defn_details }* >> ;
-definition_section = { template | image }* { @+:definition }+ ;
+definition_section = { template | image | WS }* { @+:definition }+ ;
 
 
 (* Rules for parsing etymology sections *)
-etyl_template = left_braces "etyl" template_args right_braces ;
-etyl_link = etyl:etyl_template link:link_template ;
+etyl_template = left_braces WS "etyl" template_args right_braces ;
+etyl_link = etyl:etyl_template WS link:link_template ;
 etymology_section = { etym+:etyl_link | etym+:link_template | template | wiki_link | external_link | text }+ ;
 
 
 (* Rules for parsing link sections, such as related terms and synonyms *)
-link_section = { link_line | template }+ ;
-sense_template = left_braces "sense" vertical_bar @text_with_links right_braces ;
-link_line = bullet [sense:sense_template] { link+:link_template | link+:wiki_link | template | external_link | text }+ ;
+link_section = { link_line | template | WS }+ ;
+sense_template = left_braces WS "sense" WS vertical_bar @text_with_links right_braces ;
+link_line = bullet SP [sense:sense_template] SP { link+:link_template | link+:wiki_link | template | external_link | one_line_text }+ NL ;
 
 
 (* Sections of arbitrary text *)
 text_with_links = { wiki_link | text }+ ;
+one_line_text_with_links = { wiki_link | one_line_text }+ ;
+one_line_wikitext = { @+:template | @+:wiki_link | @+:external_link | @+:one_line_text }+ ;
 wikitext = { @+:template | @+:wiki_link | @+:external_link | @+:text }+ ;

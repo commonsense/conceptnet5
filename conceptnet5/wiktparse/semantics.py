@@ -47,7 +47,7 @@ class EdgeInfo(object):
         )
 
 
-def join_text(lst, sep=' '):
+def join_text(lst):
     if lst is None:
         return None
 
@@ -57,10 +57,10 @@ def join_text(lst, sep=' '):
         if item is None:
             pass
         elif isinstance(item, string_type):
-            texts.append(item.strip())
+            texts.append(item)
         elif isinstance(item, LinkedText):
             if item.text is not None:
-                texts.append(item.text.strip())
+                texts.append(item.text)
             links.extend(item.links)
         elif isinstance(item, dict):
             # This is an unhandled template; we ignore it for the purpose of
@@ -69,7 +69,7 @@ def join_text(lst, sep=' '):
         else:
             raise TypeError(item)
 
-    text = sep.join(texts)
+    text = ''.join(texts)
     return LinkedText(text, links)
 
 
@@ -80,8 +80,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     def parse(self, text, rule_name, **kwargs):
         parser = wiktionaryParser()
-        return parser.parse(text, rule_name=rule_name, semantics=self,
-                            **kwargs)
+        return parser.parse(text, whitespace='', rule_name=rule_name,
+                            semantics=self, **kwargs)
 
     def linktext(self, ast):
         assert isinstance(ast, list)
@@ -94,6 +94,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         # semantics.
         value = join_text(ast)
         return value
+    one_line_wikitext = wikitext
 
     def wiki_link(self, ast):
         if ast['site'] is not None:
