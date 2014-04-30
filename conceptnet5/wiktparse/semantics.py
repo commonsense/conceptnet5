@@ -141,7 +141,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         which is not the case when we know we're looking for a specific
         template -- add its name as argument 0.
         """
-        template_value = ast['args'].copy()
+        if ast['args'] is not None:
+            template_value = ast['args'].copy()
+        else:
+            template_value = {}
         template_value[0] = ast['name']
         return template_value
 
