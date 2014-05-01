@@ -119,7 +119,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 target = ast['text']
             links = [EdgeInfo(
                 language=language,
-                target=ast['target']
+                target=target
             )]
         text = ast['text'] or ast['target']
         return LinkedText(text=text, links=links)
