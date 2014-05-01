@@ -79,8 +79,8 @@ text = @NL | @one_line_text ;
    which are syntactic structures that will be defined below. *)
 text_with_links = { wiki_link | text }+ ;
 one_line_text_with_links = { wiki_link | one_line_text }+ ;
-one_line_wikitext = { @+:template | @+:wiki_link | @+:external_link | @+:one_line_text }+ ;
-wikitext = { @+:template | @+:wiki_link | @+:external_link | @+:text }+ ;
+one_line_wikitext = { template | wiki_link | external_link | one_line_text }+ ;
+wikitext = { template | wiki_link | external_link | text }+ ;
 
 
 (*
@@ -152,7 +152,7 @@ trans_mid_template = left_braces WS "trans-mid" WS right_braces ;
 trans_bottom_template = left_braces WS "trans-bottom" WS right_braces ;
 
 translation_entry = bullet SP { translations+:translation_template | one_line_text_with_links }+ NL ;
-translation_content = { trans_mid_template | @+:translation_entry | WS }+ ;
+translation_content = { trans_mid_template | entries+:translation_entry | WS }+ ;
 
 (* After parsing a translation block, we "cut", indicated by the symbol >>.
    That means the parser should not backtrack past this point after
