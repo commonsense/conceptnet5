@@ -361,8 +361,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             language = args['lang']
             target = args[1]
             text = args[2] or target
-            if text == 'byspel':
-                assert language is not None, ast
             links = [EdgeInfo(language=language, target=target, rel='DerivedFrom')]
 
         elif linktype == 'ja-l':
