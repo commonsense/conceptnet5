@@ -240,7 +240,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
     def template(self, ast):
         """
         A simple template looks like this:
-        
+
             {{archaic}}
 
         More complex templates take arguments, such as this translation into French:
@@ -405,13 +405,41 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return LinkedText(text=text, links=links)
 
     def etyl_template_and_link(self, ast):
-        """
-        """
         language = ast['etyl']['language']
         links = [link.set_language(language)
                  for link in ast['link'].links]
         return LinkedText(text=ast['link'].text, links=links)
 
+    def link_entry(self, ast):
+        """
+        Parse rules:
+
+            sense_template = left_braces WS "sense" WS vertical_bar @text_with_links right_braces ;
+            link_entry = bullet SP [sense:sense_template] SP { link+:link_template | link+:wiki_link | template | external_link | one_line_text }+ NL >> ;
+        """
+        if ast['links'] is None:
+            return []
+
+        sense = ast['sense']
+        links = []
+        for sub_links in ast['links']:
+            links.extend(sub_links.links)
+
+        if sense is not None:
+            links = [link.set_sense(sense) for link in links]
+
+        return links
+
+    def sense_template(self, ast):
+        return ast.text
+
+    def link_section(self, ast):
+        """
+        Parse rule:
+
+            link_section = { @+:link_entry | template | WS }+ ;
+        """
+        return sum(ast, [])
 
 def main(filename, startrule, trace=False):
     with open(filename) as f:

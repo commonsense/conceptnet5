@@ -180,8 +180,7 @@ etymology_section = { @+:etyl_template_and_link | @+:link_template | template | 
 
 
 (* Rules for parsing link sections, such as related terms and synonyms *)
-link_section = { link_line | template | WS }+ ;
 sense_template = left_braces WS "sense" WS vertical_bar @text_with_links right_braces ;
-link_line = bullet SP [sense:sense_template] SP { link+:link_template | link+:wiki_link | template | external_link | one_line_text }+ NL >> ;
-
+link_entry = bullet SP [sense:sense_template] SP { links+:link_template | links+:wiki_link | template | external_link | one_line_text }+ NL >> ;
+link_section = { @link_entry | template | WS }+ ;
 
