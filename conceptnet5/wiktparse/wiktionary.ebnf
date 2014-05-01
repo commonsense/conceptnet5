@@ -128,7 +128,7 @@ And very complex templates can have both positional and named arguments:
     {{t|ja|例え|tr=[[たとえ]], tatoe}}
 *)
 named_arg = key:term WS equals WS value:wikitext ;
-template_arg = [ named_arg | value:wikitext ] ;
+template_arg = [ named:named_arg | positional:wikitext ] ;
 template_args = { WS vertical_bar WS @+:template_arg }+ ;
 template = left_braces WS name:term [args:template_args] right_braces ;
 
@@ -174,8 +174,9 @@ definition_section = { template | image | WS }* { @+:definition }+ ;
 (* The {{etyl}} template gives the language of the next term, or some list of
    upcoming terms of unspecified length. *)
 etyl_template = left_braces WS "etyl" WS vertical_bar language:term WS template_args right_braces ;
-etyl_link = etyl:etyl_template WS [ link:link_template | link:wiki_link ] ;
-etymology_section = { etym+:etyl_link | etym+:link_template | template | wiki_link | external_link | text }+ ;
+etyl_link = link_template | wiki_link ;
+etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
+etymology_section = { @+:etyl_template_and_link | @+:link_template | template | wiki_link | external_link | text }+ ;
 
 
 (* Rules for parsing link sections, such as related terms and synonyms *)

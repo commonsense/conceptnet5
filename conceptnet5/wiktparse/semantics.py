@@ -128,7 +128,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         # Keep only the text of external links
         return LinkedText(text=ast['text'], links=[])
 
-    def etyl_link(self, ast):
+    def etyl_template_and_link(self, ast):
         language = ast['etyl']['language']
         links = [link.set_language(language)
                  for link in ast['link'].links]
@@ -223,12 +223,14 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         template_value = {}
         position = 1
         for item in ast:
-            if 'key' in item:
-                key = item['key']
+            if item['named']:
+                key = item['named']['key']
+                value = item['named']['value']
             else:
                 key = position
                 position += 1
-            template_value[key] = item['value']
+                value = item['positional']
+            template_value[key] = value
         return template_value
 
     def template(self, ast):
