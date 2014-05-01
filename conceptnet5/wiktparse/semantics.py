@@ -437,9 +437,9 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         Parse rule:
 
-            link_section = { @+:link_entry | template | WS }+ ;
+            link_section = { entries+:link_entry | template | WS }+ ;
         """
-        return sum(ast, [])
+        return sum(ast['entries'] or [], [])
 
 def main(filename, startrule, trace=False):
     with open(filename) as f:
