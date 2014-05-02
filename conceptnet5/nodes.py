@@ -50,7 +50,7 @@ def normalized_concept_uri(lang, text, *more):
     '/c/en/this_be_test/n/example_phrase'
     """
     norm_text = normalized_concept_name(lang, text)
-    more_text = [normalize_text(item) for item in more]
+    more_text = [normalize_text(item) for item in more if item is not None]
     return concept_uri(lang, norm_text, *more_text)
 
 

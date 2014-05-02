@@ -21,16 +21,16 @@ slash           = "/" ;
    appropriate subtext of bafflement. *)
 comment = ?/<!--(.|\n)+?-->/? ;
 
-(* 
+(*
 Whitespace matching.
 
 Whitespace is significant on MediaWiki. Perhaps the most straightforward
 example is that the text:
-    
+
     [[link]] s
 
 prints differently from:
-    
+
     [[link]]s
 
 On top of that, some things, like list syntax, apply until the end of the
@@ -47,7 +47,7 @@ SP = ?/[ \t]*/? ;
 NL = ?/\n/? ;
 WS = NL | SP ;
 
-(* A "term" is a string with no wiki syntax in it. Basically, anything 
+(* A "term" is a string with no wiki syntax in it. Basically, anything
    whose characters we can consume without worrying about backtracking,
    because you can't backtrack into a regex. *)
 term = ?/[^\[\]{}<>|:=\n]+/? ;
@@ -69,7 +69,7 @@ single_left_bracket = left_bracket !left_bracket ;
 single_right_bracket = right_bracket !right_bracket ;
 single_left_brace = left_brace !left_brace ;
 single_right_brace = right_brace !right_brace ;
-one_line_text = @term | comment | html_tag | @colon | @equals 
+one_line_text = @term | comment | html_tag | @colon | @equals
               | @single_left_bracket | @single_right_bracket
               | @single_left_brace | @single_right_brace | @SP ;
 text = @NL | @one_line_text ;
@@ -114,7 +114,7 @@ Images have complex syntax like this:
 image = left_brackets WS "Image:" filename:term { vertical_bar wikitext }* WS right_brackets ;
 
 
-(* 
+(*
 A simple template looks like this:
 
     {{archaic}}
@@ -142,7 +142,7 @@ link_template = left_braces WS linktype:link_template_name { slash subtypes+:ter
 
 
 (* Rules for parsing translation sections *)
-translation_name = "t-simple" | "t+" | "t" | "t-" | "t0" | "tø" ;
+translation_name = "t-simple" | "t+" | "t-" | "t0" | "tø" | "t" ;
 translation_template = left_braces WS translation_name @template_args right_braces ;
 
 checktrans_top_template = left_braces WS "checktrans-top" WS right_braces ;
@@ -151,15 +151,15 @@ trans_top_template = { checktrans:checktrans_top_template | sensetrans:sensetran
 trans_mid_template = left_braces WS "trans-mid" WS right_braces ;
 trans_bottom_template = left_braces WS "trans-bottom" WS right_braces ;
 
-translation_entry = bullet SP { translations+:translation_template | one_line_text_with_links }+ NL ;
-translation_content = { trans_mid_template | entries+:translation_entry | WS }+ ;
+translation_entry = bullet SP { translations+:translation_template | template | one_line_text_with_links }+ NL ;
+translation_content = { trans_mid_template | entries+:translation_entry | !trans_bottom_template one_line_wikitext NL | WS }+ ;
 
 (* After parsing a translation block, we "cut", indicated by the symbol >>.
    That means the parser should not backtrack past this point after
    successfully parsing a block, and therefore it can throw out memoized
    parses before this point. *)
 translation_block = top:trans_top_template WS translations:translation_content WS trans_bottom_template WS >> ;
-translation_section = { translation_block }+ ;
+translation_section = { blocks+:translation_block }* ;
 
 
 (* Rules for parsing definition sections *)
@@ -167,7 +167,7 @@ list_chars = ?/[#*:]+/? ;
 defn_line = hash_char !bullet SP @one_line_wikitext NL WS ;
 defn_details = hash_char list_chars SP @one_line_wikitext NL WS ;
 definition = @defn_line { defn_details }* >> ;
-definition_section = { template | image | WS }* { @+:definition }+ ;
+definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ;
 
 
 (* Rules for parsing etymology sections *)
@@ -176,7 +176,7 @@ definition_section = { template | image | WS }* { @+:definition }+ ;
 etyl_template = left_braces WS "etyl" WS vertical_bar language:term WS template_args right_braces ;
 etyl_link = link_template | wiki_link ;
 etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
-etymology_section = { @+:etyl_template_and_link | @+:link_template | template | wiki_link | external_link | text }+ ;
+etymology_section = { etym+:etyl_template_and_link | etym+:link_template | template | wiki_link | external_link | text }+ ;
 
 
 (* Rules for parsing link sections, such as related terms and synonyms *)

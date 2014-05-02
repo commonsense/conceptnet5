@@ -1,11 +1,25 @@
 # coding: utf-8
 from __future__ import unicode_literals
 from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
+from conceptnet5.edges import make_edge
+from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
+from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
+from conceptnet5.formats.json_stream import read_json_stream, JSONStreamWriter
 from pprint import pprint
 from collections import defaultdict
+import sys
 
 string_type = type('')
 
+POS_HEADINGS = {
+    'Noun': 'n',
+    'Proper noun': 'n',
+    'Verb': 'v',
+    'Adjective': 'a',
+    'Adverb': 'r'
+}
+SKIPPED_LANGUAGES = ['Lojban', 'Translingual', 'American Sign Language']
 
 class LinkedText(object):
     """
@@ -64,7 +78,7 @@ class EdgeInfo(object):
     - `rel`: The relation between the source and target words, as a string
       such as "TranslationOf" or "DerivedFrom"
 
-    We don't represent the source word and its language here, because those
+    We don't represent the head word and its language here, because those
     are global to the Wiktionary entry we're parsing. We also don't represent
     the word sense of the target word, because we never know what it is.
     """
@@ -77,6 +91,12 @@ class EdgeInfo(object):
     def set_language(self, language):
         return EdgeInfo(language, self.target, self.sense, self.rel)
 
+    def set_default_language(self, language):
+        if self.language:
+            return self
+        else:
+            return EdgeInfo(language, self.target, self.sense, self.rel)
+
     def set_target(self, target):
         return EdgeInfo(self.language, target, self.sense, self.rel)
 
@@ -85,6 +105,29 @@ class EdgeInfo(object):
 
     def set_rel(self, rel):
         return EdgeInfo(self.language, self.target, self.sense, rel)
+
+    def complete_edge(self, rule_name, headlang, headword, headpos=None):
+        if headpos is None:
+            sense = None
+        else:
+            sense = self.sense
+
+        start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
+        end_uri = normalized_concept_uri(self.language, self.target, self.sense)
+        rel = self.rel or 'RelatedTo'
+
+        if rel.startswith('~'):
+            rel = rel[1:]
+            start_uri, end_uri = end_uri, start_uri
+
+        rel_uri = join_uri('/r', rel)
+        return make_edge(
+            rel=rel_uri, start=start_uri, end=end_uri,
+            dataset='/d/wiktionary/en',
+            license=Licenses.cc_sharealike,
+            sources=['/s/site/en.wiktionary.org', '/s/rule/%s' % rule_name],
+            weight=1.0
+        )
 
     def __repr__(self):
         return "EdgeInfo(%r, %r, %r, %r)" % (
@@ -119,8 +162,9 @@ def join_text(lst):
 
 
 class ConceptNetWiktionarySemantics(wiktionarySemantics):
-    def __init__(self, language, **kwargs):
+    def __init__(self, language, trace=False, **kwargs):
         self.default_language = language
+        self.trace = trace
         wiktionarySemantics.__init__(self, **kwargs)
 
     def parse(self, text, rule_name, **kwargs):
@@ -132,6 +176,105 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return parser.parse(text, whitespace='', rule_name=rule_name,
                             semantics=self, **kwargs)
 
+    def parse_jsons_file(self, filename_or_stream, out=None):
+        output = out and JSONStreamWriter(out)
+        for structure in read_json_stream(filename_or_stream):
+            for edge in self.parse_structured_entry(structure):
+                if output is None:
+                    print(edge['rel'], edge['start'], edge['end'])
+                else:
+                    output.write(edge)
+
+    def parse_structured_entry(self, structure):
+        """
+        The first-stage Wiktionary reader
+        (conceptnet5.readers.extract_wiktionary) gives us dictionary
+        structures, containing text and subsections. Turn these into
+        things we can parse.
+        """
+        edges = []
+        if structure['language'] in SKIPPED_LANGUAGES:
+            return []
+        langcode = ENGLISH_NAME_TO_CODE.get(structure['language'])
+        if langcode is None:
+            return []
+
+        for section in structure['sections']:
+            edges.extend(
+                self.parse_structured_section(
+                    section, langcode, structure['title'],
+                )
+            )
+        return edges
+
+    def parse_structured_section(self, structure, headlang, headword, headpos=None):
+        edges = []
+        heading = structure['heading']
+        text = structure['text']
+        if heading in POS_HEADINGS:
+            if headpos is None:
+                headpos = POS_HEADINGS[structure['heading']]
+
+        rule = None
+        rel = None
+        if heading == 'Translations':
+            rule = 'translation_section'
+        elif heading.startswith('Etymology'):
+            rule = 'etymology_section'
+        elif heading == 'Synonyms':
+            rule = 'link_section'
+            rel = 'Synonym'
+        elif heading == 'Antonyms':
+            rule = 'link_section'
+            rel = 'Antonym'
+        elif heading == 'Hypernyms':
+            rule = 'link_section'
+            rel = 'IsA'
+        elif heading == 'Hyponyms':
+            rule = 'link_section'
+            rel = '~IsA'
+        elif heading == 'Holonyms':
+            rule = 'link_section'
+            rel = 'PartOf'
+        elif heading == 'Meronyms':
+            rule = 'link_section'
+            rel = 'PartOf'
+        elif heading in ('Derived terms', 'Descendants'):
+            rule = 'link_section'
+            rel = '~DerivedFrom'
+        elif heading in ('Related terms', 'See also'):
+            rule = 'link_section'
+            rel = 'RelatedTo'
+        elif heading in ('Pronunciation', 'Anagrams', 'Statistics',
+                         'References', 'Quotations', 'Romanization',
+                         'Usage notes'):
+            pass
+        else:
+            rule = 'definition_section'
+
+        if rule is not None:
+            text = text.rstrip('\n') + '\n'
+            edge_info = self.parse(text, rule, trace=self.trace)
+            if rel is not None:
+                edge_info = [ei.set_rel(rel) for ei in edge_info]
+            edge_info = [ei.set_default_language(self.default_language) for ei in edge_info]
+            edges.extend(
+                [ei.complete_edge(rule, headlang, headword, headpos)
+                 for ei in edge_info
+                 if ei.target not in BAD_NAMES_FOR_THINGS]
+            )
+
+        for section in structure['sections']:
+            edges.extend(
+                self.parse_structured_section(
+                    section, headlang, headword, headpos
+                )
+            )
+        return edges
+
+
+    # The methods below implement semantic rules for various nodes of the
+    # parse tree.
     def wikitext(self, ast):
         """
         The 'wikitext' rule parses arbitrary text that may include markup,
@@ -326,7 +469,9 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return [info.set_sense(sense) for info in ast['translations']]
 
     def translation_section(self, ast):
-        return ast
+        if ast['blocks'] is None:
+            return []
+        return sum(ast['blocks'], [])
 
     def link_template(self, ast):
         # This is going to be complicated. We need to figure out the
@@ -440,6 +585,24 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             link_section = { entries+:link_entry | template | WS }+ ;
         """
         return sum(ast['entries'] or [], [])
+
+    def etymology_section(self, ast):
+        links = []
+        if ast['etym'] is None:
+            return []
+        for etym_linked_text in ast['etym']:
+            links.extend(etym_linked_text.links)
+        return links
+
+    def definition_section(self, ast):
+        links = []
+        if ast['defns'] is None:
+            return []
+        for defn_linked_text in ast['defns']:
+            # TODO: handle interlingual definitions
+            links.extend(defn_linked_text.links)
+        return links
+
 
 def main(filename, startrule, trace=False):
     with open(filename) as f:
