@@ -139,8 +139,8 @@ SOLR_FILES = $(patsubst assertions/%.jsons,solr/%.json, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
-			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2 \
-			 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
+			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2
+# skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = stats/relations.txt stats/dataset_languages.txt stats/morestats.txt
 
 
@@ -168,7 +168,7 @@ build_stats: $(STATS_FILES)
 
 # A phony target that lets you run 'make download' to get the raw data.
 download :
-	$(CURL) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
+	$(CURL_DOWNLOAD) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
 	$(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
 # A target that lets you (well, me) run 'make upload' to put the data
