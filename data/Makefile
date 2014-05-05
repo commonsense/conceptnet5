@@ -168,7 +168,7 @@ build_stats: $(STATS_FILES)
 
 # A phony target that lets you run 'make download' to get the raw data.
 download :
-	$(CURL) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
+	$(CURL_DOWNLOAD) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
 	$(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
 # A target that lets you (well, me) run 'make upload' to put the data
