@@ -53,7 +53,7 @@ else:
 
 cache_dict = {
     'limit_timeout': 60,
-    'limit_amount': 10000
+    'limit_amount': 1000
 }
 
 request_cache = SimpleCache(default_timeout=cache_dict['limit_timeout'])
@@ -122,6 +122,9 @@ STRING_FIELDS = ['features']
 
 @app.route('/search')
 def search(query_args=None):
+    limited, limit_response = request_limit(flask.request.remote_addr, 1)
+    if limited:
+        return limit_response
     if query_args is None:
         query_args = flask.request.args
     query_params = []
@@ -192,6 +195,9 @@ def not_found(error):
 
 @app.route('/assoc/list/<lang>/<termlist>')
 def list_assoc(lang, termlist):
+    limited, limit_response = request_limit(flask.request.remote_addr, 10)
+    if limited:
+        return limit_response
     load_assoc()
     if commonsense_assoc is None:
         flask.abort(404)
@@ -232,6 +238,9 @@ def assoc_for_termlist(terms, assoc):
 
 @app.route('/assoc/<path:uri>')
 def concept_assoc(uri):
+    limited, limit_response = request_limit(flask.request.remote_addr, 10)
+    if limited:
+        return limit_response
     load_assoc()
     uri = '/' + uri.rstrip('/')
     if commonsense_assoc is None:
