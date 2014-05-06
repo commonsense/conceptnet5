@@ -56,7 +56,7 @@ cache_dict = {
     'limit_amount': 1000
 }
 
-request_cache = SimpleCache(default_timeout=cache_dict['limit_timeout'])
+request_cache = SimpleCache(threshold=0, default_timeout=cache_dict['limit_timeout'])
 
 def add_slash(uri):
     """
