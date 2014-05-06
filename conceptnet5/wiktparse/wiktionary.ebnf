@@ -143,7 +143,7 @@ link_template = left_braces WS linktype:link_template_name { slash subtypes+:ter
 
 (* Rules for parsing translation sections *)
 translation_name = "t-simple" | "t+" | "t-" | "t0" | "tø" | "t" ;
-translation_template = left_braces WS translation_name @template_args right_braces ;
+translation_template = left_braces WS translation_name WS vertical_bar WS language:term WS args:template_args right_braces ;
 
 checktrans_top_template = left_braces WS "checktrans-top" WS right_braces ;
 sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar WS sense:text_with_links WS right_braces ;

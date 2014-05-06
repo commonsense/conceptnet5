@@ -5,10 +5,8 @@ from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
 from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
-from conceptnet5.formats.json_stream import read_json_stream, JSONStreamWriter
 from pprint import pprint
 from collections import defaultdict
-import sys
 
 string_type = type('')
 
@@ -19,7 +17,19 @@ POS_HEADINGS = {
     'Adjective': 'a',
     'Adverb': 'r'
 }
+
+# Skip some languages based on their headings.
+#
+# Lojban entries tend to be written in a Lojban/English metalanguage that
+# isn't very useful to parse. "Translingual" is hopelessly non-specific,
+# and American Sign Language is not going to work well when represented in
+# text in concept names.
 SKIPPED_LANGUAGES = ['Lojban', 'Translingual', 'American Sign Language']
+
+
+def language_code(language_name):
+    return ENGLISH_NAME_TO_CODE.get(language_name)
+
 
 class LinkedText(object):
     """
@@ -85,6 +95,8 @@ class EdgeInfo(object):
     def __init__(self, language, target, sense=None, rel=None):
         self.language = language
         self.target = target
+        if self.target is None:
+            raise TypeError
         self.sense = sense
         self.rel = rel
 
@@ -113,7 +125,7 @@ class EdgeInfo(object):
             sense = self.sense
 
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
-        end_uri = normalized_concept_uri(self.language, self.target, self.sense)
+        end_uri = normalized_concept_uri(self.language, self.target)
         rel = self.rel or 'RelatedTo'
 
         if rel.startswith('~'):
@@ -123,9 +135,10 @@ class EdgeInfo(object):
         rel_uri = join_uri('/r', rel)
         return make_edge(
             rel=rel_uri, start=start_uri, end=end_uri,
-            dataset='/d/wiktionary/en',
+            dataset='/d/wiktionary/en/%s' % headlang,
             license=Licenses.cc_sharealike,
-            sources=['/s/site/en.wiktionary.org', '/s/rule/%s' % rule_name],
+            sources=[join_uri('/s/web/en.wiktionary.org', headword),
+                     join_uri('/s/rule', rule_name)],
             weight=1.0
         )
 
@@ -176,15 +189,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return parser.parse(text, whitespace='', rule_name=rule_name,
                             semantics=self, **kwargs)
 
-    def parse_jsons_file(self, filename_or_stream, out=None):
-        output = out and JSONStreamWriter(out)
-        for structure in read_json_stream(filename_or_stream):
-            for edge in self.parse_structured_entry(structure):
-                if output is None:
-                    print(edge['rel'], edge['start'], edge['end'])
-                else:
-                    output.write(edge)
-
     def parse_structured_entry(self, structure):
         """
         The first-stage Wiktionary reader
@@ -195,7 +199,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         edges = []
         if structure['language'] in SKIPPED_LANGUAGES:
             return []
-        langcode = ENGLISH_NAME_TO_CODE.get(structure['language'])
+        langcode = language_code(structure['language'])
         if langcode is None:
             return []
 
@@ -217,10 +221,12 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         rule = None
         rel = None
+        language = headlang
         if heading == 'Translations':
             rule = 'translation_section'
         elif heading.startswith('Etymology'):
             rule = 'etymology_section'
+            rel = 'EtymologicallyDerivedFrom'
         elif heading == 'Synonyms':
             rule = 'link_section'
             rel = 'Synonym'
@@ -242,6 +248,9 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         elif heading in ('Derived terms', 'Descendants'):
             rule = 'link_section'
             rel = '~DerivedFrom'
+        elif heading == 'Compounds':
+            rule = 'link_section'
+            rel = '~CompoundDerivedFrom'
         elif heading in ('Related terms', 'See also'):
             rule = 'link_section'
             rel = 'RelatedTo'
@@ -251,13 +260,14 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             pass
         else:
             rule = 'definition_section'
+            language = self.default_language
 
         if rule is not None:
             text = text.rstrip('\n') + '\n'
             edge_info = self.parse(text, rule, trace=self.trace)
             if rel is not None:
                 edge_info = [ei.set_rel(rel) for ei in edge_info]
-            edge_info = [ei.set_default_language(self.default_language) for ei in edge_info]
+            edge_info = [ei.set_default_language(language) for ei in edge_info]
             edges.extend(
                 [ei.complete_edge(rule, headlang, headword, headpos)
                  for ei in edge_info
@@ -271,7 +281,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 )
             )
         return edges
-
 
     # The methods below implement semantic rules for various nodes of the
     # parse tree.
@@ -310,27 +319,24 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
             wiki_link = left_brackets [ site:term colon ] target:term [ vertical_bar text:term ] right_brackets ;
         """
+        links = []
         if ast['site'] is not None:
             # We don't like off-Wiktionary links
-            links = []
+            pass
         else:
             # Some entries specify their language using a hash-reference to
             # that language's section of the page.
-            #
-            # TODO: Does anyone ever, for example, link to the French
-            # definition of the same surface word with a link that just says
-            # [[#French]]? What text even shows up in that case? How do we
-            # figure out what the name of the current entry is, so we can
-            # point to it?
-            language = self.default_language
+            language = None
             target = ast['target']
             if target.startswith('#'):
-                language = ast['target'][1:]
+                language = language_code(ast['target'][1:])
                 target = ast['text']
-            links = [EdgeInfo(
-                language=language,
-                target=target
-            )]
+            elif '#' in target:
+                target, language = target.split('#', 1)
+                language = language_code(language) or 'unknown'
+            if target is not None and language != 'unknown':
+                links.append(EdgeInfo(language=language, target=target))
+
         text = ast['text'] or ast['target']
         return LinkedText(text=text, links=links)
 
@@ -413,14 +419,11 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         This rule handles templates that indicate a translation, returning an EdgeInfo.
 
-        Parse rules:
-
-            translation_name = "t-simple" | "t+" | "t" | "t-" | "t0" | "tø" ;
-            translation_template = left_braces WS translation_name @template_args right_braces ;
+        Parse rules: FIXME
         """
         return EdgeInfo(
-            language=ast[1].text,
-            target=ast[2].text,
+            language=ast['language'],
+            target=ast['args'][1].text,
             rel='TranslationOf'
         )
 
@@ -489,31 +492,31 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         text = ''
 
         linktype = ast['linktype']
-        if linktype == 'l' and ast['subtypes']:
+        if linktype == 'l' and ast['subtypes'] and args[1]:
             language = ast['subtypes'][0]
             target = args[1]
             links = [EdgeInfo(language=language, target=target)]
             text = target
 
-        elif linktype in ('l', 'term/t'):
+        elif linktype in ('l', 'term/t') and args[2]:
             language = args[1]
             target = args[2]
             text = args[3] or target
             links = [EdgeInfo(language=language, target=target)]
 
-        elif linktype == 'term':
+        elif linktype == 'term' and args[1]:
             # {{term}} without a language really is in an unspecified language.
             language = args['lang']
             target = args[1]
             text = args[2] or target
-            links = [EdgeInfo(language=language, target=target, rel='DerivedFrom')]
+            links = [EdgeInfo(language=language, target=target)]
 
-        elif linktype == 'ja-l':
+        elif linktype == 'ja-l' and args[1]:
             language = 'ja'
             text = target = args[1]
             links = [EdgeInfo(language=language, target=target)]
 
-        elif linktype == 'ko-inline':
+        elif linktype == 'ko-inline' and args[1]:
             language = 'ko'
             text = target = args[1]
             links = [EdgeInfo(language=language, target=target)]
@@ -524,27 +527,36 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             language = args['lang'] or self.default_language
             links = [EdgeInfo(language=language, target=args[1], rel='DerivedFrom')]
 
-        elif linktype in ('borrowing'):
+        elif linktype in ('borrowing') and args[2]:
             links = [EdgeInfo(language=args[1], target=args[2], rel='DerivedFrom')]
 
         elif linktype in ('blend', 'calque', 'compound', 'confix', 'prefix', 'suffix'):
             # TODO: 'calque' has extra parameters, 'etyl lang' and 'etyl term',
             # providing the link to the language being calqued from
             language = args['lang'] or self.default_language
-            links = [
-                EdgeInfo(language=language, target=args[1], rel='DerivedFrom'),
-                EdgeInfo(language=language, target=args[2], rel='DerivedFrom')
-            ]
-            if args[3]:
-                links.append(EdgeInfo(language=language, target=args[3], rel='DerivedFrom'))
+            links = []
+            if linktype in ('prefix', 'confix') and args[1]:
+                args[1] = args[1] + '-'
+            if linktype == 'suffix' and args[2]:
+                args[2] = '-' + args[2]
+            if linktype == 'confix':
+                lastarg = max([0] + [arg for arg in args if isinstance(arg, int)])
+                if lastarg >= 2:
+                    args[lastarg] = '-' + args[lastarg]
 
-        elif linktype == 'etycomp':
+            for argnum in range(1, 4):
+                if args[argnum]:
+                    links.append(
+                        EdgeInfo(language=language, target=args[argnum], rel='DerivedFrom')
+                    )
+
+        elif linktype == 'etycomp' and args[2]:
             # Complex compound word etymologies
             lang1 = args['lang1'] or self.default_language
             lang2 = args['lang2'] or args['lang1'] or self.default_language
             links = [
-                EdgeInfo(language=lang1, target=args[1], rel='DerivedFrom'),
-                EdgeInfo(language=lang2, target=args[2], rel='DerivedFrom')
+                EdgeInfo(language=lang1, target=args[1], rel='EtymologicallyDerivedFrom'),
+                EdgeInfo(language=lang2, target=args[2], rel='EtymologicallyDerivedFrom')
             ]
 
         return LinkedText(text=text, links=links)

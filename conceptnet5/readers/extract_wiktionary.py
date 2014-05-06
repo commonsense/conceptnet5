@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
 
-#
-# A work in progress on a better first step for reading Wiktionary.
-# Right now it puts its results into a bunch of files under "./en.wiktionary.org".
-#
-# TODO: when extracting links, try to determine what language they're in. It's
-# annoying because it differs by section, and even by template:
-#   {{sl-adv|head=[[na]] [[primer]]}}\n\n# [[for example]]
+"""
+Takes in a Wiktionary XML file, and outputs a JSON stream (.jsons) of objects
+that split the entries into sections. Each language section is a top-level
+object, and it contains objects for the subsections within it.
+"""
 
 from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
