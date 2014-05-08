@@ -15,6 +15,8 @@ Japanese-language Wiktionary.
 'French'
 >>> ENGLISH_NAME_TO_CODE['French']
 'fr'
+>>> ENGLISH_NAME_TO_CODE['Mandarin']
+'cmn'
 """
 
 from conceptnet5.util import get_data_filename
@@ -82,6 +84,16 @@ def _setup():
         for code in codes:
             CODE_TO_ENGLISH_NAME[code] = language_name
         ENGLISH_NAME_TO_CODE[language_name] = codes[0]
+
+        # For many Chinese sub-languages, the ISO standard includes "Chinese"
+        # at the end of the name, which Wiktionary omits.
+        if language_name.endswith(' Chinese'):
+            shorter_language_name = language_name[:-len(' Chinese')]
+            ENGLISH_NAME_TO_CODE[shorter_language_name] = codes[0]
+
+    ENGLISH_NAME_TO_CODE['Cantonese'] = 'yue'
+
+
 
 _setup()
 if __name__ == '__main__':
