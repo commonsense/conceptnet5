@@ -111,6 +111,7 @@ EDGE_FILES = \
 	edges/wordnet/wordnet.jsons \
 	edges/verbosity/verbosity.jsons \
 	edges/globalmind/globalmind.jsons \
+	edges/umbel/umbel.jsons \
 	edges/jmdict/jmdict.jsons \
 	$(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons) $(wildcard raw/conceptnet4_nadya/*.jsons)) \
 	$(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
@@ -233,6 +234,11 @@ edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READ
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.nt
+
+edges/umbel/umbel.jsons: raw/umbel/umbel.nt raw/umbel/umbel_links.nt $(READERS)/umbel.py $(READERS)/dbpedia.py $(CORE)
+	@mkdir -p edges/umbel
+	@mkdir -p sw_map
+	$(PYTHON) -m conceptnet5.readers.umbel raw/umbel $@ sw_map/umbel.nt
 
 # Read Japanese translations from JMDict.
 edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
