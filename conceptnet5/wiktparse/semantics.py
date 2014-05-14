@@ -523,7 +523,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         # Cases below here don't need to set 'text', because they're only used
         # in etymologies
-        elif linktype in ('back-form', 'clipping', '-er',):
+        elif linktype in ('back-form', 'clipping', '-er',) and args[1]:
             language = args['lang'] or self.default_language
             links = [EdgeInfo(language=language, target=args[1], rel='DerivedFrom')]
 
