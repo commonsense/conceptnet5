@@ -221,7 +221,7 @@ extracted/wiktionary/en/.done: raw/wiktionary/enwiktionary.xml $(READERS)/extrac
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
 edges/wiktionary/en/%.jsons: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(CORE)
 	@mkdir -p edges/wiktionary/en
-	$(PYTHON) -m conceptnet5.readers.wiktionary $(patsubst extracted/%,edges/%,$@) $@
+	$(PYTHON) -m conceptnet5.readers.wiktionary $(patsubst edges/%,extracted/%,$@) $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
