@@ -93,6 +93,18 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 # The replacement expression is simply \1 -- the part of the URI that matched
 # the twice-repeated group.
 
+# 20-way splits
+# =============
+# Some steps of the process can be parallelized by splitting the input into
+# independent pieces. Here we create the pieces of filenames necessary to
+# implement a 20-way fan-out.
+#
+# You'd think there would be a better way to do this, such as the shell command
+# `seq`, but I couldn't get a shell command to do the right thing here.
+PIECES  := 	00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
+			10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
+JPIECES := 	00.jsons 01.jsons 02.jsons 03.jsons 04.jsons 05.jsons 06.jsons 07.jsons 08.jsons 09.jsons\
+			10.jsons 11.jsons 12.jsons 13.jsons 14.jsons 15.jsons 16.jsons 17.jsons 18.jsons 19.jsons
 
 # File names
 # ==========
@@ -107,27 +119,17 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 # reason that I used := when I did.
 EDGE_FILES = \
 	edges/dbpedia/instances.jsons edges/dbpedia/properties.jsons \
-	edges/wiktionary/wiktionary_en.jsons \
 	edges/wordnet/wordnet.jsons \
 	edges/verbosity/verbosity.jsons \
 	edges/globalmind/globalmind.jsons \
 	edges/jmdict/jmdict.jsons \
+	$(patsubst %,edges/wiktionary/en/wiktionary_%, $(JPIECES)) \
 	$(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons) $(wildcard raw/conceptnet4_nadya/*.jsons)) \
 	$(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
 
 # When we turn .jsons files into .csv files, we put them in the same place with
 # a different extension.
 CSV_FILES = $(patsubst edges/%.jsons,edges/%.csv, $(EDGE_FILES))
-
-# You'd think there would be a better way to do this, such as the shell command
-# `seq`, but I couldn't get a shell command to do the right thing here.
-PIECES  := 	00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
-			10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
-
-# SPLIT_PATTERNS is not a list of filenames; it's a list of Makefile patterns
-# where we're literally sticking in the % symbol. I forget why. This should
-# probably be removed.
-SPLIT_PATTERNS := $(addprefix edges/split/%_, $(PIECES))
 
 # Build other filenames in similar ways.
 SPLIT_FILES := $(patsubst %,edges/split/edges_%, $(PIECES))
@@ -185,17 +187,17 @@ upload : $(DIST_FILES)
 # code changes.
 
 # Read edges from ConceptNet raw files.
-edges/conceptnet4/%.jsons : raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
+edges/conceptnet4/%.jsons: raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # nadya.jp output is in the same format as ConceptNet.
-edges/conceptnet4_nadya/%.jsons : raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
+edges/conceptnet4_nadya/%.jsons: raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # zh-TW data from the PTT Pet Game is in a different format, in .txt files.
-edges/conceptnet_zh/%.jsons : raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
+edges/conceptnet_zh/%.jsons: raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.ptt_petgame $< $@
 
@@ -205,10 +207,21 @@ edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.p
 	@mkdir -p edges/globalmind
 	$(PYTHON) -m conceptnet5.readers.globalmind raw/globalmind $@
 
-# One day, this will be replaced by a better Wiktionary reader.
-edges/wiktionary/wiktionary_en.jsons: raw/wiktionary/enwiktionary.xml $(READERS)/wiktionary_en.py $(CORE)
-	@mkdir -p edges/wiktionary
-	$(PYTHON) -m conceptnet5.readers.wiktionary_en $< $@
+# The Wiktionary reader proceeds in two steps. First we extract .jsons files
+# of individual sections from the huge .xml file.
+#
+# We can't list these 20 files as the outputs of this rule, because then it would run 20 times.
+# Instead, we make a file called ".done" that gets updated after the extraction has finished.
+extracted/wiktionary/en/.done: raw/wiktionary/enwiktionary.xml $(READERS)/extract_wiktionary.py
+	@mkdir -p extracted/wiktionary/en
+	$(PYTHON) -m conceptnet5.readers.extract_wiktionary $< extracted/wiktionary/en
+	touch $@
+
+# The next stage of Wiktionary reading is to run the .jsons files through the
+# full Wiktionary parser, which is relatively slow but can happen in parallel.
+edges/wiktionary/en/%.jsons: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(CORE)
+	@mkdir -p edges/wiktionary/en
+	$(PYTHON) -m conceptnet5.readers.wiktionary $(patsubst extracted/%,edges/%,$@) $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
@@ -246,8 +259,8 @@ edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
 
 # Gather all the csv files and split them into 20 pieces.
 #
-# We can't list these 20 pieces as the outputs of this rule, because then it would run 20 times.
-# Instead, we make a file called ".done" that gets updated after the split command has finished.
+# As with Wiktionary above, we make an artificial file called ".done" instead
+# of listing the actual outputs.
 edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 	@mkdir -p edges/split
 	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o edges/split -n 20
