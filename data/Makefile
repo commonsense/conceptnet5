@@ -219,7 +219,7 @@ extracted/wiktionary/en/.done: raw/wiktionary/enwiktionary.xml $(READERS)/extrac
 
 # The next stage of Wiktionary reading is to run the .jsons files through the
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
-edges/wiktionary/en/%.jsons: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(CORE)
+edges/wiktionary/en/%.jsons: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(READERS)/../wiktparse/semantics.py $(CORE)
 	@mkdir -p edges/wiktionary/en
 	$(PYTHON) -m conceptnet5.readers.wiktionary $(patsubst edges/%,extracted/%,$@) $@
 

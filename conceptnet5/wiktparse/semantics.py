@@ -7,6 +7,7 @@ from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
 from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
 from pprint import pprint
 from collections import defaultdict
+import traceback
 
 string_type = type('')
 
@@ -124,6 +125,9 @@ class EdgeInfo(object):
         else:
             sense = self.sense
 
+        if sense in BAD_NAMES_FOR_THINGS:
+            sense = None
+
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
         end_uri = normalized_concept_uri(self.language, self.target)
         rel = self.rel or 'RelatedTo'
@@ -137,7 +141,7 @@ class EdgeInfo(object):
             rel=rel_uri, start=start_uri, end=end_uri,
             dataset='/d/wiktionary/en/%s' % headlang,
             license=Licenses.cc_sharealike,
-            sources=[join_uri('/s/web/en.wiktionary.org', headword),
+            sources=[join_uri('/s/web/en.wiktionary.org/wiki', headword),
                      join_uri('/s/rule', rule_name)],
             weight=1.0
         )
@@ -203,12 +207,28 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         if langcode is None:
             return []
 
+        failures = 0
         for section in structure['sections']:
-            edges.extend(
-                self.parse_structured_section(
-                    section, langcode, structure['title'],
+            try:
+                edges.extend(
+                    self.parse_structured_section(
+                        section, langcode, structure['title'],
+                    )
                 )
-            )
+            except Exception as e:
+                print("== Exception in Wiktionary parsing ==")
+                print(e)
+                print("Section name: %s" % structure['title'])
+                print("Language code: %s" % langcode)
+                print()
+                print("=== Section content ===")
+                print(section['text'])
+                print()
+                print("=== Traceback ===")
+                print(traceback.format_exc())
+                failures += 1
+                
+        assert failures <= 1
         return edges
 
     def parse_structured_section(self, structure, headlang, headword, headpos=None):
@@ -421,6 +441,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules: FIXME
         """
+        if 1 not in ast['args']:
+            return None
         return EdgeInfo(
             language=ast['language'],
             target=ast['args'][1].text,
@@ -450,7 +472,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             return []
         if ast['translations'] is None:
             return []
-        return ast['translations']
+        return [t for t in ast['translations'] if t is not None]
 
     def translation_content(self, ast):
         """
@@ -611,7 +633,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         if ast['defns'] is None:
             return []
         for defn_linked_text in ast['defns']:
-            # TODO: handle interlingual definitions
             links.extend(defn_linked_text.links)
         return links
 
