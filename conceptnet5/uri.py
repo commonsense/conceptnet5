@@ -121,7 +121,9 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     with the same text.
 
     `text` and `disambiguation` should be strings that have already been run
-    through `normalize_text`. See `normalized_concept_uri` in nodes.py for
+    through `normalize_text`.
+    
+    This is a low-level interface. See `normalized_concept_uri` in nodes.py for
     a more generally applicable function that also deals with special
     per-language handling.
 
