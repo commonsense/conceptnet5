@@ -11,6 +11,7 @@ wikipedia.txt
 secrets.py
 *.zip
 *.tar.bz2
+dist/
 env/
 data/assoc
 data/assertions
@@ -27,5 +28,6 @@ data/graph.png
 dist/
 stats/
 attic/
+static/img/build/
 logs/*.log
 static/img/build/

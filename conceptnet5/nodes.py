@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with stemmers that reduce words
-to a root form.
+to a root form, providing a higher-level interface to looking things up in
+ConceptNet.
 
 Currently, the only stemmer we use is Morphy, the built-in stemmer in WordNet,
 which we apply to English concept names. Other languages are left alone.
@@ -12,7 +13,7 @@ a well-established set of strings. Other stemmers present a moving target that
 is harder to define.
 """
 
-from metanl.nltk_morphy import normalize as normalize_english
+from conceptnet5.language.english import normalize as normalize_english
 from conceptnet5.uri import normalize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
 
 LCODE_ALIASES = {
@@ -40,8 +41,8 @@ LCODE_ALIASES = {
 def normalized_concept_name(lang, text):
     """
     Make a normalized form of the given text in the given language. If the
-    language is English, reduce words to their root form using metanl's
-    implementation of Morphy. Otherwise, simply apply the function called
+    language is English, reduce words to their root form using the tools in
+    conceptnet5.language.english. Otherwise, simply apply the function called
     `conceptnet5.uri.normalize_text`.
 
     >>> normalized_concept_name('en', 'this is a test')
