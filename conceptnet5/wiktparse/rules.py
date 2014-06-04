@@ -1,6 +1,5 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
 from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
@@ -8,6 +7,12 @@ from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
 from pprint import pprint
 from collections import defaultdict
 import traceback
+try:
+    from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
+except ImportError:
+    # Make some dummy classes, so we can at least load the classes
+    # and their docstrings
+    wiktionaryParser = wiktionarySemantics = object
 
 string_type = type('')
 
@@ -304,6 +309,105 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     # The methods below implement semantic rules for various nodes of the
     # parse tree.
+    def __no_semantics(self, ast):
+        r"""
+        Here we define all the syntax rules that need no semantics applied to
+        them.
+
+        == Tokens ==
+
+        Parse rules:
+
+            left_bracket    = "[" ;
+            right_bracket   = "]" ;
+            left_brace      = "{" ;
+            right_brace     = "}" ;
+            left_brackets   = "[[" ;
+            right_brackets  = "]]" ;
+            left_braces     = "{{" ;
+            right_braces    = "}}" ;
+            hash_char       = "#" ;
+            vertical_bar    = "|" ;
+            equals          = "=" ;
+            bullet          = "*" ;
+            colon           = ":" ;
+            comma           = "," ;
+            semicolon       = ";" ;
+            slash           = "/" ;
+            single_left_bracket = left_bracket !left_bracket ;
+            single_right_bracket = right_bracket !right_bracket ;
+            single_left_brace = left_brace !left_brace ;
+            single_right_brace = right_brace !right_brace ;
+
+        == Whitespace ==
+
+        Whitespace is significant on MediaWiki. Perhaps the most straightforward
+        example is that the text:
+
+            [[link]] s
+
+        prints differently from:
+
+            [[link]]s
+
+        On top of that, some things, like list syntax, apply until the end of the
+        line. So we need some rules for whitespace, and whenever the syntax has
+        optional whitespace in it, we need to explicitly allow it.
+
+        Our three whitespace symbols are:
+
+        - SP: Zero or more whitespace characters that stay on the same line.
+        - NL: A single newline character (\n).
+        - WS: Zero or more whitespace characters, possibly including newlines.
+
+        Parse rules:
+
+            SP = ?/[ \t]*/? ;
+            NL = ?/\n/? ;
+            WS = ?/[ \t\n]*/? ;
+
+        == Terms ==
+
+        A "term" is a string with no wiki syntax in it. Basically, anything
+        whose characters we can consume without worrying about backtracking,
+        because you can't backtrack into a regex.
+
+        Parse rule:
+
+            term = ?/[^\[\]{}<>|:=\n]+/? ;
+
+        == HTML syntax ==
+
+        Comments and HTML tags are things we ignore. They look similar, but have
+        slightly different syntax. Despite a frothing rant on Stack Overflow,
+        we can parse them both with regexes, because we never care about their
+        contents.
+
+        Parse rules:
+
+            comment = ?/<!--(.|\n)+?-->/? ;
+            html_tag = ?/<[^>]+?>/? ;
+
+        == Plain text ==
+
+        Plain text is made of terms, significant whitespace, and occasional
+        things we ignore such as HTML tags and comments. It also allows
+        miscellaneous symbols that look like wikitext syntax, but clearly
+        aren't being used for that purpose, such as single brackets and braces.
+
+        The 'text' rule is a simple example of where order matters in a PEG
+        grammar: a comment looks like an HTML tag, but is more specific and
+        is parsed differently, so we need to match it first.
+
+        Parse rules:
+
+            one_line_text = @term | comment | html_tag | @colon | @equals
+                          | @single_left_bracket | @single_right_bracket
+                          | @single_left_brace | @single_right_brace | @SP ;
+            text = @NL | @one_line_text ;
+        """
+        return ast
+
     def wikitext(self, ast):
         """
         The 'wikitext' rule parses arbitrary text that may include markup,
@@ -313,13 +417,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            one_line_text = @term | comment | html_tag | @colon | @equals
-                            | @single_left_bracket | @single_right_bracket
-                            | @single_left_brace | @single_right_brace | @SP ;
-            text = @NL | @one_line_text ;
             text_with_links = { wiki_link | text }+ ;
             one_line_text_with_links = { wiki_link | one_line_text }+ ;
-            linktext = { @+:term | html_tag | NL | @+:colon | @+:equals }+ ;
             one_line_wikitext = { template | wiki_link | external_link | one_line_text }+ ;
             wikitext = { template | wiki_link | external_link | text }+ ;
         """
@@ -337,7 +436,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rule:
 
-            wiki_link = left_brackets [ site:term colon ] target:term [ vertical_bar text:term ] right_brackets ;
+            wiki_link = left_brackets [ site:term colon ] target:term
+                        [ vertical_bar text:term ] right_brackets ;
         """
         links = []
         if ast['site'] is not None:
@@ -369,12 +469,26 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
+            linktext = { @+:term | html_tag | NL | @+:colon | @+:equals }+ ;
             urlpath = ?/[^ \[\]{}<>|]+/? ;
             url = schema:term colon path:urlpath ;
-            external_link = left_bracket url:url WS [ text:linktext ] right_bracket ;
+            external_link = left_bracket url:url WS [ text:linktext ]
+                            right_bracket ;
         """
         # Keep only the text of external links
         return LinkedText(text=ast['text'], links=[])
+
+    def image(self, ast):
+        """
+        Images have complex syntax like
+        [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]].
+
+        Parse rules:
+            
+            image = left_brackets WS "Image:" filename:term
+                    { vertical_bar wikitext }* WS right_brackets ;
+        """
+        return None
 
     def template_args(self, ast):
         """
@@ -437,9 +551,15 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     def translation_template(self, ast):
         """
-        This rule handles templates that indicate a translation, returning an EdgeInfo.
+        This rule handles templates that indicate a translation, returning an
+        EdgeInfo.
 
-        Parse rules: FIXME
+        Parse rules:
+
+            translation_name = "t-simple" | "t+" | "t-" | "t0" | "tø" | "t" ;
+            translation_template = left_braces WS translation_name WS
+                                   vertical_bar WS language:term WS
+                                   args:template_args right_braces ;
         """
         if 1 not in ast['args']:
             return None
@@ -450,10 +570,28 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         )
 
     def sensetrans_top_template(self, ast):
-        # FIXME: This might be the identity
+        """
+        A "sensetrans" template associates a group of translation templates
+        with a particular word sense.
+
+        Parse rule:
+
+            sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar
+                                      WS sense:text_with_links WS right_braces ;
+        """
         return {'sense': ast['sense']}
 
     def checktrans_top_template(self, ast):
+        """
+        A "checktrans" template indicates that the following group of
+        translations aren't associated with any particular word sense, and
+        someone should figure out what sense they are someday.
+
+        Parse rule:
+
+            checktrans_top_template = left_braces WS "checktrans-top"
+                                      WS right_braces ;
+        """
         return {'sense': None}
 
     def translation_entry(self, ast):
@@ -464,7 +602,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            translation_entry = bullet SP { translations+:translation_template | one_line_text_with_links }+ NL ;
+            translation_entry = bullet SP
+                                { translations+:translation_template
+                                | one_line_text_with_links }+
+                                NL ;
         """
         if isinstance(ast, list):
             # If there were no translations found, we end up with a list
@@ -478,7 +619,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         Parse rule:
 
-            translation_content = { trans_mid_template | entries+:translation_entry | WS }+ ;
+            translation_content = { trans_mid_template
+                                  | entries+:translation_entry | WS }+ ;
         """
         if ast['entries'] is None:
             return []
@@ -489,16 +631,59 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         Parse a block of translations, which may be grouped together into a
         word sense. Set that sense (which may be None) as the sense for all
         the translations.
+
+        Parse rules:
+
+            trans_top_template = { checktrans:checktrans_top_template
+                                 | sensetrans:sensetrans_top_template } ;
+            trans_mid_template = left_braces WS "trans-mid" WS right_braces ;
+            trans_bottom_template = left_braces WS "trans-bottom" WS right_braces ;
+            translation_entry = bullet SP
+                                { translations+:translation_template | template
+                                | one_line_text_with_links }+
+                                NL ;
+            translation_content = { trans_mid_template | entries+:translation_entry
+                                  | !trans_bottom_template one_line_wikitext NL | WS }+ ;
+            translation_block = top:trans_top_template WS
+                                translations:translation_content WS
+                                trans_bottom_template WS >> ;
+
+        After parsing a translation block, we "cut", indicated by the symbol >>.
+        That means the parser should not backtrack past this point after
+        successfully parsing a block, and therefore it can throw out memoized
+        parses before this point.
         """
         sense = ast['top']['sense']
         return [info.set_sense(sense) for info in ast['translations']]
 
     def translation_section(self, ast):
+        """
+        A translation section contains some number of translation blocks.
+
+        Parse rule:
+
+            translation_section = { blocks+:translation_block }* ;
+        """
         if ast['blocks'] is None:
             return []
         return sum(ast['blocks'], [])
 
     def link_template(self, ast):
+        """
+        Link templates are templates that become links to definitions of
+        other words, such as {{term}} and {{l}}.
+
+        Parse rules:
+
+            link_template_name = "term/t" | "term" | "l" | "ja-l" | "ko-inline"
+                               | "blend" | "borrowing" | "back-form" | "calque"
+                               | "clipping" | "compound" | "confix" | "-er"
+                               | "etycomp" | "prefix" | "suffix" ;
+            link_template = left_braces WS linktype:link_template_name
+                            { slash subtypes+:term }* args:template_args
+                            right_braces ;
+
+        """
         # This is going to be complicated. We need to figure out the
         # argument structure of many different templates.
         args = defaultdict(lambda: None)
@@ -591,10 +776,17 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     def link_entry(self, ast):
         """
+        A 'link section' is a section for listing links to other entries, such
+        as related terms and synonyms.
+
         Parse rules:
 
-            sense_template = left_braces WS "sense" WS vertical_bar @text_with_links right_braces ;
-            link_entry = bullet SP [sense:sense_template] SP { link+:link_template | link+:wiki_link | template | external_link | one_line_text }+ NL >> ;
+            sense_template = left_braces WS "sense" WS vertical_bar
+                             @text_with_links right_braces ;
+            link_entry = bullet SP [sense:sense_template] SP
+                         { link+:link_template | link+:wiki_link | template
+                         | external_link | one_line_text }+
+                         NL >> ;
         """
         if ast['links'] is None:
             return []
@@ -610,17 +802,38 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return links
 
     def sense_template(self, ast):
+        """
+        Parse rule:
+
+            sense_template = left_braces WS "sense" WS vertical_bar
+                             @text_with_links right_braces ;
+        """
         return ast.text
 
     def link_section(self, ast):
         """
-        Parse rule:
+        Parse rules:
 
             link_section = { entries+:link_entry | template | WS }+ ;
         """
         return sum(ast['entries'] or [], [])
 
     def etymology_section(self, ast):
+        """
+        Parse etymology sections.
+
+        The {{etyl}} template gives the language of the next term, or some
+        list of upcoming terms of unspecified length.
+
+        Parse rules:
+
+            etyl_template = left_braces WS "etyl" WS vertical_bar language:term
+                            WS template_args right_braces ;
+            etyl_link = link_template | wiki_link ;
+            etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
+            etymology_section = { etym+:etyl_template_and_link | etym+:link_template
+                                | template | wiki_link | external_link | text }+ ;
+        """
         links = []
         if ast['etym'] is None:
             return []
@@ -629,6 +842,15 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return links
 
     def definition_section(self, ast):
+        """
+        Parse rules:
+
+            list_chars = ?/[#*:]+/? ;
+            defn_line = hash_char !bullet SP @one_line_wikitext NL WS ;
+            defn_details = hash_char list_chars SP @one_line_wikitext NL WS ;
+            definition = @defn_line { defn_details }* >> ;
+            definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ;
+        """
         links = []
         if ast['defns'] is None:
             return []

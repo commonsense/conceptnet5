@@ -1,6 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from conceptnet5.wiktparse.semantics import ConceptNetWiktionarySemantics
+from conceptnet5.wiktparse.rules import ConceptNetWiktionarySemantics
 from conceptnet5.formats.json_stream import read_json_stream, JSONStreamWriter
 
 def run_wiktionary(input_file, output_file, language='en', verbosity=0):
