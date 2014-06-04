@@ -6,7 +6,7 @@ PYTHON = python
 all: parser.py
 
 parser.py: parser.ebnf
-	$(GRAKO) -w '' -o $@ $<
+	$(GRAKO) -m wiktionary -w '' -o $@ $<
 
 parser.ebnf: rules.py extract_ebnf.py
 	$(PYTHON) -m conceptnet5.wiktparse.extract_ebnf conceptnet5.wiktparse.rules.ConceptNetWiktionarySemantics $@

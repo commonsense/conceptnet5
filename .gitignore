@@ -3,7 +3,8 @@
 *.egg-info
 .coverage
 conceptnet5/import*/*.txt
-*.wiktionary.org
+conceptnet5/wiktparse/parser.py
+conceptnet5/wiktparse/parser.ebnf
 evaluation/responses
 evaluation/data
 enwiktionary.xml
