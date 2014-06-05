@@ -14,6 +14,7 @@ import re
 import logging
 from ftfy import ftfy
 from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.sql import TitleDBWriter
 from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -37,8 +38,10 @@ for level in range(2, 8):
     )
     SECTION_HEADER_RES[level] = regex
 
+
 def fix_heading(heading):
     return ftfy(heading).strip('[]')
+
 
 class ExtractPages(ContentHandler):
     def __init__(self, callback):
@@ -72,6 +75,7 @@ class ExtractPages(ContentHandler):
                 # bail out
                 self.in_article = False
 
+
 class WiktionaryWriter(object):
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
@@ -79,7 +83,7 @@ class WiktionaryWriter(object):
             JSONStreamWriter(output_dir + '/wiktionary_%02d.jsons' % i)
             for i in range(nfiles)
         ]
-        self.title_writer = JSONStreamWriter(output_dir + '/titles.jsons')
+        self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
 
     def parse_wiktionary_file(self, filename):
         # Create a parser
@@ -96,6 +100,7 @@ class WiktionaryWriter(object):
 
         # Parse the input
         parser.parse(open(filename))
+        self.title_db.commit()
 
     def handle_page(self, title, text, site='en.wiktionary.org'):
         if ':' not in title:
@@ -118,10 +123,10 @@ class WiktionaryWriter(object):
         filenum = hash((site, title, heading)) % self.nfiles
         self.writers[filenum].write(data)
 
-        # Save the languages and titles to a more compact file
+        # Save the languages and titles to a database file
         language_code = ENGLISH_NAME_TO_CODE.get(language)
         if language_code is not None:
-            self.title_writer.write([language_code, title])
+            self.title_db.add(language_code, title.lower())
 
     def handle_section(self, text, heading, level):
         section_finder = SECTION_HEADER_RES[level + 1]

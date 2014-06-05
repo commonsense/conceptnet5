@@ -7,6 +7,7 @@ from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
 from pprint import pprint
 from collections import defaultdict
 import traceback
+import sqlite3
 try:
     from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
 except ImportError:
@@ -184,9 +185,10 @@ def join_text(lst):
 
 
 class ConceptNetWiktionarySemantics(wiktionarySemantics):
-    def __init__(self, language, trace=False, **kwargs):
+    def __init__(self, language, titledb, trace=False, **kwargs):
         self.default_language = language
         self.trace = trace
+        self.titledb = sqlite3.connect(titledb)
         wiktionarySemantics.__init__(self, **kwargs)
 
     def parse(self, text, rule_name, **kwargs):
@@ -285,18 +287,33 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             pass
         else:
             rule = 'definition_section'
-            language = self.default_language
+            # Definitions could link to words in the same language as this
+            # section, or in the overall language of the Wiktionary. It's
+            # ambiguous. Keep both options for now, to be resolved in a moment.
+            language = (self.default_language, headlang)
 
         if rule is not None:
             text = text.rstrip('\n') + '\n'
             edge_info = self.parse(text, rule, trace=self.trace)
             if rel is not None:
                 edge_info = [ei.set_rel(rel) for ei in edge_info]
-            edge_info = [ei.set_default_language(language) for ei in edge_info]
+            
+            if isinstance(language, tuple):
+                # When there are multiple possible languages, we need to
+                # disambiguate the language based on the target word
+                edge_info = [
+                    ei.set_default_language(
+                        self.disambiguate_language(language, ei.target)
+                    ) for ei in edge_info
+                ]
+            else:
+                edge_info = [ei.set_default_language(language)
+                            for ei in edge_info]
             edges.extend(
                 [ei.complete_edge(rule, headlang, headword, headpos)
                  for ei in edge_info
-                 if ei.target not in BAD_NAMES_FOR_THINGS]
+                 if ei.target not in BAD_NAMES_FOR_THINGS
+                 and ei.language is not None]
             )
 
         for section in structure['sections']:
@@ -306,6 +323,22 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 )
             )
         return edges
+
+    def check_titledb(self, language, title):
+        """
+        Check whether this title, for this language, is known in the database.
+        """
+        c = self.titledb.cursor()
+        c.execute('select * from titles where language=? and title=?',
+                  (language, title.lower()))
+        rows = c.fetchall()
+        return len(rows) > 0
+
+    def disambiguate_language(self, options, title):
+        for option in options:
+            if self.check_titledb(option, title):
+                return option
+        return None
 
     # The methods below implement semantic rules for various nodes of the
     # parse tree.
@@ -405,6 +438,15 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                           | @single_left_bracket | @single_right_bracket
                           | @single_left_brace | @single_right_brace | @SP ;
             text = @NL | @one_line_text ;
+
+        == Images ==
+        Images have complex syntax like
+        [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]].
+
+        Parse rules:
+            
+            image = left_brackets WS "Image:" filename:term
+                    { vertical_bar wikitext }* WS right_brackets ;
         """
         return ast
 
@@ -455,7 +497,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 target, language = target.split('#', 1)
                 language = language_code(language) or 'unknown'
             if target is not None and language != 'unknown':
-                links.append(EdgeInfo(language=language, target=target))
+                links.append(EdgeInfo(language=language, target=target.strip()))
 
         text = ast['text'] or ast['target']
         return LinkedText(text=text, links=links)
@@ -477,18 +519,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         # Keep only the text of external links
         return LinkedText(text=ast['text'], links=[])
-
-    def image(self, ast):
-        """
-        Images have complex syntax like
-        [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]].
-
-        Parse rules:
-            
-            image = left_brackets WS "Image:" filename:term
-                    { vertical_bar wikitext }* WS right_brackets ;
-        """
-        return None
 
     def template_args(self, ast):
         """
