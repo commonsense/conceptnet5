@@ -28,6 +28,7 @@ LANG_NAMES = {
     'zh_TW': 'Traditional Chinese',
     'chs': 'Simplified Chinese',
     'zh_CN': 'Simplified Chinese',
+    'zh': 'Chinese',
     'jpn': 'Japanese',
     'ja': 'Japanese',
     'kor': 'Korean',

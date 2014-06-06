@@ -22,7 +22,7 @@ def extract_contributors(source):
     Extract the set of human contributors from a 'source' URI. This is used
     in making sure we haven't duplicated the same person's contribution of
     the same assertion.
-    
+
     This has to happen during the combining step, not when extracting the
     ConceptNet edges in the first place, because the duplicate contributions
     may appear in different files.
@@ -95,11 +95,11 @@ def combine_assertions(csv_filename, output_file, license):
             if (current_surface is None) and surface:
                 current_surface = surface
 
-
         # Otherwise, it's a new assertion.
         else:
             if current_uri is not None:
-                output_assertion(out,
+                output_assertion(
+                    out,
                     dataset=current_dataset, license=license,
                     sources=current_sources,
                     surfaceText=current_surface,
@@ -120,7 +120,8 @@ def combine_assertions(csv_filename, output_file, license):
             current_dataset = this_dataset
 
     if current_uri is not None:
-        output_assertion(out,
+        output_assertion(
+            out,
             rel=rel, start=start, end=end,
             dataset=current_dataset, license=license,
             sources=current_sources,
@@ -157,6 +158,7 @@ class AssertionCombiner(object):
     A class that wraps the combine_assertions function, so it can be tested in
     the same way as the readers, despite its extra parameters.
     """
+
     def __init__(self, license):
         self.license = license
 
@@ -172,10 +174,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='csv file of input')
     parser.add_argument('output', help='jsons file to output to')
-    parser.add_argument('-l', '--license',
+    parser.add_argument(
+        '-l', '--license',
         help='URI of the license to use, such as /l/CC/By-SA'
     )
     args = parser.parse_args()
     combiner = AssertionCombiner(args.license)
     combiner.handle_file(args.input, args.output)
-
