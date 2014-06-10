@@ -45,6 +45,9 @@ PYTHON = python
 CURL_DOWNLOAD = curl -O
 RSYNC_UPLOAD = rsync -Pavz
 
+# We use recursive make sparingly, but we still use it.
+MAKE = make
+
 # Commands for working with .tar.bz2 files
 TARBALL_CREATE = tar jcvf
 TARBALL_EXTRACT = tar jxvf
@@ -222,7 +225,7 @@ extracted/wiktionary/en/.done: raw/wiktionary/enwiktionary.xml $(READERS)/extrac
 # tautologies!) The parser code has to exist before we can use it, so we run
 # its Makefile if it doesn't exist or it's out of date.
 $(BASE)/wiktparse/parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
-	cd $(BASE)/wiktparse && make parser.py
+	cd $(BASE)/wiktparse && $(MAKE) parser.py
 
 # The next stage of Wiktionary reading is to run the .jsons files through the
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
