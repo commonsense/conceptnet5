@@ -15,6 +15,7 @@ def convert_to_tab_separated(input_filename, output_filename):
         ]
         column_values = [info.get(col) for col in columns]
         line = '\t'.join(column_values)
+        assert '\n' not in line
         print(line, file=out_stream)
 
 

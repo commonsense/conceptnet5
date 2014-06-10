@@ -6,10 +6,12 @@ import codecs
 # Python 2/3 compatibility
 if sys.version_info.major >= 3:
     string_type = str
-    from io import StringIO
+    def opener(filename):
+        return open(filename, encoding='utf-8', newline='\n')
 else:
     string_type = basestring
-    from StringIO import StringIO
+    def opener(filename):
+        return codecs.open(filename, encoding='utf-8')
 
 
 class JSONStreamWriter(object):
@@ -50,13 +52,33 @@ def read_json_stream(filename_or_stream):
     """
     Read a stream of data in "JSON stream" format. Returns a generator of the
     decoded objects.
+
+    On Python 2, this will glitch out when trying to read JSON objects
+    containing Unicode characters U+2018 or U+2019. This is because the
+    "codecs" module, the only thing that reads Unicode input streams on Python
+    2, considers them to be line breaks, and can't be convinced otherwise.
+
+    We could be fully compatible with Python 2 if we read the input as bytes
+    and then decode it, but then we wouldn't be able to pass in Unicode
+    streams at all, which is a big loss. 
+
+    So, keep in mind that this function can give different results on Python 2
+    and 3. When building ConceptNet, the Python 3 version is correct.
     """
+    errors = 0
     if hasattr(filename_or_stream, 'read'):
         stream = filename_or_stream
     else:
-        stream = codecs.open(filename_or_stream, encoding='utf-8')
+        stream = opener(filename_or_stream)
     for line in stream:
         line = line.strip()
         if line:
-            yield json.loads(line)
+            try:
+                yield json.loads(line)
+            except ValueError:
+                print("Malformed JSON: %r" % line)
+                errors += 1
+                if errors >= 5:
+                    print("Re-raising because too many JSON errors have occurred.")
+                    raise
 
