@@ -491,11 +491,11 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             language = None
             target = ast['target']
             if target.startswith('#'):
-                language = language_code(ast['target'][1:])
+                language = language_code(ast['target'][1:].strip())
                 target = ast['text']
             elif '#' in target:
                 target, language = target.split('#', 1)
-                language = language_code(language) or 'unknown'
+                language = language_code(language.strip()) or 'unknown'
             if target is not None and language != 'unknown':
                 links.append(EdgeInfo(language=language, target=target.strip()))
 
@@ -594,7 +594,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         if 1 not in ast['args']:
             return None
         return EdgeInfo(
-            language=ast['language'],
+            language=ast['language'].strip(),
             target=ast['args'][1].text,
             rel='TranslationOf'
         )
@@ -730,7 +730,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         linktype = ast['linktype']
         if linktype == 'l' and ast['subtypes'] and args[1]:
-            language = ast['subtypes'][0]
+            language = ast['subtypes'][0].strip()
             target = args[1]
             links = [EdgeInfo(language=language, target=target)]
             text = target
@@ -799,7 +799,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return LinkedText(text=text, links=links)
 
     def etyl_template_and_link(self, ast):
-        language = ast['etyl']['language']
+        language = ast['etyl']['language'].strip()
         links = [link.set_language(language)
                  for link in ast['link'].links]
         return LinkedText(text=ast['link'].text, links=links)
