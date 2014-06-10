@@ -180,7 +180,7 @@ def join_text(lst):
         else:
             raise TypeError(item)
 
-    text = ''.join(texts)
+    text = ''.join(texts).replace('\n', ' ').strip()
     return LinkedText(text, links)
 
 
