@@ -8,6 +8,8 @@ from pprint import pprint
 from collections import defaultdict
 import traceback
 import sqlite3
+import os
+
 try:
     from conceptnet5.wiktparse.parser import wiktionaryParser, wiktionarySemantics
 except ImportError:
@@ -18,11 +20,15 @@ except ImportError:
 string_type = type('')
 
 POS_HEADINGS = {
-    'Noun': 'n',
-    'Proper noun': 'n',
-    'Verb': 'v',
-    'Adjective': 'a',
-    'Adverb': 'r'
+    'en': {
+        'Noun': 'n',
+        'Proper noun': 'n',
+        'Verb': 'v',
+        'Adjective': 'a',
+        'Adverb': 'r'
+    },
+    'de': {
+    }
 }
 
 # Skip some languages based on their headings.
@@ -32,6 +38,43 @@ POS_HEADINGS = {
 # and American Sign Language is not going to work well when represented in
 # text in concept names.
 SKIPPED_LANGUAGES = ['Lojban', 'Translingual', 'American Sign Language']
+
+# Maps heading strings to their (rule, relation) tuples
+RULES_AND_RELATIONS_MAP = {
+    'en': {
+        'Translations': ('translation_section', None),
+        'Synonyms': ('link_section', 'Synonym'),
+        'Antonyms': ('link_section', 'Antonym'),
+        'Hypernyms': ('link_section', 'IsA'),
+        'Hyponyms': ('link_section', '~IsA'),
+        'Holonyms': ('link_section', 'PartOf'),
+        'Meronyms': ('link_section', 'PartOf'),
+        'Derived terms': ('link_section', '~DerivedFrom'),
+        'Descendants': ('link_section', '~DerivedFrom'),
+        'Compounds': ('link_section', '~CompoundDerivedFrom'),
+        'Related terms': ('link_section', 'RelatedTo'),
+        'See also': ('link_section', 'RelatedTo'),
+        'Pronunciation': (None, None),
+        'Anagrams': (None, None),
+        'Statistics': (None, None),
+        'References': (None, None),
+        'Quotations': (None, None),
+        'Romanization': (None, None),
+        'Usage notes': (None, None)
+    },
+    'de': {
+        'Bedeutungen': ('definition_section', None),
+        'Übersetzungen': ('translation_section', None),
+        'Herkunft': ('etymology_section', 'EtymologicallyDerivedFrom'),
+        'Ähnlichkeiten': ('link_section', 'RelatedTo'),
+        'Sinnverwandte Wörter': ('link_section', 'RelatedTo'),
+        'Gegenwörter': ('link_section', 'Antonym'),
+        'Synonyme': ('link_section', 'Synonym'),
+        'Oberbegriffe': ('link_section', 'IsA'),
+        'Unterbegriffe': ('link_section', '~IsA'),
+        'Wortbildungen': ('link_section', '~DerivedFrom')
+    }
+}
 
 
 def language_code(language_name):
@@ -154,7 +197,7 @@ class EdgeInfo(object):
 
     def __repr__(self):
         return "EdgeInfo(%r, %r, %r, %r)" % (
-            self.language, self.target, self.sense, self.rel
+            self.language, self.target.encode('utf-8'), self.sense, self.rel
         )
 
 
@@ -234,59 +277,42 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 print("=== Traceback ===")
                 print(traceback.format_exc())
                 failures += 1
-                
+
         assert failures <= 1
         return edges
 
+    def _get_rule_for_heading(self, heading):
+        """
+        Returns a (rule, relation) tuple for the given `heading` string. Both
+        elements of the tuple are strings. It is possible for a "rule" to have
+        "None" as its "relation", but a non-None relation may not attach to a
+        "none" rule.
+        """
+        if self.default_language not in RULES_AND_RELATIONS_MAP.keys():
+            return (None, None)
+
+        # What to return from the RULES_AND_RELATIONS_MAP for an unknown key
+        defaults = (None, None)
+
+        if self.default_language == 'en':
+            if heading.startswith('Etymology'):
+                return ('etymology_section', 'EtymologicallyDerivedFrom')
+
+            defaults = ('definition_section', None)
+
+        return RULES_AND_RELATIONS_MAP[self.default_language].get(heading, 
+                                                                  defaults)
+
     def parse_structured_section(self, structure, headlang, headword, headpos=None):
         edges = []
-        heading = structure['heading']
         text = structure['text']
-        if heading in POS_HEADINGS:
+        heading = structure['heading']
+        if heading in POS_HEADINGS[headlang]:
             if headpos is None:
-                headpos = POS_HEADINGS[structure['heading']]
+                headpos = POS_HEADINGS[headlang][structure['heading']]
 
-        rule = None
-        rel = None
-        language = headlang
-        if heading == 'Translations':
-            rule = 'translation_section'
-        elif heading.startswith('Etymology'):
-            rule = 'etymology_section'
-            rel = 'EtymologicallyDerivedFrom'
-        elif heading == 'Synonyms':
-            rule = 'link_section'
-            rel = 'Synonym'
-        elif heading == 'Antonyms':
-            rule = 'link_section'
-            rel = 'Antonym'
-        elif heading == 'Hypernyms':
-            rule = 'link_section'
-            rel = 'IsA'
-        elif heading == 'Hyponyms':
-            rule = 'link_section'
-            rel = '~IsA'
-        elif heading == 'Holonyms':
-            rule = 'link_section'
-            rel = 'PartOf'
-        elif heading == 'Meronyms':
-            rule = 'link_section'
-            rel = 'PartOf'
-        elif heading in ('Derived terms', 'Descendants'):
-            rule = 'link_section'
-            rel = '~DerivedFrom'
-        elif heading == 'Compounds':
-            rule = 'link_section'
-            rel = '~CompoundDerivedFrom'
-        elif heading in ('Related terms', 'See also'):
-            rule = 'link_section'
-            rel = 'RelatedTo'
-        elif heading in ('Pronunciation', 'Anagrams', 'Statistics',
-                         'References', 'Quotations', 'Romanization',
-                         'Usage notes'):
-            pass
-        else:
-            rule = 'definition_section'
+        (rule, rel) = self._get_rule_for_heading(heading)
+        if rule == 'definition_section':
             # Definitions could link to words in the same language as this
             # section, or in the overall language of the Wiktionary. It's
             # ambiguous. Keep both options for now, to be resolved in a moment.
@@ -297,7 +323,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             edge_info = self.parse(text, rule, trace=self.trace)
             if rel is not None:
                 edge_info = [ei.set_rel(rel) for ei in edge_info]
-            
+
             if isinstance(language, tuple):
                 # When there are multiple possible languages, we need to
                 # disambiguate the language based on the target word
@@ -367,6 +393,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             comma           = "," ;
             semicolon       = ";" ;
             slash           = "/" ;
+            dash            = "-" ;
+            plus_sign       = "+" ;
             single_left_bracket = left_bracket !left_bracket ;
             single_right_bracket = right_bracket !right_bracket ;
             single_left_brace = left_brace !left_brace ;
@@ -441,14 +469,52 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         == Images ==
         Images have complex syntax like
-        [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]].
+          [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]]
+        or (in German)
+          |Bild 2=Bamboo book - closed - UCR.jpg|250px|1, 2|Chinesisches Bambus''buch''        .
 
         Parse rules:
-            
+
             image = left_brackets WS "Image:" filename:term
-                    { vertical_bar wikitext }* WS right_brackets ;
+                    { vertical_bar wikitext }* WS right_brackets
+                    |
+                    [ vertical_bar [ SP ] ] "Bild" [ SP ?/[0-9]+/? ]
+                    equals filename:term vertical_bar wikitext
+                    [ right_braces ] ;
         """
         return ast
+
+    def sense_num(self, ast):
+        """
+        A 'sense_num' is a single or double digit, optionally followed by a
+        lowercase letter a through e, used to separate different meanings of a
+        lemma in the German wiktionary.
+
+        Parse rule:
+
+            num = ?/[0-9][0-9]?[a-e]?/? ;
+            num_range = range_start:num SP dash SP range_end:num ;
+            sense_num = first:num [ SP ( dash | slash | plus_sign ) SP last:num |
+                        { comma SP ( next+:num !dash | next_range+:num_range) }+ ] ;
+        """
+        def expand_range(range_ast):
+            start = int(range_ast['range_start'])
+            end = int(range_ast['range_end'])
+            return [str(i) for i in range(start, end + 1)]
+
+        # If the rule matches, there is always a `first` group
+        num_list = [ast['first']]
+        # We want to capture the
+        if ast['last']:
+            num_list.append(ast['last'])
+        else:
+            if ast['next'] is not None:
+                num_list.extend([n for n in ast['next']])
+            if ast['next_range'] is not None:
+                for elem in ast['next_range']:
+                    num_list.extend(expand_range(elem))
+
+        return sorted(num_list)
 
     def wikitext(self, ast):
         """
@@ -879,7 +945,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             defn_line = hash_char !bullet SP @one_line_wikitext NL WS ;
             defn_details = hash_char list_chars SP @one_line_wikitext NL WS ;
             definition = @defn_line { defn_details }* >> ;
-            definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ;
+            definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ; 
         """
         links = []
         if ast['defns'] is None:
@@ -889,10 +955,12 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return links
 
 
-def main(filename, startrule, trace=False):
-    with open(filename) as f:
+def main(filename, startrule, titlesdb_path, language, trace=False):
+    with open(filename, encoding='utf-8') as f:
         text = f.read()
-    semantics = ConceptNetWiktionarySemantics(language='en')
+    semantics = ConceptNetWiktionarySemantics(
+        language, os.path.join(titlesdb_path, 'titles.db')
+    )
     ast = semantics.parse(
         text,
         startrule,
@@ -907,9 +975,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Semantic parser for wiktionary.")
     parser.add_argument('-t', '--trace', action='store_true',
                         help="output trace information")
+    parser.add_argument('-l', '--language', default='en',
+                        help='language of the input file')
     parser.add_argument('file', metavar="FILE", help="the input file to parse")
     parser.add_argument('startrule', metavar="STARTRULE",
                         help="the start rule for parsing")
+    parser.add_argument('titlesdb', metavar="FILE",
+                        help="full path to the SQLite3 titles DB file")
     args = parser.parse_args()
 
-    main(args.file, args.startrule, trace=args.trace)
+    main(args.file, args.startrule, args.titlesdb, language=args.language,
+         trace=args.trace)
