@@ -38,6 +38,10 @@ for level in range(2, 8):
     )
     SECTION_HEADER_RES[level] = regex
 
+# To get the language out of something like "ōrdo ({{Sprache|Lateinisch}})" in
+# the German witkionary
+LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
+
 
 def fix_heading(heading):
     return ftfy(heading).strip('[]')
@@ -45,13 +49,18 @@ def fix_heading(heading):
 
 class ExtractPages(ContentHandler):
     def __init__(self, callback):
+        self.in_base = False
         self.in_article = False
         self.in_title = False
         self.cur_title = ''
+        self.site = None
         self.callback = callback
 
     def startElement(self, name, attrs):
-        if name == 'text':
+        if name == 'base':
+            self.in_base = True
+            self.cur_text = []
+        elif name == 'text':
             self.in_article = True
             self.cur_text = []
         elif name == 'title':
@@ -59,17 +68,22 @@ class ExtractPages(ContentHandler):
             self.cur_title = ''
 
     def endElement(self, name):
+        if name == 'base' and self.site is None:
+            # Derive the site from the first base element encountered (presumed
+            # to be a child of the siteinfo element)
+            self.in_base = False
+            self.site = self.cur_text[0].split('/')[2]
         if name == 'text':
             self.in_article = False
         elif name == 'title':
             self.in_title = False
         elif name == 'page':
-            self.callback(self.cur_title, ''.join(self.cur_text))
+            self.callback(self.cur_title, ''.join(self.cur_text), self.site)
 
     def characters(self, text):
         if self.in_title:
             self.cur_title += text
-        elif self.in_article:
+        elif self.in_article or self.in_base:
             self.cur_text.append(text)
             if len(self.cur_text) > 100000:
                 # bail out
@@ -99,10 +113,10 @@ class WiktionaryWriter(object):
         parser.setContentHandler(dh)
 
         # Parse the input
-        parser.parse(open(filename))
+        parser.parse(open(filename, encoding='utf-8'))
         self.title_db.commit()
 
-    def handle_page(self, title, text, site='en.wiktionary.org'):
+    def handle_page(self, title, text, site):
         if ':' not in title:
             found = SECTION_HEADER_RES[2].split(text)
             headings = found[1::2]
@@ -114,6 +128,11 @@ class WiktionaryWriter(object):
     def handle_language_section(self, site, title, heading, text):
         sec_data = self.handle_section(text, heading, level=2)
         language = sec_data['heading']
+        # English names the language as a simple string; German has it after
+        # the headword in double braces; e.g., {{Sprache|Lateinisch}}
+        lang_match = LANGUAGE_RE.search(language)
+        if lang_match:
+            language = lang_match.group(1)
         data = {
             'site': site,
             'language': language,
@@ -150,7 +169,8 @@ def handle_file(input_file, output_dir):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help="English Wiktionary XML file")
+    parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
     args = parser.parse_args()
+
     handle_file(args.input, args.output)
