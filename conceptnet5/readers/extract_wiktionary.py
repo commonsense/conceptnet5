@@ -38,6 +38,19 @@ for level in range(2, 8):
     )
     SECTION_HEADER_RES[level] = regex
 
+# Regex for sub-sections in the German wiktionary
+SUB_SECTION_RE = re.compile(
+    r'''
+    ^{{          # double opening braces
+    ([^\|}]+)    # the subsection title; must not contain vertical bars
+    }}           # double closing brace
+    \s+          # trailing space (likely just a newline)
+    ''', re.VERBOSE | re.MULTILINE)
+
+# To get the language (as the first capturing group) out of a string such as
+# "Buch ({{Sprache|Deutsch}})" in the German witkionary
+LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
+
 
 def fix_heading(heading):
     return ftfy(heading).strip('[]')
@@ -45,13 +58,18 @@ def fix_heading(heading):
 
 class ExtractPages(ContentHandler):
     def __init__(self, callback):
+        self.in_base = False
         self.in_article = False
         self.in_title = False
         self.cur_title = ''
+        self.site = None
         self.callback = callback
 
     def startElement(self, name, attrs):
-        if name == 'text':
+        if name == 'base':
+            self.in_base = True
+            self.cur_text = []
+        elif name == 'text':
             self.in_article = True
             self.cur_text = []
         elif name == 'title':
@@ -59,17 +77,22 @@ class ExtractPages(ContentHandler):
             self.cur_title = ''
 
     def endElement(self, name):
+        if name == 'base' and self.site is None:
+            # Derive the site from the first base element encountered (presumed
+            # to be a child of the siteinfo element)
+            self.in_base = False
+            self.site = self.cur_text[0].split('/')[2]
         if name == 'text':
             self.in_article = False
         elif name == 'title':
             self.in_title = False
         elif name == 'page':
-            self.callback(self.cur_title, ''.join(self.cur_text))
+            self.callback(self.cur_title, ''.join(self.cur_text), self.site)
 
     def characters(self, text):
         if self.in_title:
             self.cur_title += text
-        elif self.in_article:
+        elif self.in_article or self.in_base:
             self.cur_text.append(text)
             if len(self.cur_text) > 100000:
                 # bail out
@@ -77,6 +100,13 @@ class ExtractPages(ContentHandler):
 
 
 class WiktionaryWriter(object):
+    """
+    Parses a wiktionary file in XML format and saves the results to a set of
+    files in JSON format and a SQLite database.
+
+    Subclasses most likely want to override the methods `_get_language()` and
+    `handle_section()`.
+    """
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
         self.writers = [
@@ -84,6 +114,14 @@ class WiktionaryWriter(object):
             for i in range(nfiles)
         ]
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
+
+    def _get_language_code(self, language):
+        return ENGLISH_NAME_TO_CODE['en'].get(language)
+
+    def _get_language(self, heading):
+        """Essentially a no-op method by default, but meant to be overridden
+        with something more useful in subclasses."""
+        return heading
 
     def parse_wiktionary_file(self, filename):
         # Create a parser
@@ -102,7 +140,7 @@ class WiktionaryWriter(object):
         with self.title_db.transaction():
             parser.parse(open(filename))
 
-    def handle_page(self, title, text, site='en.wiktionary.org'):
+    def handle_page(self, title, text, site):
         if ':' not in title:
             found = SECTION_HEADER_RES[2].split(text)
             headings = found[1::2]
@@ -114,6 +152,11 @@ class WiktionaryWriter(object):
     def handle_language_section(self, site, title, heading, text):
         sec_data = self.handle_section(text, heading, level=2)
         language = sec_data['heading']
+        # English names the language as a simple string; German has it after
+        # the headword in double braces; e.g., {{Sprache|Lateinisch}}
+        lang_match = LANGUAGE_RE.search(language)
+        if lang_match:
+            language = lang_match.group(1)
         data = {
             'site': site,
             'language': language,
@@ -124,7 +167,7 @@ class WiktionaryWriter(object):
         self.writers[filenum].write(data)
 
         # Save the languages and titles to a database file
-        language_code = ENGLISH_NAME_TO_CODE.get(language)
+        language_code = self._get_language_code(language)
         if language_code is not None:
             self.title_db.add(language_code, title.lower())
 
@@ -145,8 +188,48 @@ class WiktionaryWriter(object):
         self.title_db.close()
 
 
-def handle_file(input_file, output_dir):
-    writer = WiktionaryWriter(output_dir)
+class DeWiktionaryWriter(WiktionaryWriter):
+    def _get_language(self, heading):
+        lang_match = LANGUAGE_RE.search(heading)
+        if lang_match:
+            return lang_match.group(1).strip()
+        return 'Deutsch'
+
+    def _get_language_code(self, language):
+        return ENGLISH_NAME_TO_CODE['de'].get(language)
+
+    def handle_section(self, text, heading, level=None):
+        """
+        Sections within a page of the German wiktionary are mostly enclosed in
+        double braces ({{Bedeutungen}}, {{Synonyme}}, etc.), except for the
+        translation sections, which are introduced by 4 equals signs:
+        '==== Übersetzungen ===='.
+        """
+        sections = []
+        # First handle translations
+        sectioned = SECTION_HEADER_RES[4].split(text)
+        if len(sectioned) > 1 and sectioned[1] == 'Übersetzungen':
+            if len(SUB_SECTION_RE.split(sectioned[2])) == 1:
+                sections.append({'heading': sectioned[1],
+                                 'text': sectioned[2]})
+        # Now handle the rest
+        found = SUB_SECTION_RE.split(sectioned[0])
+        headings = found[1::2]
+        texts = found[2::2]
+        for (hdg, txt) in zip(headings, texts):
+            sections.append({'heading': hdg, 'text': txt.lstrip()})
+        return {
+            'heading': heading,
+            'text': found[0].strip(),
+            'sections': sections
+        }
+
+
+LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
+
+
+def handle_file(input_file, output_dir, language):
+    writer = LANGUAGE_TO_WRITER[language](output_dir)
     writer.parse_wiktionary_file(input_file)
     writer.close()
 
@@ -154,7 +237,10 @@ def handle_file(input_file, output_dir):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help="English Wiktionary XML file")
+    parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
+    parser.add_argument('-l', '--language', default='en',
+                        help='Two-letter ISO language code of the input file')
     args = parser.parse_args()
-    handle_file(args.input, args.output)
+
+    handle_file(args.input, args.output, args.language)
