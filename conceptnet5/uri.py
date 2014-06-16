@@ -215,7 +215,7 @@ def uri_prefixes(uri, min_pieces=2):
     for piece in split_uri(uri):
         pieces.append(piece)
         if len(pieces) >= min_pieces:
-            yield join_uri(pieces)
+            yield join_uri(*pieces)
 
 
 def parse_compound_uri(uri):

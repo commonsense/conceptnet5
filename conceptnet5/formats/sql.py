@@ -64,16 +64,17 @@ class TitleDBWriter(SQLiteWriter):
 class EdgeIndexWriter(SQLiteWriter):
     schema = [
         """CREATE TABLE IF NOT EXISTS assertions (
-            uri text PRIMARY KEY,
+            id integer PRIMARY KEY,
+            uri text UNIQUE,
             value text
         )""",
         """CREATE TABLE IF NOT EXISTS prefixes (
             prefix text,
-            assertion_uri text,
+            assertion_id integer,
             weight real,
             complete bool
-        """,
-        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefix, assertion_uri)",
+        )""",
+        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefix, assertion_id)",
         "CREATE INDEX IF NOT EXISTS prefix_lookup on prefixes (prefix ASC, weight DESC)",
     ]
     drop_schema = [
@@ -82,26 +83,27 @@ class EdgeIndexWriter(SQLiteWriter):
     ]
 
     def add(self, assertion):
+        assertion_id = self.add_uri(assertion)
         for field in ('uri', 'rel', 'start', 'end', 'dataset', 'license'):
-            self.add_prefixes(assertion['uri'], assertion['field'])
+            self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
         for source in assertion['sources']:
-            self.add_prefixes(assertion['uri'], source, assertion['weight'])
-        self.add_uri(assertion)
+            self.add_prefixes(assertion_id, source, assertion['weight'])
 
     def add_uri(self, assertion):
         c = self.db.cursor()
         c.execute(
             "INSERT OR REPLACE INTO ASSERTIONS (uri, value) VALUES (?, ?)",
-            assertion['uri'], json.dumps(assertion, ensure_ascii=False)
+            (assertion['uri'], json.dumps(assertion, ensure_ascii=False))
         )
+        return c.lastrowid
 
-    def add_prefixes(self, assertion_uri, path, weight):
+    def add_prefixes(self, assertion_id, path, weight):
         c = self.db.cursor()
         for prefix in uri_prefixes(path):
             complete = (prefix == path)
             c.execute(
                 "INSERT OR IGNORE INTO prefixes "
-                "(prefix, assertion_uri, weight, complete) "
+                "(prefix, assertion_id, weight, complete) "
                 "VALUES (?, ?, ?, ?)",
-                prefix, assertion_uri, weight, complete
+                (prefix, assertion_id, weight, complete)
             )
