@@ -73,8 +73,8 @@ RULES_AND_RELATIONS_MAP = {
         'Usage notes': (None, None)
     },
     'de': {
-        'Bedeutungen': ('definition_section', None),
-        'Übersetzungen': ('translation_section', None),
+        'Bedeutungen': ('definition_section_de', None),
+        'Übersetzungen': ('translation_section_de', None),
         'Herkunft': ('etymology_section', 'EtymologicallyDerivedFrom'),
         'Ähnlichkeiten': ('link_section', 'RelatedTo'),
         'Sinnverwandte Wörter': ('link_section', 'RelatedTo'),
@@ -442,7 +442,11 @@ class ConceptNetWiktionarySemantics(object):
             comma           = "," ;
             semicolon       = ";" ;
             slash           = "/" ;
+<<<<<<< HEAD
             dash            = "-" | "—" | "–" ;
+=======
+            dash            = "-" | "—" ;
+>>>>>>> Added German-specific definition section.
             plus_sign       = "+" ;
             single_left_bracket = left_bracket !left_bracket ;
             single_right_bracket = right_bracket !right_bracket ;
@@ -1086,8 +1090,6 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
         return links
 
 
-
-
 class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
                             de_wiktionarySemantics):
     """
@@ -1433,11 +1435,10 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--language', default='en',
                         help='language of the input file')
     parser.add_argument('file', metavar="FILE", help="the input file to parse")
-    parser.add_argument('titledb', help="Path to the title DB")
-    parser.add_argument('startrule', metavar="STARTRULE",
-                        help="the start rule for parsing")
     parser.add_argument('titlesdb', metavar="FILE",
                         help="full path to the SQLite3 titles DB file")
+    parser.add_argument('startrule', metavar="STARTRULE",
+                        help="the start rule for parsing")
     args = parser.parse_args()
 
     main(args.file, args.startrule, args.titlesdb, language=args.language,
