@@ -63,8 +63,8 @@ RULES_AND_RELATIONS_MAP = {
         'Usage notes': (None, None)
     },
     'de': {
-        'Bedeutungen': ('definition_section', None),
-        'Übersetzungen': ('translation_section', None),
+        'Bedeutungen': ('definition_section_de', None),
+        'Übersetzungen': ('translation_section_de', None),
         'Herkunft': ('etymology_section', 'EtymologicallyDerivedFrom'),
         'Ähnlichkeiten': ('link_section', 'RelatedTo'),
         'Sinnverwandte Wörter': ('link_section', 'RelatedTo'),
@@ -393,7 +393,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             comma           = "," ;
             semicolon       = ";" ;
             slash           = "/" ;
-            dash            = "-" ;
+            dash            = "-" | "—" ;
             plus_sign       = "+" ;
             single_left_bracket = left_bracket !left_bracket ;
             single_right_bracket = right_bracket !right_bracket ;
@@ -554,7 +554,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         else:
             # Some entries specify their language using a hash-reference to
             # that language's section of the page.
-            language = None
+            language = self.default_language
             target = ast['target']
             if target.startswith('#'):
                 language = language_code(ast['target'][1:].strip())
@@ -906,6 +906,16 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         return ast.text
 
+    def sense_template_de(self, ast):
+        """
+        Parse rule:
+
+            sense_template_de = colon SP left_bracket num:sense_num SP
+                                right_bracket @one_line_text_with_links ;
+        """
+        for link in ast:
+            link.set_sense(ast.num)
+
     def link_section(self, ast):
         """
         Parse rules:
@@ -935,6 +945,43 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             return []
         for etym_linked_text in ast['etym']:
             links.extend(etym_linked_text.links)
+        return links
+
+    def translation_section_de(self, ast):
+        pass
+
+    def definition_section_de(self, ast):
+        """
+        A section with word "meanings" from the German wiktionary. Different
+        senses of the word are listed by sense number, which may be serial or
+        hierarchical.
+
+        Parse rules:
+
+            line = colon [ colon ]
+                   [ left_bracket ] num:( dash | ?/[0-9a-e]/? ) [ right_bracket ]
+                   SP sense:one_line_text_with_links NL ;
+            definition_section_de = { line }+ ;
+        """
+        links = []
+        sense = None
+        head_text = ''
+        for item in ast:
+            curr_sense = sense
+            if item.num.isdigit():
+                sense = item.num
+                curr_sense = sense
+                head_text = ''
+            elif item.num.isalpha():
+                if item.num == 'a':
+                    link = links.pop()
+                    head_text = link.text.lstrip('()0123456789 ') + ' '
+                curr_sense += item.num
+            else:
+                head_text = ''
+            item.sense.text = '(' + curr_sense + ') ' + head_text + item.sense.text
+            links.append(item.sense)
+
         return links
 
     def definition_section(self, ast):
