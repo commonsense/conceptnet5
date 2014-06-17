@@ -903,7 +903,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
     def link_entry(self, ast):
         """
-        A 'link section' is a section for listing links to other entries, such
+        A 'link entry' is a section for listing links to other entries, such
         as related terms and synonyms.
 
         Parse rules:
@@ -927,15 +927,6 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             links = [link.set_sense(sense) for link in links]
 
         return links
-
-    def sense_template(self, ast):
-        """
-        Parse rule:
-
-            sense_template = left_braces WS "sense" WS vertical_bar
-                             @text_with_links right_braces ;
-        """
-        return ast.text
 
     def sense_template_de(self, ast):
         """
@@ -1011,16 +1002,30 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
             tr_base = [ left_bracket num:sense_num right_bracket SP ]
                       left_braces ?/Ü[x]*/? vertical_bar text vertical_bar
-                      [ target:text [ vertical_bar original:text ] ]
-                      right_braces [ ( comma | semicolon ) SP ] ;
+                      [ target:term [ vertical_bar original:term ] ]
+                      right_braces [ SP gender ] [ ( comma | semicolon ) SP ] ;
             from_german = bullet lang:lang_code colon SP tr:{ tr_base }+ WS ;
         """
         links = []
         lang = ast.lang
+        prev_num = []
         for t in ast.tr:
+            if not t.target:
+                # Some entries contain just a language code but no actual
+                # translation; skip 'em
+                continue
             target = t.original if t.original is not None else t.target
-            for sense in t.num:
+            if t.num is None:
+                # There may be multiple translations for the same sense number,
+                # in which case only the first of them will contain the number
+                # (which was set aside as prev_num)
+                num = prev_num
+            else:
+                num = t.num
+                prev_num = num
+            for sense in num:
                 links.append(EdgeInfo(lang, target, sense, 'TranslationOf'))
+
         return links
 
     def translation_section_de(self, ast):
@@ -1038,6 +1043,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         links = []
         for item in ast.links:
             if isinstance(item, EdgeInfo):
+                # Must check the type because it could be a table-markup line
                 links.append(item)
         return links
 
