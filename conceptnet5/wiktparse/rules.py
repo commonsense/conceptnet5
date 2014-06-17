@@ -38,6 +38,14 @@ POS_HEADINGS = {
         'Adverb': 'r'
     },
     'de': {
+        'Substantiv': 'n',
+        'Eigenname': 'n',
+        'Nachname': 'n',
+        'Vorname': 'n',
+        'Toponym': 'n',
+        'Verb': 'v',
+        'Adjektiv': 'a',
+        'Adverb': 'r'
     }
 }
 
@@ -360,7 +368,7 @@ class ConceptNetWiktionarySemantics(object):
             headpos = self._get_pos_abbrev(heading)
 
         (rule, rel) = self._get_rule_for_heading(heading)
-        if rule == 'definition_section':
+        if rule in ['definition_section', 'definition_section_de']:
             # Definitions could link to words in the same language as this
             # section, or in the overall language of the Wiktionary. It's
             # ambiguous. Keep both options for now, to be resolved in a moment.
@@ -442,11 +450,7 @@ class ConceptNetWiktionarySemantics(object):
             comma           = "," ;
             semicolon       = ";" ;
             slash           = "/" ;
-<<<<<<< HEAD
             dash            = "-" | "—" | "–" ;
-=======
-            dash            = "-" | "—" ;
->>>>>>> Added German-specific definition section.
             plus_sign       = "+" ;
             single_left_bracket = left_bracket !left_bracket ;
             single_right_bracket = right_bracket !right_bracket ;
