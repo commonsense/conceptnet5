@@ -1,0 +1,14 @@
+{{Ü-Tabelle|Ü-links=
+:{{Übersetzungen umleiten|5a|Ordensgemeinschaft|}} {{f}}
+:{{Übersetzungen umleiten|6|Ordnung|2}} {{f}}
+*{{en}}: [1] {{Ü|en|nice}}; [2] {{Ü|en|dear}}
+*{{fr}}: [1] {{Ü|fr|gentil}}; [2] {{Ü|fr|cher}}
+*{{ja}}: [1] {{Üxx|ja|やさしい, yasashii|優しい}}; [2] {{Üxx|ja|こいしい, koishii|恋しい}}
+*{{pt}}: [1] {{Ü|pt|gentil}}; [2] {{Ü|pt|querido}} {{m}}
+*{{ru}}: [1] {{Üxx|ru|míly|милый}}; [2] {{Üxx|ru|rodnój|родной}}, {{Üxx|ru|dorogój|дорогой}}
+|Ü-rechts=
+*{{sv}}: [1] {{Ü|sv|snäll}}, {{Ü|sv|rar}}, {{Ü|sv|älsvärd}}; [2] {{Ü|sv|älskad}}, {{Ü|sv|kär}}
+*{{es}}: [1, 2] {{Ü|es|amable}}, {{Ü|es|querido}}, {{Ü|es|agradable}}
+*{{cs}}: [1] {{Ü|cs|milý}}, [2] {{Ü|cs|drahý}}
+*{{hu}}: [1] {{Ü|hu|kedves}}
+}}

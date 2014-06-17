@@ -28,6 +28,14 @@ POS_HEADINGS = {
         'Adverb': 'r'
     },
     'de': {
+        'Substantiv': 'n',
+        'Eigenname': 'n',
+        'Nachname': 'n',
+        'Vorname': 'n',
+        'Toponym': 'n',
+        'Verb': 'v',
+        'Adjektiv': 'a',
+        'Adverb': 'r'
     }
 }
 
@@ -291,7 +299,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         if self.default_language not in RULES_AND_RELATIONS_MAP.keys():
             return (None, None)
 
-        # What to return from the RULES_AND_RELATIONS_MAP for an unknown key
+        # What to return if the key is not in the RULES_AND_RELATIONS_MAP
         defaults = (None, None)
 
         if self.default_language == 'en':
@@ -312,7 +320,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 headpos = POS_HEADINGS[headlang][structure['heading']]
 
         (rule, rel) = self._get_rule_for_heading(heading)
-        if rule == 'definition_section':
+        if rule in ['definition_section', 'definition_section_de']:
             # Definitions could link to words in the same language as this
             # section, or in the overall language of the Wiktionary. It's
             # ambiguous. Keep both options for now, to be resolved in a moment.
@@ -515,6 +523,29 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                     num_list.extend(expand_range(elem))
 
         return sorted(num_list)
+
+    def lang_code(self, ast):
+        """
+        A two-letter language code enclosed in double braces. Used in German
+        translation entries.
+
+        Parse rule:
+
+            lang_code = left_brace left_brace code:?/[a-z][a-z]/?
+                        right_brace right_brace ;
+        """
+        return ast.code
+
+    def gender(self, ast):
+        """
+        Single-letter indication of a word's gender. Used in most German
+        entries.
+
+        Parse rule:
+
+            gender = left_brace left_brace g:?/[fmn]/? right_brace right_brace ;
+        """
+        return ast.g
 
     def wikitext(self, ast):
         """
@@ -947,14 +978,73 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             links.extend(etym_linked_text.links)
         return links
 
-    def translation_section_de(self, ast):
+    def etymology_section_de(self, ast):
         pass
+
+    def to_german(self, ast):
+        """
+        Translation of foreign term into German.
+
+        Parse rule:
+
+            to_german = [ colon ] left_braces "Übersetzungen umleiten"
+                        vertical_bar sense:sense_num vertical_bar target:text
+                        [ vertical_bar [ target_sense:sense_num ] ]
+                        right_braces [ SP gender ] WS ;
+        """
+        links = []
+        target = ast.target
+        if ast.target_sense is not None:
+            target += ' (' + ast.target_sense[0] + ')'
+        for sense in ast.sense:
+            if sense == '':
+                sense = None
+            links.append(EdgeInfo(self.default_language, target,
+                                  sense, 'TranslationOf'))
+        return links
+
+    def from_german(self, ast):
+        """
+        Translation of a German lemma into another language.
+
+        Parse rules:
+
+            tr_base = [ left_bracket num:sense_num right_bracket SP ]
+                      left_braces ?/Ü[x]*/? vertical_bar text vertical_bar
+                      [ target:text [ vertical_bar original:text ] ]
+                      right_braces [ ( comma | semicolon ) SP ] ;
+            from_german = bullet lang:lang_code colon SP tr:{ tr_base }+ WS ;
+        """
+        links = []
+        lang = ast.lang
+        for t in ast.tr:
+            target = t.original if t.original is not None else t.target
+            for sense in t.num:
+                links.append(EdgeInfo(lang, target, sense, 'TranslationOf'))
+        return links
+
+    def translation_section_de(self, ast):
+        """
+        German translation sections take different forms, depending on the
+        language of the lemma being defined. The "table_filler" rule is there
+        to skip interstitial table markup.
+
+        Parse rules:
+
+            table_filler = ( "{{Ü-Tabelle|Ü-links=" | "|Ü-rechts=" ) WS ;
+            translation_section_de = links:{ to_german | from_german |
+                                    table_filler }+ [ right_braces ] ;
+        """
+        links = []
+        for item in ast.links:
+            if isinstance(item, EdgeInfo):
+                links.append(item)
+        return links
 
     def definition_section_de(self, ast):
         """
-        A section with word "meanings" from the German wiktionary. Different
-        senses of the word are listed by sense number, which may be serial or
-        hierarchical.
+        In the German wiktionary, different senses of the word are introduced
+        by a number or a letter (for subordinate meanings).
 
         Parse rules:
 
@@ -973,6 +1063,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 curr_sense = sense
                 head_text = ''
             elif item.num.isalpha():
+                # single letter indicates a sub-sense
                 if item.num == 'a':
                     link = links.pop()
                     head_text = link.text.lstrip('()0123456789 ') + ' '
