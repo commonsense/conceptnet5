@@ -1017,7 +1017,7 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
 
     def link_entry(self, ast):
         """
-        A 'link section' is a section for listing links to other entries, such
+        A 'link entry' is a section for listing links to other entries, such
         as related terms and synonyms.
 
         Parse rule:
