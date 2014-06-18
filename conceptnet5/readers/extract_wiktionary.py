@@ -38,7 +38,15 @@ for level in range(2, 8):
     )
     SECTION_HEADER_RES[level] = regex
 
-# To get the language out of something like "ōrdo ({{Sprache|Lateinisch}})" in
+# Regex for sub-sections, significant in German wiktionary
+SUB_SECTION_RE = re.compile(
+    r'''
+    ^{{          # double opening braces
+    ([^\|}]+)    # the subsection title; must not contain vertical bars
+    }}           # double closing brace
+    ''', re.VERBOSE | re.MULTILINE)
+
+# To get the language out of something like "Buch ({{Sprache|Deutsch}})" in
 # the German witkionary
 LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
 
@@ -91,6 +99,13 @@ class ExtractPages(ContentHandler):
 
 
 class WiktionaryWriter(object):
+    """
+    Parses a wiktionary file in XML format and saves the results to a set of
+    files in JSON format and a SQLite database.
+
+    Subclasses most likely want to override the methods `_get_langauge()` and
+    `handle_section()`.
+    """
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
         self.writers = [
@@ -98,6 +113,11 @@ class WiktionaryWriter(object):
             for i in range(nfiles)
         ]
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
+
+    def _get_language(self, heading):
+        """Essentially a no-op method by default, but meant to be overridden
+        with something more useful in subclasses."""
+        return heading
 
     def parse_wiktionary_file(self, filename):
         # Create a parser
@@ -127,12 +147,7 @@ class WiktionaryWriter(object):
 
     def handle_language_section(self, site, title, heading, text):
         sec_data = self.handle_section(text, heading, level=2)
-        language = sec_data['heading']
-        # English names the language as a simple string; German has it after
-        # the headword in double braces; e.g., {{Sprache|Lateinisch}}
-        lang_match = LANGUAGE_RE.search(language)
-        if lang_match:
-            language = lang_match.group(1)
+        language = self._get_language(sec_data['heading'])
         data = {
             'site': site,
             'language': language,
@@ -161,8 +176,44 @@ class WiktionaryWriter(object):
         return data
 
 
-def handle_file(input_file, output_dir):
-    writer = WiktionaryWriter(output_dir)
+class DeWiktionaryWriter(WiktionaryWriter):
+    def _get_language(self, heading):
+        lang_match = LANGUAGE_RE.search(heading)
+        if lang_match:
+            return lang_match.group(1)
+        return 'Deutsch'
+
+    def handle_section(self, text, heading, level=None):
+        """
+        Sections within a page of the German wiktionary are mostly enclosed in
+        double braces ({{Bedetungen}}, {{Synonyme}}, etc.), except for the
+        translation sections, which are introduced by 4 equals signs:
+        '==== Übersetzungen ===='.
+        """
+        sections = []
+        # First handle translations
+        sectioned = SECTION_HEADER_RES[4].split(text)
+        if len(sectioned) > 1 and sectioned[1] == 'Übersetzungen':
+            sections.append({'heading': sectioned[1], 'text': sectioned[2]})
+        # Now handle the rest
+        found = SUB_SECTION_RE.split(sectioned[0])
+        headings = found[1::2]
+        texts = found[2::2]
+        for (hdg, txt) in zip(headings, texts):
+            sections.append({'heading': hdg, 'text': txt, 'sections': []})
+
+        return {
+            'heading': heading,
+            'text': found[0].strip(),
+            'sections': sections
+        }
+
+
+LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
+
+
+def handle_file(input_file, output_dir, language):
+    writer = LANGUAGE_TO_WRITER[language](output_dir)
     writer.parse_wiktionary_file(input_file)
 
 
@@ -171,6 +222,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
+    parser.add_argument('-l', '--language', default='en',
+                        help='Two-letter language code of the inout file')
     args = parser.parse_args()
 
-    handle_file(args.input, args.output)
+    handle_file(args.input, args.output, args.language)
