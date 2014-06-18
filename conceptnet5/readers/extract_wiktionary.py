@@ -15,7 +15,7 @@ import logging
 from ftfy import ftfy
 from conceptnet5.formats.json_stream import JSONStreamWriter
 from conceptnet5.formats.sql import TitleDBWriter
-from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
+from conceptnet5.util.language_codes import NAME_TO_CODE
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -116,7 +116,7 @@ class WiktionaryWriter(object):
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
 
     def _get_language_code(self, language):
-        return ENGLISH_NAME_TO_CODE['en'].get(language)
+        return NAME_TO_CODE['en'].get(language)
 
     def _get_language(self, heading):
         """Essentially a no-op method by default, but meant to be overridden
@@ -140,7 +140,7 @@ class WiktionaryWriter(object):
         with self.title_db.transaction():
             parser.parse(open(filename))
 
-    def handle_page(self, title, text, site):
+    def handle_page(self, title, text, site='en.wiktionary.org'):
         if ':' not in title:
             found = SECTION_HEADER_RES[2].split(text)
             headings = found[1::2]
@@ -151,12 +151,7 @@ class WiktionaryWriter(object):
 
     def handle_language_section(self, site, title, heading, text):
         sec_data = self.handle_section(text, heading, level=2)
-        language = sec_data['heading']
-        # English names the language as a simple string; German has it after
-        # the headword in double braces; e.g., {{Sprache|Lateinisch}}
-        lang_match = LANGUAGE_RE.search(language)
-        if lang_match:
-            language = lang_match.group(1)
+        language = self._get_language(sec_data['heading'])
         data = {
             'site': site,
             'language': language,
@@ -196,7 +191,7 @@ class DeWiktionaryWriter(WiktionaryWriter):
         return 'Deutsch'
 
     def _get_language_code(self, language):
-        return ENGLISH_NAME_TO_CODE['de'].get(language)
+        return NAME_TO_CODE['de'].get(language)
 
     def handle_section(self, text, heading, level=None):
         """
