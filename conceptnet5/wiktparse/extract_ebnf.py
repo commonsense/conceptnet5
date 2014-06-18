@@ -24,20 +24,25 @@ Then run `make` to regenerate this file and the parser.
 def extract_ebnf(qualified_class_name):
     module_name, class_name = qualified_class_name.rsplit('.', 1)
     module = importlib.import_module(module_name)
-    klass = getattr(module, class_name)
+    this_class = getattr(module, class_name)
     ebnf_sections = []
     seen_docs = set()
-    for name, method in inspect.getmembers(klass):
-        if inspect.isfunction(method):
-            _, linenum = inspect.getsourcelines(method)
-            doc = inspect.getdoc(method)
-            if doc and doc not in seen_docs:
-                seen_docs.add(doc)
-                ebnf = ebnf_from_docstring(doc)
-                ebnf_sections.append((linenum, name, ebnf))
+
+    # Iterate over superclasses in method-resolution order
+    for depth, klass in enumerate(this_class.mro()):
+        if klass != object:
+            for name, method in inspect.getmembers(klass):
+                if inspect.isfunction(method):
+                    _, linenum = inspect.getsourcelines(method)
+                    doc = inspect.getdoc(method)
+                    if doc and doc not in seen_docs:
+                        seen_docs.add(doc)
+                        ebnf = ebnf_from_docstring(doc)
+                        ebnf_sections.append((-depth, linenum, name, ebnf))
+
 
     ebnf_sections.sort()
-    ebnf_rules = [EBNF_HEADER % module_name] + [sec[2] for sec in ebnf_sections if sec[2]]
+    ebnf_rules = [EBNF_HEADER % module_name] + [sec[3] for sec in ebnf_sections if sec[3]]
     return '\n\n'.join(ebnf_rules)
 
 
