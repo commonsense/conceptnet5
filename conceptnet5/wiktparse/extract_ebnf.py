@@ -96,7 +96,8 @@ if __name__ == '__main__':
         'classname', 
         help='The fully qualified name of the class to extract rules from, '
              'such as '
-             'conceptnet5.wiktparse.rules.ConceptNetWiktionarySemantics'
+             'conceptnet5.wiktparse.rules.EnWiktionarySemantics or '
+             'conceptnet5.wiktparse.rules.DeWiktionarySemantics'
     )
     parser.add_argument(
         'output_file',
