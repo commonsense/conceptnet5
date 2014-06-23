@@ -37,12 +37,15 @@ class SQLiteWriter(object):
         for cmd in self.schema:
             c.execute(cmd)
 
-    def close(self):
-        self.db.commit()
-        self.db.close()
+    def transaction(self):
+        """
+        Return a context manager that wraps commands in a transaction --
+        which is the same as the connection object.
+        """
+        return self.db
 
-    def commit(self):
-        self.db.commit()
+    def close(self):
+        self.db.close()
 
 
 class TitleDBWriter(SQLiteWriter):
@@ -87,6 +90,8 @@ class EdgeIndexWriter(SQLiteWriter):
         )""",
         "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefixhash, assertion_id)",
         "CREATE INDEX IF NOT EXISTS prefix_lookup on prefixes (prefixhash ASC, weight DESC)",
+        "PRAGMA synchronous = OFF",
+        "PRAGMA journal_mode = MEMORY"
     ]
     drop_schema = [
         "DROP TABLE IF EXISTS assertions",
@@ -95,7 +100,7 @@ class EdgeIndexWriter(SQLiteWriter):
 
     def add(self, assertion, filename, offset):
         assertion_id = self.add_uri(assertion, filename, offset)
-        for field in ('rel', 'start', 'end', 'dataset', 'license'):
+        for field in ('rel', 'start', 'end', 'dataset'):
             self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
         for source in assertion['sources']:
             self.add_prefixes(assertion_id, source, assertion['weight'])
