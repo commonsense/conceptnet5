@@ -1,6 +1,7 @@
 from conceptnet5.uri import uri_prefixes
 import sqlite3
-import json
+import struct
+from hashlib import sha1
 
 
 class SQLiteWriter(object):
@@ -61,39 +62,50 @@ class TitleDBWriter(SQLiteWriter):
         )
 
 
+def minihash(prefix):
+    """
+    Get a 32-bit SHA1 hash of the given prefix string, which can be stored
+    compactly in the DB as an integer.
+    """
+    dbytes = sha1(prefix.encode('utf-8')).digest()[:4]
+    return struct.unpack('>i', dbytes)[0]
+
+
 class EdgeIndexWriter(SQLiteWriter):
     schema = [
         """CREATE TABLE IF NOT EXISTS assertions (
             id integer PRIMARY KEY,
             uri text UNIQUE,
-            value text
+            filename text,
+            offset integer
         )""",
         """CREATE TABLE IF NOT EXISTS prefixes (
-            prefix text,
+            prefixhash integer,
             assertion_id integer,
             weight real,
             complete bool
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefix, assertion_id)",
-        "CREATE INDEX IF NOT EXISTS prefix_lookup on prefixes (prefix ASC, weight DESC)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefixhash, assertion_id)",
+        "CREATE INDEX IF NOT EXISTS prefix_lookup on prefixes (prefixhash ASC, weight DESC)",
     ]
     drop_schema = [
         "DROP TABLE IF EXISTS assertions",
         "DROP TABLE IF EXISTS prefixes"
     ]
 
-    def add(self, assertion):
-        assertion_id = self.add_uri(assertion)
-        for field in ('uri', 'rel', 'start', 'end', 'dataset', 'license'):
+    def add(self, assertion, filename, offset):
+        assertion_id = self.add_uri(assertion, filename, offset)
+        for field in ('rel', 'start', 'end', 'dataset', 'license'):
             self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
         for source in assertion['sources']:
             self.add_prefixes(assertion_id, source, assertion['weight'])
 
-    def add_uri(self, assertion):
+    def add_uri(self, assertion, filename, offset):
         c = self.db.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO ASSERTIONS (uri, value) VALUES (?, ?)",
-            (assertion['uri'], json.dumps(assertion, ensure_ascii=False))
+            "INSERT OR REPLACE INTO ASSERTIONS (uri, filename, offset) "
+            "VALUES (?, ?, ?)",
+            (assertion['uri'], filename, offset)
         )
         return c.lastrowid
 
@@ -101,9 +113,10 @@ class EdgeIndexWriter(SQLiteWriter):
         c = self.db.cursor()
         for prefix in uri_prefixes(path):
             complete = (prefix == path)
+            prefixhash = minihash(prefix)
             c.execute(
                 "INSERT OR IGNORE INTO prefixes "
-                "(prefix, assertion_id, weight, complete) "
+                "(prefixhash, assertion_id, weight, complete) "
                 "VALUES (?, ?, ?, ?)",
-                (prefix, assertion_id, weight, complete)
+                (prefixhash, assertion_id, weight, complete)
             )

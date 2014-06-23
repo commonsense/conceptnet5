@@ -10,8 +10,8 @@ def index_assertions(input_dir, output_db):
         if filename.endswith('.jsons'):
             path = os.path.join(input_dir, filename)
             print("\tIndexing %s" % filename)
-            for assertion in read_json_stream(path):
-                writer.add(assertion)
+            for assertion, offset in read_json_stream(path, offsets=True):
+                writer.add(assertion, filename, offset)
             writer.commit()
 
 

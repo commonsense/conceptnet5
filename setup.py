@@ -18,7 +18,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     package_data={'conceptnet5': ['support_data/*']},
-    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako'],
+    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako', 'ftfy'],
     license = 'GPLv3'
 )
 

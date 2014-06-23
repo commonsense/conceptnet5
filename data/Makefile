@@ -313,7 +313,7 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 
 # Index the assertions in a SQLite database.
 # This may become a replacement for Solr.
-db/conceptnet5.sqlite: $(ASSERTION_FILES)
+db/conceptnet5.sqlite: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	@mkdir -p db
 	$(PYTHON) -m conceptnet5.builders.index_assertions assertions/ $@
 
