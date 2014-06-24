@@ -67,12 +67,12 @@ class TitleDBWriter(SQLiteWriter):
         )
 
 
-def minihash(prefix):
+def minihash(index):
     """
-    Get a 32-bit SHA1 hash of the given prefix string, which can be stored
+    Get a 32-bit SHA1 hash of the given index string, which can be stored
     compactly in the DB as an integer.
     """
-    dbytes = sha1(prefix.encode('utf-8')).digest()[:4]
+    dbytes = sha1(index.encode('utf-8')).digest()[:4]
     return struct.unpack('>i', dbytes)[0]
 
 
@@ -97,20 +97,20 @@ class EdgeIndexWriter(SQLiteWriter):
             filename text,
             offset integer
         ) WITHOUT ROWID""",
-        """CREATE TABLE IF NOT EXISTS prefixes (
-            prefixhash integer,
+        """CREATE TABLE IF NOT EXISTS text_index (
+            indexhash integer,
             assertion_id integer,
             weight real,
             complete bool
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on prefixes (prefixhash, assertion_id)",
-        "CREATE INDEX IF NOT EXISTS prefix_lookup on prefixes (prefixhash ASC, weight DESC)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (indexhash, assertion_id)",
+        "CREATE INDEX IF NOT EXISTS prefix_lookup on text_index (indexhash ASC, weight DESC)",
         "PRAGMA synchronous = OFF",
         "PRAGMA journal_mode = MEMORY"
     ]
     drop_schema = [
         "DROP TABLE IF EXISTS assertions",
-        "DROP TABLE IF EXISTS prefixes"
+        "DROP TABLE IF EXISTS text_index"
     ]
 
     def add(self, assertion, filename, offset):
@@ -119,6 +119,8 @@ class EdgeIndexWriter(SQLiteWriter):
             self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
         for source in assertion['sources']:
             self.add_prefixes(assertion_id, source, assertion['weight'])
+        for feature in assertion['features']:
+            self.add_string_index(assertion_id, feature, assertion['weight'])
 
     def add_uri(self, assertion, filename, offset):
         assertion_id = edge_id_hash(assertion['id'])
@@ -134,13 +136,24 @@ class EdgeIndexWriter(SQLiteWriter):
         c = self.db.cursor()
         for prefix in uri_prefixes(path):
             complete = (prefix == path)
-            prefixhash = minihash(prefix)
+            indexhash = minihash(prefix)
             c.execute(
-                "INSERT OR IGNORE INTO prefixes "
-                "(prefixhash, assertion_id, weight, complete) "
+                "INSERT OR IGNORE INTO text_index "
+                "(indexhash, assertion_id, weight, complete) "
                 "VALUES (?, ?, ?, ?)",
-                (prefixhash, assertion_id, weight, complete)
+                (indexhash, assertion_id, weight, complete)
             )
+
+    def add_string_index(self, assertion_id, string, weight):
+        c = self.db.cursor()
+        complete = True
+        indexhash = minihash(string)
+        c.execute(
+            "INSERT OR IGNORE INTO text_index "
+            "(indexhash, assertion_id, weight, complete) "
+            "VALUES (?, ?, ?, ?)",
+            (indexhash, assertion_id, weight, complete)
+        )
 
 
 class EdgeIndexReader(object):
@@ -150,21 +163,21 @@ class EdgeIndexReader(object):
         self.open_file_cache = {}
         self.db = sqlite3.connect(filename)
 
-    def lookup_by_prefix(self, prefix, complete=False, limit=20):
-        mh = minihash(prefix)
+    def lookup_index(self, index, complete=False, limit=20):
+        mh = minihash(index)
         c = self.db.cursor()
         if complete:
             c.execute(
-                "SELECT a.filename, a.offset from assertions a, prefixes p "
-                "WHERE p.assertion_id = a.id AND p.prefixhash = ? "
-                "AND complete = true ORDER BY p.weight DESC",
+                "SELECT a.filename, a.offset from assertions a, text_index t "
+                "WHERE t.assertion_id = a.id AND t.indexhash = ? "
+                "AND complete = true ORDER BY t.weight DESC",
                 (mh,)
             )
         else:
             c.execute(
-                "SELECT a.filename, a.offset from assertions a, prefixes p "
-                "WHERE p.assertion_id = a.id AND p.prefixhash = ? "
-                "ORDER BY p.weight DESC",
+                "SELECT a.filename, a.offset from assertions a, text_index t "
+                "WHERE t.assertion_id = a.id AND t.indexhash = ? "
+                "ORDER BY t.weight DESC",
                 (mh,)
             )
 
