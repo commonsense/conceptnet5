@@ -74,14 +74,27 @@ def minihash(prefix):
     return struct.unpack('>i', dbytes)[0]
 
 
+INT_LIMIT = 2 ** 63 - 1
+
+
+def edge_id_hash(edge_id):
+    """
+    Represent the first 16 digits of an edge ID as a 64-bit integer.
+    """
+    val = int(edge_id[3:19], 16)
+    if val >= INT_LIMIT:
+        return val - INT_LIMIT * 2
+    else:
+        return val
+
+
 class EdgeIndexWriter(SQLiteWriter):
     schema = [
         """CREATE TABLE IF NOT EXISTS assertions (
             id integer PRIMARY KEY,
-            uri text UNIQUE,
             filename text,
             offset integer
-        )""",
+        ) WITHOUT ROWID""",
         """CREATE TABLE IF NOT EXISTS prefixes (
             prefixhash integer,
             assertion_id integer,
@@ -106,13 +119,14 @@ class EdgeIndexWriter(SQLiteWriter):
             self.add_prefixes(assertion_id, source, assertion['weight'])
 
     def add_uri(self, assertion, filename, offset):
+        assertion_id = edge_id_hash(assertion['id'])
         c = self.db.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO ASSERTIONS (uri, filename, offset) "
+            "INSERT OR REPLACE INTO ASSERTIONS (id, filename, offset) "
             "VALUES (?, ?, ?)",
-            (assertion['uri'], filename, offset)
+            (assertion_id, filename, offset)
         )
-        return c.lastrowid
+        return assertion_id
 
     def add_prefixes(self, assertion_id, path, weight):
         c = self.db.cursor()
