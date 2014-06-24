@@ -1,6 +1,8 @@
 from conceptnet5.uri import uri_prefixes
 import sqlite3
 import struct
+import json
+import os
 from hashlib import sha1
 
 
@@ -139,3 +141,51 @@ class EdgeIndexWriter(SQLiteWriter):
                 "VALUES (?, ?, ?, ?)",
                 (prefixhash, assertion_id, weight, complete)
             )
+
+
+class EdgeIndexReader(object):
+    def __init__(self, filename, edge_directory):
+        self.filename = filename
+        self.edge_directory = edge_directory
+        self.open_file_cache = {}
+        self.db = sqlite3.connect(filename)
+
+    def lookup_by_prefix(self, prefix, complete=False, limit=20):
+        mh = minihash(prefix)
+        c = self.db.cursor()
+        if complete:
+            c.execute(
+                "SELECT a.filename, a.offset from assertions a, prefixes p "
+                "WHERE p.assertion_id = a.id AND p.prefixhash = ? "
+                "AND complete = true ORDER BY p.weight DESC",
+                (mh,)
+            )
+        else:
+            c.execute(
+                "SELECT a.filename, a.offset from assertions a, prefixes p "
+                "WHERE p.assertion_id = a.id AND p.prefixhash = ? "
+                "ORDER BY p.weight DESC",
+                (mh,)
+            )
+
+        count = 0
+        while True:
+            rows = c.fetchmany()
+            if not rows:
+                return
+            for (filename, offset) in rows:
+                yield self.get_assertion(filename, offset)
+                count += 1
+                if count >= limit:
+                    return
+
+    def get_assertion(self, filename, offset):
+        if filename in self.open_file_cache:
+            fileobj = self.open_file_cache[filename]
+        else:
+            fileobj = open(os.path.join(self.edge_directory, filename), 'rb')
+            self.open_file_cache[filename] = fileobj
+        fileobj.seek(offset)
+        bline = fileobj.readline()
+        line = bline.decode('utf-8').strip()
+        return json.loads(line)
