@@ -99,8 +99,8 @@ class WiktionaryWriter(object):
         parser.setContentHandler(dh)
 
         # Parse the input
-        parser.parse(open(filename))
-        self.title_db.commit()
+        with self.title_db.transaction():
+            parser.parse(open(filename))
 
     def handle_page(self, title, text, site='en.wiktionary.org'):
         if ':' not in title:
