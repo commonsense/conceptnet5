@@ -84,18 +84,9 @@ def build_from_dir(dirname, output_file):
         userinfo = users[obj['author']]
         username = userinfo['fields']['username']
 
-        # GlobalMind provides information about what country the user is from, which
-        # we can preserve in the contributor URI.
-        #
-        # If I got to re-choose these URIs, I would distinguish usernames with
-        # a country code from those without a country code by something more
-        # than the number of slashes, and I would write the country code in
-        # capital letters.
-        userlocale = userinfo['fields']['ccode'].lower()
-        if userlocale:
-            user_source = "/s/contributor/globalmind/%s/%s" % (userlocale, username)
-        else:
-            user_source = "/s/contributor/globalmind/%s" % username
+        # As far as I can tell, GlobalMind used the same namespace of
+        # usernames as the original Open Mind.
+        user_source = "/s/contributor/omcs/%s" % username
 
         sources = [
             user_source,
