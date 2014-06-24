@@ -208,14 +208,20 @@ def uri_prefixes(uri, min_pieces=2):
     same path components. By default, the prefix must have at least 2
     components.
 
+    If the URI has sub-parts that are grouped by square brackets, then
+    only complete sub-parts will be allowed in prefixes.
+
     >>> list(uri_prefixes('/c/en/cat/n/feline'))
     ['/c/en', '/c/en/cat', '/c/en/cat/n', '/c/en/cat/n/feline']
+    >>> list(uri_prefixes('/test/[/group/one/]/[/group/two/]'))
+    ['/test/[/group/one/]', '/test/[/group/one/]/[/group/two/]']
     """
     pieces = []
     for piece in split_uri(uri):
         pieces.append(piece)
         if len(pieces) >= min_pieces:
-            yield join_uri(*pieces)
+            if pieces.count('[') == pieces.count(']'):
+                yield join_uri(*pieces)
 
 
 def parse_compound_uri(uri):

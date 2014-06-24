@@ -115,7 +115,7 @@ class EdgeIndexWriter(SQLiteWriter):
 
     def add(self, assertion, filename, offset):
         assertion_id = self.add_uri(assertion, filename, offset)
-        for field in ('rel', 'start', 'end', 'dataset'):
+        for field in ('uri', 'rel', 'start', 'end', 'dataset'):
             self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
         for source in assertion['sources']:
             self.add_prefixes(assertion_id, source, assertion['weight'])
