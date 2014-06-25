@@ -3,8 +3,8 @@
 *.egg-info
 .coverage
 conceptnet5/import*/*.txt
-conceptnet5/wiktparse/parser.py
-conceptnet5/wiktparse/parser.ebnf
+conceptnet5/wiktparse/*_parser.py
+conceptnet5/wiktparse/*_parser.ebnf
 evaluation/responses
 evaluation/data
 enwiktionary.xml
@@ -12,6 +12,7 @@ wikipedia.txt
 secrets.py
 *.zip
 *.tar.bz2
+*.tar.gz
 dist/
 env/
 data/assoc
@@ -22,7 +23,7 @@ data/edges
 data/extracted
 data/raw
 data/sandbox
-data/solr
+data/cnet5-solr
 data/sw_map
 data/graph.dot
 data/graph.png

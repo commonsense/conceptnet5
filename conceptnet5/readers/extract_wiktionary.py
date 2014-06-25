@@ -15,7 +15,7 @@ import logging
 from ftfy import ftfy
 from conceptnet5.formats.json_stream import JSONStreamWriter
 from conceptnet5.formats.sql import TitleDBWriter
-from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
+from conceptnet5.util.language_codes import NAME_TO_CODE
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -38,16 +38,17 @@ for level in range(2, 8):
     )
     SECTION_HEADER_RES[level] = regex
 
-# Regex for sub-sections, significant in German wiktionary
+# Regex for sub-sections in the German wiktionary
 SUB_SECTION_RE = re.compile(
     r'''
     ^{{          # double opening braces
     ([^\|}]+)    # the subsection title; must not contain vertical bars
     }}           # double closing brace
+    \s+          # trailing space (likely just a newline)
     ''', re.VERBOSE | re.MULTILINE)
 
-# To get the language out of something like "Buch ({{Sprache|Deutsch}})" in
-# the German witkionary
+# To get the language (as the first capturing group) out of a string such as
+# "Buch ({{Sprache|Deutsch}})" in the German witkionary
 LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
 
 
@@ -103,7 +104,7 @@ class WiktionaryWriter(object):
     Parses a wiktionary file in XML format and saves the results to a set of
     files in JSON format and a SQLite database.
 
-    Subclasses most likely want to override the methods `_get_langauge()` and
+    Subclasses most likely want to override the methods `_get_language()` and
     `handle_section()`.
     """
     def __init__(self, output_dir, nfiles=20):
@@ -113,6 +114,9 @@ class WiktionaryWriter(object):
             for i in range(nfiles)
         ]
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
+
+    def _get_language_code(self, language):
+        return NAME_TO_CODE['en'].get(language)
 
     def _get_language(self, heading):
         """Essentially a no-op method by default, but meant to be overridden
@@ -158,7 +162,7 @@ class WiktionaryWriter(object):
         self.writers[filenum].write(data)
 
         # Save the languages and titles to a database file
-        language_code = ENGLISH_NAME_TO_CODE.get(language)
+        language_code = self._get_language_code(language)
         if language_code is not None:
             self.title_db.add(language_code, title.lower())
 
@@ -180,13 +184,16 @@ class DeWiktionaryWriter(WiktionaryWriter):
     def _get_language(self, heading):
         lang_match = LANGUAGE_RE.search(heading)
         if lang_match:
-            return lang_match.group(1)
+            return lang_match.group(1).strip()
         return 'Deutsch'
+
+    def _get_language_code(self, language):
+        return NAME_TO_CODE['de'].get(language)
 
     def handle_section(self, text, heading, level=None):
         """
         Sections within a page of the German wiktionary are mostly enclosed in
-        double braces ({{Bedetungen}}, {{Synonyme}}, etc.), except for the
+        double braces ({{Bedeutungen}}, {{Synonyme}}, etc.), except for the
         translation sections, which are introduced by 4 equals signs:
         '==== Übersetzungen ===='.
         """
@@ -194,14 +201,15 @@ class DeWiktionaryWriter(WiktionaryWriter):
         # First handle translations
         sectioned = SECTION_HEADER_RES[4].split(text)
         if len(sectioned) > 1 and sectioned[1] == 'Übersetzungen':
-            sections.append({'heading': sectioned[1], 'text': sectioned[2]})
+            if len(SUB_SECTION_RE.split(sectioned[2])) == 1:
+                sections.append({'heading': sectioned[1],
+                                 'text': sectioned[2]})
         # Now handle the rest
         found = SUB_SECTION_RE.split(sectioned[0])
         headings = found[1::2]
         texts = found[2::2]
         for (hdg, txt) in zip(headings, texts):
-            sections.append({'heading': hdg, 'text': txt, 'sections': []})
-
+            sections.append({'heading': hdg, 'text': txt.lstrip()})
         return {
             'heading': heading,
             'text': found[0].strip(),
@@ -223,7 +231,7 @@ if __name__ == '__main__':
     parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
     parser.add_argument('-l', '--language', default='en',
-                        help='Two-letter language code of the inout file')
+                        help='Two-letter ISO language code of the input file')
     args = parser.parse_args()
 
     handle_file(args.input, args.output, args.language)

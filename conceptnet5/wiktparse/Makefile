@@ -3,10 +3,20 @@
 GRAKO = grako
 PYTHON = python
 
-all: parser.py
+all: en_parser.py de_parser.py
 
-parser.py: parser.ebnf
-	$(GRAKO) -m wiktionary -w '' -o $@ $<
+en_parser.py: en_parser.ebnf
+	$(GRAKO) -m en_wiktionary -w '' -o $@ $<
 
-parser.ebnf: rules.py extract_ebnf.py
-	$(PYTHON) -m conceptnet5.wiktparse.extract_ebnf conceptnet5.wiktparse.rules.ConceptNetWiktionarySemantics $@
+de_parser.py: de_parser.ebnf
+	$(GRAKO) -m de_wiktionary -w '' -o $@ $<
+
+en_parser.ebnf: rules.py extract_ebnf.py
+	$(PYTHON) -m conceptnet5.wiktparse.extract_ebnf conceptnet5.wiktparse.rules.EnWiktionarySemantics $@
+
+de_parser.ebnf: rules.py extract_ebnf.py
+	$(PYTHON) -m conceptnet5.wiktparse.extract_ebnf conceptnet5.wiktparse.rules.DeWiktionarySemantics $@
+
+clean:
+	rm -f *_parser.py *.ebnf
+
