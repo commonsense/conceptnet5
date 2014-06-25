@@ -1389,7 +1389,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 
 def main(filename, startrule, titlesdb_path, language, trace=False):
-    with open(filename) as f:
+    with open(filename, encoding='utf-8') as f:
         text = f.read()
 
     semantics = SEMANTICS[language](
