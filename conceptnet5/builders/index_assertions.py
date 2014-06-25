@@ -4,6 +4,7 @@ from conceptnet5.formats.json_stream import read_json_stream
 import os
 import sys
 
+
 def index_assertions(input_dir, output_db):
     filenames = sorted(os.listdir(input_dir))
     writer = EdgeIndexWriter(output_db)

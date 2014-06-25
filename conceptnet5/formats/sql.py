@@ -92,67 +92,67 @@ def edge_id_hash(edge_id):
 
 class EdgeIndexWriter(SQLiteWriter):
     schema = [
-        """CREATE TABLE IF NOT EXISTS assertions (
+        """CREATE TABLE IF NOT EXISTS edges (
             id integer PRIMARY KEY,
             filename text,
             offset integer
         ) WITHOUT ROWID""",
         """CREATE TABLE IF NOT EXISTS text_index (
-            indexhash integer,
-            assertion_id integer,
+            queryhash integer,
+            edge_id integer,
             weight real,
             complete bool
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (indexhash, assertion_id)",
-        "CREATE INDEX IF NOT EXISTS prefix_lookup on text_index (indexhash ASC, weight DESC)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (queryhash, edge_id)",
+        "CREATE INDEX IF NOT EXISTS prefix_lookup on text_index (queryhash ASC, weight DESC)",
         "PRAGMA synchronous = OFF",
         "PRAGMA journal_mode = MEMORY"
     ]
     drop_schema = [
-        "DROP TABLE IF EXISTS assertions",
+        "DROP TABLE IF EXISTS edges",
         "DROP TABLE IF EXISTS text_index"
     ]
 
-    def add(self, assertion, filename, offset):
-        assertion_id = self.add_uri(assertion, filename, offset)
+    def add(self, edge, filename, offset):
+        edge_id = self.add_edge(edge, filename, offset)
         for field in ('uri', 'rel', 'start', 'end', 'dataset'):
-            self.add_prefixes(assertion_id, assertion[field], assertion['weight'])
-        for source in assertion['sources']:
-            self.add_prefixes(assertion_id, source, assertion['weight'])
-        for feature in assertion['features']:
-            self.add_string_index(assertion_id, feature, assertion['weight'])
+            self.add_prefixes(edge_id, edge[field], edge['weight'])
+        for source in edge['sources']:
+            self.add_prefixes(edge_id, source, edge['weight'])
+        for feature in edge['features']:
+            self.add_string_index(edge_id, feature, edge['weight'])
 
-    def add_uri(self, assertion, filename, offset):
-        assertion_id = edge_id_hash(assertion['id'])
+    def add_edge(self, edge, filename, offset):
+        edge_id = edge_id_hash(edge['id'])
         c = self.db.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO ASSERTIONS (id, filename, offset) "
+            "INSERT OR REPLACE INTO edges (id, filename, offset) "
             "VALUES (?, ?, ?)",
-            (assertion_id, filename, offset)
+            (edge_id, filename, offset)
         )
-        return assertion_id
+        return edge_id
 
-    def add_prefixes(self, assertion_id, path, weight):
+    def add_prefixes(self, edge_id, path, weight):
         c = self.db.cursor()
         for prefix in uri_prefixes(path):
             complete = (prefix == path)
-            indexhash = minihash(prefix)
+            queryhash = minihash(prefix)
             c.execute(
                 "INSERT OR IGNORE INTO text_index "
-                "(indexhash, assertion_id, weight, complete) "
+                "(queryhash, edge_id, weight, complete) "
                 "VALUES (?, ?, ?, ?)",
-                (indexhash, assertion_id, weight, complete)
+                (queryhash, edge_id, weight, complete)
             )
 
-    def add_string_index(self, assertion_id, string, weight):
+    def add_string_index(self, edge_id, string, weight):
         c = self.db.cursor()
         complete = True
-        indexhash = minihash(string)
+        queryhash = minihash(string)
         c.execute(
             "INSERT OR IGNORE INTO text_index "
-            "(indexhash, assertion_id, weight, complete) "
+            "(queryhash, edge_id, weight, complete) "
             "VALUES (?, ?, ?, ?)",
-            (indexhash, assertion_id, weight, complete)
+            (queryhash, edge_id, weight, complete)
         )
 
 
@@ -163,36 +163,28 @@ class EdgeIndexReader(object):
         self.open_file_cache = {}
         self.db = sqlite3.connect(filename)
 
-    def lookup_index(self, index, complete=False, limit=20):
-        mh = minihash(index)
+    def lookup(self, query, complete=False, limit=20, offset=0):
+        mh = minihash(query)
         c = self.db.cursor()
+        complete_req = ''
         if complete:
-            c.execute(
-                "SELECT a.filename, a.offset from assertions a, text_index t "
-                "WHERE t.assertion_id = a.id AND t.indexhash = ? "
-                "AND complete = true ORDER BY t.weight DESC",
-                (mh,)
-            )
-        else:
-            c.execute(
-                "SELECT a.filename, a.offset from assertions a, text_index t "
-                "WHERE t.assertion_id = a.id AND t.indexhash = ? "
-                "ORDER BY t.weight DESC",
-                (mh,)
-            )
+            complete_req = ' AND complete = true'
 
-        count = 0
-        while True:
-            rows = c.fetchmany()
-            if not rows:
-                return
-            for (filename, offset) in rows:
-                yield self.get_assertion(filename, offset)
-                count += 1
-                if count >= limit:
-                    return
+        # If your hair is standing on end when you see "%s" in a SQL
+        # expression, I don't blame you. But the only thing being substituted
+        # this way is the `complete_req` defined just above. Don't worry,
+        # there's no room for a SQL injection.
+        c.execute(
+            "SELECT e.filename, e.offset from edges e, text_index t "
+            "WHERE t.edge_id = e.id AND t.queryhash = ? "
+            "%s ORDER BY t.weight DESC LIMIT ? OFFSET ?" % complete_req,
+            (mh, limit, offset)
+        )
+        rows = c.fetchall()
+        return [self.get_edge(filename, offset)
+                for (filename, offset) in rows]
 
-    def get_assertion(self, filename, offset):
+    def get_edge(self, filename, offset):
         if filename in self.open_file_cache:
             fileobj = self.open_file_cache[filename]
         else:
