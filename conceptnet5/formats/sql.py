@@ -3,7 +3,11 @@ import sqlite3
 import struct
 import json
 import os
+import re
 from hashlib import sha1
+
+INT_LIMIT = 2 ** 63 - 1
+SURFACE_TEXT_RE = re.compile(r'\[\[(.*?)\]\]')
 
 
 class SQLiteWriter(object):
@@ -76,9 +80,6 @@ def minihash(index):
     return struct.unpack('>i', dbytes)[0]
 
 
-INT_LIMIT = 2 ** 63 - 1
-
-
 def edge_id_hash(edge_id):
     """
     Represent the first 16 digits of an edge ID as a 64-bit integer.
@@ -121,6 +122,9 @@ class EdgeIndexWriter(SQLiteWriter):
             self.add_prefixes(edge_id, source, edge['weight'])
         for feature in edge['features']:
             self.add_string_index(edge_id, feature, edge['weight'])
+        if 'surfaceText' in edge:
+            for text in SURFACE_TEXT_RE.findall(edge['surfaceText']):
+                self.add_string_index(edge_id, text, edge['weight'])
 
     def add_edge(self, edge, filename, offset):
         edge_id = edge_id_hash(edge['id'])
@@ -157,13 +161,18 @@ class EdgeIndexWriter(SQLiteWriter):
 
 
 class EdgeIndexReader(object):
-    def __init__(self, filename, edge_directory):
+    def __init__(self, filename, edge_dir):
         self.filename = filename
-        self.edge_directory = edge_directory
+        self.edge_dir = edge_dir
         self.open_file_cache = {}
         self.db = sqlite3.connect(filename)
 
-    def lookup(self, query, complete=False, limit=20, offset=0):
+    def lookup(self, query, complete=False, limit=None, offset=0):
+        if limit is None:
+            pseudo_limit = 1000000000
+        else:
+            pseudo_limit = limit
+
         mh = minihash(query)
         c = self.db.cursor()
         complete_req = ''
@@ -178,17 +187,28 @@ class EdgeIndexReader(object):
             "SELECT e.filename, e.offset from edges e, text_index t "
             "WHERE t.edge_id = e.id AND t.queryhash = ? "
             "%s ORDER BY t.weight DESC LIMIT ? OFFSET ?" % complete_req,
-            (mh, limit, offset)
+            (mh, pseudo_limit, offset)
         )
-        rows = c.fetchall()
-        return [self.get_edge(filename, offset)
-                for (filename, offset) in rows]
+        if limit is not None:
+            rows = c.fetchall()
+            return [self.get_edge(filename, offset)
+                    for (filename, offset) in rows]
+        else:
+            return self.edge_iterator(c)
+
+    def edge_iterator(self, cursor):
+        while True:
+            rows = cursor.fetchmany()
+            if not rows:
+                return
+            for (filename, offset) in rows:
+                yield self.get_edge(filename, offset)
 
     def get_edge(self, filename, offset):
         if filename in self.open_file_cache:
             fileobj = self.open_file_cache[filename]
         else:
-            fileobj = open(os.path.join(self.edge_directory, filename), 'rb')
+            fileobj = open(os.path.join(self.edge_dir, filename), 'rb')
             self.open_file_cache[filename] = fileobj
         fileobj.seek(offset)
         bline = fileobj.readline()

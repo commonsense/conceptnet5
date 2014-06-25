@@ -1,4 +1,4 @@
-from conceptnet5.util import get_data_filename
+from conceptnet5.util import get_support_data_filename
 from conceptnet5.readers import (
     conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, wiktionary_en, wordnet
 )
@@ -15,7 +15,7 @@ else:
     from io import StringIO
 
 
-TESTDATA_DIR = get_data_filename("testdata")
+TESTDATA_DIR = get_support_data_filename("testdata")
 def data_path(filename):
     return os.path.join(TESTDATA_DIR, filename)
 
@@ -44,7 +44,7 @@ def compare_input_and_output(reader_module, input, outputs):
     input_filename = data_path(input)
     output_filenames = [data_path(output) for output in outputs]
     output_streams = [StringIO() for _ in output_filenames]
-    
+
     # Every reader module has a 'handle_file' function, with one input and
     # up to two outputs.
     #

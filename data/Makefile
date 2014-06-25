@@ -16,6 +16,7 @@ CORE = ../conceptnet5/uri.py ../conceptnet5/nodes.py ../conceptnet5/edges.py
 # date.
 DATE = $(shell date +%Y%m%d)
 OUTPUT_FOLDER = dist/$(DATE)
+DATA_SYMLINK = ~/.conceptnet5
 
 # The URL from which to download ConceptNet files, such as the raw data files.
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
@@ -152,23 +153,27 @@ SQLITE_FILE = db/conceptnet5.sqlite
 
 # High-level build tasks
 # ======================
-# By default, our goal is to build the Solr data files, the aggregate
+# By default, our goal is to build the SQLite data, the aggregate
 # statistics, and everything they depend on.
 #
 # The build_assoc step is not run by default, because it's a huge memory
 # hog.
 #
 # A complete run, including all steps, might look like this:
-#     make download build_solr build_stats build_assoc upload
-all: build_solr build_assertions build_stats
+#     make download all build_assoc upload
+all: build_assertions build_stats build_db
 build_assoc: $(ASSOC_DIR)/u.npy
 build_solr: $(SOLR_FILES)
 build_db: $(SQLITE_FILE)
 build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
+	# Once the assertions are built, we can benefit from the link pointing
+	# from ~/.conceptnet5 to this directory.
+	ln -s `pwd` $(DATA_SYMLINK)
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 build_stats: $(STATS_FILES)
+
 
 # A Makefile idiom that means "don't delete intermediate files"
 .SECONDARY:
