@@ -337,7 +337,7 @@ class ConceptNetWiktionarySemantics(object):
         (rule, rel) = self._get_rule_for_heading(heading)
         if rule is not None and rel is not None and self.logger:
             self.logger.info('headlang=%s; rule=%s (rel=%s); title=%s',
-                             headlang, rule, rel, headword.encode('utf-8'))
+                             headlang, rule, rel, headword)
 
         if rule == 'definition_section':
             # Definitions could link to words in the same language as this
@@ -1389,7 +1389,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 
 def main(filename, startrule, titlesdb_path, language, trace=False):
-    with open(filename, encoding='utf-8') as f:
+    with open(filename) as f:
         text = f.read()
 
     semantics = SEMANTICS[language](
