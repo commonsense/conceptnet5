@@ -108,7 +108,7 @@ if __name__ == '__main__':
     not_found = []
     for code in SUPPORTED_LANGUAGE_CODES:
         try:
-            print("%-4s %s" % (code, CODE_TO_NAME['en'][code].encode('utf-8')))
+            print("%-4s %s" % (code, CODE_TO_NAME['en'][code]))
         except KeyError as e:
             not_found.append(str(e))
 
