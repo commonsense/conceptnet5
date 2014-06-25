@@ -174,6 +174,9 @@ build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 build_stats: $(STATS_FILES)
 
+# Remove everything except raw data
+clean:
+	rm -r assertions edges db extracted
 
 # A Makefile idiom that means "don't delete intermediate files"
 .SECONDARY:
