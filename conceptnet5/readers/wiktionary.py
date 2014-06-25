@@ -1,13 +1,22 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from conceptnet5.wiktparse.rules import ConceptNetWiktionarySemantics
+from conceptnet5.wiktparse.rules import (EnWiktionarySemantics,
+                                         DeWiktionarySemantics)
 from conceptnet5.formats.json_stream import read_json_stream, JSONStreamWriter
+import logging
 import os
+import sys
 
 
-def run_wiktionary(input_file, output_file, titledb, language='en', verbosity=0):
+# Maps language to its ConceptNetWiktionarySemantics subclass
+SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
+
+
+def run_wiktionary(input_file, output_file, titledb, language='en', verbosity=0,
+                   logger=sys.stdout):
     trace = (verbosity >= 2)
-    sem = ConceptNetWiktionarySemantics(language, titledb=titledb, trace=trace)
+    sem = SEMANTICS[language](language, titledb=titledb, trace=trace,
+                              logger=logger)
     output = JSONStreamWriter(output_file)
     for structure in read_json_stream(input_file):
         for edge in sem.parse_structured_entry(structure):
@@ -30,13 +39,27 @@ def main():
                         help='The ISO code of the language this Wiktionary is written in')
     parser.add_argument('-t', '--titles', default=None,
                         help='a titles.db file, indicating which headwords exist in which languages')
+    parser.add_argument('-o', '--logfile', default=None,
+                        help='name of log file')
+
     args = parser.parse_args()
+
+    logger = None
+    if args.logfile:
+        logger = logging.getLogger('run_wiktionary')
+        handler = logging.FileHandler(args.logfile)
+        handler.setFormatter(
+            logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+
     titledb = args.titles
     if titledb is None:
         titledb = os.path.dirname(args.input_file) + '/titles.db'
 
     run_wiktionary(args.input_file, args.output_file, titledb=titledb,
-                   language=args.language, verbosity=args.verbosity)
+                   language=args.language, verbosity=args.verbosity,
+                   logger=logger)
 
 if __name__ == '__main__':
     main()

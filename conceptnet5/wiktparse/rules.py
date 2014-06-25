@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.util.language_codes import ENGLISH_NAME_TO_CODE
+from conceptnet5.util.language_codes import NAME_TO_CODE
 from pprint import pprint
 from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern
@@ -11,6 +11,7 @@ import traceback
 import sqlite3
 import re
 import os
+import re
 
 try:
     from conceptnet5.wiktparse.en_parser import (en_wiktionaryParser,
@@ -50,53 +51,20 @@ POS_HEADINGS = {
 }
 
 # Skip some languages based on their headings.
-#
 # Lojban entries tend to be written in a Lojban/English metalanguage that
 # isn't very useful to parse. "Translingual" is hopelessly non-specific,
 # and American Sign Language is not going to work well when represented in
 # text in concept names.
 SKIPPED_LANGUAGES = ['Lojban', 'Translingual', 'American Sign Language']
 
-# Maps heading strings to their (rule, relation) tuples
-RULES_AND_RELATIONS_MAP = {
-    'en': {
-        'Translations': ('translation_section', None),
-        'Synonyms': ('link_section', 'Synonym'),
-        'Antonyms': ('link_section', 'Antonym'),
-        'Hypernyms': ('link_section', 'IsA'),
-        'Hyponyms': ('link_section', '~IsA'),
-        'Holonyms': ('link_section', 'PartOf'),
-        'Meronyms': ('link_section', 'PartOf'),
-        'Derived terms': ('link_section', '~DerivedFrom'),
-        'Descendants': ('link_section', '~DerivedFrom'),
-        'Compounds': ('link_section', '~CompoundDerivedFrom'),
-        'Related terms': ('link_section', 'RelatedTo'),
-        'See also': ('link_section', 'RelatedTo'),
-        'Pronunciation': (None, None),
-        'Anagrams': (None, None),
-        'Statistics': (None, None),
-        'References': (None, None),
-        'Quotations': (None, None),
-        'Romanization': (None, None),
-        'Usage notes': (None, None)
-    },
-    'de': {
-        'Bedeutungen': ('definition_section_de', None),
-        'Übersetzungen': ('translation_section_de', None),
-        'Herkunft': ('etymology_section', 'EtymologicallyDerivedFrom'),
-        'Ähnlichkeiten': ('link_section', 'RelatedTo'),
-        'Sinnverwandte Wörter': ('link_section', 'RelatedTo'),
-        'Gegenwörter': ('link_section', 'Antonym'),
-        'Synonyme': ('link_section', 'Synonym'),
-        'Oberbegriffe': ('link_section', 'IsA'),
-        'Unterbegriffe': ('link_section', '~IsA'),
-        'Wortbildungen': ('link_section', '~DerivedFrom')
-    }
-}
 
-
-def language_code(language_name):
-    return ENGLISH_NAME_TO_CODE.get(language_name)
+def language_code(source_language, language_name):
+    """
+    Returns the 3-letter ISO code for the given `language_name` or None if no
+    such code can be found. `source_language` is the 2-letter ISO code for the
+    language of the input file being parsed
+    """
+    return NAME_TO_CODE[source_language].get(language_name)
 
 
 class LinkedText(object):
@@ -316,7 +284,7 @@ class ConceptNetWiktionarySemantics(object):
                 )
             except (FailedParse, FailedPattern) as f:
                 # TODO: refine patterns so this does not need separate
-                # treatment 
+                # treatment
                 if self.logger is not None:
                     self.logger.error(f)
                 continue
@@ -333,7 +301,7 @@ class ConceptNetWiktionarySemantics(object):
                 print(traceback.format_exc())
                 failures += 1
 
-        assert failures <= 1
+#         assert failures <= 1
         return edges
 
     def _get_pos_abbrev(self, heading):
@@ -361,14 +329,17 @@ class ConceptNetWiktionarySemantics(object):
         text = structure['text']
         heading = structure['heading']
         language = headlang
-        language = headlang
         if headpos is None:
             # If there is no POS abbreviation for the given heading, the method
             # returns None, in which case the call is a no-op.
             headpos = self._get_pos_abbrev(heading)
 
         (rule, rel) = self._get_rule_for_heading(heading)
-        if rule in ['definition_section', 'definition_section_de']:
+        if rule is not None and rel is not None and self.logger:
+            self.logger.info('headlang=%s; rule=%s (rel=%s); title=%s',
+                             headlang, rule, rel, headword.encode('utf-8'))
+
+        if rule == 'definition_section':
             # Definitions could link to words in the same language as this
             # section, or in the overall language of the Wiktionary. It's
             # ambiguous. Keep both options for now, to be resolved in a moment.
@@ -392,7 +363,7 @@ class ConceptNetWiktionarySemantics(object):
                 edge_info = [ei.set_default_language(language)
                              for ei in edge_info]
             edges.extend(
-                [ei.complete_edge(rule, self.default_language, headlang,
+                [ei.complete_edge(self.default_language, rule, headlang,
                                   headword, headpos)
                  for ei in edge_info
                  if ei.target not in BAD_NAMES_FOR_THINGS
@@ -442,6 +413,8 @@ class ConceptNetWiktionarySemantics(object):
             right_brackets  = "]]" ;
             left_braces     = "{{" ;
             right_braces    = "}}" ;
+            left_paren      = '(' ;
+            right_paren     = ')' ;
             hash_char       = "#" ;
             vertical_bar    = "|" ;
             equals          = "=" ;
@@ -468,7 +441,7 @@ class ConceptNetWiktionarySemantics(object):
 
         Parse rule:
 
-            pseudo_link = ?/''[^']+'':?/? SP ;
+            pseudo_link = ?/\'\'[^\']+\'\':?/? ;
 
         == Whitespace ==
 
@@ -1418,7 +1391,8 @@ SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 def main(filename, startrule, titlesdb_path, language, trace=False):
     with open(filename, encoding='utf-8') as f:
         text = f.read()
-    semantics = ConceptNetWiktionarySemantics(
+
+    semantics = SEMANTICS[language](
         language, os.path.join(titlesdb_path, 'titles.db')
     )
     ast = semantics.parse(
@@ -1440,7 +1414,7 @@ if __name__ == '__main__':
                         help='language of the input file')
     parser.add_argument('file', metavar="FILE", help="the input file to parse")
     parser.add_argument('titlesdb', metavar="FILE",
-                        help="full path to the SQLite3 titles DB file")
+                        help="parent directory of the SQLite3 titles DB file")
     parser.add_argument('startrule', metavar="STARTRULE",
                         help="the start rule for parsing")
     args = parser.parse_args()
