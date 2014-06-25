@@ -434,10 +434,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            one_line_text = @term | comment | html_tag | @colon | @equals
-                          | @single_left_bracket | @single_right_bracket
-                          | @single_left_brace | @single_right_brace | @SP ;
-            text = @NL | @one_line_text ;
+            one_line_text = @:term | comment | html_tag | @:colon | @:equals
+                          | @:single_left_bracket | @:single_right_bracket
+                          | @:single_left_brace | @:single_right_brace | @:SP ;
+            text = @:NL | @:one_line_text ;
 
         == Images ==
         Images have complex syntax like
@@ -586,7 +586,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            translation_name = "t-simple" | "t+" | "t-" | "t0" | "tø" | "t" ;
+            translation_name = "t-simple" | "t+" | "t-" | "t0" | "t\\xf8" | "t" ;
             translation_template = left_braces WS translation_name WS
                                    vertical_bar WS language:term WS
                                    args:template_args right_braces ;
@@ -668,17 +668,11 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                                  | sensetrans:sensetrans_top_template } ;
             trans_mid_template = left_braces WS "trans-mid" WS right_braces ;
             trans_bottom_template = left_braces WS "trans-bottom" WS right_braces ;
-            translation_entry = bullet SP
-                                { translations+:translation_template | template
-                                | one_line_text_with_links }+
-                                NL ;
-            translation_content = { trans_mid_template | entries+:translation_entry
-                                  | !trans_bottom_template one_line_wikitext NL | WS }+ ;
             translation_block = top:trans_top_template WS
                                 translations:translation_content WS
-                                trans_bottom_template WS >> ;
+                                trans_bottom_template WS ~ ;
 
-        After parsing a translation block, we "cut", indicated by the symbol >>.
+        After parsing a translation block, we "cut", indicated by the symbol ~.
         That means the parser should not backtrack past this point after
         successfully parsing a block, and therefore it can throw out memoized
         parses before this point.
@@ -809,14 +803,12 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         A 'link section' is a section for listing links to other entries, such
         as related terms and synonyms.
 
-        Parse rules:
+        Parse rule:
 
-            sense_template = left_braces WS "sense" WS vertical_bar
-                             @text_with_links right_braces ;
             link_entry = bullet SP [sense:sense_template] SP
                          { link+:link_template | link+:wiki_link | template
                          | external_link | one_line_text }+
-                         NL >> ;
+                         NL ~ ;
         """
         if ast['links'] is None:
             return []
@@ -836,7 +828,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         Parse rule:
 
             sense_template = left_braces WS "sense" WS vertical_bar
-                             @text_with_links right_braces ;
+                             @:text_with_links right_braces ;
         """
         return ast.text
 
@@ -876,9 +868,9 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         Parse rules:
 
             list_chars = ?/[#*:]+/? ;
-            defn_line = hash_char !bullet SP @one_line_wikitext NL WS ;
-            defn_details = hash_char list_chars SP @one_line_wikitext NL WS ;
-            definition = @defn_line { defn_details }* >> ;
+            defn_line = hash_char !bullet SP @:one_line_wikitext NL WS ;
+            defn_details = hash_char list_chars SP @:one_line_wikitext NL WS ;
+            definition = @:defn_line { defn_details }* ~ ;
             definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ;
         """
         links = []
