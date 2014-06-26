@@ -134,6 +134,12 @@ class EdgeInfo(object):
         if sense in BAD_NAMES_FOR_THINGS:
             sense = None
 
+        if isinstance(sense, LinkedText):
+            sense = sense.text
+
+        if sense in ('', '-', '?'):
+            sense = None
+
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
         end_uri = normalized_concept_uri(self.language, self.target)
         rel = self.rel or 'RelatedTo'
@@ -609,7 +615,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar
                                       WS sense:text_with_links WS right_braces ;
         """
-        return {'sense': ast['sense']}
+        return ast['sense']
 
     def checktrans_top_template(self, ast):
         """
@@ -622,7 +628,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             checktrans_top_template = left_braces WS "checktrans-top"
                                       WS right_braces ;
         """
-        return {'sense': None}
+        return None
 
     def translation_entry(self, ast):
         """
@@ -677,7 +683,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         successfully parsing a block, and therefore it can throw out memoized
         parses before this point.
         """
-        sense = ast['top']['sense']
+        sense = ast['top']['sensetrans']
         return [info.set_sense(sense) for info in ast['translations']]
 
     def translation_section(self, ast):
@@ -806,7 +812,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         Parse rule:
 
             link_entry = bullet SP [sense:sense_template] SP
-                         { link+:link_template | link+:wiki_link | template
+                         { links+:link_template | links+:wiki_link | template
                          | external_link | one_line_text }+
                          NL ~ ;
         """
