@@ -41,6 +41,10 @@ def main():
                         help='a titles.db file, indicating which headwords exist in which languages')
     parser.add_argument('-o', '--logfile', default=None,
                         help='name of log file')
+    parser.add_argument('-g', '--loglevel', default=logging.WARN,
+                        choices=['NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR',
+                                 'CRITICAL'],
+                        help='logging level (all-uppercase string)')
 
     args = parser.parse_args()
 
@@ -51,7 +55,8 @@ def main():
         handler.setFormatter(
             logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
         logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
+        if args.loglevel:
+            logger.setLevel(logging._nameToLevel[args.loglevel])
 
     titledb = args.titles
     if titledb is None:
