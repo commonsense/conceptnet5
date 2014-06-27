@@ -260,7 +260,7 @@ class ConceptNetWiktionarySemantics(object):
                 print(traceback.format_exc())
                 failures += 1
 
-#         assert failures <= 1
+        assert failures <= 1
         return edges
 
     def _get_pos_abbrev(self, heading):
@@ -294,9 +294,9 @@ class ConceptNetWiktionarySemantics(object):
             headpos = self._get_pos_abbrev(heading)
 
         (rule, rel) = self._get_rule_for_heading(heading)
-        if rule is not None and rel is not None and self.logger:
-            self.logger.info('headlang=%s; rule=%s (rel=%s); title=%s',
-                             headlang, rule, rel, headword)
+        if self.logger and rule is not None:
+            self.logger.debug('headlang=%s; rule=%s (rel=%s); title=%s',
+                              headlang, rule, rel, headword)
 
         if rule == 'definition_section':
             # Definitions could link to words in the same language as this
@@ -400,7 +400,7 @@ class ConceptNetWiktionarySemantics(object):
 
         Parse rule:
 
-            pseudo_link = ?/\'\'[^\']+\'\':?/? ;
+            pseudo_link = ?/''[^']+'':?/? SP ;
 
         == Whitespace ==
 
@@ -1046,9 +1046,6 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
         elif heading == 'Unterbegriffe':
             rule = 'link_section'
             rel = '~IsA'
-#         elif heading == 'Wortbildungen':
-#             rule = 'link_section'
-#             rel = '~DerivedFrom'
 
         return (rule, rel)
 
@@ -1115,6 +1112,13 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
         """
         return ast
 
+    def bullet_no_links(self, ast):
+        """
+        Parse rule:
+            bullet_no_links = ( bullet | hash_char ) SP one_line_wikitext NL ;
+        """
+        return ast
+
     def link_section(self, ast):
         """
         The pattern called "gloss" captures various grammatical directives and
@@ -1124,17 +1128,15 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
             gloss = left_paren [ equals ] term SP ;
             sense = left_bracket num:(sense_num | '?') right_bracket [ SP | comma ] ;
-            no_links = sense term;
-            bulleted = bullet SP left_braces ?/[^}]+/? right_braces ;
-            sense_group = { [ sense:sense ] SP [ pseudo_link SP ] [ term ]
-                          [ html_tag ] [ left_paren [ term right_paren ] ] 
+            sense_no_links = sense one_line_text ;
+            sense_group = { [ sense:sense ] [ pseudo_link ] [ term ]
+                          [ html_tag ] [ left_paren [ term right_paren ] ]
                           link:wiki_link SP [ sense | gloss | gender ]
                           [ right_paren ] [ html_tag ]
-                          [ comma | slash | colon | equals | dash ] }+ ;
-            link_section = { ( colon | bulleted )
-                           { no_links | group+:sense_group 
-                             [ ( semicolon SP | term ) ] }*
-                           NL }+ ;
+                          [ comma | slash | colon | equals | dash | semicolon ] }+ ;
+            link_section = { bullet_no_links |
+                             ( colon SP { group+:sense_group | sense_no_links
+                               [ ( semicolon SP | term ) ] }* NL ) }+ ;
         """
         all_links = []
         if ast.group is not None:
@@ -1245,45 +1247,56 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
             :[7a] sich räumlich erstrecken
             :[7b] irgendwohin führen
 
+        Not all the lines contain links, however.
+
         Parse rules:
 
-            directive = ( ?/\*''[^\[]+\[\[[^\]]+\]\]:''/? | ?/\*[^:]+:/? ) NL ;
+            directive = ( ?/\*?''[^\[]+\[\[[^\]]+\]\]:''/? | ?/\*[^:]+:/? ) NL ;
             line = colon SP [ colon ] SP
                    [ left_bracket ] num:( dash | ?/[0-9a-e]+/? ) [ right_bracket ]
                    [ SP ] [ template ] [ pseudo_link ]
-                   ( sense:one_line_text_with_links [ SP gender ] | text  ) NL ;
-            definition_section = [ directive ] { line }+ ;
+                   ( sense:one_line_wikitext [ SP template ] | text ) NL ;
+            definition_section = [ bullet_no_links ] [ { line }+ ] ;
         """
         def process_item(item, sense, linked_texts):
             curr_sense = sense
             head_text = ''
-            if item.num.isdigit():
-                sense = item.num
-                curr_sense = sense
-            elif item.num.isalpha():
-                # single letter indicates a sub-sense; we want to pull
-                if item.num == 'a':
-                    link = linked_texts.pop()
-                    head_text = link.text.lstrip('()0123456789 ') + ' '
-                curr_sense += item.num
-            item.sense.text = '(' + curr_sense + ') ' + head_text + item.sense.text
-            linked_texts.append(item.sense)
-
-        linked_texts = []
-        links = []
-        sense = ''
-        head_text = ''
-        for item in ast:
-            if isinstance(item, str):
-                continue
-            if isinstance(item, list):
-                for i in item:
-                    process_item(i, sense, linked_texts)
+            if item.num is not None:
+                if item.num.isdigit():
+                    sense = item.num
+                    curr_sense = sense
+                elif item.num.isalpha():
+                    # single letter indicates a sub-sense: pull in the parent
+                    # sense from the line above.
+                    if item.num == 'a' and len(linked_texts) > 0:
+                        link = linked_texts.pop()
+                        head_text = link.text.lstrip('()0123456789 ') + ' '
+                    curr_sense += item.num
+            if isinstance(item.sense, list):
+                for lt in item.sense:
+                    lt.text = '(' + curr_sense + ') ' + head_text + lt.text
+                    linked_texts.append(lt)
             else:
-                process_item(item, sense, linked_texts)
+                item.sense.text = '(' + curr_sense + ') ' + head_text + item.sense.text
+                linked_texts.append(item.sense)
 
-        for link in (x.links for x in linked_texts):
-            links.extend(link)
+        links = []
+        if ast is not None:
+            linked_texts = []
+            sense = ''
+            for item in ast:
+                if isinstance(item, str):
+                    continue
+                if isinstance(item, list):
+                    for i in item:
+                        process_item(i, sense, linked_texts)
+                elif isinstance(item, LinkedText):
+                    links.extend(item.links)
+                else:
+                    process_item(item, sense, linked_texts)
+
+            for link in (x.links for x in linked_texts):
+                links.extend(link)
         return links
 
 
