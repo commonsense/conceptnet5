@@ -11,7 +11,7 @@ transformations to words whose part of speech is ambiguous.
 """
 import nltk
 from nltk.corpus import wordnet
-from conceptnet5.language.token_utils import untokenize, tokenize
+from .token_utils import untokenize, tokenize
 import re
 
 try:
