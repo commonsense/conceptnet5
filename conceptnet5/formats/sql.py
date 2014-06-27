@@ -107,7 +107,7 @@ class EdgeIndexWriter(SQLiteWriter):
         "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (queryhash, edge_id)",
         "CREATE INDEX IF NOT EXISTS prefix_lookup on text_index (queryhash ASC, weight DESC)",
         "PRAGMA synchronous = OFF",
-        "PRAGMA journal_mode = MEMORY"
+        "PRAGMA journal_mode = OFF"
     ]
     drop_schema = [
         "DROP TABLE IF EXISTS edges",
@@ -122,7 +122,7 @@ class EdgeIndexWriter(SQLiteWriter):
             self.add_prefixes(edge_id, source, edge['weight'])
         for feature in edge['features']:
             self.add_string_index(edge_id, feature, edge['weight'])
-        if 'surfaceText' in edge:
+        if edge.get('surfaceText'):
             for text in SURFACE_TEXT_RE.findall(edge['surfaceText']):
                 self.add_string_index(edge_id, text, edge['weight'])
 

@@ -149,7 +149,7 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = stats/relations.txt stats/dataset_languages.txt stats/morestats.txt
-SQLITE_FILE = db/conceptnet5.sqlite
+SQLITE_FILE = db/assertions.db
 
 # High-level build tasks
 # ======================
@@ -321,7 +321,7 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 
 # Index the assertions in a SQLite database.
 # This may become a replacement for Solr.
-db/conceptnet5.sqlite: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
+$(SQLITE_FILE): $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	@mkdir -p db
 	$(PYTHON) -m conceptnet5.builders.index_assertions assertions/ $@
 
