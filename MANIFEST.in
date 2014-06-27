@@ -1,0 +1,2 @@
+recursive-include conceptnet5/support_data *
+include README.md
