@@ -192,7 +192,7 @@ def normalize_as_list(text):
 def normalize(text):
     """
     Get a string made from the non-stopword word stems in the text. See
-    normalize_list().
+    normalize_as_list().
     """
     return untokenize(normalize_as_list(text))
 
