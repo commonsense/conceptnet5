@@ -64,24 +64,24 @@ def _setup():
         if first_line:
             first_line = False
             continue
-        alpha2, alpha3, en_name, fr_name, de_name = line.rstrip('\n').split('\t')
+        alpha3, alpha2, en_name, fr_name, de_name = line.rstrip('\n').split('\t')
         codes = []
         if alpha2:
             # Not every language has an alpha2 code, but it should be first in
             # the list if it does.
             codes.append(alpha2)
-        # Every language has an ISO 639-3 alpha3 code.
-        codes.append(alpha3)
-
-        # The second column contains ISO 639-2 alpha3 codes. Some
+        # The first column contains ISO 639-2 alpha3 codes. Some
         # languages have two different codes, a "terminology" and a
         # "bibliographic" code, apparently by historical accident.
         # If this is the case, the entry will look like:
         #
         #    xxx (B),yyy (T)*
+        # We want the the "terminology" one.
         multi_code_match = re.match(r'(...) \(B\),(...) \(T\)', alpha3)
         if multi_code_match:
             codes.append(multi_code_match.group(1))
+        else:
+            codes.append(alpha3)
 
         for code in codes:
             CODE_TO_NAME['en'][code] = en_name
