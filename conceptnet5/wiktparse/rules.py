@@ -152,12 +152,21 @@ class EdgeInfo(object):
             start_uri, end_uri = end_uri, start_uri
 
         rel_uri = join_uri('/r', rel)
+
+        # Make the headword into an acceptable URI by replacing spaces with
+        # underscores.
+        #
+        # We don't apply other normalization steps, because we
+        # want to be able to distinguish pages on Wiktionary without losing
+        # information. Wiktionary is case-sensitive, for example, but it
+        # conveniently does not distinguish spaces and underscores.
+        n_headword = headword.replace(' ', '_')
         return make_edge(
             rel=rel_uri, start=start_uri, end=end_uri,
             dataset='/d/wiktionary/%s/%s' % (source_lang, headlang),
             license=Licenses.cc_sharealike,
             sources=[join_uri('/s/web/%s.wiktionary.org/wiki' % source_lang,
-                              headword),
+                              n_headword),
                      join_uri('/s/rule', rule_name)],
             weight=1.0
         )
@@ -620,7 +629,7 @@ class ConceptNetWiktionarySemantics(object):
         return LinkedText(text=ast['text'], links=[])
 
 
-class EnWiktionarySemantics(ConceptNetWiktionarySemantics, 
+class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
                             en_wiktionarySemantics):
     """
     Rules specific to the English wiktionary format.
@@ -1189,7 +1198,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
             tr_base = [ number SP ]
                       left_braces ?/Ü[x]*/? vertical_bar text vertical_bar
                       [ target:term [ vertical_bar original:term ] ]
-                      right_braces [ SP gender ] [ SP number ] 
+                      right_braces [ SP gender ] [ SP number ]
                       [ ( comma | semicolon ) SP ] ;
             from_german = bullet lang:lang_code colon SP tr:{ tr_base }+ WS ;
         """
@@ -1223,7 +1232,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
         Parse rules:
 
-            reference = colon left_bracket sense_num right_bracket SP 
+            reference = colon left_bracket sense_num right_bracket SP
                         wikitext WS ;
             table_filler = ( "{{Ü-Tabelle|Ü-links=" | "|Ü-rechts=" ) WS ;
             translation_section = links:{ to_german | from_german |
