@@ -142,11 +142,10 @@ SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES = $(patsubst edges/sorted/edges_%.csv,assertions/part_%.jsons, $(SORTED_FILES))
 ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
 COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILES))
-SOLR_FILES = $(patsubst assertions/%.jsons,solr/%.json, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
-			 $(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2
+			 $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = stats/relations.txt stats/dataset_languages.txt stats/morestats.txt
 SQLITE_FILE = db/assertions.db
@@ -163,7 +162,6 @@ SQLITE_FILE = db/assertions.db
 #     make download all build_assoc upload
 all: build_assertions build_stats build_db
 build_assoc: $(ASSOC_DIR)/u.npy
-build_solr: $(SOLR_FILES)
 build_db: $(SQLITE_FILE)
 build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
 	# Once the assertions are built, we can benefit from the link pointing
@@ -320,16 +318,9 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 	$(PYTHON) -m assoc_space.build_conceptnet $< $(ASSOC_DIR)
 
 # Index the assertions in a SQLite database.
-# This may become a replacement for Solr.
 $(SQLITE_FILE): $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	@mkdir -p db
 	$(PYTHON) -m conceptnet5.builders.index_assertions assertions/ $@
-
-# Solr's input is made of peculiarly-structured JSON files. Build those
-# files from our files of multiple JSON assertions.
-solr/%.json: assertions/%.jsons $(BUILDERS)/json_to_solr.py
-	@mkdir -p solr
-	$(PYTHON) -m conceptnet5.builders.json_to_solr $< $@
 
 # The following rules are for building the DIST_FILES to be uploaded.
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
@@ -340,9 +331,9 @@ $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ assertions/*.jsons
 
-$(OUTPUT_FOLDER)/conceptnet5_solr_json_$(DATE).tar.bz2: $(SOLR_FILES)
+$(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(SQLITE_FILE)
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ solr
+	$(TARBALL_CREATE) $@ $(SQLITE_FILE)
 
 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)

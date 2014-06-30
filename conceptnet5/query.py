@@ -49,7 +49,9 @@ class AssertionFinder(object):
     def lookup(self, query, limit=20, offset=0):
         """
         Look up all assertions associated with the given URI or string
-        property.
+        property. Any of these fields can be matched:
+
+            ['rel', 'start', 'end', 'dataset', 'sources', 'surfaceText', 'uri']
 
         If the query is a URI, it will match prefixes of longer URIs, unless
         `/.` is added to the end of the query.
