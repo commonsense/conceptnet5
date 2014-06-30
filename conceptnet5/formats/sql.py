@@ -97,7 +97,7 @@ class EdgeIndexWriter(SQLiteWriter):
             id integer PRIMARY KEY,
             filename text,
             offset integer
-        ) WITHOUT ROWID""",
+        )""",
         """CREATE TABLE IF NOT EXISTS text_index (
             queryhash integer,
             edge_id integer,
