@@ -1,3 +1,4 @@
+from __future__ import print_function, unicode_literals
 from conceptnet5.uri import uri_prefixes
 import sqlite3
 import struct
@@ -9,6 +10,12 @@ from hashlib import sha1
 INT_LIMIT = 2 ** 63 - 1
 SURFACE_TEXT_RE = re.compile(r'\[\[(.*?)\]\]')
 
+# Import apsw if we can.
+try:
+    import apsw
+except ImportError:
+    apsw = None
+
 
 class SQLiteWriter(object):
     """
@@ -18,10 +25,30 @@ class SQLiteWriter(object):
     schema = []
     drop_schema = []
 
-    def __init__(self, filename, clear=False):
+    def __init__(self, filename, clear=False, allow_apsw=True):
         self.db = None
         self.filename = filename
+        self.enable_apsw = False
+        if allow_apsw:
+            if apsw is None:
+                print("You asked to use APSW to write the database, but I "
+                      "couldn't import it. Falling back on sqlite3.")
+            else:
+                self.enable_apsw = True
         self.initialize_db(clear)
+
+    def _connect(self, filename):
+        """
+        Get a connection to the database.
+        """
+        if self.enable_apsw:
+            # Get an in-memory SQLite 3 connection. (It will only be written to
+            # the given filename when the database is closed.)
+            return apsw.Connection(':memory:')
+        else:
+            # We're using the sqlite3 built into Python, so we'll be writing
+            # to disk the whole time.
+            return sqlite3.connect(filename)
 
     def initialize_db(self, clear=False):
         """
@@ -32,7 +59,7 @@ class SQLiteWriter(object):
         if self.db is not None:
             self.db.close()
 
-        self.db = sqlite3.connect(self.filename)
+        self.db = self._connect(self.filename)
 
         c = self.db.cursor()
         if clear:
@@ -51,7 +78,20 @@ class SQLiteWriter(object):
         return self.db
 
     def close(self):
-        self.db.close()
+        if self.enable_apsw:
+            # We opened the DB in memory before. Now we need to write it to
+            # the disk.
+            target = apsw.Connection(self.filename)
+            print("Writing to %s:" % self.filename)
+            with target.backup('main', self.db, 'main') as backup:
+                while not backup.done:
+                    backup.step(100)
+                    print('\t%s/%s remaining ' % (backup.remaining, backup.pagecount),
+                          end='\r', flush=True)
+            print()
+            target.close()
+        else:
+            self.db.close()
 
 
 class TitleDBWriter(SQLiteWriter):
