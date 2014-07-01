@@ -240,7 +240,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 print("=== Traceback ===")
                 print(traceback.format_exc())
                 failures += 1
-                
+
         assert failures <= 1
         return edges
 
@@ -303,7 +303,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             edge_info = self.parse(text, rule, trace=self.trace)
             if rel is not None:
                 edge_info = [ei.set_rel(rel) for ei in edge_info]
-            
+
             if isinstance(language, tuple):
                 # When there are multiple possible languages, we need to
                 # disambiguate the language based on the target word
@@ -314,7 +314,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
                 ]
             else:
                 edge_info = [ei.set_default_language(language)
-                            for ei in edge_info]
+                             for ei in edge_info]
             edges.extend(
                 [ei.complete_edge(rule, headlang, headword, headpos)
                  for ei in edge_info
@@ -450,7 +450,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         [[Image:Stilles Mineralwasser.jpg|thumb|water (1,2)]].
 
         Parse rules:
-            
+
             image = left_brackets WS "Image:" filename:term
                     { vertical_bar wikitext }* WS right_brackets ;
         """
