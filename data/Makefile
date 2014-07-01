@@ -174,7 +174,7 @@ build_stats: $(STATS_FILES)
 
 # Remove everything except raw data and dist/
 clean:
-	rm -r assertions edges db extracted
+	rm -rf assertions edges db extracted
 
 # A Makefile idiom that means "don't delete intermediate files"
 .SECONDARY:
