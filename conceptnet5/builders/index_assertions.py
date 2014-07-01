@@ -22,6 +22,7 @@ def index_assertions(input_dir, output_db):
                         print('.', end='')
                         sys.stdout.flush()
             print()
+    writer.close()
 
 
 handle_file = index_assertions

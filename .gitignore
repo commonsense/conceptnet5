@@ -16,6 +16,7 @@ dist/
 env/
 data/assoc
 data/assertions
+data/db
 data/dist
 data/download
 data/edges
@@ -30,5 +31,6 @@ dist/
 stats/
 attic/
 static/img/build/
+lib/apsw*
 logs/*.log
 static/img/build/
