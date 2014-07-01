@@ -100,7 +100,8 @@ def handle_file(filename, output_file, sw_map_file):
     out = JSONStreamWriter(output_file)
     map_out = NTriplesWriter(sw_map_file)
     for line in open(filename, 'rb'):
-        handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
+        if not line.startswith(b'#'):
+            handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
 
 
 def handle_triple(line, reader, out, map_out):
