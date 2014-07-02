@@ -30,26 +30,6 @@ string_type = type('')
 
 POS_RE = re.compile(r'{{Wortart|([^\|]+)')
 
-POS_HEADINGS = {
-    'en': {
-        'Noun': 'n',
-        'Proper noun': 'n',
-        'Verb': 'v',
-        'Adjective': 'a',
-        'Adverb': 'r'
-    },
-    'de': {
-        'Substantiv': 'n',
-        'Eigenname': 'n',
-        'Nachname': 'n',
-        'Vorname': 'n',
-        'Toponym': 'n',
-        'Verb': 'v',
-        'Adjektiv': 'a',
-        'Adverb': 'r'
-    }
-}
-
 # Skip some languages based on their headings.
 # Lojban entries tend to be written in a Lojban/English metalanguage that
 # isn't very useful to parse. "Translingual" is hopelessly non-specific,
