@@ -411,9 +411,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         whose characters we can consume without worrying about backtracking,
         because you can't backtrack into a regex.
 
-        Parse rule:
+        Parse rules:
 
             term = ?/[^\[\]{}<>|:=\n]+/? ;
+            term_or_punct = ?/[^\[\]{}|\n]+/? ;
 
         == HTML syntax ==
 
@@ -440,10 +441,11 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            one_line_text = @:term | comment | html_tag | @:colon | @:equals
+            one_line_text = @:term_or_punct
                           | @:single_left_bracket | @:single_right_bracket
-                          | @:single_left_brace | @:single_right_brace | @:SP ;
-            text = @:NL | @:one_line_text ;
+                          | @:single_left_brace | @:single_right_brace ;
+            one_line_text_without_templates = ?/[^{}\n]*/? ;
+            text = @:one_line_text | @:NL ;
 
         == Images ==
         Images have complex syntax like
@@ -476,6 +478,22 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         # semantics.
         return join_text(ast)
     linktext = one_line_text_with_links = text_with_links = one_line_wikitext = wikitext
+
+    def wikitext_NS(self, ast):
+        """
+        Variants of the 'wikitext' rules where we are going to ignore the
+        semantics.
+
+        Parse rules:
+
+            template_NS = ?/\{\{[^}]+\}\}/? ;
+            template_args_NS = WS vertical_bar term ;
+            wiki_link_NS = ?/\[\[[^]]+\]\]/? ;
+            text_with_links_NS = { wiki_link_NS | text }+ ;
+            one_line_wikitext_NS = { template_NS | one_line_text_without_templates }+ ;
+            wikitext_NS = { template_NS | wiki_link_NS | external_link | text }+ ;
+        """
+        return None
 
     def wiki_link(self, ast):
         """
@@ -539,22 +557,33 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            named_arg = key:term WS equals WS value:wikitext ;
-            template_arg = [ named:named_arg | positional:wikitext ] ;
+            template_arg = [ key:term WS equals ] WS value:wikitext ;
             template_args = { WS vertical_bar WS @+:template_arg }+ ;
         """
         template_value = {}
         position = 1
         for item in ast:
-            if item['named']:
-                key = item['named']['key']
-                value = item['named']['value']
+            if item['key']:
+                key = item['key']
+                value = item['value']
             else:
                 key = position
                 position += 1
-                value = item['positional']
+                value = item['value']
             template_value[key] = value
         return template_value
+
+    def template_args_1(self, ast):
+        """
+        An optimized case for when we care about the value of the first
+        argument only, and we know it should exist.
+
+        Parse rule:
+
+            template_args_1 = WS vertical_bar WS value:wikitext
+                              { vertical_bar wikitext }* ;
+        """
+        return ast['value'].text
 
     def template(self, ast):
         """
@@ -595,13 +624,11 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             translation_name = "t-simple" | "t+" | "t-" | "t0" | "t\\xf8" | "t" ;
             translation_template = left_braces WS translation_name WS
                                    vertical_bar WS language:term WS
-                                   args:template_args right_braces ;
+                                   arg:template_args_1 right_braces ;
         """
-        if 1 not in ast['args']:
-            return None
         return EdgeInfo(
             language=ast['language'].strip(),
-            target=ast['args'][1].text,
+            target=ast['arg'],
             rel='TranslationOf'
         )
 
@@ -638,9 +665,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            translation_entry = bullet SP
+            ttbc_template = left_braces "ttbc" vertical_bar term right_braces ;
+            translation_entry = bullet SP { term_or_punct | ttbc_template colon } SP
                                 { translations+:translation_template
-                                | one_line_text_with_links }+
+                                  one_line_text_without_templates }*
                                 NL ;
         """
         if isinstance(ast, list):
@@ -799,6 +827,14 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return LinkedText(text=text, links=links)
 
     def etyl_template_and_link(self, ast):
+        """
+        Parse rules:
+
+            etyl_template = left_braces WS "etyl" WS vertical_bar language:term
+                            WS template_args_NS right_braces ;
+            etyl_link = link_template | wiki_link ;
+            etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
+        """
         language = ast['etyl']['language'].strip()
         links = [link.set_language(language)
                  for link in ast['link'].links]
@@ -812,7 +848,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         Parse rule:
 
             link_entry = bullet SP [sense:sense_template] SP
-                         { links+:link_template | links+:wiki_link | template
+                         { links+:link_template | links+:wiki_link | template_NS
                          | external_link | one_line_text }+
                          NL ~ ;
         """
@@ -842,7 +878,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         """
         Parse rules:
 
-            link_section = { entries+:link_entry | template | WS }+ ;
+            link_section = { entries+:link_entry | template_NS | WS }+ ;
         """
         return sum(ast['entries'] or [], [])
 
@@ -855,12 +891,8 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
 
         Parse rules:
 
-            etyl_template = left_braces WS "etyl" WS vertical_bar language:term
-                            WS template_args right_braces ;
-            etyl_link = link_template | wiki_link ;
-            etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
             etymology_section = { etym+:etyl_template_and_link | etym+:link_template
-                                | template | wiki_link | external_link | text }+ ;
+                                | template_NS | wiki_link_NS | external_link | text }+ ;
         """
         links = []
         if ast['etym'] is None:
@@ -877,7 +909,7 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
             defn_line = hash_char !bullet SP @:one_line_wikitext NL WS ;
             defn_details = hash_char list_chars SP @:one_line_wikitext NL WS ;
             definition = @:defn_line { defn_details }* ~ ;
-            definition_section = { template | image | WS }* { defns+:definition | one_line_wikitext NL }* ;
+            definition_section = { template_NS | image | WS }* { defns+:definition | one_line_wikitext_NS NL }* ;
         """
         links = []
         if ast['defns'] is None:
@@ -887,10 +919,10 @@ class ConceptNetWiktionarySemantics(wiktionarySemantics):
         return links
 
 
-def main(filename, startrule, trace=False):
+def main(filename, startrule, titledb, trace=False):
     with open(filename) as f:
         text = f.read()
-    semantics = ConceptNetWiktionarySemantics(language='en')
+    semantics = ConceptNetWiktionarySemantics(language='en', titledb=titledb)
     ast = semantics.parse(
         text,
         startrule,
@@ -906,8 +938,9 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--trace', action='store_true',
                         help="output trace information")
     parser.add_argument('file', metavar="FILE", help="the input file to parse")
+    parser.add_argument('titledb', help="Path to the title DB")
     parser.add_argument('startrule', metavar="STARTRULE",
                         help="the start rule for parsing")
     args = parser.parse_args()
 
-    main(args.file, args.startrule, trace=args.trace)
+    main(args.file, args.startrule, titledb=args.titledb, trace=args.trace)
