@@ -144,7 +144,12 @@ class EdgeInfo(object):
             sense = None
 
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
-        end_uri = normalized_concept_uri(self.language, self.target)
+
+        if rule_name == 'synonym_section':
+            end_uri = normalized_concept_uri(headlang, self.target)
+        else:
+            end_uri = normalized_concept_uri(self.language, self.target)
+
         rel = self.rel or 'RelatedTo'
 
         if rel.startswith('~'):
@@ -1041,19 +1046,19 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
         elif heading == 'Übersetzungen':
             rule = 'translation_section'
         elif heading == 'Sinnverwandte Wörter':
-            rule = 'link_section'
+            rule = 'synonym_section'
             rel = 'RelatedTo'
         elif heading == 'Gegenwörter':
-            rule = 'link_section'
+            rule = 'synonym_section'
             rel = 'Antonym'
         elif heading == 'Synonyme':
-            rule = 'link_section'
+            rule = 'synonym_section'
             rel = 'Synonym'
         elif heading == 'Oberbegriffe':
-            rule = 'link_section'
+            rule = 'synonym_section'
             rel = 'IsA'
         elif heading == 'Unterbegriffe':
-            rule = 'link_section'
+            rule = 'synonym_section'
             rel = '~IsA'
 
         return (rule, rel)
@@ -1164,6 +1169,17 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
                 all_links.extend(links)
 
         return all_links
+
+    def synonym_section(self, ast):
+        """
+        A specialized type of link_section for synonyms, antonyms and the like,
+        whose source language should be set to the language of the headword.
+
+        Parse rule:
+
+            synonym_section = links:link_section ;
+        """
+        return ast.links or []
 
     def to_german(self, ast):
         """
