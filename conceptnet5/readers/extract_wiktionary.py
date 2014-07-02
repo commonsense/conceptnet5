@@ -137,14 +137,18 @@ class WiktionaryWriter(object):
             'heading': heading,
             'text': found[0].strip(),
             'sections': [self.handle_section(text2, heading2, level + 1)
-                        for (text2, heading2) in zip(texts, headings)]
+                         for (text2, heading2) in zip(texts, headings)]
         }
         return data
+
+    def close(self):
+        self.titledb.close()
 
 
 def handle_file(input_file, output_dir):
     writer = WiktionaryWriter(output_dir)
     writer.parse_wiktionary_file(input_file)
+    writer.close()
 
 
 if __name__ == '__main__':
