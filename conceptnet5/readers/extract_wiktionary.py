@@ -142,7 +142,7 @@ class WiktionaryWriter(object):
         return data
 
     def close(self):
-        self.titledb.close()
+        self.title_db.close()
 
 
 def handle_file(input_file, output_dir):
