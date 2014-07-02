@@ -14,8 +14,9 @@ if sys.version_info.major < 3:
 else:
     from io import StringIO
 
-
 TESTDATA_DIR = get_support_data_filename("testdata")
+
+
 def data_path(filename):
     return os.path.join(TESTDATA_DIR, filename)
 
