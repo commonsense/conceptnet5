@@ -25,7 +25,7 @@ class SQLiteWriter(object):
     schema = []
     drop_schema = []
 
-    def __init__(self, filename, clear=False, allow_apsw=True):
+    def __init__(self, filename, clear=False, allow_apsw=False):
         self.db = None
         self.filename = filename
         self.enable_apsw = False
