@@ -166,7 +166,7 @@ build_db: $(SQLITE_FILE)
 build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
 	# Once the assertions are built, we can benefit from the link pointing
 	# from ~/.conceptnet5 to this directory.
-	if [ ! -e $(DATA_SYMLINK) ]; ln -s `pwd` $(DATA_SYMLINK); fi
+	if [ ! -e $(DATA_SYMLINK) ]; then ln -s `pwd` $(DATA_SYMLINK); fi
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
