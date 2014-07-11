@@ -9,7 +9,6 @@ from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern
 import traceback
 import sqlite3
-import re
 import os
 import re
 
@@ -237,7 +236,7 @@ class ConceptNetWiktionarySemantics(object):
         """
         self.default_language = language
         self.trace = trace
-        self.titledb = None if not titledb else sqlite3.connect(titledb)
+        self.titledb = sqlite3.connect(titledb)
         self.logger = logger
 
     def parse(self, text, rule_name, **kwargs):
