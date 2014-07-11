@@ -140,7 +140,7 @@ class WiktionaryWriter(object):
         with self.title_db.transaction():
             parser.parse(open(filename))
 
-    def handle_page(self, title, text, site='en.wiktionary.org'):
+    def handle_page(self, title, text, site):
         if ':' not in title:
             found = SECTION_HEADER_RES[2].split(text)
             headings = found[1::2]

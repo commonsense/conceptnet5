@@ -420,6 +420,19 @@ class ConceptNetWiktionarySemantics(object):
             single_left_brace = left_brace !left_brace ;
             single_right_brace = right_brace !right_brace ;
 
+        == Pseudo-link ==
+
+        A pseudo-link is a wiki_link-like string enclosed in doubled quotation
+        marks that is not really a linked sense for the word, but contains
+        information about or directives for its usage. Examples:
+
+        ''[[Taxonomie]]: Biologische Systematik (neulateinisch):'' or
+        ''[[administrativ]]e [[Einheit]]:''
+
+        Parse rule:
+
+            pseudo_link = ?/''[^']+'':?/? SP ;
+
         == Whitespace ==
 
         Whitespace is significant on MediaWiki. Perhaps the most straightforward
@@ -640,8 +653,8 @@ class ConceptNetWiktionarySemantics(object):
                 target = ast['text']
             elif '#' in target:
                 target, language = target.split('#', 1)
-                language = language_code(self.default_language,
-                                         language.strip()) or 'unknown'
+                language = language_code(
+                    self.default_language, language.strip()) or 'unknown'
             if target is not None and language != 'unknown':
                 links.append(EdgeInfo(language=language, target=target.strip()))
 
@@ -1165,7 +1178,6 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
             lang_code = left_braces code:?/[a-z][a-z]/? right_braces ;
         """
-        #return ast.code
         return ast
 
     def gender(self, ast):
@@ -1380,6 +1392,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 # Maps two-letter language code to its parser subclass
 SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 
+
 def main(filename, startrule, titlesdb_path, language, trace=False):
     with open(filename, encoding='utf-8') as f:
         text = f.read()
@@ -1409,6 +1422,8 @@ if __name__ == '__main__':
                         help="parent directory of the SQLite3 titles DB file")
     parser.add_argument('startrule', metavar="STARTRULE",
                         help="the start rule for parsing")
+    parser.add_argument('titlesdb', metavar="FILE",
+                        help="parent directory of the SQLite3 titles DB file")
     args = parser.parse_args()
 
     main(args.file, args.startrule, args.titlesdb, language=args.language,
