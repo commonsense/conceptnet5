@@ -237,7 +237,7 @@ class ConceptNetWiktionarySemantics(object):
         """
         self.default_language = language
         self.trace = trace
-        self.titledb = sqlite3.connect(titledb)
+        self.titledb = None if not titledb else sqlite3.connect(titledb)
         self.logger = logger
 
     def parse(self, text, rule_name, **kwargs):
@@ -371,6 +371,8 @@ class ConceptNetWiktionarySemantics(object):
         """
         Check whether this title, for this language, is known in the database.
         """
+        if not self.titledb:
+            return False
         c = self.titledb.cursor()
         c.execute('select * from titles where language=? and title=?',
                   (language, title.lower()))
@@ -418,19 +420,6 @@ class ConceptNetWiktionarySemantics(object):
             single_right_bracket = right_bracket !right_bracket ;
             single_left_brace = left_brace !left_brace ;
             single_right_brace = right_brace !right_brace ;
-
-        == Pseudo-link ==
-
-        A pseudo-link is a wiki_link-like string enclosed in doubled quotation
-        marks that is not actually a linked sense for the word, but a link to
-        information about or directives for its usage. Examples:
-
-        ''[[Taxonomie]]: Biologische Systematik (neulateinisch):'' or
-        ''[[administrativ]]e [[Einheit]]:''
-
-        Parse rule:
-
-            pseudo_link = ?/''[^']+'':?/? SP ;
 
         == Whitespace ==
 
@@ -517,6 +506,76 @@ class ConceptNetWiktionarySemantics(object):
                     [ right_braces ] ;
         """
         return ast
+
+    def template_args(self, ast):
+        """
+        Template args look like:
+
+            |arg1|arg2|name1=val1|name2=val2
+
+        The `template_args` rule gets a list of values that are either
+        positional or keyword arguments. We turn them into a dictionary,
+        where the positional arguments get keys that are integers starting
+        from 1.
+
+        Parse rules:
+
+            template_arg = [ key:term WS equals ] WS value:wikitext ;
+            template_args = { WS vertical_bar WS @+:template_arg }+ ;
+        """
+        template_value = {}
+        position = 1
+        for item in ast:
+            if item['key']:
+                key = item['key']
+                value = item['value']
+            else:
+                key = position
+                position += 1
+                value = item['value']
+            template_value[key] = value
+        return template_value
+
+    def template_args_1(self, ast):
+        """
+        An optimized case for when we care about the value of the first
+        argument only, and we know it should exist.
+
+        Parse rule:
+
+            template_args_1 = WS vertical_bar WS value:wikitext
+                              { vertical_bar wikitext }* ;
+        """
+        return ast['value'].text
+
+    def template(self, ast):
+        """
+        A simple template looks like this:
+
+            {{archaic}}
+
+        More complex templates take arguments, such as this translation into French:
+
+            {{t+|fr|exemple|m}}
+
+        And very complex templates can have both positional and named arguments:
+
+            {{t|ja|例え|tr=[[たとえ]], tatoe}}
+
+        When we parse a complete template, with a template name and args --
+        which is not the case when we know we're looking for a specific
+        template -- add its name as argument 0.
+
+        Parse rule:
+
+            template = left_braces WS name:term [args:template_args] right_braces ;
+        """
+        if ast['args'] is not None:
+            template_value = ast['args'].copy()
+        else:
+            template_value = {}
+        template_value[0] = ast['name']
+        return template_value
 
     def wikitext(self, ast):
         """
@@ -680,76 +739,6 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
             rule = 'definition_section'
 
         return (rule, rel)
-
-    def template_args(self, ast):
-        """
-        Template args look like:
-
-            |arg1|arg2|name1=val1|name2=val2
-
-        The `template_args` rule gets a list of values that are either
-        positional or keyword arguments. We turn them into a dictionary,
-        where the positional arguments get keys that are integers starting
-        from 1.
-
-        Parse rules:
-
-            template_arg = [ key:term WS equals ] WS value:wikitext ;
-            template_args = { WS vertical_bar WS @+:template_arg }+ ;
-        """
-        template_value = {}
-        position = 1
-        for item in ast:
-            if item['key']:
-                key = item['key']
-                value = item['value']
-            else:
-                key = position
-                position += 1
-                value = item['value']
-            template_value[key] = value
-        return template_value
-
-    def template_args_1(self, ast):
-        """
-        An optimized case for when we care about the value of the first
-        argument only, and we know it should exist.
-
-        Parse rule:
-
-            template_args_1 = WS vertical_bar WS value:wikitext
-                              { vertical_bar wikitext }* ;
-        """
-        return ast['value'].text
-
-    def template(self, ast):
-        """
-        A simple template looks like this:
-
-            {{archaic}}
-
-        More complex templates take arguments, such as this translation into French:
-
-            {{t+|fr|exemple|m}}
-
-        And very complex templates can have both positional and named arguments:
-
-            {{t|ja|例え|tr=[[たとえ]], tatoe}}
-
-        When we parse a complete template, with a template name and args --
-        which is not the case when we know we're looking for a specific
-        template -- add its name as argument 0.
-
-        Parse rule:
-
-            template = left_braces WS name:term [args:template_args] right_braces ;
-        """
-        if ast['args'] is not None:
-            template_value = ast['args'].copy()
-        else:
-            template_value = {}
-        template_value[0] = ast['name']
-        return template_value
 
     def translation_template(self, ast):
         """
@@ -1112,6 +1101,23 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
         return (rule, rel)
 
+    def pseudo_link(self, ast):
+        """
+        == Pseudo-link ==
+
+        A pseudo-link is a wiki_link-like string enclosed in doubled quotation
+        marks that is not actually a linked sense for the word, but a link to
+        information about or directives for its usage. Examples:
+
+        ''[[Taxonomie]]: Biologische Systematik (neulateinisch):'' or
+        ''[[administrativ]]e [[Einheit]]:''
+
+        Parse rule:
+
+            pseudo_link = ?/''[^']+'':?/? WS ;
+        """
+        return None
+
     def sense_num(self, ast):
         """
         A 'sense_num' is a single or double digit, optionally followed by a
@@ -1160,7 +1166,8 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
             lang_code = left_braces code:?/[a-z][a-z]/? right_braces ;
         """
-        return ast.code
+        #return ast.code
+        return ast
 
     def gender(self, ast):
         """
@@ -1259,16 +1266,14 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
         Parse rules:
 
-            number = left_bracket num:sense_num right_bracket ;
-            tr_base = [ number SP ]
+            tr_base = [ left_bracket num:sense_num right_bracket SP ]
                       left_braces ?/Ü[x]*/? vertical_bar text vertical_bar
                       [ target:term [ vertical_bar original:term ] ]
-                      right_braces [ SP gender ] [ SP number ]
-                      [ ( comma | semicolon ) SP ] ;
-            from_german = bullet lang:lang_code colon SP tr:{ tr_base }+ WS ;
+                      right_braces [ SP gender ] [ ( comma | semicolon ) SP ] ;
+            from_german = bullet >lang_code colon SP tr:{ tr_base }+ WS ;
         """
         links = []
-        lang = ast.lang
+        lang = ast.code
         prev_num = []
         for t in ast.tr:
             if not t.target:
@@ -1325,12 +1330,11 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
 
         Parse rules:
 
-            directive = ( ?/\*?''[^\[]+\[\[[^\]]+\]\]:''/? | ?/\*[^:]+:/? ) NL ;
-            line = colon SP [ colon ] SP
+            line = colon [ colon ] SP
                    [ left_bracket ] num:( dash | ?/[0-9a-e]+/? ) [ right_bracket ]
                    [ SP ] [ template ] [ pseudo_link ]
                    ( sense:one_line_wikitext [ SP template ] | text ) NL ;
-            definition_section = [ bullet_no_links ] [ { line }+ ] ;
+            definition_section = { ( bullet pseudo_link ) | line }+ ;
         """
         def process_item(item, sense, linked_texts):
             curr_sense = sense

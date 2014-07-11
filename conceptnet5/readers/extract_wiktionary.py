@@ -224,7 +224,10 @@ LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
 
 
 def handle_file(input_file, output_dir, language):
-    writer = LANGUAGE_TO_WRITER[language](output_dir)
+    """Utility method for unit testing. Primary difference from the main usage
+    is that it sets the number of files to 1 to make retrieving the output
+    more straightforward."""
+    writer = LANGUAGE_TO_WRITER[language](output_dir, nfiles=1)
     writer.parse_wiktionary_file(input_file)
     writer.close()
 

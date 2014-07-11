@@ -12,8 +12,8 @@ import sys
 SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 
 
-def run_wiktionary(input_file, output_file, titledb, language='en', verbosity=0,
-                   logger=sys.stdout):
+def run_wiktionary(input_file, output_file, titledb, language='en',
+                   verbosity=0, logger=sys.stdout):
     trace = (verbosity >= 2)
     sem = SEMANTICS[language](language, titledb=titledb, trace=trace,
                               logger=logger)
@@ -24,9 +24,6 @@ def run_wiktionary(input_file, output_file, titledb, language='en', verbosity=0,
                 print(edge['rel'], edge['start'], edge['end'])
             output.write(edge)
 
-
-# Entry point for testing
-handle_file = run_wiktionary
 
 def main():
     import argparse
