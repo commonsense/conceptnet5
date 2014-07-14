@@ -223,11 +223,11 @@ class DeWiktionaryWriter(WiktionaryWriter):
 LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
 
 
-def handle_file(input_file, output_dir, language):
+def handle_file(input_file, output_dir, language, nfiles=20):
     """Utility method for unit testing. Primary difference from the main usage
     is that it sets the number of files to 1 to make retrieving the output
     more straightforward."""
-    writer = LANGUAGE_TO_WRITER[language](output_dir, nfiles=1)
+    writer = LANGUAGE_TO_WRITER[language](output_dir, nfiles=nfiles)
     writer.parse_wiktionary_file(input_file)
     writer.close()
 
@@ -237,8 +237,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
-    parser.add_argument('-l', '--language', default='en',
+    parser.add_argument('-l', '--language', choices=['de', 'en'], default='en',
                         help='Two-letter ISO language code of the input file')
+    parser.add_argument('-n', '--nfiles', type=int, default=20,
+                        help='Number of output files to create')
+
     args = parser.parse_args()
 
-    handle_file(args.input, args.output, args.language)
+    handle_file(args.input, args.output, args.language, args.nfiles)

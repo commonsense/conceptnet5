@@ -76,7 +76,7 @@ def test_wiktionary_extraction():
     input_file = data_path('input/wiktionary.xml')
     reference_output = data_path('output/en_wiktionary.jsons')
     with TemporaryDirectory() as tempdir:
-        extract_wiktionary.handle_file(input_file, tempdir, 'en')
+        extract_wiktionary.handle_file(input_file, tempdir, 'en', nfiles=1)
         with codecs.open(reference_output, encoding='utf-8') as fp:
             reference_jsons = sorted([json.loads(x) for x in fp.readlines()],
                                      key=lambda x: x['title'])
