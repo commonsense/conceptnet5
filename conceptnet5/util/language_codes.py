@@ -75,7 +75,7 @@ def _setup():
         # "bibliographic" code, apparently by historical accident.
         # If this is the case, the entry will look like:
         #
-        #    xxx (B),yyy (T)*
+        #    xxx (B),yyy (T)
         # We want the the "terminology" one.
         multi_code_match = re.match(r'(...) \(B\),(...) \(T\)', alpha3)
         if multi_code_match:
@@ -90,12 +90,6 @@ def _setup():
         NAME_TO_CODE['en'][en_name] = codes[0]
         NAME_TO_CODE['de'][de_name] = codes[0]
         NAME_TO_CODE['fr'][fr_name] = codes[0]
-
-        # For many Chinese sub-languages, the ISO standard includes "Chinese"
-        # at the end of the name, which Wiktionary omits.
-        if en_name.endswith(' Chinese'):
-            shorter_language_name = en_name[:-len(' Chinese')]
-            NAME_TO_CODE['en'][shorter_language_name] = codes[0]
 
     # Add some exceptions not covered in the official standard
     NAME_TO_CODE['en']['Cantonese'] = 'yue'
