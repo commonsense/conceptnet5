@@ -420,19 +420,6 @@ class ConceptNetWiktionarySemantics(object):
             single_left_brace = left_brace !left_brace ;
             single_right_brace = right_brace !right_brace ;
 
-        == Pseudo-link ==
-
-        A pseudo-link is a wiki_link-like string enclosed in doubled quotation
-        marks that is not really a linked sense for the word, but contains
-        information about or directives for its usage. Examples:
-
-        ''[[Taxonomie]]: Biologische Systematik (neulateinisch):'' or
-        ''[[administrativ]]e [[Einheit]]:''
-
-        Parse rule:
-
-            pseudo_link = ?/''[^']+'':?/? SP ;
-
         == Whitespace ==
 
         Whitespace is significant on MediaWiki. Perhaps the most straightforward
