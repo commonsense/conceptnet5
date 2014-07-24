@@ -155,7 +155,8 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     activity = parts_dict["activity"]
 
-    creator_node = join_uri('/s/contributor/omcs', parts_dict["creator"])
+    creator_node = join_uri('/s/contributor/omcs',
+                            normalize_text(parts_dict["creator"]))
     activity_node = join_uri('/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
@@ -219,7 +220,7 @@ class CN4Builder(object):
 
         if can_skip(parts_dict):
             return
-        
+
         # build the assertion
         frame_text = build_frame_text(parts_dict)
         relation = build_relation(parts_dict)
