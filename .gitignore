@@ -10,7 +10,6 @@ evaluation/data
 enwiktionary.xml
 wikipedia.txt
 secrets.py
-*.zip
 *.tar.bz2
 *.tar.gz
 dist/
@@ -32,6 +31,7 @@ dist/
 stats/
 attic/
 static/img/build/
-lib/apsw*
 logs/*.log
+*.zip
 static/img/build/
+lib/apsw-3.8.5-r1/
