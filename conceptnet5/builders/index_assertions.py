@@ -14,13 +14,13 @@ def index_assertions(input_dir, output_db):
             print("\tIndexing %s" % filename, end='')
             sys.stdout.flush()
             count = 0
-            with writer.transaction():
-                for assertion, offset in read_json_stream(path, offsets=True):
-                    writer.add(assertion, filename, offset)
-                    count += 1
-                    if count % 10000 == 0:
-                        print('.', end='')
-                        sys.stdout.flush()
+            for assertion, offset in read_json_stream(path, offsets=True):
+                writer.add(assertion, filename, offset)
+                count += 1
+                if count % 10000 == 0:
+                    print('.', end='')
+                    sys.stdout.flush()
+            writer.commit()
             print()
     writer.close()
 

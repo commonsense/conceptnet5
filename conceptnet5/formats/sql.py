@@ -131,72 +131,91 @@ def edge_id_hash(edge_id):
         return val
 
 
-class EdgeIndexWriter(SQLiteWriter):
+class EdgeIndexWriter(object):
     schema = [
-        """CREATE TABLE IF NOT EXISTS edges (
-            id integer PRIMARY KEY,
-            filename text,
-            offset integer
-        )""",
         """CREATE TABLE IF NOT EXISTS text_index (
             queryhash integer,
-            edge_id integer,
+            filenum integer,
+            offset integer,
             weight real,
             complete bool
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (queryhash, edge_id)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS prefix_uniq on text_index (queryhash, filenum, offset)",
         "CREATE INDEX IF NOT EXISTS prefix_lookup on text_index (queryhash ASC, weight DESC)",
         "PRAGMA synchronous = OFF",
         "PRAGMA journal_mode = OFF"
     ]
     drop_schema = [
-        "DROP TABLE IF EXISTS edges",
         "DROP TABLE IF EXISTS text_index"
     ]
 
-    def add(self, edge, filename, offset):
-        edge_id = self.add_edge(edge, filename, offset)
+    def __init__(self, filename, clear=False, nshards=10):
+        self.dbs = {}
+        self.filename = filename
+        self.nshards = nshards
+        self.initialize_dbs(clear)
+
+    def initialize_dbs(self, clear=False):
+        self.close()
+
+        for i in range(self.nshards):
+            self.dbs[i] = sqlite3.connect('%s%d.db' % (self.filename, i))
+            c = self.dbs[i].cursor()
+            if clear:
+                for cmd in self.drop_schema:
+                    c.execute(cmd)
+
+            c = self.dbs[i].cursor()
+            for cmd in self.schema:
+                c.execute(cmd)
+
+    def close(self):
+        for db in self.dbs.values():
+            db.close()
+        self.dbs = {}
+
+    def commit(self):
+        for db in self.dbs.values():
+            db.commit()
+
+    def add(self, edge, filenum, offset):
         for field in ('uri', 'rel', 'start', 'end', 'dataset'):
-            self.add_prefixes(edge_id, edge[field], edge['weight'])
+            self.add_prefixes(filenum, offset, edge[field], edge['weight'])
         for source in edge['sources']:
-            self.add_prefixes(edge_id, source, edge['weight'])
+            self.add_prefixes(filenum, offset, source, edge['weight'])
         for feature in edge['features']:
-            self.add_string_index(edge_id, feature, edge['weight'])
-        if edge.get('surfaceText'):
-            for text in SURFACE_TEXT_RE.findall(edge['surfaceText']):
-                self.add_string_index(edge_id, text, edge['weight'])
+            self.add_string_index(filenum, offset, feature, edge['weight'])
+        ## We might not actually want to index by surface text. If we want to
+        ## sort edges with different surface texts, we could also do it at
+        ## lookup time.
+        #
+        #if edge.get('surfaceText'):
+        #    for text in SURFACE_TEXT_RE.findall(edge['surfaceText']):
+        #        self.add_string_index(filenum, offset, text, edge['weight'])
 
-    def add_edge(self, edge, filename, offset):
-        edge_id = edge_id_hash(edge['id'])
-        c = self.db.cursor()
-        c.execute(
-            "INSERT OR REPLACE INTO edges (id, filename, offset) "
-            "VALUES (?, ?, ?)",
-            (edge_id, filename, offset)
-        )
-        return edge_id
-
-    def add_prefixes(self, edge_id, path, weight):
-        c = self.db.cursor()
+    def add_prefixes(self, filenum, offset, path, weight):
         for prefix in uri_prefixes(path):
             complete = (prefix == path)
             queryhash = minihash(prefix)
+            shard = queryhash % self.nshards
+            c = self.dbs[shard].cursor()
             c.execute(
                 "INSERT OR IGNORE INTO text_index "
-                "(queryhash, edge_id, weight, complete) "
-                "VALUES (?, ?, ?, ?)",
-                (queryhash, edge_id, weight, complete)
+                "(queryhash, filenum, offset, weight, complete) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (queryhash, filenum, offset, weight, complete)
             )
 
-    def add_string_index(self, edge_id, string, weight):
-        c = self.db.cursor()
+    def add_string_index(self, filenum, offset, string, weight):
         complete = True
         queryhash = minihash(string)
+        shard = queryhash % self.nshards
+        c = self.dbs[shard].cursor()
         c.execute(
             "INSERT OR IGNORE INTO text_index "
-            "(queryhash, edge_id, weight, complete) "
-            "VALUES (?, ?, ?, ?)",
-            (queryhash, edge_id, weight, complete)
+            "(queryhash, filenum, offset, weight, complete) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (queryhash, filenum, offset, weight, complete)
         )
 
 
