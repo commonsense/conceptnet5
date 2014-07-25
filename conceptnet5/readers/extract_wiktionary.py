@@ -3,7 +3,7 @@
 from __future__ import unicode_literals, print_function
 
 """
-Takes in a Wiktionary XML file, and outputs a JSON stream (.jsons) of objects
+Takes in a Wiktionary XML file, and outputs msgpack streams of objects
 that split the entries into sections. Each language section is a top-level
 object, and it contains objects for the subsections within it.
 """
@@ -13,7 +13,7 @@ from xml.sax.handler import feature_namespaces
 import re
 import logging
 from ftfy import ftfy
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.sql import TitleDBWriter
 from conceptnet5.util.language_codes import NAME_TO_CODE
 logger = logging.getLogger(__name__)
@@ -102,7 +102,7 @@ class ExtractPages(ContentHandler):
 class WiktionaryWriter(object):
     """
     Parses a wiktionary file in XML format and saves the results to a set of
-    files in JSON format and a SQLite database.
+    files in msgpack format and a SQLite database.
 
     Subclasses most likely want to override the methods `_get_language()` and
     `handle_section()`.
@@ -110,7 +110,7 @@ class WiktionaryWriter(object):
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
         self.writers = [
-            JSONStreamWriter(output_dir + '/wiktionary_%02d.jsons' % i)
+            MsgpackStreamWriter(output_dir + '/wiktionary_%02d.msgpack' % i)
             for i in range(nfiles)
         ]
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)

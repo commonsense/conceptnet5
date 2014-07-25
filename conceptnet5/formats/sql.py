@@ -5,7 +5,7 @@ import struct
 import json
 import os
 import re
-from hashlib import sha1
+from hashlib import md5
 
 INT_LIMIT = 2 ** 63 - 1
 SURFACE_TEXT_RE = re.compile(r'\[\[(.*?)\]\]')
@@ -86,7 +86,7 @@ class SQLiteWriter(object):
             with target.backup('main', self.db, 'main') as backup:
                 while not backup.done:
                     backup.step(100)
-                    print('\t%s/%s remaining ' % (backup.remaining, backup.pagecount),
+                    print('\t%s/%s remaining  ' % (backup.remaining, backup.pagecount),
                           end='\r', flush=True)
             print()
             target.close()
@@ -116,7 +116,7 @@ def minihash(index):
     Get a 32-bit SHA1 hash of the given index string, which can be stored
     compactly in the DB as an integer.
     """
-    dbytes = sha1(index.encode('utf-8')).digest()[:4]
+    dbytes = md5(index.encode('utf-8')).digest()[:4]
     return struct.unpack('>i', dbytes)[0]
 
 
@@ -131,7 +131,7 @@ def edge_id_hash(edge_id):
         return val
 
 
-class EdgeIndexWriter(object):
+class EdgeIndexWriter(SQLiteWriter):
     schema = [
         """CREATE TABLE IF NOT EXISTS text_index (
             queryhash integer,
@@ -149,34 +149,12 @@ class EdgeIndexWriter(object):
         "DROP TABLE IF EXISTS text_index"
     ]
 
-    def __init__(self, filename, clear=False, nshards=10):
-        self.dbs = {}
-        self.filename = filename
+    def __init__(self, filename, shard_num, nshards, clear=False,
+                 allow_apsw=False):
+        SQLiteWriter.__init__(self, filename, clear=clear,
+                              allow_apsw=allow_apsw)
+        self.shard_num = shard_num
         self.nshards = nshards
-        self.initialize_dbs(clear)
-
-    def initialize_dbs(self, clear=False):
-        self.close()
-
-        for i in range(self.nshards):
-            self.dbs[i] = sqlite3.connect('%s%d.db' % (self.filename, i))
-            c = self.dbs[i].cursor()
-            if clear:
-                for cmd in self.drop_schema:
-                    c.execute(cmd)
-
-            c = self.dbs[i].cursor()
-            for cmd in self.schema:
-                c.execute(cmd)
-
-    def close(self):
-        for db in self.dbs.values():
-            db.close()
-        self.dbs = {}
-
-    def commit(self):
-        for db in self.dbs.values():
-            db.commit()
 
     def add(self, edge, filenum, offset):
         for field in ('uri', 'rel', 'start', 'end', 'dataset'):
@@ -198,7 +176,21 @@ class EdgeIndexWriter(object):
             complete = (prefix == path)
             queryhash = minihash(prefix)
             shard = queryhash % self.nshards
-            c = self.dbs[shard].cursor()
+            if shard == self.shard_num:
+                c = self.db.cursor()
+                c.execute(
+                    "INSERT OR IGNORE INTO text_index "
+                    "(queryhash, filenum, offset, weight, complete) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    (queryhash, filenum, offset, weight, complete)
+                )
+
+    def add_string_index(self, filenum, offset, string, weight):
+        complete = True
+        queryhash = minihash(string)
+        shard = queryhash % self.nshards
+        if shard == self.shard_num:
+            c = self.db.cursor()
             c.execute(
                 "INSERT OR IGNORE INTO text_index "
                 "(queryhash, filenum, offset, weight, complete) "
@@ -206,25 +198,20 @@ class EdgeIndexWriter(object):
                 (queryhash, filenum, offset, weight, complete)
             )
 
-    def add_string_index(self, filenum, offset, string, weight):
-        complete = True
-        queryhash = minihash(string)
-        shard = queryhash % self.nshards
-        c = self.dbs[shard].cursor()
-        c.execute(
-            "INSERT OR IGNORE INTO text_index "
-            "(queryhash, filenum, offset, weight, complete) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (queryhash, filenum, offset, weight, complete)
-        )
-
 
 class EdgeIndexReader(object):
-    def __init__(self, filename, edge_dir):
+    def __init__(self, filename, edge_dir, nshards=8):
         self.filename = filename
         self.edge_dir = edge_dir
         self.open_file_cache = {}
-        self.db = sqlite3.connect(filename)
+        self.dbs = {}
+        self.nshards = nshards
+        self._connect()
+
+    def _connect(self):
+        for i in range(self.nshards):
+            filename = '%s.%d' % (self.filename, i)
+            self.dbs[i] = sqlite3.connect(filename)
 
     def lookup(self, query, complete=False, limit=None, offset=0):
         if limit is None:
@@ -233,7 +220,8 @@ class EdgeIndexReader(object):
             pseudo_limit = limit
 
         mh = minihash(query)
-        c = self.db.cursor()
+        shard = mh % self.nshards
+        c = self.dbs[shard].cursor()
         complete_req = ''
         if complete:
             complete_req = ' AND complete = true'
@@ -243,7 +231,7 @@ class EdgeIndexReader(object):
         # this way is the `complete_req` defined just above. Don't worry,
         # there's no room for a SQL injection.
         c.execute(
-            "SELECT e.filename, e.offset from edges e, text_index t "
+            "SELECT filenum, offset from edges e, text_index t "
             "WHERE t.edge_id = e.id AND t.queryhash = ? "
             "%s ORDER BY t.weight DESC LIMIT ? OFFSET ?" % complete_req,
             (mh, pseudo_limit, offset)

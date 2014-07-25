@@ -1,28 +1,31 @@
 from __future__ import print_function
 from conceptnet5.formats.sql import EdgeIndexWriter
-from conceptnet5.formats.json_stream import read_json_stream
+from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import os
 import sys
 
 
-def index_assertions(input_dir, output_db):
-    filenames = sorted(os.listdir(input_dir))
-    writer = EdgeIndexWriter(output_db)
-    for filename in filenames:
-        if filename.endswith('.jsons'):
+def index_assertions(input_dir, output_db, shards=8, inputs=20):
+    for writer_index in range(shards):
+        print("Writing shard #%d" % writer_index)
+        dbname = '%s.%d' % (output_db, writer_index)
+        writer = EdgeIndexWriter(dbname, writer_index, shards,
+                                 clear=True, allow_apsw=True)
+        for filenum in range(inputs):
+            filename = 'part_%02d.msgpacks' % filenum
             path = os.path.join(input_dir, filename)
             print("\tIndexing %s" % filename, end='')
             sys.stdout.flush()
             count = 0
-            for assertion, offset in read_json_stream(path, offsets=True):
-                writer.add(assertion, filename, offset)
-                count += 1
-                if count % 10000 == 0:
-                    print('.', end='')
-                    sys.stdout.flush()
-            writer.commit()
+            with writer.transaction():
+                for assertion, offset in read_msgpack_stream(path, offsets=True):
+                    writer.add(assertion, filenum, offset)
+                    count += 1
+                    if count % 10000 == 0:
+                        print('.', end='')
+                        sys.stdout.flush()
             print()
-    writer.close()
+        writer.close()
 
 
 handle_file = index_assertions

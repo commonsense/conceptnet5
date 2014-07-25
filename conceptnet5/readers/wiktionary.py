@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from conceptnet5.wiktparse.rules import (EnWiktionarySemantics,
                                          DeWiktionarySemantics)
-from conceptnet5.formats.json_stream import read_json_stream, JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import read_msgpack_stream, MsgpackStreamWriter
 import logging
 import os
 import sys
@@ -17,8 +17,8 @@ def run_wiktionary(input_file, output_file, titledb, language='en',
     trace = (verbosity >= 2)
     sem = SEMANTICS[language](language, titledb=titledb, trace=trace,
                               logger=logger)
-    output = JSONStreamWriter(output_file)
-    for structure in read_json_stream(input_file):
+    output = MsgpackStreamWriter(output_file)
+    for structure in read_msgpack_stream(input_file):
         for edge in sem.parse_structured_entry(structure):
             if verbosity >= 1:
                 print(edge['rel'], edge['start'], edge['end'])
@@ -28,7 +28,7 @@ def run_wiktionary(input_file, output_file, titledb, language='en',
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', help="Extracted .jsons file of Wiktionary sections")
+    parser.add_argument('input_file', help="Extracted .msgpack file of Wiktionary sections")
     parser.add_argument('output_file', help='Output filename')
     parser.add_argument('-v', '--verbosity', action='count', default=0,
                         help='Increase output verbosity')

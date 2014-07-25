@@ -2,10 +2,8 @@ from __future__ import unicode_literals
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
-
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import yaml
-import sys
 
 
 # The language codes used by GlobalMind were idiosyncratic, and need to be
@@ -61,9 +59,9 @@ def build_from_dir(dirname, output_file):
     """
     Read a GlobalMind database exported in YAML files, translate
     it into ConceptNet 5 edges, and write those edges to disk using
-    a JSONStreamWriter.
+    a MsgpackStreamWriter.
     """
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     userdata = yaml.load_all(open(dirname + '/GMUser.yaml'))
     users = {}
 
@@ -83,6 +81,11 @@ def build_from_dir(dirname, output_file):
         frametext = frame['text']
         userinfo = users[obj['author']]
         username = userinfo['fields']['username']
+
+        # If the username is 'openmind', it's an initial data import that will
+        # be duplicated by the ConceptNet reader.
+        if username == 'openmind':
+            continue
 
         # As far as I can tell, GlobalMind used the same namespace of
         # usernames as the original Open Mind.
@@ -166,7 +169,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help="Directory containing WordNet files")
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('output', help='msgpack file to output to')
     args = parser.parse_args()
     build_from_dir(args.input_dir, args.output)
 

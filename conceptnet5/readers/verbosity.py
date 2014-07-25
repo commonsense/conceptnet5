@@ -2,11 +2,10 @@ from __future__ import print_function, unicode_literals, division
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
 from collections import defaultdict
 import re
-import sys
 
 # If any word in a clue matches one of these words, it is probably a bad
 # common-sense assertion.
@@ -42,7 +41,7 @@ def handle_file(infile, outfile):
 
     sources = ['/s/site/verbosity']
 
-    writer = JSONStreamWriter(outfile)
+    writer = MsgpackStreamWriter(outfile)
 
     for line in open(infile):
         parts = line.strip().split('\t')
@@ -180,7 +179,7 @@ def handle_file(infile, outfile):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('input', help='Msgpack file of input')
+    parser.add_argument('output', help='Msgpack file to output to')
     args = parser.parse_args()
     handle_file(args.input, args.output)

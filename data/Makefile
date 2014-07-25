@@ -110,6 +110,8 @@ PIECES  := 	00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.cs
 			10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
 JPIECES := 	00.jsons 01.jsons 02.jsons 03.jsons 04.jsons 05.jsons 06.jsons 07.jsons 08.jsons 09.jsons\
 			10.jsons 11.jsons 12.jsons 13.jsons 14.jsons 15.jsons 16.jsons 17.jsons 18.jsons 19.jsons
+MPIECES := 	00.msgpack 01.msgpack 02.msgpack 03.msgpack 04.msgpack 05.msgpack 06.msgpack 07.msgpack 08.msgpack 09.msgpack\
+			10.msgpack 11.msgpack 12.msgpack 13.msgpack 14.msgpack 15.msgpack 16.msgpack 17.msgpack 18.msgpack 19.msgpack
 
 # File names
 # ==========
@@ -123,28 +125,28 @@ JPIECES := 	00.jsons 01.jsons 02.jsons 03.jsons 04.jsons 05.jsons 06.jsons 07.js
 # variable is actually needed. I don't remember if there's a particular
 # reason that I used := when I did.
 EDGE_FILES = \
-	edges/dbpedia/instances.jsons edges/dbpedia/properties.jsons \
-	edges/wordnet/wordnet.jsons \
-	edges/verbosity/verbosity.jsons \
-	edges/globalmind/globalmind.jsons \
-	edges/jmdict/jmdict.jsons \
-	$(patsubst %,edges/wiktionary/en/wiktionary_%, $(JPIECES)) \
-	$(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.jsons) $(wildcard raw/conceptnet4_nadya/*.jsons)) \
-	$(patsubst raw/%.txt,edges/%.jsons, $(wildcard raw/conceptnet_zh/*.txt))
+	edges/dbpedia/instances.msgpack edges/dbpedia/properties.msgpack \
+	edges/wordnet/wordnet.msgpack \
+	edges/verbosity/verbosity.msgpack \
+	edges/globalmind/globalmind.msgpack \
+	edges/jmdict/jmdict.msgpack \
+	$(patsubst %,edges/wiktionary/en/wiktionary_%, $(MPIECES)) \
+	$(patsubst raw/%,edges/%, $(wildcard raw/conceptnet4/*.msgpack) $(wildcard raw/conceptnet4_nadya/*.msgpack)) \
+	$(patsubst raw/%.txt,edges/%.msgpack, $(wildcard raw/conceptnet_zh/*.txt))
 
-# When we turn .jsons files into .csv files, we put them in the same place with
+# When we turn .msgpack files into .csv files, we put them in the same place with
 # a different extension.
-CSV_FILES = $(patsubst edges/%.jsons,edges/%.csv, $(EDGE_FILES))
+CSV_FILES = $(patsubst edges/%.msgpack,edges/%.csv, $(EDGE_FILES))
 
 # Build other filenames in similar ways.
 SPLIT_FILES := $(patsubst %,edges/split/edges_%, $(PIECES))
 SORTED_FILES = $(patsubst edges/split/%,edges/sorted/%, $(SPLIT_FILES))
-ASSERTION_FILES = $(patsubst edges/sorted/edges_%.csv,assertions/part_%.jsons, $(SORTED_FILES))
-ASSOC_FILES = $(patsubst assertions/%.jsons,assoc/%.csv, $(ASSERTION_FILES))
-COMBINED_CSVS = $(patsubst assertions/%.jsons,assertions/%.csv, $(ASSERTION_FILES))
+ASSERTION_FILES = $(patsubst edges/sorted/edges_%.csv,assertions/part_%.msgpack, $(SORTED_FILES))
+ASSOC_FILES = $(patsubst assertions/%.msgpack,assoc/%.csv, $(ASSERTION_FILES))
+COMBINED_CSVS = $(patsubst assertions/%.msgpack,assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
-			 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
+			 $(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2 \
 			 $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = stats/relations.txt stats/dataset_languages.txt stats/morestats.txt
@@ -198,27 +200,27 @@ upload : $(DIST_FILES)
 # code changes.
 
 # Read edges from ConceptNet raw files.
-edges/conceptnet4/%.jsons: raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
+edges/conceptnet4/%.msgpack: raw/conceptnet4/%.msgpack $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # nadya.jp output is in the same format as ConceptNet.
-edges/conceptnet4_nadya/%.jsons: raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
+edges/conceptnet4_nadya/%.msgpack: raw/conceptnet4_nadya/%.msgpack $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # zh-TW data from the PTT Pet Game is in a different format, in .txt files.
-edges/conceptnet_zh/%.jsons: raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
+edges/conceptnet_zh/%.msgpack: raw/conceptnet_zh/%.txt $(READERS)/ptt_petgame.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.ptt_petgame $< $@
 
 # GlobalMind objects refer to each other, so the reader has to handle them all
 # in the same process.
-edges/globalmind/globalmind.jsons: raw/globalmind/*.yaml $(READERS)/globalmind.py $(CORE)
+edges/globalmind/globalmind.msgpack: raw/globalmind/*.yaml $(READERS)/globalmind.py $(CORE)
 	@mkdir -p edges/globalmind
 	$(PYTHON) -m conceptnet5.readers.globalmind raw/globalmind $@
 
-# The Wiktionary reader proceeds in two steps. First we extract .jsons files
+# The Wiktionary reader proceeds in two steps. First we extract .msgpack files
 # of individual sections from the huge .xml file.
 #
 # We can't list these 20 files as the outputs of this rule, because then it would run 20 times.
@@ -234,46 +236,46 @@ extracted/wiktionary/en/.done: raw/wiktionary/enwiktionary.xml $(READERS)/extrac
 $(BASE)/wiktparse/en_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
 	cd $(BASE)/wiktparse && $(MAKE) en_parser.py
 
-# The next stage of Wiktionary reading is to run the .jsons files through the
+# The next stage of Wiktionary reading is to run the .msgpack files through the
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
-edges/wiktionary/en/%.jsons: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/rules.py $(CORE)
+edges/wiktionary/en/%.msgpack: extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/rules.py $(CORE)
 	@mkdir -p edges/wiktionary/en
 	$(PYTHON) -m conceptnet5.readers.wiktionary -l en \
 		$(patsubst edges/%,extracted/%,$@) $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
-edges/verbosity/verbosity.jsons: raw/verbosity/verbosity.txt $(READERS)/verbosity.py $(CORE)
+edges/verbosity/verbosity.msgpack: raw/verbosity/verbosity.txt $(READERS)/verbosity.py $(CORE)
 	@mkdir -p edges/verbosity
 	$(PYTHON) -m conceptnet5.readers.verbosity $< $@
 
 # The WordNet script has an additional output, which goes into 'sw_map':
 # a mapping of Semantic Web URLs to ConceptNet 5 nodes.
-edges/wordnet/wordnet.jsons: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py $(CORE)
+edges/wordnet/wordnet.msgpack: raw/wordnet/*.ttl raw/wordnet/full/*.ttl $(READERS)/wordnet.py $(CORE)
 	@mkdir -p edges/wordnet
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.wordnet raw/wordnet $@ sw_map/wordnet.nt
 
 # Read edges from DBPedia. This script also produces an sw_map.
-edges/dbpedia/instances.jsons: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py $(CORE)
+edges/dbpedia/instances.msgpack: raw/dbpedia/instance_types_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_instances.nt
 
-edges/dbpedia/properties.jsons: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
+edges/dbpedia/properties.msgpack: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
 	@mkdir -p edges/dbpedia
 	@mkdir -p sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.nt
 
 # Read Japanese translations from JMDict.
-edges/jmdict/jmdict.jsons: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
+edges/jmdict/jmdict.msgpack: raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)
 	@mkdir -p edges/jmdict
 	$(PYTHON) -m conceptnet5.readers.jmdict $< $@
 
 # This rule covers building any edges/*.csv file from its corresponding
-# .jsons file.
-edges/%.csv: edges/%.jsons $(BUILDERS)/json_to_csv.py
-	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
+# .msgpack file.
+edges/%.csv: edges/%.msgpack $(BUILDERS)/msgpack_to_csv.py
+	$(PYTHON) -m conceptnet5.builders.msgpack_to_csv $< $@
 
 # Gather all the csv files and split them into 20 pieces.
 #
@@ -296,17 +298,17 @@ edges/sorted/%.csv: edges/split/.done
 # An assertion may be built from multiple similar edges, where the only
 # difference between them is the knowledge source. Combine edges with the same
 # assertion URI into single assertions.
-assertions/part_%.jsons: edges/sorted/edges_%.csv $(BUILDERS)/combine_assertions.py
+assertions/part_%.msgpack: edges/sorted/edges_%.csv $(BUILDERS)/combine_assertions.py
 	@mkdir -p assertions
 	$(PYTHON) -m conceptnet5.builders.combine_assertions $< $@ -l /l/CC/By-SA
 
-assertions/%.csv: assertions/%.jsons
-	$(PYTHON) -m conceptnet5.builders.json_to_csv $< $@
+assertions/%.csv: assertions/%.msgpack
+	$(PYTHON) -m conceptnet5.builders.msgpack_to_csv $< $@
 
 # Convert the assertions into unlabeled associations between concepts.
-assoc/%.csv: assertions/%.jsons $(BUILDERS)/json_to_assoc.py
+assoc/%.csv: assertions/%.msgpack $(BUILDERS)/msgpack_to_assoc.py
 	@mkdir -p assoc
-	$(PYTHON) -m conceptnet5.builders.json_to_assoc $< $@
+	$(PYTHON) -m conceptnet5.builders.msgpack_to_assoc $< $@
 
 # Combine all associations into one file.
 assoc/all.csv: $(ASSOC_FILES)
@@ -327,9 +329,9 @@ $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ raw/*/*
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_FILES)
+$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ assertions/*.jsons
+	$(TARBALL_CREATE) $@ assertions/*.msgpack
 
 $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(SQLITE_FILE)
 	@mkdir -p $(OUTPUT_FOLDER)

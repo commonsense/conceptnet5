@@ -3,7 +3,7 @@ import xmltodict
 import re
 import codecs
 from conceptnet5.util.language_codes import CODE_TO_NAME, NAME_TO_CODE
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
@@ -115,7 +115,7 @@ def handle_file(filename, output_file):
     """
     # Read the XML file as UTF-8, and parse it into a dictionary.
     file = codecs.open(filename, encoding='utf-8')
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     data = file.read()
     file.close()
     xml = xmltodict.parse(data)
@@ -200,7 +200,7 @@ def handle_file(filename, output_file):
 
 def output_edge(out, subj_concept, obj_concept):
     """
-    Write an edge to `out`, an instance of JSONFileWriter.
+    Write an edge to `out`, an instance of MsgpackStreamWriter.
     """
     rel = '/r/TranslationOf'
     edge = make_edge(rel, subj_concept, obj_concept,
@@ -215,7 +215,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='XML copy of JMDict to read')
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('output', help='msgpack-stream file to output to')
     args = parser.parse_args()
     handle_file(args.input, args.output)
 

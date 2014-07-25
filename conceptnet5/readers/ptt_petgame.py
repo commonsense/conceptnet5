@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 import codecs
 import json
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.util import get_support_data_filename
@@ -28,7 +28,7 @@ def handle_raw_assertion(line):
                     surfaceText=surfaceText, weight=1)
 
 def handle_file(input_filename, output_file):
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     for line in codecs.open(input_filename, encoding='utf-8'):
         line = line.strip()
         if line:
@@ -38,8 +38,8 @@ def handle_file(input_filename, output_file):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('input', help='msgpack file of input')
+    parser.add_argument('output', help='msgpack file to output to')
     args = parser.parse_args()
     handle_file(args.input, args.output)
 

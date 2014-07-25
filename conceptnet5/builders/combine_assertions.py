@@ -2,7 +2,7 @@ from __future__ import unicode_literals, print_function
 import codecs
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import disjunction_uri, parse_compound_uri
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import os
 import math
 
@@ -47,7 +47,7 @@ def combine_assertions(csv_filename, output_file, license):
     """
     Take in a tab-separated, sorted "CSV" file, named `csv_filename`, of
     distinct edges which should be grouped together into assertions. Output a
-    JSON stream of assertions to `output_file`.
+    Msgpack stream of assertions to `output_file`.
 
     The combined assertions will all have the dataset of the first edge that
     produces them, and the license of the strongest license being combined
@@ -66,7 +66,7 @@ def combine_assertions(csv_filename, output_file, license):
     current_weight = 0.
     current_sources = []
 
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     for line in codecs.open(csv_filename, encoding='utf-8'):
         line = line.rstrip('\n')
         if not line:
@@ -149,7 +149,7 @@ def output_assertion(out, **kwargs):
     # Make sure the computed URI is the same as the one we had.
     assert assertion['uri'] == uri, (assertion['uri'], uri)
 
-    # Output the result in a JSON stream.
+    # Output the result in a Msgpack stream.
     out.write(assertion)
 
 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='csv file of input')
-    parser.add_argument('output', help='jsons file to output to')
+    parser.add_argument('output', help='msgpack file to output to')
     parser.add_argument(
         '-l', '--license',
         help='URI of the license to use, such as /l/CC/By-SA'
