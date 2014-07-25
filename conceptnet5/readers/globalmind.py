@@ -82,11 +82,6 @@ def build_from_dir(dirname, output_file):
         userinfo = users[obj['author']]
         username = userinfo['fields']['username']
 
-        # If the username is 'openmind', it's an initial data import that will
-        # be duplicated by the ConceptNet reader.
-        if username == 'openmind':
-            continue
-
         # As far as I can tell, GlobalMind used the same namespace of
         # usernames as the original Open Mind.
         user_source = "/s/contributor/omcs/%s" % username
@@ -123,7 +118,12 @@ def build_from_dir(dirname, output_file):
                          sources=sources,
                          surfaceText=surfaceText,
                          weight=1)
-        out.write(edge)
+
+        # Avoid duplication with the ConceptNet reader, but still save every edge so that we can
+        # handle translations.
+        if username != 'openmind':
+            out.write(edge)
+
         assertions[assertion['pk']] = edge
 
     translationdata = yaml.load_all(open(dirname + '/GMTranslation.yaml'))
@@ -168,7 +168,7 @@ handle_file = build_from_dir
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', help="Directory containing WordNet files")
+    parser.add_argument('input_dir', help="Directory containing GlobalMind files")
     parser.add_argument('output', help='msgpack file to output to')
     args = parser.parse_args()
     build_from_dir(args.input_dir, args.output)
