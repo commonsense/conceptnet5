@@ -12,7 +12,7 @@ class MsgpackStreamWriter(object):
             self.stream = filename_or_stream
         else:
             self.stream = open(filename_or_stream, 'wb')
-        self.packer = msgpack.Packer()
+        self.packer = msgpack.Packer(encoding='utf-8')
 
     def write(self, obj):
         self.stream.write(self.packer.pack(obj))
@@ -27,7 +27,7 @@ def read_msgpack_stream(filename_or_stream, offsets=False):
     else:
         stream = open(filename_or_stream, 'rb')
 
-    unpacker = msgpack.Unpacker(stream)
+    unpacker = msgpack.Unpacker(stream, encoding='utf-8')
     for value in unpacker:
         if offsets:
             yield (value, stream.tell())

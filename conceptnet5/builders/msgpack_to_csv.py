@@ -6,7 +6,7 @@ import codecs
 def convert_to_tab_separated(input_filename, output_filename):
     out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
     for info in read_msgpack_stream(input_filename):
-        if info['surfaceText'] is None:
+        if info.get('surfaceText') is None:
             info['surfaceText'] = ''
         info['weight'] = str(info['weight'])
         columns = [
