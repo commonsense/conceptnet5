@@ -1,8 +1,8 @@
 from __future__ import print_function, unicode_literals
 from conceptnet5.uri import uri_prefixes
+from msgpack import Unpacker
 import sqlite3
 import struct
-import json
 import os
 import re
 from hashlib import md5
@@ -231,15 +231,15 @@ class EdgeIndexReader(object):
         # this way is the `complete_req` defined just above. Don't worry,
         # there's no room for a SQL injection.
         c.execute(
-            "SELECT filenum, offset from edges e, text_index t "
-            "WHERE t.edge_id = e.id AND t.queryhash = ? "
-            "%s ORDER BY t.weight DESC LIMIT ? OFFSET ?" % complete_req,
+            "SELECT filenum, offset from text_index "
+            "WHERE queryhash = ? "
+            "%s ORDER BY weight DESC LIMIT ? OFFSET ?" % complete_req,
             (mh, pseudo_limit, offset)
         )
         if limit is not None:
             rows = c.fetchall()
-            return [self.get_edge(filename, offset)
-                    for (filename, offset) in rows]
+            return [self.get_edge(filenum, offset)
+                    for (filenum, offset) in rows]
         else:
             return self.edge_iterator(c)
 
@@ -248,16 +248,16 @@ class EdgeIndexReader(object):
             rows = cursor.fetchmany()
             if not rows:
                 return
-            for (filename, offset) in rows:
-                yield self.get_edge(filename, offset)
+            for (filenum, offset) in rows:
+                yield self.get_edge(filenum, offset)
 
-    def get_edge(self, filename, offset):
-        if filename in self.open_file_cache:
-            fileobj = self.open_file_cache[filename]
+    def get_edge(self, filenum, offset):
+        if filenum in self.open_file_cache:
+            fileobj = self.open_file_cache[filenum]
         else:
+            filename = 'part_%02d.msgpack' % filenum
             fileobj = open(os.path.join(self.edge_dir, filename), 'rb')
             self.open_file_cache[filename] = fileobj
         fileobj.seek(offset)
-        bline = fileobj.readline()
-        line = bline.decode('utf-8').strip()
-        return json.loads(line)
+        unpacker = Unpacker(fileobj, encoding='utf-8')
+        return unpacker.unpack()
