@@ -33,7 +33,7 @@ BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
 WHITESPACE_RE = re.compile('[\s]')
 
 
-def normalize_text(text):
+def normalize_text(text, lowercase=True):
     """
     When a piece of a URI is an arbitrary string, we standardize it in the
     following ways:
@@ -77,7 +77,9 @@ def normalize_text(text):
     text = text.replace('/', ' ')
     assert (text not in BAD_NAMES_FOR_THINGS), text
     text = text.strip('.,?!"') or text
-    text = WHITESPACE_RE.sub('_', text.lower())
+    if lowercase:
+        text = text.lower()
+    text = WHITESPACE_RE.sub('_', text)
     return text
 
 

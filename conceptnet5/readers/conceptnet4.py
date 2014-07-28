@@ -155,8 +155,10 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     activity = parts_dict["activity"]
 
-    creator_node = join_uri('/s/contributor/omcs',
-                            normalize_text(parts_dict["creator"]))
+    creator_node = join_uri(
+        '/s/contributor/omcs',
+        normalize_text(parts_dict["creator"], lowercase=False)
+    )
     activity_node = join_uri('/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
@@ -242,13 +244,11 @@ class CN4Builder(object):
                     weight=weight
                 )
 
-
     def transform_file(self, input_filename, output_file):
         out = MsgpackStreamWriter(output_file)
         for obj in read_json_stream(input_filename):
             for new_obj in self.handle_assertion(obj):
                 out.write(new_obj)
-        out.close()
 
 
 def handle_file(input_filename, output_file):
