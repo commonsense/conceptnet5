@@ -12,7 +12,7 @@ def index_assertions(input_dir, output_db, shards=8, inputs=20):
         writer = EdgeIndexWriter(dbname, writer_index, shards,
                                  clear=True, allow_apsw=True)
         for filenum in range(inputs):
-            filename = 'part_%02d.msgpacks' % filenum
+            filename = 'part_%02d.msgpack' % filenum
             path = os.path.join(input_dir, filename)
             print("\tIndexing %s" % filename, end='')
             sys.stdout.flush()
