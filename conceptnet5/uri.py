@@ -14,12 +14,12 @@ can be referred to, or retrieved, using this complete URI (in version 5.2):
 """
 
 import sys
+import re
 from ftfy import fix_text
 
 
 if sys.version_info.major >= 3:
     unicode = str
-
 
 # All URIs are conceptually appended to this URL, when we need to interoperate
 # with Semantic Web-style resources.
@@ -28,6 +28,9 @@ ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.2'
 # If we end up trying to fit a piece of text that looks like these into a URI,
 # it will mess up our patterns of URIs.
 BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
+
+# Whitespace should be replaced with underscores in URIs.
+WHITESPACE_RE = re.compile('[\s]')
 
 
 def normalize_text(text):
@@ -60,6 +63,9 @@ def normalize_text(text):
 
         >>> normalize_text('   u\N{COMBINING DIAERESIS}ber\\n')
         'über'
+
+        >>> normalize_text('embedded' + chr(9) + 'tab')
+        'embedded_tab'
     """
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
@@ -71,7 +77,7 @@ def normalize_text(text):
     text = text.replace('/', ' ')
     assert (text not in BAD_NAMES_FOR_THINGS), text
     text = text.strip('.,?!"') or text
-    text = text.lower().replace(' ', '_')
+    text = WHITESPACE_RE.sub('_', text.lower())
     return text
 
 
