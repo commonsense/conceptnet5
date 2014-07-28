@@ -150,7 +150,8 @@ DIST_FILES = $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			 $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = stats/relations.txt stats/dataset_languages.txt stats/morestats.txt
-SQLITE_FILE = db/assertions.db
+DB_DIR = db
+SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 
 # High-level build tasks
 # ======================
@@ -164,7 +165,7 @@ SQLITE_FILE = db/assertions.db
 #     make download all build_assoc upload
 all: build_assertions build_stats build_db
 build_assoc: $(ASSOC_DIR)/u.npy
-build_db: $(SQLITE_FILE)
+build_db: $(DB_DIR)/.done
 build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
 	# Once the assertions are built, we can benefit from the link pointing
 	# from ~/.conceptnet5 to this directory.
@@ -320,9 +321,10 @@ $(ASSOC_DIR)/u.npy: assoc/all.csv
 	$(PYTHON) -m assoc_space.build_conceptnet $< $(ASSOC_DIR)
 
 # Index the assertions in a SQLite database.
-$(SQLITE_FILE): $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
-	@mkdir -p db
+$(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
+	@mkdir -p $(DB_DIR)
 	$(PYTHON) -m conceptnet5.builders.index_assertions assertions/ $@
+	touch $(DB_DIR)/.done
 
 # The following rules are for building the DIST_FILES to be uploaded.
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): raw/*/*
@@ -333,9 +335,9 @@ $(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ assertions/*.msgpack
 
-$(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(SQLITE_FILE)
+$(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(DB_DIR)/.done
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ $(SQLITE_FILE)
+	$(TARBALL_CREATE) $@ $(DB_DIR)
 
 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
