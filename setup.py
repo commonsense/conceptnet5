@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import sys
 
 packages = find_packages()
-version_str = '5.2.3'
+version_str = '5.3b'
 
 if sys.version_info.major == 2:
     nltk_version = 'nltk'
@@ -18,7 +18,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     package_data={'conceptnet5': ['support_data/*']},
-    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako > 3', 'ftfy', 'python-msgpack'],
+    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako > 3', 'ftfy', 'msgpack-python'],
     license = 'GPLv3'
 )
 
