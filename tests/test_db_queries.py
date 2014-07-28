@@ -14,12 +14,12 @@ SPANISH_EXAMPLE = '/a/[/r/RelatedTo/,/c/es/verbigracia/n/,/c/en/example/]'
 
 def setup():
     global FINDER
-    index_assertions(ASSERTIONS_DIR, DB_PATH)
-    FINDER = AssertionFinder(db_filename=DB_PATH, edge_dir=ASSERTIONS_DIR)
+    index_assertions(ASSERTIONS_DIR, DB_PATH, shards=1, inputs=1)
+    FINDER = AssertionFinder(db_filename=DB_PATH, edge_dir=ASSERTIONS_DIR, nshards=1)
 
 
 def teardown():
-    os.unlink(DB_PATH)
+    os.unlink(DB_PATH + '.0')
 
 
 def uris(assertions):

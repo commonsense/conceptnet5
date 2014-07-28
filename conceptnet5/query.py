@@ -32,10 +32,11 @@ def field_match(value, query):
 
 
 class AssertionFinder(object):
-    def __init__(self, db_filename=None, edge_dir=None):
+    def __init__(self, db_filename=None, edge_dir=None, nshards=8):
         self.search_index = None
         self._db_filename = db_filename or get_data_filename('db/assertions.db')
         self._edge_dir = edge_dir or get_data_filename('assertions')
+        self.nshards = nshards
 
     def load_index(self):
         """
@@ -43,7 +44,7 @@ class AssertionFinder(object):
         """
         if self.search_index is None:
             self.search_index = EdgeIndexReader(
-                self._db_filename, self._edge_dir
+                self._db_filename, self._edge_dir, self.nshards
             )
 
     def lookup(self, query, limit=20, offset=0):

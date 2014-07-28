@@ -28,8 +28,11 @@ def read_msgpack_stream(filename_or_stream, offsets=False):
         stream = open(filename_or_stream, 'rb')
 
     unpacker = msgpack.Unpacker(stream, encoding='utf-8')
+    repacker = msgpack.Packer(encoding='utf-8')
+    offset = 0
     for value in unpacker:
         if offsets:
-            yield (value, stream.tell())
+            yield (value, offset)
+            offset += len(repacker.pack(value))
         else:
             yield value
