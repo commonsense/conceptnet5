@@ -228,7 +228,7 @@ class ConceptNetWiktionarySemantics(object):
     as well as the language-specific *_wiktionarySemantics class imported from
     the language-specific parser imported above.
     """
-    def __init__(self, language, titledb, trace=False, logger=None):
+    def __init__(self, language, titledb=None, trace=False, logger=None):
         """
         Basic setup to register the language and the title database. Subclasses
         must first call this method (via super), and then the __init__() method
@@ -236,7 +236,10 @@ class ConceptNetWiktionarySemantics(object):
         """
         self.default_language = language
         self.trace = trace
-        self.titledb = sqlite3.connect(titledb)
+        if titledb is not None:
+            self.titledb = sqlite3.connect(titledb)
+        else:
+            self.titledb = sqlite3.connect(':memory:')
         self.logger = logger
 
     def parse(self, text, rule_name, **kwargs):
@@ -672,7 +675,7 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
     """
     Rules specific to the English wiktionary format.
     """
-    def __init__(self, language, titledb, trace=False, logger=None, **kwargs):
+    def __init__(self, language, titledb=None, trace=False, logger=None, **kwargs):
         super(EnWiktionarySemantics, self).__init__(language, titledb, trace,
                                                     logger)
         en_wiktionarySemantics.__init__(self, **kwargs)
@@ -1049,7 +1052,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
     """
     Rules specific to the German wiktionary format.
     """
-    def __init__(self, language, titledb, trace=False, logger=None, **kwargs):
+    def __init__(self, language, titledb=None, trace=False, logger=None, **kwargs):
         super(DeWiktionarySemantics, self).__init__(language, titledb, trace,
                                                     logger=logger)
         de_wiktionarySemantics.__init__(self, **kwargs)

@@ -1,12 +1,13 @@
 from nose.tools import eq_
 
-from conceptnet5.wiktparse.rules import (EdgeInfo,
-    EnWiktionarySemantics, DeWiktionarySemantics)
+from conceptnet5.wiktparse.rules import (
+    EdgeInfo, EnWiktionarySemantics, DeWiktionarySemantics
+)
 
 # Global variable to hold the parsers for the different languages
 PARSERS = {
-    'en': EnWiktionarySemantics('en', 'abc'),
-    'de': DeWiktionarySemantics('de', 'abc')
+    'en': EnWiktionarySemantics('en'),
+    'de': DeWiktionarySemantics('de')
 }
 
 
