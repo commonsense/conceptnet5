@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function
 import inspect
 import importlib
 import re
+import codecs
 import argparse
 
 RULE_HEADER_RE = re.compile(r'([ ]*)Parse rules?:', re.IGNORECASE)
@@ -105,5 +106,5 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     ebnf = extract_ebnf(args.classname)
-    with open(args.output_file, 'w', encoding='utf-8') as outfile:
+    with codecs.open(args.output_file, 'w', encoding='utf-8') as outfile:
         print(ebnf, file=outfile)

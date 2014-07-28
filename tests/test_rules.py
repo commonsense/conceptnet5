@@ -1,3 +1,5 @@
+# coding: utf-8
+from __future__ import unicode_literals
 from nose.tools import eq_
 
 from conceptnet5.wiktparse.rules import (

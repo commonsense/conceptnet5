@@ -117,7 +117,7 @@ def minihash(index):
     compactly in the DB as an integer.
     """
     dbytes = md5(index.encode('utf-8')).digest()[:4]
-    return struct.unpack('>i', dbytes)[0]
+    return struct.unpack(str('>i'), dbytes)[0]
 
 
 def edge_id_hash(edge_id):

@@ -7,13 +7,17 @@ from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import codecs
 import os
 import msgpack
-import json
-from itertools import zip_longest
+import sys
 from tempfile import TemporaryDirectory
 from nose.tools import eq_
 from io import BytesIO, StringIO
 
 TESTDATA_DIR = get_support_data_filename("testdata")
+
+if sys.version_info.major == 2:
+    from itertools import izip_longest as zip_longest
+else:
+    from itertools import zip_longest
 
 
 def data_path(filename):

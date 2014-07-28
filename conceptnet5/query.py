@@ -1,3 +1,4 @@
+# coding: utf-8
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.sql import EdgeIndexReader
 
