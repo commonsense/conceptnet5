@@ -9,7 +9,11 @@ PYTHON = python3
 
 # $(DATA) is where the data will be built. It should be on a filesystem with
 # lots of available space.
-DATA = ./data
+# 
+# Relative paths under this directory are okay, but don't use components that
+# will get normalized away, such as "." and "..", because they'll break the
+# rules that figure out what needs to be built from what.
+DATA = data
 
 # $(READERS) and $(BUILDERS) specify where the scripts that take in raw
 # data and build ConceptNet are located, so we know to rebuild files when
@@ -242,12 +246,20 @@ $(DATA)/extracted/wiktionary/en/.done: $(DATA)/raw/wiktionary/enwiktionary.xml $
 $(BASE)/wiktparse/en_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
 	cd $(BASE)/wiktparse && $(MAKE) en_parser.py
 
+$(BASE)/wiktparse/de_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
+	cd $(BASE)/wiktparse && $(MAKE) de_parser.py
+
 # The next stage of Wiktionary reading is to run the .msgpack files through the
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
 $(DATA)/edges/wiktionary/en/%.msgpack: $(DATA)/extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/rules.py $(CORE)
 	@mkdir -p $(DATA)/edges/wiktionary/en
 	$(PYTHON) -m conceptnet5.readers.wiktionary -l en \
-		$(patsubst edges/%,extracted/%,$@) $@
+		$(patsubst $(DATA)/edges/%,$(DATA)/extracted/%,$@) $@
+
+$(DATA)/edges/wiktionary/de/%.msgpack: $(DATA)/extracted/wiktionary/de/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/de_parser.py $(BASE)/wiktparse/rules.py $(CORE)
+	@mkdir -p $(DATA)/edges/wiktionary/de
+	$(PYTHON) -m conceptnet5.readers.wiktionary -l de \
+		$(patsubst $(DATA)/edges/%,$(DATA)/extracted/%,$@) $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
 # all at once, by one process.
@@ -299,7 +311,7 @@ $(DATA)/edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 # using $(patsubst).
 $(DATA)/edges/sorted/%.csv: $(DATA)/edges/split/.done
 	@mkdir -p $(DATA)/edges/sorted
-	$(SORT) $(patsubst edges/sorted/%,edges/split/%,$@) | uniq > $@
+	$(SORT) $(patsubst $(DATA)/edges/sorted/%,$(DATA)/edges/split/%,$@) | uniq > $@
 
 # An assertion may be built from multiple similar edges, where the only
 # difference between them is the knowledge source. Combine edges with the same
@@ -384,11 +396,11 @@ $(DATA)/stats/concepts.txt: $(DATA)/stats/concepts_left_datasets.txt $(DATA)/sta
 
 ## This doesn't work -- concepts.txt already has counts on it, in a format that
 ## 'cut' doesn't like.
-#stats/concepts_per_language.txt: stats/concepts.txt
-#	$(CUT) -f 2 stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > stats/concepts_per_language.txt
+#$(DATA)/stats/concepts_per_language.txt: $(DATA)/stats/concepts.txt
+#	$(CUT) -f 2 $(DATA)/stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > $(DATA)/stats/concepts_per_language.txt
 
 $(DATA)/stats/dataset_languages.txt: $(DATA)/stats/concepts_left_datasets.txt $(DATA)/stats/concepts_right_datasets.txt
-	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > stats/dataset_vs_language.txt
+	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > $(DATA)/stats/dataset_vs_language.txt
 
 $(DATA)/stats/morestats.txt: $(COMBINED_CSVS)
 	@mkdir -p $(DATA)/stats
