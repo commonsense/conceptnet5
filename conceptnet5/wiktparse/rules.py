@@ -12,18 +12,26 @@ import sqlite3
 import os
 import re
 
+
+class MissingSemantics(object):
+    def parse(self, *args, **kwargs):
+        raise RuntimeError(
+            "The Wiktionary parsers have not yet been built. "
+            "Run 'make parsers'."
+        )
+
 try:
     from conceptnet5.wiktparse.en_parser import (en_wiktionaryParser,
                                                  en_wiktionarySemantics)
 except ImportError:
     # Make some dummy classes, so we can at least load the classes and their
     # docstrings
-    en_wiktionaryParser = en_wiktionarySemantics = object
+    en_wiktionaryParser = en_wiktionarySemantics = MissingSemantics
 try:
     from conceptnet5.wiktparse.de_parser import (de_wiktionaryParser,
                                                  de_wiktionarySemantics)
 except ImportError:
-    de_wiktionaryParser = de_wiktionarySemantics = object
+    de_wiktionaryParser = de_wiktionarySemantics = MissingSemantics
 
 string_type = type('')
 
