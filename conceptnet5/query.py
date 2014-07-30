@@ -1,7 +1,13 @@
 # coding: utf-8
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.sql import EdgeIndexReader
-from itertools import zip_longest as izip_longest
+import sys
+
+
+if sys.version_info.major == 2:
+    from itertools import izip
+else:
+    izip = zip
 
 
 VALID_KEYS = {
@@ -107,13 +113,12 @@ class AssertionFinder(object):
                 if key in INDEXED_KEYS
             ]
 
-        queryzip = zip(*queries)
+        queryzip = izip(*queries)
 
         matches = []
         for result_set in queryzip:
             for candidate in result_set:
                 if candidate is not None:
-                    print(candidate['uri'])
                     okay = True
                     for key, val in criterion_pairs:
                         if not field_match(candidate[key], val):
