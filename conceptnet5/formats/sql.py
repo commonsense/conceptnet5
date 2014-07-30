@@ -236,12 +236,7 @@ class EdgeIndexReader(object):
             "%s ORDER BY weight DESC LIMIT ? OFFSET ?" % complete_req,
             (mh, pseudo_limit, offset)
         )
-        if limit is not None:
-            rows = c.fetchall()
-            return (self.get_edge(filenum, offset)
-                    for (filenum, offset) in rows)
-        else:
-            return self.edge_iterator(c)
+        return self.edge_iterator(c)
 
     def edge_iterator(self, cursor):
         while True:

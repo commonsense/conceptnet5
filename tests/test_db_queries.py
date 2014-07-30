@@ -43,3 +43,11 @@ def test_lookup():
     # Lookup by exact assertion URI
     found = uris(FINDER.lookup(SPANISH_EXAMPLE))
     eq_(found, [SPANISH_EXAMPLE])
+
+    # Lookup by multiple criteria
+    found = uris(FINDER.query({'start': '/c/ja', 'rel': '/r/TranslationOf', 'end': '/c/en/example'}, limit=3))
+    print(found)
+    eq_(found,
+        ['/a/[/r/TranslationOf/,/c/ja/模範/,/c/en/example/]',
+         '/a/[/r/TranslationOf/,/c/ja/例し/,/c/en/example/]',
+         '/a/[/r/TranslationOf/,/c/ja/引き合い/,/c/en/example/]'])

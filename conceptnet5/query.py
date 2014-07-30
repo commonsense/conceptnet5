@@ -36,7 +36,9 @@ def field_match(value, query):
     elif query.endswith('/.'):
         return value == query[:-2]
     else:
-        return value[:len(query)] == query
+        return (value[:len(query)] == query
+                and (len(value) == len(query) or value[len(query)] == '/'))
+
 
 
 class AssertionFinder(object):
@@ -101,7 +103,7 @@ class AssertionFinder(object):
             return []
 
         queries = []
-        criterion_pairs = list(criteria.items())
+        criterion_pairs = sorted(list(criteria.items()))
         if search_key is not None:
             if search_key not in VALID_KEYS:
                 raise KeyError("Unknown criterion: %s" % search_key)
