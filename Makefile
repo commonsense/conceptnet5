@@ -152,6 +152,7 @@ SPLIT_FILES := $(patsubst %,$(DATA)/edges/split/edges_%, $(PIECES))
 SORTED_FILES := $(patsubst $(DATA)/edges/split/%,$(DATA)/edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES := $(patsubst $(DATA)/edges/sorted/edges_%.csv,$(DATA)/assertions/part_%.msgpack, $(SORTED_FILES))
 ASSOC_FILES := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assoc/%.csv, $(ASSERTION_FILES))
+ASSOC_SUBSPACES := $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%, $(ASSOC_FILES))
 COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
@@ -334,19 +335,19 @@ $(DATA)/assoc/%.csv: $(DATA)/assertions/%.msgpack $(BUILDERS)/msgpack_to_assoc.p
 	@mkdir -p $(DATA)/assoc
 	$(PYTHON) -m conceptnet5.builders.msgpack_to_assoc $< $@
 
-# Combine all associations into one file.
-$(DATA)/assoc/all.csv: $(ASSOC_FILES)
-	cat $(ASSOC_FILES) > $@
+# Build vector spaces of associations, using the 'assoc-space' module.
+$(DATA)/assoc/subspaces/%: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space.py
+	@mkdir -p $(DATA)/assoc/subspaces
+	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $@
 
-# Use the external `assoc_space` package to build a dimensionality-reduced
-# matrix of term-term associations.
-$(ASSOC_DIR)/u.npy: $(DATA)/assoc/all.csv
-	$(PYTHON) -m assoc_space.build_conceptnet $< $(ASSOC_DIR)
+# Combine all associations into one file.
+$(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
+	echo "Not implemented yet."
 
 # Index the assertions in a SQLite database.
 $(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	@mkdir -p $(DB_DIR)
-	$(PYTHON) -m conceptnet5.builders.index_assertions $(DATA)/assertions/ $@
+	$(PYTHON) -m conceptnet5.builders.index_assertions $(DATA)/assertions/ $(SQLITE_FILE_BASE)
 	touch $(DB_DIR)/.done
 
 # The following rules are for building the DIST_FILES to be uploaded.
