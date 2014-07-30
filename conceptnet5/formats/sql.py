@@ -238,8 +238,8 @@ class EdgeIndexReader(object):
         )
         if limit is not None:
             rows = c.fetchall()
-            return [self.get_edge(filenum, offset)
-                    for (filenum, offset) in rows]
+            return (self.get_edge(filenum, offset)
+                    for (filenum, offset) in rows)
         else:
             return self.edge_iterator(c)
 

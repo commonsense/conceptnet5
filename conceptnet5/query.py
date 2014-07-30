@@ -1,6 +1,7 @@
 # coding: utf-8
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.sql import EdgeIndexReader
+from itertools import zip_longest as izip_longest
 
 
 VALID_KEYS = {
@@ -48,7 +49,7 @@ class AssertionFinder(object):
                 self._db_filename, self._edge_dir, self.nshards
             )
 
-    def lookup(self, query, limit=20, offset=0):
+    def lookup(self, query, limit=1000, offset=0):
         """
         Look up all assertions associated with the given URI or string
         property. Any of these fields can be matched:
@@ -70,7 +71,8 @@ class AssertionFinder(object):
             complete = False
         return self.search_index.lookup(query, complete, limit=limit, offset=offset)
 
-    def query(self, criteria, search_key=None, limit=20, offset=0):
+    def query(self, criteria, search_key=None, limit=20, offset=0,
+              scan_limit=1000):
         """
         Given a dictionary of criteria, return up to `limit` assertions that
         match all of the criteria.
@@ -92,34 +94,35 @@ class AssertionFinder(object):
         if not criteria:
             return []
 
+        queries = []
+        criterion_pairs = list(criteria.items())
         if search_key is not None:
             if search_key not in VALID_KEYS:
                 raise KeyError("Unknown criterion: %s" % search_key)
-            main_query = criteria[search_key]
+            queries = [self.lookup(criteria[search_key], limit=scan_limit)]
         else:
-            # Find the criterion with the longest query, which will probably
-            # be the most specific match
-            criterion_pairs = [(key, val) for (key, val) in criteria.items()
-                               if key in INDEXED_KEYS]
-            criterion_pairs.sort(lambda pair: -len(pair[1]))
-            if len(criterion_pairs) == 0:
-                raise ValueError(
-                    "None of these criteria are searchable: %s"
-                    % criteria.keys()
-                )
-            main_query = criterion_pairs[0][1]
+            queries = [
+                self.lookup(val, limit=scan_limit)
+                for (key, val) in criterion_pairs
+                if key in INDEXED_KEYS
+            ]
+
+        queryzip = zip(*queries)
 
         matches = []
-        for candidate in self.lookup(main_query, limit=None):
-            okay = True
-            for key, val in criterion_pairs:
-                if not field_match(candidate[key], val):
-                    okay = False
-                    break
-            if okay:
-                matches.append(candidate)
-                if len(matches) >= offset + limit:
-                    break
+        for result_set in queryzip:
+            for candidate in result_set:
+                if candidate is not None:
+                    print(candidate['uri'])
+                    okay = True
+                    for key, val in criterion_pairs:
+                        if not field_match(candidate[key], val):
+                            okay = False
+                            break
+                    if okay:
+                        matches.append(candidate)
+                        if len(matches) >= offset + limit:
+                            return matches[offset:]
         return matches[offset:]
 
 FINDER = AssertionFinder()
