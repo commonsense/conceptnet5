@@ -14,7 +14,7 @@ secrets.py
 *.tar.gz
 dist/
 env/
-data/
+data
 attic/
 static/img/build/
 logs/*.log
