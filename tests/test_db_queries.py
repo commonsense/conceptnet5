@@ -14,7 +14,7 @@ SPANISH_EXAMPLE = '/a/[/r/RelatedTo/,/c/es/verbigracia/n/,/c/en/example/]'
 
 def setup():
     global FINDER
-    index_assertions(ASSERTIONS_DIR, DB_PATH, shards=1, inputs=1)
+    index_assertions(ASSERTIONS_DIR, DB_PATH, input_shards=1, output_shards=1)
     FINDER = AssertionFinder(db_filename=DB_PATH, edge_dir=ASSERTIONS_DIR, nshards=1)
 
 

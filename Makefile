@@ -106,7 +106,7 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 # The replacement expression is simply \1 -- the part of the URI that matched
 # the twice-repeated group.
 
-# 20-way splits
+# 20-way and 8-way splits
 # =============
 # Some steps of the process can be parallelized by splitting the input into
 # independent pieces. Here we create the pieces of filenames necessary to
@@ -114,12 +114,11 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 #
 # You'd think there would be a better way to do this, such as the shell command
 # `seq`, but I couldn't get a shell command to do the right thing here.
-PIECES  := 	00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv 08.csv 09.csv\
-			10.csv 11.csv 12.csv 13.csv 14.csv 15.csv 16.csv 17.csv 18.csv 19.csv
-JPIECES := 	00.jsons 01.jsons 02.jsons 03.jsons 04.jsons 05.jsons 06.jsons 07.jsons 08.jsons 09.jsons\
-			10.jsons 11.jsons 12.jsons 13.jsons 14.jsons 15.jsons 16.jsons 17.jsons 18.jsons 19.jsons
 MPIECES := 	00.msgpack 01.msgpack 02.msgpack 03.msgpack 04.msgpack 05.msgpack 06.msgpack 07.msgpack 08.msgpack 09.msgpack\
 			10.msgpack 11.msgpack 12.msgpack 13.msgpack 14.msgpack 15.msgpack 16.msgpack 17.msgpack 18.msgpack 19.msgpack
+
+# Eventually we distribute edges into 8 pieces.
+PIECES_OF_EIGHT := 00.csv 01.csv 02.csv 03.csv 04.csv 05.csv 06.csv 07.csv
 
 # File names
 # ==========
@@ -148,7 +147,7 @@ EDGE_FILES := \
 CSV_FILES = $(patsubst $(DATA)/edges/%.msgpack,$(DATA)/edges/%.csv, $(EDGE_FILES))
 
 # Build other filenames in similar ways.
-SPLIT_FILES := $(patsubst %,$(DATA)/edges/split/edges_%, $(PIECES))
+SPLIT_FILES := $(patsubst %,$(DATA)/edges/split/edges_%, $(PIECES_OF_EIGHT))
 SORTED_FILES := $(patsubst $(DATA)/edges/split/%,$(DATA)/edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES := $(patsubst $(DATA)/edges/sorted/edges_%.csv,$(DATA)/assertions/part_%.msgpack, $(SORTED_FILES))
 ASSOC_FILES := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assoc/%.csv, $(ASSERTION_FILES))
@@ -308,7 +307,7 @@ $(DATA)/edges/%.csv: $(DATA)/edges/%.msgpack $(BUILDERS)/msgpack_to_csv.py
 # of listing the actual outputs.
 $(DATA)/edges/split/.done: $(CSV_FILES) $(BUILDERS)/distribute_edges.py
 	@mkdir -p $(DATA)/edges/split
-	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o $(DATA)/edges/split -n 20
+	cat $(CSV_FILES) | $(PYTHON) -m conceptnet5.builders.distribute_edges -o $(DATA)/edges/split -n 8
 	touch $(DATA)/edges/split/.done
 
 # Make sorted, uniquified versions of the split-up edge files.
@@ -347,7 +346,7 @@ $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
 # Index the assertions in a SQLite database.
 $(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	@mkdir -p $(DB_DIR)
-	$(PYTHON) -m conceptnet5.builders.index_assertions $(DATA)/assertions/ $(SQLITE_FILE_BASE)
+	$(PYTHON) -m conceptnet5.builders.index_assertions $(DATA)/assertions/ $(SQLITE_FILE_BASE) --input-shards 8
 	touch $(DB_DIR)/.done
 
 # The following rules are for building the DIST_FILES to be uploaded.
