@@ -246,8 +246,15 @@ class ConceptNetWiktionarySemantics(object):
         self.trace = trace
         if titledb is not None:
             self.titledb = sqlite3.connect(titledb)
+
+            # Test that there's a database there
+            c = self.titledb.cursor()
+            c.execute('select * from titles limit 1')
+            rows = c.fetchall()
+            if len(rows) == 0:
+                raise IOError("%r seems to be empty." % titledb)
         else:
-            self.titledb = sqlite3.connect(':memory:')
+            self.titledb = None
         self.logger = logger
 
     def parse(self, text, rule_name, **kwargs):
