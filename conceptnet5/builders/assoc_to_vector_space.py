@@ -69,7 +69,7 @@ def build_assoc_space(input_file, output_dir):
                 sparse.add_entry((-1., concept, negation))
 
     print('making assoc space')
-    space = AssocSpace.from_sparse_storage(sparse, 300, offset_weight=4e-5)
+    space = AssocSpace.from_sparse_storage(sparse, k=300, offset_weight=4e-5)
 
     print('saving')
     space.save_dir(output_dir)

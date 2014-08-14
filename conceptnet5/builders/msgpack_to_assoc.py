@@ -53,7 +53,7 @@ def convert_to_assoc(input_filename, output_filename):
         rel = info['rel']
         weight = info['weight']
 
-        if 'dbpedia' in info['sources'] and '/or/' not in info['sources']:
+        if 'dbpedia' in info['source_uri'] and '/or/' not in info['source_uri']:
             # DBPedia associations are still too numerous and too weird to
             # associate.
             continue

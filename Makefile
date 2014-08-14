@@ -174,6 +174,7 @@ SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 #     make download all build_assoc upload
 all: build_assertions build_stats build_db
 parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
+build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
 build_db: $(DB_DIR)/.done
 build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
@@ -405,7 +406,7 @@ $(DATA)/stats/concepts.txt: $(DATA)/stats/concepts_left_datasets.txt $(DATA)/sta
 #$(DATA)/stats/concepts_per_language.txt: $(DATA)/stats/concepts.txt
 #	$(CUT) -f 2 $(DATA)/stats/concepts.txt | $(TRUNCATE_URIS) | $(COUNT_AND_RANK) > $(DATA)/stats/concepts_per_language.txt
 
-$(DATA)/stats/dataset_languages.txt: $(DATA)/stats/concepts_left_datasets.txt $(DATA)/stats/concepts_right_datasets.txt
+$(DATA)/stats/dataset_vs_language.txt: $(DATA)/stats/concepts_left_datasets.txt $(DATA)/stats/concepts_right_datasets.txt
 	cat $^ | $(TRUNCATE_URIS) | $(SORT) | $(UNIQ) -c > $(DATA)/stats/dataset_vs_language.txt
 
 $(DATA)/stats/morestats.txt: $(COMBINED_CSVS)
