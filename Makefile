@@ -158,7 +158,7 @@ DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2 \
 			  $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
-STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_languages.txt $(DATA)/stats/morestats.txt
+STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_vs_language.txt $(DATA)/stats/morestats.txt
 DB_DIR = $(DATA)/db
 SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 
