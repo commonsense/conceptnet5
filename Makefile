@@ -14,6 +14,7 @@ PYTHON = python3
 # will get normalized away, such as "." and "..", because they'll break the
 # rules that figure out what needs to be built from what.
 DATA = data
+DATA_ABSOLUTE_PATH = $(shell readlink -f $(DATA))
 
 # $(READERS) and $(BUILDERS) specify where the scripts that take in raw
 # data and build ConceptNet are located, so we know to rebuild files when
@@ -177,14 +178,15 @@ parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
 build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
 build_db: $(DB_DIR)/.done
-build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
-	# Once the assertions are built, we can benefit from the link pointing
-	# from ~/.conceptnet5 to this directory.
-	if [ ! -e $(DATA_SYMLINK) ]; then ln -s `pwd` $(DATA_SYMLINK); fi
 build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 build_stats: $(STATS_FILES)
+
+# Once the assertions are built, we can benefit from the link pointing
+# from ~/.conceptnet5 to this directory.
+build_assertions: $(COMBINED_CSVS) $(ASSOC_FILES)
+	if [ ! -e $(DATA_SYMLINK) ]; then ln -s $(DATA_ABSOLUTE_PATH) $(DATA_SYMLINK); fi
 
 # Remove everything except raw data and dist/
 clean:
