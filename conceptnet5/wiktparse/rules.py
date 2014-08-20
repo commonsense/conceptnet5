@@ -47,9 +47,9 @@ SKIPPED_LANGUAGES = ['Lojban', 'Translingual', 'American Sign Language']
 
 def language_code(source_language, language_name):
     """
-    Returns the 3-letter ISO code for the given `language_name` or None if no
+    Returns the shortest ISO code for the given `language_name` or None if no
     such code can be found. `source_language` is the 2-letter ISO code for the
-    language of the input file being parsed
+    language of the input file being parsed.
     """
     return NAME_TO_CODE[source_language].get(language_name)
 
@@ -294,7 +294,7 @@ class ConceptNetWiktionarySemantics(object):
                 if self.logger is not None:
                     self.logger.error(f)
                 continue
-            except Exception as e:
+            except ZeroDivisionError as e:
                 print("== Exception in Wiktionary parsing ==")
                 print(e)
                 print("Section name: %s" % structure['title'])
@@ -345,7 +345,7 @@ class ConceptNetWiktionarySemantics(object):
             self.logger.debug('headlang=%s; rule=%s (rel=%s); title=%s',
                               headlang, rule, rel, headword)
 
-        if rule == 'definition_section':
+        if rule == 'definition_section' or rule == 'link_section':
             # Definitions could link to words in the same language as this
             # section, or in the overall language of the Wiktionary. It's
             # ambiguous. Keep both options for now, to be resolved in a moment.
@@ -650,7 +650,7 @@ class ConceptNetWiktionarySemantics(object):
         else:
             # Some entries specify their language using a hash-reference to
             # that language's section of the page.
-            language = self.default_language
+            language = None
             target = ast['target']
             if target.startswith('#'):
                 language = language_code(self.default_language,
@@ -690,7 +690,7 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
     """
     Rules specific to the English wiktionary format.
     """
-    def __init__(self, language, titledb=None, trace=False, logger=None, **kwargs):
+    def __init__(self, language='en', titledb=None, trace=False, logger=None, **kwargs):
         super(EnWiktionarySemantics, self).__init__(language, titledb, trace,
                                                     logger)
         en_wiktionarySemantics.__init__(self, **kwargs)
@@ -1067,7 +1067,7 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
     """
     Rules specific to the German wiktionary format.
     """
-    def __init__(self, language, titledb=None, trace=False, logger=None, **kwargs):
+    def __init__(self, language='de', titledb=None, trace=False, logger=None, **kwargs):
         super(DeWiktionarySemantics, self).__init__(language, titledb, trace,
                                                     logger=logger)
         de_wiktionarySemantics.__init__(self, **kwargs)

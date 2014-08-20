@@ -12,8 +12,11 @@ import sys
 SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
 
 
-def run_wiktionary(input_file, output_file, titledb, language='en',
-                   verbosity=0, logger=sys.stdout):
+def run_wiktionary(input_file, output_file, titledb=None, language='en',
+                   verbosity=0, logger=None):
+    if titledb is None:
+        titledb = os.path.dirname(input_file) + '/titles.db'
+
     trace = (verbosity >= 2)
     sem = SEMANTICS[language](language, titledb=titledb, trace=trace,
                               logger=logger)
@@ -23,6 +26,9 @@ def run_wiktionary(input_file, output_file, titledb, language='en',
             if verbosity >= 1:
                 print(edge['rel'], edge['start'], edge['end'])
             output.write(edge)
+
+
+handle_file = run_wiktionary
 
 
 def main():
@@ -56,9 +62,6 @@ def main():
             logger.setLevel(logging._nameToLevel[args.loglevel])
 
     titledb = args.titles
-    if titledb is None:
-        titledb = os.path.dirname(args.input_file) + '/titles.db'
-
     run_wiktionary(args.input_file, args.output_file, titledb=titledb,
                    language=args.language, verbosity=args.verbosity,
                    logger=logger)

@@ -135,23 +135,23 @@ def test_de_definition():
     test_list = [
         # Simple entry with pseudo-link (must yield empty lst)
         (":[1] ''[[Zoologie]]:'' Aal\n", []),
-        # Simple entry with a single link
-        (':[1] [[sprechen]]\n', [EdgeInfo('de', 'sprechen', None, None)]),
+        # Simple entry with a language-marked link
+        (':[1] [[sprechen#Deutsch]]\n', [EdgeInfo('de', 'sprechen', None, None)]),
         # Simple entry with two links
         (':[1] [[Panorama]] {{n}}, [[Aussicht]] {{f}}\n',
-         [EdgeInfo('de', 'Panorama', None, None),
-          EdgeInfo('de', 'Aussicht', None, None)]),
+         [EdgeInfo(None, 'Panorama', None, None),
+          EdgeInfo(None, 'Aussicht', None, None)]),
         # Complex entry with usage directives and 6 actual links
         (""":[2] ''militärisch:''
 ::— ''(abstrakt: Militär-Gruppierung, Legion)'' [[Glied]], [[Zenturie]], [[Abteilung]], [[Abteilungsglied]], [[Kompanie]]
 ::— ''(personifiziert)'' der [[Hauptmann]] selbst
 """,
-         [EdgeInfo('de', 'Glied', None, None),
-          EdgeInfo('de', 'Zenturie', None, None),
-          EdgeInfo('de', 'Abteilung', None, None),
-          EdgeInfo('de', 'Abteilungsglied', None, None),
-          EdgeInfo('de', 'Kompanie', None, None),
-          EdgeInfo('de', 'Hauptmann', None, None)])
+         [EdgeInfo(None, 'Glied', None, None),
+          EdgeInfo(None, 'Zenturie', None, None),
+          EdgeInfo(None, 'Abteilung', None, None),
+          EdgeInfo(None, 'Abteilungsglied', None, None),
+          EdgeInfo(None, 'Kompanie', None, None),
+          EdgeInfo(None, 'Hauptmann', None, None)])
     ]
     for (text, expected) in test_list:
         yield check_output, 'de', 'definition_section', text, expected

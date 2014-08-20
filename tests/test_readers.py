@@ -1,7 +1,7 @@
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.readers import (
     conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, extract_wiktionary,
-    wordnet)
+    wiktionary, wordnet)
 from conceptnet5.builders.combine_assertions import AssertionCombiner
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import codecs
@@ -39,6 +39,7 @@ def test_reader_modules():
         (wordnet, 'input/wordnet',
          ['output/wordnet.msgpack', 'output/wordnet_map.nt']),
         (combiner, 'input/combiner.csv', ['output/combiner.msgpack'])
+        # (wiktionary, 'input/wiktionary_extracted.msgpack', ['output/wiktionary.msgpack']),
     ]
     for (reader_module, _input, outputs) in io_mappings:
         yield compare_input_and_output, reader_module, _input, outputs
