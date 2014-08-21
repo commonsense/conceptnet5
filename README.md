@@ -9,3 +9,5 @@ If you're interested in using ConceptNet, please join the conceptnet-users Googl
 group: http://groups.google.com/group/conceptnet-users?hl=en
 
 Further documentation is available on the Wiki: https://github.com/commonsense/conceptnet5/wiki
+
+Licensing and attribution appear in LICENSE.txt and DATA-CREDITS.txt.
