@@ -294,7 +294,7 @@ class ConceptNetWiktionarySemantics(object):
                 if self.logger is not None:
                     self.logger.error(f)
                 continue
-            except ZeroDivisionError as e:
+            except Exception as e:
                 print("== Exception in Wiktionary parsing ==")
                 print(e)
                 print("Section name: %s" % structure['title'])
@@ -1157,9 +1157,14 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
                         { comma SP ( next+:num !dash | next_range+:num_range) }+ ] ;
         """
         def expand_range(range_ast):
-            start = int(range_ast['range_start'])
-            end = int(range_ast['range_end'])
-            return [str(i) for i in range(start, end + 1)]
+            try:
+                start = int(range_ast['range_start'])
+                end = int(range_ast['range_end'])
+                return [str(i) for i in range(start, end + 1)]
+            except ValueError:
+                # If there's some crazy range involving letters, don't try to
+                # figure it out
+                return range_ast['range_start']
 
         # If the rule matches, there is always a `first` group
         num_list = [ast['first']]
