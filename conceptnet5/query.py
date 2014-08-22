@@ -31,6 +31,7 @@ def field_match(value, query):
     For example, `/c/en/dog` will match assertions about `/c/en/dog/n/animal`,
     but `/c/en/dog/.` will only match assertions about `/c/en/dog`.
     """
+    query = query.rstrip('/')
     if isinstance(value, list):
         return any(field_match(subval, query) for subval in value)
     elif query.endswith('/.'):
@@ -77,7 +78,7 @@ class AssertionFinder(object):
             query = query[:-2]
         else:
             complete = False
-        return self.search_index.lookup(query, complete, limit=limit, offset=offset)
+        return self.search_index.lookup(query.rstrip('/'), complete, limit=limit, offset=offset)
 
     def query(self, criteria, search_key=None, limit=20, offset=0,
               scan_limit=1000):
@@ -107,7 +108,8 @@ class AssertionFinder(object):
         if search_key is not None:
             if search_key not in VALID_KEYS:
                 raise KeyError("Unknown criterion: %s" % search_key)
-            queries = [self.lookup(criteria[search_key], limit=scan_limit)]
+            search_value = criteria[search_key].rstrip('/')
+            queries = [self.lookup(search_value, limit=scan_limit)]
         else:
             queries = [
                 self.lookup(val, limit=scan_limit)
