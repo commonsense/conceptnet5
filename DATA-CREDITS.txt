@@ -126,7 +126,8 @@ It also uses data from Wikipedia, the free encyclopedia [wikipedia] via DBPedia
 [dbpedia].
 
 Wiktionary and Wikipedia are collaborative projects, authored by their
-respective online communities. They are currently released under the Creative Commons Attribution-ShareAlike license [CC-By-SA-3].
+respective online communities. They are currently released under the Creative
+Commons Attribution-ShareAlike license [CC-By-SA-3].
 
 Wikimedia encourages giving attribution by providing links to the hosted pages
 that the data came from, and DBPedia asks for the same thing in turn. In the

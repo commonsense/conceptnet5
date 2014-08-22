@@ -115,6 +115,12 @@ class EdgeInfo(object):
     are global to the Wiktionary entry we're parsing. We also don't represent
     the word sense of the target word, because we never know what it is.
     """
+    # until the time in the near future when we can actually check language
+    # codes for validity, here's a good estimate. It should start with a
+    # lowercase letter (so it's not an etymological abbreviation like LL),
+    # and it should contain only letters and dashes.
+    LANGUAGE_CODE_RE = re.compile(r'[a-z][-A-Za-z]+')
+
     def __init__(self, language, target, sense=None, rel=None):
         self.language = language
         self.target = target
@@ -140,6 +146,14 @@ class EdgeInfo(object):
 
     def set_rel(self, rel):
         return EdgeInfo(self.language, self.target, self.sense, rel)
+
+    def check_validity(self):
+        return (
+            self.target not in BAD_NAMES_FOR_THINGS
+            and not self.target.startswith('*')
+            and not self.language.endswith('-pro')
+            and self.LANGUAGE_CODE_RE.match(self.language)
+        )
 
     def complete_edge(self, source_lang, rule_name, headlang, headword,
                       headpos=None):
@@ -372,7 +386,7 @@ class ConceptNetWiktionarySemantics(object):
                 [ei.complete_edge(self.default_language, rule, headlang,
                                   headword, headpos)
                  for ei in edge_info
-                 if ei.target not in BAD_NAMES_FOR_THINGS
+                 if ei.check_validity()
                  and ei.language is not None]
             )
 
