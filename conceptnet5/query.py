@@ -78,7 +78,9 @@ class AssertionFinder(object):
             query = query[:-2]
         else:
             complete = False
-        return self.search_index.lookup(query.rstrip('/'), complete, limit=limit, offset=offset)
+        return self.search_index.lookup(
+            query.rstrip('/'), complete, limit=limit, offset=offset
+        )
 
     def query(self, criteria, search_key=None, limit=20, offset=0,
               scan_limit=1000):

@@ -6,9 +6,10 @@ index of all of ConceptNet 5.
 """
 
 import sys
+import os
 import flask
 from werkzeug.contrib.cache import SimpleCache
-from conceptnet5.query import lookup as db_lookup, query as db_query, VALID_KEYS
+from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
 
@@ -18,6 +19,13 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
+# This ugly setup is here because of testing. There might be a better plan.
+FINDER = AssertionFinder(
+    os.environ.get('CONCEPTNET_DB', None),
+    os.environ.get('CONCEPTNET_ASSERTIONS_DIR', None),
+    nshards=int(os.environ.get('CONCEPTNET_DB_SHARDS', 8)))
+db_lookup = FINDER.lookup
+db_query = FINDER.query
 
 ASSOC_DIR = get_data_filename('assoc/space')
 commonsense_assoc = None
@@ -68,22 +76,22 @@ def query_node(query):
     # TODO: restore support for min_weight?
     req_args = flask.request.args
     path = '/' + query.strip('/')
-    offset = req_args.get('offset', 0)
-    limit = req_args.get('limit', 50)
-    results = db_lookup(path, offset=offset, limit=limit)
-    return results
+    offset = int(req_args.get('offset', 0))
+    limit = int(req_args.get('limit', 50))
+    results = list(db_lookup(path, offset=offset, limit=limit))
+    return flask.jsonify(edges=results, numFound=len(results))
 
 
 @app.route('/search')
 def search():
     criteria = {}
-    offset = flask.request.args.get('offset', 0)
-    limit = flask.request.args.get('limit', 50)
+    offset = int(flask.request.args.get('offset', 0))
+    limit = int(flask.request.args.get('limit', 50))
     for key in flask.request.args:
         if key in VALID_KEYS:
             criteria[key] = flask.request.args[key]
-    results = db_query(criteria, limit=limit, offset=offset)
-    return results
+    results = list(db_query(criteria, limit=limit, offset=offset))
+    return flask.jsonify(edges=results, numFound=len(results))
 
 
 @app.route('/')
