@@ -20,9 +20,14 @@ See [Sharing] for more information.
 
 To give credit to ConceptNet, we suggest this text:
 
-    This work includes data from ConceptNet 5, which was compiled by the Commonsense Computing Initiative. ConceptNet 5 is freely available under the Creative Commons Attribution-ShareAlike license (CC BY SA 3.0) from http://conceptnet5.media.mit.edu.
+    This work includes data from ConceptNet 5, which was compiled by the
+    Commonsense Computing Initiative. ConceptNet 5 is freely available under
+    the Creative Commons Attribution-ShareAlike license (CC BY SA 3.0) from
+    http://conceptnet5.media.mit.edu.
 
-    The included data was created by contributors to Commonsense Computing projects, contributors to Wikimedia projects, Games with a Purpose, Princeton University's WordNet, DBPedia, OpenCyc, and Umbel.
+    The included data was created by contributors to Commonsense Computing
+    projects, contributors to Wikimedia projects, Games with a Purpose,
+    Princeton University's WordNet, DBPedia, OpenCyc, and Umbel.
 
 
 ## Credits and acknowledgements
@@ -30,12 +35,14 @@ To give credit to ConceptNet, we suggest this text:
 ConceptNet has been developed by:
 
 * The MIT Media Lab, through various groups at different times:
+
   - Commonsense Computing
   - Software Agents
   - Digital Intuition
 
-* The Commonsense Computing Initiative, a worldwide collaboration
-  with contributions from:
+* The Commonsense Computing Initiative, a worldwide collaboration with
+  contributions from:
+
   - National Taiwan University
   - Universidade Federal de São Carlos
   - Hokkaido University
@@ -91,11 +98,20 @@ is simply credited to the pseudonym "verbosity".
 UMBEL is available under a Creative Commons Attribution license. Here are
 UMBEL's license terms, adapted from [Umbel]:
 
-UMBEL and its documentation are the joint creative works of Structured Dynamics LLC [SD] and Ontotext AD [Ontotext], which grant free use rights thereto, only limited by the attribution terms described in the Creative Commons 3.0 Attribution License [CC-By-3]. The copyrights to UMBEL and its documentation remain the sole rights of Structured Dynamics LLC and Ontotext AD.
+UMBEL and its documentation are the joint creative works of Structured Dynamics
+LLC [SD] and Ontotext AD [Ontotext], which grant free use rights thereto, only
+limited by the attribution terms described in the Creative Commons 3.0
+Attribution License [CC-By-3]. The copyrights to UMBEL and its documentation
+remain the sole rights of Structured Dynamics LLC and Ontotext AD.
 
-The UMBEL Reference Concept Ontology is based on a faithful but reduced subset extraction of concepts and relationships from the OpenCyc version of the Cyc knowledge base. As such, UMBEL is a lightweight reflection of these sources, but not nearly as capable nor complete.
+The UMBEL Reference Concept Ontology is based on a faithful but reduced subset
+extraction of concepts and relationships from the OpenCyc version of the Cyc
+knowledge base. As such, UMBEL is a lightweight reflection of these sources,
+but not nearly as capable nor complete.
 
-Use and relations based on UMBEL may therefore not be an accurate representation of what might be obtained in working directly with the source Cyc or OpenCyc knowledge bases.
+Use and relations based on UMBEL may therefore not be an accurate
+representation of what might be obtained in working directly with the source
+Cyc or OpenCyc knowledge bases.
 
 [Umbel] http://umbel.org/resources/about/
 [SD] http://structureddynamics.com/
@@ -135,11 +151,34 @@ can be found in the `data/sw_map` directory.
 
 ### WordNet
 
-WordNet is available under an unencumbered license: see http://wordnet.princeton.edu/wordnet/license/.
+WordNet is available under an unencumbered license: see
+http://wordnet.princeton.edu/wordnet/license/. Its text is reproduced below:
 
 WordNet Release 3.0
-This software and database is being provided to you, the LICENSEE, by Princeton University under the following license. By obtaining, using and/or copying this software and database, you agree that you have read, understood, and will comply with these terms and conditions.: Permission to use, copy, modify and distribute this software and database and its documentation for any purpose and without fee or royalty is hereby granted, provided that you agree to comply with the following copyright notice and statements, including the disclaimer, and that the same appear on ALL copies of the software, database and documentation, including modifications that you make for internal use or for distribution.
 
-WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved. THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND PRINCETON UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT- ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+This software and database is being provided to you, the LICENSEE, by Princeton
+University under the following license. By obtaining, using and/or copying this
+software and database, you agree that you have read, understood, and will
+comply with these terms and conditions.:
 
-The name of Princeton University or Princeton may not be used in advertising or publicity pertaining to distribution of the software and/or database. Title to copyright in this software, database and any associated documentation shall at all times remain with Princeton University and LICENSEE agrees to preserve same.
+Permission to use, copy, modify and distribute this software and database and
+its documentation for any purpose and without fee or royalty is hereby granted,
+provided that you agree to comply with the following copyright notice and
+statements, including the disclaimer, and that the same appear on ALL copies of
+the software, database and documentation, including modifications that you make
+for internal use or for distribution.
+
+WordNet 3.0 Copyright 2006 by Princeton University. All rights reserved.
+
+THIS SOFTWARE AND DATABASE IS PROVIDED "AS IS" AND PRINCETON UNIVERSITY MAKES
+NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY OF EXAMPLE, BUT
+NOT LIMITATION, PRINCETON UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF
+MERCHANT- ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
+LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY
+PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+The name of Princeton University or Princeton may not be used in advertising or
+publicity pertaining to distribution of the software and/or database. Title to
+copyright in this software, database and any associated documentation shall at
+all times remain with Princeton University and LICENSEE agrees to preserve
+same.
