@@ -19,16 +19,23 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
-# This ugly setup is here because of testing. There might be a better plan.
-FINDER = AssertionFinder(
-    os.environ.get('CONCEPTNET_DB', None),
-    os.environ.get('CONCEPTNET_ASSERTIONS_DIR', None),
-    nshards=int(os.environ.get('CONCEPTNET_DB_SHARDS', 8)))
-db_lookup = FINDER.lookup
-db_query = FINDER.query
-
+FINDER = AssertionFinder()
 ASSOC_DIR = get_data_filename('assoc/space')
 commonsense_assoc = None
+
+
+def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
+    """
+    Override the usual AssertionFinder with a new one, possibly with different
+    settings. Do the same for the assoc_dir if given.
+
+    This is useful for testing.
+    """
+    global FINDER, ASSOC_DIR
+    FINDER = AssertionFinder(db_path, assertion_dir, nshards)
+    ASSOC_DIR = assoc_dir
+    if assoc_dir is not None:
+        load_assoc()
 
 
 def load_assoc():
@@ -78,7 +85,7 @@ def query_node(query):
     path = '/' + query.strip('/')
     offset = int(req_args.get('offset', 0))
     limit = int(req_args.get('limit', 50))
-    results = list(db_lookup(path, offset=offset, limit=limit))
+    results = list(FINDER.lookup(path, offset=offset, limit=limit))
     return flask.jsonify(edges=results, numFound=len(results))
 
 
@@ -90,7 +97,7 @@ def search():
     for key in flask.request.args:
         if key in VALID_KEYS:
             criteria[key] = flask.request.args[key]
-    results = list(db_query(criteria, limit=limit, offset=offset))
+    results = list(FINDER.query(criteria, limit=limit, offset=offset))
     return flask.jsonify(edges=results, numFound=len(results))
 
 
