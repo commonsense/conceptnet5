@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, print_function
 """
 This file serves the ConceptNet 5 JSON API, by connecting to a SQLite
 index of all of ConceptNet 5.
 """
+from __future__ import unicode_literals, print_function
 
 import sys
 import os
@@ -19,9 +19,17 @@ if not app.debug:
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 
+
+### Configuration ###
+
 FINDER = AssertionFinder()
 ASSOC_DIR = get_data_filename('assoc/space')
 commonsense_assoc = None
+
+if len(sys.argv) == 1:
+    root_url = 'http://conceptnet5.media.mit.edu/data/5.3'
+else:
+    root_url = sys.argv[1]
 
 
 def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
@@ -47,13 +55,40 @@ def load_assoc():
     global commonsense_assoc
     if commonsense_assoc:
         return commonsense_assoc
-    commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
-    return commonsense_assoc
+    try:
+        commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
+        return commonsense_assoc
+    except FileNotFoundError:
+        return
 
-if len(sys.argv) == 1:
-    root_url = 'http://conceptnet5.media.mit.edu/data/5.3'
-else:
-    root_url = sys.argv[1]
+
+### Error handling ###
+
+@app.errorhandler(404)
+def not_found(error):
+    return flask.jsonify({
+        'error': 'invalid request',
+        'details': str(error)
+    })
+
+class MissingAssocSpace(Exception):
+    pass
+
+@app.errorhandler(MissingAssocSpace)
+def missing_assoc_space(error):
+    return flask.jsonify({
+        'error': 'Feature unavailable',
+        'details': 'Term associations could not be loaded'
+    }), 404
+
+@app.errorhandler(ValueError)
+def term_list_error(error):
+    return flask.jsonify({
+        'error': 'Invalid request',
+        'details': error.args[0]
+    }), 400
+
+### Rate limiting ###
 
 cache_dict = {
     'limit_timeout': 60,
@@ -78,13 +113,17 @@ def request_limit(ip_address, amount=1):
         return False, None
 
 
+### API endpoints ###
+
 @app.route('/<path:query>')
 def query_node(query):
     # TODO: restore support for min_weight?
     req_args = flask.request.args
     path = '/' + query.strip('/')
     offset = int(req_args.get('offset', 0))
+    offset = max(0, offset)
     limit = int(req_args.get('limit', 50))
+    limit = max(0, min(limit, 1000))
     results = list(FINDER.lookup(path, offset=offset, limit=limit))
     return flask.jsonify(edges=results, numFound=len(results))
 
@@ -93,7 +132,9 @@ def query_node(query):
 def search():
     criteria = {}
     offset = int(flask.request.args.get('offset', 0))
+    offset = max(0, offset)
     limit = int(flask.request.args.get('limit', 50))
+    limit = max(0, min(limit, 1000))
     for key in flask.request.args:
         if key in VALID_KEYS:
             criteria[key] = flask.request.args[key]
@@ -109,19 +150,11 @@ def see_documentation():
     return flask.redirect('https://github.com/commonsense/conceptnet5/wiki/API')
 
 
-@app.errorhandler(404)
-def not_found(error):
-    return flask.jsonify({
-        'error': 'invalid request',
-        'details': str(error)
-    })
-
-
 @app.route('/assoc/list/<lang>/<termlist>')
 def list_assoc(lang, termlist):
     load_assoc()
     if commonsense_assoc is None:
-        flask.abort(404)
+        raise MissingAssocSpace
     if isinstance(termlist, bytes):
         termlist = termlist.decode('utf-8')
 
@@ -138,15 +171,14 @@ def list_assoc(lang, termlist):
                 weight = 1.
             terms.append(('/c/%s/%s' % (lang, term), weight))
     except ValueError:
-        flask.abort(400)
+        raise ValueError("%r is not a valid term list" % termlist)
     return assoc_for_termlist(terms, commonsense_assoc)
 
 
 def assoc_for_termlist(terms, assoc):
     limit = flask.request.args.get('limit', '20')
     limit = int(limit)
-    if limit > 1000:
-        limit = 20
+    limit = max(0, min(limit, 1000))
 
     filter = flask.request.args.get('filter')
 
@@ -166,7 +198,7 @@ def concept_assoc(uri):
     load_assoc()
     uri = '/' + uri.rstrip('/')
     if commonsense_assoc is None:
-        flask.abort(404)
+        raise MissingAssocSpace
 
     return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
 
