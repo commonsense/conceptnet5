@@ -148,12 +148,16 @@ class EdgeInfo(object):
         return EdgeInfo(self.language, self.target, self.sense, rel)
 
     def check_validity(self):
-        return (
-            self.target not in BAD_NAMES_FOR_THINGS
-            and not self.target.startswith('*')
-            and not self.language.endswith('-pro')
-            and self.LANGUAGE_CODE_RE.match(self.language)
-        )
+        """
+        Make sure this edge doesn't have an invalid node name, an invalid
+        language, or an unattested proto-language.
+        """
+        if self.target in BAD_NAMES_FOR_THINGS or self.target.startswith('*'):
+            return False
+        if self.language is not None:
+            if self.language.endswith('-pro') or not self.LANGUAGE_CODE_RE.match(self.language):
+                return False
+        return True
 
     def complete_edge(self, source_lang, rule_name, headlang, headword,
                       headpos=None):

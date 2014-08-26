@@ -1,5 +1,7 @@
 # ConceptNet-related configuration
 # ================================
+VERSION = 5.3
+
 # $(PYTHON) should point to an installation of Python 3.3 or later, with
 # conceptnet5 installed as a library.
 #
@@ -9,7 +11,7 @@ PYTHON = python3
 
 # $(DATA) is where the data will be built. It should be on a filesystem with
 # lots of available space.
-# 
+#
 # Relative paths under this directory are okay, but don't use components that
 # will get normalized away, such as "." and "..", because they'll break the
 # rules that figure out what needs to be built from what.
@@ -47,7 +49,7 @@ RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
 UPLOAD_PATH = conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
 
 # The name of the assoc_space directory to build.
-ASSOC_DIR = $(DATA)/assoc/assoc-space-5.2
+ASSOC_DIR = $(DATA)/assoc/assoc-space-$(VERSION)
 
 # Configuration of Unix tools
 # ===========================
@@ -108,7 +110,7 @@ TRUNCATE_URIS = sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g'
 # the twice-repeated group.
 
 # 20-way and 8-way splits
-# =============
+# =======================
 # Some steps of the process can be parallelized by splitting the input into
 # independent pieces. Here we create the pieces of filenames necessary to
 # implement a 20-way fan-out.
@@ -344,7 +346,8 @@ $(DATA)/assoc/subspaces/%: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space
 
 # Combine all associations into one file.
 $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
-	echo "Not implemented yet."
+	python -m conceptnet5.builders.merge_vector_spaces $(DATA)/assoc/subspaces
+	mv $(DATA)/assoc/subspaces/merged_complete $(ASSOC_DIR)
 
 # Index the assertions in a SQLite database.
 $(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
