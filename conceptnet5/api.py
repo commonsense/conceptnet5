@@ -8,10 +8,12 @@ from __future__ import unicode_literals, print_function
 import sys
 import os
 import flask
+from flask_cors import CORS
 from werkzeug.contrib.cache import SimpleCache
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
+CORS(app)
 
 if not app.debug:
     import logging

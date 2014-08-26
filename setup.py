@@ -8,7 +8,7 @@ version_str = '5.3b'
 if sys.version_info.major == 2:
     nltk_version = 'nltk'
 else:
-    nltk_version = 'nltk >= 3.0a'
+    nltk_version = 'nltk >= 3.0b'
 
 setup(
     name = 'ConceptNet',
@@ -18,7 +18,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     package_data={'conceptnet5': ['support_data/*']},
-    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'grako > 3', 'ftfy', 'msgpack-python'],
+    install_requires=[nltk_version, 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'flask-cors', 'grako > 3', 'ftfy', 'msgpack-python'],
     license = 'GPLv3'
 )
 
