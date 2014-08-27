@@ -297,15 +297,10 @@ $(DATA)/edges/dbpedia/properties.msgpack: $(DATA)/raw/dbpedia/mappingbased_prope
 	@mkdir -p $(DATA)/sw_map
 	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ $(DATA)/sw_map/dbpedia_properties.nt
 
-edges/dbpedia/properties.msgpack: raw/dbpedia/mappingbased_properties_en.nt $(READERS)/dbpedia.py $(CORE)
-	@mkdir -p edges/dbpedia
-	@mkdir -p sw_map
-	$(PYTHON) -m conceptnet5.readers.dbpedia $< $@ sw_map/dbpedia_properties.nt
-
-edges/umbel/umbel.msgpack: raw/umbel/umbel.nt raw/umbel/umbel_links.nt $(READERS)/umbel.py $(READERS)/dbpedia.py $(CORE)
-	@mkdir -p edges/umbel
-	@mkdir -p sw_map
-	$(PYTHON) -m conceptnet5.readers.umbel raw/umbel $@ sw_map/umbel.nt
+$(DATA)/edges/umbel/umbel.msgpack: $(DATA)/raw/umbel/umbel.nt $(DATA)/raw/umbel/umbel_links.nt $(READERS)/umbel.py $(READERS)/dbpedia.py $(CORE)
+	@mkdir -p $(DATA)/edges/umbel
+	@mkdir -p $(DATA)/sw_map
+	$(PYTHON) -m conceptnet5.readers.umbel $(DATA)/raw/umbel $@ $(DATA)/sw_map/umbel.nt
 
 # Read Japanese translations from JMDict.
 $(DATA)/edges/jmdict/jmdict.msgpack: $(DATA)/raw/jmdict/JMdict.xml $(READERS)/jmdict.py $(CORE)

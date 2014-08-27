@@ -8,11 +8,11 @@ inconvenient to work with. However, external tools can convert an N3 file
 into an N-Triples file, which this code is able to understand.
 """
 
-from metanl.token_utils import un_camel_case
+from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri, normalized_concept_name, normalize_text
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
 from conceptnet5.readers.dbpedia import translate_dbpedia_url
 from collections import defaultdict
@@ -69,7 +69,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
     ConceptNet edges and a file of mappings between the Semantic Web and
     ConceptNet.
     """
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     map_out = NTriplesWriter(sw_map_file)
     reader = NTriplesReader()
 
@@ -165,7 +165,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help="Directory containing .nt files of input")
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('output', help='msgpack file to output to')
     parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
     args = parser.parse_args()
     run_umbel(args.input_dir, args.output, args.sw_map)
