@@ -176,7 +176,7 @@ SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 #
 # A complete run, including all steps, might look like this:
 #     make download all build_assoc upload
-all: build_assertions build_stats build_db
+all: build_assertions build_stats build_cc_by build_db build_dist
 parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
 build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
@@ -185,6 +185,8 @@ build_splits: $(SORTED_FILES)
 build_csvs: $(CSV_FILES)
 build_edges: $(EDGE_FILES)
 build_stats: $(STATS_FILES)
+build_dist: $(DIST_FILES)
+build_cc_by: $(DATA)/edges/cc_by_edges.csv
 
 # Once the assertions are built, we can benefit from the link pointing
 # from ~/.conceptnet5 to this directory.
@@ -311,6 +313,11 @@ $(DATA)/edges/jmdict/jmdict.msgpack: $(DATA)/raw/jmdict/JMdict.xml $(READERS)/jm
 # .msgpack file.
 $(DATA)/edges/%.csv: $(DATA)/edges/%.msgpack $(BUILDERS)/msgpack_to_csv.py
 	$(PYTHON) -m conceptnet5.builders.msgpack_to_csv $< $@
+
+# Make the subset of the edges available that can be reused under the CC-By
+# license (as opposed to the majority of them, available under CC-By-SA).
+$(DATA)/edges/cc_by_edges.csv: $(SORTED_FILES)
+	cat $(SORTED_FILES) | grep -E "/d/(conceptnet|globalmind|umbel|verbosity|wordnet)" > $@
 
 # Gather all the csv files and split them into 20 pieces.
 #
