@@ -143,7 +143,7 @@ EDGE_FILES := \
 	$(DATA)/edges/jmdict/jmdict.msgpack \
 	$(patsubst %,$(DATA)/edges/wiktionary/en/wiktionary_%, $(MPIECES)) \
 	$(patsubst %,$(DATA)/edges/wiktionary/de/wiktionary_%, $(MPIECES)) \
-	$(patsubst $(DATA)/raw/%,$(DATA)/edges/%, $(wildcard $(DATA)/raw/conceptnet4/*.msgpack) $(wildcard $(DATA)/raw/conceptnet4_nadya/*.msgpack)) \
+	$(patsubst $(DATA)/raw/%.jsons,$(DATA)/edges/%.msgpack, $(wildcard $(DATA)/raw/conceptnet4/*.jsons) $(wildcard $(DATA)/raw/conceptnet4_nadya/*.jsons)) \
 	$(patsubst $(DATA)/raw/%.txt,$(DATA)/edges/%.msgpack, $(wildcard $(DATA)/raw/conceptnet_zh/*.txt))
 
 # When we turn .msgpack files into .csv files, we put them in the same place with
@@ -217,12 +217,12 @@ upload : $(DIST_FILES)
 # code changes.
 
 # Read edges from ConceptNet raw files.
-$(DATA)/edges/conceptnet4/%.msgpack: $(DATA)/raw/conceptnet4/%.msgpack $(READERS)/conceptnet4.py $(CORE)
+$(DATA)/edges/conceptnet4/%.msgpack: $(DATA)/raw/conceptnet4/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
 # nadya.jp output is in the same format as ConceptNet.
-$(DATA)/edges/conceptnet4_nadya/%.msgpack: $(DATA)/raw/conceptnet4_nadya/%.msgpack $(READERS)/conceptnet4.py $(CORE)
+$(DATA)/edges/conceptnet4_nadya/%.msgpack: $(DATA)/raw/conceptnet4_nadya/%.jsons $(READERS)/conceptnet4.py $(CORE)
 	@mkdir -p $$(dirname $@)
 	$(PYTHON) -m conceptnet5.readers.conceptnet4 $< $@
 
