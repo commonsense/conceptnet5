@@ -5,7 +5,7 @@ Utility functions for web interface.
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
 
-from conceptnet5.util.language_codes import SUPPORTED_LANGUAGE_CODES, CODE_TO_ENGLISH_NAME
+from conceptnet5.util.language_codes import SUPPORTED_LANGUAGE_CODES, CODE_TO_NAME
 
 
 def data_url(uri):
@@ -26,6 +26,6 @@ def uri2name(arg):
 
 def get_sorted_languages():
     return [
-        (lang, CODE_TO_ENGLISH_NAME[lang])
+        (lang, CODE_TO_NAME['en'][lang])
         for lang in SUPPORTED_LANGUAGE_CODES
     ]

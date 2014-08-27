@@ -2,10 +2,8 @@ from __future__ import unicode_literals
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
-
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import yaml
-import sys
 
 
 # The language codes used by GlobalMind were idiosyncratic, and need to be
@@ -28,6 +26,7 @@ LANG_NAMES = {
     'zh_TW': 'Traditional Chinese',
     'chs': 'Simplified Chinese',
     'zh_CN': 'Simplified Chinese',
+    'zh': 'Chinese',
     'jpn': 'Japanese',
     'ja': 'Japanese',
     'kor': 'Korean',
@@ -60,9 +59,9 @@ def build_from_dir(dirname, output_file):
     """
     Read a GlobalMind database exported in YAML files, translate
     it into ConceptNet 5 edges, and write those edges to disk using
-    a JSONStreamWriter.
+    a MsgpackStreamWriter.
     """
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     userdata = yaml.load_all(open(dirname + '/GMUser.yaml'))
     users = {}
 
@@ -83,18 +82,9 @@ def build_from_dir(dirname, output_file):
         userinfo = users[obj['author']]
         username = userinfo['fields']['username']
 
-        # GlobalMind provides information about what country the user is from, which
-        # we can preserve in the contributor URI.
-        #
-        # If I got to re-choose these URIs, I would distinguish usernames with
-        # a country code from those without a country code by something more
-        # than the number of slashes, and I would write the country code in
-        # capital letters.
-        userlocale = userinfo['fields']['ccode'].lower()
-        if userlocale:
-            user_source = "/s/contributor/globalmind/%s/%s" % (userlocale, username)
-        else:
-            user_source = "/s/contributor/globalmind/%s" % username
+        # As far as I can tell, GlobalMind used the same namespace of
+        # usernames as the original Open Mind.
+        user_source = "/s/contributor/omcs/%s" % username
 
         sources = [
             user_source,
@@ -128,7 +118,12 @@ def build_from_dir(dirname, output_file):
                          sources=sources,
                          surfaceText=surfaceText,
                          weight=1)
-        out.write(edge)
+
+        # Avoid duplication with the ConceptNet reader, but still save every edge so that we can
+        # handle translations.
+        if username != 'openmind':
+            out.write(edge)
+
         assertions[assertion['pk']] = edge
 
     translationdata = yaml.load_all(open(dirname + '/GMTranslation.yaml'))
@@ -173,8 +168,8 @@ handle_file = build_from_dir
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', help="Directory containing WordNet files")
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('input_dir', help="Directory containing GlobalMind files")
+    parser.add_argument('output', help='msgpack file to output to')
     args = parser.parse_args()
     build_from_dir(args.input_dir, args.output)
 

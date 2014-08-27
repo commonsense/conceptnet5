@@ -6,10 +6,8 @@ import codecs
 # Python 2/3 compatibility
 if sys.version_info.major >= 3:
     string_type = str
-    from io import StringIO
 else:
     string_type = basestring
-    from StringIO import StringIO
 
 
 class JSONStreamWriter(object):
@@ -25,6 +23,7 @@ class JSONStreamWriter(object):
     `sys.stdout` even if it's asked to, because that is usually undesired
     and causes things to crash.
     """
+
     def __init__(self, filename_or_stream):
         if hasattr(filename_or_stream, 'write'):
             self.stream = filename_or_stream
@@ -46,17 +45,29 @@ class JSONStreamWriter(object):
             self.stream.close()
 
 
-def read_json_stream(filename_or_stream):
+def read_json_stream(filename_or_stream, offsets=False):
     """
     Read a stream of data in "JSON stream" format. Returns a generator of the
     decoded objects.
+
+    If `offsets=True`, it will return the byte offset for each object, allowing
+    you to quickly find that object in the file again.
+
+    Because of the way `offsets` works, and because of Python 2 decoding
+    shenanigans, the file must be read as a byte stream. If you pass in an
+    already opened Unicode stream, it will fail.
     """
     if hasattr(filename_or_stream, 'read'):
         stream = filename_or_stream
     else:
-        stream = codecs.open(filename_or_stream, encoding='utf-8')
-    for line in stream:
-        line = line.strip()
-        if line:
-            yield json.loads(line)
+        stream = open(filename_or_stream, 'rb')
 
+    offset = 0
+    for bline in stream:
+        line = bline.decode('utf-8').strip()
+        if line:
+            if offsets:
+                yield (json.loads(line), offset)
+            else:
+                yield json.loads(line)
+        offset += len(bline)

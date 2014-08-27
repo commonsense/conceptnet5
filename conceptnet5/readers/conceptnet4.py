@@ -4,7 +4,8 @@ This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
 """
 
-from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
+from conceptnet5.formats.json_stream import read_json_stream
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses, normalize_text, BAD_NAMES_FOR_THINGS
@@ -154,7 +155,10 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     activity = parts_dict["activity"]
 
-    creator_node = join_uri('/s/contributor/omcs', parts_dict["creator"])
+    creator_node = join_uri(
+        '/s/contributor/omcs',
+        normalize_text(parts_dict["creator"], lowercase=False)
+    )
     activity_node = join_uri('/s/activity/omcs', normalize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
@@ -218,7 +222,7 @@ class CN4Builder(object):
 
         if can_skip(parts_dict):
             return
-        
+
         # build the assertion
         frame_text = build_frame_text(parts_dict)
         relation = build_relation(parts_dict)
@@ -240,9 +244,8 @@ class CN4Builder(object):
                     weight=weight
                 )
 
-
     def transform_file(self, input_filename, output_file):
-        out = JSONStreamWriter(output_file)
+        out = MsgpackStreamWriter(output_file)
         for obj in read_json_stream(input_filename):
             for new_obj in self.handle_assertion(obj):
                 out.write(new_obj)
@@ -257,7 +260,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('output', help='msgpack file to output to')
     args = parser.parse_args()
     handle_file(args.input, args.output)
 

@@ -158,7 +158,7 @@ class NTriplesReader(object):
     def parse_file(self, filename):
         for line in codecs.open(filename, encoding='utf-8'):
             line = line.strip()
-            if line:
+            if line and not line.startswith('#'):
                 result = self.parse_line(line)
                 if result is not None:
                     yield result

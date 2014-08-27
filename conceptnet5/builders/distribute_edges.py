@@ -24,6 +24,7 @@ class EdgeDistributor(object):
     result, and pass it to `conceptnet5.builders.combine_assertions` to
     group edges with the same assertion URI into single assertions.
     """
+
     def __init__(self, output_dir, n):
         """
         Take in parameters and open the appropriate output files.
@@ -54,7 +55,7 @@ def run_args():
     """
     Handle command-line arguments, and run the EdgeDistributor on lines read
     from standard input.
-    
+
     Unlike other builder commands, this uses standard input instead of
     taking a filename, because we often simply want to run the output of
     another step through it as a pipe.
@@ -73,4 +74,3 @@ def run_args():
 
 if __name__ == '__main__':
     run_args()
-
