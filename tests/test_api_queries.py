@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.builders.index_assertions import index_assertions
 from nose.tools import eq_

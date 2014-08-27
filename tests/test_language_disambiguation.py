@@ -1,3 +1,5 @@
+# coding: utf-8
+from __future__ import unicode_literals
 from conceptnet5.wiktparse.rules import EnWiktionarySemantics
 from conceptnet5.util import get_support_data_filename
 from nose.tools import eq_
