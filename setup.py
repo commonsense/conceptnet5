@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import sys
 
 packages = find_packages()
-version_str = '5.2.3'
+version_str = '5.2.4'
 
 if sys.version_info.major == 2:
     nltk_version = 'nltk'
@@ -13,6 +13,7 @@ else:
 setup(
     name = 'ConceptNet',
     version = version_str,
+    package_data = {'conceptnet5': ['support_data/*.*']},
     description = 'A semantic network of general knowledge',
     author = "Rob Speer",
     author_email = 'conceptnet@media.mit.edu',
