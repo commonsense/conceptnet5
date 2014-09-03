@@ -24,7 +24,26 @@ def merge_vector_spaces(subspace_dir, mergers):
         print('Merging: %s + %s -> %s' % (sourceA, sourceB, target))
         spaceA = AssocSpace.load_dir(os.path.join(subspace_dir, sourceA))
         spaceB = AssocSpace.load_dir(os.path.join(subspace_dir, sourceB))
-        merged = spaceA.merged_with(spaceB)
+
+        # On the first step, we want to keep all the axes from merging subparts.
+        # Through most of the merging, we want to maintain that number of axes.
+        # At the end, we want to go back to the original number of axes.
+
+        # For example, when we are merging 300-dimensional spaces, the
+        # intermediate merge results will have 600 dimensions, and the final
+        # result will have 300 dimensions again.
+
+        # We don't refer to the number of axes in spaceB in this code, because
+        # we're assuming all the sub-parts have equal numbers of axes.
+
+        if target.startswith('part'):
+            k = spaceA.k * 2
+        elif target == 'merged_complete':
+            k = spaceA.k // 2
+        else:
+            k = spaceA.k
+
+        merged = spaceA.merged_with(spaceB, k=k)
         del spaceA
         del spaceB
         merged.save_dir(os.path.join(subspace_dir, target))
