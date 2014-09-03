@@ -33,7 +33,7 @@ CORE = $(BASE)/uri.py $(BASE)/nodes.py $(BASE)/edges.py
 # When building a package to distribute, it will be marked with the current
 # date.
 DATE = $(shell date +%Y%m%d)
-OUTPUT_FOLDER = dist/$(DATE)
+OUTPUT_FOLDER = $(DATA)/dist/$(DATE)
 DATA_SYMLINK = ~/.conceptnet5
 
 # The URL from which to download ConceptNet files, such as the raw data files.
@@ -154,8 +154,9 @@ CSV_FILES = $(patsubst $(DATA)/edges/%.msgpack,$(DATA)/edges/%.csv, $(EDGE_FILES
 SPLIT_FILES := $(patsubst %,$(DATA)/edges/split/edges_%, $(PIECES_OF_EIGHT))
 SORTED_FILES := $(patsubst $(DATA)/edges/split/%,$(DATA)/edges/sorted/%, $(SPLIT_FILES))
 ASSERTION_FILES := $(patsubst $(DATA)/edges/sorted/edges_%.csv,$(DATA)/assertions/part_%.msgpack, $(SORTED_FILES))
+ASSERTION_JSONS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.jsons, $(ASSERTION_FILES))
 ASSOC_FILES := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assoc/%.csv, $(ASSERTION_FILES))
-ASSOC_SUBSPACES := $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%, $(ASSOC_FILES))
+ASSOC_SUBSPACES := $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%/u.npy, $(ASSOC_FILES))
 COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
@@ -368,14 +369,20 @@ $(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py
 	$(PYTHON) -m conceptnet5.builders.index_assertions $(DATA)/assertions/ $(SQLITE_FILE_BASE) --input-shards 8
 	touch $(DB_DIR)/.done
 
+
+# Distribution
+# ============
 # The following rules are for building the DIST_FILES to be uploaded.
 $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): $(DATA)/raw/*/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/raw/*/*
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_FILES)
+$(DATA)/assertions/%.jsons: $(DATA)/assertions/%.msgpack
+	python -m conceptnet5.builders.msgpack_to_json $< $@
+
+$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.msgpack
+	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.jsons
 
 $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(DB_DIR)/.done
 	@mkdir -p $(OUTPUT_FOLDER)
