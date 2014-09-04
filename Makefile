@@ -160,7 +160,7 @@ ASSOC_SUBSPACES := $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%/u.np
 COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
-			  $(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2 \
+			  $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
 			  $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_vs_language.txt $(DATA)/stats/morestats.txt
@@ -380,7 +380,7 @@ $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): $(DATA)/raw/*/*
 $(DATA)/assertions/%.jsons: $(DATA)/assertions/%.msgpack
 	python -m conceptnet5.builders.msgpack_to_json $< $@
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_JSONS)
+$(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.jsons
 
