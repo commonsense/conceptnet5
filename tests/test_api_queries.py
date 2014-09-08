@@ -11,13 +11,14 @@ import json
 TESTDATA_DIR = get_support_data_filename("testdata")
 ASSERTIONS_DIR = os.path.join(TESTDATA_DIR, 'input/assertions')
 DB_PATH = os.path.join(TESTDATA_DIR, 'output/assertions.db')
+ASSOC_DIR = os.path.join(TESTDATA_DIR, 'input/assoc_space')
 SPANISH_EXAMPLE = '/a/[/r/RelatedTo/,/c/es/verbigracia/n/,/c/en/example/]'
 CLIENT = None
 
 def setup():
     global CLIENT
     index_assertions(ASSERTIONS_DIR, DB_PATH, input_shards=1, output_shards=1)
-    configure_api(DB_PATH, ASSERTIONS_DIR, nshards=1)
+    configure_api(DB_PATH, ASSERTIONS_DIR, ASSOC_DIR, nshards=1)
     CLIENT = app.test_client()
 
 
