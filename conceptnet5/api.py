@@ -6,11 +6,11 @@ index of all of ConceptNet 5.
 from __future__ import unicode_literals, print_function
 
 import sys
-import os
 import flask
 from flask_cors import CORS
 from werkzeug.contrib.cache import SimpleCache
 from conceptnet5.query import AssertionFinder, VALID_KEYS
+from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
 from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
 CORS(app)
@@ -25,7 +25,9 @@ if not app.debug:
 ### Configuration ###
 
 FINDER = AssertionFinder()
-ASSOC_DIR = get_data_filename('assoc/space')
+ASSOC_WRAPPER = AssocSpaceWrapper(
+    get_data_filename('assoc/assoc-space-5.3'), FINDER
+)
 commonsense_assoc = None
 
 if len(sys.argv) == 1:
@@ -41,27 +43,9 @@ def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
 
     This is useful for testing.
     """
-    global FINDER, ASSOC_DIR
+    global FINDER, ASSOC_WRAPPER
     FINDER = AssertionFinder(db_path, assertion_dir, nshards)
-    ASSOC_DIR = assoc_dir
-    if assoc_dir is not None:
-        load_assoc()
-
-
-def load_assoc():
-    """
-    Load the association matrix. Requires the open source Python package
-    'assoc_space'.
-    """
-    from assoc_space import AssocSpace
-    global commonsense_assoc
-    if commonsense_assoc:
-        return commonsense_assoc
-    try:
-        commonsense_assoc = AssocSpace.load_dir(ASSOC_DIR)
-        return commonsense_assoc
-    except FileNotFoundError:
-        return
+    ASSOC_WRAPPER = AssocSpaceWrapper(assoc_dir, FINDER)
 
 
 ### Error handling ###
@@ -73,15 +57,14 @@ def not_found(error):
         'details': str(error)
     })
 
-class MissingAssocSpace(Exception):
-    pass
 
 @app.errorhandler(MissingAssocSpace)
 def missing_assoc_space(error):
     return flask.jsonify({
         'error': 'Feature unavailable',
-        'details': 'Term associations could not be loaded'
-    }), 404
+        'details': error.args[0]
+    }), 503
+
 
 @app.errorhandler(ValueError)
 def term_list_error(error):
@@ -152,57 +135,40 @@ def see_documentation():
     return flask.redirect('https://github.com/commonsense/conceptnet5/wiki/API')
 
 
-@app.route('/assoc/list/<lang>/<termlist>')
+@app.route('/assoc/list/<lang>/<path:termlist>')
 def list_assoc(lang, termlist):
-    load_assoc()
-    if commonsense_assoc is None:
-        raise MissingAssocSpace
     if isinstance(termlist, bytes):
         termlist = termlist.decode('utf-8')
 
     terms = []
-    try:
-        term_pieces = termlist.split(',')
-        for piece in term_pieces:
-            piece = piece.strip()
-            if '@' in piece:
-                term, weight = piece.split('@')
-                weight = float(weight)
-            else:
-                term = piece
-                weight = 1.
-            terms.append(('/c/%s/%s' % (lang, term), weight))
-    except ValueError:
-        raise ValueError("%r is not a valid term list" % termlist)
-    return assoc_for_termlist(terms, commonsense_assoc)
+    term_pieces = termlist.split(',')
+    for piece in term_pieces:
+        piece = piece.strip()
+        if '@' in piece:
+            term, weight = piece.split('@')
+            weight = float(weight)
+        else:
+            term = piece
+            weight = 1.
+        terms.append(('/c/%s/%s' % (lang, term), weight))
+
+    return assoc_for_termlist(terms)
 
 
-def assoc_for_termlist(terms, assoc):
+def assoc_for_termlist(terms):
     limit = flask.request.args.get('limit', '20')
-    limit = int(limit)
-    limit = max(0, min(limit, 1000))
-
+    limit = max(0, min(int(limit), 1000))
     filter = flask.request.args.get('filter')
 
-    def passes_filter(uri):
-        return filter is None or uri.startswith(filter)
-
-    vec = assoc.vector_from_terms(terms)
-    similar = assoc.terms_similar_to_vector(vec)
-    similar = [item for item in similar if item[1] > 0 and
-               passes_filter(item[0])][:limit]
-
+    similar = ASSOC_WRAPPER.associations(terms, filter=filter, limit=limit)
     return flask.jsonify({'terms': terms, 'similar': similar})
 
 
 @app.route('/assoc/<path:uri>')
 def concept_assoc(uri):
-    load_assoc()
     uri = '/' + uri.rstrip('/')
-    if commonsense_assoc is None:
-        raise MissingAssocSpace
 
-    return assoc_for_termlist([(uri, 1.0)], commonsense_assoc)
+    return assoc_for_termlist([(uri, 1.0)])
 
 
 if __name__ == '__main__':

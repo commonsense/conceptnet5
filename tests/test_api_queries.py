@@ -15,6 +15,7 @@ ASSOC_DIR = os.path.join(TESTDATA_DIR, 'input/assoc_space')
 SPANISH_EXAMPLE = '/a/[/r/RelatedTo/,/c/es/verbigracia/n/,/c/en/example/]'
 CLIENT = None
 
+
 def setup():
     global CLIENT
     index_assertions(ASSERTIONS_DIR, DB_PATH, input_shards=1, output_shards=1)
@@ -62,3 +63,23 @@ def test_lookup():
         ['/a/[/r/TranslationOf/,/c/ja/模範/,/c/en/example/]',
          '/a/[/r/TranslationOf/,/c/ja/例し/,/c/en/example/]',
          '/a/[/r/TranslationOf/,/c/ja/引き合い/,/c/en/example/]'])
+
+
+def test_assoc():
+    # Look up something that isn't in the assoc space, but can be associated
+    # via the DB
+    response = decode(CLIENT.get('/assoc/c/en/case_in_point?limit=3'))
+    eq_(response['terms'], [['/c/en/case_in_point', 1.0]])
+    similar = [item[0] for item in response['similar']]
+    eq_(similar, ['/c/en/example', '/c/en/ideas', '/c/en/green'])
+
+    # Look up something that gets no results
+    response = decode(CLIENT.get('/assoc/c/zxx/gibberish'))
+    similar = [item[0] for item in response['similar']]
+    eq_(similar, [])
+
+    # Look up a weighted list
+    response = decode(CLIENT.get('/assoc/list/en/orange,red@-.5?limit=3'))
+    eq_(response['terms'], [['/c/en/orange', 1.0], ['/c/en/red', -0.5]])
+    similar = [item[0] for item in response['similar']]
+    eq_(similar, ['/c/en/yellow', '/c/en/orange', '/c/en/lemon'])

@@ -41,7 +41,6 @@ def field_match(value, query):
                 and (len(value) == len(query) or value[len(query)] == '/'))
 
 
-
 class AssertionFinder(object):
     def __init__(self, db_filename=None, edge_dir=None, nshards=8):
         self.search_index = None
