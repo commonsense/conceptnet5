@@ -25,7 +25,9 @@ if not app.debug:
 ### Configuration ###
 
 FINDER = AssertionFinder()
-ASSOC_WRAPPER = AssocSpaceWrapper(get_data_filename('assoc_space'), FINDER)
+ASSOC_WRAPPER = AssocSpaceWrapper(
+    get_data_filename('assoc/assoc-space-5.3'), FINDER
+)
 commonsense_assoc = None
 
 if len(sys.argv) == 1:
