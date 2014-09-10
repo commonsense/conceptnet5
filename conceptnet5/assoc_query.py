@@ -26,7 +26,8 @@ class AssocSpaceWrapper(object):
         except ImportError:
             raise MissingAssocSpace("The assoc_space package is not installed.")
         except OSError:
-            raise MissingAssocSpace("The term associations could not be loaded.")
+            raise MissingAssocSpace("The space of term associations could not "
+                                    "be loaded.")
 
     @staticmethod
     def passes_filter(label, filter):
@@ -48,7 +49,7 @@ class AssocSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            for edge in finder.lookup(term, limit=limit_per_term):
+            for edge in self.finder.lookup(term, limit=limit_per_term):
                 if edge['start'] != term:
                     neighbor = edge['start']
                 elif edge['end'] != term:
@@ -66,8 +67,9 @@ class AssocSpaceWrapper(object):
         return [(term, weight / total_weight) for (term, weight) in expanded]
 
     def associations(self, terms, filter=None, limit=20):
-        vec = assoc.vector_from_terms(self.expand_terms(terms))
-        similar = assoc.terms_similar_to_vector(vec)
+        self.load()
+        vec = self.assoc.vector_from_terms(self.expand_terms(terms))
+        similar = self.assoc.terms_similar_to_vector(vec)
         similar = [
             item for item in similar if item[1] > SMALL
             and self.passes_filter(item[0], filter)

@@ -26,7 +26,7 @@ if not app.debug:
 ### Configuration ###
 
 FINDER = AssertionFinder()
-ASSOC_WRAPPER = AssocSpaceWrapper(get_data_filename('assoc/space'))
+ASSOC_WRAPPER = AssocSpaceWrapper(get_data_filename('assoc/space'), FINDER)
 commonsense_assoc = None
 
 if len(sys.argv) == 1:
@@ -44,7 +44,7 @@ def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
     """
     global FINDER, ASSOC_WRAPPER
     FINDER = AssertionFinder(db_path, assertion_dir, nshards)
-    ASSOC_WRAPPER = AssocSpaceWrapper(assoc_dir)
+    ASSOC_WRAPPER = AssocSpaceWrapper(assoc_dir, FINDER)
 
 
 ### Error handling ###
@@ -138,17 +138,16 @@ def list_assoc(lang, termlist):
         termlist = termlist.decode('utf-8')
 
     terms = []
-    try:
-        term_pieces = termlist.split(',')
-        for piece in term_pieces:
-            piece = piece.strip()
-            if '@' in piece:
-                term, weight = piece.split('@')
-                weight = float(weight)
-            else:
-                term = piece
-                weight = 1.
-            terms.append(('/c/%s/%s' % (lang, term), weight))
+    term_pieces = termlist.split(',')
+    for piece in term_pieces:
+        piece = piece.strip()
+        if '@' in piece:
+            term, weight = piece.split('@')
+            weight = float(weight)
+        else:
+            term = piece
+            weight = 1.
+        terms.append(('/c/%s/%s' % (lang, term), weight))
 
     return assoc_for_termlist(terms)
 
