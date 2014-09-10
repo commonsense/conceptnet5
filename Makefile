@@ -354,7 +354,7 @@ $(DATA)/assoc/%.csv: $(DATA)/assertions/%.msgpack $(BUILDERS)/msgpack_to_assoc.p
 	$(PYTHON) -m conceptnet5.builders.msgpack_to_assoc $< $@
 
 # Build vector spaces of associations, using the 'assoc-space' module.
-$(DATA)/assoc/subspaces/%: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space.py
+$(DATA)/assoc/subspaces/%/u.npy: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space.py
 	@mkdir -p $(DATA)/assoc/subspaces
 	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $@
 
