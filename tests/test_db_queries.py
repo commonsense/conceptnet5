@@ -67,6 +67,6 @@ def test_assoc():
     similar = [r[0] for r in results]
     eq_(similar, ['/c/en/example', '/c/en/ideas', '/c/en/green'])
 
-    results = assoc.associations([('/c/en/case_in_point/n', 1.0)], limit=3)
+    results = assoc.associations([('/c/en/case_in_point', 1.0)], limit=3)
     similar = [r[0] for r in results]
     eq_(similar, ['/c/en/example', '/c/en/ideas', '/c/en/green'])

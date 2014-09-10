@@ -25,7 +25,7 @@ class AssocSpaceWrapper(object):
             self.assoc = AssocSpace.load_dir(self.path)
         except ImportError:
             raise MissingAssocSpace("The assoc_space package is not installed.")
-        except OSError:
+        except ZeroDivisionError:
             raise MissingAssocSpace("The space of term associations could not "
                                     "be loaded.")
 
@@ -50,13 +50,13 @@ class AssocSpaceWrapper(object):
         expanded = terms[:]
         for term, weight in terms:
             for edge in self.finder.lookup(term, limit=limit_per_term):
-                if edge['start'] != term:
-                    neighbor = edge['start']
-                elif edge['end'] != term:
+                if field_match(edge['start'], term):
                     neighbor = edge['end']
+                elif field_match(edge['end'], term):
+                    neighbor = edge['start']
                 else:
                     continue
-                neighbor_weight = weight * edge['weight'] * 0.5
+                neighbor_weight = weight * edge['weight'] * 0.1
                 if edge['rel'].startswith('/r/Not'):
                     neighbor_weight *= -1
                 expanded.append((neighbor, neighbor_weight))

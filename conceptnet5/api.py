@@ -6,7 +6,6 @@ index of all of ConceptNet 5.
 from __future__ import unicode_literals, print_function
 
 import sys
-import os
 import flask
 from flask_cors import CORS
 from werkzeug.contrib.cache import SimpleCache
@@ -26,7 +25,7 @@ if not app.debug:
 ### Configuration ###
 
 FINDER = AssertionFinder()
-ASSOC_WRAPPER = AssocSpaceWrapper(get_data_filename('assoc/space'), FINDER)
+ASSOC_WRAPPER = AssocSpaceWrapper(get_data_filename('assoc_space'), FINDER)
 commonsense_assoc = None
 
 if len(sys.argv) == 1:
@@ -56,12 +55,14 @@ def not_found(error):
         'details': str(error)
     })
 
+
 @app.errorhandler(MissingAssocSpace)
 def missing_assoc_space(error):
     return flask.jsonify({
         'error': 'Feature unavailable',
         'details': error.args[0]
     }), 503
+
 
 @app.errorhandler(ValueError)
 def term_list_error(error):
@@ -132,7 +133,7 @@ def see_documentation():
     return flask.redirect('https://github.com/commonsense/conceptnet5/wiki/API')
 
 
-@app.route('/assoc/list/<lang>/<termlist>')
+@app.route('/assoc/list/<lang>/<path:termlist>')
 def list_assoc(lang, termlist):
     if isinstance(termlist, bytes):
         termlist = termlist.decode('utf-8')
@@ -157,13 +158,12 @@ def assoc_for_termlist(terms):
     limit = max(0, min(int(limit), 1000))
     filter = flask.request.args.get('filter')
 
-    similar = ASSOC_WRAPPER.assocations(terms, filter=filter, limit=limit)
+    similar = ASSOC_WRAPPER.associations(terms, filter=filter, limit=limit)
     return flask.jsonify({'terms': terms, 'similar': similar})
 
 
 @app.route('/assoc/<path:uri>')
 def concept_assoc(uri):
-    load_assoc()
     uri = '/' + uri.rstrip('/')
 
     return assoc_for_termlist([(uri, 1.0)])

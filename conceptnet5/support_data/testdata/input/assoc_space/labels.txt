@@ -1,0 +1,10 @@
+/c/en/apple
+/c/en/red
+/c/en/green
+/c/en/orange
+/c/en/banana
+/c/en/yellow
+/c/en/lemon
+/c/en/ideas
+/c/en/colorless
+/c/en/example
