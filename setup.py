@@ -13,7 +13,11 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     include_package_data=True,
-    install_requires=['nltk >= 3.0b2', 'assoc-space', 'xmltodict', 'pyyaml', 'flask', 'flask-cors', 'grako > 3', 'ftfy', 'msgpack-python'],
+    install_requires=[
+        'nltk >= 3.0b1', 'assoc-space', 'xmltodict', 'pyyaml',
+        'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
+        'msgpack-python'
+    ],
     license = 'GPLv3'
 )
 

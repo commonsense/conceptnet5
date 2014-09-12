@@ -8,11 +8,12 @@ from __future__ import unicode_literals, print_function
 import sys
 import flask
 from flask_cors import CORS
-from werkzeug.contrib.cache import SimpleCache
+from flask_limiter import Limiter
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
 from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
+limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
 
 if not app.debug:
@@ -73,31 +74,6 @@ def term_list_error(error):
         'details': error.args[0]
     }), 400
 
-### Rate limiting ###
-
-cache_dict = {
-    'limit_timeout': 60,
-    'limit_amount': 1000
-}
-
-request_cache = SimpleCache(threshold=0, default_timeout=cache_dict['limit_timeout'])
-
-
-def request_limit(ip_address, amount=1):
-    """
-    This function checks the query ip address and ensures that the requests
-    from that address have not passed the query limit.
-    """
-    ip_usage = request_cache.get(ip_address)
-    if ip_usage is not None and ip_usage > cache_dict['limit_amount']:
-        return True, flask.Response(
-            response=flask.json.dumps({'error': 'rate limit exceeded'}),
-            status=429, mimetype='json'
-        )
-    else:
-        request_cache.inc(ip_address, amount)
-        return False, None
-
 
 ### API endpoints ###
 
@@ -136,11 +112,8 @@ def see_documentation():
 
 
 @app.route('/assoc/list/<lang>/<path:termlist>')
+@limiter.limit("60 per minute")
 def list_assoc(lang, termlist):
-    limited, limit_response = request_limit(flask.request.remote_addr, 10)
-    if limited:
-        return limit_response
-    
     if isinstance(termlist, bytes):
         termlist = termlist.decode('utf-8')
 
@@ -169,11 +142,8 @@ def assoc_for_termlist(terms):
 
 
 @app.route('/assoc/<path:uri>')
+@limiter.limit("60 per minute")
 def concept_assoc(uri):
-    limited, limit_response = request_limit(flask.request.remote_addr, 10)
-    if limited:
-        return limit_response
-    
     uri = '/' + uri.rstrip('/')
     return assoc_for_termlist([(uri, 1.0)])
 
