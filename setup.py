@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import sys
 
 packages = find_packages()
-version_str = '5.3b'
+version_str = '5.3b1'
 
 if sys.version_info.major == 2:
     nltk_version = 'nltk'
