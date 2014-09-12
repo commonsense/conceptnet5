@@ -203,6 +203,7 @@ clean:
 
 # A phony target that lets you run 'make download' to get the raw data.
 download :
+	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
 	cd $(DATA) && $(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
