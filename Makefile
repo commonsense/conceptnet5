@@ -368,7 +368,7 @@ $(DATA)/assoc/subspaces/%/u.npy: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector
 
 # Combine all associations into one file.
 $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
-	python -m conceptnet5.builders.merge_vector_spaces $(DATA)/assoc/subspaces
+	$(PYTHON) -m conceptnet5.builders.merge_vector_spaces $(DATA)/assoc/subspaces
 	rm -rf $(ASSOC_DIR)
 	mv $(DATA)/assoc/subspaces/merged_complete $(ASSOC_DIR)
 
@@ -387,7 +387,7 @@ $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): $(DATA)/raw/*/*
 	$(TARBALL_CREATE) $@ $(DATA)/raw/*/*
 
 $(DATA)/assertions/%.jsons: $(DATA)/assertions/%.msgpack
-	python -m conceptnet5.builders.msgpack_to_json $< $@
+	$(PYTHON) -m conceptnet5.builders.msgpack_to_json $< $@
 
 $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
