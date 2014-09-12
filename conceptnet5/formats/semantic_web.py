@@ -51,7 +51,7 @@ def safe_quote(uri):
     >>> safe_quote('/c/en/Núria_Espert')
     '/c/en/N%C3%BAria_Espert'
     """
-    return quote(uri.encode('utf-8'), safe=':#/')
+    return quote(uri.encode('utf-8'), safe=b':/#')
 
 
 def encode_url(url):
@@ -97,7 +97,7 @@ def full_conceptnet_url(uri):
     Translate a ConceptNet URI into a fully-specified URL.
 
     >>> full_conceptnet_url('/c/en/dog')
-    'http://conceptnet5.media.mit.edu/data/5.2/c/en/dog'
+    'http://conceptnet5.media.mit.edu/data/5.3/c/en/dog'
     """
     assert uri.startswith('/')
     return ROOT_URL + safe_quote(uri)
@@ -153,12 +153,12 @@ class NTriplesReader(object):
     prefixes that they define and expanding them when they appear.
     """
     def __init__(self):
-        self.prefixes = {}
+        self.prefixes = {'_': '_'}
 
     def parse_file(self, filename):
         for line in codecs.open(filename, encoding='utf-8'):
             line = line.strip()
-            if line:
+            if line and not line.startswith('#'):
                 result = self.parse_line(line)
                 if result is not None:
                     yield result
@@ -208,13 +208,15 @@ class NTriplesReader(object):
             if '"^^' in node_text:
                 quoted_string, type_tag = node_text.rsplit('^^', 1)
                 type_tag = resource_name(decode_url(type_tag))
-                assert quoted_string.startswith('"') and quoted_string.endswith('"')
+                assert (quoted_string.startswith('"') and quoted_string.endswith('"')), quoted_string
                 return type_tag, quoted_string[1:-1]
-            elif '@' in node_text:
+            elif '"@' in node_text:
                 quoted_string, lang_code = node_text.rsplit('@', 1)
-                assert quoted_string.startswith('"') and quoted_string.endswith('"')
+                assert (quoted_string.startswith('"') and quoted_string.endswith('"')), quoted_string
                 lang = lang_code.split('-')[0]
                 return lang, quoted_string[1:-1]
+            elif node_text.endswith('"'):
+                return 'en', node_text[1:-1]
             else:
                 raise ValueError("Can't understand value: %s" % node_text)
         elif ':' in node_text:

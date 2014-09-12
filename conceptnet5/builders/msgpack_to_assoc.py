@@ -1,9 +1,7 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.uri import join_uri, split_uri
-from conceptnet5.formats.json_stream import read_json_stream
+from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import codecs
-import json
-import sys
 
 
 def reduce_concept(concept):
@@ -49,13 +47,13 @@ def convert_to_assoc(input_filename, output_filename):
     """
     out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
     
-    for info in read_json_stream(input_filename):
+    for info in read_msgpack_stream(input_filename):
         startc = reduce_concept(info['start'])
         endc = reduce_concept(info['end'])
         rel = info['rel']
         weight = info['weight']
 
-        if 'dbpedia' in info['sources'] and '/or/' not in info['sources']:
+        if 'dbpedia' in info['source_uri'] and '/or/' not in info['source_uri']:
             # DBPedia associations are still too numerous and too weird to
             # associate.
             continue
@@ -93,7 +91,7 @@ def convert_to_assoc(input_filename, output_filename):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
+    parser.add_argument('input', help='Msgpack file of input')
     parser.add_argument('output', help='CSV file to output to')
     args = parser.parse_args()
     convert_to_assoc(args.input, args.output)

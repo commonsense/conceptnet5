@@ -107,3 +107,9 @@ def un_camel_case(text):
     revstr = ' '.join(piece.strip(' _') for piece in pieces
                       if piece.strip(' _'))
     return revstr[::-1].replace('- ', '-')
+
+
+try:
+    tokenize('test')
+except LookupError:
+    nltk.download('punkt')

@@ -1,0 +1,60 @@
+:[1] ''[[administrativ]]e [[Einheit]]:'' [[kraj zwizkowy]] ([[land]])
+* {{trans.|:}}
+:[[Jahrhundert]]
+:[5] molenga
+:[6] covarde, cobarde, medroso
+:[1] [[fruta]]
+:[1] banana-da-terra, banana-nanica, banana-prata, banana-maçã, banana-d'água, banana-da-terra, banana-ouro
+:[1] [[mercato]] = [[Markt]]
+:[1] crueltat mental – seelische Grausamkeit
+:[1] [[salze ploraner]] – [[Trauerweide]]
+:[1] [[participi present]] (= Partizip Prasens), [[participi passat]] (= Partizip Perfekt)
+:[1] [[kraj zwizkowy]] ([[land]])
+:[1] [[cifero]], [[numero]]
+:[[defensa]], [[davanter]]
+:[1, 2] [[dissensus]]
+:[[Classis]]
+:[1] [[CD]], [[Heft]]; [2] [[Schrift]]
+:[1, 2, 4] [[Film]]
+:[?] [[link_1]], [[link_2]]; [?] [[link_3]], [[link_4]]
+:[2] [[sport]] {{m}} ([[Sport]])
+:[[one]]/[[two]] <small>([[three]])</small>, [[four]] <small>([[five]], [[six]])</small>
+
+:[[買手]]/[[買い手]] <small>([[Käufer]])</small>, [[語り手]] <small>([[Redner]], [[Erzähler]])</small>, [[火手]] <small>([[Heizer]])</small>, [[人手]] <small>((Arbeits-)[[Mann]], [[Seestern]], [[Beteiligung]], [[Menge]])</small>, [[上手]] <small>([[Geschick]], [[Oberteil]], [[Oberlauf]])</small>, [[下手]], [[空手]] ([[Karate]]), [[手足]] [1], [[手本]] [4], [[手風琴]] <small>([[Ziehharmonika]])</small>, [[手荷物]] <small>([[Handgepäck]])</small>, [[名手]] <small>([[Fachmann]])</small>, [[手書き]] <small>([[Handschrift]])</small>, [[小切手]] <small>([[Scheck]])</small>, [[手裏剣]] <small>([[Wurfstern]])</small>, [[手紙]] <small>([[Brief]])</small>
+
+
+
+:           colon
+[[one]]     wiki_link
+/           slash
+[[two]]     wiki_link
+            SP
+<small>     html_tag
+(           left_paren
+[[three]]   wiki_link
+)           right_paren
+</small>    html_tag
+,           comma
+            SP
+[[four]]    wiki_link
+            SP
+<small>     html_tag
+(           left_paren
+[[five]]    wiki_link
+,           comma
+            SP
+[[six]]     wik_link
+)           right_paren
+</small>    html_tag
+
+
+colon        :
+sense        [1]
+SP           
+pseudo_link  ''[[administrativ]]e [[Einheit]]:''
+SP           
+wiki_link    [[kraj zwizkowy]]
+SP            
+left_paren   (
+wiki_link    [[land]]
+right_paren  )

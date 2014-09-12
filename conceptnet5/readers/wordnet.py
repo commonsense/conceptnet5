@@ -3,7 +3,7 @@ from collections import defaultdict
 from conceptnet5.uri import join_uri
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
 import re
 import os
@@ -41,7 +41,7 @@ REL_MAPPING = {
 
 
 def run_wordnet(input_dir, output_file, sw_map_file):
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     map_out = NTriplesWriter(sw_map_file)
     reader = NTriplesReader()
 
@@ -161,7 +161,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help="Directory containing WordNet files")
-    parser.add_argument('output', help='JSON-stream file to output to')
+    parser.add_argument('output', help='Msgpack file to output to')
     parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
     args = parser.parse_args()
     run_wordnet(args.input_dir, args.output, args.sw_map)

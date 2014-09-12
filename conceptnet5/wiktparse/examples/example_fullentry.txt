@@ -1,0 +1,319 @@
+{{wikipedia|dab=example}}
+
+===Etymology===
+From {{etyl|enm|en}} {{term|example|lang=enm}}, from {{etyl|fro|en}} {{term|essample|lang=fro}} (French: {{term|exemple|lang=fr}}), from {{etyl|la|en}} {{term|exemplum||literally what is taken out (as a sample), a sample, pattern, specimen, copy for imitation, etc.|lang=la}}, from {{term/t|la|eximō||take out}}, from {{term|ex||out}} + {{term|emo|emō|buy; acquire}}; see [[exempt]]. Compare [[ensample]], [[sample]], [[exemplar]]. Displaced native [[Middle English]] {{term|bisne||lang=enm}}, {{term|forbus|forbus, forbusen|example, model, template, exemplar|lang=enm}} (from [[Old English]] {{term/t|ang|bīsen}}, {{term|forebisen|forebīsen, forebȳsen|example, model, template, exemplar|lang=ang}}) and [[Middle English]] {{term|byspel||example, proverb|lang=enm}} (from [[Old English]] {{term/t|ang|bīspel}}).
+
+===Pronunciation===
+* {{a|UK}} {{IPA|/ɪɡˈzɑːmpəl/}}
+* {{rhymes|ɑːmpəl}}
+* {{a|US}} {{IPA|/ɪɡˈzæmpəl/}}
+* {{rhymes|æmpəl}}
+* {{audio|en-us-example.ogg|Audio (US)|lang=en}}
+
+===Noun===
+{{en-noun}}
+
+# Something that is representative of all such things in a group.
+#* {{quote-magazine|date=2013-07-26|author={{w|Leo Hickman}}
+|volume=189|issue=7|page=26|magazine={{w|The Guardian Weekly}}
+|title=[http://www.theguardian.com/science/2013/jul/01/how-algorithms-rule-world-nsa How algorithms rule the world]
+|passage=The use of algorithms in policing is one '''example''' of their increasing influence on our lives. And, as their ubiquity spreads, so too does the debate around whether we should allow ourselves to become so reliant on them – and who, if anyone, is policing their use.}}
+# Something that serves to illustrate or explain a [[rule]].
+#* {{quote-magazine|year=2013|month=May-June|author=[http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel], [http://www.americanscientist.org/authors/detail/lee-dehaan Lee DeHaan]
+|title=[http://www.americanscientist.org/issues/feature/2013/3/wild-plants-to-the-rescue Wild Plants to the Rescue]
+|volume=101|issue=3|magazine={{w|American Scientist}}
+|passage=Plant breeding is always a numbers game.{{...}}The wild species we use are rich in genetic variation,&nbsp;[&hellip;]. In addition, we are looking for rare alleles, so the more plants we try, the better. These rarities may be new mutations, or they can be existing ones that are neutral—or are even selected against—in a wild population. A good '''example''' is mutations that disrupt seed dispersal, leaving the seeds on the heads long after they are ripe.}}
+# Something that serves as a [[pattern]] of [[behaviour]] to be [[imitate]]d (a [[good]] example) or not to be imitated (a [[bad]] example).
+#* Bible, {{w|Gospel of John|John}} xiii, 15
+#*: For I have given you an '''example''', that ye should do as I have done to you.
+#* {{w|John Milton}}
+#*: I gave, thou sayest, the '''example'''; I led the way.
+#* '''1818''', {{w|Mary Shelley}}, [[s:Frankenstein/Chapter 4|''Frankenstein; or, the Modern Prometheus'', Chapter 4]]:
+#*: Learn from me, if not by my precepts, then at least by my '''example,''' how dangerous is the acquirement of knowledge,{{...}}
+#* {{quote-book|year=1898|author={{w|Winston Churchill (novelist)|Winston Churchill}}
+|title={{w|The Celebrity}}|chapter=4
+|passage=The Celebrity, by arts unknown, induced Mrs. Judge Short and two other ladies to call at Mohair on an afternoon when Mr. Cooke was trying a trotter on the track.{{...}}Their '''example''' was followed by others at a time when the master of Mohair was superintending in person the docking of some two-year-olds, and equally invisible.}}
+# A person [[punish]]ed as a [[warning]] to others.
+#* {{w|William Shakespeare}}
+#*: Hang him; he'll be made an '''example'''.
+#* Bible, {{w|First Epistle to the Corinthians|1&nbsp;Corinthians}} x, 6
+#*: Now these things were our '''examples''', to the intent that we should not lust after evil things, as they also lusted.
+# A [[parallel]] or closely similar case, especially when serving as a [[precedent]] or [[model]].
+#* {{w|William Shakespeare}}
+#*: Such temperate order in so fierce a cause / Doth want '''example'''.
+# An instance (as a problem to be solved) serving to illustrate the rule or [[precept]] or to act as an [[exercise]] in the [[application]] of the rule.
+
+====Synonyms====
+* {{l|en|byspel}}, {{l|en|forbisen}}
+* See also [[Wikisaurus:model]]
+* See also [[Wikisaurus:exemplar]]
+
+====Derived terms====
+* [[for example]]
+* [[make an example of]]
+* [[proof by example]]
+* [[set an example]]
+
+====Related terms====
+* [[exemplary]]
+
+====Translations====
+{{trans-top|something representative of a group}}
+* Albanian: {{t|sq|shembull}}
+* Arabic: {{t+|ar|أمثولة|f|tr='umthuula}}, {{t+|ar|مثل|tr=máthal}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Asturian: {{t|ast|exemplu|m}}
+* Baluchi: {{t|bal|مثال|tr=misál}}, {{t|bal|نمونہ|tr=namuna}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Burmese: {{t+|my|နမူနာ|tr=na-mù-nà|sc=Mymr}}
+* Catalan: {{t|ca|exemple|m}}
+* Chinese:
+*: Mandarin: {{t+|cmn|例子|tr=lìzi|sc=Hani}}, {{t+|cmn|例|tr=lì|sc=Hani}}, {{t+|cmn|榜樣|sc=Hani}}, {{t+|cmn|榜样|tr=bǎngyàng|sc=Hani}}
+* Crimean Tatar: {{t|crh|misal}}
+* Danish: {{t|da|eksempel}}
+* Dutch: {{t+|nl|voorbeeld|n}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* Galician: {{t|gl|exemplo|m}}
+* Georgian: {{t|ka|მაგალითი|tr=magaliti|sc=Geor}}
+* German: {{t+|de|Beispiel|n}}
+* Greek: {{t+|el|παράδειγμα|tr=parádeigma}}
+* Hebrew: {{t+|he|דוגמה|alt=דֻּגְמָה|m|tr=dugma|sc=Hebr}}
+* Hindi: {{t|hi|नमूना|m|tr=namūnā}}, {{t|hi|मिसाल|m|tr=misāl}}
+* Hungarian: {{t+|hu|példány}}
+* Icelandic: {{t+|is|dæmi}}
+* Indonesian: {{t+|id|misal}}
+* Interlingua: {{t|ia|exemplo}}
+{{trans-mid}}
+* Italian: {{t+|it|esempio|m}}
+* Japanese: {{t+|ja|例|tr=[[れい]], rei}}, {{t|ja|例え|tr=[[たとえ]], tatoe}}, {{t|ja|例題|tr=[[れいたい]], reitai}}
+* Kamba: {{t|kam|mfano}}
+* Korean: {{t|ko|보기|tr=bogi|sc=Kore}}, {{t+|ko|예|tr=ye|sc=Kore}} ({{t+|ko|例|sc=Kore}})
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}, {{t|lv|paraugs|m}}
+* Lithuanian: {{t+|lt|pavyzdys|m}}
+* Lower Sorbian: {{t|dsb|pśikład|m}}
+* Luhya: {{t|luy|kumufano}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Norwegian: {{t+|no|eksempel}}, {{t|no|døme}}
+* Persian: {{t+|fa|مثال|sc=fa-Arab|tr=mesâl}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}, {{t|sl|primerek|m}}
+* Spanish: {{t+|es|ejemplo|m}}
+* Swahili: {{t+|sw|mifano}}, {{t+|sw|mfano}}
+* Swedish: {{t+|sv|exempel|n}}
+* Tamil: {{t+|ta|எடுத்துக்காட்டு|tr=eṭuttukkāṭṭu|sc=Taml}}
+* Turkish: {{t+|tr|örnek}}
+* Vietnamese: {{t+|vi|ví dụ}}
+* Welsh: {{t+|cy|enghraifft}}
+{{trans-bottom}}
+
+{{trans-top|something serving to explain or illustrate a rule}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Asturian: {{t|ast|exemplu|m}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Catalan: {{t|ca|exemple|m}}
+* Czech: {{t+|cs|příklad|m}}
+* Dutch: {{t+|nl|voorbeeld|n}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* Galician: {{t|gl|exemplo|m}}
+* German: {{t+|de|Beispiel|n}}
+* Greek: {{t+|el|παράδειγμα|n|tr=paráthigma}}
+* Hindi: {{t|hi|उदाहरण|m}}, {{t|hi|नमूना|m|tr=namūnā}}, {{t|hi|मिसाल|m|tr=misāl}}
+* Hungarian: {{t+|hu|példa}}
+* Interlingua: {{t|ia|exemplo}}
+* Japanese: {{t+|ja|例|tr=[[れい]], rei}}
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+{{trans-mid}}
+* Latin: {{t+|la|exemplar|n}}, {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}
+* Lojban: {{t|jbo|mupli}}
+* Lower Sorbian: {{t|dsb|pśikład|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Occitan: {{t|oc|exemple|m}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}
+* Spanish: {{t+|es|ejemplar|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t|sv|illustrativt exempel|n}}
+* Tatar: {{t|tt|mísal}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|something serving as a pattern of behaviour}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}, {{t|ba|өлгө|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}, {{t|eu|eredu}}
+* Bulgarian: {{t+|bg|модел|m|sc=Cyrl}}, {{t+|bg|образец|m|sc=Cyrl}}
+* Czech: {{t+|cs|příklad|m}}
+* Dutch: {{t+|nl|voorbeeld}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}, {{t+|fi|esikuva}}
+* French: {{t+|fr|exemple|m}}
+* German: {{t+|de|Vorbild|n}}, {{t+|de|Beispiel|n}}
+* Haitian Creole: {{t|ht|egzanp}}
+* Hungarian: {{t+|hu|példa}}
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+{{trans-mid}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|paraugs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t|sl|zgled|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t+|sv|föredöme}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|person punished as a warning to others}}
+* Finnish: {{t+|fi|esimerkki}}, {{t|fi|varoittava}} {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* German: {{t+|de|Exempel|n}}
+* Hungarian: {{t+|hu|precedens}}
+* Latvian: {{t|lv|piemērs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+{{trans-mid}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: (varnande) {{t+|sv|exempel}}
+* Turkish: {{t+|tr|ibret}}
+{{trans-bottom}}
+
+{{trans-top|parallel or closely similar case}}
+* French: {{t+|fr|exemple|m}}
+* Hungarian: {{t+|hu|precedens}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}, {{t|lv|paraugs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Portuguese: {{t+|pt|exemplo|m}}
+{{trans-mid}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|instance as a problem to be solved}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Finnish: {{t|fi|harjoitustehtävä}}
+* French: {{t+|fr|exemple|m}}
+* Hungarian: {{t+|hu|példa}}
+* Latvian: {{t|lv|piemērs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Portuguese: {{t+|pt|exemplo|m}}
+{{trans-mid}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t|sv|övningsexempel}}
+* Tatar: {{t+|tt|ürnäk}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* {{ttbc|ca}}: {{t|ca|exemple|m}}
+* {{ttbc|id}}: {{t+|id|contoh}}
+{{trans-mid}}
+* {{ttbc|swg}}: {{t|swg|Muschder}}
+* {{ttbc|fy}}: {{t|fy|foarbyld}}
+{{trans-bottom}}
+
+====See also====
+* [[exemplar]]
+* [[model]]
+* [[pattern]]
+* [[template]]
+
+===Verb===
+{{en-verb|exampl|ing}}
+
+# To be [[illustrated]] or [[exemplified]] (by).
+
+===Statistics===
+* {{rank|q|greatly|floor|982|example|class|century|sorry}}
+
+===External links===
+* {{R:Webster 1913}}
+* {{R:Century 1911}}
+
+===Anagrams===
+* [[exempla#English|exempla]]
+
+
+[[Category:1000 English basic words]]
+[[ang:example]]
+[[ar:example]]
+[[az:example]]
+[[cs:example]]
+[[cy:example]]
+[[de:example]]
+[[et:example]]
+[[el:example]]
+[[es:example]]
+[[eo:example]]
+[[eu:example]]
+[[fr:example]]
+[[gl:example]]
+[[ko:example]]
+[[hy:example]]
+[[io:example]]
+[[it:example]]
+[[kn:example]]
+[[kk:example]]
+[[sw:example]]
+[[ku:example]]
+[[lo:example]]
+[[lt:example]]
+[[li:example]]
+[[hu:example]]
+[[mg:example]]
+[[ml:example]]
+[[my:example]]
+[[nl:example]]
+[[ja:example]]
+[[pl:example]]
+[[pt:example]]
+[[ru:example]]
+[[sm:example]]
+[[simple:example]]
+[[fi:example]]
+[[sv:example]]
+[[ta:example]]
+[[te:example]]
+[[th:example]]
+[[chr:example]]
+[[tr:example]]
+[[uk:example]]
+[[vi:example]]
+[[zh:example]]
+

@@ -9,7 +9,7 @@ from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.formats.json_stream import JSONStreamWriter
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
 import urllib
 import sys
@@ -97,10 +97,11 @@ def map_dbpedia_relation(url):
 
 def handle_file(filename, output_file, sw_map_file):
     reader = NTriplesReader()
-    out = JSONStreamWriter(output_file)
+    out = MsgpackStreamWriter(output_file)
     map_out = NTriplesWriter(sw_map_file)
     for line in open(filename, 'rb'):
-        handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
+        if not line.startswith(b'#'):
+            handle_triple(line.decode('utf-8').strip(), reader, out, map_out)
 
 
 def handle_triple(line, reader, out, map_out):
@@ -161,9 +162,9 @@ def handle_triple(line, reader, out, map_out):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='JSON-stream file to output to')
-    parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
+    parser.add_argument('input', help='N-triples file of input')
+    parser.add_argument('output', help='msgpack file to output to')
+    parser.add_argument('sw_map', help='An N-triples file of Semantic Web equivalences')
     args = parser.parse_args()
     handle_file(args.input, args.output, args.sw_map)
 

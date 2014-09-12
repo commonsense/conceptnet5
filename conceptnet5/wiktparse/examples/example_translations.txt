@@ -1,0 +1,190 @@
+{{trans-top|something representative of a group}}
+* Albanian: {{t|sq|shembull}}
+* Arabic: {{t+|ar|أمثولة|f|tr='umthuula}}, {{t+|ar|مثل|tr=máthal}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Asturian: {{t|ast|exemplu|m}}
+* Baluchi: {{t|bal|مثال|tr=misál}}, {{t|bal|نمونہ|tr=namuna}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Burmese: {{t+|my|နမူနာ|tr=na-mù-nà|sc=Mymr}}
+* Catalan: {{t|ca|exemple|m}}
+* Chinese:
+*: Mandarin: {{t+|cmn|例子|tr=lìzi|sc=Hani}}, {{t+|cmn|例|tr=lì|sc=Hani}}, {{t+|cmn|榜樣|sc=Hani}}, {{t+|cmn|榜样|tr=bǎngyàng|sc=Hani}}
+* Crimean Tatar: {{t|crh|misal}}
+* Danish: {{t|da|eksempel}}
+* Dutch: {{t+|nl|voorbeeld|n}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* Galician: {{t|gl|exemplo|m}}
+* Georgian: {{t|ka|მაგალითი|tr=magaliti|sc=Geor}}
+* German: {{t+|de|Beispiel|n}}
+* Greek: {{t+|el|παράδειγμα|tr=parádeigma}}
+* Hebrew: {{t+|he|דוגמה|alt=דֻּגְמָה|m|tr=dugma|sc=Hebr}}
+* Hindi: {{t|hi|नमूना|m|tr=namūnā}}, {{t|hi|मिसाल|m|tr=misāl}}
+* Hungarian: {{t+|hu|példány}}
+* Icelandic: {{t+|is|dæmi}}
+* Indonesian: {{t+|id|misal}}
+* Interlingua: {{t|ia|exemplo}}
+{{trans-mid}}
+* Italian: {{t+|it|esempio|m}}
+* Japanese: {{t+|ja|例|tr=[[れい]], rei}}, {{t|ja|例え|tr=[[たとえ]], tatoe}}, {{t|ja|例題|tr=[[れいたい]], reitai}}
+* Kamba: {{t|kam|mfano}}
+* Korean: {{t|ko|보기|tr=bogi|sc=Kore}}, {{t+|ko|예|tr=ye|sc=Kore}} ({{t+|ko|例|sc=Kore}})
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}, {{t|lv|paraugs|m}}
+* Lithuanian: {{t+|lt|pavyzdys|m}}
+* Lower Sorbian: {{t|dsb|pśikład|m}}
+* Luhya: {{t|luy|kumufano}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Norwegian: {{t+|no|eksempel}}, {{t|no|døme}}
+* Persian: {{t+|fa|مثال|sc=fa-Arab|tr=mesâl}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}, {{t|sl|primerek|m}}
+* Spanish: {{t+|es|ejemplo|m}}
+* Swahili: {{t+|sw|mifano}}, {{t+|sw|mfano}}
+* Swedish: {{t+|sv|exempel|n}}
+* Tamil: {{t+|ta|எடுத்துக்காட்டு|tr=eṭuttukkāṭṭu|sc=Taml}}
+* Turkish: {{t+|tr|örnek}}
+* Vietnamese: {{t+|vi|ví dụ}}
+* Welsh: {{t+|cy|enghraifft}}
+{{trans-bottom}}
+
+{{trans-top|something serving to explain or illustrate a rule}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Asturian: {{t|ast|exemplu|m}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Catalan: {{t|ca|exemple|m}}
+* Czech: {{t+|cs|příklad|m}}
+* Dutch: {{t+|nl|voorbeeld|n}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* Galician: {{t|gl|exemplo|m}}
+* German: {{t+|de|Beispiel|n}}
+* Greek: {{t+|el|παράδειγμα|n|tr=paráthigma}}
+* Hindi: {{t|hi|उदाहरण|m}}, {{t|hi|नमूना|m|tr=namūnā}}, {{t|hi|मिसाल|m|tr=misāl}}
+* Hungarian: {{t+|hu|példa}}
+* Interlingua: {{t|ia|exemplo}}
+* Japanese: {{t+|ja|例|tr=[[れい]], rei}}
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+{{trans-mid}}
+* Latin: {{t+|la|exemplar|n}}, {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}
+* Lojban: {{t|jbo|mupli}}
+* Lower Sorbian: {{t|dsb|pśikład|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Occitan: {{t|oc|exemple|m}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}
+* Spanish: {{t+|es|ejemplar|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t|sv|illustrativt exempel|n}}
+* Tatar: {{t|tt|mísal}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|something serving as a pattern of behaviour}}
+* Armenian: {{t+|hy|օրինակ|tr=òrinak}}
+* Bashkir: {{t|ba|миҫал|sc=Cyrl}}, {{t|ba|өлгө|sc=Cyrl}}
+* Basque: {{t|eu|adibide}}, {{t|eu|eredu}}
+* Bulgarian: {{t+|bg|модел|m|sc=Cyrl}}, {{t+|bg|образец|m|sc=Cyrl}}
+* Czech: {{t+|cs|příklad|m}}
+* Dutch: {{t+|nl|voorbeeld}}
+* Esperanto: {{t|eo|ekzemplo}}
+* Finnish: {{t+|fi|esimerkki}}, {{t+|fi|esikuva}}
+* French: {{t+|fr|exemple|m}}
+* German: {{t+|de|Vorbild|n}}, {{t+|de|Beispiel|n}}
+* Haitian Creole: {{t|ht|egzanp}}
+* Hungarian: {{t+|hu|példa}}
+* Kurdish:
+*: Sorani: {{t|ku|نمونه‌|sc=ku-Arab}}
+{{trans-mid}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|paraugs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Malay: {{t|ms|contoh}}, {{t|ms|misal}}
+* Polish: {{t+|pl|przykład|m}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t|sl|zgled|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t+|sv|föredöme}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|person punished as a warning to others}}
+* Finnish: {{t+|fi|esimerkki}}, {{t|fi|varoittava}} {{t+|fi|esimerkki}}
+* French: {{t+|fr|exemple|m}}
+* German: {{t+|de|Exempel|n}}
+* Hungarian: {{t+|hu|precedens}}
+* Latvian: {{t|lv|piemērs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+{{trans-mid}}
+* Portuguese: {{t+|pt|exemplo|m}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: (varnande) {{t+|sv|exempel}}
+* Turkish: {{t+|tr|ibret}}
+{{trans-bottom}}
+
+{{trans-top|parallel or closely similar case}}
+* French: {{t+|fr|exemple|m}}
+* Hungarian: {{t+|hu|precedens}}
+* Latin: {{t|la|exemplum|n}}
+* Latvian: {{t|lv|piemērs|m}}, {{t|lv|paraugs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Portuguese: {{t+|pt|exemplo|m}}
+{{trans-mid}}
+* Romanian: {{t+|ro|exemplu}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{trans-top|instance as a problem to be solved}}
+* Bulgarian: {{t+|bg|пример|m|sc=Cyrl}}
+* Finnish: {{t|fi|harjoitustehtävä}}
+* French: {{t+|fr|exemple|m}}
+* Hungarian: {{t+|hu|példa}}
+* Latvian: {{t|lv|piemērs|m}}
+* Macedonian: {{t|mk|пример|m|tr=prímer|sc=Cyrl}}
+* Portuguese: {{t+|pt|exemplo|m}}
+{{trans-mid}}
+* Russian: {{t+|ru|пример|m|tr=primér}}
+* Scots: {{t|sco|ensaumple}}
+* Slovene: {{t+|sl|primer|m}}
+* Swahili: {{t+|sw|mifano}}
+* Swedish: {{t+|sv|exempel|n}}, {{t|sv|övningsexempel}}
+* Tatar: {{t+|tt|ürnäk}}
+* Turkish: {{t+|tr|örnek}}
+{{trans-bottom}}
+
+{{checktrans-top}}
+* {{ttbc|ca}}: {{t|ca|exemple|m}}
+* {{ttbc|id}}: {{t+|id|contoh}}
+{{trans-mid}}
+* {{ttbc|swg}}: {{t|swg|Muschder}}
+* {{ttbc|fy}}: {{t|fy|foarbyld}}
+{{trans-bottom}}
+

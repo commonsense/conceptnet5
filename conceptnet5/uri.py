@@ -14,22 +14,26 @@ can be referred to, or retrieved, using this complete URI (in version 5.2):
 """
 
 import sys
+import re
 from ftfy import fix_text
 
 
 if sys.version_info.major >= 3:
     unicode = str
 
-
 # All URIs are conceptually appended to this URL, when we need to interoperate
 # with Semantic Web-style resources.
-ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.2'
+ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.3'
 
 # If we end up trying to fit a piece of text that looks like these into a URI,
 # it will mess up our patterns of URIs.
 BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
 
-def normalize_text(text):
+# Whitespace should be replaced with underscores in URIs.
+WHITESPACE_RE = re.compile('[\s]')
+
+
+def normalize_text(text, lowercase=True):
     """
     When a piece of a URI is an arbitrary string, we standardize it in the
     following ways:
@@ -56,9 +60,12 @@ def normalize_text(text):
 
         >>> normalize_text('test/test')
         'test_test'
-        
+
         >>> normalize_text('   u\N{COMBINING DIAERESIS}ber\\n')
         'über'
+
+        >>> normalize_text('embedded' + chr(9) + 'tab')
+        'embedded_tab'
     """
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
@@ -70,7 +77,9 @@ def normalize_text(text):
     text = text.replace('/', ' ')
     assert (text not in BAD_NAMES_FOR_THINGS), text
     text = text.strip('.,?!"') or text
-    text = text.lower().replace(' ', '_')
+    if lowercase:
+        text = text.lower()
+    text = WHITESPACE_RE.sub('_', text)
     return text
 
 
@@ -101,7 +110,7 @@ def join_uri(*pieces):
 
     >>> join_uri('test')
     '/test'
-    
+
     >>> join_uri('/test', '/more/')
     '/test/more'
     """
@@ -114,7 +123,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     `concept_uri` builds a representation of a concept, which is a word or
     phrase of a particular language, which can participate in relations with
     other concepts, and may be linked to concepts in other languages.
-    
+
     Every concept has an ISO language code and a text. It may also have a part
     of speech (pos), which is typically a single letter. If it does, it may
     have a disambiguation, a string that distinguishes it from other concepts
@@ -122,7 +131,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
 
     `text` and `disambiguation` should be strings that have already been run
     through `normalize_text`.
-    
+
     This is a low-level interface. See `normalized_concept_uri` in nodes.py for
     a more generally applicable function that also deals with special
     per-language handling.
@@ -189,7 +198,7 @@ def compound_uri(op, args):
 def split_uri(uri):
     """
     Get the slash-delimited pieces of a URI.
-        
+
     >>> split_uri('/c/en/cat/n/feline')
     ['c', 'en', 'cat', 'n', 'feline']
     >>> split_uri('/')
@@ -199,6 +208,28 @@ def split_uri(uri):
     if not uri2:
         return []
     return uri2.split('/')
+
+
+def uri_prefixes(uri, min_pieces=2):
+    """
+    Get URIs that are prefixes of a given URI: that is, they begin with the
+    same path components. By default, the prefix must have at least 2
+    components.
+
+    If the URI has sub-parts that are grouped by square brackets, then
+    only complete sub-parts will be allowed in prefixes.
+
+    >>> list(uri_prefixes('/c/en/cat/n/feline'))
+    ['/c/en', '/c/en/cat', '/c/en/cat/n', '/c/en/cat/n/feline']
+    >>> list(uri_prefixes('/test/[/group/one/]/[/group/two/]'))
+    ['/test/[/group/one/]', '/test/[/group/one/]/[/group/two/]']
+    """
+    pieces = []
+    for piece in split_uri(uri):
+        pieces.append(piece)
+        if len(pieces) >= min_pieces:
+            if pieces.count('[') == pieces.count(']'):
+                yield join_uri(*pieces)
 
 
 def parse_compound_uri(uri):
@@ -272,7 +303,7 @@ def conjunction_uri(*sources):
 
     >>> conjunction_uri('/s/contributor/omcs/dev')
     '/s/contributor/omcs/dev'
-    
+
     >>> conjunction_uri('/s/rule/some_kind_of_parser', '/s/contributor/omcs/dev')
     '/and/[/s/contributor/omcs/dev/,/s/rule/some_kind_of_parser/]'
     """

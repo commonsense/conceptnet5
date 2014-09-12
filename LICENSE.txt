@@ -1,0 +1,24 @@
+## Data license: Creative Commons Attribution Share-Alike 4.0
+
+The data contained in ConceptNet is open data, and may be redistributed
+according to the terms of a Creative Commons license. See DATA-CREDITS.txt for
+details and attribution.
+
+The code and data in ConceptNet are different works. They don't have to be used
+together, and the code license does not apply to the data that it outputs.
+
+## Code license: GPL version 3
+
+The code that is used for building and hosting ConceptNet 5, which you find in
+this repository, is released under the GNU General Public License, version 3.
+The GPL license terms apply if you are extending or redistributing the code.
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details:
+http://www.gnu.org/licenses/gpl.html
