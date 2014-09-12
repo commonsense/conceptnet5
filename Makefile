@@ -38,6 +38,7 @@ DATA_SYMLINK = ~/.conceptnet5
 
 # The URL from which to download ConceptNet files, such as the raw data files.
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
+RAW_DATA_PACKAGE = conceptnet5_db.tar.bz2
 RAW_DATA_PACKAGE = conceptnet5-raw-data.tar.bz2
 
 # The hostname and path that we use to upload files, so they can be downloaded
@@ -161,7 +162,7 @@ COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.cs
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2 \
 			  $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2 \
-			  $(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2
+			  $(OUTPUT_FOLDER)/conceptnet5_db.tar.bz2
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(DATE).tar.bz2
 STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_vs_language.txt $(DATA)/stats/morestats.txt
 DB_DIR = $(DATA)/db
@@ -202,14 +203,20 @@ clean:
 .SECONDARY:
 
 # A phony target that lets you run 'make download' to get the raw data.
-download :
+download:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/current/$(RAW_DATA_PACKAGE)
 	cd $(DATA) && $(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
+# This rule lets you skip most of the build steps.
+download_db:
+	@mkdir -p $(DATA)
+	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/current/$(DB_PACKAGE)
+	cd $(DATA) && $(TARBALL_EXTRACT) $(DB_PACKAGE)
+
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
-upload : $(DIST_FILES)
+upload: $(DIST_FILES)
 	$(RSYNC_UPLOAD) $(OUTPUT_FOLDER) $(UPLOAD_PATH)
 
 
@@ -386,9 +393,13 @@ $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(DATE).tar.bz2: $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.jsons
 
-$(OUTPUT_FOLDER)/conceptnet5_db_$(DATE).tar.bz2: $(DB_DIR)/.done
+$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(DATE).tar.bz2: $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ $(DB_DIR)
+	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.msgpack
+
+$(OUTPUT_FOLDER)/conceptnet5_db.tar.bz2: $(DB_DIR)/.done $(ASSERTION_FILES)
+	@mkdir -p $(OUTPUT_FOLDER)
+	$(TARBALL_CREATE) $@ $(DB_DIR) $(ASSERTION_FILES)
 
 $(OUTPUT_FOLDER)/conceptnet5_csv_$(DATE).tar.bz2: $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
