@@ -1,5 +1,6 @@
 from __future__ import print_function, unicode_literals
 from conceptnet5.uri import uri_prefixes
+from conceptnet5.formats.msgpack_stream import encoding
 from msgpack import Unpacker
 import sqlite3
 import struct
@@ -254,5 +255,5 @@ class EdgeIndexReader(object):
             fileobj = open(os.path.join(self.edge_dir, filename), 'rb')
             self.open_file_cache[filename] = fileobj
         fileobj.seek(offset)
-        unpacker = Unpacker(fileobj, encoding='utf-8')
+        unpacker = Unpacker(fileobj, encoding=encoding)
         return unpacker.unpack()
