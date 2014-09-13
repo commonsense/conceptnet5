@@ -3,7 +3,6 @@
 *.egg-info
 .coverage
 conceptnet5/import*/*.txt
-conceptnet5/wiktparse/*_parser.py
 conceptnet5/wiktparse/*_parser.ebnf
 evaluation/responses
 evaluation/data
