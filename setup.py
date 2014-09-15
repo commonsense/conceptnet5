@@ -14,10 +14,12 @@ setup(
     packages=packages,
     include_package_data=True,
     install_requires=[
-        'nltk >= 3.0b1', 'assoc-space', 'xmltodict', 'pyyaml',
+        'nltk >= 3.0b1', 'xmltodict', 'pyyaml',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
         'msgpack-python'
     ],
+    # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
+    # not required for all of ConceptNet
     license = 'GPLv3'
 )
 
