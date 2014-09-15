@@ -3,11 +3,14 @@
 VERSION = 5.3
 
 # $(PYTHON) should point to an installation of Python 3.3 or later, with
-# conceptnet5 installed as a library.
+# conceptnet5 installed as a library. If you're in an appropriate virtualenv,
+# this will be 'python3' or simply 'python'.
+PYTHON = python
+
+# If the environment is a Python 2 environment, the build steps before
+# "build_assertions" will not be possible, but you can still run:
 #
-# If you're in an appropriate virtualenv, this will be 'python3' or simply
-# 'python'.
-PYTHON = python3
+#     make download_assertions build_db
 
 # $(DATA) is where the data will be built. It should be on a filesystem with
 # lots of available space.
