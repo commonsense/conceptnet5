@@ -39,6 +39,9 @@ DATA_SYMLINK = ~/.conceptnet5
 # The URL from which to download ConceptNet files, such as the raw data files.
 DOWNLOAD_URL = http://conceptnet5.media.mit.edu/downloads
 RAW_DATA_PACKAGE = conceptnet5_raw_data_$(VERSION).tar.bz2
+ASSERTION_PACKAGE = conceptnet5_flat_msgpack_$(VERSION).tar.bz2
+ASSERTION_PACKAGE_JSON = conceptnet5_flat_json_$(VERSION).tar.bz2
+ASSERTION_PACKAGE_CSV = conceptnet5_flat_csv_$(VERSION).tar.bz2
 
 # The hostname and path that we use to upload files, so they can be downloaded
 # later.
@@ -159,9 +162,9 @@ ASSOC_FILES := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assoc/%.csv, $(AS
 ASSOC_SUBSPACES := $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%/u.npy, $(ASSOC_FILES))
 COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.csv, $(ASSERTION_FILES))
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
-			  $(OUTPUT_FOLDER)/conceptnet5_csv_$(VERSION).tar.bz2 \
-			  $(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(VERSION).tar.bz2 \
-			  $(OUTPUT_FOLDER)/conceptnet5_flat_json_$(VERSION).tar.bz2
+			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE) \
+			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_JSON) \
+			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_CSV)
 # skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(VERSION).tar.bz2
 STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_vs_language.txt $(DATA)/stats/morestats.txt
 DB_DIR = $(DATA)/db
@@ -206,6 +209,11 @@ download:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(RAW_DATA_PACKAGE)
 	cd $(DATA) && $(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
+
+download_assertions:
+	@mkdir -p $(DATA)
+	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(ASSERTION_PACKAGE)
+	cd $(DATA) && $(TARBALL_EXTRACT) $(ASSERTION_PACKAGE)
 
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
@@ -382,25 +390,25 @@ $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE): $(DATA)/raw/*/*
 $(DATA)/assertions/%.jsons: $(DATA)/assertions/%.msgpack
 	$(PYTHON) -m conceptnet5.builders.msgpack_to_json $< $@
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_json_$(VERSION).tar.bz2: $(ASSERTION_JSONS)
+$(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_JSON): $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.jsons
 
-$(OUTPUT_FOLDER)/conceptnet5_flat_msgpack_$(VERSION).tar.bz2: $(ASSERTION_JSONS)
+$(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE): $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.msgpack
 
-$(OUTPUT_FOLDER)/conceptnet5_db_$(VERSION).tar.bz2: $(DB_DIR)/.done $(ASSERTION_FILES)
-	@mkdir -p $(OUTPUT_FOLDER)
-	$(TARBALL_CREATE) $@ $(DB_DIR) $(ASSERTION_FILES)
-
-$(OUTPUT_FOLDER)/conceptnet5_csv_$(VERSION).tar.bz2: $(COMBINED_CSVS)
+$(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_CSV): $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.csv
 
 $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(VERSION).tar.bz2: $(ASSOC_DIR)/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(ASSOC_DIR)
+
+$(OUTPUT_FOLDER)/conceptnet5_db_$(VERSION).tar.bz2: $(DB_DIR)/.done $(ASSERTION_FILES)
+	@mkdir -p $(OUTPUT_FOLDER)
+	$(TARBALL_CREATE) $@ $(DB_DIR) $(ASSERTION_FILES)
 
 
 # Statistics
