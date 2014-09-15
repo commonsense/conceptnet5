@@ -10,7 +10,6 @@ enwiktionary.xml
 wikipedia.txt
 secrets.py
 *.tar.bz2
-*.tar.gz
 dist/
 env/
 data

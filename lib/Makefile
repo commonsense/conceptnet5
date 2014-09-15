@@ -13,7 +13,7 @@ clean:
 	rm -rf $(APSW_NAME)
 
 $(APSW_NAME)/build: $(APSW_NAME)/setup.py
-	cd $(APSW_NAME) && $(PYTHON) setup.py fetch --sqlite install
+	cd $(APSW_NAME) && $(PYTHON) setup.py fetch --sqlite --version=3.8.5 install
 
 $(APSW_NAME)/setup.py: $(APSW_NAME).tar.gz
 	rm -rf $(APSW_NAME)
