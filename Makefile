@@ -45,6 +45,8 @@ RAW_DATA_PACKAGE = conceptnet5_raw_data_$(VERSION).tar.bz2
 ASSERTION_PACKAGE = conceptnet5_flat_msgpack_$(VERSION).tar.bz2
 ASSERTION_PACKAGE_JSON = conceptnet5_flat_json_$(VERSION).tar.bz2
 ASSERTION_PACKAGE_CSV = conceptnet5_flat_csv_$(VERSION).tar.bz2
+VECTOR_SPACE_PACKAGE = conceptnet5_vector_space_$(VERSION).tar.bz2
+DB_PACKAGE = conceptnet5_db_$(VERSION).tar.bz2
 
 # The hostname and path that we use to upload files, so they can be downloaded
 # later.
@@ -167,8 +169,9 @@ COMBINED_CSVS := $(patsubst $(DATA)/assertions/%.msgpack,$(DATA)/assertions/%.cs
 DIST_FILES := $(OUTPUT_FOLDER)/$(RAW_DATA_PACKAGE) \
 			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE) \
 			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_JSON) \
-			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_CSV)
-# skip for now: $(OUTPUT_FOLDER)/conceptnet5_vector_space_$(VERSION).tar.bz2
+			  $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_CSV) \
+			  $(OUTPUT_FOLDER)/$(DB_PACKAGE) \
+			  $(OUTPUT_FOLDER)/$(VECTOR_SPACE_PACKAGE)
 STATS_FILES = $(DATA)/stats/relations.txt $(DATA)/stats/dataset_vs_language.txt $(DATA)/stats/morestats.txt
 DB_DIR = $(DATA)/db
 SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
@@ -409,7 +412,7 @@ $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_CSV): $(COMBINED_CSVS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.csv
 
-$(OUTPUT_FOLDER)/conceptnet5_vector_space_$(VERSION).tar.bz2: $(ASSOC_DIR)/*
+$(OUTPUT_FOLDER)/$(VECTOR_SPACE_PACKAGE): $(ASSOC_DIR)/*
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(ASSOC_DIR)
 
