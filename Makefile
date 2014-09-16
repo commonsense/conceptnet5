@@ -375,7 +375,7 @@ $(DATA)/assoc/%.csv: $(DATA)/assertions/%.msgpack $(BUILDERS)/msgpack_to_assoc.p
 # Build vector spaces of associations, using the 'assoc-space' module.
 $(DATA)/assoc/subspaces/%/u.npy: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space.py
 	@mkdir -p $(DATA)/assoc/subspaces
-	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $@
+	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%)
 
 # Combine all associations into one file.
 $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
@@ -404,7 +404,7 @@ $(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE_JSON): $(ASSERTION_JSONS)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.jsons
 
-$(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE): $(ASSERTION_JSONS)
+$(OUTPUT_FOLDER)/$(ASSERTION_PACKAGE): $(ASSERTION_FILES)
 	@mkdir -p $(OUTPUT_FOLDER)
 	$(TARBALL_CREATE) $@ $(DATA)/assertions/*.msgpack
 
