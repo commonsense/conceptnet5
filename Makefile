@@ -226,6 +226,11 @@ download_assertions:
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(ASSERTION_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(ASSERTION_PACKAGE)
 
+download_vectors:
+	@mkdir -p $(DATA)
+	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(VECTOR_SPACE_PACKAGE)
+	$(TARBALL_EXTRACT) $(DATA)/$(VECTOR_SPACE_PACKAGE)
+
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
 upload: $(DIST_FILES)
