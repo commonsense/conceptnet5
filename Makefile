@@ -214,17 +214,17 @@ clean:
 download:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(RAW_DATA_PACKAGE)
-	cd $(DATA) && $(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
+	$(TARBALL_EXTRACT) $(DATA)/$(RAW_DATA_PACKAGE)
 
 download_db:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(DB_PACKAGE)
-	cd $(DATA) && $(TARBALL_EXTRACT) $(DB_PACKAGE)
+	$(TARBALL_EXTRACT) $(DATA)/$(DB_PACKAGE)
 
 download_assertions:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(ASSERTION_PACKAGE)
-	cd $(DATA) && $(TARBALL_EXTRACT) $(ASSERTION_PACKAGE)
+	$(TARBALL_EXTRACT) $(DATA)/$(ASSERTION_PACKAGE)
 
 # A target that lets you (well, me) run 'make upload' to put the data
 # on conceptnet5.media.mit.edu.
