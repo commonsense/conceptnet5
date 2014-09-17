@@ -216,6 +216,11 @@ download:
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(RAW_DATA_PACKAGE)
 	cd $(DATA) && $(TARBALL_EXTRACT) $(RAW_DATA_PACKAGE)
 
+download_db:
+	@mkdir -p $(DATA)
+	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(DB_PACKAGE)
+	cd $(DATA) && $(TARBALL_EXTRACT) $(DB_PACKAGE)
+
 download_assertions:
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(ASSERTION_PACKAGE)
@@ -375,7 +380,7 @@ $(DATA)/assoc/%.csv: $(DATA)/assertions/%.msgpack $(BUILDERS)/msgpack_to_assoc.p
 # Build vector spaces of associations, using the 'assoc-space' module.
 $(DATA)/assoc/subspaces/%/u.npy: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector_space.py
 	@mkdir -p $(DATA)/assoc/subspaces
-	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%)
+	$(PYTHON) -m conceptnet5.builders.assoc_to_vector_space $< $(patsubst $(DATA)/assoc/%.csv,$(DATA)/assoc/subspaces/%,$<)
 
 # Combine all associations into one file.
 $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
