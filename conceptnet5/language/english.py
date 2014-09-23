@@ -13,12 +13,7 @@ import nltk
 from nltk.corpus import wordnet
 from .token_utils import untokenize, tokenize
 import re
-
-try:
-    morphy = wordnet._morphy
-except LookupError:
-    nltk.download('wordnet')
-    morphy = wordnet._morphy
+morphy = wordnet._morphy
 
 STOPWORDS = ['the', 'a', 'an']
 

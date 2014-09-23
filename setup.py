@@ -1,9 +1,42 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Command
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
 version_str = '5.3b1'
+
+
+class NLTKDownloadCommand(Command):
+    """
+    Get the boilerplate out of the way for commands that take no options.
+    """
+    description = "Download necessary data to use with NLTK"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        from conceptnet5.language import nltk_download
+        nltk_download()
+
+
+class CustomInstallCommand(install):
+    def run(self):
+        install.run(self)
+        self.run_command('nltk_download')
+
+
+class CustomDevelopCommand(develop):
+    def run(self):
+        develop.run(self)
+        self.run_command('nltk_download')
+
 
 setup(
     name = 'ConceptNet',
@@ -20,6 +53,12 @@ setup(
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
-    license = 'GPLv3'
+    license = 'GPLv3',
+    cmdclass = {
+        'nltk_download': NLTKDownloadCommand,
+        'install': CustomInstallCommand,
+        'develop': CustomDevelopCommand
+    }
 )
+
 
