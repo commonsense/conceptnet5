@@ -12,6 +12,10 @@ ADD Makefile /src/conceptnet/Makefile
 WORKDIR /src/conceptnet
 RUN python3 setup.py develop
 
-# Build ConceptNet on the /data volume
+# Download 10.8 GB of input data
 RUN make -e download
+
+# Build ConceptNet. On 6 cores (which is what -j6 configures it for here),
+# this takes about 13 hours for me. The resulting image will take up about
+# 50 GB of disk space.
 RUN make -e -j6 all
