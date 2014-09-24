@@ -186,7 +186,7 @@ SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 #
 # A complete run, including all steps, might look like this:
 #     make download all build_assoc upload
-all: build_assertions build_stats build_cc_by build_db build_dist
+all: build_assertions build_stats build_cc_by build_db
 parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
 build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
@@ -211,12 +211,15 @@ clean:
 .SECONDARY:
 
 # A phony target that lets you run 'make download' to get the raw data.
-download:
+download: nltk_download
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(RAW_DATA_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(RAW_DATA_PACKAGE)
 
-download_db:
+nltk_download:
+	python setup.py nltk_download
+
+download_db: nltk_download
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(DB_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(DB_PACKAGE)

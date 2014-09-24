@@ -10,7 +10,7 @@ ADD Makefile /src/conceptnet/Makefile
 
 # Set up ConceptNet
 WORKDIR /src/conceptnet
-RUN pip3 install -e .
+RUN python3 setup.py develop
 
 # Build ConceptNet on the /data volume
 RUN make -e download

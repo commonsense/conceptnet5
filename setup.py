@@ -26,18 +26,6 @@ class NLTKDownloadCommand(Command):
         nltk_download()
 
 
-class CustomInstallCommand(install):
-    def run(self):
-        install.run(self)
-        self.run_command('nltk_download')
-
-
-class CustomDevelopCommand(develop):
-    def run(self):
-        develop.run(self)
-        self.run_command('nltk_download')
-
-
 setup(
     name = 'ConceptNet',
     version = version_str,
@@ -56,9 +44,5 @@ setup(
     license = 'GPLv3',
     cmdclass = {
         'nltk_download': NLTKDownloadCommand,
-        'install': CustomInstallCommand,
-        'develop': CustomDevelopCommand
     }
 )
-
-
