@@ -6,6 +6,7 @@ index of all of ConceptNet 5.
 from __future__ import unicode_literals, print_function
 
 import sys
+import os
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
@@ -15,12 +16,6 @@ from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
-
-if not app.debug:
-    import logging
-    file_handler = logging.FileHandler('logs/flask_errors.log')
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
 
 
 ### Configuration ###

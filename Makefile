@@ -223,11 +223,13 @@ download_db: nltk_download
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(DB_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(DB_PACKAGE)
+	touch $(DATA)/db/*
 
-download_assertions:
+download_assertions: nltk_download
 	@mkdir -p $(DATA)
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(ASSERTION_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(ASSERTION_PACKAGE)
+	touch $(DATA)/assertions/*
 
 download_vectors:
 	@mkdir -p $(DATA)

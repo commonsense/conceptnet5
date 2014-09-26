@@ -12,10 +12,15 @@ ADD Makefile /src/conceptnet/Makefile
 WORKDIR /src/conceptnet
 RUN python3 setup.py develop
 
-# Download 10.8 GB of input data
-RUN make -e download
+# Set up Gunicorn, which we'll use here for serving the API
+RUN pip3 install gunicorn
 
-# Build ConceptNet. On 6 cores (which is what -j6 configures it for here),
-# this takes about 13 hours for me. The resulting image will take up about
-# 50 GB of disk space.
-RUN make -e -j6 all
+# Download 5 GB of ConceptNet data
+RUN make -e download_assertions
+
+# Build the database (this takes about 8 hours)
+RUN make -e build_db
+
+# I don't believe that any of these steps can be parallelized, because
+# they're bound by I/O.
+ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:10053", "conceptnet5.api:app"]
