@@ -11,12 +11,14 @@ MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Install Python dependencies
 RUN apt-get update
-RUN apt-get install -y build-essential python3-numpy python3-scipy python3-pip
+RUN apt-get install -y build-essential python3-pip libatlas-dev liblapack-dev
+RUN apt-get install -y gfortran
 
-# Install Unicode dependencies
-RUN apt-get install -y locales
-RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && /usr/sbin/locale-gen
-ENV LANG en_US.UTF-8
+# set up Unicode in case Docker hasn't fixed this yet
+ENV LANG C.UTF-8
+
+# Install Python dependencies using pip
+RUN pip install numpy scipy
 
 # Install APSW
 ADD apsw-3.8.5-r1.tar.gz /src/apsw

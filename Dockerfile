@@ -1,4 +1,4 @@
-FROM rspeer/conceptnet-env:5.3b1
+FROM rspeer/conceptnet-base:5.3b1
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Configure the environment where ConceptNet will be built
@@ -11,9 +11,7 @@ ADD Makefile /src/conceptnet/Makefile
 # Set up ConceptNet
 WORKDIR /src/conceptnet
 RUN python3 setup.py develop
-
-# Set up Gunicorn, which we'll use here for serving the API
-RUN pip3 install gunicorn
+RUN pip3 install assoc_space==1.0b
 
 # Download 5 GB of ConceptNet data
 RUN make -e download_assertions
@@ -21,6 +19,8 @@ RUN make -e download_assertions
 # Build the database (this takes about 8 hours)
 RUN make -e build_db
 
-# I don't believe that any of these steps can be parallelized, because
-# they're bound by I/O.
-ENTRYPOINT ["gunicorn", "-b", "0.0.0.0:10053", "conceptnet5.api:app"]
+# Get the association vectors
+RUN make -e download_vectors
+
+# Keep track of where the data ended up
+ENV CONCEPTNET_DATA /src/conceptnet/data

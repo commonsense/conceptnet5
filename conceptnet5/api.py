@@ -14,6 +14,7 @@ from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
 from conceptnet5.util import get_data_filename
 app = flask.Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
 
