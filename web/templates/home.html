@@ -1,9 +1,8 @@
 {% extends "_base.html" %}
 {% block content %}
-<div class="container">
 <h1>ConceptNet Concept Browser</h1>
 <div class="row"><div class="span12">
-<form id="search-form-home" method="POST" action="/search">
+<form id="search-form-home" method="POST" action="/web/search">
 	<input id="search-text" type="search" name="keyword" title="Search for a concept..." placeholder="Search for a concept..." />
 	<select id="language-select" name="language" title="Select a language">
           {% for langcode, langname in languages %}
@@ -19,6 +18,4 @@
 </div></div>
 {% endblock %} 
 {% block scripts %}
-<script type="text/javascript" src="{{url_for('static', filename='js/jquery-1.6.2.min.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='js/search.js')}}"></script>
 {% endblock %}

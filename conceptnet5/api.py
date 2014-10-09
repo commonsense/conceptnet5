@@ -12,23 +12,34 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
-from conceptnet5.util import get_data_filename
-app = flask.Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
-limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
-CORS(app)
+from conceptnet5.util import get_data_filename, get_support_data_filename
+
 
 
 ### Configuration ###
 
+VERSION = '5.3'
+API_URL = '/data/5.3'
+WORKING_DIR = os.getcwd()
+STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
+TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
+
 FINDER = AssertionFinder()
 ASSOC_WRAPPER = AssocSpaceWrapper(
-    get_data_filename('assoc/assoc-space-5.3'), FINDER
+    get_data_filename('assoc/assoc-space-%s' % VERSION), FINDER
 )
-commonsense_assoc = None
+
+app = flask.Flask(
+    'conceptnet5',
+    template_folder=TEMPLATE_PATH,
+    static_folder=STATIC_PATH
+)
+app.config['JSON_AS_ASCII'] = False
+limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
+CORS(app)
 
 if len(sys.argv) == 1:
-    root_url = 'http://conceptnet5.media.mit.edu/data/5.3'
+    root_url = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 else:
     root_url = sys.argv[1]
 
@@ -73,7 +84,7 @@ def term_list_error(error):
 
 ### API endpoints ###
 
-@app.route('/<path:query>')
+@app.route(API_URL + '/<path:query>')
 def query_node(query):
     # TODO: restore support for min_weight?
     req_args = flask.request.args
@@ -86,7 +97,7 @@ def query_node(query):
     return flask.jsonify(edges=results, numFound=len(results))
 
 
-@app.route('/search')
+@app.route(API_URL + '/search')
 def search():
     criteria = {}
     offset = int(flask.request.args.get('offset', 0))
@@ -99,7 +110,7 @@ def search():
     results = list(FINDER.query(criteria, limit=limit, offset=offset))
     return flask.jsonify(edges=results, numFound=len(results))
 
-@app.route('/')
+@app.route(API_URL + '/')
 def see_documentation():
     """
     This function redirects to the api documentation
@@ -107,7 +118,7 @@ def see_documentation():
     return flask.redirect('https://github.com/commonsense/conceptnet5/wiki/API')
 
 
-@app.route('/assoc/list/<lang>/<path:termlist>')
+@app.route(API_URL + '/assoc/list/<lang>/<path:termlist>')
 @limiter.limit("60 per minute")
 def list_assoc(lang, termlist):
     if isinstance(termlist, bytes):
@@ -137,7 +148,7 @@ def assoc_for_termlist(terms):
     return flask.jsonify({'terms': terms, 'similar': similar})
 
 
-@app.route('/assoc/<path:uri>')
+@app.route(API_URL + '/assoc/<path:uri>')
 @limiter.limit("60 per minute")
 def concept_assoc(uri):
     uri = '/' + uri.rstrip('/')

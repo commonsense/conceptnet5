@@ -16,14 +16,14 @@ can be referred to, or retrieved, using this complete URI (in version 5.2):
 import sys
 import re
 from ftfy import fix_text
-
+from conceptnet5 import __version__ as VERSION
 
 if sys.version_info.major >= 3:
     unicode = str
 
 # All URIs are conceptually appended to this URL, when we need to interoperate
 # with Semantic Web-style resources.
-ROOT_URL = 'http://conceptnet5.media.mit.edu/data/5.3'
+ROOT_URL = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 
 # If we end up trying to fit a piece of text that looks like these into a URI,
 # it will mess up our patterns of URIs.

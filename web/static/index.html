@@ -3,8 +3,8 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <title>ConceptNet 5</title>
-  <link rel="stylesheet" href="css/bootstrap.css" type="text/css">
-  <link rel="stylesheet" href="css/conceptnet.css" type="text/css">
+  <link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css">
+  <link rel="stylesheet" href="/static/css/conceptnet.css" type="text/css">
 </head>
 <body>
 <!-- top navigation bar -->
@@ -33,8 +33,7 @@
                 <option value=bs>Bosnian</option>
                 <option value=bg>Bulgarian</option>
                 <option value=my>Burmese</option>
-                <option value=zh_CN>Chinese (Simplified)</option>
-                <option value=zh_TW>Chinese (Traditional)</option>
+                <option value=zh>Chinese</option>
                 <option value=crh>Crimean Tatar</option>
                 <option value=hr>Croatian</option>
                 <option value=cs>Czech</option>
@@ -53,7 +52,7 @@
                 <option value=hu>Hungarian</option>
                 <option value=is>Icelandic</option>
                 <option value=io>Ido</option>
-                <option value=id>Indonesian</option>
+                <option value=ms>Indonesian</option>
                 <option value=ga>Irish</option>
                 <option value=it>Italian</option>
                 <option value=ja>Japanese</option>
@@ -68,6 +67,7 @@
                 <option value=jbo>Lojban</option>
                 <option value=mk>Macedonian</option>
                 <option value=mg>Malagasy</option>
+                <option value=ms>Malay</option>
                 <option value=zh>Mandarin</option>
                 <option value=nan>Min Nan</option>
                 <option value=no>Norwegian</option>
@@ -106,8 +106,7 @@
 
 <article>
 <h1 style="text-align: center">
-<img src="cnet5promo.png" title="ConceptNet 5 -- Computers just got smarter."
-alt="ConceptNet 5 -- Computers just got smarter.">
+<img src="/static/img/cnet5logo.png" title="ConceptNet 5" alt="ConceptNet 5">
 </h1>
 <h2>About ConceptNet</h2>
 <p>
@@ -124,17 +123,17 @@ better, answer questions, and understand people's goals.
 <div class="assertion">
   <div class="assertion-edge">
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/en/learn">
+      <a href="http://conceptnet5.media.mit.edu/web/c/en/learn">
         learn
       </a>
     </span>
     <span class="relation">
-      <a href="http://conceptnet5.media.mit.edu/web/relation/MotivatedByGoal">
+      <a href="http://conceptnet5.media.mit.edu/web/r/MotivatedByGoal">
         MotivatedByGoal
       </a>
     </span>
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/en/knowledge">
+      <a href="http://conceptnet5.media.mit.edu/web/c/en/knowledge">
         knowledge
       </a>
     </span>
@@ -147,7 +146,7 @@ better, answer questions, and understand people's goals.
 <div class="assertion">
   <div class="assertion-edge">
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/en/saxophone">
+      <a href="http://conceptnet5.media.mit.edu/web/c/en/saxophone">
         saxophone
       </a>
     </span>
@@ -157,7 +156,7 @@ better, answer questions, and understand people's goals.
       </a>
     </span>
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/en/jazz">
+      <a href="http://conceptnet5.media.mit.edu/web/c/en/jazz">
         jazz
       </a>
     </span>
@@ -196,17 +195,17 @@ if it didn't contain other languages besides English, as well:</div>
 <div class="assertion">
   <div class="assertion-edge">
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/ja/本">
+      <a href="http://conceptnet5.media.mit.edu/web/c/ja/本">
         本
       </a>
     </span>
     <span class="relation">
-      <a href="http://conceptnet5.media.mit.edu/web/relation/MadeOf">
+      <a href="http://conceptnet5.media.mit.edu/web/r/MadeOf">
         MadeOf
       </a>
     </span>
     <span class="concept">
-      <a href="http://conceptnet5.media.mit.edu/web/concept/ja/紙">
+      <a href="http://conceptnet5.media.mit.edu/web/c/ja/紙">
         紙
       </a>
     </span>
@@ -321,7 +320,7 @@ taking the union of the nodes and edges. (And we <a href="#development">hope
 for this to happen!</a>)</li>
 <li>ConceptNet supports linked data: you can download a list of links to the greater
 Semantic Web, via <a href="http://dbpedia.org">DBPedia</a> and via RDF/OWL WordNet. For example, our concept 
-<a href="http://conceptnet5.media.mit.edu/web/concept/en/cat">cat</a> is linked
+<a href="http://conceptnet5.media.mit.edu/web/c/en/cat">cat</a> is linked
 to the DBPedia node at <a href="http://dbpedia.org/resource/Cat">http://dbpedia.org/resource/Cat</a>.
 </ul>
 <h2 id="download">Downloading ConceptNet 5</h2>
@@ -347,8 +346,7 @@ focusing on a particular domain or improving our coverage of a particular
 language -- we'd be happy for you to <a href="#contact">contact us</a>.</p>
 
 <h2>Authors</h2>
-<p>The development of ConceptNet 5 is led by <a
-href="http://web.media.mit.edu/~rspeer">Rob Speer</a>, advised by
+<p>The development of ConceptNet 5 is led by <a href="http://rspeer.github.io">Rob Speer</a>, advised by
 <a href="http://web.media.mit.edu/~havasi">Catherine Havasi</a>.
 It is also developed by Julian Chaidez, Justin Venezuela, and Yen-Ling Kuo.</p>
 
@@ -356,8 +354,6 @@ It is also developed by Julian Chaidez, Justin Venezuela, and Yen-Ling Kuo.</p>
 <p>For general questions and further information, join our
 <a href="http://groups.google.com/group/conceptnet-users">
 mailing list on Google Groups</a>.
-<p>For specific inquiries about our research group, e-mail <a
-href="mailto:digitalintuition@media.mit.edu">digitalintuition@media.mit.edu</a>.
 </p>
 </article>
 </body>

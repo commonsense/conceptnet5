@@ -1,8 +1,13 @@
+# coding: utf-8
+from __future__ import unicode_literals
 """
 Web interface for ConceptNet5.
 
-Minimally updated in March 2014 to maintain compatibility, but it needs to be
-revised.
+Minimally updated in March 2014 to maintain compatibility. Slightly less
+minimally updated in October 2014 to run in the same process as the JSON API.
+
+It would be great to overhaul this, possibly replacing it with a static page
+that just calls the JSON API.
 """
 
 __author__ = 'Justin Venezuela (jven@mit.edu)'
@@ -11,98 +16,64 @@ __author__ = 'Justin Venezuela (jven@mit.edu)'
 import sys
 if sys.version_info.major < 3:
     from urllib import urlencode, quote
-    from urllib2 import urlopen
 else:
     from urllib.parse import urlencode, quote
-    from urllib.request import urlopen
 
 import os
 import json
 import re
-from flask import Flask
+import requests
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
 from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.api import app
+from conceptnet5.query import lookup
 from conceptnet5.web_interface.utils import uri2name, get_sorted_languages
 
 LANGUAGES = get_sorted_languages()
 
-########################
-# Set this flag to True when developing, False otherwise! -JVen
-#
-DEVELOPMENT = False
-#
-########################
-
-app = Flask(__name__)
-
-if DEVELOPMENT:
-  site = 'http://new-caledonia.media.mit.edu:8080'
-  web_root = ''
-else:
-  site = 'http://conceptnet5.media.mit.edu'
-  web_root = '/web'
-
-json_root = 'http://conceptnet5.media.mit.edu/data/5.2/'
-
-import logging
-file_handler = logging.FileHandler('logs/web_errors.log')
-file_handler.setLevel(logging.INFO)
-app.logger.addHandler(file_handler)
-
-def get_json_from_uri(uri, params):
-    url = uri.lstrip(u'/')
-    url_bytes = url.encode('utf-8')
-    url_quoted = quote(url_bytes)
-    params_quoted = urlencode(params)
-    if params_quoted:
-        params_quoted = '?'+params_quoted
-    full_url = json_root + url_quoted + params_quoted
-    return json.load(urlopen(full_url))
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(
-        os.path.join(app.root_path, 'static', 'img'), 'favicon.ico',
-        mimetype='image/vnd.microsoft.icon')
+WEB_ROOT = '/web'
 
 @app.route('/')
-def home():
+def root():
+    return app.send_static_file('index.html')
+
+@app.route(WEB_ROOT + '/')
+def search_home():
     return render_template('home.html', languages=LANGUAGES)
-    
-@app.route('/concept/<path:uri>')
+
+@app.route(WEB_ROOT + '/concept/<path:uri>')
 def concept_redirect(uri):
-    return redirect(site + web_root + '/c/'+uri)
+    return redirect(WEB_ROOT + '/c/'+uri)
 
-@app.route('/relation/<path:uri>')
+@app.route(WEB_ROOT + '/relation/<path:uri>')
 def rel_redirect(uri):
-    return redirect(site + web_root + '/r/'+uri)
+    return redirect(WEB_ROOT + '/r/'+uri)
 
-@app.route('/search', methods=['POST'])
-def search():
+@app.route(WEB_ROOT + '/search', methods=['POST'])
+def web_search():
     keyword = request.form.get('keyword')
     lang = request.form.get('language')
-    return redirect(site + web_root + normalized_concept_uri(lang, keyword))
+    return redirect(WEB_ROOT + normalized_concept_uri(lang, keyword))
 
-@app.route('/<path:uri>', methods=['GET'])
+@app.route(WEB_ROOT + '/<path:uri>', methods=['GET'])
 def edges_for_uri(uri):
     """
     This function replaces most functions in the old Web interface, as every
     query to the API now returns a list of edges.
     """
-    uri = u'/'+uri.rstrip(u'/')
-    response = get_json_from_uri(uri, {'limit': 100})
-    edges = response.get('edges', [])
+    uri = '/' + uri.rstrip('/')
+    edges = list(lookup(uri, limit=100))
     seen_edges = {}
     out_edges = []
     caption = uri
     for edge in edges:
         switched = False
         if edge['uri'] not in seen_edges:
-            url1 = web_root+edge['start']
-            url2 = web_root+edge['end']
+            url1 = WEB_ROOT+edge['start']
+            url2 = WEB_ROOT+edge['end']
             edge['startName'] = uri2name(edge['start'])
             edge['relName'] = uri2name(edge['rel'])
             edge['endName'] = uri2name(edge['end'])
@@ -129,8 +100,8 @@ def edges_for_uri(uri):
             oldedge['score'] += edge['score']
             if not oldedge.get('linked'):
                 text = edge.get('surfaceText') or ''
-                url1 = web_root+edge['start']
-                url2 = web_root+edge['end']
+                url1 = WEB_ROOT+edge['start']
+                url2 = WEB_ROOT+edge['end']
                 linked1 = re.sub(r'\[\[([^\]]+)\]\]',
                     r'<a href="%s">\1</a>' % url1, text, count=1)
                 linked2 = re.sub(r'\[\[([^\]]+)\]\]',
@@ -141,11 +112,11 @@ def edges_for_uri(uri):
         return render_template('not_found.html', uri=uri, languages=LANGUAGES)
     else:
         return render_template('edges.html', uri=uri, caption=caption,
-        edges=out_edges, root=web_root, languages=LANGUAGES)
+        edges=out_edges, root=WEB_ROOT, languages=LANGUAGES)
 
 @app.errorhandler(404)
 def handler404(error):
-    return render_template('404.html', languages=LANGUAGES)
+    return render_template('404.html', languages=LANGUAGES), 404
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8080)
