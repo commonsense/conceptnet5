@@ -994,7 +994,7 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
             etyl_template = left_braces WS "etyl" WS vertical_bar language:term
                             WS template_args_NS right_braces ;
             etyl_link = link_template | wiki_link ;
-            etyl_template_and_link = etyl:etyl_template WS link:etyl_link ;
+            etyl_template_and_link = etyl:etyl_template WS one_line_text link:etyl_link ;
         """
         language = ast['etyl']['language'].strip()
         links = [link.set_language(language)

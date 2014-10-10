@@ -114,10 +114,11 @@ ConceptNet is a semantic network containing lots of things computers should
 know about the world, especially when understanding text written by people.
 </p>
 <p>
-It is built from nodes representing <i>concepts</i>, in the form of words or
-short phrases of natural language, and labeled relationships between them.
-These are the kinds of things computers need to know to search for information
-better, answer questions, and understand people's goals.
+It is built from nodes representing words or short phrases of natural language,
+and labeled relationships between them. (We call the nodes "concepts" for
+tradition, but they'd be better known as "terms".) These are the kinds of
+relationships computers need to know to search for information better, answer
+questions, and understand people's goals.
 </p>
 <div class="example-intro">ConceptNet contains everyday basic knowledge:</div>
 <div class="assertion">
@@ -223,7 +224,12 @@ they can be language-specific text such as "can cross".
 browsing ConceptNet.</p>
 
 <h2>API and Documentation</h2>
-<p>The newest release of ConceptNet, ConceptNet 5.2, is documented on our
+<a href="http://github.com/commonsense/conceptnet5/wiki">
+    <img src="https://raw.githubusercontent.com/commonsense/conceptnet5/master/static/img/diagram_3.png"
+     alt="A diagram of part of the structure of ConceptNet."
+     style="margin: 1em">
+ </a>
+ <p>The newest release of ConceptNet, ConceptNet 5.3, is documented on our
 <a href="http://github.com/commonsense/conceptnet5/wiki">wiki</a>.</p>
 
 <p>The documentation includes how to use our REST API, which allows
@@ -234,31 +240,34 @@ you to:</p>
 <li>Measure and query the semantic distance between nodes</li>
 </ul>
 
+<p>It also describes the structure of ConceptNet and tells you about the
+various ways that you can access the ConceptNet data on your own computer.</p>
+
 <h2>ConceptNet 5 is free</h2>
 <p>ConceptNet 5 comes largely from the hard work of hundreds of thousands of
-people who gave their time and knowledge for free. So ConceptNet is free as
-well, released under a choice of two Creative Commons licenses:</p>
-<ul>
-  <li>You can get the entirety of ConceptNet 5 under the
-  <a href="http://creativecommons.org/licenses/by-sa/3.0">
-    Creative Commons Attribution-ShareAlike 3.0
-  </a> license.
-  </li>
-  <li>You may also use a smaller version, called the "ConceptNet 5 Core",
-  under the <a href="http://creativecommons.org/licenses/by/3.0">
-    Creative Commons Attribution 3.0
-  </a> license. This version is free for any purpose as long as you give
-  credit to the <a href="#contact">Digital Intuition</a> team. However, this
-  version is necessarily missing a large number of statements learned from
-  Wikipedia, Wiktionary, and DBPedia, all of which are Attribution-ShareAlike
-  resources.
-</ul>
-<p>
-  (Until we have a separate download, you get ConceptNet 5 Core by using
-  ConceptNet 5 and discarding all nodes with <code>{license: 'CC-By-SA'}</code>
-  in them.)
-</p>
-</ul>
+people who gave their time and knowledge for free. So ConceptNet is free,
+open knowledge as well.</p>
+
+<p>You can get the entirety of ConceptNet 5 under the
+<a href="http://creativecommons.org/licenses/by-sa/4.0">
+Creative Commons Attribution-ShareAlike 4.0
+</a> license. See
+<a href="https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet">
+Copying and sharing ConceptNet</a> for more details.</p>
+
+<p>To give proper attribution to ConceptNet, we suggest this text:</p>
+<blockquote>
+    This work includes data from ConceptNet 5, which was compiled by the
+    Commonsense Computing Initiative. ConceptNet 5 is freely available under
+    the Creative Commons Attribution-ShareAlike license (CC BY SA 3.0) from
+    http://conceptnet5.media.mit.edu.
+
+    The included data was created by contributors to Commonsense Computing
+    projects, contributors to Wikimedia projects, Games with a Purpose,
+    Princeton University's WordNet, DBPedia, OpenCyc, and Umbel.
+</blockquote>
+
+
 <h2>Sources and how to contribute</h2>
 <p>
 Previous versions of ConceptNet were a home-grown crowd-sourced project, where
@@ -271,84 +280,63 @@ computational knowledge, but of <i>human</i> knowledge.
 <li>To begin with, ConceptNet 5 contains almost all the data from <a
 href="http://csc.media.mit.edu/docs/conceptnet">ConceptNet 4</a>, created by
 contributors to the Open Mind Common Sense project.</li>
-<li>Much of our knowledge comes from the <a
-href="http://en.wikipedia.org">English Wikipedia</a> and its contributors, through two
-sources:</li>
-<ul>
-<li><a href="http://dbpedia.org">DBPedia</a> extracts knowledge from the
-infoboxes that appear on articles.</li>
-<li><a href="http://reverb.cs.washington.edu">ReVerb</a> is a machine reading
-project, extracting relational knowledge from the actual text of each article.
-</li>
-</ul>
-<li>We have also parsed a large amount of content from the <a
-href="http://en.wiktionary.org">English Wiktionary</a>, including synonyms,
-antonyms, translations of concepts into hundreds of languages, and multiple
-labeled word senses for many English words.</li>
+<li>We connect to a subset of <a href="http://dbpedia.org">DBPedia</a>, which extracts
+knowledge from the infoboxes on Wikipedia articles.</li>
+
+<li>Much of our knowledge comes from <a href="http://en.wiktionary.org">Wiktionary</a>,
+the free multilingual dictionary, a sister project to Wikipedia. This gives us
+information about synonyms, antonyms, translations of concepts into hundreds of
+languages, and multiple labeled word senses for many words.</li>
+
 <li>More dictionary-style knowledge comes from <a href="http://wordnet.princeton.edu">WordNet</a>.</li>
+<li><a href="http://umbel.org/">UMBEL</a> connects ConceptNet to the OpenCyc ontology
+via a Semantic Web representation.</li>
 <li>Some knowledge about people's intuitive word associations comes from "games
 with a purpose". We learn things in English from the <a
 href="http://www.gwap.com">GWAP project</a>'s word game
 <a href="http://www.gwap.com/gwap/gamesPreview/verbosity">Verbosity</a>,
-and in Japanese from <a href="http://nadya.jp">nadya.jp</a>.
+and in Japanese from <a href="http://nadya.jp">nadya.jp</a>.</li>
 </ul>
-<h2>ConceptNet 5 is a graph</h2>
-<p>To be precise, it's a <i>hypergraph</i>, meaning it has edges about edges.
-Each statement in ConceptNet has <i>justfications</i> pointing to it,
-explaining where it comes from and how reliable the information seems to be.
+
+<p>ConceptNet supports <b>linked data</b>: you can download a list of links to
+the greater Semantic Web, via <a href="http://dbpedia.org">DBPedia</a>,
+<a href="http://umbel.org/">UMBEL</a>, and RDF/OWL WordNet. For example, our concept
+<a href="http://conceptnet5.media.mit.edu/web/c/en/cat">cat</a> is linked to the
+DBPedia node at
+<a href="http://dbpedia.org/resource/Cat">http://dbpedia.org/resource/Cat</a>.
 </p>
-<p>
-Previous versions of ConceptNet has been distributed as idiosyncratic database
-structures plus some software to interact with them. ConceptNet 5 is not a
-piece of software or a database; it is a graph. It's a set of nodes and edges,
-which we can represent in multiple formats including <a
-href="#download">JSON</a>. You probably know better than
-we do what software you want to use to interact with it!
-</p>
-<p>
-(That said, you can have our idiosyncratic Solr index if you want, but that's not
-ConceptNet, it's just a system for quickly looking things up in ConceptNet.)
-</p>
-<p>Some other interesting properties:</p>
-<ul>
-<li>The ConceptNet graph is <i>ID-less</i>. Every node and assertion contains all
-the information necessary to identify it and no more in its URI, and does not
-rely on
-sequentially-assigned IDs. The advantage of this is that if multiple branches of
-ConceptNet are developed in multiple places, we can later merge them simply by
-taking the union of the nodes and edges. (And we <a href="#development">hope
-for this to happen!</a>)</li>
-<li>ConceptNet supports linked data: you can download a list of links to the greater
-Semantic Web, via <a href="http://dbpedia.org">DBPedia</a> and via RDF/OWL WordNet. For example, our concept 
-<a href="http://conceptnet5.media.mit.edu/web/c/en/cat">cat</a> is linked
-to the DBPedia node at <a href="http://dbpedia.org/resource/Cat">http://dbpedia.org/resource/Cat</a>.
-</ul>
+
 <h2 id="download">Downloading ConceptNet 5</h2>
 <p>If you want all the data in ConceptNet for your application,
-<a href="/downloads">you can have it!</a> We provide the data in three formats:
+<a href="/downloads">you can have it!</a> We provide the data in various forms:
 <ul>
-  <li><strong>Flat JSON</strong>: files in which each line is a ConceptNet edge
-  in JSON format</li>
-  <li><strong>Solr JSON</strong>: specially formatted JSON files that can be
-  loaded into an Apache Solr index for quick retrieval</li>
-  <li><strong>CSV</strong>: simple tabular data, very convenient for
-  command-line searching or as input to machine learning
+    <li><b>Flat files</b> of all the assertions in ConceptNet, in JSON,
+    msgpack, and CSV formats. These help to make the data usable without
+    needing specific library support.</li>
+    <li>A <b>SQLite database</b> that indexes these flat files, allowing you
+    to search ConceptNet on your own computer.</li>
+    <li>A <a href="http://github.com/commonsense/conceptnet5/wiki/Docker">
+    <b>Docker image</b></a> that makes the entire ConceptNet build
+    process reproducible.</li>
 </ul>
 
 <h2 id="development">Development</h2>
-<p>ConceptNet 5 is an open-source project, developed with GPLv3 code hosted on
+<p>ConceptNet 5 is an open-source project, hosted on
 <a href="http://github.com/commonsense/conceptnet5">GitHub</a>.</p>
 
 <p>ConceptNet is part of the Commonsense Computing Initiative, a collaboration
-between the MIT Media Lab and other labs and companies around the world. If you
-want to set up a sister project to collect a specific kind of data -- perhaps
-focusing on a particular domain or improving our coverage of a particular
-language -- we'd be happy for you to <a href="#contact">contact us</a>.</p>
+between the <a href="http://www.media.mit.edu">MIT Media Lab</a>, <a
+href="http://www.luminoso.com">Luminoso Technologies Inc.</a>, and other labs
+and companies around the world. If you want to set up a sister project to
+collect a specific kind of data -- perhaps focusing on a particular domain or
+improving our coverage of a particular language -- we'd be happy for you to
+contact us.</p>
 
 <h2>Authors</h2>
 <p>The development of ConceptNet 5 is led by <a href="http://rspeer.github.io">Rob Speer</a>, advised by
-<a href="http://web.media.mit.edu/~havasi">Catherine Havasi</a>.
-It is also developed by Julian Chaidez, Justin Venezuela, and Yen-Ling Kuo.</p>
+<a href="http://web.media.mit.edu/~havasi">Catherine Havasi</a>, with contributions from
+<a href="https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet#credits-and-acknowledgements">several other people</a>.
+</p>
 
 <h2 id="contact">Mailing list and contact information</h2>
 <p>For general questions and further information, join our
