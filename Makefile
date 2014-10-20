@@ -185,8 +185,8 @@ SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 # hog.
 #
 # A complete run, including all steps, might look like this:
-#     make download all build_assoc upload
-all: build_assertions build_stats build_cc_by build_db
+#     make download all build_assoc build_cc_by upload
+all: build_assertions build_stats build_db
 parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
 build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
