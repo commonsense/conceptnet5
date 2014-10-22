@@ -35,7 +35,7 @@ setup(
     packages=packages,
     include_package_data=True,
     install_requires=[
-        'nltk >= 3.0b1', 'xmltodict', 'pyyaml',
+        'nltk >= 3.0b1', 'xmltodict', 'pyyaml', 'requests',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
         'msgpack-python'
     ],
