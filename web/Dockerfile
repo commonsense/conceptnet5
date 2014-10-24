@@ -1,4 +1,4 @@
-FROM rspeer/conceptnet:5.3b2
+FROM rspeer/conceptnet:5.3
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 RUN pip install gunicorn
