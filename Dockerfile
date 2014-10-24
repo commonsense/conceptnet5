@@ -1,4 +1,4 @@
-FROM rspeer/conceptnet-base:5.3b2
+FROM rspeer/conceptnet-base:5.3
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Configure the environment where ConceptNet will be built
@@ -6,7 +6,7 @@ ENV PYTHON python3
 ADD conceptnet5 /src/conceptnet/conceptnet5
 ADD tests /src/conceptnet/tests
 ADD setup.py /src/conceptnet/setup.py
-ADD Makefile /src/conceptnet/Makefile
+ADD partial-build.Makefile /src/conceptnet/Makefile
 
 # Set up ConceptNet
 WORKDIR /src/conceptnet
