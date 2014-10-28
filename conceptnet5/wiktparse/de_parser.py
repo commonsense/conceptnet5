@@ -15,7 +15,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import graken, Parser
 
 
-__version__ = (2014, 8, 27, 18, 2, 40, 2)
+__version__ = (2014, 10, 10, 21, 11, 16, 4)
 
 __all__ = [
     'de_wiktionaryParser',

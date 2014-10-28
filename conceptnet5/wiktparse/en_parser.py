@@ -15,7 +15,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import graken, Parser
 
 
-__version__ = (2014, 8, 27, 18, 2, 40, 2)
+__version__ = (2014, 10, 10, 21, 11, 17, 4)
 
 __all__ = [
     'en_wiktionaryParser',
@@ -764,6 +764,7 @@ class en_wiktionaryParser(Parser):
         self._etyl_template_()
         self.ast['etyl'] = self.last_node
         self._WS_()
+        self._one_line_text_()
         self._etyl_link_()
         self.ast['link'] = self.last_node
 
