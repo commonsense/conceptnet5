@@ -1,4 +1,4 @@
-FROM rspeer/conceptnet-base:5.3b2
+FROM rspeer/conceptnet-base:5.3
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Configure the environment where ConceptNet will be built
