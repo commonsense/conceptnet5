@@ -56,7 +56,7 @@ class AssocSpaceWrapper(object):
                     neighbor = edge['start']
                 else:
                     continue
-                neighbor_weight = weight * edge['weight'] * 0.1
+                neighbor_weight = weight * min(10, edge['weight']) * 0.001
                 if edge['rel'].startswith('/r/Not'):
                     neighbor_weight *= -1
                 expanded.append((neighbor, neighbor_weight))

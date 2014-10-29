@@ -241,7 +241,7 @@ class EdgeIndexReader(object):
 
     def edge_iterator(self, cursor):
         while True:
-            rows = cursor.fetchmany()
+            rows = cursor.fetchmany(size=50)
             if not rows:
                 return
             for (filenum, offset) in rows:
