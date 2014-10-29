@@ -1,6 +1,7 @@
 from assoc_space import AssocSpace
 import argparse
 import os
+import numpy as np
 
 
 def merge_8_vector_spaces(subspace_dir):
@@ -47,7 +48,12 @@ def merge_vector_spaces(subspace_dir, mergers):
         del spaceA
         del spaceB
         merged.save_dir(os.path.join(subspace_dir, target))
-    return merged
+    
+    magnitudes = (merged.u ** 2).sum(1)
+    good_indices = np.flatnonzero(magnitudes >= 1e-5)
+    filtered = merged[good_indices]
+    filtered.save_dir(os.path.join(subspace_dir, 'merged_filtered'))
+    return filtered
 
 
 if __name__ == '__main__':
