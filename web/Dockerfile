@@ -2,7 +2,7 @@ FROM rspeer/conceptnet:5.3
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 RUN pip install gunicorn
-ADD static /src/conceptnet/static
+ADD router/static /src/conceptnet/static
 ADD templates /src/conceptnet/templates
 ADD wsgi_web.py /src/conceptnet/wsgi_web.py
 

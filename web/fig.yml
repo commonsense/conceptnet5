@@ -1,0 +1,24 @@
+conceptnet52:
+    build: 'legacy'
+    expose:
+        - "10052"
+
+conceptnet53:
+    build: '.'
+    expose:
+        - "10053"
+    volumes:
+        - "/data/conceptnet:/conceptnet_data"
+    ports:
+        - "10053:10053"
+
+router:
+    build: 'router'
+    links:
+        - "conceptnet52"
+        - "conceptnet53"
+    volumes:
+        - "/data/downloads:/var/www/downloads:ro"
+    ports:
+        - "80:80"
+
