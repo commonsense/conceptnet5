@@ -36,9 +36,20 @@ def decode(response):
     return json.loads(response.data.decode('utf-8'))
 
 
+def test_normalize():
+    found = decode(CLIENT.get('/data/5.3/normalize?language=en&term=This%20is%20a%20test'))
+    eq_(found, {'uri': '/c/en/this_be_test'})
+
+    found = decode(CLIENT.get('/data/5.3/normalize?language=en&term=This_is_a_test'))
+    eq_(found, {'uri': '/c/en/this_be_test'})
+
+    found = decode(CLIENT.get('/data/5.3/normalize?language=es&term=Esto_es_una_PRUEBA'))
+    eq_(found, {'uri': '/c/es/esto_es_una_prueba'})
+
+
 def test_lookup():
     # Lookup by concept
-    found = uris(decode(CLIENT.get('/c/en/example?limit=5')))
+    found = uris(decode(CLIENT.get('/data/5.3/c/en/example?limit=5')))
     eq_(found,
         ['/a/[/r/RelatedTo/,/c/en/beauty/n/,/c/en/example/]',
          '/a/[/r/RelatedTo/,/c/en/example/n/,/c/en/behaviour/]',
@@ -47,16 +58,16 @@ def test_lookup():
          '/a/[/r/RelatedTo/,/c/fro/essainple/n/,/c/en/example/]'])
 
     # Lookup by dataset
-    found = uris(decode(CLIENT.get('/d/wiktionary/en/es')))
+    found = uris(decode(CLIENT.get('/data/5.3/d/wiktionary/en/es')))
     eq_(found, [SPANISH_EXAMPLE])
 
     # Lookup by exact assertion URI
-    found = uris(decode(CLIENT.get(SPANISH_EXAMPLE)))
+    found = uris(decode(CLIENT.get('/data/5.3' + SPANISH_EXAMPLE)))
     eq_(found, [SPANISH_EXAMPLE])
 
     # Lookup by multiple criteria
     found = uris(decode(CLIENT.get(
-        '/search?start=/c/ja&rel=/r/TranslationOf&end=/c/en/example&limit=3'
+        '/data/5.3/search?start=/c/ja&rel=/r/TranslationOf&end=/c/en/example&limit=3'
     )))
     print(found)
     eq_(found,
@@ -68,18 +79,18 @@ def test_lookup():
 def test_assoc():
     # Look up something that isn't in the assoc space, but can be associated
     # via the DB
-    response = decode(CLIENT.get('/assoc/c/en/case_in_point?limit=3'))
+    response = decode(CLIENT.get('/data/5.3/assoc/c/en/case_in_point?limit=3'))
     eq_(response['terms'], [['/c/en/case_in_point', 1.0]])
     similar = [item[0] for item in response['similar']]
     eq_(similar, ['/c/en/example', '/c/en/ideas', '/c/en/green'])
 
     # Look up something that gets no results
-    response = decode(CLIENT.get('/assoc/c/zxx/gibberish'))
+    response = decode(CLIENT.get('/data/5.3/assoc/c/zxx/gibberish'))
     similar = [item[0] for item in response['similar']]
     eq_(similar, [])
 
     # Look up a weighted list
-    response = decode(CLIENT.get('/assoc/list/en/orange,red@-.5?limit=3'))
+    response = decode(CLIENT.get('/data/5.3/assoc/list/en/orange,red@-.5?limit=3'))
     eq_(response['terms'], [['/c/en/orange', 1.0], ['/c/en/red', -0.5]])
     similar = [item[0] for item in response['similar']]
     eq_(similar, ['/c/en/yellow', '/c/en/orange', '/c/en/lemon'])

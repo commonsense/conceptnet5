@@ -396,7 +396,9 @@ $(DATA)/assoc/subspaces/%/u.npy: $(DATA)/assoc/%.csv $(BUILDERS)/assoc_to_vector
 $(ASSOC_DIR)/u.npy: $(ASSOC_SUBSPACES)
 	$(PYTHON) -m conceptnet5.builders.merge_vector_spaces $(DATA)/assoc/subspaces
 	rm -rf $(ASSOC_DIR)
-	mv $(DATA)/assoc/subspaces/merged_complete $(ASSOC_DIR)
+	mv $(DATA)/assoc/subspaces/merged_filtered $(ASSOC_DIR)
+	# When this step seems right:
+	# rm -rf $(DATA)/assoc/subspaces
 
 # Index the assertions in a SQLite database.
 $(DB_DIR)/.done: $(ASSERTION_FILES) $(BUILDERS)/index_assertions.py

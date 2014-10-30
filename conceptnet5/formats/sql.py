@@ -241,7 +241,7 @@ class EdgeIndexReader(object):
 
     def edge_iterator(self, cursor):
         while True:
-            rows = cursor.fetchmany()
+            rows = cursor.fetchmany(size=50)
             if not rows:
                 return
             for (filenum, offset) in rows:
@@ -253,7 +253,7 @@ class EdgeIndexReader(object):
         else:
             filename = 'part_%02d.msgpack' % filenum
             fileobj = open(os.path.join(self.edge_dir, filename), 'rb')
-            self.open_file_cache[filename] = fileobj
+            self.open_file_cache[filenum] = fileobj
         fileobj.seek(offset)
         unpacker = Unpacker(fileobj, encoding=encoding)
         return unpacker.unpack()
