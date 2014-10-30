@@ -10,6 +10,7 @@ import os
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
+from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
 from conceptnet5.util import get_data_filename, get_support_data_filename
@@ -63,7 +64,7 @@ def not_found(error):
     return flask.jsonify({
         'error': 'invalid request',
         'details': str(error)
-    })
+    }), 404
 
 
 @app.errorhandler(MissingAssocSpace)
@@ -109,6 +110,20 @@ def search():
             criteria[key] = flask.request.args[key]
     results = list(FINDER.query(criteria, limit=limit, offset=offset))
     return flask.jsonify(edges=results, numFound=len(results))
+
+
+@app.route(API_URL + '/normalize')
+def normalize():
+    language = flask.request.args.get('language')
+    term = flask.request.args.get('term').replace('_', ' ')
+    if term is None or language is None:
+        return flask.jsonify({
+            'error': 'Invalid request',
+            'details': "You should include the 'term' and 'language' parameters"
+        }), 400
+    uri = normalized_concept_uri(language, term)
+    return flask.jsonify(uri=uri)
+
 
 @app.route(API_URL + '/')
 def see_documentation():
