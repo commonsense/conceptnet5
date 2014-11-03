@@ -19,6 +19,7 @@ router:
         - "conceptnet53"
     volumes:
         - "/data/downloads:/var/www/downloads:ro"
+        - "/data/nginx/cache:/data/nginx/cache"
     ports:
         - "80:80"
 
