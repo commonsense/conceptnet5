@@ -224,6 +224,7 @@ download_db: nltk_download
 	cd $(DATA) && $(CURL_DOWNLOAD) $(DOWNLOAD_URL)/v$(VERSION)/$(DB_PACKAGE)
 	$(TARBALL_EXTRACT) $(DATA)/$(DB_PACKAGE)
 	touch $(DATA)/db/*
+	if [ ! -e $(DATA_SYMLINK) ]; then ln -s $(DATA_ABSOLUTE_PATH) $(DATA_SYMLINK); fi
 
 download_assertions: nltk_download
 	@mkdir -p $(DATA)
