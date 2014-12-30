@@ -217,7 +217,7 @@ download: nltk_download
 	$(TARBALL_EXTRACT) $(DATA)/$(RAW_DATA_PACKAGE)
 
 nltk_download:
-	python setup.py nltk_download
+	$(PYTHON) setup.py nltk_download
 
 download_db: nltk_download
 	@mkdir -p $(DATA)
