@@ -12,10 +12,10 @@ from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 import re
 import logging
+import langcodes
 from ftfy import ftfy
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.sql import TitleDBWriter
-from conceptnet5.util.language_codes import NAME_TO_CODE
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -107,6 +107,7 @@ class WiktionaryWriter(object):
     Subclasses most likely want to override the methods `_get_language()` and
     `handle_section()`.
     """
+    langcode = 'en'
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
         self.writers = [
@@ -116,7 +117,7 @@ class WiktionaryWriter(object):
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
 
     def _get_language_code(self, language):
-        return NAME_TO_CODE['en'].get(language)
+        return str(langcodes.find_name('language', language, self.langcode))
 
     def _get_language(self, heading):
         """Essentially a no-op method by default, but meant to be overridden
@@ -184,14 +185,12 @@ class WiktionaryWriter(object):
 
 
 class DeWiktionaryWriter(WiktionaryWriter):
+    langcode = 'de'
     def _get_language(self, heading):
         lang_match = LANGUAGE_RE.search(heading)
         if lang_match:
             return lang_match.group(1).strip()
         return 'Deutsch'
-
-    def _get_language_code(self, language):
-        return NAME_TO_CODE['de'].get(language)
 
     def handle_section(self, text, heading, level=None):
         """
@@ -220,7 +219,7 @@ class DeWiktionaryWriter(WiktionaryWriter):
         }
 
 
-LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
+LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter,}  # 'ja': JaWiktionaryWriter}
 
 
 def handle_file(input_file, output_dir, language, nfiles=20):
@@ -237,7 +236,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
-    parser.add_argument('-l', '--language', choices=['de', 'en'], default='en',
+    parser.add_argument('-l', '--language',
+                        choices=['de', 'en', 'ja'],
+                        default='en',
                         help='Two-letter ISO language code of the input file')
     parser.add_argument('-n', '--nfiles', type=int, default=20,
                         help='Number of output files to create')

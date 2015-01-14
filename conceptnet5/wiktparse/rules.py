@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.util.language_codes import NAME_TO_CODE
 from pprint import pprint
 from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern
+import langcodes
 import traceback
 import sqlite3
 import os
@@ -51,7 +51,7 @@ def language_code(source_language, language_name):
     such code can be found. `source_language` is the 2-letter ISO code for the
     language of the input file being parsed.
     """
-    return NAME_TO_CODE[source_language].get(language_name)
+    return str(langcodes.find_name('language', language_name, source_language))
 
 
 class LinkedText(object):

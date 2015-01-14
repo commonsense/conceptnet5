@@ -8,12 +8,12 @@ import yaml
 
 # The language codes used by GlobalMind were idiosyncratic, and need to be
 # converted to ISO-like codes by this dictionary instead of by the
-# language_codes module. For example, 'cht' doesn't really mean Traditional
+# langcodes package. For example, 'cht' doesn't really mean Traditional
 # Chinese, it means Cholón.
 LANG_CODES = {
     'eng': 'en',
-    'cht': 'zh_TW',
-    'chs': 'zh_CN',
+    'cht': 'zh-TW',
+    'chs': 'zh-CN',
     'jpn': 'ja',
     'kor': 'ko',
     'spa': 'es',
@@ -23,9 +23,9 @@ LANG_NAMES = {
     'eng': 'English',
     'en': 'English',
     'cht': 'Traditional Chinese',
-    'zh_TW': 'Traditional Chinese',
+    'zh-TW': 'Traditional Chinese',
     'chs': 'Simplified Chinese',
-    'zh_CN': 'Simplified Chinese',
+    'zh-CN': 'Simplified Chinese',
     'zh': 'Chinese',
     'jpn': 'Japanese',
     'ja': 'Japanese',
