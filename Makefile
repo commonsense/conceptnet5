@@ -187,7 +187,7 @@ SQLITE_FILE_BASE = $(DB_DIR)/assertions.db
 # A complete run, including all steps, might look like this:
 #     make download all build_assoc build_cc_by upload
 all: build_assertions build_stats build_db
-parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py
+parsers: $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/de_parser.py $(BASE)/wiktparse/ja_parser.py
 build_assoc_subspaces: $(ASSOC_SUBSPACES)
 build_assoc: $(ASSOC_DIR)/u.npy
 build_db: $(DB_DIR)/.done
@@ -303,6 +303,9 @@ $(BASE)/wiktparse/en_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/ext
 $(BASE)/wiktparse/de_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
 	cd $(BASE)/wiktparse && $(MAKE) de_parser.py
 
+$(BASE)/wiktparse/ja_parser.py: $(BASE)/wiktparse/rules.py $(BASE)/wiktparse/extract_ebnf.py
+	cd $(BASE)/wiktparse && $(MAKE) ja_parser.py
+
 # The next stage of Wiktionary reading is to run the .msgpack files through the
 # full Wiktionary parser, which is relatively slow but can happen in parallel.
 $(DATA)/edges/wiktionary/en/%.msgpack: $(DATA)/extracted/wiktionary/en/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/en_parser.py $(BASE)/wiktparse/rules.py $(CORE)
@@ -313,6 +316,11 @@ $(DATA)/edges/wiktionary/en/%.msgpack: $(DATA)/extracted/wiktionary/en/.done $(R
 $(DATA)/edges/wiktionary/de/%.msgpack: $(DATA)/extracted/wiktionary/de/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/de_parser.py $(BASE)/wiktparse/rules.py $(CORE)
 	@mkdir -p $(DATA)/edges/wiktionary/de
 	$(PYTHON) -m conceptnet5.readers.wiktionary -l de \
+		$(patsubst $(DATA)/edges/%,$(DATA)/extracted/%,$@) $@
+
+$(DATA)/edges/wiktionary/ja/%.msgpack: $(DATA)/extracted/wiktionary/ja/.done $(READERS)/wiktionary.py $(BASE)/wiktparse/ja_parser.py $(BASE)/wiktparse/rules.py $(CORE)
+	@mkdir -p $(DATA)/edges/wiktionary/ja
+	$(PYTHON) -m conceptnet5.readers.wiktionary -l ja \
 		$(patsubst $(DATA)/edges/%,$(DATA)/extracted/%,$@) $@
 
 # Verbosity and WordNet are also indivisible scripts; it has to be handled
