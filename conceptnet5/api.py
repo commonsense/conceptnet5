@@ -87,15 +87,20 @@ def term_list_error(error):
 
 @app.route(API_URL + '/<path:query>')
 def query_node(query):
-    # TODO: restore support for min_weight?
     req_args = flask.request.args
     path = '/' + query.strip('/')
     offset = int(req_args.get('offset', 0))
     offset = max(0, offset)
     limit = int(req_args.get('limit', 50))
     limit = max(0, min(limit, 1000))
-    results = list(FINDER.lookup(path, offset=offset, limit=limit))
-    return flask.jsonify(edges=results, numFound=len(results))
+    grouped = req_args.get('grouped', 'false').lower() == 'true'
+    if grouped:
+        limit = min(limit, 100)
+        results = FINDER.lookup_grouped_by_featuer(path, offset=offset, group_limit=limit)
+        return flask.jsonify(groups=results)
+    else:
+        results = list(FINDER.lookup(path, offset=offset, limit=limit))
+        return flask.jsonify(edges=results, numFound=len(results))
 
 
 @app.route(API_URL + '/search')
