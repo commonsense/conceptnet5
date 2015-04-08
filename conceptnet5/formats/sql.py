@@ -206,7 +206,6 @@ class EdgeIndexReader(object):
         self.filename = filename
         self.edge_dir = edge_dir
         self.open_file_cache = {}
-        self.file_sizes = {}
         self.dbs = {}
         self.nshards = nshards
         self._connect()
@@ -264,38 +263,22 @@ class EdgeIndexReader(object):
             size = os.path.getsize(path)
             fileobj = open(path, 'rb')
             self.open_file_cache[filenum] = fileobj
-            self.file_sizes[filenum] = size
             return fileobj
 
     def random(self):
-        filenum = random.randrange(0, self.nshards)
-        fileobj = self.get_file(filenum)
-        byte_offset = random.randrange(0, self.file_sizes[filenum])
-        fileobj.seek(byte_offset)
+        hashval = random.randrange(-2**31, 2**31)
+        shard = hashval % self.nshards
+        c = self.dbs[shard].cursor()
+        offset = random.randrange(0, 100)
+        rows = []
+        while not rows:
+            c.execute(
+                "SELECT filenum, offset from text_index "
+                "WHERE queryhash >= ? "
+                "ORDER BY queryhash LIMIT 1 OFFSET ?",
+                (hashval, offset)
+            )
+            rows = c.fetchall()
 
-        # This is kind of an evil hack. We've seeked to a random place in the
-        # file, which is probably in the middle of an edge. We'll find the
-        # start of the edge by seeking backwards until we find a byte 0x8D,
-        # then try to decode the dictionary that begins there.
-        #
-        # We have to allow the result to fail sometimes, as Unicode strings
-        # will also contain byte 8D, and it turns out we have a lot of those.
-
-        while True:
-            try:
-                curbyte = fileobj.read(1)
-                while curbyte != b'\x8d':
-                    byte_offset -= 1
-                    fileobj.seek(byte_offset)
-                    curbyte = fileobj.read(1)
-                fileobj.seek(byte_offset)
-
-                unpacker = Unpacker(fileobj, encoding=encoding)
-                result = unpacker.unpack()
-                if len(result) == 13 and 'uri' in result:
-                    return result
-                else:
-                    byte_offset -= 2
-            except (ValueError, TypeError):
-                byte_offset -= 2
-
+        filenum, offset = rows[0]
+        return self.get_edge(filenum, offset)
