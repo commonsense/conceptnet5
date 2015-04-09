@@ -11,6 +11,7 @@ from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
+import langcodes
 import urllib
 import sys
 import re
@@ -92,6 +93,11 @@ def translate_dbpedia_url(url):
         domain_parts = domain.split('.', 1)
         if domain_parts[1] == 'dbpedia.org':
             lang = domain_parts[0]
+
+            # If we can't name this language in English, it's probably
+            # not really a language.
+            if langcodes.get(lang).language_name('en') == lang:
+                return None
         else:
             return None
 
@@ -102,25 +108,37 @@ def translate_dbpedia_url(url):
     return normalized_concept_uri(lang, *pieces)
 
 
+SPECIFIC_RELATION_WHITELIST = {
+    'genre', 'field', 'knownFor', 'mainInterest', 'notableIdea', 'artist', 'album',
+    'author', 'director', 'producer', 'writer', 'starring', 'literaryGenre',
+    'spokenIn', 'languageFamily', 'influenced', 'influencedBy'
+}
+
+
 def map_dbpedia_relation(url):
     """
     Recognize three relations that we can extract from DBPedia, and convert
-    them to ConceptNet relations.
+    them to ConceptNet relations. If the relation is specific to DBPedia, it'll
+    be in the '/r/dbpedia' namespace.
 
     >>> map_dbpedia_relation('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
     '/r/IsA'
     >>> map_dbpedia_relation('http://dbpedia.org/ontology/location')
     '/r/AtLocation'
+    >>> map_dbpedia_relation('http://dbpedia.org/ontology/genre')
+    '/r/dbpedia/genre'
     """
     name = resource_name(url)
-    if name == 'type':
+    if name in {'type', 'occupation'}:
         return '/r/IsA'
-    elif name.startswith('isPartOf'):
-        return '/r/PartOf'
     elif name.startswith('location'):
         return '/r/AtLocation'
     elif name == 'sameAs':
         return '/r/TranslationOf'
+    elif name in SPECIFIC_RELATION_WHITELIST:
+        return '/r/dbpedia/%s' % name
+    elif name.startswith('associated'):
+        return '/r/dbpedia/%s' % name
     else:
         return None
 

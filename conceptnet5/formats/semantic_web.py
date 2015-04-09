@@ -34,7 +34,11 @@ def decode_url(url):
     'http://dbpedia.org/resource/Núria_Espert'
     """
     url_bytes = url.strip('<>').encode('utf-8')
-    return decode_escapes(unquote(url_bytes).decode('utf-8', 'replace'))
+    text = unquote(url_bytes).decode('utf-8', 'replace')
+    try:
+        return decode_escapes(text)
+    except UnicodeDecodeError:
+        return text
 
 
 def safe_quote(uri):

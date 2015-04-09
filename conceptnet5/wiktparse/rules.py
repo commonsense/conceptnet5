@@ -80,7 +80,14 @@ def language_code(source_language, language_name):
     such code can be found. `source_language` is the 2-letter ISO code for the
     language of the input file being parsed.
     """
-    return str(langcodes.find_name('language', language_name, source_language))
+    try:
+        return str(langcodes.find_name('language', language_name, source_language))
+    except LookupError:
+        if len(language_name) <= 3 and language_name == language_name.lower():
+            # This might already be a code
+            return language_name
+        else:
+            return None
 
 
 class LinkedText(object):
