@@ -28,18 +28,21 @@ def extract_ebnf(qualified_class_name):
     this_class = getattr(module, class_name)
     ebnf_sections = []
     seen_docs = set()
+    seen_names = set()
 
     # Iterate over superclasses in method-resolution order
     for depth, klass in enumerate(this_class.mro()):
         if klass != object:
             for name, method in inspect.getmembers(klass):
                 if inspect.isfunction(method):
-                    _, linenum = inspect.getsourcelines(method)
-                    doc = inspect.getdoc(method)
-                    if doc and doc not in seen_docs:
-                        seen_docs.add(doc)
-                        ebnf = ebnf_from_docstring(doc)
-                        ebnf_sections.append((-depth, linenum, name, ebnf))
+                    if name not in seen_names:
+                        seen_names.add(name)
+                        _, linenum = inspect.getsourcelines(method)
+                        doc = inspect.getdoc(method)
+                        if doc and doc not in seen_docs:
+                            seen_docs.add(doc)
+                            ebnf = ebnf_from_docstring(doc)
+                            ebnf_sections.append((-depth, linenum, name, ebnf))
 
 
     ebnf_sections.sort()

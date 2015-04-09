@@ -13,6 +13,30 @@ import os
 import re
 
 
+
+def make_surface_text(rel, start, end):
+    if rel == 'TranslationOf':
+        return '[[{0}]] is a translation of [[{1}]]'.format(start, end)
+    elif rel == 'DerivedFrom':
+        return 'The word "[[{0}]]" is derived from "[[{1}]]"'.format(start, end)
+    elif rel == 'CompoundDerivedFrom':
+        return 'The word "[[{0}]]" is derived in part from "[[{1}]]"'.format(start, end)
+    elif rel == 'EtymologicallyDerivedFrom':
+        return 'The word "[[{0}]]" etymologically comes from the word "[[{1}]]"'.format(start, end)
+    elif rel == 'RelatedTo':
+        return '[[{0}]] is related to [[{1}]]'.format(start, end)
+    elif rel == 'Synonym':
+        return '[[{0}]] is a synonym of [[{1}]]'.format(start, end)
+    elif rel == 'Antonym':
+        return '[[{0}]] is an antonym of [[{1}]]'.format(start, end)
+    elif rel == 'IsA':
+        return '[[{0}]] is a kind of [[{1}]]'.format(start, end)
+    elif rel == 'PartOf':
+        return '[[{0}]] is part of [[{1}]]'.format(start, end)
+    else:
+        return '[[{0}]] {1} [[{2}]]'.format(start, rel, end)
+
+
 class MissingSemantics(object):
     def parse(self, *args, **kwargs):
         raise RuntimeError(
@@ -32,6 +56,11 @@ try:
                                                  de_wiktionarySemantics)
 except ImportError:
     de_wiktionaryParser = de_wiktionarySemantics = MissingSemantics
+try:
+    from conceptnet5.wiktparse.ja_parser import (ja_wiktionaryParser,
+                                                 ja_wiktionarySemantics)
+except ImportError:
+    ja_wiktionaryParser = ja_wiktionarySemantics = MissingSemantics
 
 string_type = type('')
 
@@ -187,6 +216,10 @@ class EdgeInfo(object):
         if rel.startswith('~'):
             rel = rel[1:]
             start_uri, end_uri = end_uri, start_uri
+            start, end = self.target, headword
+        else:
+            start, end = headword, self.target
+
 
         rel_uri = join_uri('/r', rel)
 
@@ -200,6 +233,7 @@ class EdgeInfo(object):
         n_headword = headword.replace(' ', '_')
         return make_edge(
             rel=rel_uri, start=start_uri, end=end_uri,
+            surfaceText = make_surface_text(rel, start, end),
             dataset='/d/wiktionary/%s/%s' % (source_lang, headlang),
             license=Licenses.cc_sharealike,
             sources=[join_uri('/s/web/%s.wiktionary.org/wiki' % source_lang,
