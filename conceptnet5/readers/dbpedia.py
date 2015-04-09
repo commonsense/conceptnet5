@@ -114,6 +114,12 @@ SPECIFIC_RELATION_WHITELIST = {
     'spokenIn', 'languageFamily', 'influenced', 'influencedBy'
 }
 
+# Ban some concepts that are way too generic *and* differ from the common way that
+# people use these words
+CONCEPT_BLACKLIST = {
+    '/c/en/work', '/c/en/agent', '/c/en/artist'
+}
+
 
 def map_dbpedia_relation(url):
     """
@@ -183,7 +189,7 @@ def handle_triple(line, reader, out, map_out):
     # DBPedia categorizes a lot of things as 'works', which causes unnecessary
     # ambiguity. Disregard these edges; there will almost always be a more
     # specific edge calling it a 'creative work' anyway.
-    if obj_concept == '/c/en/work':
+    if obj_concept in CONCEPT_BLACKLIST:
         return
 
     rel = map_dbpedia_relation(pred)
