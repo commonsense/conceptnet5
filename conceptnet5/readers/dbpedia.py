@@ -20,10 +20,25 @@ import re
 if sys.version_info.major >= 3:
     quote = urllib.parse.quote
     urlsplit = urllib.parse.urlsplit
+    parse_url = urllib.parse.urlparse
 else:
     import urlparse
+    parse_url = urlparse.urlparse
     urlsplit = urlparse.urlsplit
     quote = urllib.quote
+
+
+def make_surface_text(rel, start, end):
+    if rel == '/r/IsA':
+        return '[[{0}]] is a kind of [[{1}]]'.format(start, end)
+    elif rel == '/r/PartOf':
+        return '[[{0}]] is part of [[{1}]]'.format(start, end)
+    elif rel == '/r/AtLocation':
+        return '[[{0}]] is located in [[{1}]]'.format(start, end)
+    elif rel == '/r/TranslationOf':
+        return '[[{0}]] is a translation of [[{1}]]'.format(start, end)
+    else:
+        return '[[{0}]] {1} [[{2}]]'.format(start, rel.split('/')[-1], end)
 
 
 # We're going to be building a mapping from Semantic Web URIs to ConceptNet
@@ -50,7 +65,7 @@ def parse_topic_name(text):
         return [match.group(1), 'n', match.group(2).strip(' ')]
 
 
-def translate_dbpedia_url(url, lang='en'):
+def translate_dbpedia_url(url):
     """
     Convert an object that's defined by a DBPedia URL to a ConceptNet
     URI. We do this by finding the part of the URL that names the object,
@@ -67,6 +82,19 @@ def translate_dbpedia_url(url, lang='en'):
     The URL itself is a stable thing that we can build a ConceptNet URI from,
     on the other hand.
     """
+    parsed = parse_url(url)
+    domain = parsed.netloc
+
+    if domain == 'dbpedia.org':
+        # Handle old DBPedia URLs that had no language code
+        lang = 'en'
+    else:
+        domain_parts = domain.split('.', 1)
+        if domain_parts[1] == 'dbpedia.org':
+            lang = domain_parts[0]
+        else:
+            return None
+
     # Some Semantic Web URLs are camel-cased. ConceptNet URIs use underscores
     # between words.
     pieces = parse_topic_name(resource_name(url))
@@ -91,6 +119,8 @@ def map_dbpedia_relation(url):
         return '/r/PartOf'
     elif name.startswith('location'):
         return '/r/AtLocation'
+    elif name == 'sameAs':
+        return '/r/TranslationOf'
     else:
         return None
 
@@ -125,8 +155,12 @@ def handle_triple(line, reader, out, map_out):
     if 'dbpedia.org' not in obj:
         return
 
-    subj_concept = translate_dbpedia_url(subj, 'en')
-    obj_concept = translate_dbpedia_url(obj, 'en')
+    subj_concept = translate_dbpedia_url(subj)
+    obj_concept = translate_dbpedia_url(obj)
+    subj_text = parse_topic_name(resource_name(subj))[0]
+    obj_text = parse_topic_name(resource_name(obj))[0]
+    if subj_concept is None or obj_concept is None:
+        return
 
     # DBPedia categorizes a lot of things as 'works', which causes unnecessary
     # ambiguity. Disregard these edges; there will almost always be a more
@@ -153,7 +187,8 @@ def handle_triple(line, reader, out, map_out):
     edge = make_edge(rel, subj_concept, obj_concept,
                      dataset='/d/dbpedia/en',
                      license=Licenses.cc_sharealike,
-                     sources=['/s/dbpedia/3.7'],
+                     sources=['/s/dbpedia/2014'],
+                     surfaceText=make_surface_text(rel, subj_text, obj_text),
                      weight=0.5)
 
     out.write(edge)

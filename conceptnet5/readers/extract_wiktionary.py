@@ -101,11 +101,15 @@ class ExtractPages(ContentHandler):
 
 
 def _language_name_to_code(name, name_language_code):
-    found = langcodes.find_name('language', name, name_language_code)
-    if found:
+    try:
+        found = langcodes.find_name('language', name, name_language_code)
         return str(found)
-    else:
+    except LookupError:
         return None
+
+
+def _language_code_to_name(code):
+    return langcodes.get(code).language_name('en')
 
 
 class WiktionaryWriter(object):

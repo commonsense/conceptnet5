@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 from conceptnet5.uri import ROOT_URL
+from ftfy.fixes import decode_escapes
 import sys
 import urllib
 import codecs
@@ -33,7 +34,7 @@ def decode_url(url):
     'http://dbpedia.org/resource/Núria_Espert'
     """
     url_bytes = url.strip('<>').encode('utf-8')
-    return unquote(url_bytes).decode('utf-8', 'replace')
+    return decode_escapes(unquote(url_bytes).decode('utf-8', 'replace'))
 
 
 def safe_quote(uri):
