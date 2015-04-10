@@ -75,12 +75,21 @@ def normalize_text(text, lowercase=True):
     # a piece.
     text = fix_text(text, normalization='NFC').strip()
     text = text.replace('/', ' ')
-    assert (text not in BAD_NAMES_FOR_THINGS), text
+    if text in BAD_NAMES_FOR_THINGS:
+        raise ValueError("Bad concept name: %r" % text)
     text = text.strip('.,?!"') or text
     if lowercase:
         text = text.lower()
     text = WHITESPACE_RE.sub('_', text)
     return text
+
+
+def valid_concept_name(text):
+    text = fix_text(text, normalization='NFC').strip()
+    text = text.replace('/', ' ')
+    if text in BAD_NAMES_FOR_THINGS:
+        return False
+    return True
 
 
 def join_uri(*pieces):

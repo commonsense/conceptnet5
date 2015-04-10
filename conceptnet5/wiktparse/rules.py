@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
-from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
+from conceptnet5.uri import join_uri, Licenses, valid_concept_name
 from pprint import pprint
 from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern
@@ -188,7 +188,7 @@ class EdgeInfo(object):
         Make sure this edge doesn't have an invalid node name, an invalid
         language, or an unattested proto-language.
         """
-        if self.target in BAD_NAMES_FOR_THINGS or self.target.startswith('*'):
+        if not valid_concept_name(self.target) or self.target.startswith('*'):
             return False
         if self.language is not None:
             if self.language.endswith('-pro') or not self.LANGUAGE_CODE_RE.match(self.language):
@@ -202,13 +202,13 @@ class EdgeInfo(object):
         else:
             sense = self.sense
 
-        if sense in BAD_NAMES_FOR_THINGS:
-            sense = None
-
         if isinstance(sense, LinkedText):
             sense = sense.text
 
         if sense in ('', '-', '?'):
+            sense = None
+
+        if sense is not None and not valid_concept_name(sense):
             sense = None
 
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
@@ -432,6 +432,7 @@ class ConceptNetWiktionarySemantics(object):
                                   headword, headpos)
                  for ei in edge_info
                  if ei.check_validity()
+                 and valid_concept_name(headword)
                  and ei.language is not None]
             )
 
@@ -742,9 +743,9 @@ class ConceptNetWiktionarySemantics(object):
         """
         # Keep only the text of external links
         return LinkedText(text=ast['text'], links=[])
-    
+
     # Below here are patterns that apply across multiple Wiktionaries.
-    
+
     def translation_entry(self, ast):
         """
         Lines in the translation section begin with an asterisk as a bullet,
@@ -1544,6 +1545,8 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
                 for lt in item.sense:
                     lt.text = '(' + curr_sense + ') ' + head_text + lt.text
                     linked_texts.append(lt)
+            elif item.sense is None:
+                return
             else:
                 item.sense.text = '(' + curr_sense + ') ' + head_text + item.sense.text
                 linked_texts.append(item.sense)
