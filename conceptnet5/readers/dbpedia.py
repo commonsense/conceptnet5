@@ -32,6 +32,8 @@ else:
 def make_surface_text(rel, start, end):
     if rel == '/r/IsA':
         return '[[{0}]] is a kind of [[{1}]]'.format(start, end)
+    if rel == '/r/InstanceOf':
+        return '[[{0}]] is an instance of [[{1}]]'.format(start, end)
     elif rel == '/r/PartOf':
         return '[[{0}]] is part of [[{1}]]'.format(start, end)
     elif rel == '/r/AtLocation':
@@ -128,7 +130,7 @@ def map_dbpedia_relation(url):
     be in the '/r/dbpedia' namespace.
 
     >>> map_dbpedia_relation('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
-    '/r/IsA'
+    '/r/InstanceOf'
     >>> map_dbpedia_relation('http://dbpedia.org/ontology/location')
     '/r/AtLocation'
     >>> map_dbpedia_relation('http://dbpedia.org/ontology/genre')
@@ -136,7 +138,7 @@ def map_dbpedia_relation(url):
     """
     name = resource_name(url)
     if name in {'type', 'occupation'}:
-        return '/r/IsA'
+        return '/r/InstanceOf'
     elif name.startswith('location'):
         return '/r/AtLocation'
     elif name == 'sameAs':
@@ -171,8 +173,11 @@ def handle_triple(line, reader, out, map_out):
     #     "Alfred_Nobel__1", which means "Alfred Nobel's occupation, whatever
     #     it is"
     #   - Nodes that are articles named "List of X" on Wikipedia
-    if ('foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or
-        '__' in subj or '__' in obj or 'List_of' in subj or 'List_of' in obj):
+    if (
+        'foaf/0.1/homepage' in pred or '_Feature' in obj or '#Thing' in obj or
+        '__' in subj or '__' in obj or 'List_of' in subj or 'List_of' in obj
+        or 'Wikidata:' in obj
+    ):
         return
 
     # We don't try to parse URIs from outside of dbpedia.org's namespace.
@@ -181,8 +186,8 @@ def handle_triple(line, reader, out, map_out):
 
     subj_concept = translate_dbpedia_url(subj)
     obj_concept = translate_dbpedia_url(obj)
-    subj_text = parse_topic_name(resource_name(subj))[0]
-    obj_text = parse_topic_name(resource_name(obj))[0]
+    subj_text = un_camel_case(parse_topic_name(resource_name(subj))[0])
+    obj_text = un_camel_case(parse_topic_name(resource_name(obj))[0])
     if subj_concept is None or obj_concept is None:
         return
 
@@ -195,6 +200,9 @@ def handle_triple(line, reader, out, map_out):
     rel = map_dbpedia_relation(pred)
     if rel is None:
         return
+
+    if rel in {'/r/IsA', '/r/TranslationOf'}:
+        obj_text = obj_text.lower()
 
     # We've successfully converted this Semantic Web triple to ConceptNet URIs.
     # Now write the results to the 'sw_map' file so others can follow this
