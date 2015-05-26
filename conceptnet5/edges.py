@@ -112,7 +112,8 @@ def extract_surface_terms(surface):
     if not surface:
         return (None, None)
     surface_terms = SURFACE_FORM_PATTERN.findall(surface)
-    assert len(surface_terms) == 2, surface
+    if len(surface_terms) != 2:
+        return (None, None)
     if surface.startswith('*'):
         surface_terms = surface_terms[::-1]
     return surface_terms
