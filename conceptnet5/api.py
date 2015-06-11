@@ -13,7 +13,7 @@ from flask_limiter import Limiter
 from conceptnet5 import __version__ as VERSION
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
-from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
+from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
 
 
@@ -25,10 +25,7 @@ WORKING_DIR = os.getcwd()
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
 
-FINDER = AssertionFinder()
-ASSOC_WRAPPER = AssocSpaceWrapper(
-    get_data_filename('assoc/assoc-space-%s' % VERSION), FINDER
-)
+FINDER, ASSOC_WRAPPER = get_assoc_data('assoc-space-%s' % VERSION)
 
 app = flask.Flask(
     'conceptnet5',

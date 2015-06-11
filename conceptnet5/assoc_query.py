@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
-from conceptnet5.query import field_match
+from conceptnet5.query import field_match, AssertionFinder
+from conceptnet5.util import get_data_filename
+
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
@@ -75,3 +77,11 @@ class AssocSpaceWrapper(object):
             and self.passes_filter(item[0], filter)
         ][:limit]
         return similar
+
+
+def get_assoc_data(name):
+    finder = AssertionFinder()
+    assoc_wrapper = AssocSpaceWrapper(
+        get_data_filename('assoc/%s' % name), finder
+    )
+    return finder, assoc_wrapper
