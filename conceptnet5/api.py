@@ -96,7 +96,7 @@ def query_node(query):
     grouped = req_args.get('grouped', 'false').lower() == 'true'
     if grouped:
         limit = min(limit, 100)
-        results = FINDER.lookup_grouped_by_featuer(path, offset=offset, group_limit=limit)
+        results = FINDER.lookup_grouped_by_feature(path, offset=offset, group_limit=limit)
         return flask.jsonify(groups=results)
     else:
         results = list(FINDER.lookup(path, offset=offset, limit=limit))
