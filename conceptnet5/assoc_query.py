@@ -68,9 +68,13 @@ class AssocSpaceWrapper(object):
             return []
         return [(term, weight / total_weight) for (term, weight) in expanded]
 
+    def expanded_vector(self, terms, limit_per_term=10):
+        self.load()
+        return self.assoc.vector_from_terms(self.expand_terms(terms, limit_per_term))
+
     def associations(self, terms, filter=None, limit=20):
         self.load()
-        vec = self.assoc.vector_from_terms(self.expand_terms(terms))
+        vec = self.expanded_vector(terms)
         similar = self.assoc.terms_similar_to_vector(vec)
         similar = [
             item for item in similar if item[1] > SMALL
