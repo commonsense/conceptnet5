@@ -10,6 +10,7 @@ import os
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
+from conceptnet5 import __version__ as VERSION
 from conceptnet5.nodes import normalized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
@@ -19,8 +20,7 @@ from conceptnet5.util import get_data_filename, get_support_data_filename
 
 ### Configuration ###
 
-VERSION = '5.3'
-API_URL = '/data/5.3'
+API_URL = '/data/%s' % VERSION
 WORKING_DIR = os.getcwd()
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))

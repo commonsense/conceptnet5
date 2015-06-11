@@ -102,7 +102,7 @@ def full_conceptnet_url(uri):
     Translate a ConceptNet URI into a fully-specified URL.
 
     >>> full_conceptnet_url('/c/en/dog')
-    'http://conceptnet5.media.mit.edu/data/5.3/c/en/dog'
+    'http://conceptnet5.media.mit.edu/data/5.4/c/en/dog'
     """
     assert uri.startswith('/')
     return ROOT_URL + safe_quote(uri)

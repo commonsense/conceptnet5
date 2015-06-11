@@ -1,6 +1,6 @@
 # ConceptNet-related configuration
 # ================================
-VERSION = 5.3
+VERSION = 5.4
 
 # $(PYTHON) should point to an installation of Python 3.3 or later, with
 # conceptnet5 installed as a library. If you're in an appropriate virtualenv,
