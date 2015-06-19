@@ -27,6 +27,9 @@ ROOT_URL = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 
 # If we end up trying to fit a piece of text that looks like these into a URI,
 # it will mess up our patterns of URIs.
+#
+# To avoid having to raise an error, we'll represent all of these as a single
+# underscore.
 BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
 
 # Whitespace should be replaced with underscores in URIs.
@@ -66,6 +69,9 @@ def normalize_text(text, lowercase=True):
 
         >>> normalize_text('embedded' + chr(9) + 'tab')
         'embedded_tab'
+
+        >>> normalize_text(',')
+        '_'
     """
     if not isinstance(text, unicode):
         raise ValueError("All texts must be Unicode, not bytes.")
@@ -74,9 +80,13 @@ def normalize_text(text, lowercase=True):
     # Slashes should separate pieces of a URI, and shouldn't appear within
     # a piece.
     text = fix_text(text, normalization='NFC').strip()
-    text = text.replace('/', ' ')
+
+    # Represent texts that break our URI representation as a single
+    # underscore.
     if text in BAD_NAMES_FOR_THINGS:
-        raise ValueError("Bad concept name: %r" % text)
+        return '_'
+
+    text = text.replace('/', ' ')
     text = text.strip('.,?!"') or text
     if lowercase:
         text = text.lower()
@@ -85,11 +95,26 @@ def normalize_text(text, lowercase=True):
 
 
 def valid_concept_name(text):
-    text = fix_text(text, normalization='NFC').strip()
-    text = text.replace('/', ' ')
-    if text in BAD_NAMES_FOR_THINGS:
+    """
+    Returns whether this text can be reasonably represented in a concept
+    URI. This helps to protect against making useless concepts out of
+    empty strings or punctuation.
+
+    >>> valid_concept_name('word')
+    True
+    >>> valid_concept_name(',,')
+    True
+    >>> valid_concept_name(',')
+    False
+    >>> valid_concept_name('/')
+    False
+    >>> valid_concept_name(' ')
+    False
+    """
+    if normalize_text(text) == '_':
         return False
-    return True
+    else:
+        return True
 
 
 def join_uri(*pieces):
