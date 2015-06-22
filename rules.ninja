@@ -14,7 +14,7 @@
 
 
 rule download
-  command = python setup.py nltk_download && mkdir -p $prefix && cd $prefix && curl -o $out $url
+  command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
 
 rule extract_tar
   command = tar -xvf $in -C $prefix
