@@ -14,7 +14,7 @@
 
 
 rule download
-  command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
+  command = python setup.py nltk_download && mkdir -p $prefix && cd $prefix && curl -o $out $url
 
 rule extract_tar
   command = tar -xvf $in -C $prefix
@@ -35,7 +35,6 @@ rule parse_wiktionary
 rule msgpack_to_csv
   command = python -m conceptnet5.builders.msgpack_to_csv $in $out
 
-#TODO improve name
 rule collate
   command = cat $in | python -m conceptnet5.builders.distribute_edges -o $$(dirname $out) -n $count
 
@@ -43,7 +42,7 @@ rule count_and_rank
   command = mkdir -p $$(dirname $out) && LC_ALL=C sort $in | uniq > $out
 
 rule combine_assertions
-  command = mkdir -p $$(dirname $out) && $in $out -l /l/CC/By-SA
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.builders.combine_assertions $in $out -l /l/CC/By-SA
 
 rule build_db
   command = python -m conceptnet5.builders.index_assertions $$(dirname $in) $out --input-shards 8
