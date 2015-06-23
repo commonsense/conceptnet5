@@ -60,8 +60,7 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
             if verbose:
                 print("Re-reading %s" % filepath)
             with filepath.open(encoding='utf-8') as file:
-            for line in file:
-                    line = line.rstrip()
+                for line in file:
                     left, right, value = line.rstrip().split('\t')
                     value = float(value)
                     if left in filtered_concepts and \
