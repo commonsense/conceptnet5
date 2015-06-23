@@ -1,6 +1,7 @@
 import numpy as np
 from scipy import sparse
 
+from wordfreq.query import word_frequency
 from ftfy import fix_text
 
 from assoc_space import AssocSpace, LabelSet
@@ -31,7 +32,7 @@ def glove_to_vector_map(filename, normalizer=conceptnet_normalizer):
             try:
                 ctext = fix_text(parts[0]).replace('\n', '').strip()
                 concept = normalizer(ctext)
-            except ValueError:
+            except ValueError: #TODO document cause of exception
                 continue
             zipf_weight = 1 / (i + 1)
             vec = np.array(
