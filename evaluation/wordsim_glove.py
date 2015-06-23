@@ -49,9 +49,11 @@ def read_men3000():
             yield term1, term2, gold_score
 
 
-def spearman_evaluate(standard):
+def spearman_evaluate(standard, verbose=True):
     """
-    Compares assoc_space against 'standard'.
+    Tests assoc_space's ability to recognize word correlation. This function
+    computes the spearman correlation between assoc_space's reported word
+    correlation and the expected word correlation according to 'standard'.
     """
     gold_scores = []
     our_scores = []
@@ -60,14 +62,18 @@ def spearman_evaluate(standard):
         vec1 = text_to_vector(term1)
         vec2 = text_to_vector(term2)
         our_score = vec1.dot(vec2)
-        print(term1, term2, gold_score, our_score)
+        if verbose:
+            print(term1, term2, gold_score, our_score)
         gold_scores.append(gold_score)
         our_scores.append(our_score)
 
-    print()
     correlation = spearmanr(np.array(gold_scores), np.array(our_scores))[0]
-    print("Spearman correlation: %s" % (correlation,))
-    print()
+
+    if verbose:
+        print()
+        print("Spearman correlation: %s" % (correlation,))
+        print()
+        
     return correlation
 
 def main():
