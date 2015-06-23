@@ -42,7 +42,8 @@ def glove_to_vector_map(filename, normalizer=conceptnet_normalizer):
     return vector_map
 
 
-def load_glove_vectors(filename, labels, filter_beyond_row=250000, end_row=1000000):
+def load_glove_vectors(filename, labels, filter_beyond_row=250000,
+                        end_row=1000000, frequency_cutoff=1e-6):
     vectors = []
     for i, line in enumerate(open(filename, encoding='latin-1')):
         if i >= end_row:
@@ -51,7 +52,8 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000, end_row=10000
         try:
             ctext = fix_text(parts[0]).replace('\n', '').strip()
             concept = conceptnet_normalizer(ctext)
-            if i >= filter_beyond_row and word_frequency(ctext, 'en') < 1e-6:
+            if i >= filter_beyond_row and \
+                word_frequency(ctext, 'en') < frequency_cutoff:
                 continue
         except ValueError:
             continue
