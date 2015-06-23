@@ -49,9 +49,9 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
                     counts[right] += 1
 
     filtered_concepts = {
-        key for (key, value) in counts.items()
-        if value >= en_cutoff or
-        not key.startswith('/c/en/') and value >= cutoff
+        concept for (concept, count) in counts.items()
+        if count >= en_cutoff or
+        not concept.startswith('/c/en/') and count >= cutoff
     }
 
     outpath = path / 'reduced.csv'
