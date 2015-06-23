@@ -16,23 +16,28 @@ import pathlib
 
 
 def conceptnet_normalizer(text):
+    """
+    Normalizes a text into a concept URI. This function assume the text is
+    english.
+    """
     return normalized_concept_uri('en', text)
 
 
 def glove_to_vector_map(filename, normalizer=conceptnet_normalizer):
     vector_map = defaultdict(list)
-    for i, line in enumerate(open(filename, encoding='latin-1')):
-        parts = line.rstrip().split(' ')
-        try:
-            ctext = fix_text(parts[0]).replace('\n', '').strip()
-            concept = normalizer(ctext)
-        except ValueError:
-            continue
-        zipf_weight = 1 / (i + 1)
-        vec = np.array(
-            [float(part) for part in parts[1:]]
-        )
-        vector_map[concept].append(vec * zipf_weight)
+    with open(filename, encoding='latin-1') as file:
+        for i, line in enumerate(file):
+            parts = line.rstrip().split(' ')
+            try:
+                ctext = fix_text(parts[0]).replace('\n', '').strip()
+                concept = normalizer(ctext)
+            except ValueError:
+                continue
+            zipf_weight = 1 / (i + 1)
+            vec = np.array(
+                [float(part) for part in parts[1:]]
+            )
+            vector_map[concept].append(vec * zipf_weight)
     return vector_map
 
 
