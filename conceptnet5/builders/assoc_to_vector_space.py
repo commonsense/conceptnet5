@@ -17,15 +17,12 @@ def concept_is_bad(uri):
 
 def concept_is_frequent_enough(uri, counts):
     """
-    Require that concepts in English appear at least twice. Also accept
-    negative concepts, because we will probably be able to compare them to
-    their positive version.
-
-    In languages besides English, which are more sparsely represented,
-    keep even the concepts that appear once. It may be a link to a reasonable
-    English translation, for example.
+    Require that concepts in English appear at least three times, and
+    in other languages, at least twice. Being the negation of a concept
+    counts as one appearance, implicitly.
     """
-    return (counts.get(uri, 0) > 1)
+    score = counts.get(uri, 0) + uri.endswith('/neg') - ('/en/' in uri)
+    return score >= 2
 
 
 def negate_concept(concept):
@@ -69,7 +66,7 @@ def build_assoc_space(input_file, output_dir):
                 sparse.add_entry((-1., concept, negation))
 
     print('making assoc space')
-    space = AssocSpace.from_sparse_storage(sparse, k=300, offset_weight=4e-5)
+    space = AssocSpace.from_sparse_storage(sparse, k=300, offset_weight=1e-4)
 
     print('saving')
     space.save_dir(output_dir)

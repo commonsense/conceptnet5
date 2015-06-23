@@ -45,6 +45,7 @@ TARGET = [
   'features': ['/c/cs/odčítat/v /r/RelatedTo -',
    '/c/cs/odčítat/v - /c/en/subtract',
    '- /r/RelatedTo /c/en/subtract'],
+  'surfaceText': '[[odčítat]] is related to [[subtract]]',
   'weight': 1.0,
   'end': '/c/en/subtract'},
  {'surfaceText': None,
@@ -60,6 +61,7 @@ TARGET = [
   'features': ['/c/cs/odčítat/v /r/Antonym -',
    '/c/cs/odčítat/v - /c/cs/sčítat',
    '- /r/Antonym /c/cs/sčítat'],
+  'surfaceText': '[[odčítat]] is an antonym of [[sčítat]]',
   'weight': 1.0,
   'end': '/c/cs/sčítat'},
  {'surfaceText': None,
@@ -75,6 +77,7 @@ TARGET = [
   'features': ['/c/cs/odčítání /r/DerivedFrom -',
    '/c/cs/odčítání - /c/cs/odčítat/v',
    '- /r/DerivedFrom /c/cs/odčítat/v'],
+  'surfaceText': 'The word "[[odčítání]]" is derived from "[[odčítat]]"',
   'weight': 1.0,
   'end': '/c/cs/odčítat/v'}
 ]

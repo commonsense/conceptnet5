@@ -37,7 +37,7 @@ def merge_vector_spaces(subspace_dir, mergers):
         # We don't refer to the number of axes in spaceB in this code, because
         # we're assuming all the sub-parts have equal numbers of axes.
 
-        if target.startswith('part'):
+        if sourceA.startswith('part'):
             k = spaceA.k * 2
         elif target == 'merged_complete':
             k = spaceA.k // 2

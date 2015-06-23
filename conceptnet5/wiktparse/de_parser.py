@@ -15,7 +15,7 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import graken, Parser
 
 
-__version__ = (2014, 10, 10, 21, 11, 16, 4)
+__version__ = (2015, 6, 3, 23, 34, 33, 2)
 
 __all__ = [
     'de_wiktionaryParser',
@@ -488,6 +488,348 @@ class de_wiktionaryParser(Parser):
         self.ast._define(
             ['url', 'text'],
             []
+        )
+
+    @graken()
+    def _ttbc_template_(self):
+        self._left_braces_()
+        self._token('ttbc')
+        self._vertical_bar_()
+        self._term_()
+        self._right_braces_()
+
+    @graken()
+    def _translation_entry_(self):
+        self._bullet_()
+        self._SP_()
+
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._term_or_punct_()
+                with self._option():
+                    self._ttbc_template_()
+                    self._colon_()
+                self._error('no available options')
+        self._closure(block0)
+        self._SP_()
+
+        def block2():
+            self._translation_template_()
+            self.ast.setlist('translations', self.last_node)
+            self._one_line_text_without_templates_()
+        self._closure(block2)
+        self._NL_()
+
+        self.ast._define(
+            [],
+            ['translations']
+        )
+
+    @graken()
+    def _translation_content_(self):
+
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._trans_mid_template_()
+                with self._option():
+                    self._translation_entry_()
+                    self.ast.setlist('entries', self.last_node)
+                with self._option():
+                    self._WS_()
+                self._error('no available options')
+        self._positive_closure(block0)
+
+        self.ast._define(
+            [],
+            ['entries']
+        )
+
+    @graken()
+    def _trans_top_template_(self):
+
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._checktrans_top_template_()
+                    self.ast['checktrans'] = self.last_node
+                with self._option():
+                    self._sensetrans_top_template_()
+                    self.ast['sensetrans'] = self.last_node
+                self._error('no available options')
+        self._closure(block0)
+
+        self.ast._define(
+            ['checktrans', 'sensetrans'],
+            []
+        )
+
+    @graken()
+    def _trans_mid_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('trans-mid')
+        self._WS_()
+        self._right_braces_()
+
+    @graken()
+    def _trans_bottom_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('trans-bottom')
+        self._WS_()
+        self._right_braces_()
+
+    @graken()
+    def _translation_block_(self):
+        self._trans_top_template_()
+        self.ast['top'] = self.last_node
+        self._WS_()
+        self._translation_content_()
+        self.ast['translations'] = self.last_node
+        self._WS_()
+        self._trans_bottom_template_()
+        self._WS_()
+        self._cut()
+
+        self.ast._define(
+            ['top', 'translations'],
+            []
+        )
+
+    @graken()
+    def _translation_name_(self):
+        with self._choice():
+            with self._option():
+                self._token('t-simple')
+            with self._option():
+                self._token('t+')
+            with self._option():
+                self._token('t-')
+            with self._option():
+                self._token('t0')
+            with self._option():
+                self._token('tø')
+            with self._option():
+                self._token('t')
+            self._error('expecting one of: t t+ t- t-simple t0 tø')
+
+    @graken()
+    def _translation_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._translation_name_()
+        self._WS_()
+        self._vertical_bar_()
+        self._WS_()
+        self._term_()
+        self.ast['language'] = self.last_node
+        self._WS_()
+        self._template_args_1_()
+        self.ast['arg'] = self.last_node
+        self._right_braces_()
+
+        self.ast._define(
+            ['language', 'arg'],
+            []
+        )
+
+    @graken()
+    def _sensetrans_top_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('trans-top')
+        self._WS_()
+        self._vertical_bar_()
+        self._WS_()
+        self._text_with_links_()
+        self.ast['sense'] = self.last_node
+        self._WS_()
+        self._right_braces_()
+
+        self.ast._define(
+            ['sense'],
+            []
+        )
+
+    @graken()
+    def _checktrans_top_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('checktrans-top')
+        self._WS_()
+        self._right_braces_()
+
+    @graken()
+    def _link_template_name_(self):
+        with self._choice():
+            with self._option():
+                self._token('term/t')
+            with self._option():
+                self._token('term')
+            with self._option():
+                self._token('l')
+            with self._option():
+                self._token('ja-l')
+            with self._option():
+                self._token('ko-inline')
+            with self._option():
+                self._token('blend')
+            with self._option():
+                self._token('borrowing')
+            with self._option():
+                self._token('back-form')
+            with self._option():
+                self._token('calque')
+            with self._option():
+                self._token('clipping')
+            with self._option():
+                self._token('compound')
+            with self._option():
+                self._token('confix')
+            with self._option():
+                self._token('-er')
+            with self._option():
+                self._token('etycomp')
+            with self._option():
+                self._token('prefix')
+            with self._option():
+                self._token('suffix')
+            self._error('expecting one of: -er back-form blend borrowing calque clipping compound confix etycomp ja-l ko-inline l prefix suffix term term/t')
+
+    @graken()
+    def _link_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._link_template_name_()
+        self.ast['linktype'] = self.last_node
+
+        def block1():
+            self._slash_()
+            self._term_()
+            self.ast.setlist('subtypes', self.last_node)
+        self._closure(block1)
+        self._template_args_()
+        self.ast['args'] = self.last_node
+        self._right_braces_()
+
+        self.ast._define(
+            ['linktype', 'args'],
+            ['subtypes']
+        )
+
+    @graken()
+    def _link_entry_(self):
+        self._bullet_()
+        self._SP_()
+        with self._optional():
+            self._sense_template_()
+            self.ast['sense'] = self.last_node
+        self._SP_()
+
+        def block1():
+            with self._choice():
+                with self._option():
+                    self._link_template_()
+                    self.ast.setlist('links', self.last_node)
+                with self._option():
+                    self._wiki_link_()
+                    self.ast.setlist('links', self.last_node)
+                with self._option():
+                    self._template_NS_()
+                with self._option():
+                    self._external_link_()
+                with self._option():
+                    self._one_line_text_()
+                self._error('no available options')
+        self._positive_closure(block1)
+
+        self._NL_()
+        self._cut()
+
+        self.ast._define(
+            ['sense'],
+            ['links']
+        )
+
+    @graken()
+    def _sense_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('sense')
+        self._WS_()
+        self._vertical_bar_()
+        self._text_with_links_()
+        self.ast['@'] = self.last_node
+        self._right_braces_()
+
+    @graken()
+    def _etyl_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('etyl')
+        self._WS_()
+        self._vertical_bar_()
+        self._term_()
+        self.ast['language'] = self.last_node
+        self._WS_()
+        self._template_args_NS_()
+        self._right_braces_()
+
+        self.ast._define(
+            ['language'],
+            []
+        )
+
+    @graken()
+    def _etyl_link_(self):
+        with self._choice():
+            with self._option():
+                self._link_template_()
+            with self._option():
+                self._wiki_link_()
+            self._error('no available options')
+
+    @graken()
+    def _etyl_template_and_link_(self):
+        self._etyl_template_()
+        self.ast['etyl'] = self.last_node
+        self._WS_()
+        self._one_line_text_()
+        self._etyl_link_()
+        self.ast['link'] = self.last_node
+
+        self.ast._define(
+            ['etyl', 'link'],
+            []
+        )
+
+    @graken()
+    def _etymology_section_(self):
+
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._etyl_template_and_link_()
+                    self.ast.setlist('etym', self.last_node)
+                with self._option():
+                    self._link_template_()
+                    self.ast.setlist('etym', self.last_node)
+                with self._option():
+                    self._template_NS_()
+                with self._option():
+                    self._wiki_link_NS_()
+                with self._option():
+                    self._external_link_()
+                with self._option():
+                    self._text_()
+                self._error('no available options')
+        self._positive_closure(block0)
+
+        self.ast._define(
+            [],
+            ['etym']
         )
 
     @graken()
@@ -1086,6 +1428,63 @@ class de_wiktionarySemantics(object):
         return ast
 
     def external_link(self, ast):
+        return ast
+
+    def ttbc_template(self, ast):
+        return ast
+
+    def translation_entry(self, ast):
+        return ast
+
+    def translation_content(self, ast):
+        return ast
+
+    def trans_top_template(self, ast):
+        return ast
+
+    def trans_mid_template(self, ast):
+        return ast
+
+    def trans_bottom_template(self, ast):
+        return ast
+
+    def translation_block(self, ast):
+        return ast
+
+    def translation_name(self, ast):
+        return ast
+
+    def translation_template(self, ast):
+        return ast
+
+    def sensetrans_top_template(self, ast):
+        return ast
+
+    def checktrans_top_template(self, ast):
+        return ast
+
+    def link_template_name(self, ast):
+        return ast
+
+    def link_template(self, ast):
+        return ast
+
+    def link_entry(self, ast):
+        return ast
+
+    def sense_template(self, ast):
+        return ast
+
+    def etyl_template(self, ast):
+        return ast
+
+    def etyl_link(self, ast):
+        return ast
+
+    def etyl_template_and_link(self, ast):
+        return ast
+
+    def etymology_section(self, ast):
         return ast
 
     def pseudo_link(self, ast):

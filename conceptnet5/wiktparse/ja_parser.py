@@ -15,18 +15,18 @@ from __future__ import print_function, division, absolute_import, unicode_litera
 from grako.parsing import graken, Parser
 
 
-__version__ = (2015, 4, 20, 15, 46, 48, 0)
+__version__ = (2015, 4, 9, 19, 42, 31, 3)
 
 __all__ = [
-    'en_wiktionaryParser',
-    'en_wiktionarySemantics',
+    'ja_wiktionaryParser',
+    'ja_wiktionarySemantics',
     'main'
 ]
 
 
-class en_wiktionaryParser(Parser):
+class ja_wiktionaryParser(Parser):
     def __init__(self, whitespace='', nameguard=True, **kwargs):
-        super(en_wiktionaryParser, self).__init__(
+        super(ja_wiktionaryParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
             **kwargs
@@ -491,42 +491,6 @@ class en_wiktionaryParser(Parser):
         )
 
     @graken()
-    def _ttbc_template_(self):
-        self._left_braces_()
-        self._token('ttbc')
-        self._vertical_bar_()
-        self._term_()
-        self._right_braces_()
-
-    @graken()
-    def _translation_entry_(self):
-        self._bullet_()
-        self._SP_()
-
-        def block0():
-            with self._choice():
-                with self._option():
-                    self._term_or_punct_()
-                with self._option():
-                    self._ttbc_template_()
-                    self._colon_()
-                self._error('no available options')
-        self._closure(block0)
-        self._SP_()
-
-        def block2():
-            self._translation_template_()
-            self.ast.setlist('translations', self.last_node)
-            self._one_line_text_without_templates_()
-        self._closure(block2)
-        self._NL_()
-
-        self.ast._define(
-            [],
-            ['translations']
-        )
-
-    @graken()
     def _translation_content_(self):
 
         def block0():
@@ -866,6 +830,42 @@ class en_wiktionaryParser(Parser):
         )
 
     @graken()
+    def _ttbc_template_(self):
+        self._left_braces_()
+        self._token('ttbc')
+        self._vertical_bar_()
+        self._term_()
+        self._right_braces_()
+
+    @graken()
+    def _translation_entry_(self):
+        self._bullet_()
+        self._SP_()
+
+        def block0():
+            with self._choice():
+                with self._option():
+                    self._term_or_punct_()
+                with self._option():
+                    self._ttbc_template_()
+                    self._colon_()
+                self._error('no available options')
+        self._closure(block0)
+        self._SP_()
+
+        def block2():
+            self._translation_template_()
+            self.ast.setlist('translations', self.last_node)
+            self._one_line_text_without_templates_()
+        self._closure(block2)
+        self._NL_()
+
+        self.ast._define(
+            [],
+            ['translations']
+        )
+
+    @graken()
     def _list_chars_(self):
         self._pattern(r'[#*:]+')
 
@@ -931,7 +931,7 @@ class en_wiktionaryParser(Parser):
         )
 
 
-class en_wiktionarySemantics(object):
+class ja_wiktionarySemantics(object):
     def left_bracket(self, ast):
         return ast
 
@@ -1094,12 +1094,6 @@ class en_wiktionarySemantics(object):
     def external_link(self, ast):
         return ast
 
-    def ttbc_template(self, ast):
-        return ast
-
-    def translation_entry(self, ast):
-        return ast
-
     def translation_content(self, ast):
         return ast
 
@@ -1157,6 +1151,12 @@ class en_wiktionarySemantics(object):
     def etymology_section(self, ast):
         return ast
 
+    def ttbc_template(self, ast):
+        return ast
+
+    def translation_entry(self, ast):
+        return ast
+
     def list_chars(self, ast):
         return ast
 
@@ -1177,7 +1177,7 @@ def main(filename, startrule, trace=False, whitespace=None):
     import json
     with open(filename) as f:
         text = f.read()
-    parser = en_wiktionaryParser(parseinfo=False)
+    parser = ja_wiktionaryParser(parseinfo=False)
     ast = parser.parse(
         text,
         startrule,
@@ -1199,12 +1199,12 @@ if __name__ == '__main__':
     class ListRules(argparse.Action):
         def __call__(self, parser, namespace, values, option_string):
             print('Rules:')
-            for r in en_wiktionaryParser.rule_list():
+            for r in ja_wiktionaryParser.rule_list():
                 print(r)
             print()
             sys.exit(0)
 
-    parser = argparse.ArgumentParser(description="Simple parser for en_wiktionary.")
+    parser = argparse.ArgumentParser(description="Simple parser for ja_wiktionary.")
     parser.add_argument('-l', '--list', action=ListRules, nargs=0,
                         help="list all rules and exit")
     parser.add_argument('-t', '--trace', action='store_true',

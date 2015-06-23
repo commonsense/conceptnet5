@@ -2,15 +2,39 @@
 from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
 from conceptnet5.nodes import normalized_concept_uri
-from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.util.language_codes import NAME_TO_CODE
+from conceptnet5.uri import join_uri, Licenses, valid_concept_name
 from pprint import pprint
 from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern
+import langcodes
 import traceback
 import sqlite3
 import os
 import re
+
+
+
+def make_surface_text(rel, start, end):
+    if rel == 'TranslationOf':
+        return '[[{0}]] is a translation of [[{1}]]'.format(start, end)
+    elif rel == 'DerivedFrom':
+        return 'The word "[[{0}]]" is derived from "[[{1}]]"'.format(start, end)
+    elif rel == 'CompoundDerivedFrom':
+        return 'The word "[[{0}]]" is derived in part from "[[{1}]]"'.format(start, end)
+    elif rel == 'EtymologicallyDerivedFrom':
+        return 'The word "[[{0}]]" etymologically comes from the word "[[{1}]]"'.format(start, end)
+    elif rel == 'RelatedTo':
+        return '[[{0}]] is related to [[{1}]]'.format(start, end)
+    elif rel == 'Synonym':
+        return '[[{0}]] is a synonym of [[{1}]]'.format(start, end)
+    elif rel == 'Antonym':
+        return '[[{0}]] is an antonym of [[{1}]]'.format(start, end)
+    elif rel == 'IsA':
+        return '[[{0}]] is a kind of [[{1}]]'.format(start, end)
+    elif rel == 'PartOf':
+        return '[[{0}]] is part of [[{1}]]'.format(start, end)
+    else:
+        return '[[{0}]] {1} [[{2}]]'.format(start, rel, end)
 
 
 class MissingSemantics(object):
@@ -32,6 +56,11 @@ try:
                                                  de_wiktionarySemantics)
 except ImportError:
     de_wiktionaryParser = de_wiktionarySemantics = MissingSemantics
+try:
+    from conceptnet5.wiktparse.ja_parser import (ja_wiktionaryParser,
+                                                 ja_wiktionarySemantics)
+except ImportError:
+    ja_wiktionaryParser = ja_wiktionarySemantics = MissingSemantics
 
 string_type = type('')
 
@@ -51,7 +80,14 @@ def language_code(source_language, language_name):
     such code can be found. `source_language` is the 2-letter ISO code for the
     language of the input file being parsed.
     """
-    return NAME_TO_CODE[source_language].get(language_name)
+    if len(language_name) <= 3 and language_name == language_name.lower():
+        # This might already be a code
+        return language_name
+    else:
+        try:
+            return str(langcodes.find_name('language', language_name, source_language))
+        except LookupError:
+            return None
 
 
 class LinkedText(object):
@@ -152,7 +188,7 @@ class EdgeInfo(object):
         Make sure this edge doesn't have an invalid node name, an invalid
         language, or an unattested proto-language.
         """
-        if self.target in BAD_NAMES_FOR_THINGS or self.target.startswith('*'):
+        if not valid_concept_name(self.target) or self.target.startswith('*'):
             return False
         if self.language is not None:
             if self.language.endswith('-pro') or not self.LANGUAGE_CODE_RE.match(self.language):
@@ -166,13 +202,13 @@ class EdgeInfo(object):
         else:
             sense = self.sense
 
-        if sense in BAD_NAMES_FOR_THINGS:
-            sense = None
-
         if isinstance(sense, LinkedText):
             sense = sense.text
 
         if sense in ('', '-', '?'):
+            sense = None
+
+        if sense is not None and not valid_concept_name(sense):
             sense = None
 
         start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
@@ -187,6 +223,10 @@ class EdgeInfo(object):
         if rel.startswith('~'):
             rel = rel[1:]
             start_uri, end_uri = end_uri, start_uri
+            start, end = self.target, headword
+        else:
+            start, end = headword, self.target
+
 
         rel_uri = join_uri('/r', rel)
 
@@ -200,6 +240,7 @@ class EdgeInfo(object):
         n_headword = headword.replace(' ', '_')
         return make_edge(
             rel=rel_uri, start=start_uri, end=end_uri,
+            surfaceText = make_surface_text(rel, start, end),
             dataset='/d/wiktionary/%s/%s' % (source_lang, headlang),
             license=Licenses.cc_sharealike,
             sources=[join_uri('/s/web/%s.wiktionary.org/wiki' % source_lang,
@@ -391,6 +432,7 @@ class ConceptNetWiktionarySemantics(object):
                                   headword, headpos)
                  for ei in edge_info
                  if ei.check_validity()
+                 and valid_concept_name(headword)
                  and ei.language is not None]
             )
 
@@ -702,121 +744,7 @@ class ConceptNetWiktionarySemantics(object):
         # Keep only the text of external links
         return LinkedText(text=ast['text'], links=[])
 
-
-class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
-                            en_wiktionarySemantics):
-    """
-    Rules specific to the English wiktionary format.
-    """
-    def __init__(self, language='en', titledb=None, trace=False, logger=None, **kwargs):
-        super(EnWiktionarySemantics, self).__init__(language, titledb, trace,
-                                                    logger)
-        en_wiktionarySemantics.__init__(self, **kwargs)
-        self.parser = en_wiktionaryParser()
-
-    def parse(self, text, rule_name, **kwargs):
-        """
-        Parse `text` starting from the given `rule_name`, applying these
-        semantics to the resulting parse tree.
-        """
-        return self.parser.parse(text, whitespace='', rule_name=rule_name,
-                                 semantics=self, **kwargs)
-
-    def _get_pos_abbrev(self, heading):
-        if heading in ['Noun', 'Proper noun']:
-            return 'n'
-        if heading == 'Verb':
-            return 'v'
-        if heading == 'Adjective':
-            return 'a'
-        if heading == 'Adverb':
-            return 'r'
-        return None
-
-    def _get_rule_for_heading(self, heading):
-        rule = None
-        rel = None
-        if heading == 'Translations':
-            rule = 'translation_section'
-        elif heading.startswith('Etymology'):
-            rule = 'etymology_section'
-            rel = 'EtymologicallyDerivedFrom'
-        elif heading == 'Synonyms':
-            rule = 'link_section'
-            rel = 'Synonym'
-        elif heading == 'Antonyms':
-            rule = 'link_section'
-            rel = 'Antonym'
-        elif heading == 'Hypernyms':
-            rule = 'link_section'
-            rel = 'IsA'
-        elif heading == 'Hyponyms':
-            rule = 'link_section'
-            rel = '~IsA'
-        elif heading == 'Holonyms':
-            rule = 'link_section'
-            rel = 'PartOf'
-        elif heading == 'Meronyms':
-            rule = 'link_section'
-            rel = 'PartOf'
-        elif heading in ('Derived terms', 'Descendants'):
-            rule = 'link_section'
-            rel = '~DerivedFrom'
-        elif heading == 'Compounds':
-            rule = 'link_section'
-            rel = '~CompoundDerivedFrom'
-        elif heading in ('Related terms', 'See also'):
-            rule = 'link_section'
-            rel = 'RelatedTo'
-        elif heading not in ('Pronunciation', 'Anagrams', 'Statistics',
-                             'References', 'Quotations', 'Romanization',
-                             'Usage notes'):
-            rule = 'definition_section'
-
-        return (rule, rel)
-
-    def translation_template(self, ast):
-        """
-        This rule handles templates that indicate a translation, returning an
-        EdgeInfo.
-
-        Parse rules:
-
-            translation_name = "t-simple" | "t+" | "t-" | "t0" | "t\\xf8" | "t" ;
-            translation_template = left_braces WS translation_name WS
-                                   vertical_bar WS language:term WS
-                                   arg:template_args_1 right_braces ;
-        """
-        return EdgeInfo(
-            language=ast['language'].strip(),
-            target=ast['arg'],
-            rel='TranslationOf'
-        )
-
-    def sensetrans_top_template(self, ast):
-        """
-        A "sensetrans" template associates a group of translation templates
-        with a particular word sense.
-
-        Parse rule:
-
-            sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar
-                                      WS sense:text_with_links WS right_braces ;
-        """
-        return ast['sense']
-
-    def checktrans_top_template(self, ast):
-        """
-        A "checktrans" template indicates that the following group of
-        translations aren't associated with any particular word sense, and
-        someone should figure out what sense they are someday.
-
-        Parse rule:
-
-            checktrans_top_template = left_braces WS "checktrans-top"
-                                      WS right_braces ;
-        """
-        return None
+    # Below here are patterns that apply across multiple Wiktionaries.
 
     def translation_entry(self, ast):
         """
@@ -886,6 +814,49 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
         if ast['blocks'] is None:
             return []
         return sum(ast['blocks'], [])
+
+    def translation_template(self, ast):
+        """
+        This rule handles templates that indicate a translation, returning an
+        EdgeInfo.
+
+        Parse rules:
+
+            translation_name = "t-simple" | "t+" | "t-" | "t0" | "t\\xf8" | "t" ;
+            translation_template = left_braces WS translation_name WS
+                                   vertical_bar WS language:term WS
+                                   arg:template_args_1 right_braces ;
+        """
+        return EdgeInfo(
+            language=ast['language'].strip(),
+            target=ast['arg'],
+            rel='TranslationOf'
+        )
+
+    def sensetrans_top_template(self, ast):
+        """
+        A "sensetrans" template associates a group of translation templates
+        with a particular word sense.
+
+        Parse rule:
+
+            sensetrans_top_template = left_braces WS "trans-top" WS vertical_bar
+                                      WS sense:text_with_links WS right_braces ;
+        """
+        return ast['sense']
+
+    def checktrans_top_template(self, ast):
+        """
+        A "checktrans" template indicates that the following group of
+        translations aren't associated with any particular word sense, and
+        someone should figure out what sense they are someday.
+
+        Parse rule:
+
+            checktrans_top_template = left_braces WS "checktrans-top"
+                                      WS right_braces ;
+        """
+        return None
 
     def link_template(self, ast):
         """
@@ -987,20 +958,6 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
 
         return LinkedText(text=text, links=links)
 
-    def etyl_template_and_link(self, ast):
-        """
-        Parse rules:
-
-            etyl_template = left_braces WS "etyl" WS vertical_bar language:term
-                            WS template_args_NS right_braces ;
-            etyl_link = link_template | wiki_link ;
-            etyl_template_and_link = etyl:etyl_template WS one_line_text link:etyl_link ;
-        """
-        language = ast['etyl']['language'].strip()
-        links = [link.set_language(language)
-                 for link in ast['link'].links]
-        return LinkedText(text=ast['link'].text, links=links)
-
     def link_entry(self, ast):
         """
         A 'link entry' is a section for listing links to other entries, such
@@ -1043,6 +1000,20 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
         """
         return sum(ast['entries'] or [], [])
 
+    def etyl_template_and_link(self, ast):
+        """
+        Parse rules:
+
+            etyl_template = left_braces WS "etyl" WS vertical_bar language:term
+                            WS template_args_NS right_braces ;
+            etyl_link = link_template | wiki_link ;
+            etyl_template_and_link = etyl:etyl_template WS one_line_text link:etyl_link ;
+        """
+        language = ast['etyl']['language'].strip()
+        links = [link.set_language(language)
+                 for link in ast['link'].links]
+        return LinkedText(text=ast['link'].text, links=links)
+
     def etymology_section(self, ast):
         """
         Parse etymology sections.
@@ -1062,6 +1033,80 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
             links.extend(etym_linked_text.links)
         return links
 
+
+
+class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
+                            en_wiktionarySemantics):
+    """
+    Rules specific to the English wiktionary format.
+    """
+    def __init__(self, language='en', titledb=None, trace=False, logger=None, **kwargs):
+        super(EnWiktionarySemantics, self).__init__(language, titledb, trace,
+                                                    logger)
+        en_wiktionarySemantics.__init__(self, **kwargs)
+        self.parser = en_wiktionaryParser()
+
+    def parse(self, text, rule_name, **kwargs):
+        """
+        Parse `text` starting from the given `rule_name`, applying these
+        semantics to the resulting parse tree.
+        """
+        return self.parser.parse(text, whitespace='', rule_name=rule_name,
+                                 semantics=self, **kwargs)
+
+    def _get_pos_abbrev(self, heading):
+        if heading in ['Noun', 'Proper noun']:
+            return 'n'
+        if heading == 'Verb':
+            return 'v'
+        if heading == 'Adjective':
+            return 'a'
+        if heading == 'Adverb':
+            return 'r'
+        return None
+
+    def _get_rule_for_heading(self, heading):
+        rule = None
+        rel = None
+        if heading == 'Translations':
+            rule = 'translation_section'
+        elif heading.startswith('Etymology'):
+            rule = 'etymology_section'
+            rel = 'EtymologicallyDerivedFrom'
+        elif heading == 'Synonyms':
+            rule = 'link_section'
+            rel = 'Synonym'
+        elif heading == 'Antonyms':
+            rule = 'link_section'
+            rel = 'Antonym'
+        elif heading == 'Hypernyms':
+            rule = 'link_section'
+            rel = 'IsA'
+        elif heading == 'Hyponyms':
+            rule = 'link_section'
+            rel = '~IsA'
+        elif heading == 'Holonyms':
+            rule = 'link_section'
+            rel = 'PartOf'
+        elif heading == 'Meronyms':
+            rule = 'link_section'
+            rel = 'PartOf'
+        elif heading in ('Derived terms', 'Descendants'):
+            rule = 'link_section'
+            rel = '~DerivedFrom'
+        elif heading == 'Compounds':
+            rule = 'link_section'
+            rel = '~CompoundDerivedFrom'
+        elif heading in ('Related terms', 'See also'):
+            rule = 'link_section'
+            rel = 'RelatedTo'
+        elif heading not in ('Pronunciation', 'Anagrams', 'Statistics',
+                             'References', 'Quotations', 'Romanization',
+                             'Usage notes'):
+            rule = 'definition_section'
+
+        return (rule, rel)
+
     def definition_section(self, ast):
         """
         Parse rules:
@@ -1078,6 +1123,113 @@ class EnWiktionarySemantics(ConceptNetWiktionarySemantics,
         for defn_linked_text in ast['defns']:
             links.extend(defn_linked_text.links)
         return links
+
+
+class JaWiktionarySemantics(ConceptNetWiktionarySemantics,
+                            ja_wiktionarySemantics):
+    """
+    Rules specific to the Japanese Wiktionary format.
+    """
+    def __init__(self, language='ja', titledb=None, trace=False, logger=None, **kwargs):
+        ConceptNetWiktionarySemantics.__init__(language, titledb, trace, logger)
+        ja_wiktionarySemantics.__init__(self, **kwargs)
+        self.parser = ja_wiktionaryParser()
+
+    def parse(self, text, rule_name, **kwargs):
+        """
+        Parse `text` starting from the given `rule_name`, applying these
+        semantics to the resulting parse tree.
+        """
+        return self.parser.parse(text, whitespace='', rule_name=rule_name,
+                                 semantics=self, **kwargs)
+
+    def _get_pos_abbrev(self, heading):
+        heading = heading.split(':')[0]
+        if heading in {'{{noun}}', '{{abbr}}', '{{name}}', '名詞', '人名'}:
+            return 'n'
+        if heading in {'{{verb}}', '動詞'}:
+            return 'v'
+        if heading in {'{{adjective}}', '{{adj}}', '形容詞'}:
+            return 'a'
+        if heading in {'{{adverb}}', '副詞'}:
+            return 'r'
+        return None
+
+    def _get_rule_for_heading(self, heading):
+        rule = None
+        rel = None
+        if heading.startswith('{{trans}}'):
+            rule = 'translation_section'
+        elif heading.startswith('{{etym}}'):
+            rule = 'etymology_section'
+            rel = 'EtymologicallyDerivedFrom'
+        elif heading.startswith('{{syn}}'):
+            rule = 'link_section'
+            rel = 'Synonym'
+        elif heading.startswith('{{ant}}'):
+            rule = 'link_section'
+            rel = 'Antonym'
+        elif heading.startswith('{{comp}}'):
+            rule = 'link_section'
+            rel = '~CompoundDerivedFrom'
+        elif heading.startswith('{{rel}}'):
+            rule = 'link_section'
+            rel = 'RelatedTo'
+        elif heading.startswith('{{seealso}}'):
+            rule = 'link_section'
+            rel = 'RelatedTo'
+        elif heading.startswith('{{drv}}'):
+            rule = 'link_section'
+            rel = '~DerivedFrom'
+        elif self._get_pos_abbrev(heading) is not None:
+            rule = 'definition_section'
+
+        return (rule, rel)
+
+    def translation_entry(self, ast):
+        """
+        FIXME
+
+        Lines in the translation section begin with an asterisk as a bullet,
+        then may contain translation templates interspersed with plain text.
+        We want to get just the values of the translation templates.
+
+        Parse rules:
+
+            ttbc_template = left_braces "ttbc" vertical_bar term right_braces ;
+            translation_entry = bullet SP { term_or_punct | ttbc_template colon } SP
+                                { translations+:translation_template
+                                  one_line_text_without_templates }*
+                                NL ;
+        """
+        if isinstance(ast, list):
+            # If there were no translations found, we end up with a list
+            # of all the other junk.
+            return []
+        if ast['translations'] is None:
+            return []
+        return [t for t in ast['translations'] if t is not None]
+
+    def definition_section(self, ast):
+        """
+        FIXME
+
+        Parse rules:
+
+            list_chars = ?/[#*:]+/? ;
+            defn_line = hash_char !bullet SP @:one_line_wikitext NL WS ;
+            defn_details = hash_char list_chars SP @:one_line_wikitext NL WS ;
+            definition = @:defn_line { defn_details }* ~ ;
+            definition_section = { template_NS | image | WS }* { defns+:definition | one_line_wikitext_NS NL }* ;
+        """
+        links = []
+        if ast['defns'] is None:
+            return []
+        for defn_linked_text in ast['defns']:
+            links.extend(defn_linked_text.links)
+        return links
+
+
 
 
 class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
@@ -1393,6 +1545,8 @@ class DeWiktionarySemantics(ConceptNetWiktionarySemantics,
                 for lt in item.sense:
                     lt.text = '(' + curr_sense + ') ' + head_text + lt.text
                     linked_texts.append(lt)
+            elif item.sense is None:
+                return
             else:
                 item.sense.text = '(' + curr_sense + ') ' + head_text + item.sense.text
                 linked_texts.append(item.sense)

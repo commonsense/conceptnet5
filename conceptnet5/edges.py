@@ -3,9 +3,12 @@ from hashlib import sha1
 from conceptnet5.uri import (conjunction_uri, assertion_uri, Licenses,
                              parse_possible_compound_uri)
 from pprint import pprint
+import re
+
 
 def make_edge(rel, start, end, dataset, license, sources,
-              context='/ctx/all', surfaceText=None, weight=1.0):
+              context='/ctx/all', surfaceText=None,
+              surfaceStart=None, surfaceEnd=None, weight=1.0):
     """
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary form.
@@ -47,7 +50,7 @@ def make_edge(rel, start, end, dataset, license, sources,
     else:
         source_tree = sources
         source_list = parse_possible_compound_uri('or', sources)
-    
+
     separate_source_lists = [
         parse_possible_compound_uri('and', source)
         for source in source_list
@@ -62,6 +65,8 @@ def make_edge(rel, start, end, dataset, license, sources,
     edge_unique_data = [uri, context, source_tree]
     edge_unique = ' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
+    if surfaceStart is None or surfaceEnd is None:
+        surfaceStart, surfaceEnd = extract_surface_terms(surfaceText)
     obj = {
         'id': id,
         'uri': uri,
@@ -75,6 +80,40 @@ def make_edge(rel, start, end, dataset, license, sources,
         'features': features,
         'license': license,
         'weight': weight,
-        'surfaceText': surfaceText
+        'surfaceText': surfaceText,
+        'surfaceStart': surfaceStart,
+        'surfaceEnd': surfaceEnd
     }
     return obj
+
+
+SURFACE_FORM_PATTERN = re.compile(r'\[\[(.*?)\]\]')
+
+
+def extract_surface_terms(surface):
+    """
+    Some formats don't have separate slots for the surface text of the
+    'start' and 'end' terms; we only record them as part of the overall
+    surface text, in double brackets.
+
+    A typical surface text will look like this:
+
+        [[A dog]] has [[a tail]].
+
+    Occasionally, there will be sentence frames that put the 'end' term
+    before the 'start' term. These are marked with an asterisk.
+
+        *[[A tail]] can belong to [[a dog]].
+
+    This function returns the terms in their proper order -- 'surfaceStart'
+    followed by 'surfaceEnd' -- so they can be indexed in the more flexible
+    jsons and msgpack formats.
+    """
+    if not surface:
+        return (None, None)
+    surface_terms = SURFACE_FORM_PATTERN.findall(surface)
+    if len(surface_terms) != 2:
+        return (None, None)
+    if surface.startswith('*'):
+        surface_terms = surface_terms[::-1]
+    return surface_terms

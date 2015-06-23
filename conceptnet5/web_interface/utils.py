@@ -1,12 +1,22 @@
 from __future__ import unicode_literals
 """
 Utility functions for web interface.
+
+Gradually adapted from code by Justin Venezuela <jven@mit.edu>.
 """
 
-__author__ = 'Justin Venezuela (jven@mit.edu)'
+import langcodes
 
-from conceptnet5.util.language_codes import SUPPORTED_LANGUAGE_CODES, CODE_TO_NAME
 
+# This list is for interface purposes only. We'll choose to show languages
+# that have at least 10,000 edges in them.
+SUPPORTED_LANGUAGE_CODES = [
+    'af', 'ar', 'bg', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es',
+    'et', 'fa', 'fi', 'fo', 'fr', 'ga', 'gl', 'gv', 'he', 'hi', 'hu', 'hy',
+    'io', 'is', 'it', 'ja', 'ka', 'ko', 'la', 'lt', 'lv', 'ms', 'nl', 'no',
+    'pl', 'pt', 'ro', 'ru', 'sa', 'sh', 'sq', 'sv', 'syc', 'te', 'tr', 'ur',
+    'vi', 'vo', 'zh'
+]
 
 def data_url(uri):
     return '/web/' + uri.strip('/')
@@ -26,6 +36,6 @@ def uri2name(arg):
 
 def get_sorted_languages():
     return [
-        (lang, CODE_TO_NAME['en'][lang])
+        (lang, langcodes.get(lang).autonym())
         for lang in SUPPORTED_LANGUAGE_CODES
     ]

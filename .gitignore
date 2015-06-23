@@ -1,3 +1,7 @@
+.ninja_deps
+.ninja_log
+build.ninja
+__pycache__
 *.swp
 *.pyc
 *.egg-info
