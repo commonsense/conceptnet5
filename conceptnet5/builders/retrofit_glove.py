@@ -1,13 +1,17 @@
-from conceptnet5.nodes import normalized_concept_uri
-from conceptnet5.util import get_data_filename
-from assoc_space import AssocSpace, LabelSet
-from assoc_space.eigenmath import normalize_rows
-from collections import defaultdict
-# FIXME: negate_concept should live somewhere nicer
-from conceptnet5.builders.assoc_to_vector_space import negate_concept
-from ftfy import fix_text
 import numpy as np
 from scipy import sparse
+
+from ftfy import fix_text
+
+from assoc_space import AssocSpace, LabelSet
+from assoc_space.eigenmath import normalize_rows
+
+from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.util import get_data_filename
+# FIXME: negate_concept should live somewhere nicer
+from conceptnet5.builders.assoc_to_vector_space import negate_concept
+
+from collections import defaultdict
 import pathlib
 
 
