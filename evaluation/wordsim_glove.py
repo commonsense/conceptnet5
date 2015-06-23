@@ -50,6 +50,9 @@ def read_men3000():
 
 
 def spearman_evaluate(standard):
+    """
+    Compares assoc_space against 'standard'.
+    """
     gold_scores = []
     our_scores = []
 
@@ -67,6 +70,9 @@ def spearman_evaluate(standard):
     print()
     return correlation
 
+def main():
+    spearman_evaluate(read_ws353())
+    spearman_evaluate(read_men3000())
 
-spearman_evaluate(read_ws353())
-spearman_evaluate(read_men3000())
+if __name__ == '__main__':
+    main()
