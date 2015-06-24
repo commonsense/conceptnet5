@@ -110,7 +110,18 @@ def make_sparse_assoc(filename, labels, verbose=True):
 
         return mat
 
-def retrofit(dense_file, sparse_file, output_file, iterations=10, offset=1e-9):
+
+def retrofit(dense_file, sparse_file, output_file,
+        iterations=10, offset=1e-9, verbose=True):
+    """
+    Updates the word vectors contained in `dense_file` using the association
+    contained in `sparse_file` and writes the new vectors to `output_file`.
+
+    The function will apply retrofitting `iterations` times.
+
+    A larger `offset` causes vectors with small magnitudes to be normalized
+    into vectors with magnitudes less than 1.
+    """
     labels = LabelSet()
     vectors = load_glove_vectors(dense_file, labels)
     sparse_csr = make_sparse_assoc(sparse_file, labels)
