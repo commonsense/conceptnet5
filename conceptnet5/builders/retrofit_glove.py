@@ -69,12 +69,13 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
     return vectors
 
 
-def make_sparse_assoc(filename, labels):
+def make_sparse_assoc(filename, labels, verbose=True):
     rows = []
     cols = []
     values = []
     totals = defaultdict(float)
-    print("Loading sparse associations")
+    if verbose:
+        print("Loading sparse associations")
     with open(filename, encoding='utf-8') as infile:
         for line in infile:
             line = line.rstrip()
@@ -91,7 +92,8 @@ def make_sparse_assoc(filename, labels):
             totals[concept1] += value
             totals[concept2] += value
 
-    print("Adding self-loops and negations")
+    if verbose:
+        print("Adding self-loops and negations")
     for concept in labels:
         index1 = labels.index(concept)
         rows.append(index1)
@@ -108,7 +110,8 @@ def make_sparse_assoc(filename, labels):
             cols.append(index1)
             values.append(-0.5)
 
-    print("Building sparse matrix")
+    if verbose:
+        print("Building sparse matrix")
     sparse_csr = sparse.coo_matrix((values, (rows, cols))).tocsr()
     return sparse_csr
 
@@ -118,17 +121,18 @@ def retrofit(dense_file, sparse_file, output_file):
     vectors = load_glove_vectors(dense_file, labels)
     sparse_csr = make_sparse_assoc(sparse_file, labels)
     dense = np.zeros((len(labels), 300))
-    print("Building dense matrix")
+    if verbose:
+        print("Building dense matrix")
     for i in range(len(vectors)):
         dense[i] = vectors[i]
 
-    print("Retrofitting")
+    if verbose:
+        print("Retrofitting")
     orig_dense = normalize_rows(dense, offset=1e-9)
     for iter in range(10):
-        print("%d/10" % (iter + 1))
+        if verbose:
+            print("%d/10" % (iter + 1))
         product = sparse_csr.dot(dense)
-        # mean = np.mean(product, axis=0)
-        # product -= mean
 
         newdense = normalize_rows(product, offset=1e-9)
         del product
@@ -137,7 +141,8 @@ def retrofit(dense_file, sparse_file, output_file):
         newdense[:len(vectors)] /= 2
         diff = np.mean(np.abs(newdense - dense))
         dense = newdense
-        print("   Average diff: %s" % diff)
+        if verbose:
+            print("   Average diff: %s" % diff)
 
     assoc = AssocSpace(dense, np.ones(300), labels, assoc=dense)
     assoc.save_dir(output_file)
