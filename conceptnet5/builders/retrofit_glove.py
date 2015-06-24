@@ -68,12 +68,13 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
 
 def make_sparse_assoc(filename, labels, verbose=True):
     """
-    Generates a sparse association matrix from a file.
+    Generates a sparse association matrix from a file. The entries correspond
+    to the existing entries in labels. Concepts not in labels are ignored.
     """
-    rows = []
-    cols = []
-    values = []
-    totals = defaultdict(float)
+    # We ignore the concepts not in the labels so we can perform matrix
+    # multiplication between the sparse matrix and the word vectors
+
+    mat = sparse.csr_matrix((len(labels), len(labels), dtype=float))
 
     if verbose:
         print("Loading sparse associations")
@@ -83,44 +84,31 @@ def make_sparse_assoc(filename, labels, verbose=True):
         for line in infile:
             line = line.rstrip()
             concept1, concept2, value_str = line.split('\t')
-            index1 = labels.add(concept1)
-            index2 = labels.add(concept2)
-            value = float(value_str)
-            rows.append(index1)
-            cols.append(index2)
-            values.append(value)
-            rows.append(index2)
-            cols.append(index1)
-            values.append(value)
-            totals[concept1] += value
-            totals[concept2] += value
+            if concept1 in labels and concept2 in labels:
+                index1 = labels.index(concept1)
+                index2 = labels.index(concept2)
+                value = float(value_str)
 
+                mat[index1, index2] = value
+                mat[index2, index1] = value
     if verbose:
         print("Adding self-loops and negations")
 
     # A concept is very related to itself
-    for concept in labels:
-        index = labels.index(concept)
-        rows.append(index)
-        cols.append(index)
-        values.append(totals[concept] + 10) #TODO Why 10?
+    for index, row in mat:
+
+        mat[index, index] = np.sum(row) + 10 #TODO Why 10?
 
         # A concept is unrelated to its negation
         neg = negate_concept(concept)
+
         if neg in labels:
-            index2 = labels.index(neg)
-            rows.append(index1)
-            cols.append(index2)
-            values.append(-0.5) #TODO Why -0.5?
-            rows.append(index2)
-            cols.append(index1)
-            values.append(-0.5)
+            mat(index, labels.index(neg)) = -0.5 #TODO Why -0.5?
 
     if verbose:
         print("Building sparse matrix")
 
-    sparse_csr = sparse.coo_matrix((values, (rows, cols))).tocsr()
-    return sparse_csr
+        return mat
 
 
 def retrofit(dense_file, sparse_file, output_file, offset=1e-9):
