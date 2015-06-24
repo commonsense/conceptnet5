@@ -65,7 +65,7 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
                     value = float(value)
                     if left in filtered_concepts and \
                         right in filtered_concepts and \
-                        value > 0:
+                        value != 0:
                         print(line, file=out)
 
 
