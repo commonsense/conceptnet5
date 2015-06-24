@@ -24,16 +24,18 @@ def conceptnet_normalizer(text):
     return normalized_concept_uri('en', text)
 
 
-def glove_to_vector_map(filename, normalizer=conceptnet_normalizer):
+def glove_to_vector_map(filename):
     vector_map = defaultdict(list)
     with open(filename, encoding='latin-1') as file:
         for i, line in enumerate(file):
             parts = line.rstrip().split(' ')
+
             try:
                 ctext = fix_text(parts[0]).replace('\n', '').strip()
-                concept = normalizer(ctext)
+                concept = conceptnet_normalizer(ctext)
             except ValueError: #TODO document cause of exception
                 continue
+
             zipf_weight = 1 / (i + 1)
             vec = np.array(
                 [float(part) for part in parts[1:]]
@@ -45,24 +47,25 @@ def glove_to_vector_map(filename, normalizer=conceptnet_normalizer):
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6):
     vectors = []
-    for i, line in enumerate(open(filename, encoding='latin-1')):
-        if i >= end_row:
-            break
-        parts = line.rstrip().split(' ')
-        try:
-            ctext = fix_text(parts[0]).replace('\n', '').strip()
-            concept = conceptnet_normalizer(ctext)
-            if i >= filter_beyond_row and \
-                word_frequency(ctext, 'en') < frequency_cutoff:
+    with open(filename, encoding='latin-1') as file:
+        for i, line in enumerate(file):
+            if i >= end_row:
+                break
+            parts = line.rstrip().split(' ')
+            try:
+                ctext = fix_text(parts[0]).replace('\n', '').strip()
+                concept = conceptnet_normalizer(ctext)
+                if i >= filter_beyond_row and \
+                    word_frequency(ctext, 'en') < frequency_cutoff:
+                    continue
+            except ValueError: #TODO document cause of exception
                 continue
-        except ValueError:
-            continue
-        index = labels.add(concept)
-        while index >= len(vectors):
-            vectors.append(np.zeros(300))
-        zipf_weight = 1 / (i + 1)
-        vec = np.array([float(part) for part in parts[1:]])
-        vectors[index] += vec * zipf_weight
+            index = labels.add(concept)
+            while index >= len(vectors):
+                vectors.append(np.zeros(300))
+            zipf_weight = 1 / (i + 1)
+            vec = np.array([float(part) for part in parts[1:]])
+            vectors[index] += vec * zipf_weight
     return vectors
 
 
