@@ -14,29 +14,35 @@
 
 
 rule download
-  command = python setup.py nltk_download && mkdir -p $prefix && cd $prefix && curl -o $out $url
+  command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
 
 rule extract_tar
-  command = tar -xvf $in -C $prefix
+  command = tar -xvf $in
 
 rule extract_wiktionary
-  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.extract_wiktionary $in $$(dirname $out) -l $lang && cd conceptnet5/wiktparse && eval "make ${lang}_parser.py"
+  command = mkdir -p $dir && python -m conceptnet5.readers.extract_wiktionary $in $dir -l $lang && cd conceptnet5/wiktparse && eval "make ${lang}_parser.py"
 
 ## STEP 2: Parse the data
 rule parse
   command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.$parser $in $out
 
+rule parse_globalmind
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.globalmind $$(dirname $$(echo $in | cut -d ' ' -f1)) $out
+
+rule parse_dbpedia
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.dbpedia $in $out
+
 rule parse_sw
-  command = mkdir -p $$(dirname $out) && mkdir -p $prefix && python -m conceptnet5.readers.$parser $dir $out
+  command = mkdir -p $$(dirname $out) && mkdir -p $prefix && eval "python -m conceptnet5.readers.$parser $dir $out ${prefix}${parser}.nt"
 
 rule parse_wiktionary
-  command =  python -m conceptnet5.readers.wiktionary $data $out -l $lang
+  command =  python -m conceptnet5.readers.wiktionary -l $lang $in $out
 
 rule msgpack_to_csv
   command = python -m conceptnet5.builders.msgpack_to_csv $in $out
 
 rule collate
-  command = cat $in | python -m conceptnet5.builders.distribute_edges -o $$(dirname $out) -n $count
+  command = cat $in | python -m conceptnet5.builders.distribute_edges -o $dir -n $count
 
 rule count_and_rank
   command = mkdir -p $$(dirname $out) && LC_ALL=C sort $in | uniq > $out
@@ -45,4 +51,4 @@ rule combine_assertions
   command = mkdir -p $$(dirname $out) && python -m conceptnet5.builders.combine_assertions $in $out -l /l/CC/By-SA
 
 rule build_db
-  command = python -m conceptnet5.builders.index_assertions $$(dirname $in) $out --input-shards 8
+  command = python -m conceptnet5.builders.index_assertions $$(dirname $$(echo $in | cut -d ' ' -f1)) $out --input-shards 8

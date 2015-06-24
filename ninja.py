@@ -1,3 +1,5 @@
+import collections
+
 def Dep(inputs, outputs, rule, params=None):
     return {
         'inputs': inputs,
@@ -9,7 +11,7 @@ def Dep(inputs, outputs, rule, params=None):
 prefix = 'data/'
 version = '5.3'
 
-wiktionary_langs = ['en', 'de', 'ja']
+wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
 collate_count = 8
 
@@ -36,7 +38,6 @@ in_tar = {
 
     'dbpedia':
         ['mappingbased_properties_en.nt',
-         'interlanguage_links_en.nt',
          'instance_types_en.nt', ],
 
     'jmdict':
@@ -53,11 +54,11 @@ in_tar = {
     'conceptnet4_nadya': ['conceptnet4_nadya_flat_%s.jsons' % i
                           for i in range(10)],
 
-    'conceptnet_zh': ['rconceptnet_zh_part%s.txt' % i
+    'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
                       for i in range(13)],
 
-    'verbosity': ['raw/verbosity/verbosity.txt', ],
-    'umbel': ['raw/umbel/umbel.nt', ],
+    'verbosity': ['verbosity.txt', ],
+    'umbel': ['umbel.nt', ],
 
 }
 
@@ -66,13 +67,18 @@ in_tar = {k: [prefix + 'raw/%s/%s' % (k, file) for file in v]
 
 
 def add_all_deps(deps):
-    download(deps)
-    untar(deps)
-    parse_sw(deps)  # wordnet, umbel
-    parse_standard(deps)  # globalmind, jmdict, verbosity
-    parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
+
+    #download(deps)
+    #untar(deps)
+
+    #parse_sw(deps)  # wordnet, umbel
+    #parse_standard(deps)  # jmdict, verbosity
+    #parse_globalmind(deps)
+    #parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
+    parse_dbpedia(deps)
+
     msgpack_to_csv(deps)
     collate(deps)
     count_and_rank(deps)
@@ -81,8 +87,8 @@ def add_all_deps(deps):
 
 
 def download(deps):
-    output = prefix + 'conceptnet5_raw_data_%s.tar.bz2' % version
-    url = 'http://conceptnet5.media.mit.edu/downloads/v%s/' % version + output
+    file = 'conceptnet5_raw_data_%s.tar.bz2' % version
+    url = 'http://conceptnet5.media.mit.edu/downloads/v%s/' % version + file
     deps['download_tar'] = Dep(
         [],
         prefix + 'conceptnet5_raw_data_%s.tar.bz2' % version,
@@ -107,19 +113,44 @@ def parse_sw(deps):
             'parse_sw',
             {
                 'parser': type,
-                'prefix': prefix + 'sw_map',
+                'prefix': prefix + 'sw_map/',
                 'dir': prefix + 'raw/' + type
             })
 
 
 def parse_standard(deps):
-    for type in ['globalmind', 'jmdict', 'verbosity']:
+    for type in ['jmdict', 'verbosity']:
         deps['parse %s' % type] = Dep(
             in_tar[type],
             edge_output_str(type),
             'parse',
             {'parser': type})
 
+def parse_globalmind(deps):
+    deps['parse globalmind'] = Dep(
+        in_tar['globalmind'],
+        edge_output_str('globalmind'),
+        'parse_globalmind',
+        {'parser': 'globalmind'})
+
+def parse_dbpedia(deps):
+    for file in in_tar['dbpedia']:
+
+        if 'instance' in file:
+            new = 'instances'
+        else:
+            new = 'properties'
+
+        outputs = [
+            prefix+'edges/dbpedia/%s.msgpack'%new,
+            prefix+'sw_map/dbpedia_%s.nt'%new
+        ]
+
+        deps['parse dbpedia %s' % new] = Dep(
+            file,
+            outputs,
+            'parse_dbpedia',
+        )
 
 def parse_conceptnet4(deps):
     for type in ['conceptnet4', 'conceptnet4_nadya', 'conceptnet_zh']:
@@ -127,7 +158,7 @@ def parse_conceptnet4(deps):
             output = input.replace('jsons', 'msgpack')\
                 .replace('txt', 'msgpack')\
                 .replace('raw', 'edges')
-            parser = type if not type.endswith('zh') else 'ptt_petgame'
+            parser = 'conceptnet4' if not type.endswith('zh') else 'ptt_petgame'
             deps['parse %s' % type] = Dep(
                 [input],
                 [output],
@@ -138,16 +169,16 @@ def parse_conceptnet4(deps):
 def extract_wiktionary(deps):
     for lang in wiktionary_langs:
         input = prefix + 'raw/wiktionary/%swiktionary.xml' % lang
-        template = prefix + 'extracted/wiktionary/%s/wiktionary_%02d.msgpack'
+        path = prefix + 'extracted/wiktionary/%s/' % lang
+        template =path + 'wiktionary_%02d.msgpack'
 
-        outputs = [template % (lang, i)
-                   for i in range(wiktionary_slices)]
+        outputs = [template % i for i in range(wiktionary_slices)]
 
         deps['extract %s wiktionary' % lang] = Dep(
             [input],
             outputs,
             'extract_wiktionary',
-            {'lang': lang})
+            {'lang': lang, 'dir':path})
 
 
 def parse_wiktionary(deps):
@@ -169,6 +200,9 @@ def msgpack_to_csv(deps):
             continue
 
         for input in v['outputs']:
+            if not input.endswith('.msgpack'):
+                continue
+
             new_deps['msgpack to csv %s' % input] = Dep(
                 [input],
                 [input.replace('msgpack', 'csv')],
@@ -183,12 +217,14 @@ def collate(deps):
         if k.startswith('msgpack to csv'):
             inputs += v['outputs']
 
+    out_path = prefix + 'edges/split/'
+
     deps['collate'] = Dep(
         inputs,
-        [prefix + 'edges/split/edges_%02d.csv' % i
+        [out_path + '/edges_%02d.csv' % i
             for i in range(collate_count)],
         'collate',
-        {'count': collate_count}
+        {'count': collate_count, 'dir': out_path}
     )
 
 
@@ -221,13 +257,11 @@ def build_db(deps):
         if not k.startswith('combine assertions'):
             continue
         inputs += v['outputs']
-    output = prefix + 'db/assertions.db'
 
     deps['build db'] = Dep(
         inputs,
-        [output],
-        'build_db'
-    )
+        [prefix + 'db/assertions.db'],
+        'build_db')
 
 
 def edge_output_str(type):
@@ -263,7 +297,7 @@ def add_dep(lines, rule, inputs, outputs, extra=None, params=None):
 
 
 def main():
-    deps = {}
+    deps = collections.OrderedDict()
     add_all_deps(deps)
     ninja = to_ninja(open('rules.ninja').read(), deps)
     print(ninja, file=open('build.ninja', mode='w'))
