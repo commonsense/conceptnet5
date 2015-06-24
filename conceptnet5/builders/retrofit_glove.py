@@ -23,49 +23,44 @@ def conceptnet_normalizer(text):
     """
     return normalized_concept_uri('en', text)
 
-
-def glove_to_vector_map(filename):
-    vector_map = defaultdict(list)
-    with open(filename, encoding='latin-1') as file:
-        for i, line in enumerate(file):
-            parts = line.rstrip().split(' ')
-
-            try:
-                ctext = fix_text(parts[0]).replace('\n', '').strip()
-                concept = conceptnet_normalizer(ctext)
-            except ValueError: #TODO document cause of exception
-                continue
-
-            zipf_weight = 1 / (i + 1)
-            vec = np.array(
-                [float(part) for part in parts[1:]]
-            )
-            vector_map[concept].append(vec * zipf_weight)
-    return vector_map
-
-
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6):
+    """
+    Loads glove vectors from a file. Each line contains a word and a space
+    separated vector. The lines are sorted by word frequency.
+
+    This function will only parse at most `end_row` lines.
+
+    If the index of a line is greater than `filter_beyond_row` and its
+    frequency according to wordfreq is less than `frequency_cutoff`, it is
+    ignored.
+    """
     vectors = []
     with open(filename, encoding='latin-1') as file:
         for i, line in enumerate(file):
             if i >= end_row:
                 break
+
             parts = line.rstrip().split(' ')
-            try:
-                ctext = fix_text(parts[0]).replace('\n', '').strip()
-                concept = conceptnet_normalizer(ctext)
-                if i >= filter_beyond_row and \
-                    word_frequency(ctext, 'en') < frequency_cutoff:
-                    continue
-            except ValueError: #TODO document cause of exception
+            ctext = fix_text(parts[0]).replace('\n', '').strip()
+            concept = conceptnet_normalizer(ctext)
+
+            if i >= filter_beyond_row and \
+                word_frequency(ctext, 'en') < frequency_cutoff:
                 continue
+
             index = labels.add(concept)
+
+            #We extend `vectors` to the appropriate length
             while index >= len(vectors):
-                vectors.append(np.zeros(300))
+                vectors.append(np.zeros(len(parts)-1))
+
+            # We need to combine words with the same normalization, but
+            # different raw forms. We approximate this according to zipf's law
             zipf_weight = 1 / (i + 1)
             vec = np.array([float(part) for part in parts[1:]])
             vectors[index] += vec * zipf_weight
+
     return vectors
 
 
