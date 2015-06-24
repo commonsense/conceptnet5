@@ -110,8 +110,7 @@ def make_sparse_assoc(filename, labels, verbose=True):
 
         return mat
 
-
-def retrofit(dense_file, sparse_file, output_file, offset=1e-9):
+def retrofit(dense_file, sparse_file, output_file, iterations=10, offset=1e-9):
     labels = LabelSet()
     vectors = load_glove_vectors(dense_file, labels)
     sparse_csr = make_sparse_assoc(sparse_file, labels)
@@ -119,35 +118,30 @@ def retrofit(dense_file, sparse_file, output_file, offset=1e-9):
     if verbose:
         print("Building dense matrix")
 
-    dense = np.array(vectors)
+    orig_dense = normalize_rows(np.array(vectors), offset=offset)
+    dense = np.copy(orig_dense)
 
     if verbose:
         print("Retrofitting")
 
-    orig_dense = normalize_rows(dense, offset=offset)
-
-    for iter in range(10):
+    for iter in range(iterations):
         if verbose:
             print("%d/10" % (iter + 1))
 
         newdense = normalize_rows(sparse_csr.dot(dense), offset)
-
-        newdense[:len(vectors)] += orig_dense[:len(vectors)]
-        newdense[:len(vectors)] /= 2
-
-        diff = np.mean(np.abs(newdense - dense))
+        newdense += orig_dense
+        newdense /= 2
         dense = newdense
+
         if verbose:
-            print("   Average diff: %s" % diff)
+            print("Average diff: %s" % np.mean(np.abs(dense - orig_dense)))
 
     assoc = AssocSpace(dense, np.ones(len(vectors[0])), labels, assoc=dense)
     assoc.save_dir(output_file)
 
-
 def main():
     import sys
     retrofit(sys.argv[1], sys.argv[2], sys.argv[3])
-
 
 if __name__ == '__main__':
     main()
