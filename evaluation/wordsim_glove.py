@@ -8,9 +8,7 @@ from conceptnet5.nodes import normalized_concept_uri
 import numpy as np
 from scipy.stats import spearmanr
 
-assoc = AssocSpace.load_dir(get_data_filename('assoc/glove.retrofit'))
-
-def text_to_vector(text):
+def text_to_vector(text, assoc):
     uri = normalized_concept_uri('en', text)
     return normalize(assoc.vector_from_terms([(uri, 1.)]))
 
@@ -49,7 +47,7 @@ def read_men3000():
             yield term1, term2, gold_score
 
 
-def spearman_evaluate(standard, verbose=True):
+def spearman_evaluate(standard, assoc, verbose=1):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word
@@ -59,10 +57,10 @@ def spearman_evaluate(standard, verbose=True):
     our_scores = []
 
     for term1, term2, gold_score in standard:
-        vec1 = text_to_vector(term1)
-        vec2 = text_to_vector(term2)
+        vec1 = text_to_vector(term1, assoc)
+        vec2 = text_to_vector(term2, assoc)
         our_score = vec1.dot(vec2)
-        if verbose:
+        if verbose > 1:
             print(term1, term2, gold_score, our_score)
         gold_scores.append(gold_score)
         our_scores.append(our_score)
@@ -70,15 +68,17 @@ def spearman_evaluate(standard, verbose=True):
     correlation = spearmanr(np.array(gold_scores), np.array(our_scores))[0]
 
     if verbose:
-        print()
         print("Spearman correlation: %s" % (correlation,))
-        print()
-        
+
     return correlation
 
-def main():
-    spearman_evaluate(read_ws353())
-    spearman_evaluate(read_men3000())
+def main(dir):
+    assoc = AssocSpace.load_dir(dir)
+    print("ws353")
+    spearman_evaluate(read_ws353(), assoc)
+    print("men3000")
+    spearman_evaluate(read_men3000(), assoc)
 
 if __name__ == '__main__':
-    main()
+    import sys
+    main(sys.argv[1])
