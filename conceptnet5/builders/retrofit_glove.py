@@ -24,7 +24,8 @@ def conceptnet_normalizer(text):
     return normalized_concept_uri('en', text)
 
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
-                        end_row=1000000, frequency_cutoff=1e-6):
+                        end_row=1000000, frequency_cutoff=1e-6,
+                        verbose=10000):
     """
     Loads glove vectors from a file and returns a list of numpy arrays.
 
@@ -42,6 +43,8 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
         for i, line in enumerate(file):
             if i >= end_row:
                 break
+            if i % verbose == 0:
+                print(i)
 
             parts = line.rstrip().split(' ')
             ctext = fix_text(parts[0]).replace('\n', '').strip()
@@ -66,7 +69,8 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
     return vectors
 
 
-def make_sparse_assoc(filename, labels, verbose=True):
+def make_sparse_assoc(filename, labels, verbose=True,
+                        self_assoc_weight=1, neg_assoc_weight=-0.5):
     """
     Generates a sparse association matrix from a file. The entries correspond
     to the existing entries in labels. Concepts not in labels are ignored.
@@ -74,7 +78,7 @@ def make_sparse_assoc(filename, labels, verbose=True):
     # We ignore the concepts not in the labels so we can perform matrix
     # multiplication between the sparse matrix and the word vectors
 
-    mat = sparse.csr_matrix((len(labels), len(labels), dtype=float))
+    mat = sparse.dok_matrix((len(labels), len(labels)), dtype=float)
 
     if verbose:
         print("Loading sparse associations")
@@ -91,24 +95,25 @@ def make_sparse_assoc(filename, labels, verbose=True):
 
                 mat[index1, index2] = value
                 mat[index2, index1] = value
+
     if verbose:
         print("Adding self-loops and negations")
 
     # A concept is very related to itself
-    for index, row in mat:
-
-        mat[index, index] = np.sum(row) + 10 #TODO Why 10?
+    for concept in labels:
+        index = labels.index(concept)
+        mat[index, index] = self_assoc_weight
 
         # A concept is unrelated to its negation
         neg = negate_concept(concept)
 
         if neg in labels:
-            mat(index, labels.index(neg)) = -0.5 #TODO Why -0.5?
+            mat[index, labels.index(neg)] = neg_assoc_weight
 
     if verbose:
         print("Building sparse matrix")
 
-        return mat
+    return mat.tocsr()
 
 
 def retrofit(dense_file, sparse_file, output_file,
@@ -125,9 +130,6 @@ def retrofit(dense_file, sparse_file, output_file,
     labels = LabelSet()
     vectors = load_glove_vectors(dense_file, labels)
     sparse_csr = make_sparse_assoc(sparse_file, labels)
-
-    if verbose:
-        print("Building dense matrix")
 
     orig_dense = normalize_rows(np.array(vectors), offset=offset)
     dense = np.copy(orig_dense)
