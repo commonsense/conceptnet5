@@ -9,7 +9,7 @@ def Dep(inputs, outputs, rule, params=None):
     }
 
 prefix = 'data/'
-version = '5.3'
+data_version = '5.3'
 
 wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
@@ -68,13 +68,13 @@ in_tar = {k: [prefix + 'raw/%s/%s' % (k, file) for file in v]
 
 def add_all_deps(deps):
 
-    #download(deps)
-    #untar(deps)
+    download(deps)
+    untar(deps)
 
-    #parse_sw(deps)  # wordnet, umbel
-    #parse_standard(deps)  # jmdict, verbosity
-    #parse_globalmind(deps)
-    #parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
+    parse_sw(deps)  # wordnet, umbel
+    parse_standard(deps)  # jmdict, verbosity
+    parse_globalmind(deps)
+    parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
     parse_dbpedia(deps)
@@ -84,6 +84,10 @@ def add_all_deps(deps):
     count_and_rank(deps)
     combine_assertions(deps)
     build_db(deps)
+
+    symlink(deps)
+    msgpack_to_assoc(deps)
+    stats(deps)
 
 
 def download(deps):
@@ -221,7 +225,7 @@ def collate(deps):
 
     deps['collate'] = Dep(
         inputs,
-        [out_path + '/edges_%02d.csv' % i
+        [out_path + 'edges_%02d.csv' % i
             for i in range(collate_count)],
         'collate',
         {'count': collate_count, 'dir': out_path}
@@ -245,11 +249,35 @@ def combine_assertions(deps):
 
         new_deps['combine assertions %s' % input] = Dep(
             [input],
-            [input.replace('edges', 'assertions').replace('csv', 'msgpack')],
+            [input.replace('edges/sorted', 'assertions')\
+                    .replace('csv', 'msgpack')\
+                    .replace('assertions_', 'part_')],
             'combine_assertions')
 
     deps.update(new_deps)
 
+def symlink(deps):
+    deps['symlink'] = Dep(
+    [prefix],
+    ['~/.conceptnet5'],
+    'symlink'
+    )
+
+def msgpack_to_assoc(deps):
+    new_deps = {}
+    for k, v in deps.items():
+        if not k.startswith('combine assertions'):
+            continue
+
+        input = v['outputs'][0]
+
+        new_deps['msgpack to assoc %s' % input] = Dep(
+            [input],
+            [input.replace('msgpack', 'csv').replace('assertions', 'assoc')],
+            'msgpack_to_assoc'
+        )
+
+    deps.update(new_deps)
 
 def build_db(deps):
     inputs = []
@@ -263,14 +291,54 @@ def build_db(deps):
         [prefix + 'db/assertions.db'],
         'build_db')
 
+def stats(deps):
+    inputs = []
+    for k, v in deps.items():
+        if k.startswith('count and rank'):
+            inputs += v['outputs']
+
+    outputs = [prefix + 'stats/relations.txt']
+
+    deps['relation stats'] = Dep(
+        inputs,
+        outputs,
+        'relation_stats'
+    )
+
+    dataset_outputs = []
+
+    for side, fields in [('left', '3,9'), ('right', '4,9')]:
+        output = prefix + 'stats/concepts_%s_datasets.txt' % side
+        dataset_outputs.append(output)
+
+        deps['dataset stats %s' % side] = Dep(
+            inputs,
+            [output],
+            'dataset_stats',
+            {'fields': fields}
+        )
+
+    deps['dataset vs language'] = Dep(
+        dataset_outputs,
+        prefix + 'stats/dataset_vs_language.txt',
+        'dataset_vs_language_stats'
+    )
+
+    deps['more stats'] = Dep(
+        inputs,
+        prefix + 'stats/morestats.txt',
+        'more_stats'
+    )
+
 
 def edge_output_str(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
 
 
-def to_ninja(rules, deps):
+def to_ninja(rules, deps, only=None):
     lines = [rules]
-    for dep in deps.values():
+    for name, dep in deps.items():
+        if only is not None and not only(name): continue
         add_dep(lines, **dep)
     return "\n".join(lines)
 
