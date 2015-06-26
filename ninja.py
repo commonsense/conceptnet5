@@ -85,7 +85,6 @@ def add_all_deps(deps):
     combine_assertions(deps)
     build_db(deps)
 
-    symlink(deps)
     msgpack_to_assoc(deps)
     stats(deps)
 
@@ -257,13 +256,6 @@ def combine_assertions(deps):
 
     deps.update(new_deps)
 
-def symlink(deps):
-    deps['symlink'] = Dep(
-    [prefix],
-    ['~/.conceptnet5'],
-    'symlink'
-    )
-
 def msgpack_to_assoc(deps):
     new_deps = {}
     for k, v in deps.items():
@@ -290,7 +282,8 @@ def build_db(deps):
     deps['build db'] = Dep(
         inputs,
         [prefix + 'db/assertions.db'],
-        'build_db')
+        'build_db',
+        {'prefix': prefix})
 
 def stats(deps):
     inputs = []
