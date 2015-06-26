@@ -91,11 +91,11 @@ def add_all_deps(deps):
 
 
 def download(deps):
-    file = 'conceptnet5_raw_data_%s.tar.bz2' % version
-    url = 'http://conceptnet5.media.mit.edu/downloads/v%s/' % version + file
+    file = 'conceptnet5_raw_data_%s.tar.bz2' % data_version
+    url = 'http://conceptnet5.media.mit.edu/downloads/v%s/' % data_version + file
     deps['download_tar'] = Dep(
         [],
-        prefix + 'conceptnet5_raw_data_%s.tar.bz2' % version,
+        prefix + 'conceptnet5_raw_data_%s.tar.bz2' % data_version,
         'download',
         {'prefix': prefix, 'url': url}
     )
@@ -250,6 +250,7 @@ def combine_assertions(deps):
         new_deps['combine assertions %s' % input] = Dep(
             [input],
             [input.replace('edges/sorted', 'assertions')\
+                    .replace('edges', 'part')
                     .replace('csv', 'msgpack')\
                     .replace('assertions_', 'part_')],
             'combine_assertions')

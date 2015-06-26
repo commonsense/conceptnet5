@@ -63,7 +63,7 @@ rule relation_stats
   command = mkdir -p $$(dirname $out) && cut -f 2 $in | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
 
 rule dataset_stats
-  command = mkdir -p $$(dirname $out) && cut -f $fields $in > out
+  command = mkdir -p $$(dirname $out) && cut -f $fields $in > $out
 
 rule dataset_vs_language_stats
   command = mkdir -p $$(dirname $out) && cat $in | sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g' | LC_ALL=C sort | LC_ALL=C uniq -c > $out
