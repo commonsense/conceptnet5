@@ -26,32 +26,47 @@ def negate_concept(concept):
         return concept + '/neg'
 
 
-def reduce_assoc(dirname, cutoff=3, en_cutoff=4):
+def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
+    """
+    Removes uncommon associations and associations unlikely to be useful.
+    This function expects files of the form part_*.csv in `dirname` and will
+    create `reduced.csv` in `dirname`.
+
+    All concepts that occur fewer than `cutoff` times will be removed.
+    All english concepts that occur fewer than `en_cutoff` times will be removed
+    """
     path = pathlib.Path(dirname)
     counts = defaultdict(int)
     for filepath in path.glob('part_*.csv'):
-        print(filepath)
-        for line in filepath.open(encoding='utf-8'):
-            left, right, value = line.rstrip().split('\t')
-            if not concept_is_bad(left) and not concept_is_bad(right):
-                counts[left] += 1
-                counts[right] += 1
+        if verbose:
+            print(filepath)
+
+        with filepath.open(encoding='utf-8') as file:
+            for line in file:
+                left, right, _ = line.rstrip().split('\t')
+                if not concept_is_bad(left) and not concept_is_bad(right):
+                    counts[left] += 1
+                    counts[right] += 1
 
     filtered_concepts = {
-        key for (key, value) in counts.items()
-        if value >= en_cutoff
-        or (not key.startswith('/c/en/')) and value >= cutoff
+        concept for (concept, count) in counts.items()
+        if count >= en_cutoff or
+        not concept.startswith('/c/en/') and count >= cutoff
     }
+
     outpath = path / 'reduced.csv'
     with outpath.open('w', encoding='utf-8') as out:
         for filepath in path.glob('part_*.csv'):
-            print("Re-reading %s" % filepath)
-            for line in filepath.open(encoding='utf-8'):
-                line = line.rstrip()
-                left, right, value = line.split('\t')
-                value = float(value)
-                if left in filtered_concepts and right in filtered_concepts and value > 0:
-                    print(line, file=out)
+            if verbose:
+                print("Re-reading %s" % filepath)
+            with filepath.open(encoding='utf-8') as file:
+                for line in file:
+                    left, right, value = line.rstrip().split('\t')
+                    value = float(value)
+                    if left in filtered_concepts and \
+                        right in filtered_concepts and \
+                        value != 0:
+                        print(line, file=out)
 
 
 if __name__ == '__main__':
