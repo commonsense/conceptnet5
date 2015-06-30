@@ -5,9 +5,10 @@ from conceptnet5.nodes import normalized_concept_uri
 import numpy as np
 from scipy.stats import spearmanr
 
-def text_to_vector(text, assoc):
-    uri = normalized_concept_uri('en', text)
-    return assoc.vector_from_terms([(uri, 1.)])
+def text_to_vector(text, assoc, normalize=False):
+    if normalize:
+        text = normalized_concept_uri('en', text)
+    return assoc.vector_from_terms([(text, 1.)])
 
 def cos_diff(a, b):
     return normalize(a).dot(normalize(b))
@@ -75,7 +76,7 @@ def read_mc():
             parts = line.split()
             yield parts[0], parts[1], float(parts[2])
 
-def spearman_evaluate(standard, assoc, verbose=1):
+def spearman_evaluate(standard, assoc, verbose=1, normalize=False):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word
@@ -85,8 +86,8 @@ def spearman_evaluate(standard, assoc, verbose=1):
     our_scores = []
 
     for term1, term2, gold_score in standard:
-        vec1 = text_to_vector(term1, assoc)
-        vec2 = text_to_vector(term2, assoc)
+        vec1 = text_to_vector(term1, assoc, normalize=normalize)
+        vec2 = text_to_vector(term2, assoc, normalize=normalize)
         our_score = cos_diff(vec1, vec2)
         if verbose > 1:
             print(term1, term2, gold_score, our_score)
@@ -100,17 +101,17 @@ def spearman_evaluate(standard, assoc, verbose=1):
 
     return correlation
 
-def test(assoc):
+def test(assoc, normalize=False):
     print("ws353")
-    ws353 = spearman_evaluate(read_ws353(), assoc)
+    ws353 = spearman_evaluate(read_ws353(), assoc, normalize=normalize)
     print("men3000")
-    men3000 = spearman_evaluate(read_men3000(), assoc)
+    men3000 = spearman_evaluate(read_men3000(), assoc, normalize=normalize)
     print("rg65")
-    rg65 = spearman_evaluate(read_rg65(), assoc)
+    rg65 = spearman_evaluate(read_rg65(), assoc, normalize=normalize)
     print("rw")
-    rw = spearman_evaluate(read_rw(), assoc)
+    rw = spearman_evaluate(read_rw(), assoc, normalize=normalize)
     print("mc")
-    mc = spearman_evaluate(read_mc(), assoc)
+    mc = spearman_evaluate(read_mc(), assoc, normalize=normalize)
 
 def main(dir):
     assoc = AssocSpace.load_dir(dir)
