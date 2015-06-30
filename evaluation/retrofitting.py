@@ -4,7 +4,8 @@ import pickle
 from assoc_space import AssocSpace, LabelSet
 from conceptnet5.builders.retrofit_glove import retrofit
 from sklearn.preprocessing import normalize
-from wordsim import test, text_to_vector
+import wordsim
+import analogy
 
 def save_csr_matrix(matrix, filename):
     np.savez(filename, data=matrix.data, indices=matrix.indices,
@@ -13,9 +14,6 @@ def save_csr_matrix(matrix, filename):
 def load_csr_matrix(filename):
     matrix = np.load(filename)
     return sparse.csr_matrix((matrix['data'], matrix['indices'], matrix['indptr']), shape=matrix['shape'])
-
-def sort_by_relavence(assoc, seq):
-    return sorted(seq, key=lambda x: text_to_vector(x[0], assoc).dot(text_to_vector(x[1], assoc)))
 
 def gen_assoc(normalize_sparse=True, normalize_vectors='l1', retrofit_vectors=False, normalize_intermediate=False):
 
@@ -42,10 +40,14 @@ def gen_assoc(normalize_sparse=True, normalize_vectors='l1', retrofit_vectors=Fa
 
         vectors = retrofit(vectors, sparse, labels, normalize_intermediate=normalize_intermediate)
 
-    return AssocSpace(vectors, np.ones(len(vectors[0])), labels, assoc=vectors)
+    assoc = normalize(vectors)
+
+    return AssocSpace(vectors, np.ones(len(vectors[0])), labels, assoc=assoc)
 
 def main():
-    test(gen_assoc())
+    assoc = gen_assoc()
+    wordsim.test(assoc)
+    analogy.test(assoc)
 
 if __name__ == '__main__':
     main()
