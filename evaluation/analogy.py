@@ -5,7 +5,7 @@ from sklearn.preprocessing import normalize
 
 def read_symrel():
     """
-    Parses the SYM-REL database from Mikolov et al.
+    Parses the symantic analogy relations from Mikolov et al.
     """
     filename = get_support_data_filename('rel/questions-words.txt')
     with open(filename) as file:
@@ -16,20 +16,39 @@ def read_symrel():
                 continue
             yield line.split()
 
-def evaluate(standard, assoc, verbose=True):
+def read_synrel():
+    """
+    Prases the syntatic analogy relations from Mikolov et al.
+    """
+    filename = get_support_data_filename('rel/questions-words.txt')
+    with open(filename) as file:
+        for line in file:
+            if line.startswith(': gram'):
+                break
+
+        for line in file:
+            if line.startswith(':'):
+                continue
+            yield line.split()
+
+def evaluate(standard, assoc, verbose=True, normalize_text=False):
     correct = 0
     total = 0
     for a,b,c,d in standard:
         if total % 10 == 0:
             print(correct, total)
-        av = text_to_vector(a, assoc)
-        bv = text_to_vector(b, assoc)
-        cv = text_to_vector(c, assoc)
+        av = text_to_vector(a, assoc, normalize=normalize_text)
+        bv = text_to_vector(b, assoc, normalize=normalize_text)
+        cv = text_to_vector(c, assoc, normalize=normalize_text)
         terms = assoc.terms_similar_to_vector(normalize(bv-av+cv)[0])
         d2 = terms[0]
         print(a,b,c,d,terms[:2])
-        if d2[0] ==  normalized_concept_uri('en', d):
-            correct += 1
+        if normalize_text:
+            if d2[0] == normalized_concept_uri('en', d):
+                correct += 1
+        else:
+            if d2[0] == d:
+                correct += 1
         total += 1
 
     if verbose:
@@ -37,9 +56,11 @@ def evaluate(standard, assoc, verbose=True):
 
     return (correct, total)
 
-def test(assoc):
+def test(assoc, normalize=False):
+    print("SYN-REL")
+    evaluate(read_synrel(), assoc, normalize_text=normalize)
     print("SYM-REL")
-    evaluate(read_symrel(), assoc)
+    evaluate(read_symrel(), assoc, normalize_text=normalize)
 
 def main(dir):
     assoc = AssocSpace.load_dir(dir)
