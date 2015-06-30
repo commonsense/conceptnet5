@@ -1,6 +1,3 @@
-"""
-A quick and dirty script to evaluate against wordsim-353.
-"""
 from conceptnet5.util import get_data_filename, get_support_data_filename
 from assoc_space import AssocSpace
 from assoc_space.eigenmath import normalize
@@ -10,8 +7,10 @@ from scipy.stats import spearmanr
 
 def text_to_vector(text, assoc):
     uri = normalized_concept_uri('en', text)
-    return normalize(assoc.vector_from_terms([(uri, 1.)]))
+    return assoc.vector_from_terms([(uri, 1.)])
 
+def cos_diff(a, b):
+    return normalize(a).dot(normalize(b))
 
 def read_ws353():
     """
@@ -53,8 +52,6 @@ def read_rg65():
     filename = get_support_data_filename('rg65/EN-RG-65.txt')
     with open(filename) as file:
         for line in file:
-            if line.startswith(':'):
-                continue
             parts = line.split()
             yield parts[0], parts[1], float(parts[2])
 
@@ -90,7 +87,7 @@ def spearman_evaluate(standard, assoc, verbose=1):
     for term1, term2, gold_score in standard:
         vec1 = text_to_vector(term1, assoc)
         vec2 = text_to_vector(term2, assoc)
-        our_score = vec1.dot(vec2)
+        our_score = cos_diff(vec1, vec2)
         if verbose > 1:
             print(term1, term2, gold_score, our_score)
         gold_scores.append(gold_score)
