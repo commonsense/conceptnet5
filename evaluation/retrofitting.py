@@ -46,8 +46,8 @@ def gen_assoc(normalize_sparse=True, normalize_vectors='l1', retrofit_vectors=Fa
 
 def main():
     assoc = gen_assoc()
-    wordsim.test(assoc)
-    analogy.test(assoc)
+    wordsim.test(assoc, normalize=True)
+    #analogy.test(assoc) # slow
 
 if __name__ == '__main__':
     main()
