@@ -1,5 +1,7 @@
 import sys
 
+from ftfy import fix_text
+
 import numpy as np
 
 from sklearn.preprocessing import normalize
@@ -7,7 +9,7 @@ from assoc_space import AssocSpace, LabelSet
 
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6,
-                        verbose=10000):
+                        verbose=10000, normalize=True):
     """
     Loads glove vectors from a file and returns a list of numpy arrays.
 
@@ -31,14 +33,19 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
             parts = line.rstrip().split(' ')
             ctext = fix_text(parts[0]).replace('\n', '').strip()
 
-            try:
-                concept = conceptnet_normalizer(ctext)
-            except ValueError: # Bad concept names
-                continue
+            if normalize:
 
-            if i >= filter_beyond_row and \
-                word_frequency(ctext, 'en') < frequency_cutoff:
-                continue
+                try:
+                    concept = conceptnet_normalizer(ctext)
+                except ValueError: # Bad concept names
+                    continue
+
+                if i >= filter_beyond_row and \
+                    word_frequency(ctext, 'en') < frequency_cutoff:
+                    continue
+
+            else:
+                concept = ctext
 
             index = labels.add(concept)
 
@@ -52,7 +59,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
             vec = np.array([float(part) for part in parts[1:]])
             vectors[index] += vec * zipf_weight
 
-    return normalize(np.array(vectors))
+    return np.array(vectors)
 
 
 def glove_to_assoc_space(filename, output_dir):
