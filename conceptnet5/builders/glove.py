@@ -6,6 +6,8 @@ import numpy as np
 
 from sklearn.preprocessing import normalize
 from assoc_space import AssocSpace, LabelSet
+from conceptnet5.nodes import normalized_concept_uri
+from wordfreq import word_frequency
 
 def conceptnet_normalizer(text):
     """

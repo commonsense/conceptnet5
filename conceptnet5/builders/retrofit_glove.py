@@ -1,7 +1,6 @@
 import numpy as np
 from scipy import sparse
 
-from wordfreq import word_frequency
 from ftfy import fix_text
 
 from sklearn.preprocessing import normalize
