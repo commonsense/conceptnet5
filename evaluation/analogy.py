@@ -40,14 +40,13 @@ def evaluate(standard, assoc, verbose=True, normalize_text=False):
         av = text_to_vector(a, assoc, normalize=normalize_text)
         bv = text_to_vector(b, assoc, normalize=normalize_text)
         cv = text_to_vector(c, assoc, normalize=normalize_text)
-        terms = assoc.terms_similar_to_vector(normalize(bv-av+cv)[0])
-        d2 = terms[0]
-        print(a,b,c,d,terms[:2])
+        term = assoc.most_similar(normalize(1.5*(bv-av)+cv)[0])[0]
+        print(a,b,c,d,term)
         if normalize_text:
-            if d2[0] == normalized_concept_uri('en', d):
+            if term == normalized_concept_uri('en', d):
                 correct += 1
         else:
-            if d2[0] == d:
+            if term == d:
                 correct += 1
         total += 1
 
@@ -57,8 +56,8 @@ def evaluate(standard, assoc, verbose=True, normalize_text=False):
     return (correct, total)
 
 def test(assoc, normalize=False):
-    print("SYN-REL")
-    evaluate(read_synrel(), assoc, normalize_text=normalize)
+    #print("SYN-REL")
+    #evaluate(read_synrel(), assoc, normalize_text=normalize)
     print("SYM-REL")
     evaluate(read_symrel(), assoc, normalize_text=normalize)
 
