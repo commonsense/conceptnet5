@@ -9,11 +9,9 @@ modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
 modifications mostly involve heuristics for when to apply noun or verb
 transformations to words whose part of speech is ambiguous.
 """
-import nltk
-from nltk.corpus import wordnet
 from .token_utils import untokenize, tokenize
 import re
-morphy = wordnet._morphy
+morphy = None
 
 STOPWORDS = ['the', 'a', 'an']
 
@@ -108,6 +106,13 @@ def _morphy_best(word, pos=None):
     Get the most likely stem for a word using Morphy, once the input has been
     pre-processed by morphy_stem().
     """
+
+    global morphy
+    if morphy is None:
+        from nltk.corpus import wordnet
+        morphy = wordnet._morphy
+    
+
     results = []
     if pos is None:
         pos = 'nvar'
