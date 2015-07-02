@@ -18,15 +18,6 @@ from conceptnet5.builders.glove import load_glove_vectors
 from collections import defaultdict
 import pathlib
 
-
-def conceptnet_normalizer(text):
-    """
-    Normalizes a text into a concept URI. This function assume the text is
-    english.
-    """
-    return normalized_concept_uri('en', text)
-
-
 class SparseMatrixBuilder:
     """
     SparseMatrixBuilder is a utility class that helps build a matrix of

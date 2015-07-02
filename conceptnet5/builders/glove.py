@@ -7,6 +7,13 @@ import numpy as np
 from sklearn.preprocessing import normalize
 from assoc_space import AssocSpace, LabelSet
 
+def conceptnet_normalizer(text):
+    """
+    Normalizes a text into a concept URI. This function assume the text is
+    english.
+    """
+    return normalized_concept_uri('en', text)
+
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6,
                         verbose=10000, normalize=True):
