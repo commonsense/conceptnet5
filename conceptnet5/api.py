@@ -11,7 +11,7 @@ import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
 from conceptnet5 import __version__ as VERSION
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
@@ -123,7 +123,7 @@ def normalize():
             'error': 'Invalid request',
             'details': "You should include the 'term' and 'language' parameters"
         }), 400
-    uri = normalized_concept_uri(language, term)
+    uri = standardized_concept_uri(language, term)
     return flask.jsonify(uri=uri)
 
 

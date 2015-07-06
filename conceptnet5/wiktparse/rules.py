@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import join_uri, Licenses, valid_concept_name
 from pprint import pprint
 from collections import defaultdict
@@ -211,12 +211,12 @@ class EdgeInfo(object):
         if sense is not None and not valid_concept_name(sense):
             sense = None
 
-        start_uri = normalized_concept_uri(headlang, headword, headpos, sense)
+        start_uri = standardized_concept_uri(headlang, headword, headpos, sense)
         if rule_name == 'synonym_section':
             # Special treatment for German
-            end_uri = normalized_concept_uri(headlang, self.target)
+            end_uri = standardized_concept_uri(headlang, self.target)
         else:
-            end_uri = normalized_concept_uri(self.language, self.target)
+            end_uri = standardized_concept_uri(self.language, self.target)
 
         rel = self.rel or 'RelatedTo'
 

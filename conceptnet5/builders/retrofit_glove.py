@@ -8,7 +8,7 @@ from sklearn.preprocessing import normalize
 from assoc_space import AssocSpace, LabelSet
 from assoc_space.eigenmath import normalize_rows
 
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.util import get_data_filename
 # FIXME: negate_concept should live somewhere nicer
 from conceptnet5.builders.assoc_to_vector_space import negate_concept

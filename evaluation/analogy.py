@@ -1,5 +1,5 @@
 from wordsim import text_to_vector, cos_diff
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.util import get_support_data_filename
 from sklearn.preprocessing import normalize
 
@@ -31,19 +31,19 @@ def read_synrel():
                 continue
             yield line.split()
 
-def evaluate(standard, assoc, verbose=True, normalize_text=False):
+def evaluate(standard, assoc, verbose=True, standardize_text=False):
     correct = 0
     total = 0
     for a,b,c,d in standard:
         if total % 10 == 0:
             print(correct, total)
-        av = text_to_vector(a, assoc, normalize=normalize_text)
-        bv = text_to_vector(b, assoc, normalize=normalize_text)
-        cv = text_to_vector(c, assoc, normalize=normalize_text)
+        av = text_to_vector(a, assoc, standardize=standardize_text)
+        bv = text_to_vector(b, assoc, standardize=standardize_text)
+        cv = text_to_vector(c, assoc, standardize=standardize_text)
         term = assoc.most_similar_to_vector(normalize(bv-av+cv)[0])[0]
         print(a,b,c,d,term)
-        if normalize_text:
-            if term == normalized_concept_uri('en', d):
+        if standardize_text:
+            if term == standardized_concept_uri('en', d):
                 correct += 1
         else:
             if term == d:
@@ -55,11 +55,11 @@ def evaluate(standard, assoc, verbose=True, normalize_text=False):
 
     return (correct, total)
 
-def test(assoc, normalize=False):
+def test(assoc, standardize=False):
     #print("SYN-REL")
-    #evaluate(read_synrel(), assoc, normalize_text=normalize)
+    #evaluate(read_synrel(), assoc, standardize_text=normalize)
     print("SYM-REL")
-    evaluate(read_symrel(), assoc, normalize_text=normalize)
+    evaluate(read_symrel(), assoc, standardize_text=normalize)
 
 def main(dir):
     assoc = AssocSpace.load_dir(dir)

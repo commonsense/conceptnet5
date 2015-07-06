@@ -13,8 +13,8 @@ a well-established set of strings. Other stemmers present a moving target that
 is harder to define.
 """
 
-from conceptnet5.language.english import normalize as normalize_english
-from conceptnet5.uri import normalize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
+from conceptnet5.language.english import standardize as standardize_english
+from conceptnet5.uri import standardize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
 
 LCODE_ALIASES = {
     # Pretend that all Chinese languages and variants are equivalent. This is
@@ -38,26 +38,27 @@ LCODE_ALIASES = {
 }
 
 
-def normalized_concept_name(lang, text):
+def standardized_concept_name(lang, text):
     """
     Make a normalized form of the given text in the given language. If the
     language is English, reduce words to their root form using the tools in
     conceptnet5.language.english. Otherwise, simply apply the function called
-    `conceptnet5.uri.normalize_text`.
+    `conceptnet5.uri.standardize_text`.
 
-    >>> normalized_concept_name('en', 'this is a test')
+    >>> standardized_concept_name('en', 'this is a test')
     'this_be_test'
-    >>> normalized_concept_name('es', 'ESTO ES UNA PRUEBA')
+    >>> standardized_concept_name('es', 'ESTO ES UNA PRUEBA')
     'esto_es_una_prueba'
     """
     if lang == 'en':
-        stem = normalize_english(text) or text
-        return normalize_text(stem)
+        stem = standardize_english(text) or text
+        return standardize_text(stem)
     else:
-        return normalize_text(text)
+        return standardize_text(text)
 
+normalized_concept_name = standardized_concept_name
 
-def normalized_concept_uri(lang, text, *more):
+def standardized_concept_uri(lang, text, *more):
     """
     Make the appropriate URI for a concept in a particular language, including
     stemming the text if necessary, normalizing it, and joining it into a
@@ -66,17 +67,18 @@ def normalized_concept_uri(lang, text, *more):
     Items in 'more' will not be stemmed, but will go through the other
     normalization steps.
 
-    >>> normalized_concept_uri('en', 'this is a test')
+    >>> standardized_concept_uri('en', 'this is a test')
     '/c/en/this_be_test'
-    >>> normalized_concept_uri('en', 'this is a test', 'n', 'example phrase')
+    >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
     '/c/en/this_be_test/n/example_phrase'
     """
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
-    norm_text = normalized_concept_name(lang, text)
-    more_text = [normalize_text(item) for item in more if item is not None]
+    norm_text = standardized_concept_name(lang, text)
+    more_text = [standardize_text(item) for item in more if item is not None]
     return concept_uri(lang, norm_text, *more_text)
 
+normalized_concept_uri = standardized_concept_uri
 
 def uri_to_lemmas(uri):
     """
@@ -95,7 +97,6 @@ def uri_to_lemmas(uri):
         lang = uri_pieces[1]
         text = uri_pieces[4].replace('_', ' ')
         if text not in BAD_NAMES_FOR_THINGS:
-            disambig = normalized_concept_name(lang, text)
+            disambig = standardized_concept_name(lang, text)
             lemmas.extend(disambig.split('_'))
     return lemmas
-
