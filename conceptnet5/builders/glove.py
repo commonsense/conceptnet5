@@ -6,15 +6,15 @@ import numpy as np
 
 from sklearn.preprocessing import normalize
 from assoc_space import AssocSpace, LabelSet
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from wordfreq import word_frequency
 
-def conceptnet_normalizer(text):
+def conceptnet_standardize(text):
     """
     Normalizes a text into a concept URI. This function assume the text is
     english.
     """
-    return normalized_concept_uri('en', text)
+    return standardized_concept_uri('en', text)
 
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6,
@@ -45,7 +45,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
             if normalize:
 
                 try:
-                    concept = conceptnet_normalizer(ctext)
+                    concept = conceptnet_standardize(ctext)
                 except ValueError: # Bad concept names
                     continue
 
@@ -71,7 +71,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                 vectors[index] += vec * zipf_weight
             else:
                 vectors[index] += vec
-                
+
     return np.array(vectors)
 
 

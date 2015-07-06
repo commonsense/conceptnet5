@@ -168,16 +168,16 @@ def good_lemma(lemma):
     return lemma and lemma not in STOPWORDS and lemma[0].isalnum()
 
 
-def normalize_as_list(text):
+def standardize_as_list(text):
     """
     Get a list of word stems that appear in the text. Stopwords and an initial
     'to' will be stripped, unless this leaves nothing in the stem.
 
-    >>> normalize_as_list('the dog')
+    >>> standardize_as_list('the dog')
     ['dog']
-    >>> normalize_as_list('big dogs')
+    >>> standardize_as_list('big dogs')
     ['big', 'dog']
-    >>> normalize_as_list('the')
+    >>> standardize_as_list('the')
     ['the']
     """
     pieces = [morphy_stem(word) for word in tokenize(text)]
@@ -192,9 +192,9 @@ def normalize_as_list(text):
 def normalize(text):
     """
     Get a string made from the non-stopword word stems in the text. See
-    normalize_as_list().
+    standardize_as_list().
     """
-    return untokenize(normalize_as_list(text))
+    return untokenize(standardize_as_list(text))
 
 
 def normalize_topic(topic):
