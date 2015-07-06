@@ -111,7 +111,7 @@ def _morphy_best(word, pos=None):
     if morphy is None:
         from nltk.corpus import wordnet
         morphy = wordnet._morphy
-    
+
 
     results = []
     if pos is None:
@@ -189,7 +189,7 @@ def standardize_as_list(text):
     return pieces
 
 
-def normalize(text):
+def standardize(text):
     """
     Get a string made from the non-stopword word stems in the text. See
     standardize_as_list().
@@ -197,12 +197,12 @@ def normalize(text):
     return untokenize(standardize_as_list(text))
 
 
-def normalize_topic(topic):
+def standardize_topic(topic):
     """
     Get a canonical representation of a Wikipedia topic, which may include
     a disambiguation string in parentheses.
 
-    Returns (name, disambig), where "name" is the normalized topic name,
+    Returns (name, disambig), where "name" is the standardized topic name,
     and "disambig" is a string corresponding to the disambiguation text or
     None.
     """
@@ -210,6 +210,6 @@ def normalize_topic(topic):
     topic = topic.replace('_', ' ')
     match = re.match(r'([^(]+) \(([^)]+)\)', topic)
     if not match:
-        return normalize(topic), None
+        return standardize(topic), None
     else:
-        return normalize(match.group(1)), 'n/' + match.group(2).strip(' _')
+        return standardize(match.group(1)), 'n/' + match.group(2).strip(' _')

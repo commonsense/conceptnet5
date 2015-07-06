@@ -10,7 +10,7 @@ into an N-Triples file, which this code is able to understand.
 
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri, standardized_concept_name, stardardize_text
+from conceptnet5.nodes import standardized_concept_uri, standardized_concept_name, standardize_text
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
@@ -96,7 +96,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
             if 'CW' not in web_obj.split() and 'PCW' not in web_obj.split():
                 labels[web_subj] = web_obj
         if resource_name(web_rel).endswith('Label'):
-            text = stardardize_text(web_obj)
+            text = standardize_text(web_obj)
             label_sets[text].add(web_subj)
 
     # Read through umbel.nt again and extract ConceptNet edges.
@@ -128,7 +128,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
                 if standardized_concept_name('en', name) != standardized_concept_name('en', labels[web_subj]):
                     if not set(words) & IGNORED_WORDS:
                         main_label = standardized_concept_uri('en', labels[web_subj])
-                        name_text = stardardize_text(name)
+                        name_text = standardize_text(name)
                         if len(label_sets[name_text]) >= 2 or len(name_text) <= 3:
                             disambig = un_camel_case(resource_name(web_subj))
 

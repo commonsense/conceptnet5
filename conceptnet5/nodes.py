@@ -13,8 +13,8 @@ a well-established set of strings. Other stemmers present a moving target that
 is harder to define.
 """
 
-from conceptnet5.language.english import normalize as standardize_english
-from conceptnet5.uri import stardardize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
+from conceptnet5.language.english import standardize as standardize_english
+from conceptnet5.uri import standardize_text, concept_uri, split_uri, BAD_NAMES_FOR_THINGS
 
 LCODE_ALIASES = {
     # Pretend that all Chinese languages and variants are equivalent. This is
@@ -43,7 +43,7 @@ def standardized_concept_name(lang, text):
     Make a normalized form of the given text in the given language. If the
     language is English, reduce words to their root form using the tools in
     conceptnet5.language.english. Otherwise, simply apply the function called
-    `conceptnet5.uri.stardardize_text`.
+    `conceptnet5.uri.standardize_text`.
 
     >>> standardized_concept_name('en', 'this is a test')
     'this_be_test'
@@ -52,9 +52,9 @@ def standardized_concept_name(lang, text):
     """
     if lang == 'en':
         stem = standardize_english(text) or text
-        return stardardize_text(stem)
+        return standardize_text(stem)
     else:
-        return stardardize_text(text)
+        return standardize_text(text)
 
 normalized_concept_name = standardized_concept_name
 
@@ -75,10 +75,11 @@ def standardized_concept_uri(lang, text, *more):
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
     norm_text = standardized_concept_name(lang, text)
-    more_text = [stardardize_text(item) for item in more if item is not None]
+    more_text = [standardize_text(item) for item in more if item is not None]
     return concept_uri(lang, norm_text, *more_text)
 
 normalized_concept_uri = standardized_concept_uri
+
 def uri_to_lemmas(uri):
     """
     Given a normalized concept URI, extract the list of words (in their root

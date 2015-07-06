@@ -8,7 +8,7 @@ from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses, stardardize_text, BAD_NAMES_FOR_THINGS
+from conceptnet5.uri import join_uri, Licenses, standardize_text, BAD_NAMES_FOR_THINGS
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -157,9 +157,9 @@ def build_sources(parts_dict, preposition_fix=False):
 
     creator_node = join_uri(
         '/s/contributor/omcs',
-        stardardize_text(parts_dict["creator"], lowercase=False)
+        standardize_text(parts_dict["creator"], lowercase=False)
     )
-    activity_node = join_uri('/s/activity/omcs', stardardize_text(activity))
+    activity_node = join_uri('/s/activity/omcs', standardize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
     else:

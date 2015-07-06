@@ -33,7 +33,7 @@ BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
 WHITESPACE_RE = re.compile('[\s]')
 
 
-def stardardize_text(text, lowercase=True):
+def standardize_text(text, lowercase=True):
     """
     When a piece of a URI is an arbitrary string, we standardize it in the
     following ways:
@@ -46,25 +46,25 @@ def stardardize_text(text, lowercase=True):
 
     The result will be a Unicode string that can be used within a URI.
 
-        >>> stardardize_text(' cat')
+        >>> standardize_text(' cat')
         'cat'
 
-        >>> stardardize_text('Italian supercat')
+        >>> standardize_text('Italian supercat')
         'italian_supercat'
 
-        >>> stardardize_text('Test?!')
+        >>> standardize_text('Test?!')
         'test'
 
-        >>> stardardize_text('TEST.')
+        >>> standardize_text('TEST.')
         'test'
 
-        >>> stardardize_text('test/test')
+        >>> standardize_text('test/test')
         'test_test'
 
-        >>> stardardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
+        >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
         'über'
 
-        >>> stardardize_text('embedded' + chr(9) + 'tab')
+        >>> standardize_text('embedded' + chr(9) + 'tab')
         'embedded_tab'
     """
     if not isinstance(text, unicode):
@@ -101,8 +101,8 @@ def join_uri(*pieces):
     The resulting URI will always begin with a slash and have its pieces
     separated by a single slash.
 
-    The pieces do not have `stardardize_text` applied to them; to make sure your
-    URIs are in normal form, run `stardardize_text` on each piece that represents
+    The pieces do not have `standardize_text` applied to them; to make sure your
+    URIs are in normal form, run `standardize_text` on each piece that represents
     arbitrary text.
 
     >>> join_uri('/c', 'en', 'cat')
@@ -139,7 +139,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     with the same text.
 
     `text` and `disambiguation` should be strings that have already been run
-    through `stardardize_text`.
+    through `standardize_text`.
 
     This is a low-level interface. See `standardized_concept_uri` in nodes.py for
     a more generally applicable function that also deals with special
@@ -156,7 +156,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         ...
     AssertionError: 'this is wrong' is not in normalized form
     """
-    assert text == stardardize_text(text), "%r is not in normalized form" % text
+    assert text == standardize_text(text), "%r is not in normalized form" % text
     if pos is None:
         if disambiguation is not None:
             raise ValueError("Disambiguated concepts must have a part of speech")
@@ -165,7 +165,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         if disambiguation is None:
             return join_uri('/c', lang, text, pos)
         else:
-            assert disambiguation == stardardize_text(disambiguation),\
+            assert disambiguation == standardize_text(disambiguation),\
                 "%r is not in normalized form" % disambiguation
             return join_uri('/c', lang, text, pos, disambiguation)
 
