@@ -40,14 +40,16 @@ def gen_assoc(normalize_sparse=True, normalize_vectors='l1', retrofit_vectors=Fa
 
         vectors = retrofit(vectors, sparse, labels, normalize_intermediate=normalize_intermediate)
 
+    print("Normalizing associations")
+
     assoc = normalize(vectors)
 
-    return AssocSpace(vectors, np.ones(len(vectors[0])), labels, assoc=assoc)
+    return AssocSpace(vectors, np.ones(vectors.shape[1]), labels, assoc=assoc)
 
 def main():
     assoc = gen_assoc()
     wordsim.test(assoc, normalize=True)
-    #analogy.test(assoc) # slow
+    #analogy.test(assoc, normalize=True) # slow
 
 if __name__ == '__main__':
     main()
