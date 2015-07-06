@@ -34,7 +34,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
     vectors = []
     with open(filename, encoding='latin-1') as file:
         for i, line in enumerate(file):
-            if i >= end_row:
+            if end_row is not None and i >= end_row:
                 break
             if i % verbose == 0:
                 print(i)
@@ -49,7 +49,8 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                 except ValueError: # Bad concept names
                     continue
 
-                if i >= filter_beyond_row and \
+                if filter_beyond_row is not None and \
+                    i >= filter_beyond_row and \
                     word_frequency(ctext, 'en') < frequency_cutoff:
                     continue
 
@@ -64,10 +65,13 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
 
             # We need to combine words with the same normalization, but
             # different raw forms. We approximate this according to zipf's law
-            zipf_weight = 1 / (i + 1)
-            vec = np.array([float(part) for part in parts[1:]])
-            vectors[index] += vec * zipf_weight
-
+            if normalize:
+                zipf_weight = 1 / (i + 1)
+                vec = np.array([float(part) for part in parts[1:]])
+                vectors[index] += vec * zipf_weight
+            else:
+                vectors[index] += vec
+                
     return np.array(vectors)
 
 
