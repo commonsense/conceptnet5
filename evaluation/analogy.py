@@ -40,7 +40,7 @@ def evaluate(standard, assoc, verbose=True, normalize_text=False):
         av = text_to_vector(a, assoc, normalize=normalize_text)
         bv = text_to_vector(b, assoc, normalize=normalize_text)
         cv = text_to_vector(c, assoc, normalize=normalize_text)
-        term = assoc.most_similar(normalize(1.5*(bv-av)+cv)[0])[0]
+        term = assoc.most_similar_to_vector(normalize(bv-av+cv)[0])[0]
         print(a,b,c,d,term)
         if normalize_text:
             if term == normalized_concept_uri('en', d):
