@@ -56,6 +56,7 @@ def standardized_concept_name(lang, text):
     else:
         return stardardize_text(text)
 
+normalized_concept_name = standardized_concept_name
 
 def standardized_concept_uri(lang, text, *more):
     """
@@ -77,7 +78,7 @@ def standardized_concept_uri(lang, text, *more):
     more_text = [stardardize_text(item) for item in more if item is not None]
     return concept_uri(lang, norm_text, *more_text)
 
-
+normalized_concept_uri = standardized_concept_uri
 def uri_to_lemmas(uri):
     """
     Given a normalized concept URI, extract the list of words (in their root
@@ -98,4 +99,3 @@ def uri_to_lemmas(uri):
             disambig = standardized_concept_name(lang, text)
             lemmas.extend(disambig.split('_'))
     return lemmas
-
