@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 from nose.tools import eq_
 
 from conceptnet5.wiktparse.rules import (
-    EdgeInfo, EnWiktionarySemantics, DeWiktionarySemantics
+    EdgeInfo,  LinkedText,
+    EnWiktionarySemantics, DeWiktionarySemantics
 )
 
 # Global variable to hold the parsers for the different languages
@@ -32,6 +33,27 @@ def test_en_etymology():
     ]
     for (text, expected) in test_list:
         yield check_output, 'en', 'etymology_section', text, expected
+
+def test_en_ext_link():
+    test_list = [
+        ('[http://books.google.ca/books?shortened=True Google preview]',
+         LinkedText('Google preview', [])),
+        ('[http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]',
+         LinkedText('David Van Tassel', [])),
+    ]
+    for (text, expected) in test_list:
+        yield check_output, 'en', 'external_link', text, expected
+
+def test_en_wiki_link():
+    test_list = [
+        ('[[w:Francis Bacon|Francis Bacon]]',
+        LinkedText('Francis Bacon', [])),
+        ('[[bloodshed]]',
+        LinkedText('bloodshed', [EdgeInfo(None, 'bloodshed', None, None)]))
+    ]
+
+    for (text, expected) in test_list:
+        yield check_output, 'en', 'wiki_link', text, expected
 
 
 def test_de_sense_num():
