@@ -122,6 +122,11 @@ class LinkedText(object):
     def __repr__(self):
         return "LinkedText(%r, %r)" % (self.text, self.links)
 
+    def __eq__(self, other):
+        """Returns true if the string representation of both instances is the
+        same. (Used primarily in unit testing.) """
+        return self.__repr__() == other.__repr__()
+
 
 class EdgeInfo(object):
     """
