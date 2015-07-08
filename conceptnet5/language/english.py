@@ -9,11 +9,9 @@ modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
 modifications mostly involve heuristics for when to apply noun or verb
 transformations to words whose part of speech is ambiguous.
 """
-import nltk
-from nltk.corpus import wordnet
 from .token_utils import untokenize, tokenize
 import re
-morphy = wordnet._morphy
+morphy = None
 
 STOPWORDS = ['the', 'a', 'an']
 
@@ -108,6 +106,13 @@ def _morphy_best(word, pos=None):
     Get the most likely stem for a word using Morphy, once the input has been
     pre-processed by morphy_stem().
     """
+
+    global morphy
+    if morphy is None:
+        from nltk.corpus import wordnet
+        morphy = wordnet._morphy
+
+
     results = []
     if pos is None:
         pos = 'nvar'
@@ -163,16 +168,16 @@ def good_lemma(lemma):
     return lemma and lemma not in STOPWORDS and lemma[0].isalnum()
 
 
-def normalize_as_list(text):
+def standardize_as_list(text):
     """
     Get a list of word stems that appear in the text. Stopwords and an initial
     'to' will be stripped, unless this leaves nothing in the stem.
 
-    >>> normalize_as_list('the dog')
+    >>> standardize_as_list('the dog')
     ['dog']
-    >>> normalize_as_list('big dogs')
+    >>> standardize_as_list('big dogs')
     ['big', 'dog']
-    >>> normalize_as_list('the')
+    >>> standardize_as_list('the')
     ['the']
     """
     pieces = [morphy_stem(word) for word in tokenize(text)]
@@ -184,20 +189,20 @@ def normalize_as_list(text):
     return pieces
 
 
-def normalize(text):
+def standardize(text):
     """
     Get a string made from the non-stopword word stems in the text. See
-    normalize_as_list().
+    standardize_as_list().
     """
-    return untokenize(normalize_as_list(text))
+    return untokenize(standardize_as_list(text))
 
 
-def normalize_topic(topic):
+def standardize_topic(topic):
     """
     Get a canonical representation of a Wikipedia topic, which may include
     a disambiguation string in parentheses.
 
-    Returns (name, disambig), where "name" is the normalized topic name,
+    Returns (name, disambig), where "name" is the standardized topic name,
     and "disambig" is a string corresponding to the disambiguation text or
     None.
     """
@@ -205,6 +210,6 @@ def normalize_topic(topic):
     topic = topic.replace('_', ' ')
     match = re.match(r'([^(]+) \(([^)]+)\)', topic)
     if not match:
-        return normalize(topic), None
+        return standardize(topic), None
     else:
-        return normalize(match.group(1)), 'n/' + match.group(2).strip(' _')
+        return standardize(match.group(1)), 'n/' + match.group(2).strip(' _')

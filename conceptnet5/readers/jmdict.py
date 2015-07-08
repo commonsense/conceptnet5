@@ -5,7 +5,7 @@ import codecs
 import langcodes
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 
 
@@ -188,8 +188,8 @@ def handle_file(filename, output_file):
                     and text not in BAD_NAMES_FOR_THINGS
                 ):
                     for head in headwords:
-                        ja_concept = normalized_concept_uri('ja', head)
-                        other_concept = normalized_concept_uri(lang, text)
+                        ja_concept = standardized_concept_uri('ja', head)
+                        other_concept = standardized_concept_uri(lang, text)
                         output_edge(out, ja_concept, other_concept)
 
 

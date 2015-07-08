@@ -10,7 +10,7 @@ into an N-Triples file, which this code is able to understand.
 
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import normalized_concept_uri, normalized_concept_name, normalize_text
+from conceptnet5.nodes import standardized_concept_uri, standardized_concept_name, standardize_text
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
@@ -96,7 +96,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
             if 'CW' not in web_obj.split() and 'PCW' not in web_obj.split():
                 labels[web_subj] = web_obj
         if resource_name(web_rel).endswith('Label'):
-            text = normalize_text(web_obj)
+            text = standardize_text(web_obj)
             label_sets[text].add(web_subj)
 
     # Read through umbel.nt again and extract ConceptNet edges.
@@ -105,8 +105,8 @@ def run_umbel(input_dir, output_file, sw_map_file):
             # Only use nodes for which we've seen preferred labels.
             # (This skips some anonymous OWL-cruft nodes.)
             if web_subj in labels and web_obj in labels:
-                subj_uri = normalized_concept_uri('en', labels[web_subj])
-                obj_uri = normalized_concept_uri('en', labels[web_obj])
+                subj_uri = standardized_concept_uri('en', labels[web_subj])
+                obj_uri = standardized_concept_uri('en', labels[web_obj])
                 rel_name = resource_name(web_rel)
                 # Check if this is a relation we want to handle.
                 if rel_name in REL_MAPPING:
@@ -125,18 +125,18 @@ def run_umbel(input_dir, output_file, sw_map_file):
             if web_subj in labels:
                 name = web_obj
                 words = name.split(' ')
-                if normalized_concept_name('en', name) != normalized_concept_name('en', labels[web_subj]):
+                if standardized_concept_name('en', name) != standardized_concept_name('en', labels[web_subj]):
                     if not set(words) & IGNORED_WORDS:
-                        main_label = normalized_concept_uri('en', labels[web_subj])
-                        name_text = normalize_text(name)
+                        main_label = standardized_concept_uri('en', labels[web_subj])
+                        name_text = standardize_text(name)
                         if len(label_sets[name_text]) >= 2 or len(name_text) <= 3:
                             disambig = un_camel_case(resource_name(web_subj))
 
                             # Cyc does not distinguish texts by their part of speech, so use
                             # '_' as the part of speech symbol.
-                            alt_label = normalized_concept_uri('en', name, '_', disambig)
+                            alt_label = standardized_concept_uri('en', name, '_', disambig)
                         else:
-                            alt_label = normalized_concept_uri('en', name)
+                            alt_label = standardized_concept_uri('en', name)
                         surface = SYN_FRAME % (name, labels[web_subj])
                         out.write(umbel_edge('/r/Synonym', alt_label, main_label, surface, SOURCE))
 
@@ -146,7 +146,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
                 subj_label = resource_name(web_subj).replace('_', ' ')
                 subj_uri = translate_dbpedia_url(web_subj)
                 obj_label = labels[web_obj]
-                obj_uri = normalized_concept_uri('en', obj_label)
+                obj_uri = standardized_concept_uri('en', obj_label)
                 rel_name = resource_name(web_rel)
                 if rel_name in REL_MAPPING:
                     rel_uri, frame = REL_MAPPING[rel_name]
