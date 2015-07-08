@@ -372,7 +372,7 @@ class ConceptNetWiktionarySemantics(object):
                 print(traceback.format_exc())
                 failures += 1
 
-        assert failures <= 1 # Why is 1 failure ok?
+        assert failures <= 1
         return edges
 
     def _get_pos_abbrev(self, heading):
