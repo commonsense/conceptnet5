@@ -12,6 +12,7 @@ import sqlite3
 import os
 import re
 
+import itertools
 
 
 def make_surface_text(rel, start, end):
@@ -121,6 +122,11 @@ class LinkedText(object):
 
     def __repr__(self):
         return "LinkedText(%r, %r)" % (self.text, self.links)
+
+    def __eq__(self, other):
+        """Returns true if the string representation of both instances is the
+        same. (Used primarily in unit testing.) """
+        return self.__repr__() == other.__repr__()
 
 
 class EdgeInfo(object):
@@ -813,7 +819,7 @@ class ConceptNetWiktionarySemantics(object):
         """
         if ast['blocks'] is None:
             return []
-        return sum(ast['blocks'], [])
+        return list(itertools.chain(ast['blocks']))
 
     def translation_template(self, ast):
         """
