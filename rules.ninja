@@ -14,7 +14,7 @@
 
 
 rule download
-  command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
+  command = python setup.py nltk_download && mkdir -p $out && curl -o $out $url
 
 rule extract_tar
   command = tar -xvf $in
@@ -67,3 +67,12 @@ rule dataset_vs_language_stats
 
 rule more_stats
   command = mkdir -p $$(dirname $out) && cut -f 2,3,4,9 $in | sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g' | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
+
+rule parse_glove
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.builders.glove $in $out
+
+rule parse_raw_glove_labels
+  command = mkdir -p $$(dirname $out) && cut -d" " -f1 $in >$out
+
+rule parse_raw_glove_vectors
+  command = mkdir -p $$(dirname $out) && cut -d" " -f2- $in | python -m conceptnet5.builders.raw_glove $$(wc -l $in) $out

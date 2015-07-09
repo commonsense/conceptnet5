@@ -88,6 +88,8 @@ def add_all_deps(deps):
     msgpack_to_assoc(deps)
     stats(deps)
 
+    build_glove(deps)
+
 
 def download(deps):
     file = 'conceptnet5_raw_data_%s.tar.bz2' % data_version
@@ -96,7 +98,7 @@ def download(deps):
         [],
         prefix + 'conceptnet5_raw_data_%s.tar.bz2' % data_version,
         'download',
-        {'prefix': prefix, 'url': url}
+        {'url': url}
     )
 
 
@@ -129,12 +131,14 @@ def parse_standard(deps):
             'parse',
             {'parser': type})
 
+
 def parse_globalmind(deps):
     deps['parse globalmind'] = Dep(
         in_tar['globalmind'],
         edge_output_str('globalmind'),
         'parse_globalmind',
         {'parser': 'globalmind'})
+
 
 def parse_dbpedia(deps):
     for file in in_tar['dbpedia']:
@@ -256,6 +260,7 @@ def combine_assertions(deps):
 
     deps.update(new_deps)
 
+
 def msgpack_to_assoc(deps):
     new_deps = {}
     for k, v in deps.items():
@@ -272,6 +277,7 @@ def msgpack_to_assoc(deps):
 
     deps.update(new_deps)
 
+
 def build_db(deps):
     inputs = []
     for k, v in deps.items():
@@ -284,6 +290,7 @@ def build_db(deps):
         [prefix + 'db/assertions.db'],
         'build_db',
         {'prefix': prefix})
+
 
 def stats(deps):
     inputs = []
@@ -324,6 +331,34 @@ def stats(deps):
         'more_stats'
     )
 
+def build_glove(deps):
+    url = 'http://www-nlp.stanford.edu/data/glove.42B.300d.txt.gz'
+    glove_prefix = prefix+'glove/'
+    file = glove_prefix + '42B.300d.txt'
+    deps['download GloVe'] = Dep(
+        [],
+        [file],
+        'download',
+        {'url': url}
+    )
+
+    deps['parse GloVe'] = Dep(
+        [file],
+        [glove_prefix+'42B.300d.labels', glove_prefix+'42B.300d.npy'],
+        'parse_glove'
+    )
+
+    deps['parse raw GloVe labels'] = Dep(
+        [file],
+        [glove_prefix+'raw.42B.300d.labels'],
+        'parse_raw_glove_labels'
+    )
+
+    deps['parse raw GloVe vectors'] = Dep(
+        [file],
+        [glove_prefix+'raw.42B.300d.npy'],
+        'parse_raw_glove_vectors'
+    )
 
 def edge_output_str(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
