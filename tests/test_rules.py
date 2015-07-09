@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 from nose.tools import eq_
 
 from conceptnet5.wiktparse.rules import (
-    EdgeInfo, EnWiktionarySemantics, DeWiktionarySemantics
+    EdgeInfo, LinkedText,
+    EnWiktionarySemantics, DeWiktionarySemantics
 )
 
 # Global variable to hold the parsers for the different languages
@@ -32,6 +33,59 @@ def test_en_etymology():
     ]
     for (text, expected) in test_list:
         yield check_output, 'en', 'etymology_section', text, expected
+
+
+def test_ext_link():
+    test_list = [
+        ('[http://books.google.ca/books?shortened=True Google preview]',
+         LinkedText('Google preview', [])),
+        ('[http://www.americanscientist.org/authors/detail/david-van-tassel David Van Tassel]',
+         LinkedText('David Van Tassel', [])),
+    ]
+    for (text, expected) in test_list:
+        yield check_output, 'en', 'external_link', text, expected
+
+
+def test_wiki_link():
+    test_cases = {
+        '[[w:Francis Bacon|Francis Bacon]]':
+            LinkedText('Francis Bacon', []),
+        '[[bloodshed]]':
+            LinkedText('bloodshed', [EdgeInfo(None, 'bloodshed', None, None)]),
+        '[[link#Dutch]]':
+            LinkedText('link#Dutch', [EdgeInfo('nl', 'link', None, None)]),
+        '[[awm#English|awm]]':
+            LinkedText('awm', [EdgeInfo('en', 'awm', None, None)]),
+        '[[#Example section 3|something]]':
+            LinkedText('something', [EdgeInfo(None, 'something', None, None)])
+    }
+
+    for (text, expected) in test_cases.items():
+        yield check_output, 'en', 'wiki_link', text, expected
+
+
+def test_templates():
+    test_cases = {
+        '{{IPA|/mɔː/|lang=en}}':
+            {0: 'IPA', 1: LinkedText('/mɔː/', []), 'lang': LinkedText('en', [])},
+        '{{t|ja|例え|tr=[[たとえ]], tatoe}}':
+            {0: 't',
+            1: LinkedText('ja', []),
+            2: LinkedText('例え', []),
+            'tr': LinkedText('たとえ, tatoe', [EdgeInfo(None, 'たとえ', None, None)])}
+    }
+
+    for (text, expected) in test_cases.items():
+        yield check_output, 'en', 'template', text, expected
+
+
+def test_translation_templates():
+    test_cases = {
+        '{{t+|ca|estómac|m}}': EdgeInfo('ca', 'estómac', None, 'TranslationOf')
+    }
+
+    for (text, expected) in test_cases.items():
+        yield check_output, 'en', 'translation_template', text, expected
 
 
 def test_de_sense_num():

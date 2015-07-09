@@ -34,6 +34,8 @@ def make_edge(rel, start, end, dataset, license, sources,
          'source_uri': '/and/[/.../]',
          'sources': ['/...'],
          'start': '/c/en/fire',
+         'surfaceEnd': 'hot',
+         'surfaceStart': 'Fire',
          'surfaceText': '[[Fire]] is [[hot]]',
          'uri': '/a/[/r/HasProperty/,/c/en/fire/,/c/en/hot/]',
          'weight': 1.0}

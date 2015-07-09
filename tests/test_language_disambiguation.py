@@ -86,4 +86,8 @@ TARGET = [
 def test_language_disambiguation():
     titledb = data_path('input/en_titles.db')
     semparser = EnWiktionarySemantics(titledb=titledb)
-    eq_(semparser.parse_structured_entry(ENTRY), TARGET)
+    parsed_list = semparser.parse_structured_entry(ENTRY)
+    eq_(len(parsed_list), 3)
+    for index, elem in enumerate(parsed_list):
+        for k,v in TARGET[index].items():
+            eq_(v, elem[k])
