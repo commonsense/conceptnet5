@@ -18,7 +18,7 @@ def conceptnet_standardize(text):
 
 def load_glove_vectors(filename, labels, filter_beyond_row=250000,
                         end_row=1000000, frequency_cutoff=1e-6,
-                        verbose=10000, normalize=True):
+                        verbose=10000, standardize_text=True):
     """
     Loads glove vectors from a file and returns a list of numpy arrays.
 
@@ -42,8 +42,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
             parts = line.rstrip().split(' ')
             ctext = fix_text(parts[0]).replace('\n', '').strip()
 
-            if normalize:
-
+            if standardize_text:
                 try:
                     concept = conceptnet_standardize(ctext)
                 except ValueError: # Bad concept names
@@ -65,7 +64,7 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
 
             # We need to combine words with the same normalization, but
             # different raw forms. We approximate this according to zipf's law
-            if normalize:
+            if standardize_text:
                 zipf_weight = 1 / (i + 1)
                 vec = np.array([float(part) for part in parts[1:]])
                 vectors[index] += vec * zipf_weight
