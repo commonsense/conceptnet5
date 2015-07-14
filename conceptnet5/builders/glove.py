@@ -1,4 +1,5 @@
 import sys
+import pickle
 
 from ftfy import fix_text
 
@@ -74,13 +75,11 @@ def load_glove_vectors(filename, labels, filter_beyond_row=250000,
     return np.array(vectors)
 
 
-def glove_to_assoc_space(filename, output_dir):
+def glove_to_assoc_space(filename, label_filename, glove_filename):
     labels = LabelSet()
     vectors = load_glove_vectors(filename, labels)
-
-    assoc = AssocSpace(np.array(vectors),
-                        np.ones(len(vectors[0])), labels)
-    assoc.save_dir(output_dir)
+    pickle.dump(list(labels), open(label_filename, mode='wb'))
+    np.save(glove_filename, vectors)
 
 if __name__ == '__main__':
-    glove_to_assoc_space(sys.argv[1], sys.argv[2])
+    glove_to_assoc_space(sys.argv[1], sys.argv[2], sys.argv[3])

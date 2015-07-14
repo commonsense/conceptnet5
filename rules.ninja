@@ -1,0 +1,78 @@
+# This defines the rules on how to build parts of the wordfreq lists, using the
+# Ninja build system:
+#
+#   http://martine.github.io/ninja/manual.html
+#
+# Ninja is available in the 'ninja-build' Ubuntu package. It's like make with
+# better parallelism and the ability for build steps to produce multiple
+# outputs. The tradeoff is that its rule syntax isn't full of magic for
+# expanding wildcards and finding dependencies, so in general you have to
+# write the dependencies using a script.
+#
+# This file will become the header of the larger build.ninja file, which also
+# contains the programatically-defined dependency graph.
+
+
+rule download
+  command = python setup.py nltk_download && mkdir -p $out && curl -o $out $url
+
+rule extract_tar
+  command = tar -xvf $in
+
+rule extract_wiktionary
+  command = mkdir -p $dir && python -m conceptnet5.readers.extract_wiktionary $in $dir -l $lang && cd conceptnet5/wiktparse && eval "make ${lang}_parser.py"
+
+## STEP 2: Parse the data
+rule parse
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.$parser $in $out
+
+rule parse_globalmind
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.globalmind $$(dirname $$(echo $in | cut -d ' ' -f1)) $out
+
+rule parse_dbpedia
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.readers.dbpedia $in $out
+
+rule parse_sw
+  command = mkdir -p $$(dirname $out) && mkdir -p $prefix && eval "python -m conceptnet5.readers.$parser $dir $out ${prefix}${parser}.nt"
+
+rule parse_wiktionary
+  command =  python -m conceptnet5.readers.wiktionary -l $lang $in $out
+
+rule msgpack_to_csv
+  command = python -m conceptnet5.builders.msgpack_to_csv $in $out
+
+rule collate
+  command = cat $in | python -m conceptnet5.builders.distribute_edges -o $dir -n $count
+
+rule count_and_rank
+  command = mkdir -p $$(dirname $out) && LC_ALL=C sort $in | uniq > $out
+
+rule combine_assertions
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.builders.combine_assertions $in $out -l /l/CC/By-SA
+
+rule msgpack_to_assoc
+  command = python -m conceptnet5.builders.msgpack_to_assoc $in $out
+
+rule build_db
+  command = if [ ! -e ~/.conceptnet5 ]; then ln -s $$(readlink -f $prefix) ~/.conceptnet5; fi && python -m conceptnet5.builders.index_assertions $$(dirname $$(echo $in | cut -d ' ' -f1)) $out --input-shards 8
+
+rule relation_stats
+  command = mkdir -p $$(dirname $out) && cut -f 2 $in | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
+
+rule dataset_stats
+  command = mkdir -p $$(dirname $out) && cut -f $fields $in > $out
+
+rule dataset_vs_language_stats
+  command = mkdir -p $$(dirname $out) && cat $in | sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g' | LC_ALL=C sort | LC_ALL=C uniq -c > $out
+
+rule more_stats
+  command = mkdir -p $$(dirname $out) && cut -f 2,3,4,9 $in | sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g' | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
+
+rule parse_glove
+  command = mkdir -p $$(dirname $out) && python -m conceptnet5.builders.glove $in $out
+
+rule parse_raw_glove_labels
+  command = mkdir -p $$(dirname $out) && cut -d" " -f1 $in >$out
+
+rule parse_raw_glove_vectors
+  command = mkdir -p $$(dirname $out) && cut -d" " -f2- $in | python -m conceptnet5.builders.raw_glove $$(wc -l $in) $out
