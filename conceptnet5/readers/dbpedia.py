@@ -111,8 +111,7 @@ def translate_dbpedia_url(url):
 
 
 SPECIFIC_RELATION_WHITELIST = {
-    'genre', 'field', 'knownFor', 'mainInterest', 'notableIdea', 'artist', 'album',
-    'author', 'director', 'producer', 'writer', 'starring', 'literaryGenre',
+    'genre', 'field', 'knownFor', 'mainInterest', 'notableIdea',
     'spokenIn', 'languageFamily', 'influenced', 'influencedBy'
 }
 
@@ -125,7 +124,7 @@ CONCEPT_BLACKLIST = {
 
 def map_dbpedia_relation(url):
     """
-    Recognize three relations that we can extract from DBPedia, and convert
+    Recognize some relations that we can extract from DBPedia, and convert
     them to ConceptNet relations. If the relation is specific to DBPedia, it'll
     be in the '/r/dbpedia' namespace.
 
@@ -144,8 +143,6 @@ def map_dbpedia_relation(url):
     elif name == 'sameAs':
         return '/r/TranslationOf'
     elif name in SPECIFIC_RELATION_WHITELIST:
-        return '/r/dbpedia/%s' % name
-    elif name.startswith('associated'):
         return '/r/dbpedia/%s' % name
     else:
         return None

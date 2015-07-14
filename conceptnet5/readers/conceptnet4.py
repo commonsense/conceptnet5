@@ -45,6 +45,16 @@ AROUND_PREPOSITIONS = [
   'in', 'on', 'at', 'under', 'near'
 ]
 
+# Some specific relations were once added to ConceptNet that have no purpose
+# for us anymore, especially ones connected with a project that was trying to
+# understand how people describe pain.
+#
+# 'InheritsFrom' was an inference-related hack on ConceptNet 3 that was never
+# supposed to make it into the actual database.
+
+RELATIONS_TO_DROP = {
+    '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom'
+}
 
 def can_skip(parts_dict):
     """
@@ -230,6 +240,13 @@ class CN4Builder(object):
         end = build_end(parts_dict)
         dataset = build_data_set(parts_dict)
         weighted_sources = build_sources(parts_dict, preposition_fix)
+
+        if relation in RELATIONS_TO_DROP:
+            return
+
+        if relation == '/r/DesireOf':
+            # Fix an inconsistently-named relation from GlobalMind
+            relation = '/r/Desires'
 
         for source_list, weight in weighted_sources:
             if 'commons2_reject' in ' '.join(source_list):
