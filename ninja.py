@@ -1,12 +1,13 @@
 import collections
 from os.path import exists
 
-def Dep(inputs, outputs, rule, params=None):
+def Dep(inputs, outputs, rule, params=None, use_existing=False):
     return {
         'inputs': inputs,
         'outputs': outputs,
         'rule': rule,
         'params': params,
+        'use_existing': use_existing
     }
 
 prefix = 'data/'
@@ -15,8 +16,6 @@ data_version = '5.3'
 wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
 collate_count = 8
-
-ignore_existing = True
 
 in_tar = {
     'wordnet':
@@ -99,7 +98,8 @@ def download(deps):
         [],
         prefix + 'conceptnet5_raw_data_%s.tar.bz2' % data_version,
         'download',
-        {'prefix': prefix, 'url': url}
+        {'prefix': prefix, 'url': url},
+        use_existing=True
     )
 
 
@@ -108,7 +108,7 @@ def untar(deps):
     for files in in_tar.values():
         outputs += files
     input = deps['download_tar']['outputs']
-    deps['untar'] = Dep([input], outputs, 'extract_tar', {'prefix': prefix})
+    deps['untar'] = Dep([input], outputs, 'extract_tar', {'prefix': prefix}, use_existing=True)
 
 
 def parse_sw(deps):
@@ -340,7 +340,7 @@ def to_ninja(rules, deps, only=None):
     return "\n".join(lines)
 
 
-def add_dep(lines, rule, inputs, outputs, extra=None, params=None):
+def add_dep(lines, rule, inputs, outputs, extra=None, params=None, use_existing=False):
     if isinstance(outputs, list):
         outputs = ' '.join(outputs)
     if isinstance(inputs, list):
@@ -352,7 +352,7 @@ def add_dep(lines, rule, inputs, outputs, extra=None, params=None):
     else:
         extrastr = ''
 
-    if ignore_existing and all(exists(output) for output in outputs.split()):
+    if use_existing and all(exists(output) for output in outputs.split()):
         return
 
     build_rule = "build {outputs}: {rule} {inputs}{extra}".format(
