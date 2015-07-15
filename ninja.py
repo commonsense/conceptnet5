@@ -1,4 +1,5 @@
 import collections
+from os.path import exists
 
 def Dep(inputs, outputs, rule, params=None):
     return {
@@ -14,6 +15,8 @@ data_version = '5.3'
 wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
 collate_count = 8
+
+ignore_existing = True
 
 in_tar = {
     'wordnet':
@@ -348,6 +351,10 @@ def add_dep(lines, rule, inputs, outputs, extra=None, params=None):
         extrastr = ' | ' + extra
     else:
         extrastr = ''
+
+    if ignore_existing and all(exists(output) for output in outputs.split()):
+        return
+
     build_rule = "build {outputs}: {rule} {inputs}{extra}".format(
         outputs=outputs, rule=rule, inputs=inputs, extra=extrastr
     )
