@@ -819,7 +819,7 @@ class ConceptNetWiktionarySemantics(object):
         """
         if ast['blocks'] is None:
             return []
-        return list(itertools.chain(ast['blocks']))
+        return list(itertools.chain(*ast['blocks']))
 
     def translation_template(self, ast):
         """
