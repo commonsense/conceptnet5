@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.4.0'
+version_str = '5.4a1'
 
 
 class NLTKDownloadCommand(Command):
