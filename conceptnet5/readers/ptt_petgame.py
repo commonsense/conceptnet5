@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import codecs
 import json
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.util import get_support_data_filename
 
@@ -20,8 +20,8 @@ def handle_raw_assertion(line):
     rel = fdata['relation']
 
     surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace('{2}', '[[' + concept2 + ']]')
-    start = normalized_concept_uri('zh_TW', concept1)
-    end = normalized_concept_uri('zh_TW', concept2)
+    start = standardized_concept_uri('zh_TW', concept1)
+    end = standardized_concept_uri('zh_TW', concept2)
     sources = ['/s/activity/ptt/petgame', '/s/contributor/petgame/' + user]
     yield make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
                     license='/l/CC/By', sources=sources,

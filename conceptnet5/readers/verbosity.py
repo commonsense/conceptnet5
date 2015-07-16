@@ -1,6 +1,6 @@
 from __future__ import print_function, unicode_literals, division
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
@@ -163,9 +163,8 @@ def handle_file(infile, outfile):
 
             count += 1
             outcomes['success'] += 1
-
-            leftc = normalized_concept_uri('en', left)
-            rightc = normalized_concept_uri('en', rightword)
+            leftc = standardized_concept_uri('en', left)
+            rightc = standardized_concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
                              license=Licenses.cc_attribution,
                              sources=sources, surfaceText=text,
