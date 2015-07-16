@@ -27,7 +27,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.api import app
 from conceptnet5.query import lookup
 from conceptnet5.web_interface.utils import uri2name, get_sorted_languages
@@ -56,7 +56,7 @@ def rel_redirect(uri):
 def web_search():
     keyword = request.form.get('keyword')
     lang = request.form.get('language')
-    return redirect(WEB_ROOT + normalized_concept_uri(lang, keyword))
+    return redirect(WEB_ROOT + standardized_concept_uri(lang, keyword))
 
 @app.route(WEB_ROOT + '/<path:uri>', methods=['GET'])
 def edges_for_uri(uri):

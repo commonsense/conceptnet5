@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import yaml
@@ -92,8 +92,8 @@ def build_from_dir(dirname, output_file):
         ]
 
         lang = LANG_CODES[obj['lcode']]
-        start = normalized_concept_uri(lang, obj['node1'])
-        end = normalized_concept_uri(lang, obj['node2'])
+        start = standardized_concept_uri(lang, obj['node1'])
+        end = standardized_concept_uri(lang, obj['node2'])
         rel = '/r/' + RELATION_MAP.get(frame['relation'], frame['relation'])
 
         # fix messy english "around in"

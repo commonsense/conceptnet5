@@ -7,7 +7,7 @@ __author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
@@ -107,7 +107,7 @@ def translate_dbpedia_url(url):
     # between words.
     pieces = parse_topic_name(resource_name(url))
     pieces[0] = un_camel_case(pieces[0])
-    return normalized_concept_uri(lang, *pieces)
+    return standardized_concept_uri(lang, *pieces)
 
 
 SPECIFIC_RELATION_WHITELIST = {

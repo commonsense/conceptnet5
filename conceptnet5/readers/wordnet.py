@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from collections import defaultdict
 from conceptnet5.uri import join_uri
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
@@ -97,7 +97,7 @@ def run_wordnet(input_dir, output_file, sw_map_file):
         pos = PARTS_OF_SPEECH[synset_pos]
         disambig = glossary[synset]
 
-        concept = normalized_concept_uri('en', synset_name, pos, disambig)
+        concept = standardized_concept_uri('en', synset_name, pos, disambig)
         concept_map[synset] = concept
 
     # Map senses to their synsets.

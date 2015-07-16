@@ -1,0 +1,2034 @@
+squishing	squirt	5.88	7	7	6	1	4	6	6	7	2	4
+undated	undatable	5.83	10	9	6	5	5	7	7	9	2	5
+circumvents	beat	5.33	7	7	3	9	8	6	3	2	0	6
+circumvents	ebb	3.25	7	4	6	4	2	0	0	3	6	0
+dispossess	deprive	6.83	10	6	7	10	10	8	5	8	1	7
+provincialism	narrow-mindedness	8.11	9	7	9	9	8	6	9	7	0	9
+provincialism	partiality	4.50	9	3	0	4	8	9	6	5	0	0
+instrumentality	department	3.00	6	2	4	3	7	3	3	0	0	0
+instrumentality	utility	7.29	6	7	7	5	8	7	9	8	3	8
+involvement	action	6.86	7	8	7	8	5	9	6	9	7	1
+involvement	implication	4.17	5	8	2	3	10	8	4	4	4	5
+ecclesiastic	clergyman	8.67	10	8	10	10	8	6	8	0	9	9
+brigadier	general	8.17	8	8	10	8	9	7	9	6	5	10
+carbonic	chemical	5.17	7	3	5	4	8	7	9	0	2	5
+carbonic	paper	5.17	8	7	6	2	8	7	7	0	0	2
+aspirate	pronounce	5.20	8	4	2	10	7	6	0	0	7	0
+aspirate	remove	2.50	6	3	7	3	2	0	2	0
+monotype	machine	5.25	1	8	1	6	1	5	5	9	0	5
+incommensurate	incommensurable	7.60	10	10	8	7	9	8	4	6
+campfires	fire	9.33	10	9	9	9	9	10	10	8	10	6
+cognizance	knowing	9.44	10	9	10	8	10	10	8	10	10	7
+urbanize	change	5.67	4	2	2	7	5	7	4	10	2	7
+imperfection	state	0.29	0	1	0	0	1	0	6	4	0
+assessment	charge	4.40	0	8	2	1	7	8	5	7	0
+assessment	assay	5.83	8	10	5	6	4	5	7	3
+incubate	breed	6.40	10	6	10	5	7	4	7	7
+incubate	develop	7.20	7	7	8	6	7	7	9	10
+principality	domain	7.62	7	8	8	4	8	0	7	8	7	8
+vicarious	abnormal	0.12	3	0	0	0	5	0	0	0	0	1
+vicarious	secondary	6.50	7	8	0	9	5	0	10	8	2
+ungraceful	awkward	8.50	10	7	9	9	10	7	8	10	7	8
+unsighted	color-blind	5.29	6	5	7	4	6	5	5	0	6
+socialise	educate	6.12	6	7	1	7	5	7	6	4	7	0
+socialise	swing	1.00	5	6	1	3	0	4	0	0	0	0
+diagonals	line	7.57	8	6	8	8	8	7	4	8	5	5
+diagonals	heterosexual	0.11	0	1	0	0	0	3	0	0	0	0
+naturalise	adapt	7.75	7	8	9	9	7	8	0	6	0	8
+insubordinate	rebellious	9.00	10	8	8	9	10	8	9	10	9	9
+insubordinate	defiant	9.56	10	9	9	10	10	7	10	10	9	9
+subdividing	subdivide	9.50	9	10	10	10	10	6	10	9	7	8
+subdividing	separate	8.67	9	9	8	8	10	6	10	9	9	0
+antifeminism	sexism	8.60	10	9	9	6	10	5	5	9	9	7
+circumcising	cut	8.00	7	8	8	7	8	10	10	8	8	7
+circumcising	remove	8.17	8	8	6	6	8	10	9	8	8	5
+excommunicate	oust	8.20	8	10	7	10	9	10	10	8	8	8
+accomplished	over	5.00	7	0	4	0	10	10	0	7	2	5
+attackers	wrongdoer	7.50	7	8	5	7	7	9	7	8	8	8
+contravened	disagree	7.38	6	9	9	6	8	7	7	10	2	7
+contravened	transgress	7.00	8	6	9	6	8	10	7	2	4	7
+tenderize	change	5.88	7	0	4	6	4	5	7	7	7	0
+blithering	chatter	7.71	8	10	6	7	9	10	6	9	4	9
+resurfacing	coat	8.44	7	8	9	9	10	10	7	10	0	6
+resurfacing	surface	6.50	8	5	6	4	8	5	8	7	10	5
+friendships	brotherhood	7.50	8	7	6	8	7	6	9	7	9	8
+soulfully	emotional	7.60	7	9	3	9	5	8	7	8	5	8
+elector	voter	7.83	10	7	5	10	10	7	8	9	9	7
+intentionality	intended	8.40	8	8	7	10	7	8	9	9	7	10
+vulgarism	profanity	9.62	10	9	10	10	9	8	9	10	10	7
+vulgarism	inelegance	6.29	5	4	6	9	1	9	8	8	7	6
+preliterate	illiterate	4.71	5	7	5	5	5	7	3	5	5	0
+preliterate	noncivilized	4.43	4	7	0	4	5	6	2	5	5	0
+retrying	hear	0.38	0	4	0	0	3	5	0	0	0	0
+wanderers	program	0.29	0	4	0	0	2	4	0	0	5	0
+wanderers	nomad	9.50	10	9	10	10	10	9	9	9	10	9
+marginalize	interact	2.50	3	0	0	2	5	0	6	0	3	2
+hyperlink	link	9.12	8	10	9	4	6	10	8	8	10	10
+inducted	admit	7.17	5	7	3	6	8	10	10	8	0	9
+inducted	install	6.00	8	7	0	4	7	10	4	6	0	6
+entrapping	capture	8.00	8	8	3	10	7	8	8	8	9	8
+entrapping	deceive	6.57	5	8	4	8	7	3	9	2	7	7
+alleviated	comfort	6.00	6	6	5	4	8	6	6	6	8	8
+alleviated	help	6.00	6	6	5	7	6	7	4	3	8	5
+radiators	beginning	0.00	0	0	0	5	4	0	0	0	0	0
+radiators	system	1.00	0	2	0	6	6	1	7	0	4	0
+postmodernism	genre	2.80	0	6	1	3	7	3	7	2	0	5
+excavations	site	5.29	3	0	1	6	7	9	5	5	6	5
+excavations	removal	7.43	3	6	0	8	8	10	9	8	5	8
+comfortable	cozy	8.83	9	9	5	10	8	9	7	9	9	10
+unfeathered	unfledged	7.14	6	6	9	9	4	8	8	3	0	10
+unfeathered	plucked	8.00	10	8	9	9	7	7	9	7	10	6
+assigned	regiment	3.80	1	6	0	7	6	0	2	0	4	8
+assigned	allow	3.50	1	5	0	7	9	0	5	0	3	7
+listeners	eavesdropper	8.14	8	6	5	7	10	8	9	8	8	9
+unheralded	unexpected	7.57	3	6	5	9	8	9	10	8	8	3
+inabilities	insufficiency	7.38	6	8	1	8	8	3	8	6	8	7
+inabilities	incomprehension	4.33	2	7	3	6	0	6	4	0	5	7
+monocultures	culture	4.50	8	5	5	8	1	4	6	3	8	4
+tricolour	flag	5.80	7	6	6	3	0	1	10	7	0	9
+omnipotence	state	0.86	5	3	0	6	2	1	0	0	6	0
+mingles	change	1.71	2	5	1	2	0	1	2	1	0	3
+calcify	harden	8.12	10	8	3	9	6	9	8	9	7	9
+calcify	change	4.83	5	7	0	5	4	5	5	0	8	5
+disinheritance	discontinuance	5.67	4	6	0	8	6	4	0	0	7	7
+interwove	braid	8.75	9	9	4	9	9	8	10	8	9	9
+cession	relinquishment	6.67	6	7	8	8	1	6	2	5	10	0
+dwarfish	small	8.38	9	7	3	10	9	9	9	7	9	8
+assessments	charge	5.12	7	4	3	6	0	6	8	7	5	3
+assessments	classification	6.86	4	8	1	6	8	10	9	7	0	6
+prescriptions	medicine	9.11	10	5	9	9	9	10	8	9	9	9
+prescriptions	direction	2.57	5	1	7	5	1	0	6	1	4	1
+antipsychotic	lithium	8.17	10	8	10	8	8	7	7	8	9	8
+circumferential	peripheral	7.33	7	7	7	8	0	5	8	9	6	9
+roosters	cockerel	8.56	10	10	9	2	10	6	10	6	9	7
+nonpublic	private	10.00	10	10	10	10	10	10	8	10	9	10
+yodeling	sing	7.71	10	7	8	9	8	10	5	8	7	7
+yodeling	singing	7.50	10	7	8	10	8	10	5	8	7	7
+autoerotic	sexy	8.44	10	10	10	8	10	4	9	7	6	6
+unisons	concurrence	7.56	7	9	8	7	0	8	9	8	6	6
+unisons	agreement	7.14	7	10	8	7	7	9	9	7	7	7
+disassembled	destroy	8.00	8	6	8	9	6	9	7	10	8	7
+preteens	juvenile	8.40	10	8	10	8	9	10	7	9	8	7
+unaccessible	pathless	7.25	6	6	10	9	0	9	7	9	5	7
+monogram	symbol	7.25	4	10	9	9	6	7	9	7	7	0
+opalescence	brightness	7.89	10	9	10	0	7	6	10	8	5	6
+estrogenic	hormone	8.00	5	6	10	6	8	0	9	8	10	10
+misleading	beat	1.25	0	3	0	0	4	0	3	6	7	0
+consubstantial	considerable	5.40	7	0	7	0	4	7	0	2	8
+coeducation	education	7.71	5	7	9	10	6	7	5	8	8	9
+canonical	standard	6.00	9	9	8	4	0	6	5	7	1	6
+galvanic	exciting	6.00	9	5	0	6	7	0	7	5
+nominated	nominate	8.33	9	10	9	10	8	10	8	8	8	5
+nominated	choose	8.67	7	10	10	10	7	10	8	9	7	3
+exceedance	probability	5.00	7	7	0	6	5	0	6	6	2	0
+confide	consign	5.14	6	6	0	6	4	0	5	5	10	4
+confide	unwrap	0.67	1	0	0	0	2	1	0	2	5	0
+established	initiate	5.86	0	5	8	3	7	5	6	10	7	0
+condescend	act	2.20	3	3	2	1	0	2	4	0	4	0
+tricycle	pedicab	6.00	8	7	9	0	4	9	5	6	7	5
+discharged	spread	4.57	0	3	6	2	6	5	6	7	4	0
+postmodernist	artist	6.57	8	7	7	3	9	10	5	6	7	6
+ruralist	rustic	7.86	8	8	5	7	9	10	5	7	7	9
+ruralist	advocate	0.67	0	2	2	2	4	0	0	0	0	0
+conjurors	enchantress	7.50	9	9	7	5	6	9	9	6	3
+detestable	offensive	8.75	10	9	6	9	5	10	8	9	10	6
+detestable	hateful	9.62	10	9	7	9	8	10	10	9	10	10
+comparing	compare	10.00	8	10	10	10	10	10	10	10	10	7
+comparing	analogize	8.00	8	5	8	7	7	8	10	9	5	9
+marketers	selling	8.43	9	10	7	4	9	9	8	10	9	8
+hypercoaster	roller	3.25	0	7	4	0	4	9	0	8	2	3
+pittance	payment	5.14	2	5	5	5	5	8	8	6	6	4
+soulless	insensitive	7.17	6	7	8	5	9	8	9	7	7	5
+hypermarket	supermarket	5.00	2	5	9	9	4	10	6	5	0
+confluent	branch	4.20	2	3	8	7	6	5	0	5	0
+confluent	convergent	6.29	4	6	7	8	8	0	8	3
+anterooms	building	6.14	4	6	7	7	6	7	9	6	1	10
+reasoning	deduce	8.00	7	8	9	10	8	9	8	10	7	6
+reasoning	re-argue	4.00	1	6	2	3	5	7	7	4	0	4
+summonings	page	5.43	6	5	9	5	4	7	7	0	8	4
+summonings	demand	7.14	5	5	9	10	7	9	7	0	8	1
+preordained	predetermine	8.50	7	8	9	10	8	9	9	10	8	7
+antechamber	room	7.88	7	7	9	8	8	9	10	8	7	3
+concavity	shape	6.67	5	6	9	7	7	6	9	7	7	4
+concavity	recess	7.67	6	6	8	6	9	7	9	10	8	6
+unzipping	unfasten	8.29	8	9	6	8	9	8	9	10	7	6
+spoonful	containerful	4.20	4	8	3	2	7	7	5	4	0	5
+partible	divisible	7.71	10	6	7	7	8	9	8	10	8	7
+hypersensitive	susceptible	6.33	0	5	7	3	8	10	7	8
+impurity	adulteration	6.33	10	6	4	5	8	8	6	5
+impurity	waste	4.83	5	4	7	0	8	0	5	3	9	5
+inscribe	engrave	8.67	10	7	9	8	9	10	10	8	9	9
+virginals	harpsichord	1.86	1	3	0	8	0	4	5	0
+hypertexts	database	7.00	5	8	0	8	0	1	7	9	7	7
+inheritances	acquisition	6.83	10	5	7	1	8	9	3	9	0
+infectious	septic	7.00	10	8	7	2	8	10	10	6	6	0
+infectious	contagious	9.25	10	8	9	10	9	5	10	8	6	10
+pinpointed	locate	9.22	9	9	8	7	9	10	10	8	10	10
+capitalised	profit	7.60	5	7	9	2	9	10	10	8	2	0
+capitalised	supply	5.17	5	7	7	0	8	0	5	6	1	0
+retrace	return	7.25	8	8	8	2	8	0	8	8	5	5
+deadness	quality	0.38	0	0	3	0	0	4	0	1	2	0
+deadness	inelasticity	4.29	3	0	5	8	6	0	6	5	2	3
+conformism	legalism	3.67	9	5	7	6	0	4	0	2	2	3
+tripods	tripod	10.00	10	9	9	10	10	10	9	10	10	10
+lastingly	wear	3.00	8	0	2	1	3	0	5	7	4	3
+lastingly	populate	0.43	1	0	4	0	0	0	6	0	4	2
+unexpected	unannounced	8.00	6	9	8	10	8	5	8	7	10	8
+interlink	intercommunicate	7.00	10	5	7	7	7	0	8	9	5	8
+interlink	connect	9.22	10	7	10	10	10	9	9	8	8	9
+brained	kill	1.75	0	0	7	5	10	0	4	0	3	2
+brained	hit	3.40	0	0	10	5	10	2	4	0	4	2
+unicycles	wheel	6.88	10	5	7	8	8	0	7	5	8	7
+unicycles	bicycle	6.57	9	5	8	7	8	0	7	5	6	9
+preservers	cook	5.17	6	0	6	6	7	0	5	0	5	3
+preservers	worker	2.80	6	1	3	3	6	0	5	0	7	2
+autografts	graft	5.33	2	7	0	0	7	6	8	6	8	4
+retarding	decelerate	7.88	6	8	0	8	8	9	9	2	7	8
+retarding	stay	4.20	4	5	0	2	0	7	7	4	1	6
+subfamily	group	8.00	7	10	7	5	10	9	6	8	8	9
+encrust	coat	8.44	8	10	0	8	9	10	8	8	9	6
+encrust	decorate	6.71	6	8	0	9	7	7	7	4	8	3
+wingless	flightless	8.80	9	10	7	6	7	10	9	9	9	8
+intraspecific	interspecies	5.50	8	4	0	0	0	7	6	8	5
+tunneled	penetrate	6.33	7	9	1	5	5	9	7	1	7	7
+tunneled	dig	8.71	9	10	9	7	9	10	8	8	9	9
+suppressor	gene	3.75	7	0	0	2	0	4	3	6	8	8
+suppressor	restrainer	9.22	8	10	7	9	10	10	10	8	9	9
+expound	elaborate	8.67	9	10	8	9	10	8	7	9	9	10
+expound	detail	8.88	9	9	8	9	8	0	3	9	9	10
+brisker	energetic	8.33	7	9	8	9	9	8	8	2	8	9
+brisker	invigorating	8.62	8	9	8	7	6	9	9	8	9	9
+wealthy	rich	9.67	8	10	10	9	10	9	10	9	10	10
+eventful	important	7.86	9	9	9	8	5	3	7	8	10	0
+eventful	lively	7.57	7	8	8	8	3	7	9	7	8	2
+edgeless	dull	7.43	8	8	7	6	10	1	7	9	7	10
+clownish	humorous	7.67	9	9	7	5	7	8	9	8	8	8
+inquisitor	thousand	0.29	2	0	1	1	0	0	0	2	3	0
+inquisitor	inquirer	7.80	7	10	7	5	5	9	9	7	10	10
+extravert	extroversive	7.83	7	10	7	8	5	9	7	9	10
+finality	conclusive	8.57	8	10	7	6	8	9	9	9	9	8
+gibberish	dutch	4.00	6	9	6	1	0	0	0	3	8
+championship	status	4.60	5	1	5	4	3	0	8	6	7	0
+championship	contest	6.22	6	10	8	5	5	5	8	6	8	5
+indelicate	indecent	5.88	8	10	6	7	0	7	7	3	6	3
+indelicate	tasteless	7.33	9	7	8	10	7	7	7	5	4	8
+sheikhdoms	domain	6.29	7	8	6	6	1	9	6	7	4
+flighted	fly	8.20	6	8	6	7	9	10	10	6	9	8
+flighted	shoot	2.40	3	7	0	2	2	5	1	4	0	0
+backwardness	idiocy	6.38	4	8	8	6	8	8	9	4	0	5
+discontinuous	disjunct	7.80	7	9	6	8	8	8	10	5	6	8
+cheapen	devalue	10.00	10	9	10	9	9	10	10	10	9	10
+flatulence	physical	3.20	2	7	4	8	2	0	8	4	0	4
+venomous	toxic	9.78	10	9	10	10	8	10	10	10	10	9
+venomous	malicious	7.14	7	8	8	5	7	6	9	6	10	8
+enshrouded	envelop	8.67	10	9	6	9	9	6	9	8	10	8
+impotently	ineffective	8.67	10	9	9	9	10	8	10	7	8	9
+deviationism	desertion	3.00	7	8	2	2	5	7	2	0	0	4
+capitation	tax	6.00	9	6	5	8	7	5	1	0	10	5
+denominate	label	5.71	8	7	7	2	7	3	0	0	6	9
+illiberal	narrow-minded	8.86	9	9	8	10	9	7	9	7	9	9
+periodical	nightly	5.80	1	6	1	10	5	7	6	5	10	2
+periodical	publication	9.14	9	8	2	10	10	0	8	10	0	9
+distillate	liquid	8.00	5	8	5	9	10	7	10	8	8	4
+returning	bounce	4.17	0	8	2	0	5	5	6	5	2	7
+dictatorship	state	6.75	1	9	0	8	0	10	5	6	1	8
+disfavoring	prejudice	8.75	6	8	3	10	10	10	7	10	5	9
+postglacial	cold	6.17	6	8	0	0	0	9	7	8	1	7
+ennobled	honor	7.29	9	8	5	10	6	10	6	6	9	7
+anticyclones	high	4.50	6	6	0	5	2	2	6	10	3	6
+cylindrical	rounded	8.40	8	9	3	10	5	10	8	8	4	9
+nonpolitical	apolitical	9.50	10	8	6	10	10	9	10	9	5	10
+circumference	size	7.83	8	8	2	10	5	9	7	6	9	10
+repositions	move	9.11	9	8	3	10	9	10	9	9	8	10
+repositions	reduce	0.88	1	2	0	8	0	0	1	5	2	1
+librarianship	position	5.40	3	0	8	6	2	5	7	8	6	2
+conductive	semiconducting	4.40	5	0	7	7	5	6	0	7	3	3
+bounced	skip	6.88	8	8	7	8	5	9	7	3	7	5
+bounced	bounce	9.00	10	10	10	9	7	9	9	9	7	7
+entreaty	request	8.50	3	10	9	10	2	10	6	10	7	6
+convertible	car	7.29	7	9	8	6	5	8	6	8	8	4
+convertible	security	0.38	2	0	0	0	0	0	3	5	1	0
+constitutive	essential	6.00	7	3	6	0	5	6	9	6	9	6
+kindergarteners	child	7.33	8	8	9	8	3	5	7	9	8	3
+angrier	huffy	6.88	6	9	7	7	6	8	6	7	8	2
+angrier	stormy	7.75	7	9	3	9	7	8	7	8	7	1
+defiles	mar	8.00	9	8	8	7	9	8	9	7	7	8
+defiles	spot	1.67	9	2	0	2	0	5	0	5	1	0
+hankering	desire	8.60	10	9	9	8	8	10	6	9	6	5
+hankering	longing	9.12	9	9	10	8	8	10	5	10	9	6
+circumnavigate	circle	7.25	9	8	10	7	2	5	7	9	6	7
+criticality	juncture	2.00	3	0	4	0	2	0	4	0	5	1
+criticality	urgency	7.29	8	0	8	7	7	10	7	6	8	3
+mistrustful	distrustful	7.43	7	9	10	6	8	10	8	4	8	6
+presuppose	imply	7.43	9	6	9	3	8	7	10	5	8	4
+presuppose	premise	6.75	5	2	9	7	7	9	9	2	0	8
+mayoralty	position	6.71	8	4	8	5	3	8	9	5	8	5
+companionships	friendship	9.50	10	9	9	9	9	10	10	10	10	9
+primates	priest	0.50	4	0	0	3	0	0	1	0	0	5
+omnipotent	powerful	9.38	10	9	7	9	10	9	10	10	5	8
+postboxes	maildrop	9.78	10	10	7	9	10	10	10	10	9	10
+loveable	desirable	8.83	9	7	6	9	8	10	10	9	9	9
+antedating	chronologize	7.40	8	5	8	7	8	9	5	9	5	6
+benefited	help	8.40	10	8	8	9	10	9	10	10	7	8
+benefited	get	6.33	5	8	0	9	5	9	7	8	0	5
+contrastive	different	9.33	10	10	6	9	10	10	10	9	0	10
+contrastive	antonymous	5.40	7	10	3	6	9	8	1	2	3
+interned	work	7.75	8	7	6	8	7	8	8	8	5	8
+interned	confine	7.43	10	1	8	8	7	9	0	7	5	8
+clamorous	noisy	9.44	0	8	9	9	10	10	10	10	10	9
+baseness	unworthiness	4.00	4	2	0	8	0	7	0	5	10	2
+serenaded	perform	7.12	6	0	9	7	10	6	4	8	8	9
+snookered	play	5.00	3	1	0	5	7	3	5	7	5	9
+snookered	flim-flam	8.00	9	8	9	7	10	9	0	6	5	9
+immeasurable	incalculable	9.33	10	9	9	9	10	10	4	8	9	10
+immeasurable	illimitable	8.43	8	7	10	9	10	9	9	8	8	8
+encroachments	inroad	6.00	7	5	9	6	9	8	3	7	1	0
+encroachments	entrance	2.75	3	1	8	5	10	2	1	6	3	1
+deregulating	liberation	8.00	5	3	8	7	10	9	7	8	9	8
+deregulating	exempt	6.62	4	2	0	8	8	4	5	8	8	8
+acceptable	satisfactory	8.40	9	8	9	10	10	10	7	8	8	10
+acceptable	standard	7.83	6	6	9	7	10	8	8	8	8	8
+sentenced	declare	5.71	3	0	7	6	7	5	2	8	5	7
+shrieks	shout	8.89	7	3	10	7	10	10	8	9	9	10
+shrieks	cry	8.67	9	3	10	6	10	10	7	9	7	10
+nonviable	dead	7.29	2	9	10	10	5	9	6	6	8	8
+papered	cover	6.71	3	9	10	8	5	8	7	6	7	6
+territorials	soldier	5.60	1	9	0	2	0	7	8	6	7	6
+territorials	guard	6.29	3	9	0	3	0	8	8	7	8	7
+publicise	tell	8.29	10	8	10	8	10	9	9	8	8	8
+reenact	re-create	8.67	8	9	10	10	10	9	9	7	9	8
+reenact	ordain	1.67	1	7	0	3	0	1	8	0	7	8
+interstellar	major	7.00	0	8	0	6	0	6	8	9	0	7
+scattered	separate	8.00	3	9	0	8	9	8	8	8	8	6
+transmigrating	immigrate	7.22	0	6	8	8	8	8	7	7	5	8
+transmigrating	born	1.12	0	0	2	0	1	6	4	5	2	0
+associations	southern	0.56	0	1	0	1	0	1	5	2	0	0
+associations	sociable	6.00	6	8	5	5	0	5	8	10	6	5
+admiralty	department	4.50	0	4	5	7	0	4	5	8	0	0
+admiralty	position	7.00	5	7	5	7	5	7	6	8	7	10
+autobiographer	biographer	7.00	8	8	6	9	7	5	7	6	5
+planners	schemer	7.50	10	9	8	9	6	7	8	7	6	5
+planners	notebook	6.86	7	7	7	8	7	8	0	10	4	2
+supplement	constitute	3.60	3	7	7	8	3	5	4	3	0
+supplement	leverage	2.60	0	2	3	6	2	2	0	6	6	4
+combusts	blow	7.25	9	8	7	8	9	5	0	10	4	8
+combusts	ablaze	8.29	10	8	8	8	9	6	6	9	7	9
+brightness	intelligence	8.38	10	8	8	9	8	8	5	8	9	9
+brightness	radiance	9.50	10	9	9	10	10	9	10	10	9	9
+producing	together	1.11	8	4	0	0	2	0	0	0	0	4
+reserve	assign	6.43	8	3	5	9	8	3	9	1	0	10
+reserve	withhold	8.62	10	7	6	10	10	9	8	3	4	9
+unflagging	constant	6.33	4	8	1	10	0	9	10	5	9	3
+unflagging	energetic	3.60	2	3	0	6	0	0	7	2	5	9
+preschooler	child	7.75	8	6	10	9	7	9	8	8	7	4
+baggers	machine	1.25	6	4	0	5	3	3	0	0	0	0
+baggers	workman	6.14	8	6	5	10	7	6	5	1	0	6
+willingness	wholeheartedness	7.71	8	6	6	9	7	9	0	10	0	9
+unacceptable	unsatisfactory	8.89	9	7	8	10	9	9	10	10	0	8
+unacceptable	unwelcome	7.00	9	7	6	8	10	5	8	6	7	7
+directionless	purposeless	8.40	10	8	7	10	9	9	8	10	6	8
+replications	reproduction	8.40	9	8	9	10	7	9	10	10	6	5
+replications	procedure	4.40	6	5	2	7	8	5	0	4	0	0
+retrials	trial	6.50	8	5	9	7	0	7	5	8	4	8
+venders	selling	8.00	9	10	10	7	5	8	7	8	9	10
+fantasist	creator	5.40	9	1	0	6	5	7	0	8	5	4
+interlinks	intercommunicate	7.25	9	9	1	9	6	0	8	3	8	6
+interlinks	connect	8.38	10	9	8	9	10	8	8	8	9	8
+adversely	unfavorable	8.43	10	9	8	9	8	5	6	8	8	9
+repulses	disgust	8.67	10	10	9	9	8	8	10	7	9	9
+repulses	fight	3.00	5	3	2	2	6	0	7	0	6	0
+humanness	quality	4.80	1	7	0	6	6	5	6	0	7	0
+autofocus	optical	6.71	7	7	0	8	6	0	6	5	8
+conversely	interview	0.38	8	0	0	0	0	5	2	1	0	0
+conversely	proposition	0.14	6	1	0	0	0	6	0	5	0	0
+ceaseless	continuous	9.33	10	10	6	9	10	8	8	10	10	9
+hybridise	breed	6.86	10	9	3	8	8	0	6	4	8	5
+antitumor	brain	0.71	4	0	8	0	0	6	0	0	1
+parallelism	similarity	8.17	10	10	5	9	10	8	8	7	8	9
+sightedness	sight	6.88	7	9	8	10	6	1	8	5	7	5
+battleships	dreadnought	5.50	10	1	0	7	10	3	7	0	5
+subarctic	polar	7.29	9	9	8	10	6	10	4	7	6	6
+subarctic	overshoe	0.14	0	1	0	3	0	2	2	0	0	0
+sufferance	self	2.29	2	5	6	0	4	3	1	3	1	2
+uncomprehending	undiscerning	6.57	8	10	6	7	6	2	6	7	1	6
+regretful	penitent	8.78	9	10	10	10	8	6	3	6	10	10
+monoplanes	airplane	7.62	8	8	8	7	10	8	8	0	8	6
+steepen	change	3.83	4	2	4	0	7	4	5	4	7	0
+transfuse	breathe	3.00	1	0	7	0	5	2	4	5	1	6
+transfuse	pour	4.89	5	6	4	6	6	4	3	6	1	4
+hyperextension	extension	6.25	7	0	0	8	7	7	4	8	2	7
+amazings	surprise	4.67	4	6	8	0	7	3	2	6	5	4
+amazings	stump	2.25	1	0	2	0	3	4	3	4	5	0
+perished	change	2.00	1	2	0	1	5	3	0	3	0	5
+hilarity	gaiety	7.71	5	8	7	8	4	6	9	8	8	10
+appearance	apparition	4.71	5	8	1	9	5	4	4	5	5	5
+transmissible	infectious	8.00	10	9	0	3	9	7	7	9	7	8
+transmissible	inheritable	6.50	6	9	3	0	6	4	8	8	7	10
+wheaten	source	2.40	0	2	0	3	3	0	4	2	0	2
+magnetize	charm	5.00	8	5	6	3	7	5	0	8	1	4
+magnetize	change	3.00	0	3	1	6	4	0	4	0	6	3
+militarize	change	3.17	1	1	0	7	4	0	3	4	6	8
+circumspect	prudent	6.00	8	5	5	0	0	4	1	8	6	10
+translocate	transfer	6.86	10	1	5	8	5	7	8	7	8	10
+macroevolution	evolution	7.00	8	8	8	7	6	6	7	7	7	8
+circumvented	attack	0.57	0	7	0	0	3	1	7	0	10	0
+circumvented	surpass	6.86	6	0	6	8	1	4	8	8	0	8
+adventism	christianity	6.75	5	5	7	8	7	7	6	5	8
+breather	submarine	1.25	1	8	6	0	5	0	0	4	0	0
+breather	respite	8.62	10	9	9	8	7	0	7	2	10	9
+disabused	inform	4.40	4	7	3	4	0	0	5	6
+contravene	deny	6.33	7	6	7	5	7	0	6	2	2
+contravene	transgress	8.00	8	8	8	2	6	0	9	9
+transducers	device	6.29	5	7	9	6	7	6	0	5	8	10
+icelandic	scandinavian	7.50	5	8	9	7	8	8	8	5	6	10
+uncertainty	speculativeness	8.00	4	7	9	8	9	8	7	5	8	10
+disengages	unclog	5.00	4	8	1	8	8	6	5	2	2
+painkillers	hydrochloride	3.33	0	2	9	3	7	1	5	0	3	6
+associational	legion	4.40	1	2	9	9	9	5	7	0	5	3
+associational	affiliation	9.00	8	8	9	10	10	8	9	9	10	4
+luxuriance	abundance	8.86	9	9	10	0	9	2	9	8	8	1
+vacations	spend	6.00	0	6	0	6	7	0	7	9	0	4
+chooses	compare	7.33	6	8	0	9	0	8	8	6	0	8
+chooses	decide	9.78	10	10	9	10	8	10	10	10	9	10
+enunciated	state	6.00	1	10	0	10	3	9	2	5	9	8
+cosponsoring	sponsor	8.12	8	7	9	9	9	8	8	7	5	2
+impeded	obstruct	9.11	10	10	8	9	10	9	5	8	10	8
+impeded	dam	6.40	8	10	5	8	10	3	0	7	10	4
+irremovable	tenured	6.50	7	9	4	8	10	2	5	7	5	7
+strangers	person	1.00	5	0	0	7	7	1	0	7	0	1
+utilitarianism	doctrine	0.71	0	0	8	8	3	0	7	0	0	2
+puffery	flattery	7.40	7	8	9	10	7	5	6	8	7
+noncitizens	traveler	6.14	7	6	0	7	8	5	0	6	7	5
+monsignori	priest	8.75	9	10	4	9	10	9	6	9	3	8
+refered	apply	1.00	8	0	1	9	9	0	0	6	0	0
+refered	remember	2.12	0	9	1	7	10	4	0	4	0	1
+macrocosmic	large	7.38	9	3	8	10	6	8	6	6	7	9
+functionality	practicality	8.11	8	9	1	9	10	9	5	8	10	5
+spoonfuls	containerful	4.80	6	8	0	7	8	2	5	4	8	0
+instructorship	position	0.86	0	5	0	7	10	1	0	7	0	0
+approved	authorize	8.89	10	10	6	9	10	9	0	8	10	8
+approved	rubberstamp	5.40	0	10	4	10	8	2	0	7	0	6
+recorders	box	0.00	0	0	0	7	0	0	0	6	0	0
+recorders	official	0.29	0	7	1	7	0	1	0	6	0	0
+headship	position	5.40	8	2	3	9	3	2	9	8	5	10
+credentials	document	6.20	7	6	4	6	6	4	6	9	8	8
+credentials	certificate	7.50	7	8	5	6	9	6	8	9	9	7
+enunciating	state	7.88	8	8	3	3	8	6	9	7	8	9
+enunciating	round	0.14	3	5	0	3	1	0	0	0	0	0
+caramelize	convert	3.29	5	6	2	4	5	2	6	0	3	2
+cosigns	validate	7.17	7	7	3	8	6	4	8	7	3	9
+cosigns	endorse	8.50	7	6	9	9	10	10	9	8	5	9
+deformity	appearance	5.00	5	6	5	3	1	2	9	5	6	8
+responsible	causative	6.00	5	8	9	0	6	9	0	10	0	5
+undisputable	undeniable	9.25	9	9	9	9	6	9	10	9	5	10
+reassess	measure	7.14	6	9	3	6	7	8	8	7	4	8
+colonise	settle	9.11	8	9	8	10	6	9	10	8	10	10
+subserve	help	7.00	5	8	8	7	5	6	10	8	9	2
+religionist	person	5.33	3	6	5	4	6	3	8	6	5	9
+sanctioned	empower	5.71	8	9	4	6	6	1	4	7	9	5
+sanctioned	back	5.00	0	8	0	9	7	9	1	2	3	9
+suggestible	susceptible	5.33	9	7	0	3	8	6	9	9	3	5
+warmness	protectiveness	6.00	9	7	0	4	6	5	8	9	6	2
+warmness	hotness	8.57	8	6	10	8	8	9	10	9	9	9
+relates	focus	5.00	6	6	0	0	5	6	5	4	3	9
+relates	remember	5.57	7	7	5	0	0	8	3	7	3	7
+cardinality	number	5.86	6	10	1	5	6	6	6	3	4	10
+rotational	transformation	4.29	4	3	10	0	8	4	5	3	7	4
+rotational	circumvolution	7.62	7	7	8	1	9	9	6	9	6
+totalism	political	4.38	5	7	6	0	5	2	5	3	10	2
+irrationality	insanity	8.00	7	8	9	6	10	7	8	9	8	6
+absorbance	density	6.00	8	6	2	2	6	6	2	5	10	7
+intracerebral	emotional	4.14	0	3	0	2	6	7	4	6	6	2
+disjoined	separate	9.86	10	8	10	10	7	10	10	8	9	10
+intramuscular	powerful	5.29	5	4	8	0	9	7	6	3	4	9
+endangerment	hazard	9.67	9	9	10	10	8	10	10	9	10	10
+decomposition	fragmentation	6.71	6	6	8	10	3	9	8	7	5	7
+decomposition	algebra	2.40	0	4	0	0	6	2	7	1	1	4
+autobiographies	memoir	8.67	9	9	10	9	9	8	10	7	10	8
+characterless	ordinary	7.33	5	8	8	6	9	6	8	3	9	8
+dissenters	conscientious	4.25	5	6	2	4	2	0	6	9	4	5
+subspecies	group	6.57	5	8	6	2	9	7	9	8	5	7
+irreproducible	unrepeatable	8.62	10	9	10	3	3	8	10	6	9	7
+cosigned	validate	6.00	7	7	6	1	4	7	5	9	10	6
+cosigned	endorse	8.33	9	6	9	5	7	8	8	6	10	9
+embellishment	expansion	6.67	6	7	10	3	8	9	7	8	1	4
+encyclopaedic	comprehensive	7.67	10	9	10	8	7	8	7	4	7	0
+indispensable	critical	7.89	8	9	9	6	7	9	6	9	8	0
+indispensable	necessary	7.50	10	8	6	4	4	9	8	6	10	8
+fractures	destroy	6.38	7	8	4	1	7	7	5	6	9	7
+fractures	pervert	1.78	4	3	0	0	3	3	0	0	3	8
+entraps	gin	0.12	1	2	0	2	0	0	0	0	0	0
+entraps	deceive	7.50	8	7	10	7	8	10	3	8	1	7
+anamorphosis	evolution	7.80	7	10	6	3	9	4	8	9
+anamorphosis	copy	3.40	5	2	3	7	0	7	5	2
+dispersive	distributive	7.29	10	6	10	8	7	7	8	8	7	4
+smoothen	rub	7.00	6	5	3	6	8	8	1	8	8	3
+interpreter	person	4.86	6	6	2	5	3	6	3	9	0	5
+interpreter	symbolist	2.00	6	6	0	4	1	6	1	6	0	0
+meadows	grassland	8.57	8	8	10	8	9	9	7	9	9
+obtainment	acquiring	9.00	10	9	10	9	9	8	9	9	8	8
+nonprofessional	lay	5.75	5	9	0	9	7	8	9	3	0	0
+attendances	frequency	6.43	5	8	9	4	7	6	0	8	0	7
+attendances	appearance	6.38	5	7	9	6	8	5	1	7	8	5
+protraction	continuance	6.50	7	8	4	0	8	5	5	0	7	8
+transshipped	transfer	7.88	7	7	9	1	8	8	4	9	8	7
+entrapped	capture	8.00	9	7	7	4	8	9	7	5	9	10
+entrapped	deceive	7.43	8	7	8	4	9	7	10	2	8	5
+exclaiming	call	6.75	8	5	3	1	8	7	8	7	7	4
+exclaiming	declare	7.78	9	7	2	7	8	8	8	7	8	8
+passable	satisfactory	8.00	9	8	6	7	10	8	7	7	9	9
+passable	negotiable	3.50	2	7	0	3	8	4	1	5	0	6
+undetectable	invisible	8.89	9	8	7	2	10	9	8	10	9	10
+undetectable	imperceptible	8.20	10	8	10	8	10	9	8	6	8	10
+endurable	tolerable	8.40	9	7	9	8	10	8	10	8	10	10
+supposed	speculate	7.67	9	8	6	6	8	7	8	9	8	7
+supposed	suspect	6.44	7	6	4	6	8	6	6	8	7	0
+transact	bank	5.75	5	7	0	0	6	9	0	8	5	0
+survivalist	person	4.57	6	6	1	0	5	8	5	3	5	2
+increasing	grow	8.29	10	9	9	5	7	9	7	3	8	9
+increasing	up	6.40	9	8	6	6	7	9	5	3	9	0
+fabricate	make	9.22	10	8	8	9	6	10	9	10	10	9
+fabricate	think	4.20	5	5	1	4	5	6	2	0	0	7
+partnership	partner	8.67	9	8	9	7	9	8	7	10	9	10
+partnership	relationship	7.83	3	7	4	9	7	8	9	7	10	10
+microorganism	organism	7.12	7	7	2	6	4	7	8	8	6	8
+impossibilities	unattainableness	8.80	10	9	6	9	7	9	9	10	10	8
+repress	suppress	8.00	9	7	3	7	7	9	10	9	8	1
+dimensional	multidimensional	6.86	8	6	2	6	4	8	7	7	6	9
+performance	universe	0.89	2	8	0	1	0	2	1	0	0	2
+performance	musical	6.83	10	9	1	7	7	7	8	5	4	7
+feudalism	organization	5.00	0	7	4	6	5	3	7	6	6	2
+behaviorist	psychologist	8.67	10	3	8	8	10	8	9	9	7	9
+interjection	break	7.14	1	7	6	10	4	7	8	7	8	7
+interjection	exclamation	8.00	2	10	9	8	9	4	10	9	5	0
+consequences	position	0.56	0	0	0	2	0	0	2	6	1	0
+consequences	result	9.38	9	9	9	9	10	10	7	9	6	10
+preschoolers	child	7.83	10	1	9	4	9	9	6	7	7	10
+unmentionables	garment	6.00	10	1	9	5	6	6	1	6	7
+subeditor	editor	6.71	1	7	6	5	8	7	6	8	9	9
+standardize	regulate	8.38	9	5	9	8	9	2	8	7	8	9
+standardize	measure	4.60	8	3	6	7	0	4	3	8	8	0
+winners	walloper	1.67	1	0	1	0	1	3	3	5	1	10
+persuasions	electioneering	2.75	0	6	2	0	5	1	3	6	7	0
+persuasions	belief	7.50	0	5	9	6	10	7	8	9	8	8
+conformations	balance	2.33	1	0	1	1	6	7	3	2	7	8
+conformations	curvature	4.75	5	5	8	0	0	8	4	5	0
+seriousness	badness	5.80	6	0	0	1	6	6	8	10	9	3
+seriousness	gravity	7.67	7	7	9	10	9	9	1	5	0	1
+metabolism	organic	5.80	0	5	0	0	7	7	7	0	9	3
+reprints	reproduce	8.44	8	6	6	10	9	9	9	10	9	2
+reprints	publication	5.67	7	7	2	5	6	8	6	0	9	3
+replication	procedure	4.50	4	6	0	3	7	6	7	0	6	2
+replication	copying	9.38	10	10	7	10	10	10	8	10	6	4
+highjacking	robbery	9.33	8	10	5	8	10	9	10	10	9	10
+highjacking	seize	9.00	9	10	7	7	9	9	9	10	10	9
+repurchases	buy	7.62	9	7	0	7	8	7	6	10	8	9
+sympathized	feel	8.67	9	10	6	8	9	8	7	10	9	9
+unsuitable	unfit	10.00	10	10	8	10	10	10	10	10	10	10
+unsuitable	irrelevant	5.00	8	0	1	2	0	8	6	0	9	9
+victorious	successful	9.50	10	10	10	10	8	10	8	4	10	0
+victorious	undefeated	8.60	10	6	10	9	8	10	7	8	9	9
+leagued	unite	8.60	9	10	9	10	9	8	5	5	6	8
+ravenous	gluttonous	7.60	9	5	2	10	10	7	6	8	10	8
+ravenous	hungry	6.67	9	4	6	5	10	10	8	7	5
+inversions	abnormality	4.50	5	5	0	0	7	5	3	4	5	7
+inversions	phenomenon	5.00	6	7	5	0	0	0	5	8	4	0
+flavourful	tasty	9.62	10	10	9	10	9	10	5	6	10	9
+spaciousness	largeness	9.67	10	6	9	5	9	10	6	10	10
+evidently	obvious	9.38	9	10	9	10	10	9	7	10	7	8
+evidently	noticeable	9.00	9	10	9	10	9	9	8	3	7	10
+reinsured	insure	6.29	8	7	7	5	7	6	4	4	7	5
+crudeness	wild	4.43	7	6	3	4	3	0	6	3	6
+crudeness	impoliteness	9.00	10	10	10	9	8	9	7	5	9
+initialise	divide	0.86	5	0	2	7	0	3	1	0	0
+initialise	determine	3.40	3	6	0	7	7	0	6	1	0	1
+requirement	duty	6.71	5	5	3	10	8	7	9	5	8	10
+requirement	thing	0.57	6	0	2	6	0	2	0	6	0	0
+contortionists	acrobat	7.62	4	8	1	8	8	9	7	0	9	8
+dysentery	diarrhea	8.67	9	7	1	8	10	10	7	10	10	7
+occlusion	thrombosis	6.71	7	8	6	5	0	8	8	5	0	9
+reenactor	actor	7.71	10	8	0	2	8	5	7	9	8	9
+ulcerate	affect	2.40	6	0	6	7	5	3	2	0	1	1
+ulcerate	change	3.50	6	0	7	7	2	4	1	0	3	5
+exemplify	embody	9.12	10	7	3	10	9	10	7	10	10	0
+exemplify	elaborate	3.67	3	7	0	2	0	8	6	0	0	8
+attractor	entertainer	7.17	2	7	0	7	7	0	8	10	8	6
+macroeconomists	economist	7.00	6	8	5	9	6	4	2	10	10	8
+exploitive	consumptive	5.00	3	5	0	7	8	0	4	0	8	6
+lectureship	position	4.75	0	8	8	4	8	6	2	7	0	0
+automate	change	5.60	6	5	8	1	8	0	6	5	6	0
+incorruptible	incorrupt	9.33	10	9	9	6	10	10	8	6
+exacerbated	anger	7.00	10	10	8	9	6	3	7	7	6	6
+exacerbated	inflame	8.00	10	10	7	9	7	7	5	9	8	9
+continuously	unbroken	8.17	6	10	7	8	8	9	8	8	8	10
+crusaders	warrior	8.00	8	10	8	9	5	10	7	8	7	9
+crusaders	insurgent	6.00	7	9	3	9	6	9	5	9	6	3
+formations	flight	3.50	0	6	4	7	3	7	2	7	4	2
+formations	filing	6.60	10	9	2	7	6	8	2	8	4	0
+bestowals	giving	8.33	10	10	7	9	10	10	7	7	8	8
+bestowals	gift	8.50	10	10	7	9	10	8	9	8	9	8
+undeviating	reliable	7.83	8	7	9	8	8	8	9	6	6	8
+undeviating	direct	7.50	8	5	9	5	10	7	8	8	8	6
+impassively	voice	0.43	7	0	0	6	0	6	3	0	0	0
+paradoxical	inexplicable	7.43	8	2	7	0	4	10	7	9	8	9
+deceitful	dishonest	9.78	10	9	10	10	8	10	9	10	10	10
+commissions	equip	0.50	1	2	1	4	0	5	0	0	0	0
+commissions	order	5.40	9	7	0	8	10	7	0	1	0	4
+leisured	idle	7.75	10	8	3	7	7	9	8	8	6	9
+unsalable	unmarketable	9.78	10	10	9	10	7	10	10	9	10	10
+hypersensitivity	sensitivity	8.17	9	8	8	10	8	7	8	7	8	10
+inquisitiveness	nosiness	8.33	8	8	10	6	9	8	9	1	9	8
+monograms	symbol	7.67	6	8	7	5	8	10	7	10	8	8
+admitting	confess	10.00	10	10	10	10	9	10	9	10	9	10
+deflowering	deface	8.00	10	8	8	4	6	5	8	9	8	9
+innovativeness	originality	9.56	10	9	10	10	9	6	10	10	8	10
+impulsion	force	7.29	10	8	10	8	6	0	7	7	7	8
+impulsion	drive	9.25	8	10	10	10	7	8	5	10	9	9
+unisexual	sexual	6.40	7	10	7	6	5	7	9	3
+anarchist	radical	8.60	8	10	9	9	8	6	6	10	9	10
+circumcision	banquet	0.88	5	0	0	1	3	0	3	0	0
+socialites	person	4.50	3	2	8	7	8	3	7	4	3
+rearrangements	reordering	8.56	10	10	7	6	6	5	10	2	10	9
+unquenchable	insatiate	8.71	9	10	10	9	9	7	9	9	8	8
+interrelated	interrelate	9.62	9	10	10	9	9	10	10	10	8	8
+interrelated	associate	7.71	8	10	0	7	8	9	6	1	8	8
+synthetical	logical	5.80	7	1	3	9	10	3	10	7	0
+entombment	funeral	8.17	8	8	5	10	9	8	10	8	5	8
+kidnapped	shanghai	6.80	7	6	9	10	1	0	7	10	0	5
+uproarious	humorous	8.56	7	10	9	10	7	9	8	8	0	9
+uproarious	noisy	8.67	8	9	8	9	9	10	10	9	10	6
+discipleship	position	5.29	6	0	6	6	5	6	6	2	1
+vaporise	evaporate	9.43	9	10	10	9	5	10	8	10
+vaporise	change	6.20	5	6	8	8	7	4	6	7	4	8
+memorialize	remind	6.33	7	7	4	7	8	5	4	6	6	9
+memorialize	address	4.43	4	2	4	6	5	8	4	4	4	0
+personify	embody	8.17	8	8	8	7	9	10	6	10	9	4
+personify	typify	5.88	4	7	0	8	9	3	8	4	8	5
+inbreeding	coupling	6.67	10	7	6	5	7	6	8	6	5	10
+lenience	softness	6.67	7	8	2	1	9	8	0	7	1	8
+lenience	mercifulness	8.78	10	9	9	4	9	9	7	10	7	9
+preposed	put	5.80	5	7	1	5	8	0	7	9	2	5
+prophetical	predictive	8.88	10	7	8	2	9	10	8	4	10	9
+standoffish	unapproachable	9.00	9	4	8	5	10	9	10	6	10	10
+procurator	agent	6.43	0	8	7	7	9	5	7	6	5
+excitations	arousal	7.17	9	6	6	4	8	9	7	9	8	8
+excitations	fever	2.75	4	3	3	0	6	8	1	0	6	0
+thoughtless	inconsiderate	9.44	8	8	10	9	6	10	10	10	10	10
+untruth	statement	1.22	0	4	0	0	3	7	0	1	0	3
+malfeasance	wrongdoing	8.00	8	7	5	7	10	8	9	0	10
+supporters	trader	0.25	1	7	0	5	0	0	1	0	0	0
+supporters	strength	7.14	9	8	6	0	6	8	0	7	6	10
+punctuate	quote	6.43	8	8	5	0	6	9	4	6	8	3
+punctuate	point	7.60	10	8	5	1	8	10	0	9	8	2
+translocation	organic	0.62	0	6	0	0	0	0	0	2	3	8
+translocation	procedure	1.38	1	6	0	0	4	0	0	3	3	10
+deforming	change	6.33	7	6	4	1	4	10	9	8	10	10
+deforming	morph	7.00	8	7	4	3	6	10	9	8	8	5
+attributions	attributable	7.86	10	7	10	7	8	8	8	8	5	9
+shouter	crier	9.25	10	8	5	9	4	10	10	7	10	10
+excrete	make	2.80	6	7	1	1	4	8	0	7	0	2
+concerti	concerto	9.00	10	10	9	9	9	7	7	9	9	10
+reformism	doctrine	4.60	5	0	5	2	0	8	5	6
+moisten	baste	7.33	7	3	10	7	8	9	7	8	7	5
+moisten	sprinkle	4.60	1	3	9	0	7	8	4	6	8	3
+inflammation	pitch	0.25	0	0	0	0	0	2	4	0	0
+intermingles	commingle	8.43	9	8	9	9	8	8	4	10	8
+gathering	sponge	0.44	0	0	0	2	0	5	2	0	0	0
+gathering	hive	6.50	8	7	6	9	5	9	3	1
+concerning	involve	8.43	8	6	9	10	9	7	5	8	9	9
+deviously	indirect	5.60	5	6	0	0	9	0	5	5	7
+deviously	untrustworthy	8.00	9	8	8	3	6	9	9	7	8
+admittance	right	0.75	0	0	0	3	2	0	9	8	0	1
+performing	improvise	4.20	8	0	6	7	1	0	4	6	4	0
+performing	church	0.22	0	1	0	1	0	0	0	6	0	0
+pretenders	ringer	1.00	0	1	0	8	3	2	3	0	0	0
+toppled	push	5.00	5	2	1	8	2	0	7	6	9	9
+toppled	over	4.80	6	5	1	9	0	0	5	8	3	5
+nonconscious	unconscious	9.71	10	10	9	10	9	10	8	8	10	7
+nonconscious	inanimate	7.14	5	9	7	8	5	3	8	10	0	8
+meaningless	empty	7.71	6	8	9	9	5	2	2	8	10	9
+immoveable	immobile	9.62	10	9	9	10	8	10	8	9	10	10
+unblock	play	0.12	0	1	0	3	0	0	0	2	0	0
+unblock	unstuff	6.20	5	1	2	8	7	2	9	8	3	10
+rhythmicity	lilt	5.33	9	7	2	7	3	3	7	0	9	5
+significances	meaning	7.67	10	7	7	1	10	7	3	7	9	9
+sheepish	docile	5.75	4	6	2	10	10	2	7	10	6	0
+sheepish	ashamed	5.75	10	4	5	6	8	7	0	6	4	6
+immensely	large	7.50	4	6	7	7	9	8	6	9	8	10
+eruptive	active	7.67	8	7	7	6	9	8	8	8	6	9
+eruptive	aqueous	0.86	7	6	1	3	2	0	0	7	0	0
+transvestitism	practice	0.86	2	2	2	0	0	4	5	0	0
+royalist	monarchist	7.80	7	7	6	6	10	10	10	8	8	9
+libelous	harmful	7.00	7	6	7	7	6	2	9	9	8	8
+commodes	drawers	2.83	5	3	1	3	6	0	3	0	2	9
+commodes	fixture	5.00	5	6	3	6	5	2	2	8	5	8
+conscripting	enlist	7.67	7	7	5	8	7	9	8	0	9	9
+depopulate	shrink	7.33	10	4	7	7	1	8	10	0	9	9
+directional	leading	5.00	9	4	8	0	0	4	8	0	7	0
+disbelieving	doubt	9.25	10	6	7	10	6	10	10	10	8	9
+disbelieving	incredulous	9.44	10	4	8	10	9	10	10	10	8	10
+hypervelocity	speed	8.67	10	6	7	10	1	10	9	10	8	8
+interdisciplinary	nonindulgent	4.25	2	6	6	0	0	3	0	0	7	9
+nonverbally	numerical	4.00	4	7	0	9	2	2	0	8	8	5
+pressurise	change	5.57	8	3	7	10	0	5	7	0	7	2
+measurements	viscometry	4.40	1	3	10	0	10	7	0	8	3
+nonfunctional	run-down	7.60	5	0	7	10	1	10	8	0	9	9
+severer	intense	8.25	7	6	7	10	0	1	10	10	7	9
+brainless	unintelligent	9.67	10	10	10	6	10	9	10	10	9	9
+marinate	steep	7.14	6	10	7	6	8	9	2	9	3	5
+freighter	cargo	6.17	7	7	7	1	6	9	9	0	6	4
+terrorize	coerce	4.80	8	8	7	2	3	8	6	0	3	5
+terrorize	frighten	8.67	10	9	9	6	8	9	10	10	8	9
+prayerful	pious	8.33	9	9	6	10	9	9	10	6	7	7
+bestowal	giving	8.57	8	9	10	6	8	9	9	10	9	8
+bestowal	gift	8.25	9	6	9	7	7	9	10	9	9	7
+diagonal	line	3.67	7	4	0	1	4	8	6	0	5	2
+diagonal	heterosexual	0.00	0	0	0	0	0	2	0	0	0	0
+ingroup	bohemia	0.75	0	1	3	7	0	0	0	0	2
+uncomfortable	comfortless	9.33	10	10	10	0	9	9	10	10	9	7
+uncomfortable	disquieting	8.11	8	8	9	5	8	9	10	0	8	8
+hyperlinks	link	6.71	7	7	10	7	8	5	3	8	5
+therapeutical	acoustic	1.14	1	5	2	8	0	0	0	6	0
+therapeutical	healthful	7.17	6	7	10	10	3	8	7	4	8	7
+depreciate	deflate	8.29	9	9	10	3	7	9	3	8	8	8
+intelligence	shrewdness	7.00	6	7	2	6	8	6	8	8	10
+intelligence	agency	2.00	1	3	2	2	0	0	0	6	5
+cynically	distrustful	7.14	7	4	8	10	5	4	8	6	8	8
+autopilot	unconsciousness	5.00	3	0	7	9	0	0	0	5	8	8
+enjoining	forbid	0.62	2	1	0	0	0	5	6	0	0	2
+enjoining	command	4.20	2	6	4	0	4	0	5	0	8	8
+reelections	election	7.14	9	8	6	8	5	1	8	8	7	2
+tidings	float	0.25	0	2	0	0	0	7	6	0	0	0
+tidings	ebb	0.88	0	2	0	0	0	7	6	0	2	3
+transmigrated	immigrate	6.75	1	6	0	8	6	8	7	8	7	4
+infeasible	impossible	8.22	8	9	8	8	8	10	8	9	8	8
+rhymers	writer	4.83	5	4	2	8	6	3	5	7	5	4
+germanic	scandinavian	5.00	9	7	0	3	5	8	7	6	2	0
+anticancer	person	0.75	0	3	0	0	0	2	6	8	0	1
+fording	traverse	7.50	8	8	1	8	0	9	7	5	6	9
+fording	deep	5.14	6	3	0	6	0	9	5	2	7	7
+unmolested	untroubled	7.67	8	9	2	10	2	8	7	5	9	3
+covariant	variable	7.38	7	8	4	7	5	8	8	3	8	8
+postposition	place	4.50	1	8	6	3	2	7	7	2	9	1
+splashy	covered	1.14	1	3	8	2	0	7	0	2	0
+splashy	ostentatious	7.14	9	9	8	9	4	6	0	0	5	10
+sprouting	germinate	8.44	9	9	6	8	8	10	8	8	10	2
+sprouting	grow	9.50	10	9	6	10	9	10	9	10	9	6
+entwined	stitch	5.60	1	9	2	4	5	7	6	6	10	2
+entwined	wreathe	5.67	7	5	5	3	5	5	3	8	8	7
+hypertext	text	6.00	4	9	3	7	3	6	7	4	10	8
+expressible	representable	7.00	9	1	7	10	6	7	7	6	10	0
+unicyclist	pedaler	5.17	1	5	3	10	6	7	7	3	10
+spatiality	property	5.20	7	1	3	8	6	5	5	0	8	0
+acoustical	remedy	0.14	0	0	0	1	3	5	0	0	0
+strains	trouble	6.14	4	1	7	10	6	6	5	7	0	8
+strains	rack	1.25	0	0	3	1	0	5	2	4	0	7
+resistor	splitter	2.67	2	1	9	0	5	5	1	0	6	2
+pastorship	position	4.83	1	8	7	9	6	6	6	2	0	2
+brightly	colorful	8.25	8	8	8	9	9	8	8	6	8	10
+lubricate	change	1.83	6	2	2	5	3	1	2	0	1
+lubricate	fill	1.86	1	5	2	2	3	3	1	0	1
+hilariously	humorous	9.57	10	10	9	7	9	10	9	10
+intercession	prayer	4.60	10	6	10	0	5	3	2	7
+evangelicalism	revivalism	7.25	10	5	8	6	8	7	5	10
+unmarried	unwed	10.00	10	10	10	10	9	10	10	10	10
+globalise	widen	8.00	10	10	7	8	6	9	7	10	5	9
+cofactor	compound	6.00	7	7	4	5	1	0	7
+energized	enliven	8.00	8	9	8	8	8	8	5
+energized	change	3.67	10	3	7	6	6	3	1	2	2	1
+registry	register	7.75	10	9	8	9	8	8	6	9	5	0
+unrealizable	impossible	8.43	8	6	10	10	6	9	2	10
+dissociations	compartmentalization	6.40	9	0	7	6	8	7	3	10	4
+dissociations	separation	8.14	10	9	9	8	7	9	8	4	7	10
+griping	bite	3.80	10	2	0	4	6	0	0	2	7	5
+griping	complain	8.17	10	9	10	8	7	9	6	8	5	8
+quieten	hush	9.38	10	10	10	9	7	10	8	10	8	7
+quieten	compose	4.60	2	0	6	3	8	5	8	7	0
+transfigure	change	7.33	10	10	10	7	7	9	7	7	7	6
+scarceness	rarity	9.78	10	8	10	10	9	10	9	10	10	10
+corroding	decay	9.78	10	10	10	10	8	10	10	9	9	10
+corroding	corrode	9.88	9	10	8	10	7	10	10	10	10	10
+freakishly	panic	4.17	0	6	0	5	5	1	0	6	9	2
+copilot	pilot	7.50	8	8	7	7	9	6	8	5	9	7
+analyzed	synthesize	3.83	8	4	0	7	2	5	2	0	5	5
+analyzed	survey	5.86	10	9	5	0	6	5	8	4	8	5
+confinements	pregnancy	3.50	10	1	1	0	6	6	6	1	8	0
+confinements	restraint	8.50	10	8	8	10	10	7	9	9	8	9
+prideful	elated	5.60	10	7	6	8	0	6	5	4	0	1
+prideful	proud	10.00	10	10	10	10	10	10	8	10	10	10
+commode	drawers	4.60	6	2	0	0	0	5	6	9	0	4
+commode	seat	6.00	8	7	6	4	7	3	5	6	5	6
+fluidity	thinness	2.80	6	3	8	0	0	2	5	3	0	1
+fluidity	changeableness	8.22	10	7	7	0	5	9	7	10	9	10
+internationalize	control	4.00	8	7	4	0	5	4	3	8	0	1
+internationalize	change	4.80	6	7	6	0	7	4	2	1	6	1
+academicism	traditionalism	3.00	1	4	0	0	8	6	0	1	5	4
+boisterously	spirited	8.33	9	5	9	9	9	6	8	10	4	10
+boisterously	disorderly	5.14	8	3	0	0	3	5	6	7	7	5
+effected	carry	2.20	0	4	3	1	1	5	2	6	0	0
+effected	draw	0.62	0	1	3	1	0	5	1	2	0	0
+subhead	heading	6.86	6	3	2	8	8	9	5	6	8	7
+whizzed	sound	7.57	9	4	7	3	8	8	10	7	8	6
+independences	independent	7.33	10	8	7	7	7	7	8	6	9	9
+independences	victory	6.20	9	3	6	8	5	2	7	7	6	2
+conductance	electrical	8.33	10	7	9	10	7	10	8	7	8	7
+uncontrolled	rampant	9.50	10	8	7	10	9	10	10	9	9	9
+selectively	exclusive	8.57	8	6	8	10	9	8	9	9	9	10
+selectively	discriminating	8.40	10	7	9	8	8	10	9	8	10	10
+fulfillments	satisfaction	8.43	10	4	9	10	8	8	9	9	7	9
+fulfillments	self-fulfillment	8.56	10	1	8	9	8	9	10	6	9	8
+premeditation	planning	8.80	6	10	7	10	9	9	9	8	9	10
+stewardship	position	5.80	10	7	6	0	5	5	0	6	10	0
+residing	populate	6.33	10	6	7	2	3	3	7	8	6	4
+residing	stay	7.83	9	8	9	7	10	6	5	5	8	10
+coefficient	self	0.62	0	2	2	0	0	1	3	0	5	0
+algebraist	mathematician	9.12	10	9	10	6	10	6	7	10	9	8
+drownings	extinguish	4.83	3	5	7	0	5	5	7	0	6	5
+drownings	cover	2.40	2	3	5	1	3	0	3	5	6	0
+encamping	populate	5.29	9	6	6	0	3	3	9	7	5	7
+prostatic	criticism	0.71	3	1	0	5	0	5	0	1	0
+prostatic	radio	0.62	0	3	2	0	6	0	5	0	0	0
+violating	fly	0.33	0	0	1	0	0	0	2	0	5	0
+violating	observe	0.67	0	2	1	0	0	0	2	0	4	1
+remitting	transfer	4.50	10	2	7	2	5	7	4	0	5	4
+orientate	reorientate	6.25	8	8	10	2	5	6	6	5	7	5
+postmark	marker	5.12	8	2	10	0	3	3	8	2	7	8
+postmark	stamp	8.67	10	9	9	6	5	5	9	9	7	9
+establishment	organization	8.40	9	9	8	6	10	8	7	10	8	10
+establishment	beginning	7.20	10	7	8	6	10	8	3	4	7	10
+recitalist	soloist	7.50	6	8	10	8	7	7	9	7	6	8
+institutionalize	hospitalize	8.33	8	9	10	7	8	8	7	10	9	8
+verbalize	enthuse	6.14	7	7	7	0	6	6	1	0	6	4
+verbalize	talk	9.44	10	8	10	10	10	8	10	10	9	6
+presenters	communicator	7.33	7	7	10	2	8	7	8	0	2	7
+presenters	advocate	5.60	8	4	9	0	6	7	0	0	4	7
+repressing	suppress	7.50	6	9	10	3	10	8	8	10	8	6
+repressing	oppress	8.00	3	9	9	8	8	7	7	9	9	6
+premisses	presuppose	4.60	8	0	5	2	8	5	6	5	8	0
+premisses	premise	6.83	5	5	3	9	10	6	0	9	7	10
+outfoxed	surpass	5.00	6	7	8	4	6	8	2	0	0	8
+gardens	sink	0.00	2	2	0	0	0	3	0	0	0	0
+gardens	tend	4.57	7	5	7	0	6	8	1	0	1	5
+phosphate	drink	3.50	6	6	4	0	3	5	0	0	0	2
+phosphate	sodium	5.33	7	6	5	8	8	5	2	0	5	4
+airship	trade	0.71	5	5	4	0	0	5	0	0	1	0
+submariners	bluejacket	0.43	3	0	0	0	5	0	0	6	0	7
+infectiously	canker	6.12	7	5	10	4	8	6	8	1	5	6
+subsurface	submarine	6.57	7	9	10	8	5	8	4	5	5	8
+extendible	long	7.00	6	5	8	9	7	8	9	1	8	3
+refresher	beverage	7.33	7	7	7	8	8	7	5	4	10	9
+refresher	legal	1.38	7	4	1	0	0	2	0	1	3	6
+seasonable	opportune	5.20	7	0	8	10	0	6	0	2	4	7
+moderatorship	position	6.50	7	3	6	9	6	7	6	0	7	9
+modesty	demureness	9.50	9	9	6	10	10	10	3	9	10	9
+prejudging	evaluate	7.20	5	5	9	10	8	6	7	4	7	8
+roadless	inaccessible	7.86	9	7	7	10	10	8	8	6	9	7
+objectifying	change	1.25	1	2	1	10	0	4	0	0	2	6
+expounded	clarify	8.00	7	6	8	9	9	10	5	5	9	10
+expounded	premise	0.86	0	0	0	8	0	7	0	0	6	8
+nonperformance	negligence	6.00	5	7	6	7	8	4	10	5	1	0
+acoustics	remedy	0.11	0	0	0	0	1	0	0	5	0	0
+acoustics	physics	3.20	5	7	0	4	3	0	8	3	1	0
+yellowish	chromatic	4.25	0	3	3	0	8	5	0	7	6	0
+reckoner	statistician	3.40	1	1	6	0	10	5	0	9	4
+reckoner	handbook	0.75	0	0	0	6	0	10	1	0	0	5
+conscientious	careful	9.22	9	10	6	8	8	10	10	8	10	10
+amounted	make	5.67	6	6	2	7	6	3	10	4	5	9
+amounted	work	2.50	3	0	0	2	7	1	7	4	0	8
+vegetational	growth	7.57	7	7	0	6	7	9	10	9	3	8
+vegetational	forest	7.71	7	8	1	5	8	9	10	8	3	9
+unfavourable	adverse	8.20	8	8	8	6	9	8	10	10	6	6
+unfavourable	discriminatory	6.33	4	7	0	6	9	8	7	10	6	1
+vocalism	voice	7.67	5	9	2	7	9	10	8	10	8	3
+vocalism	system	0.67	1	0	0	2	2	0	0	8	1	0
+continence	self-discipline	4.83	3	6	5	4	8	10	0	3	10
+immoderate	excessive	7.50	7	10	7	5	8	7	9	10	7	5
+internships	position	7.17	5	8	1	1	8	9	8	8	6	1
+translunar	heavenly	6.67	6	9	1	8	1	7	10	7	5	7
+ideality	quality	5.20	6	0	1	3	8	8	6	8	7	4
+importance	momentousness	6.83	7	7	3	0	8	10	8	10	6	5
+importance	primacy	7.17	8	6	5	8	8	7	10	6	4	10
+jarringly	move	3.86	5	0	1	6	6	8	2	0	5	2
+jarringly	conflict	2.60	2	8	1	1	6	8	0	0	7	3
+affectional	emotional	7.83	7	10	4	8	8	8	7	5	10	9
+rediscovery	discovery	6.60	6	8	7	7	3	4	8	3	7	6
+microfossils	fossil	7.25	7	8	7	4	9	6	8	6	8	8
+unknowing	ignorance	8.17	10	9	8	6	7	6	10	8	8	9
+unknowing	uninformed	8.14	9	9	7	10	8	7	10	9	8	5
+commandership	position	5.60	2	5	8	7	3	6	6	4	8	8
+autoimmunity	autoimmune	8.50	9	8	8	7	9	7	10	9	8	10
+undefended	vulnerable	8.33	8	8	7	8	8	7	10	7	9	9
+collected	take	6.67	3	7	6	6	4	5	10	8	8	4
+collected	corral	7.71	9	1	9	0	7	6	8	0	7	8
+secluding	isolate	8.60	10	8	7	9	7	6	9	8	9	10
+ceramicist	craftsman	6.57	3	7	8	5	1	6	4	8	9	8
+teaspoonful	containerful	5.17	9	6	5	0	5	2	9	7	6	0
+migrational	emigration	8.00	10	10	4	0	0	5	10	9	7	9
+migrational	people	4.50	5	5	4	0	2	1	8	6	0	5
+newness	brand-newness	8.60	10	10	8	9	7	7	10	9	8	9
+circumscribes	content	2.75	5	4	0	0	2	3	5	0	2
+rudderless	purposeless	6.38	8	8	8	5	0	7	10	5	5	5
+internationaler	foreign	7.80	8	8	9	5	8	6	9	7	9	8
+contrive	plot	7.38	8	6	0	8	9	9	5	5	9	10
+contrive	make	7.14	3	8	8	0	8	8	8	5	5	9
+unarguable	incontestable	9.00	10	10	8	9	10	8	10	9	8	9
+replaces	preempt	4.86	0	3	7	7	3	9	5	5	4	0
+unconcern	heartlessness	7.14	6	8	6	10	5	8	10	7	7	8
+unconcern	carefreeness	8.44	10	8	7	10	0	8	10	7	7	9
+reformations	religious	5.67	2	5	4	7	0	8	6	6	6	9
+procreated	make	8.43	10	7	8	9	9	8	9	8	8	10
+inducement	motivation	6.29	8	7	4	1	9	10	7	4	8	6
+inducement	causing	6.14	7	6	7	5	9	4	7	2	3	7
+sanctify	lustrate	5.20	9	5	3	0	0	10	3	0	7	8
+sanctify	declare	6.83	7	7	6	0	7	8	10	6	2	0
+effectiveness	potent	8.67	10	8	9	6	5	9	9	8	6	9
+restrainer	chemical	0.71	0	5	4	0	0	7	0	5	1	0
+restrainer	nazi	3.43	5	2	3	0	4	6	5	4	1	0
+imprecise	inaccurate	9.00	10	8	9	4	8	10	3	9	10	8
+heraldist	applaud	4.67	5	5	6	0	4	9	0	5	3	0
+heraldist	tell	4.80	4	5	8	0	6	8	0	7	2	0
+sweetish	sweet	8.50	9	9	8	4	8	10	6	9	8	10
+bootless	unproductive	4.25	9	7	2	0	0	9	9	5	3	0
+follower	tail	6.20	0	6	6	5	0	9	6	8	9	1
+follower	cultist	7.00	6	5	7	3	5	9	10	9	1	8
+traversals	travel	7.12	7	7	8	0	6	7	5	9	8	10
+traversals	skiing	4.00	5	3	5	1	5	4	7	2	0	8
+requests	invite	7.25	8	6	7	2	8	8	7	8	10	6
+posthole	hole	7.62	1	3	9	0	7	9	9	8	7	9
+unilluminated	dark	9.78	10	10	9	7	10	10	9	10	10	10
+consigning	abandon	4.00	8	7	4	3	7	3	1	0	4	6
+consigning	entrust	6.40	9	3	9	7	7	5	3	9	5	8
+purchasable	available	7.86	8	8	7	4	5	7	8	10	8	9
+purchasable	corrupt	4.00	0	2	5	8	1	6	3	8	0	7
+abandonment	absence	6.57	7	7	4	0	3	6	8	7	7	9
+pestilence	plague	9.22	10	9	8	8	9	10	3	9	10	10
+pestilence	disease	9.11	10	10	8	7	8	10	2	9	10	10
+weirdly	deity	0.14	3	0	0	0	0	1	3	0	5	0
+weirdly	supernatural	6.43	6	8	5	6	8	4	8	9	0	9
+antagonist	person	5.43	4	5	0	7	6	4	7	9	5
+antagonist	muscle	1.00	2	1	0	5	2	2	0	1	0
+puritanism	sternness	6.60	9	7	0	6	1	5	8	7
+profitless	unrewarding	8.56	10	9	9	9	7	7	6	2	10	10
+customise	produce	4.60	6	3	0	7	5	5	0	4
+customise	change	7.12	8	5	8	7	7	4	7	8	7	1
+insurrectional	conflict	7.50	8	7	0	6	6	0	9	9
+algebras	vector	5.00	8	3	0	9	7	5	4	6
+monotony	constancy	8.60	9	8	10	10	9	7	8	9	7
+monotony	unvariedness	9.56	10	9	10	10	9	4	8	10	10	10
+subletting	lease	8.60	7	8	9	8	9	7	7	9	10	10
+princedom	domain	7.00	9	8	9	7	4	5	5	10	1	9
+princedom	rank	6.67	8	7	9	7	5	5	8	9	2
+uninhibited	unreserved	8.40	10	9	10	8	8	7	8	9	10	10
+sublieutenant	lieutenant	7.14	8	7	5	8	7	6	8	10	6
+absorbing	assimilate	7.89	9	8	6	9	8	3	8	8	9	6
+absorbing	learn	7.57	8	7	9	8	7	6	7	8	8	6
+conflagration	fire	5.75	10	5	0	9	3	10	6
+condescended	act	1.56	2	1	2	2	1	2	10	4	0	0
+decompositions	decay	9.33	10	10	9	2	9	9	9	10	8	10
+decompositions	algebra	0.75	3	0	0	7	3	0	5	0	0	0
+obstructive	preventive	7.80	10	9	10	6	1	0	8	9	0	7
+intelligences	brain	7.67	8	9	8	7	4	7	8	4	8	5
+intelligences	military	5.00	6	9	5	5	5	8	3	4	9	5
+indirectness	characteristic	2.75	5	5	5	4	1	4	2	0	0	0
+imperils	exist	3.00	4	2	3	5	0	6	0	0	0	5
+skillfulness	command	4.40	7	4	8	2	7	6	3	0	5	4
+unmentionable	impermissible	4.50	8	5	5	2	0	9	8	0	6	0
+shortish	short	9.71	10	10	9	10	7	8	10	9	10	8
+deserters	quitter	9.00	10	10	9	8	8	9	10	8	9	9
+engineering	design	8.33	9	9	8	10	7	10	6	6	8	9
+engineering	plan	7.62	9	10	8	4	7	9	6	6	7	9
+provisionally	conditional	8.12	6	7	9	9	9	10	7	9	7	8
+subordination	relation	3.00	4	2	3	3	5	2	0	4	0	0
+subordination	dependence	4.25	2	8	8	5	3	0	7	9	0	0
+cofounder	founder	9.11	10	8	5	9	9	9	10	9	9	9
+membership	body	5.50	0	7	5	5	5	0	9	0	5	6
+membership	relationship	6.00	5	5	5	7	10	8	9	2	6	6
+embroideries	needlepoint	8.20	8	6	7	10	10	10	9	8	8	8
+embroideries	expansion	0.89	0	3	3	2	0	0	0	0	7	0
+americanize	change	5.25	0	7	4	6	9	0	0	0	5	6
+protectorship	position	5.00	6	3	5	9	6	7	0	5	0	3
+unilateralist	advocate	5.00	3	6	7	6	9	3	0	5	0	5
+nonstandard	measure	1.56	0	3	4	8	1	2	0	4	0	0
+convector	heater	7.12	7	8	6	6	10	8	8	5	8	6
+evacuated	move	7.67	10	8	5	4	10	6	9	8	8	7
+evacuated	empty	9.71	7	8	6	10	10	10	10	10	7	10
+subroutines	software	4.33	7	7	4	3	0	0	8	0	6
+brittany	france	1.25	0	7	5	0	0	0	0	9	0	5
+accomplishments	attainment	7.00	7	10	4	7	9	8	10	3	7	0
+accomplishments	horsemanship	3.67	0	2	4	5	8	2	0	0	5	4
+outperforming	outshout	6.40	7	1	10	7	6	2	2	7	9	5
+microcircuit	chip	8.40	8	8	10	10	7	9	9	7	8	7
+voraciously	gluttonous	8.00	8	9	6	8	8	8	8	7	8	10
+voraciously	acquisitive	5.20	9	8	1	6	0	5	4	7	4	0
+intramolecular	molar	1.14	4	6	8	3	6	0	0	0	0	1
+hospitalize	commit	7.17	7	7	8	7	6	7	6	9	9	7
+distinguishing	discriminate	6.60	7	8	1	10	4	0	7	10	7	0
+distinguishing	sex	0.62	3	1	1	2	3	0	1	0	0	0
+reproductive	fruitful	8.00	9	8	9	8	8	9	7	9	7	8
+goldplated	plate	6.50	8	2	3	8	6	0	6	8	6	7
+favourable	complimentary	8.00	7	9	6	10	9	10	5	10	7	6
+procreation	generation	6.60	6	9	3	7	7	4	8	7	6	4
+postponements	adjournment	7.00	5	1	1	7	8	2	9	9	7	8
+postponements	extension	8.00	10	9	7	7	5	9	7	8	9	3
+detectable	perceptible	8.56	10	10	9	8	6	0	10	8	7	9
+detectable	noticeable	9.22	10	10	9	9	9	9	10	8	6	9
+contraception	control	7.00	10	8	0	7	9	9	5	0	4	7
+lushness	abundance	8.89	10	8	5	9	9	10	10	9	7	8
+incensing	anger	7.71	9	8	3	4	10	9	7	5	7	9
+incensing	odorize	3.75	8	3	1	6	2	4	8	1	8	0
+outlawed	illegal	9.62	9	8	10	9	10	10	10	9	10
+embroiderers	embroideress	9.44	10	10	9	10	4	9	9	10	8	10
+blitzed	attack	8.14	10	7	6	9	10	9	7	9	7	9
+wilderness	disfavor	0.38	1	5	1	0	4	0	1	0	0	0
+wilderness	bush	5.60	9	5	5	7	8	5	8	2	6	2
+decapitated	guillotine	8.20	10	4	9	10	8	10	5	8	8	8
+decapitated	headless	10.00	10	10	9	10	10	10	10	10	10	9
+microflora	microorganism	7.33	9	7	8	3	8	6	8	7	4	4
+acceptance	blessing	6.17	9	6	7	10	6	8	7	2	3	0
+acceptance	recognition	6.88	6	7	9	8	8	6	6	7	4	7
+unfortunate	prisoner	4.17	7	4	6	3	8	3	7	4	5	2
+unfortunate	black	0.29	0	1	2	0	1	0	2	0	0	2
+refuted	oppose	8.50	9	7	9	10	8	8	9	8	7	7
+refuted	disprove	9.62	10	7	9	10	6	10	9	10	9	10
+greenly	discolor	4.20	5	4	0	4	0	6	0	6	4	4
+greenly	emerald	9.12	10	8	7	0	9	0	10	10	9	10
+importances	standing	4.29	2	6	8	4	6	0	3	5	4	0
+importances	deal	3.20	2	5	7	2	6	0	5	0	2	0
+autoimmune	carrier	5.14	8	4	9	2	6	7	4	7	4	4
+autoimmune	exempt	4.50	6	9	0	8	7	4	4	4	2	0
+circumnavigations	travel	8.25	9	8	9	8	8	8	9	7	10	5
+interrelationship	psychodynamics	6.00	2	6	5	0	9	6	8	9	1	5
+monoatomic	small	5.86	4	9	0	8	7	8	9	4	4	6
+monoatomic	thermonuclear	4.33	5	1	0	8	1	6	3	4	6	2
+undefinable	undefined	8.44	5	9	7	0	9	10	9	9	10	8
+catalogued	compose	4.86	0	6	2	0	7	6	5	5	9	3
+catalogued	classify	8.78	9	8	9	9	9	9	9	8	9	7
+heterosexism	discrimination	3.67	6	6	7	0	2	5	0	2	8	1
+inflicted	intrude	5.29	8	7	4	1	7	5	4	6	8	4
+preaching	evangelize	8.38	4	9	9	9	8	5	7	9	9	7
+preaching	sermonize	8.67	9	9	9	9	9	7	8	9	8	8
+improver	benefactor	6.38	3	8	8	0	3	6	8	8	2	7
+improver	attachment	3.17	5	7	3	0	0	4	1	7	1	5
+prudery	modesty	7.20	9	8	5	4	9	6	9	8	6	8
+combusted	burn	9.00	10	9	7	9	9	9	10	8	9	9
+swooshing	sound	7.50	9	9	9	1	7	0	5	7	8	6
+intersected	meet	9.00	10	9	9	8	9	10	9	9	10	10
+unwaveringly	hover	3.50	3	8	3	3	8	3	6	2	8	3
+interlingua	language	7.56	5	9	7	1	8	7	7	8	8	9
+tricolours	flag	5.20	3	1	8	10	9	8	1	2	5
+fictitiously	unreal	9.12	5	8	10	10	6	10	8	8	9	10
+fictitiously	counterfeit	7.67	3	8	9	9	5	10	7	7	6	10
+languishing	weaken	9.00	6	8	10	4	10	9	7	10	10	8
+scampering	run	7.00	6	6	9	8	5	9	7	7	7	8
+sulfuric	process	2.25	2	5	0	2	3	5	0	2	0
+sulfuric	sulfide	7.17	8	7	8	10	5	8	9	6	6
+trilateral	reciprocal	3.50	4	6	0	8	5	2	3	0	0
+trilateral	isosceles	8.00	5	6	9	9	7	10	7	8	7	9
+delimitations	property	5.80	6	6	6	10	5	6	2	9	0
+management	administration	7.33	7	7	9	8	6	8	7	9	7	10
+management	finance	6.14	6	6	7	8	9	7	4	5	0
+microfiche	microfilm	8.56	7	8	10	0	9	8	10	9	8	8
+medicate	impregnate	0.50	7	2	0	0	0	1	0	0	4	1
+medicate	treat	8.14	9	8	5	10	7	8	9	8	8	10
+subgroup	group	8.33	9	9	5	6	10	8	9	9	3	5
+subgroup	bench	0.12	5	3	0	0	0	0	0	0	1	0
+normalise	normalize	8.33	8	6	10	8	7	9	10	7	10	10
+irreligious	nonobservant	4.60	6	4	3	4	9	8	4	8	3	5
+slanderous	harmful	7.78	9	8	1	5	7	9	9	7	8	8
+microbiologist	virologist	5.67	6	6	1	4	9	1	6	9	6	6
+circumvent	beat	3.00	5	3	1	0	7	0	2	8	6	1
+circumvent	attack	4.00	3	0	0	4	0	3	7	8	0	6
+revolutionise	indoctrinate	5.20	6	0	0	5	0	8	7	8	2	6
+revolutionise	change	7.57	9	9	1	5	7	10	8	7	10	8
+discrete	separate	3.67	6	3	3	4	0	10	1	8	5	0
+protrusion	mogul	2.50	7	2	8	1	0	0	1	0	7	6
+protrusion	shape	5.43	6	6	6	4	5	2	6	8	5	3
+bewitchment	sorcery	9.38	10	6	8	8	10	10	10	10	9	6
+locality	scenery	5.43	5	7	5	7	5	2	5	8	4	8
+scornful	disrespectful	7.00	9	5	6	7	10	0	8	10	9	5
+reburial	burying	7.57	9	6	4	8	7	6	8	9	4	10
+untracked	inaccessible	5.00	9	3	4	5	0	8	6	7	2	5
+mutinied	rebel	8.20	9	8	7	8	10	10	10	10	8	8
+unforeseen	unexpected	9.75	10	9	7	9	10	10	10	10	10	8
+helical	coiled	7.29	10	6	9	5	7	9	9	6	0	0
+carbonate	process	3.71	5	6	4	5	0	0	5	1	5	1
+carbonate	change	2.33	6	5	4	4	0	0	1	1	3	1
+disturbances	magnetic	0.75	5	4	0	0	0	1	0	1	1	3
+disturbances	agitation	8.50	9	8	4	8	10	8	9	9	9	8
+mccarthyism	witch-hunt	8.17	9	8	8	5	8	7	10	10	10	9
+titillated	please	5.67	0	1	5	6	1	3	7	8	6	7
+titillated	itch	0.88	2	0	0	4	0	0	5	1	1	3
+fetishism	belief	3.40	0	1	0	4	2	7	6	0	5	5
+indifferently	uninterested	7.00	10	3	7	8	10	5	3	10	8	7
+indifferently	unconcerned	7.75	7	6	6	6	9	8	8	9	8	9
+rascality	naughtiness	8.75	10	6	6	6	9	8	9	10	9
+parallelize	put	4.20	7	0	3	6	1	8	6	5	0	0
+fractionate	separate	7.20	10	4	6	7	10	3	7	7	10	9
+chairmanship	position	6.88	9	1	5	7	8	8	6	7	5	10
+starkness	limit	1.67	2	0	2	3	2	3	3	0	10	0
+bellowing	shout	8.40	9	6	7	8	9	10	10	8	8
+destroyers	annihilator	9.50	10	7	7	9	10	10	10	9	9	9
+destroyers	warship	8.38	8	7	4	8	7	10	10	7	0	10
+rededicated	give	4.43	3	5	0	1	2	5	6	6	4	7
+reassuringly	affirm	8.50	9	8	9	9	7	9	8	8	8	10
+inconvertible	incommutable	5.83	4	9	4	0	7	0	6	8	6	10
+dissatisfying	disgruntle	6.71	10	7	2	5	7	7	6	9	6	10
+seeders	person	3.17	5	5	0	0	0	1	2	2	8	4
+seeders	mechanical	4.50	8	4	3	0	6	7	3	5	6	1
+prospector	sourdough	0.00	2	0	0	0	0	0	0	4	0	0
+leadership	helm	7.00	0	8	8	1	8	7	5	6	7	10
+leadership	high	4.33	2	6	2	2	6	4	5	2	4	6
+assassinated	kill	9.75	10	8	10	10	9	10	9	10	8	10
+assassinated	defame	4.17	6	3	1	7	2	4	7	4	4	4
+considerable	significant	9.00	9	9	10	10	8	9	9	9	7	10
+guardedly	shepherd	5.62	7	6	3	9	7	7	5	0	3	7
+guardedly	patrol	6.60	8	7	3	1	7	5	6	9	3	9
+accessible	approachable	8.40	9	8	7	10	8	10	8	9	6	10
+accessible	comprehensible	7.29	9	8	0	8	6	6	3	7	7	10
+interconnectedness	connection	8.20	10	10	9	8	8	7	7	8	8	7
+autograft	graft	6.56	0	6	5	8	4	8	7	6	8	7
+antagonize	annoy	9.00	10	9	8	10	8	9	8	9	9	9
+antagonize	act	4.50	6	3	2	5	4	8	0	4	5	8
+nerveless	composed	8.56	8	10	8	8	8	0	9	8	9	9
+distrustful	cynical	7.86	2	2	10	6	9	8	9	6	8	9
+democratize	change	4.75	1	5	8	2	4	7	8	8	3
+diffidence	unassertiveness	7.00	9	1	5	10	0	7	10	0
+heartlessly	spiritless	5.50	6	8	0	8	6	7	0	6	6	2
+sensualist	epicure	6.29	7	0	8	0	10	6	8	5	6	4
+concordance	agreement	9.44	10	8	9	10	10	9	4	9	10	10
+concordance	order	6.29	8	5	2	6	9	8	0	5	8	4
+promiscuous	unchaste	9.33	10	8	4	9	10	10	9	9	10	9
+promiscuous	indiscriminate	7.33	9	0	8	8	9	7	4	7	5	9
+excitedly	affect	2.40	4	3	2	0	5	2	0	3	0	2
+excitedly	arouse	7.57	7	8	8	10	8	8	7	5	5	7
+careerism	practice	5.20	7	1	0	8	7	8	0	3	7	2
+retraced	return	7.29	8	8	1	10	8	9	1	5	6	7
+internationality	scope	2.67	6	1	0	8	9	2	1	2	0	4
+advisory	announcement	7.00	8	5	8	0	10	6	7	8	7	7
+advisory	informative	6.67	9	7	2	10	7	8	4	6	6	6
+enunciates	state	5.80	9	7	5	7	0	7	0	3	9	9
+battened	strengthen	4.67	9	7	0	6	4	3	3	5	10	9
+assistance	facilitation	8.44	8	8	10	7	2	7	7	9	10	10
+blunders	transgress	6.44	8	4	8	8	1	4	7	5	7	7
+combust	blow	7.50	10	7	0	9	8	6	10	4	7	8
+combust	burn	7.67	7	8	0	7	8	10	7	10	9	4
+excitation	arousal	8.25	8	8	10	9	10	7	10	10	8
+excitation	exciting	8.20	9	8	10	10	8	8	10	6	8
+blackmailed	extort	9.62	10	10	10	5	10	3	8	10	9	10
+bunking	cheat	3.50	3	5	5	9	5	2	3	2	0	3
+bunking	bed	7.75	7	9	9	6	8	8	7	1	8	10
+labourer	hire	5.00	7	4	7	0	2	6	4	8	8	0
+rectorate	position	4.25	3	5	0	0	4	1	5	7	8	7
+designed	intend	5.00	6	6	1	8	7	8	3	3	5	0
+designed	mental	1.25	4	1	2	2	7	0	1	0	6	0
+behavioural	action	5.33	5	8	7	0	7	0	8	2	6	5
+behavioural	propriety	1.00	6	4	7	0	2	0	0	1	6	0
+defrauding	short-change	7.00	8	9	8	0	9	0	0	6	6
+procurators	bureaucrat	4.83	7	2	4	0	8	0	3	7	9	6
+procurators	agent	5.67	7	7	9	0	8	0	2	10	5	5
+assistances	resource	4.83	7	6	8	2	8	0	4	5	5	0
+assistances	recourse	2.33	7	1	7	2	3	0	2	1	5	0
+unsubdivided	smooth	6.43	8	6	10	0	7	6	7	0	5	6
+implantations	placement	7.14	8	9	7	0	8	7	6	0	6	8
+implantations	procedure	3.67	8	6	9	1	7	0	2	0	5	1
+advancement	seafaring	0.50	8	2	1	0	1	0	0	0	5	0
+advancement	encouragement	4.00	8	2	6	0	7	0	5	3	7	0
+translocating	transfer	7.00	8	7	6	6	8	9	9	4	7	9
+codefendants	corespondent	1.56	3	1	4	0	8	0	2	0	3	1
+monarchic	undemocratic	7.57	8	5	8	2	8	8	10	8	8	0
+traitorous	disloyal	9.56	9	9	10	8	10	9	10	10	10	9
+highlanders	soldier	4.83	8	4	4	5	7	9	8	4	5	0
+highlanders	scot	7.60	7	4	7	5	8	10	10	4	8	8
+syntactic	plan	5.60	5	6	9	8	1	7	5	5	0	0
+reproducible	duplicable	9.50	10	5	10	9	10	9	10	8	7	10
+monopolist	person	4.80	6	0	2	1	4	6	8	10	6	0
+comportment	manner	7.00	9	0	7	7	8	10	6	0	10	5
+roofers	thatcher	6.83	8	6	7	6	10	10	7	7	10	0
+improving	relieve	4.50	6	6	2	4	2	6	2	5	4	5
+improving	reform	7.50	5	6	7	9	8	8	5	4	8	8
+adjustor	investigator	6.83	7	5	7	7	7	10	6	10	7	10
+dooming	convict	5.67	4	1	7	3	8	9	7	10	5	2
+preadolescent	young	8.50	8	9	8	10	9	10	7	10	8	9
+depictive	representational	9.67	10	8	9	8	9	10	10	10
+stoical	unemotional	10.00	10	9	9	9	10	10	10	10	10	9
+dynastic	ruler	7.86	8	1	8	8	7	10	8	9	7	0
+hinduism	religion	8.00	8	8	8	7	6	10	9	10	6	10
+pathfinder	usher	5.67	5	5	6	5	6	5	7	5	7	10
+romanic	italian	6.00	10	5	7	7	1	10	2	8	4	5
+overlying	lie	5.00	4	0	6	5	1	5	7	0	7	5
+overlying	kill	0.38	0	0	0	2	1	5	0	0	3	0
+refinery	plant	7.60	10	7	9	7	7	10	5	10	8	2
+industrialise	change	5.29	6	5	4	5	6	9	2	10	6	5
+expressionless	uncommunicative	6.17	6	0	0	7	3	6	7	8	9
+censorship	military	0.75	1	0	0	7	0	1	6	2	2	0
+censorship	deletion	6.57	6	0	7	8	3	8	6	9	8	0
+tricolor	flag	0.71	4	0	0	7	0	1	8	0	0
+tricolor	colored	7.33	7	8	8	6	7	9	7	9	7	5
+interlaces	hold	6.50	4	3	8	7	4	5	6	7	7	7
+interlaces	splice	5.50	6	0	0	8	7	6	9	2	9	4
+personifying	embody	8.29	9	8	9	6	6	8	9	6	8	10
+personifying	exemplify	7.62	8	0	8	4	9	7	7	10	9	9
+immobilization	restraint	7.38	5	9	10	7	7	2	9	7	8	7
+immobilization	preservation	2.00	1	0	0	6	1	6	2	3	3	6
+subsequences	result	6.83	10	1	0	7	7	6	6	8	10	7
+circumcisions	rite	4.60	6	1	5	7	1	1	2	7	5	5
+circumcisions	day	0.43	1	0	0	3	0	1	1	0
+bibliographies	list	6.75	8	4	8	8	0	0	8	5	8	5
+unnecessary	inessential	9.00	9	7	9	7	9	9	10	9	10	10
+rejoinders	reply	3.50	6	2	1	3	0	3	10	0	6	9
+rejoinders	pleading	3.43	4	3	0	3	0	3	7	5	5	1
+lavishness	expensiveness	9.09	10	8	0	8	9	10	10	8	8	10
+acronymic	form	3.00	7	1	3	0	8	6	0	2	0	9
+incoordination	unskillfulness	8.25	10	8	6	6	8	10	6	9	10	8
+provisionary	conditional	9.44	6	10	10	10	9	8	8	10	10	10
+regardless	heedless	7.88	7	8	2	8	9	7	8	10	8	8
+promotive	encouraging	8.14	8	8	10	5	7	9	8	8	10	9
+indicted	charge	6.71	0	7	5	9	9	0	3	10	5	9
+asphaltic	paving	8.44	10	8	6	8	10	2	9	8	10	7
+asphaltic	pave	8.56	10	9	7	8	10	2	9	8	9	7
+cowered	crouch	8.14	8	6	5	9	9	9	7	10	9	4
+cowered	bend	4.71	0	6	5	6	9	3	4	5	0	4
+mimicked	imitate	9.88	8	8	10	10	10	10	10	9	10	10
+protestantism	fundamentalism	5.71	5	6	0	7	6	6	6	8	4	1
+performances	play	6.57	6	8	6	2	10	8	7	6	5	9
+regained	locate	1.88	6	6	0	0	5	5	5	0	0	0
+regained	get	5.25	6	5	3	6	5	7	7	3	0	8
+monoculture	culture	7.00	8	6	0	7	7	8	3	3	6	9
+emulsifying	change	4.83	9	7	5	2	7	0	2	6
+knightly	past	1.00	2	1	0	0	0	4	0	2	0	5
+knightly	courteous	6.50	6	6	4	7	7	7	0	2	1	10
+monogenesis	reproduction	5.00	4	9	7	5	1	4	2	5
+interlace	hold	5.14	7	6	0	5	6	5	5	2	1	8
+communistic	socialist	6.00	8	5	8	5	7	7	5	8	7	3
+communistic	politician	5.38	7	5	9	7	7	5	4	0	3	5
+extraterrestrials	animal	1.00	3	4	0	2	0	0	3	4	0	0
+bronchus	tube	6.86	8	6	2	8	2	5	10	7	8	6
+contraries	opposition	8.62	10	7	2	9	10	2	8	7	10	8
+amethysts	crystalline	5.86	8	6	0	6	9	4	7	9	6	4
+travelers	foreigner	7.67	10	7	0	7	8	2	8	9	10	7
+gathered	muster	8.40	8	6	6	9	10	6	9	10	9	7
+gathered	convene	8.57	9	7	8	9	8	9	9	6	10	8
+trusteeship	position	5.50	7	7	0	9	1	6	3	9	5	5
+trusteeship	district	5.33	7	7	0	8	0	5	4	8	4	5
+suspiciousness	distrust	8.43	9	9	5	9	10	9	7	6	9	7
+feminised	change	5.29	2	7	0	6	9	0	5	7	4	6
+mushroomed	grow	7.71	8	8	4	8	7	7	5	9	8	8
+mushroomed	pick	0.67	0	3	2	0	0	0	6	1	0	0
+vindictively	unforgiving	7.38	7	8	6	9	2	7	9	7	6	10
+vindictively	malicious	8.56	8	9	9	1	8	9	10	9	6	9
+castled	move	5.50	8	7	5	1	3	7	8	1	0
+castled	fancy	1.00	0	4	0	2	7	7	0	9	0
+glittery	bright	7.83	7	6	10	8	10	6	7	8	9	8
+lightship	ship	6.29	9	6	5	5	1	6	8	10	6	8
+eroticism	arousal	8.43	9	8	9	6	10	5	9	9	8	7
+eroticism	desire	6.67	9	8	6	4	1	6	7	9	6	7
+caesarism	autocracy	7.43	10	1	9	9	6	7	8	8	5
+sessions	quarter	5.57	6	6	2	5	5	2	5	6	6	3
+sessions	sitting	4.43	6	7	0	1	0	9	3	6	6	2
+fashionable	up-to-date	8.33	6	7	9	8	10	6	8	9	10	9
+teasingly	torment	7.43	7	2	8	2	6	9	7	7	8	10
+teasingly	kid	8.62	9	8	1	8	8	9	9	8	0	10
+microwaving	cook	7.86	8	2	8	8	7	9	10	8	10	7
+transverse	crosswise	8.17	10	6	8	9	7	10	7	9	5	9
+managership	position	7.67	5	1	7	8	6	9	9	9	8	8
+methodically	acting	4.50	3	8	0	1	6	3	10	6	3	6
+methodically	know-how	5.60	0	6	1	5	5	0	10	9	7	5
+excitements	fever	6.29	0	10	3	1	8	5	8	8	5	7
+excitements	intoxication	4.33	0	0	3	2	6	6	8	9	3	6
+christianise	convert	7.00	7	3	8	8	7	10	5	5	8	8
+monarchical	undemocratic	7.83	4	2	9	8	8	9	7	4	10	6
+monarchical	noble	5.33	0	0	2	7	5	7	10	8	3	9
+cooperators	spouse	4.71	2	0	7	3	2	9	8	3	8	10
+circumscribed	restrict	7.20	10	10	7	8	7	7	10	10	6	7
+circumscribed	trace	4.57	0	0	3	4	4	5	7	3	10	6
+topically	current	5.50	0	7	0	8	6	5	10	4	3	10
+topically	local	4.00	0	6	5	8	3	3	9	3	3	5
+evangelistic	enthusiastic	0.14	0	6	6	8	0	0	0	0	1	0
+emotionalism	emotional	8.11	0	9	8	10	6	8	9	7	10	6
+differences	differentia	8.67	0	6	8	10	9	8	9	9	9	10
+differences	variation	9.11	5	8	9	10	9	9	10	9	8	10
+hallucinating	ill	4.20	0	6	7	5	4	0	8	5	1	0
+hallucinating	perceive	5.43	7	6	3	8	5	1	2	7	6	4
+liverpools	england	7.17	0	8	8	10	7	10	8	0	5	7
+deciphering	read	7.67	10	7	7	10	6	5	9	9	8	5
+stroked	touch	8.43	9	6	10	6	8	8	9	8	8	9
+motherless	unparented	9.75	10	7	10	5	10	9	10	10	9	10
+impermanent	improvised	2.25	7	4	10	0	0	1	0	6	0	9
+contrabands	merchandise	5.00	5	6	10	0	2	8	4	10	0
+astronautical	spacewalker	8.14	7	7	10	8	3	9	9	9	5	8
+scrutiny	look	7.33	8	8	7	4	0	7	9	6	8	9
+discolor	bleach	7.14	7	7	7	4	9	6	6	8	10	10
+receiverships	proceeding	4.83	6	5	6	0	2	0	4	6	7	0
+rematches	repeat	6.43	5	8	9	9	6	5	7	3	7	7
+scandalize	disgust	6.62	8	7	6	7	6	6	9	1	6	7
+condensing	encapsulate	5.20	2	5	8	3	6	0	5	8	7
+scholarship	letters	2.60	7	1	6	2	0	2	8	0	8	2
+scholarship	prize	8.50	8	4	9	9	9	7	10	4	9	4
+transmitter	communicator	8.33	8	6	10	9	8	7	2	7	10	10
+transmitter	carrier	7.75	8	8	9	9	6	7	2	6	10	9
+autobuses	school	5.25	8	1	7	4	3	3	7	7	6	5
+dematerialised	vanish	8.60	10	9	9	9	8	8	6	10	10	6
+predators	attacker	9.11	10	7	9	9	9	9	10	4	10	9
+predators	carnivore	8.40	10	4	9	8	8	4	10	5	9	8
+enlarger	equipment	0.57	2	1	5	0	0	0	1	0	5	5
+repositioned	down	4.80	5	4	5	0	0	0	7	4	7	6
+repositioned	reduce	2.40	0	1	5	0	4	0	1	3	3	6
+equivalence	tie	7.43	9	5	2	8	0	5	10	8	9	8
+localise	lie	0.75	1	7	7	0	0	0	0	0	1	4
+localise	situate	7.00	6	9	9	3	8	0	8	6	7	7
+enfolded	cocoon	7.25	7	7	9	9	6	6	8	9	7	6
+approachable	comprehensible	3.83	1	4	8	0	0	9	1	7	7	3
+animality	nature	7.17	7	7	8	3	4	8	9	9	7	6
+interweaved	braid	9.22	9	9	9	10	10	6	10	9	9	8
+engorge	eat	7.50	6	5	9	0	8	2	9	6	9	8
+protesters	picket	8.00	8	7	9	10	9	4	10	8	8	7
+protesters	nonconformist	7.25	3	3	8	8	5	8	7	8	7	7
+rooters	enthusiast	7.38	7	8	9	7	8	5	7	7	7	8
+unobjectionable	dirty	1.00	0	0	0	2	0	6	0	3	5	3
+unobjectionable	inoffensive	7.78	8	8	9	1	5	8	8	9	7	8
+physically	material	5.50	6	7	2	0	6	4	4	8	6	9
+physically	bodily	8.44	7	8	9	10	8	7	0	10	7	10
+unceremonious	informal	8.43	8	6	10	9	8	8	8	9	9	6
+unceremonious	discourteous	7.00	6	6	10	0	0	0	0	8	8	7
+postcodes	code	6.17	7	6	8	4	7	2	5	5	7	8
+autosuggestion	self-improvement	4.00	4	4	0	7	1	0	0	6	7	5
+circumventing	beat	5.33	7	8	6	0	6	2	0	0	5	6
+circumventing	ebb	1.29	6	4	8	0	0	0	0	5	6	0
+homoerotic	homosexual	7.12	8	7	5	0	8	6	6	8	9	10
+undesirable	unwelcome	6.86	8	6	10	8	2	7	5	5	9	10
+adaptive	accommodative	7.60	8	7	10	10	7	6	10	5	8	8
+foresters	farmer	5.57	6	8	0	6	3	5	7	5	7	0
+winking	flicker	5.60	7	3	6	5	8	2	3	6	5	6
+trichloride	chloride	7.33	2	5	10	8	8	8	7	8	10	4
+preconception	opinion	6.50	0	0	7	9	8	5	7	9	6	6
+preconception	homophobia	3.17	3	0	5	1	5	8	7	3	2	0
+fringes	decorate	5.40	8	5	6	1	9	6	5	2	8	5
+fringes	surround	5.50	4	0	10	8	9	7	5	3	6	0
+shepherded	guard	7.88	8	8	3	9	9	8	8	7	6	10
+shepherded	tend	8.75	10	5	9	9	9	8	9	2	9	7
+kingship	rank	7.50	8	2	9	7	10	8	8	5	3	2
+excretion	matter	5.50	4	0	7	5	9	10	7	4	6	2
+excretion	defecation	9.25	10	8	9	10	10	9	9	9	6	5
+inventively	creative	8.43	10	9	9	9	10	8	8	8	7	8
+inheritor	heiress	9.12	9	6	9	10	10	10	9	9	5	7
+conspicuousness	boldness	5.57	4	0	9	7	8	3	3	8	6
+preconceptions	opinion	6.00	9	4	9	2	6	3	8	6
+preconceptions	experimenter	1.00	3	0	0	5	0	3	5	0
+uproariously	combustion	4.83	7	3	6	3	7	0	6	6	0	5
+uproariously	noise	7.33	10	6	7	4	7	5	8	8	8	9
+glistens	spangle	6.83	4	6	0	8	0	7	8	8	10
+glistens	brightness	8.00	9	4	8	3	9	4	8	9	5	10
+sexless	asexual	8.50	7	9	9	6	9	9	10	10	8	5
+sexless	unsexy	6.17	9	6	6	0	7	8	5	5	10
+spellers	writer	6.80	7	6	7	2	7	2	7	8
+spellers	primer	5.20	6	8	1	4	1	5	6	9	5
+orchestrations	musical	7.14	10	3	8	2	9	6	7	9	6	5
+orchestrations	arrangement	7.12	5	10	8	2	9	5	9	9	7	5
+embroiderer	needleworker	9.33	10	10	9	4	8	9	8	10	10	10
+arousal	desire	9.29	6	10	9	6	9	10	9	10	8
+arousal	inflammation	5.50	10	5	8	4	6	0	8	2	0
+extending	increase	7.12	10	6	8	6	9	0	8	4	7	9
+extending	range	5.67	6	5	8	0	9	0	6	7	5	5
+enforcements	imposition	6.50	7	6	10	2	8	5	8	5	10	2
+connectedness	bridge	7.00	8	6	9	5	10	6	7	0	8	10
+blacken	discolor	7.80	8	9	8	8	8	7	9	6	6	6
+blacken	singe	8.50	9	8	8	9	7	9	9	8	10	8
+galvanize	coat	7.86	6	7	9	7	9	7	7	10	9	10
+galvanize	shock	6.60	6	4	10	1	10	7	0	0	8	8
+weaponize	change	3.00	2	1	5	3	0	4	3	0	9	0
+sorrowful	grievous	9.00	8	9	9	9	9	8	4	10	10	9
+postdated	follow	5.88	0	4	7	7	6	5	6	9	4	8
+antipsychotics	clozapine	9.83	9	10	6	10	7	10	10	10	7
+convocation	gathering	8.75	7	9	10	2	10	7	9	10	8
+convocation	assembly	8.50	7	9	10	8	10	7	9	8	10	7
+intensions	meaning	6.60	7	9	8	9	5	0	0	6	0	7
+employed	ship	1.00	4	3	0	0	8	5	0	0	1	0
+employed	give	3.00	3	4	0	0	1	5	0	2	4	4
+susceptible	impressionable	8.60	9	8	9	8	9	6	7	10
+susceptible	allergic	4.80	9	8	5	2	9	7	0	2
+alarmism	warning	9.12	6	9	9	6	10	7	10	10	9	9
+canonize	declare	6.43	6	8	7	5	10	6	4	10	5	8
+canonize	laud	7.20	7	9	7	6	7	10	1
+imbedding	nest	7.17	8	8	8	7	9	5	7	0	3
+foreigner	transalpine	3.40	5	3	0	5	1	3	8	9	0
+foreigner	gringo	7.43	9	6	3	7	9	8	3	8	10	5
+anaesthetics	drug	8.67	8	9	8	9	10	9	10	7	9	10
+disassociates	separate	8.38	7	9	9	8	9	5	7	9	9
+utterance	communication	6.57	6	7	8	9	6	6	9	6	5	7
+mitigated	relieve	6.86	4	8	8	4	1	7	8	3	9	10
+mitigated	apologize	4.29	2	6	4	4	3	0	6	5	0	7
+unconsolidated	loose	7.33	8	8	8	8	6	10	5	5	5	6
+ukrainians	slavic	6.83	10	7	7	7	5	7	5	7	6	9
+hypocrisy	pretense	4.80	1	9	6	3	0	1	9	5	3	7
+refurbishment	improvement	8.00	9	8	7	10	8	8	10	7	4	9
+intertwining	raw	0.00	0	5	4	0	0	0	0	4	0	0
+objectify	change	3.00	0	4	4	5	0	5	0	5	3	1
+crispness	freshness	9.25	10	10	10	10	8	8	6	7	9	9
+magically	supernatural	8.67	10	9	5	9	8	9	6	9	8	6
+philanthropy	aid	8.00	10	10	10	5	9	8	4	7	8	8
+washers	worker	7.14	9	8	0	9	5	7	4	10	8	0
+washers	seal	0.86	0	0	0	8	6	3	0	2	7	1
+frowning	displeased	8.40	8	10	6	10	8	9	7	8	9	10
+frowning	scowl	9.75	10	10	10	10	8	8	9	9	10	10
+debarred	prevent	7.40	7	0	9	2	7	7	7	10
+nonnative	foreign	10.00	10	10	10	10	10	10	10	10
+defeatist	pessimist	7.43	8	7	8	6	7	8	7	10	7	10
+nakedness	gloom	0.50	0	2	2	0	3	0	3	0	0	0
+nakedness	undress	9.75	10	10	10	10	9	9	8	7	10	10
+inexpert	unprofessional	9.00	8	9	7	2	9	10	4	10	3	10
+designs	plot	6.71	6	7	7	9	2	7	7	9	6	7
+designs	intend	7.50	4	8	6	8	8	8	8	6	1	8
+implicational	meaning	7.62	9	7	4	8	9	8	6	10	8	6
+accordance	giving	4.62	6	6	4	5	2	0	6	1	2	6
+accordance	agreement	8.40	10	8	9	8	8	7	9	7	10	10
+skateboarders	skater	8.44	8	9	8	0	10	9	7	7	9	9
+amusements	delight	7.50	10	7	10	6	7	10	7	8	8	8
+divided	paragraph	4.71	5	6	6	0	4	0	4	8	4	4
+divided	calculate	5.67	8	6	5	1	6	0	6	4	7	8
+dissociable	divisible	4.83	7	6	5	7	6	0	0	5	4	3
+reduced	abbreviate	7.40	8	7	4	8	7	9	4	7	10	2
+reduced	spill	0.14	0	6	0	1	6	0	0	7	0	0
+unintelligible	incomprehensible	8.00	10	9	6	7	9	10	9	7	10	7
+unintelligible	slurred	8.25	9	9	7	8	8	9	4	7	10	9
+syllable	word	6.50	6	6	1	7	0	1	7	9	5	8
+governance	sociable	1.89	1	3	0	3	5	0	0	5	9	0
+governance	government	8.00	9	7	2	10	8	9	3	9	10	6
+rainless	dry	9.50	10	9	4	9	9	10	5	9	10	10
+kazakhstani	asian	6.43	6	8	1	8	9	0	4	7	7	5
+microseconds	nanosecond	8.75	7	8	2	9	9	10	5	8	10	9
+disgorge	seed	0.57	7	5	0	2	0	0	5	2	0	0
+discernment	knowing	6.20	8	7	6	2	9	6	9	4	3	3
+discernment	discrimination	6.50	0	5	7	7	8	8	8	5	4	9
+employable	worker	6.60	8	10	3	7	4	7	7	9	2	3
+univocal	absolute	6.17	7	10	10	0	7	4	7	8	4	10
+disturbing	affect	1.88	6	0	10	0	0	1	2	6	10	0
+disturbing	toss	0.25	0	0	0	0	0	3	2	0	0	4
+unicycling	bicycle	7.12	9	7	10	1	8	6	6	7	9	5
+mildness	balminess	7.83	9	10	6	3	8	7	2	2	8	9
+mildness	manner	3.67	0	7	1	0	0	5	7	5	0	7
+civilise	sophisticate	6.57	9	10	10	0	6	6	7	6	8	4
+civilise	change	3.43	9	5	10	0	5	2	3	4	3	2
+valorous	brave	9.25	10	10	10	10	10	9	7	8	5	6
+exporters	businessperson	5.67	9	6	10	0	6	2	8	6	6	0
+enrollment	body	1.12	1	4	1	1	0	0	6	3	3	0
+enrollment	entrance	4.83	4	6	10	2	3	8	6	7	3	0
+preheated	heat	7.22	5	7	8	6	8	6	7	8	8	7
+scholarships	aid	8.60	7	8	9	8	10	10	9	10	9	6
+scholarships	education	5.71	6	7	9	3	0	5	8	3	9	8
+stressor	agent	4.50	6	4	8	1	5	4	3	5	0
+correspondence	write	7.83	5	9	9	5	10	10	6	8	6	9
+correspondence	conformity	3.83	6	3	0	1	0	0	1	6	9	6
+interlinking	connect	9.12	7	8	6	10	10	10	10	6	9	9
+princedoms	domain	8.00	6	8	6	6	7	10	8	8	10	9
+princedoms	rank	6.75	7	7	9	6	0	5	4	7	10	9
+extrapolations	calculation	6.00	7	7	6	2	9	3	5	6	8	5
+extrapolations	inference	5.00	7	6	4	3	10	8	4	3	0	9
+extraterritorial	territorial	6.78	6	5	7	5	8	0	8	8	6	8
+whimsically	arbitrary	7.40	9	2	8	10	0	0	9	0	9	0
+nobelist	laureate	7.67	8	8	8	4	7	5	10	8	10	7
+resigning	top	1.00	9	3	0	0	0	2	1	3	0	0
+resigning	office	5.43	5	6	7	3	0	0	7	3	7	10
+wrathful	angry	8.67	9	9	10	8	9	8	10	10	6	9
+cowboys	performer	0.71	3	0	0	0	0	5	2	7	5	0
+cowboys	ranch	7.33	7	0	8	9	0	7	0	10	8	5
+conjoins	intermarry	8.67	7	2	9	10	10	8	9	9	7	9
+conjoins	cross-link	7.83	9	1	9	2	5	9	7	10	8	3
+predominance	obviousness	4.17	6	2	9	1	0	6	0	6	4	10
+predominance	dominance	6.62	9	0	10	9	6	9	7	4	5	4
+brandish	expose	9.00	10	0	10	8	10	7	9	1	0
+brandish	hold	8.71	6	8	10	10	0	8	1	10	9	2
+regionalisms	policy	7.40	0	9	8	6	1	8	8	7	1
+regionalisms	address	2.75	0	0	5	7	3	10	0	7	0
+extrasensory	clairvoyant	9.27	10	2	10	10	10	8	10	10	9	8
+microcomputers	computer	9.00	7	2	10	10	10	7	9	10	5	9
+subtropical	figurative	0.12	0	0	0	0	0	2	0	1	0
+subtropical	equatorial	8.75	7	3	9	9	10	7	2	10	9	9
+unbiased	impartial	9.71	8	10	10	9	10	8	7	9	10	10
+unbiased	nonpartisan	7.57	6	7	10	8	10	4	9	8	7	8
+adhesion	scar	5.80	6	9	4	8	0	6	9	10	5	3
+resistive	defiant	9.38	6	10	10	9	10	6	8	9	10	9
+homogeneous	homogenized	8.57	2	10	9	10	3	10	0	0	9	9
+dependence	addiction	8.25	8	10	10	8	10	7	7	8	10	9
+dependence	helplessness	6.71	6	8	8	6	10	3	4	5	7	7
+disinvestment	withdrawal	7.33	6	8	10	7	3	8	10	10	8	7
+containership	ship	5.00	0	6	0	6	7	2	0	5	6	5
+naivety	artlessness	2.12	10	0	3	5	2	0	0	7	10	0
+transmuted	become	7.67	8	7	8	10	8	5	7	8	4	5
+baptistic	protestant	3.75	8	8	8	6	0	2	5	2
+purveying	supply	6.00	7	6	3	8	10	0	0	10
+secularist	advocate	2.50	5	2	7	8	1	0	2	9	0	0
+demerit	mark	4.40	5	6	3	9	0	5	10	3	0	10
+remarriage	marriage	7.57	9	10	7	7	9	3	7	3	9	5
+interpreted	reinterpret	6.60	9	9	7	7	7	5	3	7	4	9
+interpreted	deconstruct	4.50	6	8	0	9	0	0	2	0	4	6
+clericalism	policy	2.33	5	1	1	7	6	2	0	1	4	0
+irresolution	doubt	5.29	3	4	0	8	10	4	6	5	7	9
+irresolution	volatility	4.00	5	0	1	7	7	0	2	6	6	0
+transmutes	become	8.00	9	9	8	10	4	4	8	6
+transmutes	work	0.29	5	0	0	2	0	0	0	0	5	6
+footballers	player	7.14	9	10	1	8	0	9	8	6	4	6
+excommunicated	oust	7.83	4	8	1	9	8	7	9	10	10	6
+containers	cargo	7.50	9	9	1	8	6	10	10	8	5	4
+commutation	travel	6.86	0	6	1	8	9	5	8	8	10	4
+transponder	device	6.50	9	7	1	10	5	7	7	9	3	3
+cooperator	spouse	4.29	1	6	0	6	5	3	2	7	2	6
+buggered	copulate	8.67	9	2	9	8	2	2	9	0	8	9
+remarkable	extraordinary	9.44	10	9	6	10	9	10	10	9	10	8
+remarkable	significant	8.29	10	8	4	8	8	9	9	9	10	7
+suppleness	gracefulness	5.17	10	6	4	9	0	3	6	0	4	8
+suppleness	bendability	5.50	1	9	9	9	7	5	2	6	9	4
+purgatory	situation	3.33	2	3	0	6	0	7	6	5	0	0
+prehistorical	past	8.62	10	8	1	7	9	8	8	10	9	3
+technology	aeronautical	3.83	9	8	0	6	2	9	2	5	4	4
+technology	science	7.50	10	9	1	8	8	10	7	8	3	5
+transfusing	pour	5.86	8	6	9	0	3	7	3	0	6	8
+transfusing	lend	3.71	9	5	2	4	1	4	0	5	3	3
+prolapse	descend	6.67	10	5	4	8	5	9	5	10	4	8
+circularize	canvass	5.43	8	5	5	7	6	1	0	5	3	7
+circularize	poll	5.43	8	4	4	6	2	6	0	4	7	7
+greenness	profusion	1.25	9	0	2	3	2	0	0	3	0
+greenness	ripeness	7.33	10	7	8	3	9	4	8	8	0
+formalisms	philosophic	4.00	6	5	7	1	4	0	7	8	0	0
+formalisms	imitation	1.14	9	7	1	5	1	1	0	7	0	0
+interpenetrate	spiritize	4.60	8	3	8	7	1	0	6	0	6	0
+worsens	inflame	7.14	10	8	6	7	7	7	3	7	8	0
+worsens	tumble	1.75	6	2	7	6	0	0	0	0	8	0
+pathfinders	hunt	7.71	5	7	6	9	9	9	0	0	9	0
+demanded	clamor	4.83	5	4	3	6	0	8	5	0	6	0
+demanded	cost	1.12	6	3	0	0	4	0	2	0	7	0
+unequivocal	unambiguous	9.00	2	7	7	5	9	10	10	10	10
+unequivocal	explicit	8.86	10	4	7	4	9	10	10	8	8
+intending	aim	7.71	7	10	9	6	9	3	5	8	7	8
+intending	plan	8.40	10	10	10	6	8	5	7	9	9	9
+foreclosed	obstruct	4.83	6	8	6	5	4	5	0	3	8	0
+disturbance	storm	7.00	7	8	5	8	3	3	4	7	7	9
+disturbance	agitation	8.29	9	9	6	8	2	8	5	10	9	9
+eldership	position	1.67	8	7	1	7	3	0	0	1
+homophony	pronunciation	4.40	1	9	3	8	5	5	5	0	4
+homophony	music	6.80	7	9	3	7	3	5	2	7	8
+contrarily	brown	0.00	0	0	0	1	0	0	0	0
+partnerships	relationship	9.25	9	10	10	3	9	7	9	10	10	6
+partnerships	copartnership	9.00	8	10	8	9	9	10	10	10	8	9
+removes	empty	8.62	10	10	10	2	7	2	7	8	10	7
+removes	out	5.67	2	9	1	7	5	5	7	6	4	8
+skidding	skid	9.62	10	10	9	9	10	7	10	9	10	5
+sportive	playful	7.50	8	9	8	8	6	7	7	7	8	7
+nurturance	care	9.25	10	10	6	8	9	8	10	9	10	5
+microvolts	potential	1.00	0	0	3	6	0	0	4	6	0	7
+asteroidal	angular	0.62	6	7	0	0	0	0	4	1	0	0
+asteroidal	child	0.00	0	0	0	0	0	0	0	1	0	0
+exterminator	killer	9.50	10	9	5	10	9	9	10	4	10	9
+talkativeness	communicativeness	8.67	8	9	3	9	6	10	10	6	10	10
+difference	distinction	9.12	9	10	6	8	9	9	10	3	8	10
+difference	inflection	3.80	8	8	1	5	3	0	0	4	6	0
+gumption	fortitude	7.12	8	9	4	8	4	9	10	6	9	0
+competes	race	7.71	8	8	4	8	6	9	8	4	8	8
+scheduled	calendar	5.80	7	9	2	6	3	7	0	6	9	9
+scheduled	program	7.29	7	9	7	5	8	8	5	6	8	7
+undisclosed	covert	8.75	9	9	3	8	6	9	10	0	9	10
+abstractionist	nonrepresentational	7.22	7	9	7	8	6	7	0	4	9	8
+abstractionist	painter	7.38	6	7	1	6	4	9	9	2	9	9
+merchantable	salable	8.88	8	7	4	10	3	9	9	10	9	9
+exacted	necessitate	5.33	7	4	0	0	6	6	7	0
+developments	advancement	8.22	8	6	9	7	7	9	9	7	9	9
+syphons	draw	7.38	4	6	6	8	6	7	9	10	8	9
+syphons	tube	6.57	1	8	3	8	0	6	7	10	8	6
+organismal	system	6.50	3	5	7	6	0	5	8	9	9	8
+sanctifying	spiritualize	7.29	5	6	9	4	10	6	7	9	9	2
+cuteness	beauty	7.40	6	9	9	9	7	8	5	8	8	5
+subserving	help	8.00	8	9	9	7	10	8	8	7	5
+cofactors	compound	4.80	6	6	7	6	0	5	7	1	0	0
+combusting	ablaze	8.88	3	9	9	8	3	10	7	8	10	10
+combusting	change	2.71	0	3	4	6	4	5	1	6	1	1
+shoulders	thrust	0.38	2	0	1	0	0	5	0	3	0	0
+shoulders	raise	2.60	4	0	2	0	0	6	1	3	3	6
+consonant	letter	7.67	7	9	3	6	6	7	9	9	7	9
+auditive	analyze	4.00	5	8	0	0	5	6	7	3	0	1
+auditive	learn	5.17	5	7	1	0	6	5	9	2	0	6
+clients	case	4.67	6	6	0	2	0	8	7	10	4	3
+clients	guest	5.50	6	6	0	1	0	7	6	10	2	6
+interesting	fascinate	8.00	8	10	4	8	2	8	9	10	7	8
+interesting	refer	3.25	6	5	0	0	2	6	4	6	2	0
+exhibited	flaunt	7.50	8	10	2	7	7	6	9	9	7	7
+exhibited	possess	5.20	4	7	0	1	0	6	7	8	2	8
+remakes	recast	7.57	8	8	3	3	7	8	9	8	6	8
+remakes	creation	6.17	8	6	2	4	2	8	6	7	7	7
+florescence	growth	2.75	4	1	0	0	8	5	9	1	7	0
+autopilots	guidance	6.14	9	8	3	8	7	8	6	0	2	3
+autopilots	unconsciousness	3.40	4	5	1	0	4	3	8	7	0	0
+separationist	separatist	8.00	7	10	8	9	10	3	7	5	8	9
+falsifier	deceiver	9.22	9	10	8	10	7	8	9	9	10	10
+manacles	shackle	9.00	8	8	10	8	10	8	10	10	10	8
+microcircuits	chip	7.67	6	10	6	8	8	10	8	7	8	7
+purposeless	worthless	8.14	7	10	7	5	9	4	9	9	7	9
+cofounders	founder	8.57	7	10	9	9	7	8	9	8	8	9
+specialism	career	6.17	7	5	6	7	9	3	7	5	8	3
+specialism	concentration	5.40	2	4	9	5	9	8	0	0	9	8
+apocalyptical	prophetic	6.88	10	8	6	7	9	6	0	5	5	9
+copilots	pilot	8.71	9	5	8	8	9	9	9	6	9	6
+reprehensible	wrong	8.67	9	6	8	10	8	9	9	9	6	10
+abashed	upset	6.60	6	3	7	3	7	8	9	7	4	6
+unshaped	unformed	9.67	10	8	9	9	9	10	10	10	10	10
+boastful	proud	9.57	7	6	6	10	9	10	10	9	10	9
+commingled	blend	9.00	9	8	9	10	9	9	8	9	10	10
+trioxide	oxide	7.33	8	7	7	7	8	10	5	7
+despoil	destroy	7.71	8	3	7	6	9	9	9	6	10	10
+bachelors	live	0.22	0	0	1	0	5	1	0	0	0	0
+bachelors	man	7.14	8	1	7	6	7	9	10	2	4	9
+macroeconomist	economist	8.50	9	5	9	9	8	8	10	9	7	9
+placidity	calmness	8.50	10	5	9	10	7	9	9	8	9	4
+placidity	composure	7.67	9	7	8	7	7	8	9	6	8	0
+affordable	cheap	8.22	8	4	7	9	9	7	7	9	9	9
+wallpapered	cover	7.00	6	3	6	3	8	8	8	3	6	10
+friendship	brotherhood	8.14	8	8	10	10	8	5	8	8	9	8
+practicable	practical	9.38	9	4	10	10	10	6	7	9	10	10
+practicable	possible	7.43	9	8	7	10	7	7	7	6	7	10
+householders	warrior	2.20	1	3	4	1	0	0	5	5	2	0
+blurting	talk	6.00	7	6	6	8	3	5	7	8	5	6
+confirmable	empirical	6.00	8	8	7	6	0	3	6	4	7	6
+positioners	actuator	5.25	5	6	5	6	0	5	5	5	5	0
+inadvertence	omission	5.86	2	5	10	4	0	6	5	6	7	8
+reassessments	appraisal	6.20	1	7	7	9	9	0	4	7	9	6
+reclaim	save	8.22	8	6	10	10	9	0	9	7	8	7
+reclaim	get	7.00	8	6	7	10	7	5	7	7	5	7
+broadcasters	disk	2.50	0	2	0	0	0	3	2	5	5	3
+broadcasters	mechanical	1.60	5	2	0	0	0	1	1	2	5	2
+inclosure	document	4.00	0	3	0	4	7	8	0	4	4	5
+inclosure	insertion	4.25	3	2	0	6	7	0	0	8	6	0
+regularize	decide	4.00	0	5	7	3	2	5	0	0	5	6
+regularize	arrange	6.00	4	7	10	8	6	5	0	0	5	7
+interlayers	layer	7.75	9	7	9	9	7	10	7	2	8	6
+disembodied	rid	4.80	7	7	10	3	10	9	0	2	5	0
+interviewing	converse	7.71	8	7	10	8	7	5	8	4	8	8
+pledged	donate	8.17	7	9	10	7	10	9	10	5	9	8
+pledged	guarantee	8.22	8	7	10	8	9	6	9	0	9	8
+insidiously	dangerous	7.22	7	8	8	7	4	9	5	0	9	8
+insidiously	seductive	5.00	6	7	10	2	8	0	0	0	5	5
+spiritualist	psychic	6.43	5	6	10	5	7	7	10	3	8	7
+microphallus	penis	7.25	8	10	9	7	0	5	5	7	9	8
+interceptor	fighter	6.14	5	6	10	8	7	2	3	0	8	6
+surroundings	touch	0.43	0	7	0	3	6	0	0	0	6	0
+surroundings	cover	3.00	1	5	0	3	6	3	0	1	5	6
+reviewers	critic	8.89	10	10	9	1	10	8	9	7	7	10
+reviewers	writer	6.62	8	8	6	0	9	8	7	7	4	5
+gladness	happiness	10.00	10	10	9	10	10	9	10	9	10
+followed	tailgate	9.25	10	10	7	5	8	10	9	8	10	9
+disestablishing	deprive	5.17	7	4	4	0	4	6	6	8
+dissolved	state	2.50	2	4	0	0	6	2	7	2	0
+dissolved	integrity	2.40	0	1	3	0	0	4	2	5	2	5
+grassroots	common	4.60	0	8	5	0	0	5	1	5	7	10
+grassroots	basic	5.17	8	9	7	0	5	5	0	3	6	5
+slaughterers	skilled	0.86	7	1	2	0	0	5	1	2	0
+corruptive	evil	8.00	9	8	7	2	5	7	10	9	8	8
+autographic	picture	7.57	10	6	3	5	7	9	6	9	7	9
+autographic	written	7.00	5	8	6	8	10	9	6	9	5	3
+predetermine	prejudice	7.50	4	8	7	7	10	6	8	2	9
+predetermine	determine	7.50	8	8	8	8	6	9	4	5	7
+autoregulation	organic	7.00	8	7	6	0	6	0	8	7	0
+incurved	curved	8.38	9	10	8	2	8	9	9	10	4	0
+knifing	injure	7.14	7	7	8	8	0	4	3	8	8
+immigrating	inch	1.12	3	6	0	1	0	6	4	0	1	0
+immigrating	migrate	8.00	8	8	9	8	6	9	8	8
+noticeable	broad	5.00	5	6	5	5	0	6	3	2	8	7
+noticeable	perceptible	8.78	7	9	10	9	9	6	10	9	10	0
+synchronic	synchronized	8.71	9	9	10	10	9	8	6	2	5
+explorers	person	4.57	6	6	5	9	0	5	3	4	0	3
+circumstances	possession	1.12	3	2	2	6	0	0	0	2	0
+circumstances	providence	0.80	7	2	9	0	0	2	7	0
+expounding	premise	6.00	7	7	5	0	7	4	6	1
+inharmonious	incongruous	7.67	8	8	9	8	0	9	4	3	10
+disavowed	deny	7.25	9	9	8	7	5	6	9	3	5	10
+regularise	even	5.86	8	6	3	6	0	8	5	5	9
+regularise	decide	2.60	7	7	5	3	0	0	2	2	1
+possessor	holder	8.78	10	7	10	0	8	10	10	9	7	8
+consultive	informative	7.17	10	7	10	2	7	10	8	8	6	7
+distressful	heavy	4.33	4	6	5	4	5	5	1	3	0
+advised	inform	7.60	10	8	10	8	7	10	10	8	6	7
+advised	hash	4.17	6	0	1	4	5	0	4	5	2	5
+deposes	oust	7.67	7	10	7	8	4	10	7	8	10	9
+deposes	declare	4.80	5	7	0	5	2	1	5	8	0	8
+wordless	inarticulate	7.57	10	8	10	7	6	4	8	9	8	7
+demoralise	bastardize	8.14	5	7	9	8	8	10	9	2	8	8
+muscularity	strength	7.86	10	7	9	9	7	7	10	8	5	8
+muscularity	condition	5.43	8	4	7	6	5	5	9	5	2	6
+unspecialised	generalized	8.29	9	10	9	7	7	9	9	6	8	4
+appearances	manifestation	6.88	8	8	10	0	7	4	9	6	7	6
+disarranged	randomize	7.50	9	7	9	8	7	6	10	8	6	5
+sniffers	person	3.86	4	2	0	4	4	9	3	0	5	5
+irritatingly	worsen	4.50	3	5	6	0	8	8	4	2	8	8
+irritatingly	fret	4.17	0	4	7	2	8	0	3	2	8	7
+exaction	demand	7.50	10	7	7	8	6	8	8	7	6	9
+sailings	travel	7.43	2	9	4	10	7	9	8	6	8	5
+sailings	swan	3.50	0	2	6	8	5	0	4	0	3	0
+objector	dissenter	8.20	10	7	6	8	9	9	10	10	8	6
+earmuffs	covering	8.25	2	8	8	9	8	8	9	8	8	5
+synoptic	same	6.40	2	8	4	0	7	9	7	9	6
+infolding	organic	0.50	0	4	0	7	0	5	0	0	0	0
+smallish	small	8.83	9	9	7	8	9	10	10	9	9	5
+digitise	change	4.50	2	6	0	6	3	7	5	5	1
+receptions	tea	5.00	0	0	4	9	6	4	6	5	8	1
+receptions	greeting	8.22	8	9	7	8	8	8	8	9	9	5
+corpulence	fleshiness	8.17	8	8	8	9	8	10	10	8	10	5
+disfigure	scar	7.83	7	6	7	10	10	7	9	8	9	5
+refurbishments	improvement	8.78	7	2	9	9	10	9	9	8	10	8
+censorships	deletion	6.50	7	1	5	8	1	6	2	10	7	6
+censorships	censoring	9.56	9	9	4	10	10	9	10	10	10	9
+depressor	nerve	2.12	6	0	0	7	0	6	0	5	0	8
+depressor	muscle	1.86	7	2	0	6	0	9	0	5	0
+grocery	greengrocery	8.00	5	3	8	9	8	6	10	9	7	9
+fruiterer	seller	7.67	6	6	8	9	8	7	8	8	9	1
+unionise	enroll	6.00	6	0	8	6	9	7	8	2	5	0
+unionise	join	6.62	7	0	6	7	8	8	6	6	9	5
+malevolence	vindictiveness	8.56	8	6	6	9	9	2	10	9	10	10
+malevolence	evil	9.78	8	9	10	9	10	10	10	10	10	10
+unprecedented	new	8.57	9	10	7	9	9	8	9	5	3	9
+reclassifications	categorization	7.71	8	9	9	10	8	6	4	6	8	5
+embracement	cuddle	8.71	9	10	9	10	8	7	9	8	9	9
+autoloading	automatic	9.25	9	10	10	10	9	5	8	7	9	9
+abductor	muscle	2.00	8	8	9	0	8	1	0	3	0	2
+cliffhanger	episode	4.50	7	8	6	0	4	2	5	0	6	4
+cliffhanger	contest	0.25	4	0	2	0	0	0	0	0	6	0
+solemnity	seriousness	9.38	10	10	8	10	10	8	7	9	6	10
+delimited	determine	3.75	6	5	3	0	0	8	2	0	0	5
+moralist	stickler	7.50	7	10	9	0	10	6	2	8	2	2
+insecurities	insecureness	8.78	8	8	10	7	3	9	9	9	9	10
+insecurities	anxiety	8.67	9	10	8	7	9	8	7	9	9	6
+repeating	replicate	9.25	10	10	10	9	10	7	9	2	9	5
+churchs	perform	0.50	1	0	0	1	0	1	0	1	1	0
+discovery	rediscovery	7.50	6	8	2	5	7	8	9	10	9	8
+discovery	disclosure	3.83	3	6	1	2	8	4	1	8	5	3
+submerging	cover	7.67	10	3	7	0	8	7	9	7	10	8
+submerging	sink	9.38	10	4	9	6	10	7	10	10	9	10
+literalness	concreteness	6.50	8	7	5	2	0	7	9	9	7	5
+acknowledgement	admission	8.43	5	9	5	7	9	8	9	10	8	9
+acknowledgement	acceptance	7.71	10	5	8	3	7	7	7	9	8	8
+rompers	garment	5.57	6	4	0	7	9	7	10	4	6	5
+rompers	person	1.44	1	2	0	5	0	0	0	0	5	9
+enfolding	cocoon	7.57	9	8	8	9	7	8	7	5	7	8
+enfolding	change	3.67	8	9	7	3	5	0	1	1	5	0
+antifeminist	chauvinist	7.67	10	8	10	8	6	7	9	7	6	7
+omniscience	wisdom	8.00	10	10	10	9	7	7	5	5	9	5
+astonish	dazzle	8.33	10	10	9	9	10	8	7	8	8	8
+circumpolar	polar	7.38	0	9	8	6	0	4	8	8	9	7
+ascendence	predominance	5.67	5	3	7	9	7	2	5	5	3	5
+aerialist	ropewalker	8.29	8	9	10	8	7	9	8	8	8	6
+precociously	early	5.50	9	0	8	9	4	9	6	4	6	5
+precociously	intelligent	6.00	2	8	8	9	4	8	4	4	5	7
+suspenseful	tense	9.00	10	10	9	9	10	9	7	8	9	9
+banished	expel	10.00	10	10	10	9	10	10	10	10	10	9
+relocation	transportation	6.57	9	2	7	6	7	8	5	6	7	1
+relocation	change	6.14	9	1	8	6	8	6	3	8	4	2
+indexical	cross-index	5.60	8	5	6	7	3	5	2	5	9
+indexical	supply	1.12	4	0	3	2	0	7	0	0	0
+absconding	flee	7.86	3	8	7	8	2	9	9	8	10	6
+encoded	code	6.50	8	4	7	8	7	5	5	5	7	9
+shanked	hit	5.33	8	1	6	7	6	3	3	8	0	7
+hypermarkets	supermarket	7.00	8	10	9	0	9	5	7	5	6	0
+prejudge	evaluate	5.33	7	3	4	6	8	6	4	5	8	3
+genuinely	sincere	9.25	10	1	10	8	10	10	9	8	5	9
+genuinely	attested	4.80	7	4	5	6	9	8	2	0	1
+discoverys	disclosure	1.50	4	2	8	7	2	0	4	0	0	0
+discoverys	self-discovery	6.33	9	1	5	7	8	3	7	0	8	9
+palestinians	arab	6.67	7	3	7	7	9	7	7	0	5
+parasitical	dependent	7.29	8	8	7	3	7	3	8	8	5	9
+interconnect	intercommunicate	7.00	7	9	9	0	8	6	4	8	5	10
+interconnect	connect	8.22	8	9	8	6	7	8	9	9	9	7
+nondescripts	person	1.25	5	0	1	4	0	1	1	3	6	0
+amorphous	unformed	8.75	10	7	8	3	8	10	7	10	10	0
+amorphous	inorganic	1.89	5	5	4	1	2	0	0	9	0	0
+uncreative	sterile	4.80	9	1	8	5	0	4	0	7	0	7
+foreigners	gringo	6.83	6	1	8	1	1	8	10	6	8	5
+unaffected	unimpressed	8.14	9	8	7	8	9	9	4	3	7	10
+unaffected	insensitive	2.86	2	2	9	2	3	2	4	5	8	9
+gravitated	move	5.40	7	8	8	5	6	4	5	2	8	2
+gravitated	tend	4.60	5	4	5	8	0	0	0	4	5	10
+respectable	reputable	8.62	8	9	8	6	9	9	8	9	9	10
+respectable	worthy	7.75	9	8	6	6	8	8	7	6	9	9
+reproduce	photocopy	8.00	10	8	10	9	9	5	4	8	7	7
+reproduce	propagate	8.57	9	7	8	9	8	6	8	10	9	9
+schnauzer	giant	0.33	0	1	0	0	7	2	0	0	0	0
+stimuli	stimulation	8.50	9	9	10	9	8	10	6	5	8	8
+astronomical	large	8.80	9	10	10	9	9	9	10	8	7	7
+microbalance	balance	5.00	0	6	6	8	8	4	3	6	3	7
+subjoined	append	7.17	5	0	10	9	7	7	0	9	6	0
+unquestioned	uncontroversial	6.29	10	7	0	10	5	8	7	4	5	8
+loveless	unloving	7.71	7	8	10	7	7	4	9	8	10	8
+loveless	unloved	8.00	7	6	10	8	8	4	9	8	10	8
+postmarks	marker	5.50	1	6	5	6	7	2	1	5	6	5
+postmarks	stamp	8.33	5	9	10	9	8	6	6	9	7	8
+presenting	bring	7.00	3	9	8	0	6	8	10	9	6	0
+presenting	argue	0.71	1	0	0	0	7	2	0	8	6	2
+fiddled	embezzle	0.12	0	1	0	0	7	5	0	0	0	0
+fiddled	slack	0.75	0	1	0	0	6	9	0	5	0	0
+transfused	breathe	0.11	0	1	0	0	5	0	0	0	0	0
+transfused	pour	1.38	0	10	0	4	6	1	0	0	0	10
+interchanging	shift	6.00	5	9	4	5	6	6	3	8	9	9
+interchanging	trade	6.50	8	9	8	9	7	0	5	4	7	3
+antisubmarine	defensive	4.75	6	9	1	0	5	0	0	8	7
+displeases	repel	7.00	7	8	3	7	6	7	2	6	7	8
+reproachful	unfavorable	6.00	6	6	1	8	5	8	2	7	0	8
+independently	worker	2.80	1	2	0	5	6	1	0	5	0	7
+independently	individualist	8.12	7	9	0	10	8	10	0	8	8	5
+extrajudicial	illegal	5.40	4	4	1	10	2	8	10	8	3
+exterminated	destroy	9.33	9	10	3	10	9	10	10	8	9	9
+exterminated	kill	9.78	10	10	4	10	9	10	10	10	10	9
+intercede	negociate	6.86	7	8	2	6	6	9	2	8	6	7
+postdates	follow	5.60	6	9	0	6	5	0	4	9	0	7
+postdates	chronologize	6.71	7	5	0	10	7	8	2	8	6	6
+comport	about	0.00	0	0	0	6	6	0	0	0	5
+comport	misbehave	1.62	5	0	10	2	0	5	0	1	0
+stockers	animal	0.00	0	0	0	0	4	0	0	0	0	6
+ceremonious	formal	8.33	10	6	10	8	8	9	10	8	8	9
+authorship	initiation	6.20	6	7	0	7	0	7	4	0
+slacken	decrease	7.60	10	4	10	10	8	4	8	7	6	9
+slacken	weaken	6.33	0	4	10	10	7	10	8	6	4	9
+freshen	regenerate	8.44	10	2	10	6	8	10	9	8	6	9
+freshen	wash	7.14	5	7	8	7	8	10	10	8	7	1
+observed	comment	5.71	0	6	7	6	6	9	5	3	1	7
+observed	discover	6.83	10	5	9	7	7	10	6	4	4	7
+hydrolysed	change	5.43	4	0	7	7	7	8	6	4	3	8
+enjoins	instruct	5.00	4	3	7	0	6	9	5	2	9
+replacements	stand-in	9.25	10	9	10	10	7	10	8	8	9
+replacements	supplanting	6.00	2	5	6	8	10	10	5	6	10
+bengali	ethnic	6.38	6	2	8	10	5	7	6	5	7	7
+transsexual	person	8.00	8	3	3	5	9	9	1	9	10	8
+automates	change	2.00	6	1	0	8	0	0	5	8	0	4
+amateurish	unprofessional	8.50	10	7	8	9	8	10	9	9	10	8
+sponsorship	support	8.20	10	9	6	10	10	10	8	8	8	8
+ejector	person	0.75	4	0	0	7	1	0	6	1	0	0
+ejector	mechanism	7.62	6	0	8	9	9	0	8	7	8	6
+rehashing	recycle	8.33	9	6	9	9	4	8	5	9	10	10
+preassembled	produce	5.50	4	0	5	9	9	0	5	6	7	6
+fascinate	matter	1.71	0	0	7	6	0	6	0	7	0	7
+fascinate	interest	8.29	5	9	9	10	8	8	8	10	8	8
+riskless	safe	9.44	10	9	9	10	10	9	10	8	4	10
+incombustible	fireproof	9.00	8	9	9	10	9	10	10	9	9	10
+rareness	scarcity	9.00	9	9	9	10	10	9	9	8	10	10
+lengthy	long	10.00	10	10	10	10	10	9	10	10	10
+lordship	authority	8.00	9	7	9	9	6	7	9	9	7	2
+lordship	title	7.38	9	6	7	10	8	7	9	5	8	1
+grinder	sandwich	9.33	10	9	10	0	0	8	10	9	0
+grinder	wisdom	0.00	0	0	0	0	0	0	0	9	0
+algebraic	quadratics	7.25	8	9	7	8	0	8	4	8	6
+congeniality	friendliness	9.50	7	10	10	10	5	9	10	8	10	9
+congeniality	compatibility	6.29	9	7	8	9	5	8	5	6	5	4
+portioned	distribute	5.80	4	6	9	10	5	6	6	6	10
+piquancy	spiciness	9.25	10	9	9	10	7	8	8	10	10
+piquancy	quality	3.33	5	0	6	0	2	3	6	0
+commenting	note	9.00	8	8	9	10	8	8	9	9	9	9
+commenting	explain	7.86	9	7	10	7	6	7	9	10	8	8
+reprocessing	reclaim	5.33	2	6	0	7	5	6	6	8	8	0
+roosted	settle	7.67	10	7	3	7	8	3	7	8	9	0
+roosted	sit	6.86	8	6	6	6	9	10	5	7	8	7
+immobilizing	beat	1.50	0	3	0	5	4	0	8	6	0	0
+immobilizing	withhold	3.80	5	4	1	1	5	0	3	6	8	2
+promised	declare	6.20	2	5	0	5	9	9	9	6	7	8
+employments	state	3.75	0	4	0	2	0	6	6	0	4	5
+employments	populace	3.33	2	4	0	5	0	6	0	4
+transposable	exchangeable	7.17	10	8	6	10	7	9	2	6	7	10
+protractors	drafting	5.83	1	8	0	5	9	7	4	6	10	5
+religiousness	piety	7.50	10	6	7	9	7	10	8	1	0	8
+religiousness	conscientiousness	4.00	8	2	6	3	5	3	5	0	9
+concerts	settle	0.44	0	2	0	0	0	2	5	0	0	0
+concerts	plan	0.50	0	4	0	0	0	7	5	0	0	0
+postholes	hole	5.50	1	0	8	5	7	5	0	9	5
+liveable	habitable	10.00	10	9	9	10	9	10	10	9	10	10
+besieging	attack	8.22	7	6	1	6	10	10	8	8	9	10
+besieging	distress	5.50	6	0	1	5	0	7	6	3	6	10
+irregardless	look	0.00	4	0	0	0	4	0	0	0	0
+irregardless	prize	0.00	3	0	0	0	0	2	0	0	0	0
+attendance	frequency	4.83	5	3	6	0	7	1	5	6	1	4
+attendance	presence	8.25	8	7	7	7	10	10	8	9	10	8
+computer	expert	0.71	5	0	1	0	0	0	6	5	2	2
+computer	server	6.67	7	6	3	1	6	10	7	6	9	8
+subtend	shepherd	5.33	0	5	0	6	8	6	6	5	4	0
+subtend	suffer	0.38	0	0	2	0	1	5	0	0	4	0
+irrelevance	inapplicability	8.33	9	10	7	8	8	9	8	7	0	9
+desiccating	dry	8.56	6	9	0	6	9	10	9	9	10	9
+desiccating	preserve	5.86	6	1	5	6	9	8	6	10	4	6
+transforming	transubstantiate	7.17	7	10	0	6	0	8	6	10	7	9
+transforming	change	8.50	9	8	8	7	10	10	9	7	10	10
+prisoners	internee	6.17	9	4	6	10	10	10	1	5	8	5
+cosponsors	sponsor	8.67	7	9	8	10	10	9	9	8	8	3
+unconvincing	implausible	7.00	8	9	9	7	9	7	7	6	3	7
+unconvincing	unpersuasive	10.00	10	10	9	10	10	10	10	10	10	8
+analogous	similar	8.17	8	5	7	8	10	9	10	8	10	9
+preheating	heat	7.12	6	8	7	9	7	8	7	7	7	2
+irrigate	hush	0.50	1	0	4	0	0	0	1	2	6	0
+irrigate	treat	4.00	5	5	5	0	0	3	0	9	5	1
+immortalize	remind	4.33	5	5	4	6	4	6	5	3	1	0
+immortalize	change	2.33	1	3	6	4	3	2	6	1	0	0
+unploughed	untilled	8.60	9	10	9	10	10	8	9	8	6	7
+syntaxes	system	6.12	3	2	7	7	0	7	7	7	5	6
+syntaxes	structure	7.38	8	7	7	9	7	8	8	7	7	6
+enforcing	execute	7.86	9	8	6	6	8	10	9	5	9	3
+enforcing	compel	7.25	6	7	9	6	9	10	8	7	1	6
+devilish	playful	6.38	7	0	7	7	7	3	7	6	7	0
+devilish	evil	8.89	9	8	7	2	10	9	10	10	10	7
+ganging	group	7.67	6	8	6	7	9	8	10	6	9	6
+dissimulate	disguise	7.25	9	2	3	9	8	9	8	6	0	6
+enhancement	improvement	9.75	10	8	9	8	10	10	10	10	10	9
+reconstructs	construct	7.14	6	8	7	8	3	8	8	2	9	5
+entrench	fasten	4.20	0	3	5	8	6	0	8	2	5	0
+entrench	trespass	1.75	0	1	0	3	0	2	0	2	2	3
+spherical	round	9.00	9	10	8	7	9	0	10	9	9	10
+impolitic	inexpedient	5.14	6	5	6	8	6	0	1	6	3	4
+londoners	person	5.17	6	6	3	2	5	5	8	4	5	7
+predetermination	decision	6.17	2	9	6	6	5	8	10	2	6	6
+destabilization	change	6.14	6	5	8	9	5	6	10	3	8	5
+reasonable	moderate	7.67	7	8	8	5	10	7	10	6	8	8
+reasonable	rational	8.33	0	8	10	8	9	6	10	7	8	9
+pottery	lusterware	7.57	7	8	8	9	8	5	6	8	8	3
+pottery	trade	2.50	5	1	1	2	6	1	0	7	5	0
+unenthusiastic	halfhearted	8.50	10	7	7	7	10	9	10	8	7	10
+virility	masculinity	7.00	7	8	7	6	8	10	6	5	10	10
+virility	maleness	7.00	7	7	5	8	4	10	7	6	10	10
+discordance	dissonance	7.67	8	9	5	8	7	8	7	8	9	9
+discordance	strife	7.86	9	7	8	6	9	10	7	7	10	8
+plundered	destroy	8.71	10	5	9	9	9	8	9	9	8	10
+plundered	steal	9.75	8	9	10	8	10	9	10	10	10	10
+transvestite	person	4.86	7	5	3	5	10	1	6	5	8	3
+transvestite	homosexual	3.67	9	10	4	4	2	3	5	4	9	0
+retraction	motion	5.83	6	6	6	8	8	6	5	4	4	6
+retraction	withdrawal	8.75	10	9	5	10	9	10	8	9	3	2
+enslaves	subjugate	8.78	9	8	8	10	9	10	8	7	3	10
+carburettors	mechanical	7.57	10	7	6	8	2	9	7	9	3	7
+explorer	diver	6.86	9	6	6	7	7	2	8	6	8	2
+perfectible	perfect	6.67	7	7	2	9	8	9	5	6	9	7
+stimulates	prompt	4.50	8	6	6	10	6	2	0	3	4	0
+stimulates	quicken	6.43	6	7	7	10	6	0	0	7	5	7
+concurrencies	agreement	9.11	8	8	9	8	10	9	10	5	10	10
+concurrencies	cooperation	6.83	5	7	2	8	9	8	7	2	6	10
+emulsify	change	5.00	1	10	7	5	5	2	3	7	3
+internationalisms	scope	0.43	5	5	0	4	0	0	0	3	0	0
+internationalisms	doctrine	3.80	6	5	1	4	0	7	0	5	4	0
+cylindric	rounded	8.12	7	6	3	10	8	10	0	10	10	4
+sexually	sexy	8.00	7	8	5	10	8	9	8	5	8	8
+afghani	iranian	5.20	8	8	0	5	8	0	5	3	6	7
+animalism	doctrine	0.86	5	6	0	2	0	0	0	4	5	0
+animalism	disposition	3.25	3	6	0	4	0	0	2	4
+latinist	classicist	6.29	7	7	6	6	0	5	2	5	9	8
+punjabi	sanskrit	6.00	7	8	0	7	5	5	5	3	8	7
+punjabi	indian	6.83	8	9	3	9	8	6	6	6	9	7
+exterminate	destroy	9.67	10	9	10	8	10	10	9	10	9	10
+exterminate	kill	9.88	10	5	10	5	10	10	10	10	9	10
+consign	check	2.67	7	4	0	1	3	0	4	1	3	0
+respectively	individual	3.75	0	2	6	0	9	1	9	0	6	9
+receiving	fence	0.14	0	3	2	0	0	0	2	0	1	0
+unicycle	wheel	7.00	10	2	6	3	8	8	6	7	7	10
+unicycle	bicycle	7.29	8	8	7	7	8	6	3	7	10	1
+incised	cut	8.78	8	6	2	8	10	10	10	8	9	10
+incised	compound	1.14	5	4	0	2	2	0	5	0	0
+perfective	future	0.62	3	1	0	0	0	2	2	3	0	0
+perfective	aspect	3.40	1	0	6	8	0	0	3	4	3	10
+apprenticeship	position	5.75	6	0	7	8	5	5	6	4	6	7
+reporters	reporter	9.78	10	10	9	10	10	10	10	9	4	10
+houseful	containerful	4.71	4	0	5	5	5	0	5	4	7	5
+irreverence	evil	1.62	2	0	0	8	0	0	3	4	4	7
+unostentatious	tasteful	7.50	8	6	0	9	10	0	7	7	0	8
+disadvantaged	underprivileged	8.14	9	5	8	9	10	10	9	7	8	7
+combatted	wrestle	6.60	9	2	2	8	5	1	9	6	6	8
+snooper	eavesdropper	8.89	10	9	9	9	10	7	10	9	5	7
+researchers	fieldworker	6.50	7	3	7	8	5	1	7	3	6	7
+resides	populate	6.50	5	0	6	9	10	5	9	4	5	9
+individualize	distinguish	8.29	8	4	8	8	10	10	9	7	9	9
+individualize	change	4.25	3	0	0	8	5	0	8	6	8	3
+coinsurance	insurance	6.50	6	9	6	6	8	7	7	6	6	9
+micrometer	nanometer	7.14	10	6	8	8	7	6	3	8	7	4
+micrometer	caliper	2.83	7	4	7	1	5	2	1	2	2	2
+postcode	address	8.00	6	8	8	7	10	8	9	5	8
+encrusted	coat	7.29	8	9	8	4	8	7	10	6	7	7
+encrusted	decorate	5.83	6	8	8	6	5	7	3	6	5	2
+undissolved	unmelted	9.22	10	9	9	8	10	8	10	10	5	9
+fastness	fast	8.12	10	7	3	0	10	10	9	7	1	9
+remainder	sell	2.17	2	4	0	0	1	3	3	3	1	5
+remainder	part	6.17	10	8	5	1	7	4	7	9	1	6
+marginality	position	6.14	6	5	6	0	7	6	6	2	1	7
+unmanned	faze	1.62	0	2	0	9	6	2	1	3	0	5
+refuels	fuel	7.86	9	7	9	5	10	9	7	3	6	8
+sidewinder	rattlesnake	7.29	7	8	9	8	8	3	6	6	3	8
+sidewinder	missile	7.29	8	8	8	10	7	2	7	8	3	5
+federalize	unite	7.43	7	8	7	8	8	10	7	10	10	7
+casteless	unwanted	7.50	5	7	8	4	10	8	7	10	10	10
+animalize	change	3.00	0	5	1	3	6	6	8	0	3	0
+reproves	knock	5.50	6	8	4	8	0	7	8	0	5	0
+characters	being	4.40	2	2	1	3	9	8	7	9	10	0
+characters	scratch	0.00	0	0	0	0	0	0	1	0	0	1
+conjecture	hypothesis	10.00	10	10	10	9	10	9	9	9	10	10
+symmetrical	balanced	10.00	10	10	9	10	9	10	9	10	10	9
+allurement	temptation	9.78	9	10	6	9	10	10	10	10	10	10
+allurement	invitation	8.86	6	9	9	8	9	9	10	9	10	9
+binging	eat	7.43	9	2	5	6	9	10	3	7	7	9
+extractor	forceps	8.50	8	9	8	6	9	5	6	8	9	10
+photographer	paparazzo	7.60	7	5	10	5	8	10	7	8	10	8
+perspectives	eye	4.67	6	9	0	4	6	3	4	8	5	8
+perspectives	point	6.43	6	9	6	5	8	0	7	7	6	9
+disinflation	economic	5.83	9	5	3	5	6	3	7	8	6	6
+interplanetary	international	5.62	6	3	5	5	7	0	6	7	6	10
+interplanetary	unsettled	2.00	2	5	0	4	0	5	0	8	0
+trilogies	trio	8.33	8	9	7	7	10	10	10	8	10	7
+poisoning	corrupt	7.25	7	9	6	5	9	5	8	8	5	9
+poisoning	poison	9.62	9	10	9	10	10	7	10	9	10	6
+bobbers	float	9.00	9	9	9	8	10	9	9	8	10	10
+portrayer	painter	7.29	8	10	8	3	8	8	6	7	6	10
+invariable	hard-and-fast	6.57	5	8	7	8	3	0	7	0	8	10
+invariable	parameter	3.60	7	0	6	5	3	3	0	4	3	0
+constrict	astringe	6.33	0	10	7	6	0	6	10	10	0
+constrict	choke	8.40	9	6	10	7	10	10	6	8	9	9
+extraversion	sociability	8.71	10	9	8	5	8	9	9	9	10	9
+frivolously	superficial	7.86	9	3	0	5	9	9	7	8	10	8
+remounted	mount	7.60	6	8	8	8	6	9	7	9	7	5
+remounted	hop	0.29	7	0	0	0	6	0	0	2	8	0
+reviles	abuse	5.86	8	2	5	0	6	8	0	4	10	8
+discounters	mercantile	5.67	6	0	5	5	1	8	5	6	9	7
+confinement	restraint	9.33	9	5	10	10	10	9	8	9	10	9
+consciousness	knowing	8.20	8	8	7	10	10	8	7	9	7	8
+consciousness	self	5.86	5	10	5	0	10	5	8	5	6	7
+believing	feel	6.00	7	6	5	7	5	1	9	0	6	2
+believing	believe	9.75	9	8	10	10	10	10	10	10	9	8
+regimental	control	7.00	10	7	2	9	10	2	7	4	9	7
+regimental	form	5.00	9	5	0	7	0	3	7	5	8	3
+subdivided	subdivide	9.50	10	6	9	9	10	10	10	9	9	5
+subdivided	divide	6.00	9	7	5	0	10	8	7	5	5	5
+sustainable	continue	7.86	8	8	7	0	8	7	9	0	10	8
+standardise	gauge	6.50	8	7	3	6	5	1	5	8	9	10
+standardise	measure	7.12	9	6	8	7	8	9	5	0	10	5
+defrayed	pay	3.80	7	9	0	0	3	4	1	4	10	0
+devilishly	cook	0.22	5	2	0	0	0	0	0	0	0	0
+devilishly	antagonize	5.50	7	5	0	0	0	6	6	2	7	8
+disapproving	discountenance	5.40	9	3	7	0	8	3	2	6	9	10
+subspaces	mathematical	6.57	4	7	1	7	10	6	0	6	8	8
+connoting	imply	7.67	7	9	9	8	8	7	8	8	5	6
+connoting	express	5.57	7	2	8	7	4	8	4	7	5	5
+inheritance	transfer	5.71	6	0	7	9	7	6	2	0	7	5
+inheritance	acquisition	7.00	6	4	7	9	9	7	3	9	8	3
+archery	sport	7.00	8	6	3	9	9	8	6	7	9	7
+sufficed	serve	5.20	7	2	6	8	6	1	0	5
+belligerence	hostility	8.67	9	8	8	9	10	7	9	9	7	6
+procreating	brood	7.17	7	5	6	9	7	5	7	5	8	8
+gelatinous	thick	8.00	9	8	8	8	7	8	8	8	9	8
+villainous	wicked	9.75	10	10	9	10	10	9	8	10	10
+harmony	congruity	8.25	8	8	8	9	8	8	8	4	9	5
+harmony	music	7.25	7	9	5	8	9	7	9	6	9	7
+inoffensive	innocuous	8.83	9	10	9	9	8	6	9	6	9	10
+insurrectionist	young	3.00	5	3	1	5	4	2	5	0
+inquisitive	curious	8.40	8	8	9	9	7	10	10	8	10	10
+inquisitive	inquiring	8.43	8	9	8	9	8	6	7	10	9	8
+extraterrestrial	hypothetical	3.20	4	2	4	6	6	1	0	5	0
+triclinic	monoclinic	5.40	5	7	6	3	7	5	6	5
+murderer	killer	9.78	10	10	10	10	9	10	7	10	10	9
+concurrency	agreement	9.00	10	8	4	8	8	10	9	10	1	9
+concurrency	cooperation	7.33	9	6	6	7	6	9	6	8	0	9
+historically	real	4.71	4	6	3	2	5	5	4	6	7	0
+nontoxic	antitoxic	7.00	2	8	6	10	7	6	2	10	8	7
+nontoxic	edible	6.43	8	5	6	10	6	6	7	9	7	1
+strengthened	sandbag	5.00	7	1	6	5	7	0	0	3	6	7
+strengthened	brace	7.17	9	7	7	7	7	7	5	8	5	9
+incontrovertible	undeniable	7.50	10	7	7	3	8	10	10	8	9	6
+incontrovertible	incontestable	7.50	10	6	7	3	8	10	7	8	5	9
+rumbled	sound	6.50	1	7	9	1	5	7	6	7	7	0
+intragroup	intramural	6.38	7	7	4	6	10	6	7	6	0	8
+exceptionally	extraordinary	8.80	9	9	7	6	9	10	8	10	7	9
+irredeemable	wicked	6.43	5	4	7	6	7	10	6	6	3	8
+irredeemable	inconvertible	6.57	8	9	6	3	2	0	9	4	7	10
+snickering	laugh	7.71	8	8	7	5	7	9	8	8	8	9
