@@ -85,10 +85,12 @@ def convert_to_assoc(input_filename, output_filename):
                 pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
 
         for (start, end) in pairs:
-            line = "%(start)s\t%(end)s\t%(weight)s" % {
+            line = "%(start)s\t%(end)s\t%(weight)s\t%(dataset)s\t%(relation)s" % {
                 'start': start,
                 'end': end,
                 'weight': weight,
+                'dataset': info['dataset'],
+                'relation': rel
             }
             print(line, file=out_stream)
 
@@ -102,4 +104,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
