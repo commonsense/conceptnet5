@@ -70,7 +70,7 @@ def standardize_text(text, lowercase=True):
         >>> standardize_text('embedded' + chr(9) + 'tab')
         'embedded_tab'
 
-        >>> normalize_text(',')
+        >>> standardize_text(',')
         '_'
     """
     if not isinstance(text, unicode):
@@ -111,7 +111,7 @@ def valid_concept_name(text):
     >>> valid_concept_name(' ')
     False
     """
-    if normalize_text(text) == '_':
+    if standardize_text(text) == '_':
         return False
     else:
         return True
