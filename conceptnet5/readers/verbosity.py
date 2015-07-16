@@ -9,7 +9,7 @@ import re
 
 # If any word in a clue matches one of these words, it is probably a bad
 # common-sense assertion.
-# 
+#
 # Many of these represent violations of the use-mention distinction, such as
 # "dog has three letters" instead of "dog has four legs". Others involve
 # pronouns that refer to a previous clue or previous guess.
@@ -78,7 +78,7 @@ def handle_file(infile, outfile):
         freq = int(freq)
         orderscore = int(orderscore)
 
-        # Test each word 
+        # Test each word
         flagged = False
         for rword in right.split():
             if BAD_CLUE_REGEX.match(rword):
@@ -123,7 +123,7 @@ def handle_file(infile, outfile):
         if sls > 0.35:
             outcomes['text similarity'] += 1
             continue
-        
+
         # Calculate a score for the assertion:
         #
         #   - The number of times it's been used as a clue
@@ -157,13 +157,13 @@ def handle_file(infile, outfile):
             edge_sources = list(sources)
             if i > 0:
                 edge_sources.append('/s/rule/split_words')
-            
+
             # Build the natural-language-ish surface text for this clue
             text = '[[%s]] %s [[%s]]' % (left, reltext, rightword)
-            
+
             count += 1
             outcomes['success'] += 1
-            
+
             leftc = normalized_concept_uri('en', left)
             rightc = normalized_concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
