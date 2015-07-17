@@ -72,8 +72,33 @@ def standardize_as_list(text, token_filter=None):
 
 def standardize_text(text, token_filter=None):
     """
-    Get a string made from the tokens in the text. See
-    standardize_as_list().
+    Get a string made from the tokens in the text, joined by
+    underscores. The tokens may have a language-specific `token_filter`
+    applied to them. See `standardize_as_list()`.
+
+        >>> standardize_text(' cat')
+        'cat'
+
+        >>> standardize_text('Italian supercat')
+        'italian_supercat'
+
+        >>> standardize_text('Test?!')
+        'test'
+
+        >>> standardize_text('TEST.')
+        'test'
+
+        >>> standardize_text('test/test')
+        'test_test'
+
+        >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
+        'über'
+
+        >>> standardize_text('embedded' + chr(9) + 'tab')
+        'embedded_tab'
+
+        >>> standardize_text(',')
+        ''
     """
     return '_'.join(standardize_as_list(text, token_filter))
 

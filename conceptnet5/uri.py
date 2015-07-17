@@ -25,13 +25,6 @@ if sys.version_info.major >= 3:
 # with Semantic Web-style resources.
 ROOT_URL = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 
-# If we end up trying to fit a piece of text that looks like these into a URI,
-# it will mess up our patterns of URIs.
-#
-# To avoid having to raise an error, we'll represent all of these as a single
-# underscore.
-BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
-
 # Whitespace should be replaced with underscores in URIs.
 WHITESPACE_RE = re.compile('[\s]')
 

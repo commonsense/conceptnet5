@@ -4,8 +4,8 @@ import re
 import codecs
 import langcodes
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import Licenses
+from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
 from conceptnet5.edges import make_edge
 
 
@@ -185,7 +185,7 @@ def handle_file(filename, output_file):
                 # that are more than five words long.
                 if (
                     text is not None and '.' not in text and text.count(' ') <= 4
-                    and text not in BAD_NAMES_FOR_THINGS
+                    and valid_concept_name(text)
                 ):
                     for head in headwords:
                         ja_concept = standardized_concept_uri('ja', head)

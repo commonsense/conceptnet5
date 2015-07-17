@@ -6,9 +6,11 @@ and builds ConceptNet 5 edges from the data.
 
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import standardized_concept_uri, standardize_text
+from conceptnet5.nodes import (
+    standardized_concept_uri, standardize_text, valid_concept_name
+)
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses, BAD_NAMES_FOR_THINGS
+from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -85,9 +87,9 @@ def can_skip(parts_dict):
         return True
     if 'testing' in parts_dict["activity"]:
         return True
-    if (
-        parts_dict["startText"].strip() in BAD_NAMES_FOR_THINGS or
-        parts_dict["endText"].strip() in BAD_NAMES_FOR_THINGS
+    if not (
+        valid_concept_name(parts_dict["startText"]) or
+        valid_concept_name(parts_dict["endText"])
     ):
         return True
     return False
