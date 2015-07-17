@@ -43,7 +43,7 @@ def build_assoc_space(input_file, output_dir):
     triples = []
 
     for line in codecs.open(input_file, encoding='utf-8'):
-        left, right, value = line.strip().split('\t')
+        left, right, value = line.strip().split('\t')[:3]
         if not concept_is_bad(left) and not concept_is_bad(right):
             value = float(value)
             triples.append((value, left, right))
