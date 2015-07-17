@@ -57,7 +57,7 @@ in_tar = {
                           for i in range(10)],
 
     'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
-                      for i in range(13)],
+                      for i in range(1, 13)],
 
     'verbosity': ['verbosity.txt', ],
     'umbel': ['umbel.nt', ],
