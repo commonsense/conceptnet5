@@ -1,8 +1,8 @@
 # coding: utf-8
 from __future__ import unicode_literals
 from conceptnet5.edges import make_edge
-from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.uri import join_uri, Licenses, valid_concept_name
+from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
+from conceptnet5.uri import join_uri, Licenses
 from pprint import pprint
 from collections import defaultdict
 from grako.exceptions import FailedParse, FailedPattern

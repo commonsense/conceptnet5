@@ -9,7 +9,7 @@ modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
 modifications mostly involve heuristics for when to apply noun or verb
 transformations to words whose part of speech is ambiguous.
 """
-from .token_utils import untokenize, tokenize
+from wordfreq import simple_tokenize
 import re
 morphy = None
 
@@ -161,55 +161,12 @@ def morphy_stem(word, pos=None):
     return _morphy_best(word, pos) or word
 
 
-def good_lemma(lemma):
-    """
-    Filter for lemmas that are not stopwords, and are not punctuation.
-    """
-    return lemma and lemma not in STOPWORDS and lemma[0].isalnum()
-
-
-def standardize_as_list(text):
-    """
-    Get a list of word stems that appear in the text. Stopwords and an initial
-    'to' will be stripped, unless this leaves nothing in the stem.
-
-    >>> standardize_as_list('the dog')
-    ['dog']
-    >>> standardize_as_list('big dogs')
-    ['big', 'dog']
-    >>> standardize_as_list('the')
-    ['the']
-    """
-    pieces = [morphy_stem(word) for word in tokenize(text)]
-    pieces = [piece for piece in pieces if good_lemma(piece)]
-    if not pieces:
-        return [text]
-    if pieces[0] == 'to':
-        pieces = pieces[1:]
-    return pieces
-
-
-def standardize(text):
-    """
-    Get a string made from the non-stopword word stems in the text. See
-    standardize_as_list().
-    """
-    return untokenize(standardize_as_list(text))
-
-
-def standardize_topic(topic):
-    """
-    Get a canonical representation of a Wikipedia topic, which may include
-    a disambiguation string in parentheses.
-
-    Returns (name, disambig), where "name" is the standardized topic name,
-    and "disambig" is a string corresponding to the disambiguation text or
-    None.
-    """
-    # find titles of the form Foo (bar)
-    topic = topic.replace('_', ' ')
-    match = re.match(r'([^(]+) \(([^)]+)\)', topic)
-    if not match:
-        return standardize(topic), None
+def english_filter(tokens):
+    non_stopwords = [morphy_stem(token) for token in tokens if token not in STOPWORDS]
+    if non_stopwords and non_stopwords[0] == 'to':
+        non_stopwords = non_stopwords[1:]
+    if non_stopwords:
+        return non_stopwords
     else:
-        return standardize(match.group(1)), 'n/' + match.group(2).strip(' _')
+        return tokens
+

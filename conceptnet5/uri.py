@@ -37,84 +37,10 @@ WHITESPACE_RE = re.compile('[\s]')
 
 
 def standardize_text(text, lowercase=True):
-    """
-    When a piece of a URI is an arbitrary string, we standardize it in the
-    following ways:
-
-    - Ensure it is in Unicode, and standardize its Unicode representation
-      with the `ftfy.fix_text` function.
-    - Erase case distinctions by converting cased characters to lowercase.
-    - Strip common punctuation, unless that would make the string empty.
-    - Replace spaces with underscores.
-
-    The result will be a Unicode string that can be used within a URI.
-
-        >>> standardize_text(' cat')
-        'cat'
-
-        >>> standardize_text('Italian supercat')
-        'italian_supercat'
-
-        >>> standardize_text('Test?!')
-        'test'
-
-        >>> standardize_text('TEST.')
-        'test'
-
-        >>> standardize_text('test/test')
-        'test_test'
-
-        >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
-        'über'
-
-        >>> standardize_text('embedded' + chr(9) + 'tab')
-        'embedded_tab'
-
-        >>> standardize_text(',')
-        '_'
-    """
-    if not isinstance(text, unicode):
-        raise ValueError("All texts must be Unicode, not bytes.")
-
-    # Replace slashes with spaces, which will become underscores later.
-    # Slashes should separate pieces of a URI, and shouldn't appear within
-    # a piece.
-    text = fix_text(text, normalization='NFC').strip()
-
-    # Represent texts that break our URI representation as a single
-    # underscore.
-    if text in BAD_NAMES_FOR_THINGS:
-        return '_'
-
-    text = text.replace('/', ' ')
-    text = text.strip('.,?!"') or text
-    if lowercase:
-        text = text.lower()
-    text = WHITESPACE_RE.sub('_', text)
-    return text
-
-
-def valid_concept_name(text):
-    """
-    Returns whether this text can be reasonably represented in a concept
-    URI. This helps to protect against making useless concepts out of
-    empty strings or punctuation.
-
-    >>> valid_concept_name('word')
-    True
-    >>> valid_concept_name(',,')
-    True
-    >>> valid_concept_name(',')
-    False
-    >>> valid_concept_name('/')
-    False
-    >>> valid_concept_name(' ')
-    False
-    """
-    if standardize_text(text) == '_':
-        return False
-    else:
-        return True
+    raise NotImplementedError(
+        "This function has been superseded by "
+        "conceptnet5.nodes.standardize_text."
+    )
 
 
 def join_uri(*pieces):
@@ -181,7 +107,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         ...
     AssertionError: 'this is wrong' is not in normalized form
     """
-    assert text == standardize_text(text), "%r is not in normalized form" % text
+    assert ' ' not in text, "%r is not in normalized form" % text
     if pos is None:
         if disambiguation is not None:
             raise ValueError("Disambiguated concepts must have a part of speech")
@@ -190,7 +116,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         if disambiguation is None:
             return join_uri('/c', lang, text, pos)
         else:
-            assert disambiguation == standardize_text(disambiguation),\
+            assert ' ' not in disambiguation,\
                 "%r is not in normalized form" % disambiguation
             return join_uri('/c', lang, text, pos, disambiguation)
 
