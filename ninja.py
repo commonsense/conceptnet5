@@ -378,7 +378,7 @@ class NoOverrideDict(collections.OrderedDict):
         return super().__setitem__(key, val)
 
 def main():
-    deps = NoOverideDict()
+    deps = NoOverrideDict()
     add_all_deps(deps)
     ninja = to_ninja(open('rules.ninja').read(), deps)
     print(ninja, file=open('build.ninja', mode='w'))
