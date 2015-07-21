@@ -66,7 +66,7 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
                     if left in filtered_concepts and \
                         right in filtered_concepts and \
                         value != 0:
-                        print(line, file=out)
+                        out.write(line)
 
 
 if __name__ == '__main__':
