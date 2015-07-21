@@ -365,7 +365,12 @@ def add_dep(lines, rule, inputs, outputs, extra=None, params=None, use_existing=
     lines.append("")
 
 
-class NoOverideDict(collections.OrderedDict):
+class NoOverrideDict(collections.OrderedDict):
+    """
+    NoOverrideDict prevents values from being changed once set.
+
+    This prevents functions from overriding existing dependencies.
+    """
 
     def __setitem__(self, key, val):
         if super().__contains__(key):
