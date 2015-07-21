@@ -165,7 +165,7 @@ def parse_conceptnet4(deps):
                 .replace('txt', 'msgpack')\
                 .replace('raw', 'edges')
             parser = 'conceptnet4' if not type.endswith('zh') else 'ptt_petgame'
-            deps['parse %s' % type] = Dep(
+            deps['parse %s %s' % (type, input)] = Dep(
                 [input],
                 [output],
                 'parse',
@@ -365,8 +365,15 @@ def add_dep(lines, rule, inputs, outputs, extra=None, params=None, use_existing=
     lines.append("")
 
 
+class NoOverideDict(collections.OrderedDict):
+
+    def __setitem__(self, key, val):
+        if super().__contains__(key):
+            raise ValueError()
+        return super().__setitem__(key, val)
+
 def main():
-    deps = collections.OrderedDict()
+    deps = NoOverideDict()
     add_all_deps(deps)
     ninja = to_ninja(open('rules.ninja').read(), deps)
     print(ninja, file=open('build.ninja', mode='w'))
