@@ -149,8 +149,8 @@ def parse_dbpedia(deps):
             new = 'properties'
 
         outputs = [
-            prefix+'edges/dbpedia/%s.msgpack'%new,
-            prefix+'sw_map/dbpedia_%s.nt'%new
+            prefix+'edges/dbpedia/%s.msgpack' % new,
+            prefix+'sw_map/dbpedia_%s.nt' % new
         ]
 
         deps['parse dbpedia %s' % new] = Dep(
@@ -158,6 +158,7 @@ def parse_dbpedia(deps):
             outputs,
             'parse_dbpedia',
         )
+
 
 def parse_conceptnet4(deps):
     for type in ['conceptnet4', 'conceptnet_zh']:
@@ -177,7 +178,7 @@ def extract_wiktionary(deps):
     for lang in wiktionary_langs:
         input = prefix + 'raw/wiktionary/%swiktionary.xml' % lang
         path = prefix + 'extracted/wiktionary/%s/' % lang
-        template =path + 'wiktionary_%02d.msgpack'
+        template = path + 'wiktionary_%02d.msgpack'
 
         outputs = [template % i for i in range(wiktionary_slices)]
 
@@ -185,7 +186,7 @@ def extract_wiktionary(deps):
             [input],
             outputs,
             'extract_wiktionary',
-            {'lang': lang, 'dir':path})
+            {'lang': lang, 'dir': path})
 
 
 def parse_wiktionary(deps):
@@ -252,13 +253,14 @@ def combine_assertions(deps):
 
         new_deps['combine assertions %s' % input] = Dep(
             [input],
-            [input.replace('edges/sorted', 'assertions')\
-                    .replace('edges', 'part')
-                    .replace('csv', 'msgpack')\
-                    .replace('assertions_', 'part_')],
+            [input.replace('edges/sorted', 'assertions')
+                  .replace('edges', 'part')
+                  .replace('csv', 'msgpack')
+                  .replace('assertions_', 'part_')],
             'combine_assertions')
 
     deps.update(new_deps)
+
 
 def msgpack_to_assoc(deps):
     new_deps = {}
@@ -276,6 +278,7 @@ def msgpack_to_assoc(deps):
 
     deps.update(new_deps)
 
+
 def build_db(deps):
     inputs = []
     for k, v in deps.items():
@@ -288,6 +291,7 @@ def build_db(deps):
         [prefix + 'db/assertions.db'],
         'build_db',
         {'prefix': prefix})
+
 
 def stats(deps):
     inputs = []
@@ -336,7 +340,8 @@ def edge_output_list(type):
 def to_ninja(rules, deps, only=None):
     lines = [rules]
     for name, dep in deps.items():
-        if only is not None and not only(name): continue
+        if only is not None and not only(name):
+            continue
         add_dep(lines, **dep)
     return "\n".join(lines)
 
@@ -377,6 +382,7 @@ class NoOverrideDict(collections.OrderedDict):
         if super().__contains__(key):
             raise ValueError()
         return super().__setitem__(key, val)
+
 
 def main():
     deps = NoOverrideDict()
