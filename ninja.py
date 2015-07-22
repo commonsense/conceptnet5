@@ -1,6 +1,7 @@
 import collections
 from os.path import exists
 
+
 def Dep(inputs, outputs, rule, params=None, use_existing=False):
     return {
         'inputs': inputs,
@@ -9,6 +10,7 @@ def Dep(inputs, outputs, rule, params=None, use_existing=False):
         'params': params,
         'use_existing': use_existing
     }
+
 
 prefix = 'data/'
 data_version = '5.3'
@@ -53,9 +55,7 @@ in_tar = {
     'conceptnet4': ['conceptnet4_flat_%s.jsons' % i
                     for i in range(10)],
 
-    'conceptnet4_nadya': ['conceptnet4_nadya_flat_%s.jsons' % i
-                          for i in range(10)],
-
+    'nadya': ['nadya-2014.csv'],
     'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
                       for i in range(1, 13)],
 
@@ -69,14 +69,13 @@ in_tar = {k: [prefix + 'raw/%s/%s' % (k, file) for file in v]
 
 
 def add_all_deps(deps):
-
     download(deps)
     untar(deps)
 
     parse_sw(deps)  # wordnet, umbel
     parse_standard(deps)  # jmdict, verbosity
     parse_globalmind(deps)
-    parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
+    parse_conceptnet4(deps)  # conceptnet4 conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
     parse_dbpedia(deps)
@@ -115,7 +114,7 @@ def parse_sw(deps):
     for type in ['wordnet', 'umbel']:
         deps['parse %s' % type] = Dep(
             in_tar[type],
-            edge_output_str(type),
+            edge_output_list(type),
             'parse_sw',
             {
                 'parser': type,
@@ -125,19 +124,21 @@ def parse_sw(deps):
 
 
 def parse_standard(deps):
-    for type in ['jmdict', 'verbosity']:
+    for type in ['jmdict', 'verbosity', 'nadya']:
         deps['parse %s' % type] = Dep(
             in_tar[type],
-            edge_output_str(type),
+            edge_output_list(type),
             'parse',
             {'parser': type})
+
 
 def parse_globalmind(deps):
     deps['parse globalmind'] = Dep(
         in_tar['globalmind'],
-        edge_output_str('globalmind'),
+        edge_output_list('globalmind'),
         'parse_globalmind',
         {'parser': 'globalmind'})
+
 
 def parse_dbpedia(deps):
     for file in in_tar['dbpedia']:
@@ -159,7 +160,7 @@ def parse_dbpedia(deps):
         )
 
 def parse_conceptnet4(deps):
-    for type in ['conceptnet4', 'conceptnet4_nadya', 'conceptnet_zh']:
+    for type in ['conceptnet4', 'conceptnet_zh']:
         for input in in_tar[type]:
             output = input.replace('jsons', 'msgpack')\
                 .replace('txt', 'msgpack')\
@@ -328,7 +329,7 @@ def stats(deps):
     )
 
 
-def edge_output_str(type):
+def edge_output_list(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
 
 
