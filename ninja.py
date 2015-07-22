@@ -42,7 +42,7 @@ in_tar = {
 
     'dbpedia':
         ['mappingbased_properties_en.nt',
-         'instance_types_en.nt', ],
+         'instance_types_en.nt'],
 
     'jmdict':
         ['JMdict.xml'],
@@ -50,7 +50,7 @@ in_tar = {
     'wiktionary':
         ['enwiktionary.xml',
          'dewiktionary.xml',
-         'jawiktionary.xml', ],
+         'jawiktionary.xml'],
 
     'conceptnet4': ['conceptnet4_flat_%s.jsons' % i
                     for i in range(10)],
@@ -59,8 +59,8 @@ in_tar = {
     'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
                       for i in range(1, 13)],
 
-    'verbosity': ['verbosity.txt', ],
-    'umbel': ['umbel.nt', ],
+    'verbosity': ['verbosity.txt'],
+    'umbel': ['umbel.nt'],
 
 }
 
