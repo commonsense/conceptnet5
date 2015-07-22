@@ -43,7 +43,7 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
 
         with filepath.open(encoding='utf-8') as file:
             for line in file:
-                left, right, _ = line.rstrip().split('\t')
+                left, right, *_ = line.rstrip().split('\t')
                 if not concept_is_bad(left) and not concept_is_bad(right):
                     counts[left] += 1
                     counts[right] += 1
@@ -61,12 +61,12 @@ def reduce_assoc(dirname, cutoff=3, en_cutoff=4, verbose=True):
                 print("Re-reading %s" % filepath)
             with filepath.open(encoding='utf-8') as file:
                 for line in file:
-                    left, right, value = line.rstrip().split('\t')
+                    left, right, value, *_ = line.rstrip().split('\t')
                     value = float(value)
                     if left in filtered_concepts and \
                         right in filtered_concepts and \
                         value != 0:
-                        print(line, file=out)
+                        out.write(line)
 
 
 if __name__ == '__main__':

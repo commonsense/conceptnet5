@@ -180,6 +180,9 @@ def build_sources(parts_dict, preposition_fix=False):
 
     for vote in parts_dict["votes"]:
         username = vote[0]
+        if username == parts_dict["creator"]:
+            continue
+            
         vote_int = vote[1]
         conjunction = [
             join_uri('/s/contributor/omcs', standardize_text(username)),
@@ -285,4 +288,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
