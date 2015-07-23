@@ -162,6 +162,10 @@ def morphy_stem(word, pos=None):
 
 
 def english_filter(tokens):
+    """
+    Given a list of tokens, remove a small list of English stopwords, and
+    reduce the words to their WordNet roots using Morphy.
+    """
     non_stopwords = [morphy_stem(token) for token in tokens if token not in STOPWORDS]
     if non_stopwords and non_stopwords[0] == 'to':
         non_stopwords = non_stopwords[1:]

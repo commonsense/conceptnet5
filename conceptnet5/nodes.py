@@ -45,10 +45,9 @@ def standardize_as_list(text, token_filter=None):
     """
     Get a list of tokens or stems that appear in the text.
 
-    The tokens can optionally be normalized and have stopwords removed.
-    In practice, these will be used for English.
-    Stopwords and an initial
-    'to' will be stripped, unless this leaves nothing in the stem.
+    `token_filter` is an optional function to apply to the list of tokens,
+    performing language-specific lemmatization and stopword removal. In
+    practice, the only such filter is for English.
 
     >>> standardize_as_list('the dog', token_filter=english_filter)
     ['dog']
@@ -133,7 +132,6 @@ def standardized_concept_name(lang, text):
     >>> standardized_concept_name('es', 'ESTO ES UNA PRUEBA')
     'esto_es_una_prueba'
     """
-    lang_filter = None
     if lang == 'en':
         lang_filter = english_filter
     else:

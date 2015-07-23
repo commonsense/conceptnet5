@@ -88,7 +88,7 @@ def can_skip(parts_dict):
     if 'testing' in parts_dict["activity"]:
         return True
     if not (
-        valid_concept_name(parts_dict["startText"]) or
+        valid_concept_name(parts_dict["startText"]) and
         valid_concept_name(parts_dict["endText"])
     ):
         return True
@@ -182,7 +182,7 @@ def build_sources(parts_dict, preposition_fix=False):
         username = vote[0]
         if username == parts_dict["creator"]:
             continue
-            
+
         vote_int = vote[1]
         conjunction = [
             join_uri('/s/contributor/omcs', standardize_text(username)),
