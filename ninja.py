@@ -1,6 +1,7 @@
 import collections
 from os.path import exists
 
+
 def Dep(inputs, outputs, rule, params=None, use_existing=False):
     return {
         'inputs': inputs,
@@ -9,6 +10,7 @@ def Dep(inputs, outputs, rule, params=None, use_existing=False):
         'params': params,
         'use_existing': use_existing
     }
+
 
 prefix = 'data/'
 data_version = '5.3'
@@ -40,7 +42,7 @@ in_tar = {
 
     'dbpedia':
         ['mappingbased_properties_en.nt',
-         'instance_types_en.nt', ],
+         'instance_types_en.nt'],
 
     'jmdict':
         ['JMdict.xml'],
@@ -48,19 +50,17 @@ in_tar = {
     'wiktionary':
         ['enwiktionary.xml',
          'dewiktionary.xml',
-         'jawiktionary.xml', ],
+         'jawiktionary.xml'],
 
     'conceptnet4': ['conceptnet4_flat_%s.jsons' % i
                     for i in range(10)],
 
-    'conceptnet4_nadya': ['conceptnet4_nadya_flat_%s.jsons' % i
-                          for i in range(10)],
-
+    'nadya': ['nadya-2014.csv'],
     'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
                       for i in range(1, 13)],
 
-    'verbosity': ['verbosity.txt', ],
-    'umbel': ['umbel.nt', ],
+    'verbosity': ['verbosity.txt'],
+    'umbel': ['umbel.nt'],
 
 }
 
@@ -69,14 +69,13 @@ in_tar = {k: [prefix + 'raw/%s/%s' % (k, file) for file in v]
 
 
 def add_all_deps(deps):
-
     download(deps)
     untar(deps)
 
     parse_sw(deps)  # wordnet, umbel
     parse_standard(deps)  # jmdict, verbosity
     parse_globalmind(deps)
-    parse_conceptnet4(deps)  # conceptnet4 conceptnet4_nadya conceptnet_zh
+    parse_conceptnet4(deps)  # conceptnet4 conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
     parse_dbpedia(deps)
@@ -115,7 +114,7 @@ def parse_sw(deps):
     for type in ['wordnet', 'umbel']:
         deps['parse %s' % type] = Dep(
             in_tar[type],
-            edge_output_str(type),
+            edge_output_list(type),
             'parse_sw',
             {
                 'parser': type,
@@ -125,19 +124,21 @@ def parse_sw(deps):
 
 
 def parse_standard(deps):
-    for type in ['jmdict', 'verbosity']:
+    for type in ['jmdict', 'verbosity', 'nadya']:
         deps['parse %s' % type] = Dep(
             in_tar[type],
-            edge_output_str(type),
+            edge_output_list(type),
             'parse',
             {'parser': type})
+
 
 def parse_globalmind(deps):
     deps['parse globalmind'] = Dep(
         in_tar['globalmind'],
-        edge_output_str('globalmind'),
+        edge_output_list('globalmind'),
         'parse_globalmind',
         {'parser': 'globalmind'})
+
 
 def parse_dbpedia(deps):
     for file in in_tar['dbpedia']:
@@ -148,8 +149,8 @@ def parse_dbpedia(deps):
             new = 'properties'
 
         outputs = [
-            prefix+'edges/dbpedia/%s.msgpack'%new,
-            prefix+'sw_map/dbpedia_%s.nt'%new
+            prefix+'edges/dbpedia/%s.msgpack' % new,
+            prefix+'sw_map/dbpedia_%s.nt' % new
         ]
 
         deps['parse dbpedia %s' % new] = Dep(
@@ -158,8 +159,9 @@ def parse_dbpedia(deps):
             'parse_dbpedia',
         )
 
+
 def parse_conceptnet4(deps):
-    for type in ['conceptnet4', 'conceptnet4_nadya', 'conceptnet_zh']:
+    for type in ['conceptnet4', 'conceptnet_zh']:
         for input in in_tar[type]:
             output = input.replace('jsons', 'msgpack')\
                 .replace('txt', 'msgpack')\
@@ -176,7 +178,7 @@ def extract_wiktionary(deps):
     for lang in wiktionary_langs:
         input = prefix + 'raw/wiktionary/%swiktionary.xml' % lang
         path = prefix + 'extracted/wiktionary/%s/' % lang
-        template =path + 'wiktionary_%02d.msgpack'
+        template = path + 'wiktionary_%02d.msgpack'
 
         outputs = [template % i for i in range(wiktionary_slices)]
 
@@ -184,7 +186,7 @@ def extract_wiktionary(deps):
             [input],
             outputs,
             'extract_wiktionary',
-            {'lang': lang, 'dir':path})
+            {'lang': lang, 'dir': path})
 
 
 def parse_wiktionary(deps):
@@ -251,13 +253,14 @@ def combine_assertions(deps):
 
         new_deps['combine assertions %s' % input] = Dep(
             [input],
-            [input.replace('edges/sorted', 'assertions')\
-                    .replace('edges', 'part')
-                    .replace('csv', 'msgpack')\
-                    .replace('assertions_', 'part_')],
+            [input.replace('edges/sorted', 'assertions')
+                  .replace('edges', 'part')
+                  .replace('csv', 'msgpack')
+                  .replace('assertions_', 'part_')],
             'combine_assertions')
 
     deps.update(new_deps)
+
 
 def msgpack_to_assoc(deps):
     new_deps = {}
@@ -275,6 +278,7 @@ def msgpack_to_assoc(deps):
 
     deps.update(new_deps)
 
+
 def build_db(deps):
     inputs = []
     for k, v in deps.items():
@@ -287,6 +291,7 @@ def build_db(deps):
         [prefix + 'db/assertions.db'],
         'build_db',
         {'prefix': prefix})
+
 
 def stats(deps):
     inputs = []
@@ -328,14 +333,15 @@ def stats(deps):
     )
 
 
-def edge_output_str(type):
+def edge_output_list(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
 
 
 def to_ninja(rules, deps, only=None):
     lines = [rules]
     for name, dep in deps.items():
-        if only is not None and not only(name): continue
+        if only is not None and not only(name):
+            continue
         add_dep(lines, **dep)
     return "\n".join(lines)
 
@@ -376,6 +382,7 @@ class NoOverrideDict(collections.OrderedDict):
         if super().__contains__(key):
             raise ValueError()
         return super().__setitem__(key, val)
+
 
 def main():
     deps = NoOverrideDict()
