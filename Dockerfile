@@ -12,12 +12,18 @@ ADD rules.ninja /src/conceptnet/rules.ninja
 # Set up ConceptNet
 WORKDIR /src/conceptnet
 RUN python3 setup.py develop
-RUN pip3 install assoc_space==1.0b
-RUN pip3 install wordfreq==1.0b4
+RUN pip3 install assoc_space==1.0.2
+RUN pip3 install wordfreq==1.0
 
 # Run the ninja build
 RUN python3 ninja.py
 RUN ninja -v
 
+# Run the assoc_space build, still in Make
+ADD Makefile /src/conceptnet/Makefile
+RUN make build_assoc
+
 # Keep track of where the data ended up
 ENV CONCEPTNET_DATA /src/conceptnet/data
+
+ENTRYPOINT /bin/bash
