@@ -1,3 +1,7 @@
+# This Makefile has been mostly superseded by the Ninja build, which
+# should be a more reliable build process. However, it's still needed
+# in order to build the assoc_space matrix.
+
 # ConceptNet-related configuration
 # ================================
 VERSION = 5.4

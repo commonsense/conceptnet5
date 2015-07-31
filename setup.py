@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.4a1'
+version_str = '5.4.0'
 
 
 class NLTKDownloadCommand(Command):
@@ -37,7 +37,7 @@ setup(
     install_requires=[
         'nltk >= 3.0b1', 'xmltodict', 'pyyaml', 'requests',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
-        'msgpack-python'
+        'msgpack-python', 'langcodes >= 1.1.1'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
