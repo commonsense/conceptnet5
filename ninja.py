@@ -1,6 +1,9 @@
 import collections
+import datetime
 from os.path import exists
+from itertools import chain
 
+start_date = datetime.date.today().isoformat().replace('-', '')
 
 def Dep(inputs, outputs, rule, params=None, use_existing=False):
     return {
@@ -89,13 +92,16 @@ def add_all_deps(deps):
     msgpack_to_assoc(deps)
     stats(deps)
 
+    build_vector_spaces(deps)
+    upload(deps)
+
 
 def download(deps):
     file = 'conceptnet5_raw_data_%s.tar.bz2' % data_version
     url = 'http://conceptnet5.media.mit.edu/downloads/v%s/' % data_version + file
     deps['download_tar'] = Dep(
         [],
-        prefix + 'conceptnet5_raw_data_%s.tar.bz2' % data_version,
+        [prefix + 'conceptnet5_raw_data_%s.tar.bz2' % data_version],
         'download',
         {'prefix': prefix, 'url': url},
         use_existing=True
@@ -106,8 +112,8 @@ def untar(deps):
     outputs = []
     for files in in_tar.values():
         outputs += files
-    input = deps['download_tar']['outputs']
-    deps['untar'] = Dep([input], outputs, 'extract_tar', {'prefix': prefix}, use_existing=True)
+    inputs = deps['download_tar']['outputs']
+    deps['untar'] = Dep(inputs, outputs, 'extract_tar', {'prefix': prefix}, use_existing=True)
 
 
 def parse_sw(deps):
@@ -322,16 +328,79 @@ def stats(deps):
 
     deps['dataset vs language'] = Dep(
         dataset_outputs,
-        prefix + 'stats/dataset_vs_language.txt',
+        [prefix + 'stats/dataset_vs_language.txt'],
         'dataset_vs_language_stats'
     )
 
     deps['more stats'] = Dep(
         inputs,
-        prefix + 'stats/morestats.txt',
+        [prefix + 'stats/morestats.txt'],
         'more_stats'
     )
 
+def build_vector_spaces(deps):
+    vecs = []
+    for csv in outputs_where(deps, lambda x: x.startswith('data/assoc/part_0') and x.endswith('.csv')):
+        output = csv.replace('.csv', '').replace('/assoc/', '/assoc/subspaces/')
+        vecs.append(output)
+        deps['assoc to vector %s'%output] = Dep(
+            [csv],
+            [output],
+            'build_assoc'
+        )
+
+    deps['merge vector spaces'] = Dep(
+        vecs,
+        ['data/assoc/subspaces/merged_filtered'],
+        'merge_assoc'
+    )
+
+def upload(deps):
+    uploads = []
+    msgpacks = outputs_where(deps,
+                             lambda x: x.startswith('data/assertions/') and
+                                       x.endswith('.msgpack'))
+
+    for msgpack in msgpacks:
+        deps['to jsons %s'%msgpack] = Dep(
+            [msgpack],
+            [msgpack.replace('.msgpack', '.jsons')],
+            'msgpack_to_json'
+        )
+
+        deps['to csv %s'%msgpack] = Dep(
+            [msgpack],
+            [msgpack.replace('.msgpack', '.csv')],
+            'msgpack_to_csv'
+        )
+
+    for output, inputs in [
+        ('raw_data', list(chain(*in_tar.values()))),
+        ('flat_msgpack', msgpacks),
+        ('flat_json', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.jsons'))),
+        ('flat_csv', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.csv'))),
+        ('db', deps['build db']['outputs'] + msgpacks),
+        ('vector_space', deps['merge vector spaces']['outputs'])
+    ]:
+        output = prefix + 'dist/' + start_date + '/conceptnet5_' + output + '_5.4.tar.bz2'
+        uploads.append(output)
+        deps['upload '+output] = Dep(
+            inputs,
+            [output],
+            'compress_tar'
+        )
+
+    deps['upload'] = Dep(
+        uploads,
+        ['UPLOAD'],
+        'upload'
+    )
+
+def outputs_where(deps, where):
+    out = set()
+    for v in deps.values():
+        out.update(output for output in v['outputs'] if where(output))
+    return list(out)
 
 def edge_output_list(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
