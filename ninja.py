@@ -5,6 +5,7 @@ from itertools import chain
 
 start_date = datetime.date.today().isoformat().replace('-', '')
 
+
 def Dep(inputs, outputs, rule, params=None, use_existing=False):
     return {
         'inputs': inputs,
@@ -92,7 +93,7 @@ def add_all_deps(deps):
     msgpack_to_assoc(deps)
     stats(deps)
 
-    build_vector_spaces(deps)
+    build_vector_space(deps)
     upload(deps)
 
 
@@ -338,22 +339,21 @@ def stats(deps):
         'more_stats'
     )
 
-def build_vector_spaces(deps):
-    vecs = []
-    for csv in outputs_where(deps, lambda x: x.startswith('data/assoc/part_0') and x.endswith('.csv')):
-        output = csv.replace('.csv', '').replace('/assoc/', '/assoc/subspaces/')
-        vecs.append(output)
-        deps['assoc to vector %s'%output] = Dep(
-            [csv],
-            [output],
-            'build_assoc'
-        )
 
-    deps['merge vector spaces'] = Dep(
-        vecs,
-        ['data/assoc/subspaces/merged_filtered'],
-        'merge_assoc'
+def build_vector_space(deps):
+    assoc_inputs = outputs_where(deps, lambda x: x.startswith(prefix + 'assoc/part_0') and x.endswith('.csv'))
+    deps['reduce vector space input'] = Dep(
+        assoc_inputs,
+        prefix + 'assoc/reduced.csv',
+        'reduce_assoc'
     )
+
+    deps['build vector space'] = Dep(
+        [prefix + 'assoc/reduced.csv'],
+        [prefix + 'assoc/assoc-space-5.4/u.npy'],
+        'build_assoc'
+    )
+
 
 def upload(deps):
     uploads = []
@@ -380,11 +380,11 @@ def upload(deps):
         ('flat_json', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.jsons'))),
         ('flat_csv', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.csv'))),
         ('db', deps['build db']['outputs'] + msgpacks),
-        ('vector_space', deps['merge vector spaces']['outputs'])
+        ('vector_space', deps['build vector space']['outputs'])
     ]:
         output = prefix + 'dist/' + start_date + '/conceptnet5_' + output + '_5.4.tar.bz2'
         uploads.append(output)
-        deps['upload '+output] = Dep(
+        deps['compress '+output] = Dep(
             inputs,
             [output],
             'compress_tar'
@@ -396,11 +396,13 @@ def upload(deps):
         'upload'
     )
 
+
 def outputs_where(deps, where):
     out = set()
     for v in deps.values():
         out.update(output for output in v['outputs'] if where(output))
-    return list(out)
+    return sorted(list(out))
+
 
 def edge_output_list(type):
     return [prefix + 'edges/%s/%s.msgpack' % (type, type)]
@@ -411,6 +413,7 @@ def to_ninja(rules, deps, only=None):
     for name, dep in deps.items():
         if only is not None and not only(name):
             continue
+        lines.append('# %s' % name)
         add_dep(lines, **dep)
     return "\n".join(lines)
 

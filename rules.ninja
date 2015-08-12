@@ -1,4 +1,4 @@
-# This defines the rules on how to build parts of the wordfreq lists, using the
+# This defines the rules on how to build parts of ConceptNet, using the
 # Ninja build system:
 #
 #   http://martine.github.io/ninja/manual.html
@@ -12,6 +12,9 @@
 # This file will become the header of the larger build.ninja file, which also
 # contains the programatically-defined dependency graph.
 
+pool memory_hogs
+  depth = 1
+
 rule rebuild_ninja
   command = python -m ninja
 
@@ -24,7 +27,6 @@ rule extract_tar
 rule extract_wiktionary
   command = python -m conceptnet5.readers.extract_wiktionary $in $dir -l $lang && cd conceptnet5/wiktparse && eval "make ${lang}_parser.py"
 
-## STEP 2: Parse the data
 rule parse
   command = python -m conceptnet5.readers.$parser $in $out
 
@@ -70,11 +72,12 @@ rule dataset_vs_language_stats
 rule more_stats
   command = cut -f 2,3,4,9 $in | sed -r 's:((/[^/\t]+){2})[^\t]*:\1:g' | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
 
-rule build_assoc
-  command = python -m conceptnet5.builders.assoc_to_vector_space $in $out
+rule reduce_assoc
+  command = python -m conceptnet5.builders.reduce_assoc $$(dirname $in)
 
-rule merge_assoc
-  command = python -m conceptnet5.builders.merge_vector_spaces $$(dirname $$(echo $in | cut -d' ' -f1))
+rule build_assoc
+  command = python -m conceptnet5.builders.assoc_to_vector_space $in $$(dirname $out)
+  pool = memory_hogs
 
 rule msgpack_to_json
   command = python -m conceptnet5.builders.msgpack_to_json $in $out
