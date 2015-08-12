@@ -86,7 +86,7 @@ def language_code(source_language, language_name):
         return language_name
     else:
         try:
-            return str(langcodes.find_name('language', language_name, source_language))
+            return langcodes.find_name('language', language_name, source_language).language
         except LookupError:
             return None
 

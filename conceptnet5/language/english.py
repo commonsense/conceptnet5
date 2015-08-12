@@ -9,7 +9,7 @@ modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
 modifications mostly involve heuristics for when to apply noun or verb
 transformations to words whose part of speech is ambiguous.
 """
-from wordfreq import simple_tokenize
+from .token_utils import simple_tokenize
 import re
 morphy = None
 
