@@ -60,7 +60,7 @@ in_tar = {
 
     'nadya': ['nadya-2014.csv'],
     'conceptnet_zh': ['conceptnet_zh_part%s.txt' % i
-                      for i in range(1, 13)],
+                      for i in range(1, 13)] + ['conceptnet_zh_api.txt'],
 
     'verbosity': ['verbosity.txt'],
     'umbel': ['umbel.nt'],
