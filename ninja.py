@@ -209,7 +209,7 @@ def parse_wiktionary(deps):
 
 
 def msgpack_to_csv(deps):
-    new_deps = {}
+    new_deps = NoOverrideDict()
     for k, v in deps.items():
         if not k.startswith('parse'):
             continue
@@ -252,7 +252,7 @@ def count_and_rank(deps):
 
 
 def combine_assertions(deps):
-    new_deps = {}
+    new_deps = NoOverrideDict()
     for k, v in deps.items():
         if not k.startswith('count and rank'):
             continue
@@ -270,7 +270,7 @@ def combine_assertions(deps):
 
 
 def msgpack_to_assoc(deps):
-    new_deps = {}
+    new_deps = NoOverrideDict()
     for k, v in deps.items():
         if not k.startswith('combine assertions'):
             continue
