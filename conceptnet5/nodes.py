@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import unicode_literals
 """
 This module constructs URIs for nodes (concepts) in various languages. This
@@ -14,8 +15,8 @@ is harder to define.
 """
 
 from conceptnet5.language.english import english_filter
+from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import concept_uri, split_uri
-from wordfreq import simple_tokenize
 from ftfy import fix_text
 import re
 
