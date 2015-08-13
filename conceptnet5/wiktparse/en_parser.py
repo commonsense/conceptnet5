@@ -12,10 +12,12 @@
 
 
 from __future__ import print_function, division, absolute_import, unicode_literals
+
 from grako.parsing import graken, Parser
+from grako.util import re, RE_FLAGS
 
 
-__version__ = (2015, 7, 15, 17, 3, 20, 2)
+__version__ = (2015, 8, 13, 11, 33, 15, 3)
 
 __all__ = [
     'en_wiktionaryParser',
@@ -25,10 +27,13 @@ __all__ = [
 
 
 class en_wiktionaryParser(Parser):
-    def __init__(self, whitespace='', nameguard=True, **kwargs):
+    def __init__(self, whitespace='', nameguard=None, **kwargs):
         super(en_wiktionaryParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
+            comments_re=None,
+            eol_comments_re=None,
+            ignorecase=None,
             **kwargs
         )
 
@@ -1173,7 +1178,7 @@ class en_wiktionarySemantics(object):
         return ast
 
 
-def main(filename, startrule, trace=False, whitespace=None):
+def main(filename, startrule, trace=False, whitespace=None, nameguard=None):
     import json
     with open(filename) as f:
         text = f.read()
@@ -1183,7 +1188,8 @@ def main(filename, startrule, trace=False, whitespace=None):
         startrule,
         filename=filename,
         trace=trace,
-        whitespace=whitespace)
+        whitespace=whitespace,
+        nameguard=nameguard)
     print('AST:')
     print(ast)
     print()
@@ -1207,6 +1213,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Simple parser for en_wiktionary.")
     parser.add_argument('-l', '--list', action=ListRules, nargs=0,
                         help="list all rules and exit")
+    parser.add_argument('-n', '--no-nameguard', action='store_true',
+                        dest='no_nameguard',
+                        help="disable the 'nameguard' feature")
     parser.add_argument('-t', '--trace', action='store_true',
                         help="output trace information")
     parser.add_argument('-w', '--whitespace', type=str, default=string.whitespace,
@@ -1220,5 +1229,6 @@ if __name__ == '__main__':
         args.file,
         args.startrule,
         trace=args.trace,
-        whitespace=args.whitespace
+        whitespace=args.whitespace,
+        nameguard=not args.no_nameguard
     )

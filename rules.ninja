@@ -86,4 +86,4 @@ rule compress_tar
   command = tar jcvf $out $in
 
 rule upload
-  command = rsync -Pavz $$(dirname $$(echo $in | cut -d ' ' -f1)) conceptnet5.media.mit.edu:/var/www/conceptnet5/downloads
+  command = rsync -Pavz $$(dirname $$(echo $in | cut -d ' ' -f1)) conceptnet5.media.mit.edu:/data/downloads
