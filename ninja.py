@@ -293,11 +293,12 @@ def build_db(deps):
             continue
         inputs += v['outputs']
 
+    num_shards = 8
     deps['build db'] = Dep(
         inputs,
-        [prefix + 'db/assertions.db'],
+        [prefix + 'db/assertions.db.%d' % n for n in range(num_shards)],
         'build_db',
-        {'prefix': prefix})
+        {'prefix': prefix, 'num': num_shards, 'basename': prefix + 'db/assertions.db'})
 
 
 def stats(deps):

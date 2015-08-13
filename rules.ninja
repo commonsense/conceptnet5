@@ -58,7 +58,7 @@ rule msgpack_to_assoc
   command = python -m conceptnet5.builders.msgpack_to_assoc $in $out
 
 rule build_db
-  command = if [ ! -e ~/.conceptnet5 ]; then ln -s $$(readlink -f $prefix) ~/.conceptnet5; fi && python -m conceptnet5.builders.index_assertions $$(dirname $$(echo $in | cut -d ' ' -f1)) $out --input-shards 8
+  command = if [ ! -e ~/.conceptnet5 ]; then ln -s $$(readlink -f $prefix) ~/.conceptnet5; fi && python -m conceptnet5.builders.index_assertions $$(dirname $$(echo $in | cut -d ' ' -f1)) $basename --input-shards $num
 
 rule relation_stats
   command = cut -f 2 $in | LC_ALL=C sort | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > $out
