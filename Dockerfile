@@ -15,7 +15,7 @@ RUN pip3 install assoc_space==1.0.2
 RUN pip3 install wordfreq==1.0
 
 # Get the database
-RUN make download_db
+RUN make download_db download_vectors
 
 # Keep track of where the data ended up
 ENV CONCEPTNET_DATA /src/conceptnet/data

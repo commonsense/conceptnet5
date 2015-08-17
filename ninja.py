@@ -94,7 +94,7 @@ def add_all_deps(deps):
     stats(deps)
 
     build_vector_space(deps)
-    upload(deps)
+    build_dist(deps)
 
 
 def download(deps):
@@ -356,8 +356,7 @@ def build_vector_space(deps):
     )
 
 
-def upload(deps):
-    uploads = []
+def build_dist(deps):
     msgpacks = outputs_where(deps,
                              lambda x: x.startswith('data/assertions/') and
                                        x.endswith('.msgpack'))
@@ -384,19 +383,11 @@ def upload(deps):
         ('vector_space', deps['build vector space']['outputs'])
     ]:
         output = prefix + 'dist/' + start_date + '/conceptnet5_' + output + '_5.4.tar.bz2'
-        uploads.append(output)
         deps['compress '+output] = Dep(
             inputs,
             [output],
             'compress_tar'
         )
-
-    deps['upload'] = Dep(
-        uploads,
-        ['UPLOAD'],
-        'upload'
-    )
-
 
 def outputs_where(deps, where):
     out = set()
