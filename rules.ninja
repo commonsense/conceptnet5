@@ -76,7 +76,7 @@ rule reduce_assoc
   command = python -m conceptnet5.builders.reduce_assoc $$(dirname $$(echo $in | cut -d ' ' -f1))
 
 rule build_assoc
-  command = python -m conceptnet5.builders.assoc_to_vector_space $in $$(dirname $out)
+  command = python -m conceptnet5.builders.assoc_to_vector_space $in $$(dirname $$(echo $out | cut -d ' ' -f1))
   pool = memory_hogs
 
 rule msgpack_to_json

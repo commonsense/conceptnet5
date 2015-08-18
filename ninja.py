@@ -351,7 +351,10 @@ def build_vector_space(deps):
 
     deps['build vector space'] = Dep(
         [prefix + 'assoc/reduced.csv'],
-        [prefix + 'assoc/assoc-space-5.4/u.npy'],
+        [prefix + 'assoc/assoc-space-5.4/u.npy',
+         prefix + 'assoc/assoc-space-5.4/sigma.npy',
+         prefix + 'assoc/assoc-space-5.4/assoc.npy',
+         prefix + 'assoc/assoc-space-5.4/labels.txt'],
         'build_assoc'
     )
 
