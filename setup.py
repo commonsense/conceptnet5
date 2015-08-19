@@ -8,9 +8,9 @@ packages = find_packages()
 version_str = '5.4.0'
 
 if sys.version_info.major < 3:
-    langcodes_req = 'langcodes-py2 == 1.1.1'
+    langcodes_req = 'langcodes-py2 == 1.1.2'
 else:
-    langcodes_req = 'langcodes == 1.1.1'
+    langcodes_req = 'langcodes == 1.1.2'
 
 
 class NLTKDownloadCommand(Command):
