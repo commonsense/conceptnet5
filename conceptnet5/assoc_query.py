@@ -75,7 +75,7 @@ class AssocSpaceWrapper(object):
     def associations(self, terms, filter=None, limit=20):
         self.load()
         vec = self.expanded_vector(terms)
-        similar = self.assoc.terms_similar_to_vector(vec)
+        similar = self.assoc.terms_similar_to_vector(vec, num=None)
         similar = [
             item for item in similar if item[1] > SMALL
             and self.passes_filter(item[0], filter)
