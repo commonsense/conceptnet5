@@ -6,4 +6,4 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-rsync -Pavz data/dist/$1 conceptnet5.media.mit.edu:/data/downloads
+rsync -Pavz data/dist/$1/ conceptnet5.media.mit.edu:/data/downloads/$1/
