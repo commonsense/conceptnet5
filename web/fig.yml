@@ -16,6 +16,8 @@ conceptnet54:
     build: '.'
     expose:
         - "10054"
+    volumes:
+        - "/data/conceptnet5.4:/conceptnet_data"
     ports:
         - "10054:10054"
 
