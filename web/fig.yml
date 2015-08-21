@@ -13,7 +13,7 @@ conceptnet53:
         - "10053:10053"
 
 conceptnet54:
-    build: '.'
+    image: 'rspeer/conceptnet-web:5.4'
     expose:
         - "10054"
     volumes:
