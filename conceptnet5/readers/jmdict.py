@@ -2,10 +2,10 @@ from __future__ import unicode_literals, print_function
 import xmltodict
 import re
 import codecs
-from conceptnet5.util.language_codes import CODE_TO_NAME, NAME_TO_CODE
+import langcodes
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.uri import Licenses, BAD_NAMES_FOR_THINGS
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.uri import Licenses
+from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
 from conceptnet5.edges import make_edge
 
 
@@ -52,15 +52,10 @@ VERB_TYPES = [
 
 def convert_lang_code(code):
     """
-    Map a language code to the canonical one that ConceptNet 5 uses,
-    which is either the alpha2 code, or the "terminology" alpha3 code if no
-    alpha2 code exists
-
-    JMdict uses the "bibliographic" alpha3 code, which is often equal to
-    neither of these, but we can map it to a canonical one by running it back
-    and forth through our language name dictionaries.
+    Map a language code to the canonical one that ConceptNet 5 uses, using the
+    'langcodes' library.
     """
-    return NAME_TO_CODE['en'][CODE_TO_NAME['en'][code]]
+    return str(langcodes.get(code))
 
 
 def get_list(node, tag):
@@ -190,11 +185,11 @@ def handle_file(filename, output_file):
                 # that are more than five words long.
                 if (
                     text is not None and '.' not in text and text.count(' ') <= 4
-                    and text not in BAD_NAMES_FOR_THINGS
+                    and valid_concept_name(text)
                 ):
                     for head in headwords:
-                        ja_concept = normalized_concept_uri('ja', head)
-                        other_concept = normalized_concept_uri(lang, text)
+                        ja_concept = standardized_concept_uri('ja', head)
+                        other_concept = standardized_concept_uri(lang, text)
                         output_edge(out, ja_concept, other_concept)
 
 

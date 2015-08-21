@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function
 from conceptnet5.uri import join_uri, split_uri
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import codecs
+import langcodes
 
 
 def reduce_concept(concept):
@@ -10,10 +11,11 @@ def reduce_concept(concept):
     leaving a potentially ambiguous concept that can be matched against surface
     text.
 
-    Additionally, remove the region tag from Chinese assertions, so they are
-    considered simply as assertions about Chinese regardless of whether it is
-    Traditional or Simplified Chinese. In the cases where they overlap, this
-    helps to make the information more complete.
+    Additionally, simplify language tags to a bare language. The main purpose
+    is to remove the region tag from Chinese assertions, so they are considered
+    simply as assertions about Chinese regardless of whether it is Traditional
+    or Simplified Chinese. In the cases where they overlap, this helps to make
+    the information more complete.
 
     >>> reduce_concept('/c/en/cat/n/feline')
     '/c/en/cat'
@@ -21,9 +23,11 @@ def reduce_concept(concept):
     '/c/zh/良好'
     """
     parts = split_uri(concept)
-    # Unify simplified and traditional Chinese in associations.
-    if parts[1] == 'zh_CN' or parts[1] == 'zh_TW':
-        parts[1] = 'zh'
+    langtag = parts[1]
+    if parts[1] != '[':
+        langcode = langcodes.get(langtag).language
+        if langcode:
+            parts[1] = langcode
     return join_uri(*parts[:3])
 
 
@@ -41,12 +45,12 @@ def convert_to_assoc(input_filename, output_filename):
 
     The result can be used to predict word associations using ConceptNet by using
     dimensionality reduction, as in the `assoc_space` package.
-    
+
     The relation is mostly ignored because we have not yet found a good way to
     take the relation into account in dimensionality reduction.
     """
     out_stream = codecs.open(output_filename, 'w', encoding='utf-8')
-    
+
     for info in read_msgpack_stream(input_filename):
         startc = reduce_concept(info['start'])
         endc = reduce_concept(info['end'])
@@ -81,10 +85,12 @@ def convert_to_assoc(input_filename, output_filename):
                 pairs = [(startc, endc + '/neg'), (startc + '/neg', endc)]
 
         for (start, end) in pairs:
-            line = "%(start)s\t%(end)s\t%(weight)s" % {
+            line = "%(start)s\t%(end)s\t%(weight)s\t%(dataset)s\t%(relation)s" % {
                 'start': start,
                 'end': end,
                 'weight': weight,
+                'dataset': info['dataset'],
+                'relation': rel
             }
             print(line, file=out_stream)
 
@@ -98,4 +104,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

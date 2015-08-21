@@ -6,6 +6,7 @@ import sqlite3
 import struct
 import os
 import re
+import random
 from hashlib import md5
 
 INT_LIMIT = 2 ** 63 - 1
@@ -248,12 +249,36 @@ class EdgeIndexReader(object):
                 yield self.get_edge(filenum, offset)
 
     def get_edge(self, filenum, offset):
-        if filenum in self.open_file_cache:
-            fileobj = self.open_file_cache[filenum]
-        else:
-            filename = 'part_%02d.msgpack' % filenum
-            fileobj = open(os.path.join(self.edge_dir, filename), 'rb')
-            self.open_file_cache[filenum] = fileobj
+        fileobj = self.get_file(filenum)
         fileobj.seek(offset)
         unpacker = Unpacker(fileobj, encoding=encoding)
         return unpacker.unpack()
+
+    def get_file(self, filenum):
+        if filenum in self.open_file_cache:
+            return self.open_file_cache[filenum]
+        else:
+            filename = 'part_%02d.msgpack' % filenum
+            path = os.path.join(self.edge_dir, filename)
+            size = os.path.getsize(path)
+            fileobj = open(path, 'rb')
+            self.open_file_cache[filenum] = fileobj
+            return fileobj
+
+    def random(self):
+        hashval = random.randrange(-2**31, 2**31)
+        shard = hashval % self.nshards
+        c = self.dbs[shard].cursor()
+        offset = random.randrange(0, 100)
+        rows = []
+        while not rows:
+            c.execute(
+                "SELECT filenum, offset from text_index "
+                "WHERE queryhash >= ? "
+                "ORDER BY queryhash LIMIT 1 OFFSET ?",
+                (hashval, offset)
+            )
+            rows = c.fetchall()
+
+        filenum, offset = rows[0]
+        return self.get_edge(filenum, offset)

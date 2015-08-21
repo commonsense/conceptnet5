@@ -25,62 +25,15 @@ if sys.version_info.major >= 3:
 # with Semantic Web-style resources.
 ROOT_URL = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 
-# If we end up trying to fit a piece of text that looks like these into a URI,
-# it will mess up our patterns of URIs.
-BAD_NAMES_FOR_THINGS = {'', ',', '[', ']', '/'}
-
 # Whitespace should be replaced with underscores in URIs.
 WHITESPACE_RE = re.compile('[\s]')
 
 
-def normalize_text(text, lowercase=True):
-    """
-    When a piece of a URI is an arbitrary string, we standardize it in the
-    following ways:
-
-    - Ensure it is in Unicode, and standardize its Unicode representation
-      with the `ftfy.fix_text` function.
-    - Erase case distinctions by converting cased characters to lowercase.
-    - Strip common punctuation, unless that would make the string empty.
-    - Replace spaces with underscores.
-
-    The result will be a Unicode string that can be used within a URI.
-
-        >>> normalize_text(' cat')
-        'cat'
-
-        >>> normalize_text('Italian supercat')
-        'italian_supercat'
-
-        >>> normalize_text('Test?!')
-        'test'
-
-        >>> normalize_text('TEST.')
-        'test'
-
-        >>> normalize_text('test/test')
-        'test_test'
-
-        >>> normalize_text('   u\N{COMBINING DIAERESIS}ber\\n')
-        'über'
-
-        >>> normalize_text('embedded' + chr(9) + 'tab')
-        'embedded_tab'
-    """
-    if not isinstance(text, unicode):
-        raise ValueError("All texts must be Unicode, not bytes.")
-
-    # Replace slashes with spaces, which will become underscores later.
-    # Slashes should separate pieces of a URI, and shouldn't appear within
-    # a piece.
-    text = fix_text(text, normalization='NFC').strip()
-    text = text.replace('/', ' ')
-    assert (text not in BAD_NAMES_FOR_THINGS), text
-    text = text.strip('.,?!"') or text
-    if lowercase:
-        text = text.lower()
-    text = WHITESPACE_RE.sub('_', text)
-    return text
+def standardize_text(text, lowercase=True):
+    raise NotImplementedError(
+        "This function has been superseded by "
+        "conceptnet5.nodes.standardize_text."
+    )
 
 
 def join_uri(*pieces):
@@ -92,8 +45,8 @@ def join_uri(*pieces):
     The resulting URI will always begin with a slash and have its pieces
     separated by a single slash.
 
-    The pieces do not have `normalize_text` applied to them; to make sure your
-    URIs are in normal form, run `normalize_text` on each piece that represents
+    The pieces do not have `standardize_text` applied to them; to make sure your
+    URIs are in normal form, run `standardize_text` on each piece that represents
     arbitrary text.
 
     >>> join_uri('/c', 'en', 'cat')
@@ -130,9 +83,9 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     with the same text.
 
     `text` and `disambiguation` should be strings that have already been run
-    through `normalize_text`.
+    through `standardize_text`.
 
-    This is a low-level interface. See `normalized_concept_uri` in nodes.py for
+    This is a low-level interface. See `standardized_concept_uri` in nodes.py for
     a more generally applicable function that also deals with special
     per-language handling.
 
@@ -147,7 +100,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         ...
     AssertionError: 'this is wrong' is not in normalized form
     """
-    assert text == normalize_text(text), "%r is not in normalized form" % text
+    assert ' ' not in text, "%r is not in normalized form" % text
     if pos is None:
         if disambiguation is not None:
             raise ValueError("Disambiguated concepts must have a part of speech")
@@ -156,7 +109,7 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
         if disambiguation is None:
             return join_uri('/c', lang, text, pos)
         else:
-            assert disambiguation == normalize_text(disambiguation),\
+            assert ' ' not in disambiguation,\
                 "%r is not in normalized form" % disambiguation
             return join_uri('/c', lang, text, pos, disambiguation)
 

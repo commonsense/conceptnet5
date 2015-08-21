@@ -10,25 +10,22 @@ import os
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5 import __version__ as VERSION
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
-from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace
+from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
 
 
 
 ### Configuration ###
 
-VERSION = '5.3'
-API_URL = '/data/5.3'
+API_URL = '/data/%s' % VERSION
 WORKING_DIR = os.getcwd()
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
 
-FINDER = AssertionFinder()
-ASSOC_WRAPPER = AssocSpaceWrapper(
-    get_data_filename('assoc/assoc-space-%s' % VERSION), FINDER
-)
+FINDER, ASSOC_WRAPPER = get_assoc_data('assoc-space-%s' % VERSION)
 
 app = flask.Flask(
     'conceptnet5',
@@ -87,15 +84,20 @@ def term_list_error(error):
 
 @app.route(API_URL + '/<path:query>')
 def query_node(query):
-    # TODO: restore support for min_weight?
     req_args = flask.request.args
     path = '/' + query.strip('/')
     offset = int(req_args.get('offset', 0))
     offset = max(0, offset)
     limit = int(req_args.get('limit', 50))
     limit = max(0, min(limit, 1000))
-    results = list(FINDER.lookup(path, offset=offset, limit=limit))
-    return flask.jsonify(edges=results, numFound=len(results))
+    grouped = req_args.get('grouped', 'false').lower() == 'true'
+    if grouped:
+        limit = min(limit, 100)
+        results = FINDER.lookup_grouped_by_feature(path, offset=offset, group_limit=limit)
+        return flask.jsonify(groups=results)
+    else:
+        results = list(FINDER.lookup(path, offset=offset, limit=limit))
+        return flask.jsonify(edges=results, numFound=len(results))
 
 
 @app.route(API_URL + '/search')
@@ -112,16 +114,23 @@ def search():
     return flask.jsonify(edges=results, numFound=len(results))
 
 
+@app.route(API_URL + '/uri')
 @app.route(API_URL + '/normalize')
-def normalize():
+@app.route(API_URL + '/standardize')
+def standardize_uri():
+    """
+    Look up the URI for a given piece of text. 'text' and 'language' should be
+    given as parameters.
+    """
     language = flask.request.args.get('language')
-    term = flask.request.args.get('term').replace('_', ' ')
-    if term is None or language is None:
+    text = flask.request.args.get('text') or flask.request.args.get('term')
+    if text is None or language is None:
         return flask.jsonify({
             'error': 'Invalid request',
-            'details': "You should include the 'term' and 'language' parameters"
+            'details': "You should include the 'text' and 'language' parameters"
         }), 400
-    uri = normalized_concept_uri(language, term)
+    text = text.replace('_', ' ')
+    uri = standardized_concept_uri(language, text)
     return flask.jsonify(uri=uri)
 
 

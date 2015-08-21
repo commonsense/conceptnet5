@@ -1,6 +1,7 @@
 # coding: utf-8
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.sql import EdgeIndexReader
+from collections import defaultdict
 import sys
 
 
@@ -80,6 +81,54 @@ class AssertionFinder(object):
         return self.search_index.lookup(
             query.rstrip('/'), complete, limit=limit, offset=offset
         )
+
+    def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10, offset=0):
+        """
+        Given a query for a concept, return assertions about that concept grouped by
+        their features (for example, "A dog wants to ..." could be a group).
+
+        It will scan up to `scan_limit` assertions to find out which features exist,
+        then retrieve `group_limit` assertions for each feature if possible.
+        """
+        groups = defaultdict(list)
+        more = set()
+        for assertion in self.lookup(query, limit=scan_limit, offset=offset):
+            groupkeys = []
+            if assertion['start'] == query:
+                groupkeys.append('%s %s -' % (assertion['start'], assertion['rel']))
+            if assertion['end'] == query:
+                groupkeys.append('- %s %s' % (assertion['rel'], assertion['end']))
+            for groupkey in groupkeys:
+                if len(groups[groupkey]) < group_limit:
+                    groups[groupkey].append(assertion)
+                else:
+                    more.add(groupkey)
+
+        for groupkey in groups:
+            if len(groups[groupkey]) < group_limit:
+                num_more = group_limit - len(groups[groupkey])
+                for assertion in self.lookup(groupkey, limit=num_more):
+                    groups[groupkey].append(assertion)
+
+        grouped = []
+        for groupkey in groups:
+            assertions = groups[groupkey]
+            grouped.append({
+                'feature': groupkey,
+                'more': groupkey in more,
+                'largest_weight': max(assertion['weight'] for assertion in assertions),
+                'assertions': assertions
+            })
+
+        grouped.sort(key=lambda g: -g['largest_weight'])
+        return grouped
+
+    def random_assertions(self, num=10):
+        self.load_index()
+        return [
+            self.search_index.random()
+            for i in range(num)
+        ]
 
     def query(self, criteria, search_key=None, limit=20, offset=0,
               scan_limit=1000):

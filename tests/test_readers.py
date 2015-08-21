@@ -87,7 +87,8 @@ def compare_msgpack(bytes1, bytes2):
     unpacker1 = msgpack.Unpacker(BytesIO(bytes1), encoding='utf-8')
     unpacker2 = msgpack.Unpacker(BytesIO(bytes2), encoding='utf-8')
     for obj1, obj2 in zip_longest(unpacker1, unpacker2):
-        eq_(obj1, obj2)
+        for k,v in obj1.items():
+            eq_(v, obj2[k])
 
 
 def compare_text(text1, text2):

@@ -6,9 +6,11 @@ and builds ConceptNet 5 edges from the data.
 
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import normalized_concept_uri
+from conceptnet5.nodes import (
+    standardized_concept_uri, standardize_text, valid_concept_name
+)
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses, normalize_text, BAD_NAMES_FOR_THINGS
+from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -45,6 +47,16 @@ AROUND_PREPOSITIONS = [
   'in', 'on', 'at', 'under', 'near'
 ]
 
+# Some specific relations were once added to ConceptNet that have no purpose
+# for us anymore, especially ones connected with a project that was trying to
+# understand how people describe pain.
+#
+# 'InheritsFrom' was an inference-related hack on ConceptNet 3 that was never
+# supposed to make it into the actual database.
+
+RELATIONS_TO_DROP = {
+    '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom'
+}
 
 def can_skip(parts_dict):
     """
@@ -75,9 +87,9 @@ def can_skip(parts_dict):
         return True
     if 'testing' in parts_dict["activity"]:
         return True
-    if (
-        parts_dict["startText"].strip() in BAD_NAMES_FOR_THINGS or
-        parts_dict["endText"].strip() in BAD_NAMES_FOR_THINGS
+    if not (
+        valid_concept_name(parts_dict["startText"]) and
+        valid_concept_name(parts_dict["endText"])
     ):
         return True
     return False
@@ -127,14 +139,14 @@ def build_relation(parts_dict):
 def build_start(parts_dict):
     lang = parts_dict['lang']
     startText = parts_dict["startText"]
-    start = normalized_concept_uri(lang, startText)
+    start = standardized_concept_uri(lang, startText)
     return start
 
 
 def build_end(parts_dict):
     lang = parts_dict['lang']
     endText = parts_dict["endText"]
-    end = normalized_concept_uri(lang, endText)
+    end = standardized_concept_uri(lang, endText)
     return end
 
 
@@ -157,9 +169,9 @@ def build_sources(parts_dict, preposition_fix=False):
 
     creator_node = join_uri(
         '/s/contributor/omcs',
-        normalize_text(parts_dict["creator"], lowercase=False)
+        standardize_text(parts_dict["creator"])
     )
-    activity_node = join_uri('/s/activity/omcs', normalize_text(activity))
+    activity_node = join_uri('/s/activity/omcs', standardize_text(activity))
     if preposition_fix:
         conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
     else:
@@ -168,9 +180,12 @@ def build_sources(parts_dict, preposition_fix=False):
 
     for vote in parts_dict["votes"]:
         username = vote[0]
+        if username == parts_dict["creator"]:
+            continue
+
         vote_int = vote[1]
         conjunction = [
-            join_uri('/s/contributor/omcs', username),
+            join_uri('/s/contributor/omcs', standardize_text(username)),
             '/s/activity/omcs/vote'
         ]
         weighted_sources.append((conjunction, vote_int))
@@ -231,6 +246,13 @@ class CN4Builder(object):
         dataset = build_data_set(parts_dict)
         weighted_sources = build_sources(parts_dict, preposition_fix)
 
+        if relation in RELATIONS_TO_DROP:
+            return
+
+        if relation == '/r/DesireOf':
+            # Fix an inconsistently-named relation from GlobalMind
+            relation = '/r/Desires'
+
         for source_list, weight in weighted_sources:
             if 'commons2_reject' in ' '.join(source_list):
                 return
@@ -266,4 +288,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals, print_function
-from conceptnet5.query import field_match
+from conceptnet5.query import field_match, AssertionFinder
+from conceptnet5.util import get_data_filename
+
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
@@ -66,12 +68,24 @@ class AssocSpaceWrapper(object):
             return []
         return [(term, weight / total_weight) for (term, weight) in expanded]
 
+    def expanded_vector(self, terms, limit_per_term=10):
+        self.load()
+        return self.assoc.vector_from_terms(self.expand_terms(terms, limit_per_term))
+
     def associations(self, terms, filter=None, limit=20):
         self.load()
-        vec = self.assoc.vector_from_terms(self.expand_terms(terms))
-        similar = self.assoc.terms_similar_to_vector(vec)
+        vec = self.expanded_vector(terms)
+        similar = self.assoc.terms_similar_to_vector(vec, num=None)
         similar = [
             item for item in similar if item[1] > SMALL
             and self.passes_filter(item[0], filter)
         ][:limit]
         return similar
+
+
+def get_assoc_data(name):
+    finder = AssertionFinder()
+    assoc_wrapper = AssocSpaceWrapper(
+        get_data_filename('assoc/%s' % name), finder
+    )
+    return finder, assoc_wrapper

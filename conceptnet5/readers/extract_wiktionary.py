@@ -12,10 +12,10 @@ from xml.sax import ContentHandler, make_parser
 from xml.sax.handler import feature_namespaces
 import re
 import logging
+import langcodes
 from ftfy import ftfy
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.sql import TitleDBWriter
-from conceptnet5.util.language_codes import NAME_TO_CODE
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
@@ -49,7 +49,8 @@ SUB_SECTION_RE = re.compile(
 
 # To get the language (as the first capturing group) out of a string such as
 # "Buch ({{Sprache|Deutsch}})" in the German witkionary
-LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
+DE_LANGUAGE_RE = re.compile(r'{{[^\|}]+\|([^}]+)}}')
+JA_LANGUAGE_RE = re.compile(r'\{\{([A-Za-z-]+)\}\}')
 
 
 def fix_heading(heading):
@@ -99,13 +100,25 @@ class ExtractPages(ContentHandler):
                 self.in_article = False
 
 
+def _language_name_to_code(name, name_language_code):
+    try:
+        found = langcodes.find_name('language', name, name_language_code)
+        return str(found)
+    except LookupError:
+        return None
+
+
+def _language_code_to_name(code):
+    return langcodes.get(code).language_name('en')
+
+
 class WiktionaryWriter(object):
     """
     Parses a wiktionary file in XML format and saves the results to a set of
     files in msgpack format and a SQLite database.
 
-    Subclasses most likely want to override the methods `_get_language()` and
-    `handle_section()`.
+    Subclasses most likely want to override the methods `_get_language_code()`
+    and `handle_section()`.
     """
     def __init__(self, output_dir, nfiles=20):
         self.nfiles = nfiles
@@ -116,12 +129,7 @@ class WiktionaryWriter(object):
         self.title_db = TitleDBWriter(output_dir + '/titles.db', clear=True)
 
     def _get_language_code(self, language):
-        return NAME_TO_CODE['en'].get(language)
-
-    def _get_language(self, heading):
-        """Essentially a no-op method by default, but meant to be overridden
-        with something more useful in subclasses."""
-        return heading
+        return _language_name_to_code(language, 'en')
 
     def parse_wiktionary_file(self, filename):
         # Create a parser
@@ -151,7 +159,9 @@ class WiktionaryWriter(object):
 
     def handle_language_section(self, site, title, heading, text):
         sec_data = self.handle_section(text, heading, level=2)
-        language = self._get_language(sec_data['heading'])
+        language = self._get_language_code(sec_data['heading'])
+        if language is None:
+            return
         data = {
             'site': site,
             'language': language,
@@ -162,9 +172,7 @@ class WiktionaryWriter(object):
         self.writers[filenum].write(data)
 
         # Save the languages and titles to a database file
-        language_code = self._get_language_code(language)
-        if language_code is not None:
-            self.title_db.add(language_code, title.lower())
+        self.title_db.add(language, title.lower())
 
     def handle_section(self, text, heading, level):
         section_finder = SECTION_HEADER_RES[level + 1]
@@ -184,14 +192,14 @@ class WiktionaryWriter(object):
 
 
 class DeWiktionaryWriter(WiktionaryWriter):
-    def _get_language(self, heading):
-        lang_match = LANGUAGE_RE.search(heading)
+    langcode = 'de'
+    def _get_language_code(self, heading):
+        lang_match = DE_LANGUAGE_RE.search(heading)
         if lang_match:
-            return lang_match.group(1).strip()
-        return 'Deutsch'
-
-    def _get_language_code(self, language):
-        return NAME_TO_CODE['de'].get(language)
+            name = lang_match.group(1).strip()
+            return _language_name_to_code(name, 'de')
+        else:
+            return None
 
     def handle_section(self, text, heading, level=None):
         """
@@ -220,7 +228,17 @@ class DeWiktionaryWriter(WiktionaryWriter):
         }
 
 
-LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter}
+class JaWiktionaryWriter(WiktionaryWriter):
+    langcode = 'ja'
+    def _get_language_code(self, heading):
+        match = JA_LANGUAGE_RE.match(heading)
+        if match:
+            return langcodes.standardize_tag(match.group(1))
+        else:
+            return None
+
+
+LANGUAGE_TO_WRITER = {'en': WiktionaryWriter, 'de': DeWiktionaryWriter, 'ja': JaWiktionaryWriter}
 
 
 def handle_file(input_file, output_dir, language, nfiles=20):
@@ -237,7 +255,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help="Wiktionary XML file")
     parser.add_argument('output', help='Directory to output to')
-    parser.add_argument('-l', '--language', choices=['de', 'en'], default='en',
+    parser.add_argument('-l', '--language',
+                        choices=['de', 'en', 'ja'],
+                        default='en',
                         help='Two-letter ISO language code of the input file')
     parser.add_argument('-n', '--nfiles', type=int, default=20,
                         help='Number of output files to create')

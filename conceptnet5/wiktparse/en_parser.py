@@ -12,10 +12,12 @@
 
 
 from __future__ import print_function, division, absolute_import, unicode_literals
+
 from grako.parsing import graken, Parser
+from grako.util import re, RE_FLAGS
 
 
-__version__ = (2014, 10, 10, 21, 11, 17, 4)
+__version__ = (2015, 8, 13, 11, 33, 15, 3)
 
 __all__ = [
     'en_wiktionaryParser',
@@ -25,10 +27,13 @@ __all__ = [
 
 
 class en_wiktionaryParser(Parser):
-    def __init__(self, whitespace='', nameguard=True, **kwargs):
+    def __init__(self, whitespace='', nameguard=None, **kwargs):
         super(en_wiktionaryParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
+            comments_re=None,
+            eol_comments_re=None,
+            ignorecase=None,
             **kwargs
         )
 
@@ -491,69 +496,6 @@ class en_wiktionaryParser(Parser):
         )
 
     @graken()
-    def _translation_name_(self):
-        with self._choice():
-            with self._option():
-                self._token('t-simple')
-            with self._option():
-                self._token('t+')
-            with self._option():
-                self._token('t-')
-            with self._option():
-                self._token('t0')
-            with self._option():
-                self._token('tø')
-            with self._option():
-                self._token('t')
-            self._error('expecting one of: t t+ t- t-simple t0 tø')
-
-    @graken()
-    def _translation_template_(self):
-        self._left_braces_()
-        self._WS_()
-        self._translation_name_()
-        self._WS_()
-        self._vertical_bar_()
-        self._WS_()
-        self._term_()
-        self.ast['language'] = self.last_node
-        self._WS_()
-        self._template_args_1_()
-        self.ast['arg'] = self.last_node
-        self._right_braces_()
-
-        self.ast._define(
-            ['language', 'arg'],
-            []
-        )
-
-    @graken()
-    def _sensetrans_top_template_(self):
-        self._left_braces_()
-        self._WS_()
-        self._token('trans-top')
-        self._WS_()
-        self._vertical_bar_()
-        self._WS_()
-        self._text_with_links_()
-        self.ast['sense'] = self.last_node
-        self._WS_()
-        self._right_braces_()
-
-        self.ast._define(
-            ['sense'],
-            []
-        )
-
-    @graken()
-    def _checktrans_top_template_(self):
-        self._left_braces_()
-        self._WS_()
-        self._token('checktrans-top')
-        self._WS_()
-        self._right_braces_()
-
-    @graken()
     def _ttbc_template_(self):
         self._left_braces_()
         self._token('ttbc')
@@ -675,6 +617,69 @@ class en_wiktionaryParser(Parser):
         )
 
     @graken()
+    def _translation_name_(self):
+        with self._choice():
+            with self._option():
+                self._token('t-simple')
+            with self._option():
+                self._token('t+')
+            with self._option():
+                self._token('t-')
+            with self._option():
+                self._token('t0')
+            with self._option():
+                self._token('tø')
+            with self._option():
+                self._token('t')
+            self._error('expecting one of: t t+ t- t-simple t0 tø')
+
+    @graken()
+    def _translation_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._translation_name_()
+        self._WS_()
+        self._vertical_bar_()
+        self._WS_()
+        self._term_()
+        self.ast['language'] = self.last_node
+        self._WS_()
+        self._template_args_1_()
+        self.ast['arg'] = self.last_node
+        self._right_braces_()
+
+        self.ast._define(
+            ['language', 'arg'],
+            []
+        )
+
+    @graken()
+    def _sensetrans_top_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('trans-top')
+        self._WS_()
+        self._vertical_bar_()
+        self._WS_()
+        self._text_with_links_()
+        self.ast['sense'] = self.last_node
+        self._WS_()
+        self._right_braces_()
+
+        self.ast._define(
+            ['sense'],
+            []
+        )
+
+    @graken()
+    def _checktrans_top_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('checktrans-top')
+        self._WS_()
+        self._right_braces_()
+
+    @graken()
     def _link_template_name_(self):
         with self._choice():
             with self._option():
@@ -730,47 +735,6 @@ class en_wiktionaryParser(Parser):
         self.ast._define(
             ['linktype', 'args'],
             ['subtypes']
-        )
-
-    @graken()
-    def _etyl_template_(self):
-        self._left_braces_()
-        self._WS_()
-        self._token('etyl')
-        self._WS_()
-        self._vertical_bar_()
-        self._term_()
-        self.ast['language'] = self.last_node
-        self._WS_()
-        self._template_args_NS_()
-        self._right_braces_()
-
-        self.ast._define(
-            ['language'],
-            []
-        )
-
-    @graken()
-    def _etyl_link_(self):
-        with self._choice():
-            with self._option():
-                self._link_template_()
-            with self._option():
-                self._wiki_link_()
-            self._error('no available options')
-
-    @graken()
-    def _etyl_template_and_link_(self):
-        self._etyl_template_()
-        self.ast['etyl'] = self.last_node
-        self._WS_()
-        self._one_line_text_()
-        self._etyl_link_()
-        self.ast['link'] = self.last_node
-
-        self.ast._define(
-            ['etyl', 'link'],
-            []
         )
 
     @graken()
@@ -836,6 +800,47 @@ class en_wiktionaryParser(Parser):
         self.ast._define(
             [],
             ['entries']
+        )
+
+    @graken()
+    def _etyl_template_(self):
+        self._left_braces_()
+        self._WS_()
+        self._token('etyl')
+        self._WS_()
+        self._vertical_bar_()
+        self._term_()
+        self.ast['language'] = self.last_node
+        self._WS_()
+        self._template_args_NS_()
+        self._right_braces_()
+
+        self.ast._define(
+            ['language'],
+            []
+        )
+
+    @graken()
+    def _etyl_link_(self):
+        with self._choice():
+            with self._option():
+                self._link_template_()
+            with self._option():
+                self._wiki_link_()
+            self._error('no available options')
+
+    @graken()
+    def _etyl_template_and_link_(self):
+        self._etyl_template_()
+        self.ast['etyl'] = self.last_node
+        self._WS_()
+        self._one_line_text_()
+        self._etyl_link_()
+        self.ast['link'] = self.last_node
+
+        self.ast._define(
+            ['etyl', 'link'],
+            []
         )
 
     @graken()
@@ -1094,18 +1099,6 @@ class en_wiktionarySemantics(object):
     def external_link(self, ast):
         return ast
 
-    def translation_name(self, ast):
-        return ast
-
-    def translation_template(self, ast):
-        return ast
-
-    def sensetrans_top_template(self, ast):
-        return ast
-
-    def checktrans_top_template(self, ast):
-        return ast
-
     def ttbc_template(self, ast):
         return ast
 
@@ -1130,19 +1123,22 @@ class en_wiktionarySemantics(object):
     def translation_section(self, ast):
         return ast
 
+    def translation_name(self, ast):
+        return ast
+
+    def translation_template(self, ast):
+        return ast
+
+    def sensetrans_top_template(self, ast):
+        return ast
+
+    def checktrans_top_template(self, ast):
+        return ast
+
     def link_template_name(self, ast):
         return ast
 
     def link_template(self, ast):
-        return ast
-
-    def etyl_template(self, ast):
-        return ast
-
-    def etyl_link(self, ast):
-        return ast
-
-    def etyl_template_and_link(self, ast):
         return ast
 
     def link_entry(self, ast):
@@ -1152,6 +1148,15 @@ class en_wiktionarySemantics(object):
         return ast
 
     def link_section(self, ast):
+        return ast
+
+    def etyl_template(self, ast):
+        return ast
+
+    def etyl_link(self, ast):
+        return ast
+
+    def etyl_template_and_link(self, ast):
         return ast
 
     def etymology_section(self, ast):
@@ -1173,7 +1178,7 @@ class en_wiktionarySemantics(object):
         return ast
 
 
-def main(filename, startrule, trace=False, whitespace=None):
+def main(filename, startrule, trace=False, whitespace=None, nameguard=None):
     import json
     with open(filename) as f:
         text = f.read()
@@ -1183,7 +1188,8 @@ def main(filename, startrule, trace=False, whitespace=None):
         startrule,
         filename=filename,
         trace=trace,
-        whitespace=whitespace)
+        whitespace=whitespace,
+        nameguard=nameguard)
     print('AST:')
     print(ast)
     print()
@@ -1207,6 +1213,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Simple parser for en_wiktionary.")
     parser.add_argument('-l', '--list', action=ListRules, nargs=0,
                         help="list all rules and exit")
+    parser.add_argument('-n', '--no-nameguard', action='store_true',
+                        dest='no_nameguard',
+                        help="disable the 'nameguard' feature")
     parser.add_argument('-t', '--trace', action='store_true',
                         help="output trace information")
     parser.add_argument('-w', '--whitespace', type=str, default=string.whitespace,
@@ -1220,5 +1229,6 @@ if __name__ == '__main__':
         args.file,
         args.startrule,
         trace=args.trace,
-        whitespace=args.whitespace
+        whitespace=args.whitespace,
+        nameguard=not args.no_nameguard
     )
