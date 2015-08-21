@@ -13,6 +13,7 @@ WORKDIR /src/conceptnet
 RUN python3 setup.py develop
 RUN pip3 install assoc_space==1.0.2
 RUN pip3 install wordfreq==1.0
+RUN python -c 'import nltk; nltk.download("wordnet")'
 
 # This is where the data should go, but you have to put it there using
 # a Docker volume

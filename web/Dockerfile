@@ -2,7 +2,6 @@ FROM rspeer/conceptnet:5.4
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 RUN pip install gunicorn
-RUN pip install flask_limiter limits
 
 ADD router/static /src/conceptnet/static
 ADD templates /src/conceptnet/templates

@@ -156,6 +156,7 @@ def standardized_concept_uri(lang, text, *more):
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
     '/c/en/this_be_test/n/example_phrase'
     """
+    lang = lang.lower()
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
     norm_text = standardized_concept_name(lang, text)

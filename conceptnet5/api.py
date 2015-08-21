@@ -114,16 +114,23 @@ def search():
     return flask.jsonify(edges=results, numFound=len(results))
 
 
+@app.route(API_URL + '/uri')
 @app.route(API_URL + '/normalize')
-def normalize():
+@app.route(API_URL + '/standardize')
+def standardize_uri():
+    """
+    Look up the URI for a given piece of text. 'text' and 'language' should be
+    given as parameters.
+    """
     language = flask.request.args.get('language')
-    term = flask.request.args.get('term').replace('_', ' ')
-    if term is None or language is None:
+    text = flask.request.args.get('text') or flask.request.args.get('term')
+    if text is None or language is None:
         return flask.jsonify({
             'error': 'Invalid request',
-            'details': "You should include the 'term' and 'language' parameters"
+            'details': "You should include the 'text' and 'language' parameters"
         }), 400
-    uri = standardized_concept_uri(language, term)
+    text = text.replace('_', ' ')
+    uri = standardized_concept_uri(language, text)
     return flask.jsonify(uri=uri)
 
 
