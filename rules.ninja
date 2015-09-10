@@ -22,7 +22,7 @@ rule download
   command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
 
 rule extract_tar
-  command = tar -xvf $in -C $prefix
+  command = tar -xvf $in
 
 rule extract_wiktionary
   command = python -m conceptnet5.readers.extract_wiktionary $in $dir -l $lang && cd conceptnet5/wiktparse && eval "make ${lang}_parser.py"
