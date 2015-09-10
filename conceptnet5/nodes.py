@@ -30,8 +30,10 @@ LCODE_ALIASES = {
     'cmn': 'zh',
     'yue': 'zh',
     'nan': 'zh',
-    'zh_TW': 'zh',
-    'zh_CN': 'zh',
+    'zh_tw': 'zh',
+    'zh_cn': 'zh',
+    'zh-tw': 'zh',
+    'zh-cn': 'zh',
 
     # An easier case: consider Bahasa Indonesia and Bahasa Malay to be the
     # same language, with code 'ms', because they're already 90% the same.
