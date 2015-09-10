@@ -64,7 +64,7 @@ in_tar = {
                       for i in range(1, 13)] + ['conceptnet_zh_api.txt'],
 
     'verbosity': ['verbosity.txt'],
-    'umbel': ['umbel.nt'],
+    'umbel': ['umbel.nt', 'umbel_links.nt'],
 
 }
 
