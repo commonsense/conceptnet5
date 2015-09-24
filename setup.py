@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.4.0'
+version_str = '5.4.1'
 
 if sys.version_info.major < 3:
     langcodes_req = 'langcodes-py2 == 1.1.2'
