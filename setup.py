@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.4.1'
+version_str = '5.4.2'
 
 if sys.version_info.major < 3:
     langcodes_req = 'langcodes-py2 == 1.1.2'
@@ -39,6 +39,7 @@ setup(
     author_email = 'conceptnet@media.mit.edu',
     packages=packages,
     include_package_data=True,
+    exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
         'nltk >= 3.0b1', 'xmltodict', 'pyyaml', 'requests', 'limits',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
