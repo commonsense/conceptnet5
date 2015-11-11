@@ -82,10 +82,11 @@ def term_list_error(error):
 
 ### API endpoints ###
 
-@app.route(API_URL + '/<path:query>')
-def query_node(query):
+# Lookup: match any path starting with /a/, /c/, /d/, /r/, or /s/
+@app.route(API_URL + '/<any(a, c, d, r, s):top>/<path:query>')
+def query_node(top, query):
     req_args = flask.request.args
-    path = '/' + query.strip('/')
+    path = '/%s/%s' % (top, query.strip('/'))
     offset = int(req_args.get('offset', 0))
     offset = max(0, offset)
     limit = int(req_args.get('limit', 50))
