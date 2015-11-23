@@ -84,7 +84,6 @@ def run_umbel(input_dir, output_file, sw_map_file):
     # We parse them both in this file so that umbel_links can reuse the
     # concept names extracted from umbel.nt.
     main_file = os.path.join(input_dir, 'umbel.nt')
-    dbpedia_link_file = os.path.join(input_dir, 'umbel_links.nt')
 
     # Read through umbel.nt once, finding all the "preferred labels". We will
     # use these as the surface texts for the nodes.
@@ -139,22 +138,6 @@ def run_umbel(input_dir, output_file, sw_map_file):
                             alt_label = standardized_concept_uri('en', name)
                         surface = SYN_FRAME % (name, labels[web_subj])
                         out.write(umbel_edge('/r/Synonym', alt_label, main_label, surface, SOURCE))
-
-    for web_subj, web_rel, web_obj, objtag in reader.parse_file(dbpedia_link_file):
-        if objtag == 'URL' and acceptable_node(web_obj) and acceptable_node(web_subj):
-            if web_obj in labels:
-                subj_label = resource_name(web_subj).replace('_', ' ')
-                subj_uri = translate_dbpedia_url(web_subj)
-                obj_label = labels[web_obj]
-                obj_uri = standardized_concept_uri('en', obj_label)
-                rel_name = resource_name(web_rel)
-                if rel_name in REL_MAPPING:
-                    rel_uri, frame = REL_MAPPING[rel_name]
-                    surface = frame % (subj_label, obj_label)
-                    out.write(umbel_edge(rel_uri, subj_uri, obj_uri, surface, LINK_SOURCE))
-                    map_out.write_link(web_rel, full_conceptnet_url(rel_uri))
-                    map_out.write_link(web_subj, full_conceptnet_url(subj_uri))
-                    map_out.write_link(web_obj, full_conceptnet_url(obj_uri))
 
 
 # Entry point for testing
