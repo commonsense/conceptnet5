@@ -82,7 +82,7 @@ def add_all_deps(deps):
     parse_conceptnet4(deps)  # conceptnet4 conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
-    parse_dbpedia(deps)
+    # parse_dbpedia(deps)
 
     msgpack_to_csv(deps)
     collate(deps)
