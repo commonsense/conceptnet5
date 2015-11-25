@@ -87,9 +87,12 @@ def combine_assertions(csv_filename, output_file, license):
             current_weight += weight
             if source_uri not in current_sources:
                 contributors = extract_contributors(source_uri)
-                if not contributors & current_contributors:
-                    current_sources.append(source_uri)
-                    current_contributors |= contributors
+
+                # Only list sources that are positive about the assertion
+                if weight > 0:
+                    if not contributors & current_contributors:
+                        current_sources.append(source_uri)
+                        current_contributors |= contributors
             # We use the first surface form we see as the surface form for
             # the whole assertion.
             if (current_surface is None) and surface:
