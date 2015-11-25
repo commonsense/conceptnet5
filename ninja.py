@@ -88,12 +88,12 @@ def add_all_deps(deps):
     collate(deps)
     count_and_rank(deps)
     combine_assertions(deps)
-    build_db(deps)
+    #build_db(deps)
 
     msgpack_to_assoc(deps)
     stats(deps)
 
-    build_vector_space(deps)
+    #build_vector_space(deps)
     build_dist(deps)
 
 
@@ -382,8 +382,8 @@ def build_dist(deps):
         ('flat_msgpack', msgpacks),
         ('flat_json', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.jsons'))),
         ('flat_csv', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.csv'))),
-        ('db', deps['build db']['outputs'] + msgpacks),
-        ('vector_space', deps['build vector space']['outputs'])
+        # ('db', deps['build db']['outputs'] + msgpacks),
+        # ('vector_space', deps['build vector space']['outputs'])
     ]:
         output = prefix + 'dist/' + start_date + '/conceptnet5_' + output + '_5.4.tar.bz2'
         deps['compress '+output] = Dep(
