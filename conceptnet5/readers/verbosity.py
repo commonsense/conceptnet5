@@ -17,11 +17,12 @@ import re
 # I have no idea why the word 'mince' shows up in so many bad assertions, but
 # it does.
 BAD_CLUE_REGEX = re.compile(
-    r'(^letter|^rhyme|^blank$|^words?$|^syllable$|^spell|^tense$|^prefix'
+    r'(^letter|^rhyme|^blank$|^words?$|^syllables?$|^spell|^tense$|^prefix'
     r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
     r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
     r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$|'
-    r'^delete|^remove|^add$|^plus$|^more$|^less$|^clue$)'
+    r'^delete|^remove|^add$|^plus$|^more$|^less$|^combine$|^clue$|^my$|'
+    r'^uppercase$|^capital|^previous$|^next$|^last$)'
 )
 
 # These are words we won't pull out of phrases in order to make individual
