@@ -4,16 +4,26 @@ from __future__ import print_function, unicode_literals
 """
 Tools for working with English text and reducing it to a normal form.
 
-In English, we remove a very small number of stopwords, and then apply a
-modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
-modifications mostly involve heuristics for when to apply noun or verb
-transformations to words whose part of speech is ambiguous.
+In English, we remove a small number of stopwords (mostly determiners), and
+then apply a modified version of Morphy, the stemmer (lemmatizer) used in
+WordNet.  The modifications mostly involve heuristics for when to apply noun or
+verb transformations to words whose part of speech is ambiguous.
+
 """
 from .token_utils import simple_tokenize
 import re
 morphy = None
 
-STOPWORDS = ['the', 'a', 'an']
+STOPWORDS = [
+    # Determiners
+    'the', 'a', 'an', 'any', 'all', 'some',
+    # Determiner pronouns
+    'my', 'our', 'your', 'his', 'her', 'its', 'their',
+    # Pronouns that aren't determiners
+    'i', 'you', 'he', 'she', 'it', 'they', 'me', 'him', 'them'
+    # Vague nouns
+    'something', 'someone', 'anything'
+]
 
 EXCEPTIONS = {
     # Avoid obsolete and obscure roots, the way lexicographers don't.
@@ -167,7 +177,7 @@ def english_filter(tokens):
     reduce the words to their WordNet roots using Morphy.
     """
     non_stopwords = [morphy_stem(token) for token in tokens if token not in STOPWORDS]
-    if non_stopwords and non_stopwords[0] == 'to':
+    if non_stopwords and non_stopwords[0] in ('to', 'be'):
         non_stopwords = non_stopwords[1:]
     if non_stopwords:
         return non_stopwords
