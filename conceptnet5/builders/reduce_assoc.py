@@ -11,7 +11,7 @@ def concept_is_bad(uri):
     specific phrase, possibly mis-parsed. A concept with a colon is probably
     detritus from a wiki.
     """
-    return ':' in uri or uri.count('_') >= 3
+    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/')
 
 
 def negate_concept(concept):
