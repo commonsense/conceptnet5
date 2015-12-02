@@ -38,7 +38,7 @@ def judge_reliability(reliability, nodes, initial_weight):
             weight += 0.25
         elif node in reliability:
             weight += reliability[node]
-    return weight
+    return weight_scale(weight)
 
 
 def extract_contributors(source):
@@ -128,16 +128,16 @@ def combine_assertions(csv_filename, output_file, license):
         # Otherwise, it's a new assertion.
         else:
             if current_uri is not None:
-                weight = judge_reliability(
+                judged_weight = judge_reliability(
                     reliability, current_sources + [start, end], current_weight
                 )
-                if weight > 0:
+                if judged_weight > 0:
                     output_assertion(
                         out,
                         dataset=current_dataset, license=license,
                         sources=current_sources,
                         surfaceText=current_surface,
-                        weight=current_weight,
+                        weight=judged_weight,
                         uri=current_uri,
                         **current_data
                     )
@@ -154,17 +154,17 @@ def combine_assertions(csv_filename, output_file, license):
             current_dataset = this_dataset
 
     if current_uri is not None:
-        weight = judge_reliability(
+        judged_weight = judge_reliability(
             reliability, current_sources + [start, end], current_weight
         )
-        if weight > 0:
+        if judged_weight > 0:
             output_assertion(
                 out,
                 rel=rel, start=start, end=end,
                 dataset=current_dataset, license=license,
                 sources=current_sources,
                 surfaceText=current_surface,
-                weight=current_weight,
+                weight=judged_weight,
                 uri=current_uri
             )
 
