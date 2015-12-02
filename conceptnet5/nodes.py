@@ -99,6 +99,9 @@ def standardize_text(text, token_filter=None):
         >>> standardize_text('embedded' + chr(9) + 'tab')
         'embedded_tab'
 
+        >>> standardize_text('_')
+        '_'
+
         >>> standardize_text(',')
         ''
     """
