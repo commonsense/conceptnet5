@@ -21,8 +21,8 @@ BAD_CLUE_REGEX = re.compile(
     r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
     r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
     r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$|'
-    r'^delete|^remove|^add$|^plus$|^more$|^less$|^combine$|^clue$|^my$|'
-    r'^uppercase$|^capital|^previous$|^next$|^last$)'
+    r'^delete|^remove|^add$|^drop$|^plus$|^more$|^less$|^combine$|^clue$|'
+    r'^my$|^uppercase$|^capital|^previous$|^next$|^last$|^no$|^without$)'
 )
 
 # These are words we won't pull out of phrases in order to make individual
