@@ -114,7 +114,7 @@ def handle_file(filename, output_file):
     data = file.read()
     file.close()
     xml = xmltodict.parse(data)
-    
+
     # The dictionary contains a list of <entry> tags.
     root_node = xml['JMdict']
     for entry in get_list(root_node, 'entry'):

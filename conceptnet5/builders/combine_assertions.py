@@ -5,7 +5,6 @@ from conceptnet5.uri import disjunction_uri, parse_compound_uri
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util import get_support_data_filename
 import os
-import math
 
 N = 100
 CURRENT_DIR = os.getcwd()
@@ -29,13 +28,43 @@ def read_reliability_file(filename):
     return reliability
 
 
+def truncate_term(term):
+    parts = term.split('/')
+    return '/'.join(parts[:4])
+
+
+def transform_node(node):
+    if node.startswith('/s/web/'):
+        return truncate_term(node)
+    elif node.startswith('/s/contributor/omcs/20q'):
+        return '/s/contributor/omcs/20q'
+    else:
+        return node
+
+
+def flatten_sources(sources):
+    sources_out = []
+    for source in sources:
+        if source.startswith('/and/'):
+            head, items = parse_compound_uri(source)
+            sources_out.extend(items)
+        elif source.startswith('/or/'):
+            raise ValueError("Didn't expect a disjunction here")
+        else:
+            sources_out.append(source)
+    return sources_out
+
+
 def judge_reliability(reliability, nodes, initial_weight):
     weight = initial_weight - 1
-    for node in nodes:
+    for node in flatten_sources(nodes):
+        node = transform_node(node)
         if node.startswith('/c/') and not node.startswith('/c/en/'):
             # Our evaluation process really only works for English, so
             # compensate non-English assertions here
             weight += 0.25
+        if node.startswith('/a/'):
+            weight += 0.5
         elif node in reliability:
             weight += reliability[node]
     return weight_scale(weight)
@@ -94,6 +123,7 @@ def combine_assertions(csv_filename, output_file, license):
     )
 
     out = MsgpackStreamWriter(output_file)
+    out_bad = MsgpackStreamWriter(output_file + '.reject')
     for line in codecs.open(csv_filename, encoding='utf-8'):
         line = line.rstrip('\n')
         if not line:
@@ -132,15 +162,18 @@ def combine_assertions(csv_filename, output_file, license):
                     reliability, current_sources + [start, end], current_weight
                 )
                 if judged_weight > 0:
-                    output_assertion(
-                        out,
-                        dataset=current_dataset, license=license,
-                        sources=current_sources,
-                        surfaceText=current_surface,
-                        weight=judged_weight,
-                        uri=current_uri,
-                        **current_data
-                    )
+                    destination = out
+                else:
+                    destination = out_bad
+                output_assertion(
+                    destination,
+                    dataset=current_dataset, license=license,
+                    sources=current_sources,
+                    surfaceText=current_surface,
+                    weight=judged_weight,
+                    uri=current_uri,
+                    **current_data
+                )
             current_uri = uri
             current_data = {
                 'rel': rel,
@@ -158,15 +191,18 @@ def combine_assertions(csv_filename, output_file, license):
             reliability, current_sources + [start, end], current_weight
         )
         if judged_weight > 0:
-            output_assertion(
-                out,
-                rel=rel, start=start, end=end,
-                dataset=current_dataset, license=license,
-                sources=current_sources,
-                surfaceText=current_surface,
-                weight=judged_weight,
-                uri=current_uri
-            )
+            destination = out
+        else:
+            destination = out_bad
+        output_assertion(
+            destination,
+            rel=rel, start=start, end=end,
+            dataset=current_dataset, license=license,
+            sources=current_sources,
+            surfaceText=current_surface,
+            weight=judged_weight,
+            uri=current_uri
+        )
 
 
 def output_assertion(out, **kwargs):

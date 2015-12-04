@@ -140,7 +140,7 @@ def handle_file(infile, outfile):
         # The weight is the score divided by 100. All divisions are floating
         # point, as defined by the __future__ import at the top of this module.
         score = (freq * 2 - 1) * (1 - sls) * (1 - orderscore / 1000)
-        if score <= 0.5:
+        if score <= 1.:
             outcomes['low score'] += 1
             continue
 
