@@ -9,6 +9,7 @@ modified version of Morphy, the stemmer (lemmatizer) used in WordNet.  The
 modifications mostly involve heuristics for when to apply noun or verb
 transformations to words whose part of speech is ambiguous.
 """
+from ..util import get_support_data_filename
 from .token_utils import simple_tokenize
 import re
 morphy = None
@@ -174,3 +175,59 @@ def english_filter(tokens):
     else:
         return tokens
 
+
+class SimpleLemmatizer:
+    def __init__(self, language):
+        self.language = language
+        self.mapping = {}
+        self.patterns = []
+        self._load()
+
+    def _load(self):
+        from nltk.corpus import wordnet
+        self.wordnet = wordnet
+
+        self.mapping.clear()
+        self.patterns.clear()
+        self._load_patterns()
+        self._load_exceptions()
+        self._load_unchanged()
+
+    def _load_patterns(self):
+        filename = get_support_data_filename('morphology/{0}_patterns.txt'.format(self.language))
+        for line in open(filename, encoding='utf-8'):
+            pattern, replacement, pos, morph = line.rstrip().split(None, 3)
+            if morph == '-':
+                morph = ''
+            re_pattern = re.compile(pattern.replace('*', '(.+)') + '$')
+            replacement = replacement.replace('*', r'\1')
+            self.patterns.append((re_pattern, replacement, pos.lower(), morph))
+
+    def _load_exceptions(self):
+        for pos in ['noun', 'verb', 'adj']:
+            filename = get_support_data_filename('morphology/{0}_{1}.txt'.format(self.language, pos))
+            for line in open(filename, encoding='utf-8'):
+                before, after, morph = line.rstrip().split(None, 2)
+                self.mapping[before] = (after, morph)
+
+    def _load_unchanged(self):
+        filename = get_support_data_filename('morphology/{0}_unchanged.txt'.format(self.language))
+        for line in open(filename, encoding='utf-8'):
+            word = line.rstrip()
+            self.mapping[word] = (word, '')
+
+    def lookup(self, word):
+        if word in self.mapping:
+            return self.mapping[word]
+
+        if len(word) > 3:
+            for re_pattern, replacement, pos, morph in self.patterns:
+                match = re_pattern.match(word)
+                if match:
+                    replaced = re_pattern.sub(replacement, word)
+                    if self.wordnet.lemmas(replaced, pos):
+                        self.mapping[word] = (replaced, morph)
+                        return (replaced, morph)
+
+        self.mapping[word] = (word, '')
+        return (word, '')
