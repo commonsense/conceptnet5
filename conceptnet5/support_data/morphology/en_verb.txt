@@ -32,7 +32,6 @@ betaken betake +ed
 bethought bethink +ed
 betook betake +ed
 bidden bid +ed
-bit bite +ed
 bitten bite +ed
 bled bleed +ed
 blest bless +ed
@@ -61,7 +60,6 @@ curst curse +ed
 dealt deal +ed
 did do +ed
 done do +ed
-dove dive +ed
 drank drink +ed
 drawn draw +ed
 dreamt dream +ed
@@ -133,10 +131,10 @@ got get +ed
 gotten get +ed
 graven grave +ed
 grew grow +ed
-ground grind +ed
 grown grow +ed
 hacksawn hacksaw +ed
 had have +ed
+hamstrung hamstring +ed
 heard hear +ed
 held hold +ed
 hewn hew +ed
@@ -164,7 +162,6 @@ leant lean +ed
 leapt leap +ed
 learnt learn +ed
 led lead +ed
-left leave +ed
 lent lend +ed
 lit light +ed
 lost lose +ed
@@ -179,6 +176,7 @@ misbecame misbecome +ed
 misdealt misdeal +ed
 misgave misgive +ed
 misgiven misgive +ed
+misheard mishear +ed
 mislaid mislay +ed
 misled mislead +ed
 mispled misplead +ed
@@ -280,7 +278,6 @@ rewrote rewrite +ed
 ridden ride +ed
 risen rise +ed
 rode ride +ed
-rose rise +ed
 rung ring +ed
 said say +ed
 sang sing +ed
@@ -342,6 +339,7 @@ stole steal +ed
 stolen steal +ed
 stood stand +ed
 strewn strew +ed
+stricken strike +ed
 striven strive +ed
 strode stride +ed
 strove strive +ed
@@ -351,6 +349,7 @@ strung string +ed
 stuck stick +ed
 stung sting +ed
 stunk stink +ed
+stymied stymie +ed
 sung sing +ed
 sunk sink +ed
 sunken sink +ed
@@ -455,20 +454,26 @@ yclept clepe +ed
 being be +ing
 dying die +ing
 lying lie +ing
+overlying overlie +ing
 singing sing +ing
 stymying stymie +ing
 tying tie +ing
 underlying underlie +ing
 untying untie +ing
 vying vie +ing
-am be +
-are be +
+am be +s
+amuses amuse +s
+are be +s
 believes believe +s
+delves delve +s
 dies die +s
 has have +s
 is be +s
 leaves leave +s
 uses use +s
 proves prove +s
+relieves relieve +s
+reverses reverse +s
 serves serve +s
 strives strive +s
+waives waive +s

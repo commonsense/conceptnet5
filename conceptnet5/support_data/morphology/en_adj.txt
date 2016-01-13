@@ -34,6 +34,8 @@ older old +er
 oldest old +est
 madder mad +er
 maddest mad +est
+redder red +er
+reddest red +est
 sadder sad +er
 saddest sad +est
 slimmer slim +er
