@@ -17,7 +17,7 @@ def Dep(inputs, outputs, rule, params=None, use_existing=False):
 
 
 prefix = 'data/'
-data_version = '5.4'
+data_version = '5.5'
 
 wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
@@ -82,7 +82,7 @@ def add_all_deps(deps):
     parse_conceptnet4(deps)  # conceptnet4 conceptnet_zh
     extract_wiktionary(deps)
     parse_wiktionary(deps)
-    parse_dbpedia(deps)
+    # parse_dbpedia(deps)
 
     msgpack_to_csv(deps)
     collate(deps)
