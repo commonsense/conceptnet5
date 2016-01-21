@@ -12,7 +12,10 @@ from .token_utils import simple_tokenize
 from collections import defaultdict
 import re
 
-STOPWORDS = ['the', 'a', 'an']
+STOPWORDS = ['the', 'a', 'an',
+             'your', 'my', 'his', 'her', 'its', 'their', 'this', 'that',
+             'something', 'someone', 'anything',
+             'you', 'me', 'him', 'it', 'them']
 
 
 def english_filter(tokens):
@@ -20,7 +23,7 @@ def english_filter(tokens):
     Given a list of tokens, remove a small list of English stopwords, and
     reduce the words to their WordNet roots using a simple lemmatizer.
     """
-    non_stopwords = [lemmatize(token) for token in tokens if token not in STOPWORDS]
+    non_stopwords = [lemmatize(token)[0] for token in tokens if token not in STOPWORDS]
     if non_stopwords and non_stopwords[0] == 'to':
         non_stopwords = non_stopwords[1:]
     if non_stopwords:
@@ -116,6 +119,32 @@ def lemmatize(word):
     >>> lemmatize('good')
     ('good', '')
     """
-    stem, ending = LEMMATIZER.lookup(word)
-    return stem
+    return LEMMATIZER.lookup(word)
+
+
+def lemmatize_with_residue(text):
+    tokens = simple_tokenize(text)
+    lemma_pairs = [lemmatize(token) for token in tokens]
+    non_stopwords = [pair for pair in lemma_pairs if pair[0] not in STOPWORDS]
+    if non_stopwords and non_stopwords[0][0] == 'to':
+        non_stopwords = non_stopwords[1:]
+
+    preserve_stopwords = not non_stopwords
+    lemmas = []
+    residue = []
+    for i, (lemma, ending) in enumerate(lemma_pairs):
+        is_stopword = lemma in STOPWORDS or (i == 0 and lemma == 'to')
+        if preserve_stopwords or not is_stopword:
+            residue.append('{%d}%s' % (len(lemmas), ending))
+            lemmas.append(lemma)
+        else:
+            residue.append(lemma)
+
+    return lemmas, ' '.join(residue)
+
+
+def uri_and_residue(text):
+    lemmas, residue = lemmatize_with_residue(text)
+    uri = '/c/en/' + ('_'.join(lemmas))
+    return uri, residue
 

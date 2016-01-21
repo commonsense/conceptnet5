@@ -14,16 +14,14 @@ def index_assertions(input_dir, output_db, input_shards=8):
         sys.stdout.flush()
         count = 0
 
-        txn = db.write_transaction()
-        for assertion in read_msgpack_stream(path):
-            db.store_edge(txn, assertion)
-            db.store_indices(txn, assertion)
-            count += 1
-            if count % 10000 == 0:
-                print('.', end='')
-                sys.stdout.flush()
+        with db.write_transaction() as txn:
+            for assertion, offset in read_msgpack_stream(path, offsets=True):
+                db.store_indices(txn, assertion, filenum, offset)
+                count += 1
+                if count % 10000 == 0:
+                    print('.', end='')
+                    sys.stdout.flush()
         print()
-        writer.close()
 
 
 handle_file = index_assertions
