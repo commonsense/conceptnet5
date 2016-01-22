@@ -13,9 +13,9 @@ from collections import defaultdict
 import re
 
 STOPWORDS = ['the', 'a', 'an',
-             'your', 'my', 'his', 'her', 'its', 'their', 'this', 'that',
-             'something', 'someone', 'anything',
-             'you', 'me', 'him', 'it', 'them']
+             'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
+             'these', 'those', 'something', 'someone', 'anything', 'some',
+             'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they']
 
 
 def english_filter(tokens):
@@ -123,6 +123,14 @@ def lemmatize(word):
 
 
 def lemmatize_with_residue(text):
+    """
+    Run the simple English lemmatizer on a list of words, and return a
+    "residue" string indicating what was removed. This string can
+    hypothetically be used to reconstruct a similar string to the input.
+
+    >>> lemmatize_with_residue('stemming some words')
+    (['stem', 'word'], '{0}+ing some {1}+s')
+    """
     tokens = simple_tokenize(text)
     lemma_pairs = [lemmatize(token) for token in tokens]
     non_stopwords = [pair for pair in lemma_pairs if pair[0] not in STOPWORDS]
