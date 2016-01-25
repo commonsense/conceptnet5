@@ -12,9 +12,9 @@ from .token_utils import simple_tokenize
 from collections import defaultdict
 import re
 
-STOPWORDS = ['the', 'a', 'an',
+STOPWORDS = ['the', 'a', 'an', 'some', 'any',
              'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
-             'these', 'those', 'something', 'someone', 'anything', 'some',
+             'these', 'those', 'something', 'someone', 'anything',
              'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they']
 
 
