@@ -95,7 +95,9 @@ class SimpleLemmatizer:
                 match = re_pattern.match(word)
                 if match:
                     replaced = re_pattern.sub(replacement, word)
-                    if replaced == word or replaced.lower() in self._vocab[pos.lower()]:
+                    if replaced == word:
+                        return (replaced, morph)
+                    elif replaced.lower() in self._vocab[pos.lower()]:
                         seen = seen + (word,)
                         stem, morph_recursive = self.lookup(replaced, seen)
                         morph2 = morph_recursive + morph
