@@ -79,7 +79,7 @@ class SimpleLemmatizer:
             word = line.rstrip()
             self._mapping[word] = (word, '')
 
-    def lookup(self, word):
+    def lookup(self, word, seen=()):
         if not self.loaded:
             self._load()
 
@@ -87,14 +87,20 @@ class SimpleLemmatizer:
         if word in self._mapping:
             return self._mapping[word]
 
+        if word in seen:
+            raise ValueError("Encountered a loop when lemmatizing %r" % word)
+
         if len(word) > 3:
             for re_pattern, replacement, pos, morph in self._patterns:
                 match = re_pattern.match(word)
                 if match:
                     replaced = re_pattern.sub(replacement, word)
                     if replaced == word or replaced.lower() in self._vocab[pos.lower()]:
-                        self._mapping[word] = (replaced, morph)
-                        return (replaced, morph)
+                        seen = seen + (word,)
+                        stem, morph_recursive = self.lookup(replaced, seen)
+                        morph2 = morph_recursive + morph
+                        self._mapping[word] = (stem, morph2)
+                        return (stem, morph2)
 
         self._mapping[word] = (word, '')
         return (word, '')
@@ -118,6 +124,12 @@ def lemmatize(word):
     ('be', '+s')
     >>> lemmatize('good')
     ('good', '')
+
+    Lemmatization is repeated until it reaches a fixed point, which helps
+    with some edge cases:
+
+    >>> lemmatize('runnings')
+    ('run', '+ing+s')
     """
     return LEMMATIZER.lookup(word)
 
