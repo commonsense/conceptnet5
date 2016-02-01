@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.preprocessing import normalize
+from .formats import load_hdf, save_hdf
 
 
-def run_retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbose=True):
+def retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbose=True):
     retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns)
     retroframe.update(dense_frame)
     # weight = 2 for known vectors, 1 for unknown vectors
@@ -21,7 +22,8 @@ def run_retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbose=Tru
             print('Iteration %s of %s' % (iteration+1, iterations))
             vecs = sparse_csr.dot(vecs)
 
-            # use sklearn's normalize because it normalizes zero-rows to 0
+            # use sklearn's normalize, because it normalizes in place and
+            # leaves zero-rows at 0
             normalize(vecs, norm='l2', copy=False)
 
             # Average known rows with original vectors
@@ -30,3 +32,10 @@ def run_retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbose=Tru
 
     retroframe = pd.DataFrame(data=vecs, index=row_labels, columns=dense_frame.columns)
     return retroframe
+
+
+def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename, iterations=10, verbose=True):
+    dense_frame = load_hdf(dense_hdf_filename)
+    sparse_csr, combined_index = build_from_conceptnet_table(DATA_PATH / 'assoc/reduced.csv', orig_index=dense_frame.index)
+    retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
+    save_hdf(retrofitted, output_filename)
