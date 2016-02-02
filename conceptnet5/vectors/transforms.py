@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from .standardize import standardized_uri
+from ..vectors import standardized_uri
 
 
 def standardize_row_labels(frame, language='en'):

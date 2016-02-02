@@ -1,7 +1,7 @@
 from scipy import sparse
 import pandas as pd
 from ordered_set import OrderedSet
-from .standardize import replace_numbers
+from ..vectors import replace_numbers
 
 
 class SparseMatrixBuilder:
@@ -11,18 +11,18 @@ class SparseMatrixBuilder:
     """
 
     def __init__(self):
-        self.rowIndex = []
-        self.colIndex = []
+        self.row_index = []
+        self.col_index = []
         self.values = []
 
     def __setitem__(self, key, val):
         row, col = key
-        self.rowIndex.append(row)
-        self.colIndex.append(col)
+        self.row_index.append(row)
+        self.col_index.append(col)
         self.values.append(val)
 
     def tocsr(self, shape, dtype=float):
-        return sparse.coo_matrix((self.values, (self.rowIndex, self.colIndex)),
+        return sparse.coo_matrix((self.values, (self.row_index, self.col_index)),
                                  shape=shape, dtype=dtype).tocsr()
 
 
@@ -36,7 +36,7 @@ def build_from_conceptnet_table(filename, orig_index=()):
 
     # TODO: rebalance by dataset? Or maybe do that when building the
     # associations in the first place.
-    
+
     labels = OrderedSet(orig_index)
 
     with open(str(filename), encoding='utf-8') as infile:
