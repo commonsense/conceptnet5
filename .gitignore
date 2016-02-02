@@ -6,6 +6,7 @@ __pycache__
 *.pyc
 *.egg-info
 .coverage
+build/
 conceptnet5/import*/*.txt
 conceptnet5/wiktparse/*_parser.ebnf
 evaluation/responses
@@ -23,3 +24,4 @@ logs/*.log
 *.zip
 static/img/build/
 lib/apsw-3.8.5-r1/
+lib/apsw-3.8.6-r1/

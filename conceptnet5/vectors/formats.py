@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy import sparse
 
 
 def load_glove(filename, nrows=500000):

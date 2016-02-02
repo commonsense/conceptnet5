@@ -2,7 +2,7 @@ from scipy import sparse
 import pandas as pd
 from ordered_set import OrderedSet
 from .standardize import replace_numbers
-import re
+
 
 class SparseMatrixBuilder:
     """
