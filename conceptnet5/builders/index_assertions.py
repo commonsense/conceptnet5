@@ -9,7 +9,7 @@ def index_assertions(preindex_filename, index_filename):
     current_key = ''
     current_data = []
     try:
-        db.open(index_filename, db.OWRITER | db.OCREATE)
+        db.open(index_filename, db.OWRITER | db.OTRUNCATE)
         for i, line in enumerate(open(preindex_filename, encoding='utf-8')):
             if i % 100000 == 0:
                 print(i)

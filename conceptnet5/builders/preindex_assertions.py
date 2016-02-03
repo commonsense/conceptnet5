@@ -9,29 +9,24 @@ def get_indices(edge):
     for field in ('uri', 'rel', 'start', 'end', 'dataset'):
         indices.append(edge[field])
     indices.extend(edge['sources'])
-    indices.extend(edge['features'])
     return indices
 
 
-def preindex_assertions(msgpack_filename, preindex_filename):
-    with open(preindex_filename, 'w', encoding='utf-8') as out:
-        goalpost = 0
-        for assertion, offset in read_msgpack_stream(msgpack_filename, offsets=True):
-            if offset // 1000000 > goalpost:
-                print(offset)
-                goalpost = offset // 1000000
-            weight = assertion['weight']
-            if weight > 0.:
-                packed = struct.pack('>fQ', 1.0 / weight, offset)
-                packed_b64 = b2a_base64(packed).rstrip('\n').decode('ascii')
-                for index in get_indices(assertion):
-                    print('%s\t%s' % (index, packed_b64), file=out)
+def preindex_assertions(msgpack_filename):
+    # TODO: use Click to accept outputs besides stdout
+    for assertion, offset in read_msgpack_stream(msgpack_filename, offsets=True):
+        weight = assertion['weight']
+        if weight > 0.:
+            packed = struct.pack('>fQ', 1.0 / weight, offset)
+            packed_b64 = b2a_base64(packed).rstrip(b'\n').decode('ascii')
+            for index in get_indices(assertion):
+                print('%s\t%s' % (index, packed_b64))
 
 
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('assertion_filename', help='msgpack file of assertions to index')
-    parser.add_argument('preindex_filename', help='pre-index filename to output to')
+    # parser.add_argument('preindex_filename', help='pre-index filename to output to')
     args = parser.parse_args()
-    preindex_assertions(args.assertion_filename, args.preindex_filename)
+    preindex_assertions(args.assertion_filename)
