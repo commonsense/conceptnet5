@@ -17,7 +17,7 @@ def Dep(inputs, outputs, rule, params=None, use_existing=False):
 
 
 prefix = 'data/'
-data_version = '5.4'
+data_version = '5.5'
 
 wiktionary_langs = ['en', 'de']
 wiktionary_slices = 20
