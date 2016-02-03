@@ -1,4 +1,5 @@
 from __future__ import print_function
+from conceptnet5.uri import uri_prefixes
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import struct
 from binascii import b2a_base64
@@ -7,7 +8,7 @@ from binascii import b2a_base64
 def get_indices(edge):
     indices = []
     for field in ('uri', 'rel', 'start', 'end', 'dataset'):
-        indices.append(edge[field])
+        indices.extend(uri_prefixes(edge[field]))
     indices.extend(edge['sources'])
     return indices
 
