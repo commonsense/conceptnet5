@@ -1,3 +1,4 @@
+from .index import HEADER_SIZE, ENTRY_SIZE
 import msgpack
 import math
 import itertools
@@ -17,28 +18,30 @@ def hash_table_bits(num_entries):
     return nbits
 
 
-HEADER_SIZE = 8
-ENTRY_SIZE = 16
 BUFFER_SIZE = 65536
 
 
-def build_index(preindex_filename, hashtable_filename, hash_width):
-    # hash_width = hash_table_bits(num_values)
-    print("Using %d bits for hashtable" % hash_width)
-    with open(hashtable_filename, 'wb') as hfile:
-        # Write the header
-        hfile.write(b'\xf0\x9f\xa5\x81\x00\x00')
-        hfile.write(bytes([hash_width, 0]))
-        values_start = HEADER_SIZE + (1 << hash_width) * ENTRY_SIZE
+def copy_data(input_file, output_file):
+    while True:
+        read = input_file.read(BUFFER_SIZE)
+        if len(read) == 0:
+            break
+        output_file.write(read)
 
-        with tempfile.TemporaryFile(prefix='conceptnet5.hashtable.') as vfile:
+
+def build_index(preindex_filename, hashtable_filename, hash_width):
+    print("Using %d bits for hashtable" % hash_width)
+    with tempfile.TemporaryFile(prefix='conceptnet5.values.') as vfile:
+        with tempfile.TemporaryFile(prefix='conceptnet5.hashtable.') as hfile:
             with open(preindex_filename, 'r', encoding='utf-8') as preindex:
                 groups = itertools.groupby(
                     preindex, key=_make_bucket_function(hash_width)
                 )
                 for bucket, lines in groups:
+                    if bucket % 65536 == 0:
+                        print('\t%x' % bucket)
                     hfile_pos = hfile.tell()
-                    target_pos = HEADER_SIZE + bucket * ENTRY_SIZE
+                    target_pos = bucket * ENTRY_SIZE
                     if target_pos > hfile_pos:
                         hfile.seek(target_pos)
                     
@@ -51,19 +54,30 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
                             _, _, value = line.rstrip().split('\t')
                             values.append(json.loads(value))
                         encoded = msgpack.dumps(values, use_bin_type=True)
-                        vpos = values_start + vfile.tell()
-
+                        vpos = vfile.tell() + HEADER_SIZE
                         record = struct.pack('<QQ', int(keyhash, 16), vpos)
                         hfile.write(record)
                         vfile.write(encoded)
 
-            hfile.seek(values_start)
+            values_size = vfile.tell()
+
+            hfile.seek(0)
             vfile.seek(0)
-            while True:
-                read = vfile.read(BUFFER_SIZE)
-                if len(read) == 0:
-                    break
-                hfile.write(read)
+            print("Writing %r" % hashtable_filename)
+            with open(hashtable_filename, 'wb') as outfile:
+                # Header: "CN5" in ASCII, followed by the hash width, and four
+                # unused bytes that we might find a need for in the future
+                outfile.write(b'CN5')
+                outfile.write(bytes([hash_width, 0, 0, 0, 0]))
+
+                # 8-byte pointer to the start of the hashtable
+                outfile.write(struct.pack('<Q', values_size + HEADER_SIZE))
+
+                # Value data
+                copy_data(vfile, outfile)
+
+                # Hashtable data
+                copy_data(hfile, outfile)
 
 
 def _make_bucket_function(nbits):
@@ -77,4 +91,3 @@ def _make_bucket_function(nbits):
 
 def _extract_keyhash(line):
     return line.split('\t')[0]
-

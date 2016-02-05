@@ -247,10 +247,6 @@ upload: $(DIST_FILES)
 	$(RSYNC_UPLOAD) $(OUTPUT_FOLDER) $(UPLOAD_PATH)
 
 
-# Building the DB is faster with APSW. 'make apsw' will try to build and install it.
-apsw:
-	cd lib && $(MAKE) apsw
-
 # Build steps
 # ===========
 # These rules explain how to build various files. Their dependencies
