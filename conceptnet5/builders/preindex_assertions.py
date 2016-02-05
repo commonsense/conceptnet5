@@ -1,7 +1,9 @@
 from __future__ import print_function
 from conceptnet5.uri import uri_prefixes
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
+from conceptnet5.hashtable.preindex import preindex_data
 import struct
+import math
 from binascii import b2a_base64
 
 
@@ -10,24 +12,23 @@ def get_indices(edge):
     for field in ('uri', 'rel', 'start', 'end', 'dataset'):
         indices.extend(uri_prefixes(edge[field]))
     indices.extend(edge['sources'])
+    indices.extend(edge['features'])
     return indices
 
 
 def preindex_assertions(msgpack_filename):
-    # TODO: use Click to accept outputs besides stdout
     for assertion, offset in read_msgpack_stream(msgpack_filename, offsets=True):
         weight = assertion['weight']
-        if weight > 0.:
-            packed = struct.pack('>fQ', 1.0 / weight, offset)
-            packed_b64 = b2a_base64(packed).rstrip(b'\n').decode('ascii')
-            for index in get_indices(assertion):
-                print('%s\t%s' % (index, packed_b64))
+        for key in get_indices(assertion):
+            yield (key, weight, offset)
+
+
+def output_preindex(msgpack_filename):
+    generator = preindex_assertions(msgpack_filename)
+    preindex_data(generator)
 
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('assertion_filename', help='msgpack file of assertions to index')
-    # parser.add_argument('preindex_filename', help='pre-index filename to output to')
-    args = parser.parse_args()
-    preindex_assertions(args.assertion_filename)
+    # TODO: click
+    import sys
+    output_preindex(sys.argv[1])
