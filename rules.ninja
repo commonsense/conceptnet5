@@ -19,7 +19,7 @@ rule rebuild_ninja
   command = python -m ninja
 
 rule download
-  command = python setup.py nltk_download && mkdir -p $prefix && curl -o $out $url
+  command = mkdir -p $prefix && curl -o $out $url
 
 rule extract_tar
   command = tar -xvf $in
@@ -48,14 +48,20 @@ rule msgpack_to_csv
 rule collate
   command = cat $in | python -m conceptnet5.builders.distribute_edges -o $dir -n $count
 
-rule count_and_rank
+rule sort_edges
   command = LC_ALL=C sort $in | uniq > $out
 
 rule combine_assertions
-  command = python -m conceptnet5.builders.combine_assertions $in $out -l /l/CC/By-SA
+  command = python -m conceptnet5.builders.combine_assertions -o $out -l /l/CC/By-SA $in
 
 rule msgpack_to_assoc
   command = python -m conceptnet5.builders.msgpack_to_assoc $in $out
+
+rule build_preindex
+  command = mkdir -p $tmp && python -m conceptnet5.builders.preindex_assertions $in | LANG=C sort -T $tmp | LANG=C uniq > $out
+
+rule build_index
+  command = if [ ! -e ~/.conceptnet5 ]; then ln -s $$(readlink $prefix) ~/.conceptnet5; fi && cn5-build-index $in $out $width
 
 rule build_db
   command = if [ ! -e ~/.conceptnet5 ]; then ln -s $$(readlink -f $prefix) ~/.conceptnet5; fi && python -m conceptnet5.builders.index_assertions $$(dirname $$(echo $in | cut -d ' ' -f1)) $basename --input-shards $num

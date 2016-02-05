@@ -30,7 +30,6 @@ def copy_data(input_file, output_file):
 
 
 def build_index(preindex_filename, hashtable_filename, hash_width):
-    print("Using %d bits for hashtable" % hash_width)
     with tempfile.TemporaryFile(prefix='conceptnet5.values.') as vfile:
         with tempfile.TemporaryFile(prefix='conceptnet5.hashtable.') as hfile:
             with open(preindex_filename, 'r', encoding='utf-8') as preindex:
@@ -38,8 +37,6 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
                     preindex, key=_make_bucket_function(hash_width)
                 )
                 for bucket, lines in groups:
-                    if bucket % 65536 == 0:
-                        print('\t%x' % bucket)
                     hfile_pos = hfile.tell()
                     target_pos = bucket * ENTRY_SIZE
                     if target_pos > hfile_pos:
@@ -63,7 +60,6 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
 
             hfile.seek(0)
             vfile.seek(0)
-            print("Writing %r" % hashtable_filename)
             with open(hashtable_filename, 'wb') as outfile:
                 # Header: "CN5" in ASCII, followed by the hash width, and four
                 # unused bytes that we might find a need for in the future

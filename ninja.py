@@ -86,9 +86,9 @@ def add_all_deps(deps):
 
     msgpack_to_csv(deps)
     collate(deps)
-    count_and_rank(deps)
+    sort_edges(deps)
     combine_assertions(deps)
-    #build_db(deps)
+    build_index(deps)
 
     msgpack_to_assoc(deps)
     stats(deps)
@@ -243,28 +243,28 @@ def collate(deps):
     )
 
 
-def count_and_rank(deps):
+def sort_edges(deps):
     for input in deps['collate']['outputs']:
-        deps['count and rank %s' % input] = Dep(
+        deps['sort edges %s' % input] = Dep(
             [input],
             [input.replace('split', 'sorted')],
-            'count_and_rank')
+            'sort_edges')
 
 
 def combine_assertions(deps):
     new_deps = NoOverrideDict()
+    inputs = []
     for k, v in deps.items():
-        if not k.startswith('count and rank'):
+        if not k.startswith('sort edges'):
             continue
-        input = v['outputs'][0]  # will only be a single element list
+        this_input = v['outputs'][0]  # will only be a single element list
+        inputs.append(this_input)
 
-        new_deps['combine assertions %s' % input] = Dep(
-            [input],
-            [input.replace('edges/sorted', 'assertions')
-                  .replace('edges', 'part')
-                  .replace('csv', 'msgpack')
-                  .replace('assertions_', 'part_')],
-            'combine_assertions')
+    new_deps['combine assertions'] = Dep(
+        inputs,
+        [prefix + 'assertions/assertions.msgpack'],
+        'combine_assertions'
+    )
 
     deps.update(new_deps)
 
@@ -286,25 +286,27 @@ def msgpack_to_assoc(deps):
     deps.update(new_deps)
 
 
-def build_db(deps):
-    inputs = []
-    for k, v in deps.items():
-        if not k.startswith('combine assertions'):
-            continue
-        inputs += v['outputs']
-
-    num_shards = 8
-    deps['build db'] = Dep(
-        inputs,
-        [prefix + 'db/assertions.db.%d' % n for n in range(num_shards)],
-        'build_db',
-        {'prefix': prefix, 'num': num_shards, 'basename': prefix + 'db/assertions.db'})
+def build_index(deps):
+    deps['build preindex'] = Dep(
+        [prefix + 'assertions/assertions.msgpack'],
+        [prefix + 'db/assertions.preindex.txt'],
+        'build_preindex',
+        {'tmp': prefix + 'tmp/'}
+    )
+    deps['build index'] = Dep(
+        [prefix + 'db/assertions.preindex.txt'],
+        [prefix + 'db/assertions.index'],
+        'build_index',
+        # If ConceptNet doubles in size, the value below needs to be
+        # increased by 1
+        {'width': 26}
+    )
 
 
 def stats(deps):
     inputs = []
     for k, v in deps.items():
-        if k.startswith('count and rank'):
+        if k.startswith('sort edges'):
             inputs += v['outputs']
 
     outputs = [prefix + 'stats/relations.txt']
@@ -382,10 +384,12 @@ def build_dist(deps):
         ('flat_msgpack', msgpacks),
         ('flat_json', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.jsons'))),
         ('flat_csv', outputs_where(deps, lambda x: x.startswith('data/assertions/') and x.endswith('.csv'))),
-        # ('db', deps['build db']['outputs'] + msgpacks),
+        ('index', deps['build index']['outputs'] + msgpacks),
         # ('vector_space', deps['build vector space']['outputs'])
     ]:
-        output = prefix + 'dist/' + start_date + '/conceptnet5_' + output + '_5.4.tar.bz2'
+        output = '{}dist/{}/conceptnet5_{}_{}.tar.bz2'.format(
+            prefix, start_date, output, data_version
+        )
         deps['compress '+output] = Dep(
             inputs,
             [output],
