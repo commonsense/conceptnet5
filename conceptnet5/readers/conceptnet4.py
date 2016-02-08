@@ -9,6 +9,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
     standardized_concept_uri, standardize_text, valid_concept_name
 )
+from conceptnet5.util.node_filters import FILTERED_SOURCES
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import join_uri, Licenses
 
@@ -254,8 +255,11 @@ class CN4Builder(object):
             relation = '/r/Desires'
 
         for source_list, weight in weighted_sources:
-            if 'commons2_reject' in ' '.join(source_list):
-                return
+            for source in source_list:
+                if 'commons2_reject' in source:
+                    return
+                if source in FILTERED_SOURCES:
+                    return
 
         for source_list, weight in weighted_sources:
             if not by_bedume_and_bad(source_list, start, end):

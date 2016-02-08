@@ -4,8 +4,10 @@ from __future__ import print_function, unicode_literals
 """
 Tools for working with English text and reducing it to a normal form.
 
-In English, we remove a very small number of stopwords, and then apply a
-modified version of Morphy, the stemmer (lemmatizer) used in WordNet.
+In English, we remove a small number of stopwords (mostly determiners), and
+then apply a modified version of Morphy, the stemmer (lemmatizer) used in
+WordNet.  The modifications mostly involve heuristics for when to apply noun or
+verb transformations to words whose part of speech is ambiguous.
 """
 from ..util import get_support_data_filename
 from .token_utils import simple_tokenize
@@ -16,6 +18,9 @@ STOPWORDS = ['the', 'a', 'an', 'some', 'any',
              'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
              'these', 'those', 'something', 'someone', 'anything',
              'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they']
+
+
+DROP_FIRST = ['to', 'be']
 
 
 def english_filter(tokens):
@@ -148,14 +153,14 @@ def lemmatize_with_residue(text):
     tokens = simple_tokenize(text)
     lemma_pairs = [lemmatize(token) for token in tokens]
     non_stopwords = [pair for pair in lemma_pairs if pair[0] not in STOPWORDS]
-    if non_stopwords and non_stopwords[0][0] == 'to':
+    if non_stopwords and non_stopwords[0][0] in DROP_FIRST:
         non_stopwords = non_stopwords[1:]
 
     preserve_stopwords = not non_stopwords
     lemmas = []
     residue = []
     for i, (lemma, ending) in enumerate(lemma_pairs):
-        is_stopword = lemma in STOPWORDS or (i == 0 and lemma == 'to')
+        is_stopword = lemma in STOPWORDS or (i == 0 and lemma in DROP_FIRST)
         if preserve_stopwords or not is_stopword:
             residue.append('{%d}%s' % (len(lemmas), ending))
             lemmas.append(lemma)

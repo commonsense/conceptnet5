@@ -17,11 +17,12 @@ import re
 # I have no idea why the word 'mince' shows up in so many bad assertions, but
 # it does.
 BAD_CLUE_REGEX = re.compile(
-    r'(^letter|^rhyme|^blank$|^words?$|^syllable$|^spell|^tense$|^prefix'
+    r'(^letter|^rhyme|^blank$|^words?$|^syllables?$|^spell|^tense$|^prefix'
     r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
     r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
     r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$|'
-    r'^delete|^remove|^add$|^plus$|^more$|^less$|^clue$)'
+    r'^delete|^remove|^add$|^drop$|^plus$|^more$|^less$|^combine$|^clue$|'
+    r'^my$|^uppercase$|^capital|^previous$|^next$|^last$|^no$|^without$)'
 )
 
 # These are words we won't pull out of phrases in order to make individual
@@ -139,7 +140,7 @@ def handle_file(infile, outfile):
         # The weight is the score divided by 100. All divisions are floating
         # point, as defined by the __future__ import at the top of this module.
         score = (freq * 2 - 1) * (1 - sls) * (1 - orderscore / 1000)
-        if score <= 0.5:
+        if score <= 1.:
             outcomes['low score'] += 1
             continue
 

@@ -114,7 +114,7 @@ def handle_file(filename, output_file):
     data = file.read()
     file.close()
     xml = xmltodict.parse(data)
-    
+
     # The dictionary contains a list of <entry> tags.
     root_node = xml['JMdict']
     for entry in get_list(root_node, 'entry'):
@@ -202,7 +202,7 @@ def output_edge(out, subj_concept, obj_concept):
                      dataset='/d/jmdict',
                      license=Licenses.cc_sharealike,
                      sources=['/s/jmdict/1.07'],
-                     weight=0.5)
+                     weight=1.0)
     out.write(edge)
 
 

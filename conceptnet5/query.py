@@ -1,8 +1,10 @@
 # coding: utf-8
 from conceptnet5.util import get_data_filename
-from conceptnet5.formats.sql import EdgeIndexReader
+from conceptnet5.formats.msgpack_stream import read_msgpack_value
+from conceptnet5.hashtable.index import HashTableIndex
 from collections import defaultdict
 import sys
+import itertools
 
 
 if sys.version_info.major == 2:
@@ -43,44 +45,36 @@ def field_match(value, query):
 
 
 class AssertionFinder(object):
-    def __init__(self, db_filename=None, edge_dir=None, nshards=8):
+    def __init__(self, index_filename=None, edge_filename=None):
+        self._index_filename = index_filename or get_data_filename('db/assertions.table.bin')
+        self._edge_filename = edge_filename or get_data_filename('assertions/all.msgpack')
         self.search_index = None
-        self._db_filename = db_filename or get_data_filename('db/assertions.db')
-        self._edge_dir = edge_dir or get_data_filename('assertions')
-        self.nshards = nshards
 
     def load_index(self):
         """
-        Load the SQLite index, if it isn't loaded already.
+        Load the assertion index, if it isn't loaded already.
         """
         if self.search_index is None:
-            self.search_index = EdgeIndexReader(
-                self._db_filename, self._edge_dir, self.nshards
-            )
+            self.search_index = HashTableIndex(self._index_filename)
+        self.edge_file = open(self._edge_filename, 'rb')
 
     def lookup(self, query, limit=1000, offset=0):
         """
         Look up all assertions associated with the given URI or string
         property. Any of these fields can be matched:
 
-            ['rel', 'start', 'end', 'dataset', 'sources', 'surfaceText', 'uri']
-
-        If the query is a URI, it will match prefixes of longer URIs, unless
-        `/.` is added to the end of the query.
-
-        For example, `/c/en/dog` will match assertions about
-        `/c/en/dog/n/animal`, but `/c/en/dog/.` will only match assertions
-        about `/c/en/dog`.
+            ['rel', 'start', 'end', 'dataset', 'sources', 'uri', 'features']
         """
         self.load_index()
         if query.endswith('/.'):
-            complete = True
+            # We can't filter for complete matches here, but let's at least
+            # deal with the syntax
             query = query[:-2]
-        else:
-            complete = False
-        return self.search_index.lookup(
-            query.rstrip('/'), complete, limit=limit, offset=offset
-        )
+        pointers = self.search_index.lookup(query)
+        for i, pointer in enumerate(pointers[offset:]):
+            if i >= limit:
+                return
+            yield read_msgpack_value(self.edge_file, pointer)
 
     def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10, offset=0):
         """
@@ -94,9 +88,9 @@ class AssertionFinder(object):
         more = set()
         for assertion in self.lookup(query, limit=scan_limit, offset=offset):
             groupkeys = []
-            if assertion['start'] == query:
+            if field_match(assertion['start'], query):
                 groupkeys.append('%s %s -' % (assertion['start'], assertion['rel']))
-            if assertion['end'] == query:
+            if field_match(assertion['end'], query):
                 groupkeys.append('- %s %s' % (assertion['rel'], assertion['end']))
             for groupkey in groupkeys:
                 if len(groups[groupkey]) < group_limit:
@@ -122,13 +116,6 @@ class AssertionFinder(object):
 
         grouped.sort(key=lambda g: -g['largest_weight'])
         return grouped
-
-    def random_assertions(self, num=10):
-        self.load_index()
-        return [
-            self.search_index.random()
-            for i in range(num)
-        ]
 
     def query(self, criteria, search_key=None, limit=20, offset=0,
               scan_limit=1000):

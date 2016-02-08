@@ -32,7 +32,8 @@ setup(
     license = 'Apache License 2.0',
     entry_points = {
         'console_scripts': [
-            'cn5-vectors = conceptnet5.vectors.cli:cli'
+            'cn5-vectors = conceptnet5.vectors.cli:cli',
+            'cn5-build-index = conceptnet5.hashtable.cli:run_build',
         ]
     }
 )

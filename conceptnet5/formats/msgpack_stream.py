@@ -42,3 +42,10 @@ def read_msgpack_stream(filename_or_stream, offsets=False):
             offset += len(repacker.pack(value))
         else:
             yield value
+
+
+def read_msgpack_value(stream, offset):
+    if offset is not None:
+        stream.seek(offset)
+    unpacker = msgpack.Unpacker(stream, encoding='utf-8')
+    return unpacker.unpack()
