@@ -6,7 +6,7 @@ separate and join tokens. The tools apply most to English, but should also
 be able to do their job in any Western language that uses spaces.
 """
 
-from wordfreq.tokens import simple_tokenize
+from wordfreq import simple_tokenize
 import sys
 import re
 

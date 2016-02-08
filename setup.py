@@ -8,9 +8,8 @@ packages = find_packages()
 version_str = '5.5.0'
 
 if sys.version_info.major < 3:
-    langcodes_req = 'langcodes-py2 == 1.1.2'
-else:
-    langcodes_req = 'langcodes == 1.1.2'
+    print("The ConceptNet 5 code can only run in Python 3.")
+    sys.exit(1)
 
 
 setup(
@@ -25,7 +24,7 @@ setup(
     install_requires=[
         'xmltodict', 'click', 'pyyaml', 'requests', 'limits',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
-        'msgpack-python', langcodes_req
+        'msgpack-python', 'langcodes', 'wordfreq'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
