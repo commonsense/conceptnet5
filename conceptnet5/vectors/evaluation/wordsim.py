@@ -72,7 +72,7 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def spearman_evaluate(frame, standard, language='en', verbose=2):
+def spearman_evaluate(frame, standard, language='en', verbose=0):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word

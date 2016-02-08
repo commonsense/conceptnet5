@@ -2,14 +2,15 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import coo_matrix
 from sklearn.preprocessing import normalize
+from conceptnet5.vectors.evaluation.wordsim import evaluate
 
 
-def retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbosity=1):
+def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns)
     retroframe.update(dense_frame)
     # weight = 2 for known vectors, 1 for unknown vectors
-    weights = 2 - retroframe[0].isnull()
-    weight_array = weights.values[:, np.newaxis]
+    orig_weights = 1 - retroframe[0].isnull()
+    weight_array = orig_weights.values[:, np.newaxis]
     orig_vecs = retroframe.fillna(0).values
 
     # Delete the frame we built, we won't need its indices again until the end
@@ -28,9 +29,10 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbosity=1):
 
         # Average known rows with original vectors
         vecs += orig_vecs
-        vecs /= weight_array
+        vecs /= (weight_array + 1.)
+        retroframe = pd.DataFrame(data=vecs, index=row_labels, columns=dense_frame.columns)
+        if verbosity >= 1:
+            print(evaluate(retroframe))
+            print()
 
-    retroframe = pd.DataFrame(data=vecs, index=row_labels, columns=dense_frame.columns)
     return retroframe
-
-

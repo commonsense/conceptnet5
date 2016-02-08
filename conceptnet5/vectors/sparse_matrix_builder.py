@@ -1,6 +1,7 @@
 from scipy import sparse
 import pandas as pd
 from ordered_set import OrderedSet
+from collections import defaultdict
 from ..vectors import replace_numbers
 
 
@@ -39,6 +40,7 @@ def build_from_conceptnet_table(filename, orig_index=()):
 
     labels = OrderedSet(orig_index)
 
+    totals = defaultdict(float)
     with open(str(filename), encoding='utf-8') as infile:
         for line in infile:
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
@@ -48,6 +50,12 @@ def build_from_conceptnet_table(filename, orig_index=()):
             value = float(value_str)
             mat[index1, index2] = value
             mat[index2, index1] = value
+            totals[index1] += value
+            totals[index2] += value
+
+    # add self-loops on the diagonal with equal weight to the rest of the row
+    for key, value in totals.items():
+        mat[key, key] = value
 
     shape = (len(labels), len(labels))
     index = pd.Index(labels)
