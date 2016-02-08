@@ -8,7 +8,7 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=10, verbosity=1):
     retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns)
     retroframe.update(dense_frame)
     # weight = 2 for known vectors, 1 for unknown vectors
-    weights = retroframe[0].isnull() + 1
+    weights = 2 - retroframe[0].isnull()
     weight_array = weights.values[:, np.newaxis]
     orig_vecs = retroframe.fillna(0).values
 
