@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from scipy import sparse
+import gzip
+import struct
 
 
 def load_glove(filename, nrows=500000):
@@ -10,6 +12,44 @@ def load_glove(filename, nrows=500000):
         names=['term'] + list(range(300)),
         nrows=nrows
     )
+
+
+def _read_until_space(file):
+    chars = []
+    while True:
+        newchar = file.read(1)
+        if newchar == b'' or newchar == b' ':
+            break
+        chars.append(newchar[0])
+    return bytes(chars).decode('utf-8')
+
+
+def _read_vec(file, ndims):
+    fmt = 'f' * ndims
+    bytes_in = file.read(4 * ndims)
+    values = list(struct.unpack(fmt, bytes_in))
+    return np.array(values)
+
+
+def load_word2vec_bin(filename):
+    label_list = []
+    vec_list = []
+    with gzip.open(filename, 'rb') as infile:
+        header = infile.readline().rstrip()
+        nrows_str, ncols_str = header.split()
+        nrows = int(nrows_str)
+        ncols = int(ncols_str)
+        for row in range(nrows):
+            label = _read_until_space(infile)
+            vec = _read_vec(infile, ncols)
+            if label == '</s>':
+                # Skip the word2vec sentence boundary marker, which will not
+                # correspond to anything in other data
+                continue
+            label_list.append(label)
+            vec_list.append(vec)
+    mat = np.array(vec_list)
+    return pd.DataFrame(mat, index=label_list, dtype='f')
 
 
 def load_hdf(filename):
