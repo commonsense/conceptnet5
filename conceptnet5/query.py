@@ -46,8 +46,8 @@ def field_match(value, query):
 
 class AssertionFinder(object):
     def __init__(self, index_filename=None, edge_filename=None):
-        self._index_filename = index_filename or get_data_filename('db/assertions.table.bin')
-        self._edge_filename = edge_filename or get_data_filename('assertions/all.msgpack')
+        self._index_filename = index_filename or get_data_filename('db/assertions.index')
+        self._edge_filename = edge_filename or get_data_filename('assertions/assertions.msgpack')
         self.search_index = None
 
     def load_index(self):
@@ -74,7 +74,13 @@ class AssertionFinder(object):
         for i, pointer in enumerate(pointers[offset:]):
             if i >= limit:
                 return
-            yield read_msgpack_value(self.edge_file, pointer)
+            val = read_msgpack_value(self.edge_file, pointer)
+            if not isinstance(val, dict):
+                raise IOError(
+                    "Couldn't find a dictionary in %r at byte offset %d"
+                    % (self.edge_file, pointer)
+                )
+            yield val
 
     def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10, offset=0):
         """
