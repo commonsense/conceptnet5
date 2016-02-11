@@ -2,12 +2,17 @@ import msgpack
 import struct
 import mmap
 import mmh3
+import random
 
 HEADER_SIZE = 16
 ENTRY_SIZE = 16
 
 
 class HashTableIndex:
+    """
+    A read-only view of an on-disk hashtable that maps keys to lists of
+    values.
+    """
     def __init__(self, filename):
         self.data = open(filename, 'rb')
         header = self.data.read(4)
@@ -31,7 +36,7 @@ class HashTableIndex:
         self.data.seek(loc)
         zero = bytes(8)
         while True:
-            data = self.data.read(16)
+            data = self.data.read(ENTRY_SIZE)
             if not data:
                 return []
             if data[:8] == zero:
@@ -39,6 +44,17 @@ class HashTableIndex:
             elif data[:8] == hbytes:
                 ptr = struct.unpack('<Q', data[8:])[0]
                 return self._unpack_values(ptr)
+
+    def weighted_random(self):
+        zero = bytes(8)
+        while True:
+            bucket = random.randrange(0, 1 << self._hash_width)
+            loc = self._table_ptr + ENTRY_SIZE * bucket
+            self.data.seek(loc)
+            data = self.data.read(ENTRY_SIZE)
+            if data[:8] != zero:
+                ptr = struct.unpack('<Q', data[8:])[0]
+                return random.choice(self._unpack_values(ptr))
 
     def _unpack_values(self, ptr):
         self.data.seek(ptr)

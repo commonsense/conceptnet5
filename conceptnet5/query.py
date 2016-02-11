@@ -82,6 +82,11 @@ class AssertionFinder(object):
                 )
             yield val
 
+    def lookup_random(self):
+        self.load_index()
+        pointer = self.search_index.weighted_random()
+        return read_msgpack_value(self.edge_file, pointer)
+
     def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10, offset=0):
         """
         Given a query for a concept, return assertions about that concept grouped by
