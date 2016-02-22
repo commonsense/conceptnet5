@@ -5,6 +5,7 @@ from ftfy.fixes import decode_escapes
 import sys
 import urllib
 import codecs
+import langcodes
 
 SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
 
@@ -214,14 +215,14 @@ class NTriplesReader(object):
                 quoted_string, type_tag = node_text.rsplit('^^', 1)
                 type_tag = resource_name(decode_url(type_tag))
                 assert (quoted_string.startswith('"') and quoted_string.endswith('"')), quoted_string
-                return type_tag, quoted_string[1:-1]
+                return type_tag, decode_escapes(quoted_string[1:-1])
             elif '"@' in node_text:
                 quoted_string, lang_code = node_text.rsplit('@', 1)
                 assert (quoted_string.startswith('"') and quoted_string.endswith('"')), quoted_string
-                lang = lang_code.split('-')[0]
-                return lang, quoted_string[1:-1]
+                lang = langcodes.get(lang_code).language
+                return lang, decode_escapes(quoted_string[1:-1])
             elif node_text.endswith('"'):
-                return 'en', node_text[1:-1]
+                return 'en', decode_escapes(node_text[1:-1])
             else:
                 raise ValueError("Can't understand value: %s" % node_text)
         elif ':' in node_text:
@@ -231,4 +232,4 @@ class NTriplesReader(object):
             url_base = self.prefixes[prefix]
             return 'URL', decode_url(url_base + resource)
         else:
-            return (None, node_text)
+            return (None, decode_escapes(node_text))

@@ -76,7 +76,7 @@ def can_skip(parts_dict):
     if lang == 'ja' and parts_dict["activity"] != 'nadya.jp':
         # Use Japanese data collected from nadya.jp, but not earlier attempts.
         return True
-    if parts_dict["goodness"] < 1:
+    if parts_dict["goodness"] <= 1:
         return True
     if 'spatial concept' in parts_dict["startText"]:
         return True
