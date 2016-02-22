@@ -53,9 +53,32 @@ REL_MAPPING = {
     'antonym': ('Antonym', '{0} is the opposite of {1}'),
     'derivation': ('DerivedFrom', '"{0}" is derived from "{1}"'),
     'pertainym': ('PertainsTo', '{0} pertains to {1}'),
-    'translation': ('TranslationOf', '{0} is a translation of {1}')
+    'translation': ('~TranslationOf', '{0} is a translation of {1}')
     # Do we want a relation for verbs in the same VerbNet group?
 }
+
+
+def label_sort_key(label):
+    """
+    A sort key that encourages more useful labels to come first, when we don't
+    have a more solid basis to decide.
+
+    * Prefer words starting with digits over words starting with letters:
+      '101' is better than 'ci' or 'one hundred one'.
+    * Prefer words ending with letters over words ending with digits:
+      'hassium' is better than 'atomic number 108'.
+    * Prefer lowercase words over capitalized ones: 'huge' is better than
+      'Brobdingnagian'.
+    * Prefer longer labels over shorter ones, as they're probably more
+      specific: 'Paul Newman' is better than 'Newman'.
+    * All else being equal, prefer the first label in alphabetical order.
+
+    This is, fortunately, not the only way to choose labels. If a WordNet
+    synset has a "sameAs" link pointing to a named synset in WordNet 2.0, we
+    use that name, letting us use the label "United Kingdom" instead of
+    "United Kingdom of Great Britain and Northern Ireland".
+    """
+    return (not label[0].isdigit(), label[-1].isdigit(), not label[0].islower(), -len(label), label)
 
 
 def run_wordnet(input_file, output_file, sw_map_file):
@@ -71,7 +94,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
     synset_domains = {}
     synset_glosses = {}
     synset_disambig = {}
-    synset_uris = defaultdict(list)
+    synset_uris = {}
     term_info = {}
 
     # First pass: find data about synsets
@@ -90,7 +113,9 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 # determine from 3.1 alone what to name a category.
                 objname = resource_name(obj)
                 parts = objname.split('-')[1:-2]
-                label = '-'.join(parts).replace('_', ' ')
+
+                # Handle missing apostrophes
+                label = '-'.join(parts).replace('_s_', "'s_").replace('_s-', "'s_").replace("s__", "s'_").replace("s_-", "s'-").replace('_', ' ')
                 synset_canonical_labels[subj] = label
 
                 # shortcut
@@ -110,11 +135,15 @@ def run_wordnet(input_file, output_file, sw_map_file):
             synset_senses[synset].append(lemma)
             sense_synsets[lemma] = synset
 
+    used_labels = set(synset_canonical_labels.values())
     for synset, values in synset_labels.items():
-        values.sort(key=len)
+        values.sort(key=lambda label: (label in used_labels,) + label_sort_key(label))
         if synset not in synset_canonical_labels:
             label = values[0]
             synset_canonical_labels[synset] = label
+            if len(values) > 1:
+                print("Guessed canonical label %r for %r" % (label, values))
+            used_labels.add(label)
 
     for synset, labels in synset_labels.items():
         if synset in synset_categories:
@@ -131,9 +160,22 @@ def run_wordnet(input_file, output_file, sw_map_file):
             category_name = None
         synset_disambig[synset] = (pos, category_name)
 
+        canon = synset_canonical_labels[synset]
+        canon_uri = standardized_concept_uri('en', canon, pos, category_name)
+        synset_uris[synset] = canon_uri
+
         for label in labels:
-            uri = standardized_concept_uri('en', label, pos, category_name)
-            synset_uris[synset].append((uri, label))
+            if label != canon:
+                other_uri = standardized_concept_uri('en', label, pos, category_name)
+                rel_uri = '/r/Synonym'
+                surface = '[[{0}]] is a synonym of [[{1}]]'.format(label, canon)
+                print(other_uri, rel_uri, canon_uri, surface)
+                edge = make_edge(
+                    rel_uri, other_uri, canon_uri, dataset=DATASET, surfaceText=surface,
+                    license='/l/CC/By', sources=SOURCE, weight=2.0
+                )
+                out.write(edge)
+
 
     for subj, rel, obj, objtag in reader.parse_file(input_file):
         relname = resource_name(rel)
@@ -145,26 +187,28 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 reversed_frame = True
             rel_uri = '/r/' + rel
             if objtag == 'URL':
-                objects = synset_uris.get(obj, [])
+                obj_uri = synset_uris.get(obj)
+                obj_label = synset_canonical_labels[obj]
             else:
                 pos, sense = synset_disambig.get(subj, (None, None))
                 obj_uri = standardized_concept_uri(objtag, obj, pos, sense)
-                objects = [(obj_uri, obj)]
+                obj_label = obj
 
-            for subj_uri, subj_label in synset_uris.get(subj, []):
-                for obj_uri, obj_label in objects:
-                    if reversed_frame:
-                        subj_uri, obj_uri = obj_uri, subj_uri
-                        subj_label, obj_label = obj_label, subj_label
+            subj_uri = synset_uris[subj]
+            subj_label = synset_canonical_labels[subj]
 
-                    surface = frame.format('[[%s]]' % subj_label, '[[%s]]' % obj_label)
-                    print(subj_uri, rel_uri, obj_uri, '\t\t', surface)
+            if reversed_frame:
+                subj_uri, obj_uri = obj_uri, subj_uri
+                subj_label, obj_label = obj_label, subj_label
 
-                    edge = make_edge(
-                        rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
-                        license='/l/CC/By', sources=SOURCE, weight=2.0
-                    )
-                    out.write(edge)
+            surface = frame.format('[[%s]]' % subj_label, '[[%s]]' % obj_label)
+            print(subj_uri, rel_uri, obj_uri, '\t\t', surface)
+
+            edge = make_edge(
+                rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
+                license='/l/CC/By', sources=SOURCE, weight=2.0
+            )
+            out.write(edge)
 
 
 
