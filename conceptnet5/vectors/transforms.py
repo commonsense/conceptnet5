@@ -11,10 +11,7 @@ def standardize_row_labels(frame, language='en'):
     standardized URI get combined, with earlier rows given more weight.
     """
     # Re-label the DataFrame with standardized, non-unique row labels
-    frame.index = pd.Series(
-        [standardized_uri(language, label) for label in frame.index],
-        name='term'
-    )
+    frame.index = [standardized_uri(language, label) for label in frame.index]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
     nrows = frame.shape[0]
@@ -24,7 +21,14 @@ def standardize_row_labels(frame, language='en'):
     # groupby(level=0).sum() means to add rows that have the same label
     relabeled = frame.mul(weights, axis='rows').sort_index().groupby(level=0).sum()
     combined_weights = label_weights.sort_index().groupby(level=0).sum()
-    return relabeled.div(combined_weights, axis='rows')
+    scaled = relabeled.div(combined_weights, axis='rows')
+
+    # Rearrange the items in descending order of weight, similar to the order
+    # we get them in from word2vec and GloVe
+    combined_weights.sort(ascending=False)
+    result = scaled.loc[combined_weights.index.drop_duplicates()]
+    assert not result.index.has_duplicates
+    return result
 
 
 def l1_normalize_columns(frame):
