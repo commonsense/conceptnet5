@@ -31,13 +31,13 @@ def _read_vec(file, ndims):
     return np.array(values)
 
 
-def load_word2vec_bin(filename):
+def load_word2vec_bin(filename, nrows):
     label_list = []
     vec_list = []
     with gzip.open(filename, 'rb') as infile:
         header = infile.readline().rstrip()
         nrows_str, ncols_str = header.split()
-        nrows = int(nrows_str)
+        nrows = min(int(nrows_str), nrows)
         ncols = int(ncols_str)
         for row in range(nrows):
             label = _read_until_space(infile)
@@ -53,11 +53,11 @@ def load_word2vec_bin(filename):
 
 
 def load_hdf(filename):
-    return pd.read_hdf(filename, 'mat')
+    return pd.read_hdf(filename, 'mat', encoding='utf-8')
 
 
 def save_hdf(table, filename):
-    return table.to_hdf(filename, 'mat')
+    return table.to_hdf(filename, 'mat', encoding='utf-8')
 
 
 def save_csr(matrix, filename):
