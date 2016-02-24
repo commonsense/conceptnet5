@@ -56,7 +56,7 @@ AROUND_PREPOSITIONS = [
 # supposed to make it into the actual database.
 
 RELATIONS_TO_DROP = {
-    '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom'
+    '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom', '/r/SimilarSize'
 }
 
 def can_skip(parts_dict):
@@ -65,8 +65,8 @@ def can_skip(parts_dict):
     database dump.
 
     The activity called 'testing' was actually collecting preliminary data for
-    a dataset about subjective medical experiences. This data looks really out
-    of place now.
+    someone's dataset about subjective medical experiences. This data looks
+    really out of place now.
     """
     lang = parts_dict['lang']
     if lang.startswith('zh'):
