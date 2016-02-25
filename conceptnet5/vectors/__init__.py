@@ -15,7 +15,7 @@ def replace_numbers(s):
     This operation is applied to text that passes through word2vec, so we
     should match it.
     """
-    if DOUBLE_DIGIT_RE.search(s): 
+    if DOUBLE_DIGIT_RE.search(s):
         return DIGIT_RE.sub('#', s)
     else:
         return s
@@ -59,6 +59,10 @@ def similar_to(frame, text, num=50, language=None):
     Returns a sorted Series of the items with vectors most similar to `text`.
     """
     vec = get_vector(frame, text, language)
+    return similar_to_vec(frame, vec)
+
+
+def similar_to_vec(frame, vec, num=50):
     similarity = frame.dot(vec).sort(ascending=False, inplace=False)
     if num is not None:
         similarity = similarity.iloc[0:num]
@@ -70,3 +74,10 @@ def get_similarity(frame, text1, text2, language=None):
     vec2 = get_vector(frame, text2, language)
     return cosine_similarity(vec1, vec2)
 
+
+def weighted_average(frame, weight_series):
+    newframe = pd.DataFrame(index=weight_series.index, columns=frame.columns, dtype='f')
+    for label in weight_series.index:
+        if label in frame.index:
+            newframe.loc[label] = weight_series.loc[label] * frame.loc[label]
+    return normalize_vec(newframe.sum(axis='rows'))

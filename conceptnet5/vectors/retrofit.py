@@ -6,7 +6,36 @@ from conceptnet5.vectors.evaluation.wordsim import evaluate
 
 
 def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
-    retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns)
+    """
+    Retrofitting is a process of combining information from a machine-learned
+    space of term vectors with further structured information about those
+    terms. It was originally presented in this 2015 NAACL paper by Manaal
+    Faruqui, Jesse Dodge, Sujay Jauhar, Chris Dyer, Eduard Hovy, and Noah
+    Smith, "Retrofitting Word Vectors to Semantic Lexicons":
+
+        https://www.cs.cmu.edu/~hovy/papers/15HLT-retrofitting-word-vectors.pdf
+
+    This function implements a variant that I've been calling "wide
+    retrofitting", which extends the process to learn vectors for terms that
+    were outside the original space.
+
+    `row_labels` is the list of terms that we want to have vectors for.
+
+    `dense_frame` is a DataFrame assigning vectors to some of these terms.
+
+    `sparse_csr` is a SciPy sparse square matrix, whose rows and columns are
+    implicitly labeled with `row_labels`. The entries of this matrix are
+    positive for terms that we know are related from our structured data.
+    (This is an awkward form of input, but unfortunately there is no good
+    way to represent sparse labeled data in Pandas.)
+
+    See cli.py for an example of how to build `row_labels` and `sparse_csr`
+    appropriately.
+    """
+    # Initialize a DataFrame with rows that we know
+    retroframe = pd.DataFrame(
+        index=row_labels, columns=dense_frame.columns, dtype='f'
+    )
     retroframe.update(dense_frame)
     # weight = 2 for known vectors, 1 for unknown vectors
     orig_weights = 1 - retroframe[0].isnull()
