@@ -10,7 +10,6 @@ class SparseMatrixBuilder:
     SparseMatrixBuilder is a utility class that helps build a matrix of
     unknown shape.
     """
-
     def __init__(self):
         self.row_index = []
         self.col_index = []
@@ -32,6 +31,12 @@ def build_from_conceptnet_table(filename, orig_index=()):
     Read a file of tab-separated association data from ConceptNet, such as
     `data/assoc/reduced.csv`. Return a SciPy sparse matrix of the associations,
     and a pandas Index of labels.
+
+    If you specify `orig_index`, then the index of labels will be pre-populated
+    with existing labels, and any new labels will get index numbers that are
+    higher than the index numbers the existing labels use. This is important
+    for producing a sparse matrix that can be used for retrofitting onto an
+    existing dense labeled matrix (see retrofit.py).
     """
     mat = SparseMatrixBuilder()
 

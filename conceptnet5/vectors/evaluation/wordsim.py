@@ -97,6 +97,11 @@ def spearman_evaluate(frame, standard, language='en', verbose=0):
 
 
 def evaluate(frame, subset='dev'):
+    """
+    Evaluate a DataFrame containing term vectors on its ability to predict
+    term relatedness, according to MEN-3000, RW, and WordSim-353. Return
+    a Series containing these three labeled results.
+    """
     men_score = spearman_evaluate(frame, read_men3000(subset))
     rw_score = spearman_evaluate(frame, read_rw(subset))
     ws_score = spearman_evaluate(frame, read_ws353())
