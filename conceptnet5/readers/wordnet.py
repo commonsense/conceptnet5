@@ -77,8 +77,13 @@ def label_sort_key(label):
     synset has a "sameAs" link pointing to a named synset in WordNet 2.0, we
     use that name, letting us use the label "United Kingdom" instead of
     "United Kingdom of Great Britain and Northern Ireland".
+
+    However, we disregard the synset names for people, as they tend to be just
+    the person's last name, and therefore are highly ambiguous in a way that
+    won't be disambiguated by adding the category "person". For people, we
+    apply this rule no matter what, choosing their longest name.
     """
-    return (not label[0].isdigit(), label[-1].isdigit(), not label[0].islower(), -len(label), label)
+    return (not label[0].isdigit(), label[-1].isdigit(), not label.islower(), -len(label), label)
 
 
 def run_wordnet(input_file, output_file, sw_map_file):
@@ -118,9 +123,6 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 label = '-'.join(parts).replace('_s_', "'s_").replace('_s-', "'s_").replace("s__", "s'_").replace("s_-", "s'-").replace('_', ' ')
                 synset_canonical_labels[subj] = label
 
-                # shortcut
-                if subj.endswith('303167317-a') and label == 'unsaponified':
-                    break
         elif relname == 'domain_category':
             synset_categories[subj] = obj
         elif relname == 'lexical_domain':
@@ -138,7 +140,9 @@ def run_wordnet(input_file, output_file, sw_map_file):
     used_labels = set(synset_canonical_labels.values())
     for synset, values in synset_labels.items():
         values.sort(key=lambda label: (label in used_labels,) + label_sort_key(label))
-        if synset not in synset_canonical_labels:
+        if (synset not in synset_canonical_labels or
+            synset_canonical_labels[synset][0].isupper() and synset_domains.get(synset) == 'person'
+        ):
             label = values[0]
             synset_canonical_labels[synset] = label
             if len(values) > 1:
