@@ -26,8 +26,7 @@ def standardize_row_labels(frame, language='en'):
     # Rearrange the items in descending order of weight, similar to the order
     # we get them in from word2vec and GloVe
     combined_weights.sort(ascending=False)
-    result = scaled.loc[combined_weights.index.drop_duplicates()]
-    assert not result.index.has_duplicates
+    result = scaled.loc[combined_weights.index]
     return result
 
 
