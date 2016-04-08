@@ -15,12 +15,12 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
-from conceptnet5.json_rendering import jsonify, urlize_quoted_links, highlight_json
+from conceptnet5.json_rendering import jsonify, highlight_and_link_json
 
 
 ### Configuration ###
 
-API_URL = ''
+API_URL = '/data/5.4'
 WORKING_DIR = os.getcwd()
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
@@ -33,8 +33,7 @@ app = flask.Flask(
     static_folder=STATIC_PATH
 )
 app.config['JSON_AS_ASCII'] = False
-app.jinja_env.filters['highlight_json'] = highlight_json
-app.jinja_env.filters['urlize_quoted_links'] = urlize_quoted_links
+app.jinja_env.filters['highlight_json'] = highlight_and_link_json(API_URL)
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)

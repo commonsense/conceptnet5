@@ -20,12 +20,18 @@ def urlize_quoted_links(content):
     """
 
 
-def highlight_json(content):
-    formatter = HtmlFormatter()
-    lexer = get_lexer_by_name('json')
-    html = highlight(content, lexer, formatter)
-    urlized_html = re.sub(r'&quot;((https?://|/[acdlrs]/)[^& ]*)&quot;', r'&quot;<a href="\1">\1</a>&quot;', html)
-    return Markup(urlized_html)
+def highlight_and_link_json(base_url):
+    def _highlight_and_link_json(content):
+        formatter = HtmlFormatter()
+        lexer = get_lexer_by_name('json')
+        html = highlight(content, lexer, formatter)
+        urlized_html = re.sub(
+            r'&quot;((https?://|/[acdlrs]/)[^& ]*)&quot;',
+            r'&quot;<a href="{}\1">\1</a>&quot;'.format(base_url),
+            html
+        )
+        return Markup(urlized_html)
+    return _highlight_and_link_json
 
 
 def jsonify(obj):
