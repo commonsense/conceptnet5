@@ -13,20 +13,13 @@ def request_wants_json():
     return best == 'application/json'
 
 
-def urlize_quoted_links(content):
-    """
-    Convert URLs (including relative URLs) to links in prettified JSON
-    responses. Adapted from Tom Christie's flask_api.
-    """
-
-
 def highlight_and_link_json(base_url):
     def _highlight_and_link_json(content):
         formatter = HtmlFormatter()
         lexer = get_lexer_by_name('json')
         html = highlight(content, lexer, formatter)
         urlized_html = re.sub(
-            r'&quot;((https?://|/[acdlrs]/)[^& ]*)&quot;',
+            r'&quot;((https?://|/[acdrs]/)[^& ]*)&quot;',
             r'&quot;<a href="{}\1">\1</a>&quot;'.format(base_url),
             html
         )
@@ -37,13 +30,15 @@ def highlight_and_link_json(base_url):
 def jsonify(obj):
     if flask.request is None or request_wants_json():
         return flask.Response(
-            json.dumps(obj, ensure_ascii=False),
+            json.dumps(obj, ensure_ascii=False, sort_keys=True),
             mimetype='application/json'
         )
     else:
-        pretty_json = json.dumps(obj, ensure_ascii=False, indent=2)
+        pretty_json = json.dumps(obj, ensure_ascii=False, sort_keys=True, indent=2)
+        ugly_json = json.dumps(obj, ensure_ascii=False, sort_keys=True)
         return flask.render_template(
             'json.html',
             json=pretty_json,
+            json_raw=ugly_json
         )
 

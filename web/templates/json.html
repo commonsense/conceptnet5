@@ -16,5 +16,8 @@
 {% block content %}
 {{ json | highlight_json }}
 {% endblock %}
+<script type="application/ld+json">
+{{ json_raw|safe }}
+</script>
 </body>
 </html>

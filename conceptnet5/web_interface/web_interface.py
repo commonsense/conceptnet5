@@ -65,7 +65,7 @@ def edges_for_uri(uri):
     query to the API now returns a list of edges.
     """
     uri = '/' + uri.rstrip('/')
-    edges = list(lookup(uri, limit=100))
+    edges = list(lookup(uri, limit=500))
     seen_edges = {}
     out_edges = []
     caption = uri
