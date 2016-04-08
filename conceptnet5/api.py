@@ -15,7 +15,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
-from conceptnet5.json_rendering import jsonify, urlize_quoted_links
+from conceptnet5.json_rendering import jsonify, urlize_quoted_links, highlight_json
 
 
 ### Configuration ###
@@ -33,6 +33,7 @@ app = flask.Flask(
     static_folder=STATIC_PATH
 )
 app.config['JSON_AS_ASCII'] = False
+app.jinja_env.filters['highlight_json'] = highlight_json
 app.jinja_env.filters['urlize_quoted_links'] = urlize_quoted_links
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
@@ -66,10 +67,10 @@ def query_node(top, query):
     if grouped:
         limit = min(limit, 100)
         results = FINDER.lookup_grouped_by_feature(path, offset=offset, group_limit=limit)
-        return flask.jsonify(groups=results)
+        return jsonify({'groups': results})
     else:
         results = list(FINDER.lookup(path, offset=offset, limit=limit))
-        return flask.jsonify(edges=results, numFound=len(results))
+        return jsonify({'edges': results, 'numFound': len(results)})
 
 
 @app.route(API_URL + '/search')
@@ -83,7 +84,7 @@ def search():
         if key in VALID_KEYS:
             criteria[key] = flask.request.args[key]
     results = list(FINDER.query(criteria, limit=limit, offset=offset))
-    return flask.jsonify(edges=results, numFound=len(results))
+    return jsonify({'edges': results, 'numFound': len(results)})
 
 
 @app.route(API_URL + '/uri')
