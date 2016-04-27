@@ -1,0 +1,4 @@
+/c/en/there                          # too vague
+/c/en/ilxx                           # WordNet typo for the Roman numeral for 69
+/c/en/reddisn_purple                 # WordNet typo
+/s/contributor/omcs/brunogodoifred   # banged on the keyboard a lot
