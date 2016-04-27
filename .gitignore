@@ -25,3 +25,4 @@ logs/*.log
 static/img/build/
 lib/apsw-3.8.5-r1/
 lib/apsw-3.8.6-r1/
+.snakemake/
