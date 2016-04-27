@@ -80,6 +80,8 @@ class AssertionFinder(object):
                     "Couldn't find a dictionary in %r at byte offset %d"
                     % (self.edge_file, pointer)
                 )
+            if 'context' in val:
+                del val['context']
             yield val
 
     def lookup_random(self):

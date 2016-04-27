@@ -15,12 +15,12 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.query import AssertionFinder, VALID_KEYS
 from conceptnet5.assoc_query import AssocSpaceWrapper, MissingAssocSpace, get_assoc_data
 from conceptnet5.util import get_data_filename, get_support_data_filename
-
+from conceptnet5.json_rendering import jsonify, highlight_and_link_json
 
 
 ### Configuration ###
 
-API_URL = '/data/%s' % VERSION
+API_URL = '/data/5.4'
 WORKING_DIR = os.getcwd()
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
@@ -33,13 +33,10 @@ app = flask.Flask(
     static_folder=STATIC_PATH
 )
 app.config['JSON_AS_ASCII'] = False
+app.jinja_env.filters['highlight_json'] = highlight_and_link_json(API_URL)
+app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
-
-if len(sys.argv) == 1:
-    root_url = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
-else:
-    root_url = sys.argv[1]
 
 
 def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
@@ -52,32 +49,6 @@ def configure_api(db_path, assertion_dir, assoc_dir=None, nshards=8):
     global FINDER, ASSOC_WRAPPER
     FINDER = AssertionFinder(db_path, assertion_dir, nshards)
     ASSOC_WRAPPER = AssocSpaceWrapper(assoc_dir, FINDER)
-
-
-### Error handling ###
-
-@app.errorhandler(404)
-def not_found(error):
-    return flask.jsonify({
-        'error': 'invalid request',
-        'details': str(error)
-    }), 404
-
-
-@app.errorhandler(MissingAssocSpace)
-def missing_assoc_space(error):
-    return flask.jsonify({
-        'error': 'Feature unavailable',
-        'details': error.args[0]
-    }), 503
-
-
-@app.errorhandler(ValueError)
-def term_list_error(error):
-    return flask.jsonify({
-        'error': 'Invalid request',
-        'details': error.args[0]
-    }), 400
 
 
 ### API endpoints ###
@@ -95,10 +66,10 @@ def query_node(top, query):
     if grouped:
         limit = min(limit, 100)
         results = FINDER.lookup_grouped_by_feature(path, offset=offset, group_limit=limit)
-        return flask.jsonify(groups=results)
+        return jsonify({'groups': results})
     else:
         results = list(FINDER.lookup(path, offset=offset, limit=limit))
-        return flask.jsonify(edges=results, numFound=len(results))
+        return jsonify({'edges': results, 'numFound': len(results)})
 
 
 @app.route(API_URL + '/search')
@@ -112,7 +83,7 @@ def search():
         if key in VALID_KEYS:
             criteria[key] = flask.request.args[key]
     results = list(FINDER.query(criteria, limit=limit, offset=offset))
-    return flask.jsonify(edges=results, numFound=len(results))
+    return jsonify({'edges': results, 'numFound': len(results)})
 
 
 @app.route(API_URL + '/uri')
