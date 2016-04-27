@@ -1,0 +1,20 @@
+Design of ConceptNet 5.5:
+
+- [x] link the API responses (fix Pygments order)
+- [ ] Don't stem things on the way in
+- [ ] Use JSON-LD when possible
+- [X] Store the index in a reasonable constant database
+
+ConceptNet 5.6 perhaps:
+
+- [ ] Nodes should have labels that are stored separately from their edges
+- [ ] Break down the and-or trees into more machine-readable structures
+
+Cleaning up the data:
+
+- [ ] Relabel vague nodes like "someone" and "something"
+- [ ] Infer things from verb phrases
+
+Other things to do:
+
+- [ ] Use command-line tools such as jq to get things done quickly
