@@ -41,7 +41,7 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
                     target_pos = bucket * ENTRY_SIZE
                     if target_pos > hfile_pos:
                         hfile.seek(target_pos)
-                    
+
                     keygroups = itertools.groupby(
                         lines, key=_extract_keyhash
                     )
