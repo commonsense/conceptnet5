@@ -127,8 +127,9 @@ def run_wordnet(input_file, output_file, sw_map_file):
             synset_categories[subj] = obj
         elif relname == 'lexical_domain':
             target = resource_name(obj)
-            domain = target.split('.')[1]
-            synset_domains[subj] = domain
+            if '.' in target:
+                domain = target.split('.')[1]
+                synset_domains[subj] = domain
         elif relname == 'gloss':
             synset_glosses[subj] = obj
         elif relname == 'reference':
@@ -154,8 +155,9 @@ def run_wordnet(input_file, output_file, sw_map_file):
             category_name = synset_canonical_labels[synset_categories[synset]]
         else:
             category_name = synset_domains.get(synset, None)
-        pos = synset[-1].lower()
-        assert pos in 'nvarsp', pos
+        synset_no_fragment = synset.split('#')[0]
+        pos = synset_no_fragment[-1].lower()
+        assert pos in 'nvarsp', synset
         if pos == 's':
             pos = 'a'
         elif pos == 'p':
