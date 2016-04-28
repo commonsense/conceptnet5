@@ -1,19 +1,21 @@
 from __future__ import unicode_literals
-import sys
 import argparse
-import codecs
+import hashlib
 
-# Get the version of sys.stdin that contains bytes, not Unicode.
-if sys.version_info.major >= 3:
-    STDIN = sys.stdin.buffer
-else:
-    STDIN = sys.stdin
+
+def strhash(text):
+    """
+    Get a number from 0 to 255 from the first byte of the SHA1 hash
+    of a string.
+    """
+    hashobj = hashlib.sha1(text.encode('utf-8'))
+    return hashobj.digest()[0]
 
 
 class EdgeDistributor(object):
     """
-    Takes in lines of a tab-separated "CSV" file, and distributes them
-    between `n` output files.
+    Takes in tab-separated "CSV" files, and distributes their lines between
+    `n` output files.
 
     The file to write to is determined by a hash of the first item in
     the line, so all rows with the same first item will end up in the same
@@ -34,14 +36,16 @@ class EdgeDistributor(object):
             codecs.open(output_dir + '/edges_%02d.csv' % i, 'w', encoding='utf-8')
             for i in range(n)
         ]
-
-    def handle_line(self, line):
+    
+    def handle_file(self, filename):
         """
-        Read a line, and split based on the hash of its first item.
+        Send the lines of this input file to different output files based on
+        the hash of their first item.
         """
-        key = line.split('\t', 1)[0]
-        bucket = hash(key) % self.n
-        self.files[bucket].write(line)
+        for line in open(filename, encoding='utf-8'):
+            key = line.split('\t', 1)[0]
+            bucket = strhash(key) % self.n
+            self.files[bucket].write(line)
 
     def close(self):
         """
@@ -61,13 +65,14 @@ def run_args():
     another step through it as a pipe.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', default='./split', help='the directory in which to write output files')
-    parser.add_argument('-n', type=int, default=20, help='the number of separate files to write')
+    parser.add_argument('-o', default='data/collated', help='the directory in which to write output files')
+    parser.add_argument('-n', type=int, default=8, help='the number of separate files to write')
+    parser.add_argument('files', nargs='+', help='msgpack input files to collate')
     args = parser.parse_args()
 
     sorter = EdgeDistributor(args.o, args.n)
-    for line in STDIN:
-        sorter.handle_line(line.decode('utf-8'))
+    for file in args.files:
+        sorter.handle_file(file)
 
     sorter.close()
 

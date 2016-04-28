@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, print_function
-import codecs
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import disjunction_uri, parse_compound_uri
+from conceptnet5.uri import disjunction_uri, parse_compound_uri, Licenses
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util import get_support_data_filename
 import os
@@ -118,6 +117,7 @@ def combine_assertions(input_filenames, output_file, license):
     current_dataset = None
     current_weight = 0.
     current_sources = []
+    current_license = Licenses.cc_attribution
     reliability = read_reliability_file(
         get_support_data_filename('reliability.csv')
     )
@@ -125,14 +125,14 @@ def combine_assertions(input_filenames, output_file, license):
     out = MsgpackStreamWriter(output_file)
     out_bad = MsgpackStreamWriter(output_file + '.reject')
     for csv_filename in input_filenames:
-        for line in codecs.open(csv_filename, encoding='utf-8'):
+        for line in open(csv_filename, encoding='utf-8'):
             line = line.rstrip('\n')
             if not line:
                 continue
             # Interpret the columns of the file.
             parts = line.split('\t')
-            (uri, rel, start, end, context, weight, source_uri, id, this_dataset,
-             surface) = parts[:10]
+            (uri, rel, start, end, context, weight, source_uri, id,
+             this_dataset, this_license, surface) = parts[:10]
             surface = surface.strip()
             weight = float(weight)
 
@@ -156,9 +156,15 @@ def combine_assertions(input_filenames, output_file, license):
                 if (current_surface is None) and surface:
                     current_surface = surface
 
+                # If one source has a ShareAlike license, the combined
+                # assertion does too.
+                if this_license == Licenses.cc_sharealike:
+                    current_license = Licenses.cc_sharealike
+
             # Otherwise, it's a new assertion.
             else:
                 if current_uri is not None:
+                    # Output the existing assertion before starting a new one.
                     judged_weight = judge_reliability(
                         reliability, current_sources + [start, end], current_weight
                     )
@@ -168,13 +174,15 @@ def combine_assertions(input_filenames, output_file, license):
                         destination = out_bad
                     output_assertion(
                         destination,
-                        dataset=current_dataset, license=license,
+                        dataset=current_dataset, license=current_license,
                         sources=current_sources,
                         surfaceText=current_surface,
                         weight=judged_weight,
                         uri=current_uri,
                         **current_data
                     )
+                
+                # Set values for a new assertion.
                 current_uri = uri
                 current_data = {
                     'rel': rel,
@@ -186,6 +194,8 @@ def combine_assertions(input_filenames, output_file, license):
                 current_contributors = extract_contributors(source_uri)
                 current_surface = surface or None
                 current_dataset = this_dataset
+                current_license = this_license
+               
 
         if current_uri is not None:
             judged_weight = judge_reliability(
@@ -198,7 +208,7 @@ def combine_assertions(input_filenames, output_file, license):
             output_assertion(
                 destination,
                 rel=rel, start=start, end=end,
-                dataset=current_dataset, license=license,
+                dataset=current_dataset, license=current_license,
                 sources=current_sources,
                 surfaceText=current_surface,
                 weight=judged_weight,
@@ -251,9 +261,5 @@ if __name__ == '__main__':
     parser.add_argument(
         '-o', '--output', help='msgpack file to output to'
     )
-    parser.add_argument(
-        '-l', '--license',
-        help='URI of the license to use, such as /l/CC/By-SA'
-    )
     args = parser.parse_args()
-    combine_assertions(args.inputs, args.output, args.license)
+    combine_assertions(args.inputs, args.output)

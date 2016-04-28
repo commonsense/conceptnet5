@@ -11,7 +11,7 @@ def convert_to_tab_separated(input_filename, output_filename):
         info['weight'] = str(info['weight'])
         columns = [
             'uri', 'rel', 'start', 'end', 'context', 'weight', 'source_uri',
-            'id', 'dataset', 'surfaceText'
+            'id', 'dataset', 'license', 'surfaceText'
         ]
         column_values = [info.get(col) for col in columns]
         line = '\t'.join(column_values)
