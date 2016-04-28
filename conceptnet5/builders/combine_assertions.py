@@ -27,6 +27,15 @@ def read_reliability_file(filename):
     return reliability
 
 
+def read_blacklist(filename):
+    blacklisted = set()
+    for line in open(filename, encoding='utf-8'):
+        before_comment = line.split('#')[0].strip()
+        if before_comment:
+            blacklisted.add(before_comment)
+    return blacklisted
+
+
 def truncate_term(term):
     parts = term.split('/')
     return '/'.join(parts[:4])
@@ -37,6 +46,8 @@ def transform_node(node):
         return truncate_term(node)
     elif node.startswith('/s/contributor/omcs/20q'):
         return '/s/contributor/omcs/20q'
+    elif node.startswith('/s/contributor/petgame'):
+        return '/s/contributor/petgame'
     else:
         return node
 
@@ -52,21 +63,6 @@ def flatten_sources(sources):
         else:
             sources_out.append(source)
     return sources_out
-
-
-def judge_reliability(reliability, nodes, initial_weight):
-    weight = initial_weight - 1
-    for node in flatten_sources(nodes):
-        node = transform_node(node)
-        if node.startswith('/c/') and not node.startswith('/c/en/'):
-            # Our evaluation process really only works for English, so
-            # compensate non-English assertions here
-            weight += 0.25
-        if node.startswith('/a/'):
-            weight += 0.5
-        elif node in reliability:
-            weight += reliability[node]
-    return weight_scale(weight)
 
 
 def extract_contributors(source):
@@ -117,8 +113,8 @@ def combine_assertions(input_filenames, output_file):
     current_weight = 0.
     current_sources = []
     current_license = Licenses.cc_attribution
-    reliability = read_reliability_file(
-        get_support_data_filename('reliability.csv')
+    blacklist = read_blacklist(
+        get_support_data_filename('blacklist.txt')
     )
 
     out = MsgpackStreamWriter(output_file)
@@ -164,9 +160,11 @@ def combine_assertions(input_filenames, output_file):
             else:
                 if current_uri is not None:
                     # Output the existing assertion before starting a new one.
-                    judged_weight = judge_reliability(
-                        reliability, current_sources + [start, end], current_weight
-                    )
+                    nodes = current_sources + [start, end]
+                    if set(nodes) & blacklist:
+                        judged_weight = 0
+                    else:
+                        judged_weight = weight_scale(current_weight)
                     if judged_weight > 0:
                         destination = out
                     else:
@@ -180,7 +178,7 @@ def combine_assertions(input_filenames, output_file):
                         uri=current_uri,
                         **current_data
                     )
-                
+
                 # Set values for a new assertion.
                 current_uri = uri
                 current_data = {
@@ -194,12 +192,12 @@ def combine_assertions(input_filenames, output_file):
                 current_surface = surface or None
                 current_dataset = this_dataset
                 current_license = this_license
-               
 
         if current_uri is not None:
-            judged_weight = judge_reliability(
-                reliability, current_sources + [start, end], current_weight
-            )
+            if set(nodes) & blacklist:
+                judged_weight = 0
+            else:
+                judged_weight = weight_scale(current_weight)
             if judged_weight > 0:
                 destination = out
             else:

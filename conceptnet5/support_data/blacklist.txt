@@ -1,4 +1,19 @@
-/c/en/there                          # too vague
+# too vague
+/c/en/there
+/c/en/something
+/c/en/this
+/c/en/that
+/c/en/someone
+/c/en/you
+/c/en/i
+/c/en/he
+/c/en/she
+/c/en/it
+/c/en/
+
+# typoes in WordNet
 /c/en/ilxx                           # WordNet typo for the Roman numeral for 69
 /c/en/reddisn_purple                 # WordNet typo
+
+# unhelpful contributors
 /s/contributor/omcs/brunogodoifred   # banged on the keyboard a lot

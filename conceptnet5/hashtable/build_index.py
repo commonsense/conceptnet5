@@ -30,6 +30,8 @@ def copy_data(input_file, output_file):
 
 
 def build_index(preindex_filename, hashtable_filename, hash_width):
+    collisions = 0
+    entries = 0
     with tempfile.TemporaryFile(prefix='conceptnet5.values.') as vfile:
         with tempfile.TemporaryFile(prefix='conceptnet5.hashtable.') as hfile:
             with open(preindex_filename, 'r', encoding='utf-8') as preindex:
@@ -39,6 +41,9 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
                 for bucket, lines in groups:
                     hfile_pos = hfile.tell()
                     target_pos = bucket * ENTRY_SIZE
+                    entries += 1
+                    if target_pos < hfile_pos:
+                        collisions += 1
                     if target_pos > hfile_pos:
                         hfile.seek(target_pos)
 
@@ -74,6 +79,18 @@ def build_index(preindex_filename, hashtable_filename, hash_width):
 
                 # Hashtable data
                 copy_data(hfile, outfile)
+    nslots = 2 ** hash_width
+    print(
+        "{0} collisions in {1} entries, with {2} slots.\n"
+        "The hash table is {3:3.2f}% full.".format(
+            collisions, entries, nslots,
+            entries / nslots * 100
+        )
+    )
+    if entries / nslots > 0.8:
+        raise RuntimeError(
+            "Hash table is too full. You should increase the `hash_width`."
+        )
 
 
 def _make_bucket_function(nbits):

@@ -215,7 +215,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
             subj_label = synset_canonical_labels[subj]
             license = Licenses.cc_attribution
             langcode = subj_uri.split('/')[2]
-            if langcode in SHAREALIKE_LANUGAGES:
+            if langcode in SHAREALIKE_LANGUAGES:
                 license = Licenses.cc_sharealike
 
             if reversed_frame:
