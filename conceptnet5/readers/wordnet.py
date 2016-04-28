@@ -146,8 +146,6 @@ def run_wordnet(input_file, output_file, sw_map_file):
         ):
             label = values[0]
             synset_canonical_labels[synset] = label
-            if len(values) > 1:
-                print("Guessed canonical label %r for %r" % (label, values))
             used_labels.add(label)
 
     for synset, labels in synset_labels.items():
@@ -175,7 +173,6 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 other_uri = standardized_concept_uri('en', label, pos, category_name)
                 rel_uri = '/r/Synonym'
                 surface = '[[{0}]] is a synonym of [[{1}]]'.format(label, canon)
-                print(other_uri, rel_uri, canon_uri, surface)
                 edge = make_edge(
                     rel_uri, other_uri, canon_uri, dataset=DATASET, surfaceText=surface,
                     license='/l/CC/By', sources=SOURCE, weight=2.0
@@ -194,12 +191,16 @@ def run_wordnet(input_file, output_file, sw_map_file):
             rel_uri = '/r/' + rel
             if objtag == 'URL':
                 obj_uri = synset_uris.get(obj)
+                if obj not in synset_canonical_labels:
+                    continue
                 obj_label = synset_canonical_labels[obj]
             else:
                 pos, sense = synset_disambig.get(subj, (None, None))
                 obj_uri = standardized_concept_uri(objtag, obj, pos, sense)
                 obj_label = obj
 
+            if subj not in synset_uris or subj not in synset_canonical_labels:
+                continue
             subj_uri = synset_uris[subj]
             subj_label = synset_canonical_labels[subj]
 
@@ -208,14 +209,12 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 subj_label, obj_label = obj_label, subj_label
 
             surface = frame.format('[[%s]]' % subj_label, '[[%s]]' % obj_label)
-            print(subj_uri, rel_uri, obj_uri, '\t\t', surface)
 
             edge = make_edge(
                 rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
                 license='/l/CC/By', sources=SOURCE, weight=2.0
             )
             out.write(edge)
-
 
 
 # Entry point for testing
