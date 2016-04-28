@@ -95,15 +95,14 @@ def extract_contributors(source):
         return set()
 
 
-def combine_assertions(input_filenames, output_file, license):
+def combine_assertions(input_filenames, output_file):
     """
     Take in a number of tab-separated, sorted "CSV" files, indicated by
     `input_filenames`, that should be grouped together into assertions.
     Output a msgpack stream of assertions to `output_file`.
 
     The combined assertions will all have the dataset of the first edge that
-    produces them, and the license of the strongest license being combined
-    (which should be passed in as `license`).
+    produces them, and the license of the strongest license being combined.
 
     This process requires its input to be a sorted CSV so that all edges for
     the same assertion will appear consecutively.
@@ -132,7 +131,7 @@ def combine_assertions(input_filenames, output_file, license):
             # Interpret the columns of the file.
             parts = line.split('\t')
             (uri, rel, start, end, context, weight, source_uri, id,
-             this_dataset, this_license, surface) = parts[:10]
+             this_dataset, this_license, surface) = parts[:11]
             surface = surface.strip()
             weight = float(weight)
 

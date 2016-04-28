@@ -1,13 +1,14 @@
 from __future__ import unicode_literals
 from collections import defaultdict
-from conceptnet5.uri import join_uri
+from conceptnet5.uri import join_uri, Licenses
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
+from conceptnet5.formats.semantic_web import (
+    NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
+)
 import re
 import os
-import langcodes
 
 
 # new plan
@@ -56,6 +57,15 @@ REL_MAPPING = {
     'translation': ('~TranslationOf', '{0} is a translation of {1}')
     # Do we want a relation for verbs in the same VerbNet group?
 }
+
+# Some OMW languages come with Share-Alike restrictions that we should keep
+# track of. Here's a list of them. This comes from the table at
+# http://compling.hss.ntu.edu.sg/omw/, but the language codes are translated
+# into BCP 47.
+
+SHAREALIKE_LANGUAGES = [
+    'ar', 'arb', 'nl', 'pt', 'ro', 'lt', 'sk', 'sl'
+]
 
 
 def label_sort_key(label):
@@ -203,6 +213,10 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 continue
             subj_uri = synset_uris[subj]
             subj_label = synset_canonical_labels[subj]
+            license = Licenses.cc_attribution
+            langcode = subj_uri.split('/')[2]
+            if langcode in SHAREALIKE_LANUGAGES:
+                license = Licenses.cc_sharealike
 
             if reversed_frame:
                 subj_uri, obj_uri = obj_uri, subj_uri
@@ -212,7 +226,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
 
             edge = make_edge(
                 rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
-                license='/l/CC/By', sources=SOURCE, weight=2.0
+                license=license, sources=SOURCE, weight=2.0
             )
             out.write(edge)
 

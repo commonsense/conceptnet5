@@ -33,7 +33,7 @@ class EdgeDistributor(object):
         """
         self.n = n
         self.files = [
-            codecs.open(output_dir + '/edges_%02d.csv' % i, 'w', encoding='utf-8')
+            open(output_dir + '/edges_%02d.csv' % i, 'w', encoding='utf-8')
             for i in range(n)
         ]
     

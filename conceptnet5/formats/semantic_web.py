@@ -1,10 +1,8 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
 from conceptnet5.uri import ROOT_URL
 from ftfy.fixes import decode_escapes
 import sys
 import urllib
-import codecs
 import langcodes
 
 SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
@@ -127,7 +125,7 @@ class NTriplesWriter(object):
         if hasattr(filename_or_stream, 'write'):
             self.stream = filename_or_stream
         else:
-            self.stream = codecs.open(filename_or_stream, 'w', encoding='ascii')
+            self.stream = open(filename_or_stream, 'w', encoding='ascii')
         self.seen = set()
 
     def write(self, triple):
@@ -162,7 +160,7 @@ class NTriplesReader(object):
         self.prefixes = {'_': '_'}
 
     def parse_file(self, filename):
-        for line in codecs.open(filename, encoding='utf-8'):
+        for line in open(filename, encoding='utf-8'):
             line = line.strip()
             if line and not line.startswith('#'):
                 result = self.parse_line(line)

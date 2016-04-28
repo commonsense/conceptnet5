@@ -65,7 +65,7 @@ rule read_umbel:
     output:
         "data/edges/umbel/{filename}.msgpack",
         "data/edges/umbel/{filename}.links.jsons"
-    shell: "python3 -m conceptnet5.readers.umbel {input} {output}"
+    shell: "python3 -m conceptnet5.readers.umbel data/raw/umbel/ {output}"
 
 rule read_verbosity:
     input: "data/raw/verbosity/verbosity.txt"
