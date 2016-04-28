@@ -2,6 +2,7 @@ Design of ConceptNet 5.5:
 
 - [x] link the API responses (fix Pygments order)
 - [ ] Don't stem things on the way in
+- [ ] Use the blacklist when making assertions
 - [ ] Use JSON-LD when possible
 - [X] Store the index in a reasonable constant database
 
