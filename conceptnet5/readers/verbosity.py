@@ -110,7 +110,7 @@ def handle_file(infile, outfile):
         rel = '/r/RelatedTo'
         reltext = 'is related to'
         if right.startswith('not '):
-            rel = '/r/Antonym'
+            rel = '/r/DistinctFrom'
             right = right[4:]
             reltext = 'is not'
         if relation == 'it is the opposite of':

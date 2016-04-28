@@ -78,7 +78,10 @@ def convert_to_assoc(input_filename, output_filename):
             else:
                 pairs = [(startc, endc)]
         else:
-            negated = (rel.startswith('/r/Not') or rel.startswith('/r/Antonym'))
+            negated = (
+                rel.startswith('/r/Not') or rel.startswith('/r/Antonym')
+                or rel.startswith('/r/DistinctFrom')
+            )
             if not negated:
                 pairs = [(startc, endc)]
             else:
