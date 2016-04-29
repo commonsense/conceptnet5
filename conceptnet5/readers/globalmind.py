@@ -64,11 +64,6 @@ def build_from_dir(dirname, output_file):
     a MsgpackStreamWriter.
     """
     out = MsgpackStreamWriter(output_file)
-    userdata = yaml.load_all(open(dirname + '/GMUser.yaml'))
-    users = {}
-
-    for userinfo in userdata:
-        users[userinfo['pk']] = userinfo
 
     frame_data = yaml.load_all(open(dirname + '/GMFrame.yaml'))
     frames = {}
@@ -81,12 +76,11 @@ def build_from_dir(dirname, output_file):
         obj = assertion['fields']
         frame = frames[obj['frame']]
         frametext = frame['text']
-        userinfo = users[obj['author']]
-        username = userinfo['fields']['username']
+        user_id = obj['author']
 
-        # As far as I can tell, GlobalMind used the same namespace of
-        # usernames as the original Open Mind.
-        user_source = "/s/contributor/omcs/%s" % username
+        # The 'author' field is a primary key of an external table of
+        # users that we're not reading here. We'll just use the ID as a proxy.
+        user_source = "/s/contributor/globalmind/user_%s" % user_id
 
         sources = [
             user_source,
@@ -113,7 +107,9 @@ def build_from_dir(dirname, output_file):
 
         node1 = u'[[' + obj['node1'] + u']]'
         node2 = u'[[' + obj['node2'] + u']]'
-        surfaceText = frametext.replace('//', '').replace('[node1]', node1).replace('[node2]', node2)
+        surfaceText = frametext.replace('//', '')\
+                               .replace('[node1]', node1)\
+                               .replace('[node2]', node2)
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
                          license='/l/CC/By',
@@ -121,9 +117,8 @@ def build_from_dir(dirname, output_file):
                          surfaceText=surfaceText,
                          weight=1)
 
-        # Avoid duplication with the ConceptNet reader, but still save every edge so that we can
-        # handle translations.
-        if username != 'openmind':
+        # User IDs 2 and 3 contain data duplicated from OMCS.
+        if user_id >= 4:
             out.write(edge)
 
         assertions[assertion['pk']] = edge
@@ -141,14 +136,8 @@ def build_from_dir(dirname, output_file):
         lang1 = LANG_NAMES[get_lang(assertion1)]
         lang2 = LANG_NAMES[get_lang(assertion2)]
         surfaceText = u"[[%s]] in %s means [[%s]] in %s." % (text1, lang1, text2, lang2)
-        userinfo = users[obj['author']]
-        username = userinfo['fields']['username']
-
-        userlocale = userinfo['fields']['ccode'].lower()
-        if userlocale:
-            user_source = "/s/contributor/globalmind/%s/%s" % (userlocale, username)
-        else:
-            user_source = "/s/contributor/globalmind/%s" % username
+        user_id = obj['author']
+        user_source = "/s/contributor/globalmind/user_%s" % user_id
 
         sources = [
             user_source,
@@ -178,4 +167,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
