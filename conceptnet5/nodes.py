@@ -21,15 +21,14 @@ from ftfy import fix_text
 import re
 
 LCODE_ALIASES = {
-    # Pretend that all Chinese languages and variants are equivalent. This is
-    # linguistically problematic, but it's also very helpful for aligning them
-    # on terms where they actually are the same.
+    # Pretend that various Chinese languages and variants are equivalent. This
+    # is linguistically problematic, but it's also very helpful for aligning
+    # them on terms where they actually are the same.
     #
     # This would mostly be a problem if ConceptNet was being used to *generate*
     # Chinese natural language text, and I don't believe it is.
     'cmn': 'zh',
     'yue': 'zh',
-    'nan': 'zh',
     'zh_tw': 'zh',
     'zh_cn': 'zh',
     'zh-tw': 'zh',
@@ -40,7 +39,21 @@ LCODE_ALIASES = {
     # Many sources use 'ms' to represent the entire macrolanguage, with
     # 'zsm' to refer to Bahasa Malay in particular.
     'zsm': 'ms',
-    'id': 'ms'
+    'id': 'ms',
+
+    # Our sources have entries in Croatian, entries in Serbian, and entries
+    # in Serbo-Croatian. Some of the Serbian and Serbo-Croatian entries
+    # are written in Cyrillic letters, while all Croatian entries are written
+    # in Latin letters. Bosnian and Montenegrin are in there somewhere,
+    # too.
+    #
+    # Applying the same principle as Chinese, we will unify the language codes
+    # without unifying the scripts.
+    'bs': 'sh',
+    'hr': 'sh',
+    'sr': 'sh',
+    'sr-latn': 'sh',
+    'sr-cyrl': 'sh'
 }
 
 
