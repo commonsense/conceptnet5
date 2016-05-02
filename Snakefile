@@ -37,24 +37,26 @@ DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 
 RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data"
 
-# Downloaders
-# ===========
-rule download_raw:
-    input:
-        HTTP.remote(RAW_DATA_URL + '/2016/{dirname,[^/]+}/{filename}')
-    output:
-        "data/raw/conceptnet4/{filename}"
-
-# Readers
-# =======
-# These are steps that turn raw data into files of uncombined 'edges'.
-
 rule all:
     input:
         "data/assertions/assertions.csv",
         "data/db/assertions.index",
         "data/stats/dataset_vs_language.txt",
         "data/stats/relations.txt"
+
+# Downloaders
+# ===========
+rule download_raw:
+    input:
+        HTTP.remote(RAW_DATA_URL + '/2016/{dirname}/{filename}', keep_local=True)
+    output:
+        "data/raw/{dirname}/{filename}"
+    shell:
+        "cp {input} {output}"
+
+# Readers
+# =======
+# These are steps that turn raw data into files of uncombined 'edges'.
 
 rule read_conceptnet4:
     input:
