@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri, standardize_text
 from conceptnet5.edges import make_edge
+from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import yaml
 
@@ -65,22 +66,22 @@ def build_from_dir(dirname, output_file):
     """
     out = MsgpackStreamWriter(output_file)
 
-    frame_data = yaml.load_all(open(dirname + '/GMFrame.yaml'))
     frames = {}
-    for frame in frame_data:
+    for frame in read_json_stream(dirname + '/frames.jsons'):
         frames[frame['pk']] = frame['fields']
 
-    assertiondata = yaml.load_all(open(dirname + '/GMAssertion.yaml'))
+    usernames = {}
+    for user in read_json_stream(dirname + '/users.jsons'):
+        usernames[user['pk']] = user['fields']['username']
+
     assertions = {}
-    for assertion in assertiondata:
+    for assertion in read_json_stream(dirname + '/assertions.jsons'):
         obj = assertion['fields']
         frame = frames[obj['frame']]
         frametext = frame['text']
         user_id = obj['author']
-
-        # The 'author' field is a primary key of an external table of
-        # users that we're not reading here. We'll just use the ID as a proxy.
-        user_source = "/s/contributor/globalmind/user_%s" % user_id
+        username = standardize_text(usernames[user_id])
+        user_source = "/s/contributor/globalmind/%s" % username
 
         sources = [
             user_source,
@@ -123,8 +124,7 @@ def build_from_dir(dirname, output_file):
 
         assertions[assertion['pk']] = edge
 
-    translationdata = yaml.load_all(open(dirname + '/GMTranslation.yaml'))
-    for translation in translationdata:
+    for translation in read_json_stream(dirname + '/translations.jsons'):
         obj = translation['fields']
         assertion1 = assertions[obj['assertion1']]
         assertion2 = assertions[obj['assertion2']]
@@ -137,7 +137,8 @@ def build_from_dir(dirname, output_file):
         lang2 = LANG_NAMES[get_lang(assertion2)]
         surfaceText = u"[[%s]] in %s means [[%s]] in %s." % (text1, lang1, text2, lang2)
         user_id = obj['author']
-        user_source = "/s/contributor/globalmind/user_%s" % user_id
+        username = standardize_text(usernames[user_id])
+        user_source = "/s/contributor/globalmind/%s" % username
 
         sources = [
             user_source,

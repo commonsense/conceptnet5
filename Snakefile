@@ -1,3 +1,6 @@
+from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+HTTP = HTTPRemoteProvider()
+
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
@@ -32,6 +35,15 @@ DATASET_NAMES = [
 DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 
+RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data"
+
+# Downloaders
+# ===========
+rule download_raw:
+    input:
+        HTTP.remote(RAW_DATA_URL + '/2016/{dirname,[^/]+}/{filename}')
+    output:
+        "data/raw/conceptnet4/{filename}"
 
 # Readers
 # =======
@@ -54,10 +66,10 @@ rule read_conceptnet4:
 
 rule read_globalmind:
     input:
-        "data/raw/globalmind/GMFrame.yaml",
-        "data/raw/globalmind/GMTranslation.yaml",
-        "data/raw/globalmind/GMAssertion.yaml",
-        "data/raw/globalmind/GMUser.yaml"
+        "data/raw/globalmind/frames.jsons",
+        "data/raw/globalmind/users.jsons",
+        "data/raw/globalmind/assertions.jsons",
+        "data/raw/globalmind/translations.jsons"
     output:
         "data/edges/globalmind/globalmind.msgpack"
     shell:
@@ -81,7 +93,7 @@ rule read_nadya:
 
 rule read_ptt_petgame:
     input:
-        "data/raw/conceptnet_zh/conceptnet_zh_{part}.txt"
+        "data/raw/ptt_petgame/conceptnet_zh_{part}.txt"
     output:
         "data/edges/ptt_petgame/{part}.msgpack"
     shell:
