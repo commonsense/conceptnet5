@@ -18,6 +18,7 @@ secrets.py
 dist/
 env/
 data
+conceptnet.s3.amazonaws.com/
 attic/
 static/img/build/
 logs/*.log
