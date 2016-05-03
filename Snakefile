@@ -47,12 +47,10 @@ rule all:
 # Downloaders
 # ===========
 rule download_raw:
-    input:
-        HTTP.remote(RAW_DATA_URL + '/2016/{dirname}/{filename}', keep_local=True)
     output:
         "data/raw/{dirname}/{filename}"
     shell:
-        "cp {input} {output}"
+        "curl {RAW_DATA_URL}/2016/{wildcards.dirname}/{wildcards.filename} > {output}"
 
 # Readers
 # =======
