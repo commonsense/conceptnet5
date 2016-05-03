@@ -1,6 +1,13 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 HTTP = HTTPRemoteProvider()
 
+# Some build steps are difficult to run, so we've already run them and put
+# the results in S3. Of course, that can't be the complete solution, because
+# we have to have run those build steps first. So when USE_PRECOMPUTED is
+# True, we will download the computed files; when it's False, we will compute
+# them.
+USE_PRECOMPUTED = False
+
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
@@ -16,6 +23,17 @@ N_PIECES = 16
 # The index of the hash table will require 2 ^ (HASH_WIDTH + 4) bytes on disk,
 # so a hash width of 26 takes up half a gigabyte.
 HASH_WIDTH = 26
+
+# The versions of Wiktionary data to download. Updating these requires
+# uploading new Wiktionary dumps to ConceptNet's S3.
+WIKTIONARY_VERSIONS = {
+    'en': '20160305',
+    'fr': '20160305',
+    'de': '20160407'
+}
+
+# Increment this number when we incompatibly change the parser
+WIKT_PARSER_VERSION = "1"
 
 # Dataset filenames
 # =================
@@ -35,7 +53,10 @@ DATASET_NAMES = [
 DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 
-RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data"
+RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data/2016"
+PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
+PRECOMPUTED_DATA_URL = "conceptnet.s3.amazonaws.com/precomputed-data/2016" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 rule all:
     input:
@@ -50,7 +71,46 @@ rule download_raw:
     output:
         "data/raw/{dirname}/{filename}"
     shell:
-        "curl {RAW_DATA_URL}/2016/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+
+
+# Precomputation
+# ==============
+# This section is for tricky build steps where we would rather just distribute
+# the result of the computation.
+
+def find_wiktionary_input(wildcards):
+    if USE_PRECOMPUTED:
+        return []
+    else:
+        language = wildcards.language
+        version = WIKTIONARY_VERSIONS[wildcards.language]
+        filename = "data/raw/wiktionary/{0}wiktionary-{1}-pages-articles.xml.bz2".format(
+            language, version
+        )
+        return [filename]
+
+rule precompute_wiktionary:
+    input:
+        find_wiktionary_input
+    output:
+        "data/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
+    run:
+        if USE_PRECOMPUTED:
+            shell("curl {PRECOMPUTED_DATA_URL}/wiktionary/"
+                  "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
+                  "> {output}")
+        else:
+            # This is a mess because, for most of these sub-steps, the file
+            # being output isn't {output} but its uncompressed version
+            shell("bunzip2 -c {input} "
+                  "| wiktionary-parser {wildcards.language} "
+                  "| gzip -c > {output}")
+            shell("aws s3 cp {output} "
+                  "{PRECOMPUTED_S3_UPLOAD}/wiktionary/"
+                  "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
+                  "--acl public-read")
+
 
 # Readers
 # =======
@@ -116,6 +176,26 @@ rule read_verbosity:
     shell:
         "python3 -m conceptnet5.readers.verbosity {input} {output}"
 
+rule prescan_wiktionary:
+    input:
+        expand(
+            "data/precomputed/wiktionary/parsed-{version}/{language}.jsons",
+            version=[WIKT_PARSER_VERSION],
+            language=sorted(list(WIKTIONARY_VERSIONS))
+        )
+    output:
+        "data/db/wiktionary.db"
+    shell:
+        "python3 -m conceptnet5.readers.wiktionary_pre -o {output} {input}"
+
+rule read_wiktionary:
+    input:
+        "data/precomputed/wiktionary/parsed-{WIKT_PARSER_VERSION}/{language}.jsons"
+    output:
+        "data/edges/wiktionary/{language}.msgpack",
+    shell:
+        "python3 -m conceptnet5.readers.wiktionary {input} {output}"
+
 rule read_wordnet:
     input:
         "data/raw/wordnet-rdf/wn31.nt"
@@ -124,6 +204,7 @@ rule read_wordnet:
         "data/edges/wordnet/wordnet.links.jsons"
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
+
 
 # Converting msgpack to csv
 # =========================
