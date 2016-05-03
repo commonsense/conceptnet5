@@ -179,14 +179,14 @@ rule read_verbosity:
 rule prescan_wiktionary:
     input:
         expand(
-            "data/precomputed/wiktionary/parsed-{version}/{language}.jsons",
+            "data/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz",
             version=[WIKT_PARSER_VERSION],
             language=sorted(list(WIKTIONARY_VERSIONS))
         )
     output:
         "data/db/wiktionary.db"
     shell:
-        "python3 -m conceptnet5.readers.wiktionary_pre -o {output} {input}"
+        "cn5-read wiktionary_pre {input} {output}"
 
 rule read_wiktionary:
     input:

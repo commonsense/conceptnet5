@@ -2,6 +2,7 @@ from __future__ import print_function, unicode_literals
 import json
 import sys
 import codecs
+import gzip
 
 # Python 2/3 compatibility
 if sys.version_info.major >= 3:
@@ -60,7 +61,10 @@ def read_json_stream(filename_or_stream, offsets=False):
     if hasattr(filename_or_stream, 'read'):
         stream = filename_or_stream
     else:
-        stream = open(filename_or_stream, 'rb')
+        if filename_or_stream.endswith('.gz'):
+            stream = gzip.open(filename_or_stream, 'rb')
+        else:
+            stream = open(filename_or_stream, 'rb')
 
     offset = 0
     for bline in stream:

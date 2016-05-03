@@ -1,70 +1,53 @@
-# coding: utf-8
-from __future__ import unicode_literals
-from conceptnet5.wiktparse.rules import (EnWiktionarySemantics,
-                                         DeWiktionarySemantics)
-from conceptnet5.formats.msgpack_stream import read_msgpack_stream, MsgpackStreamWriter
-import logging
-import os
-import sys
+from conceptnet5.formats.json_stream import read_json_stream
+import sqlite3
+import pathlib
 
 
-# Maps language to its ConceptNetWiktionarySemantics subclass
-SEMANTICS = {'en': EnWiktionarySemantics, 'de': DeWiktionarySemantics}
+def prepare_db(inputs, dbfile):
+    db = sqlite3.connect(dbfile)
+    make_tables(db)
+    try:
+        for filename in inputs:
+            filepath = pathlib.Path(filename)
+            file_language = filepath.name.split('.')[0]
+            for item in read_json_stream(filename):
+                if 'language' in item:
+                    add_title(
+                        db, file_language, item['language'], item['title']
+                    )
+                    print(item['language'], item['title'])
+                elif 'rel' in item and item['rel'].startswith('form/'):
+                    form_name = item['rel'][5:]
+                    tfrom = item['from']
+                    tto = item['to']
+                    pos = tfrom.get('pos', '')
+                    add_form(
+                        db, file_language, tfrom['language'],
+                        tfrom['text'], pos, tto['text'], form_name
+                    )
+    finally:
+        db.close()
 
 
-def run_wiktionary(input_file, output_file, titledb=None, language='en',
-                   verbosity=0, logger=None):
-    if titledb is None:
-        titledb = os.path.dirname(input_file) + '/titles.db'
+def make_tables(db):
+    db.execute("CREATE TABLE titles (id integer primary key, site_language text, language text, title text)")
+    db.execute("CREATE INDEX titles_search ON titles (language, title)")
 
-    trace = (verbosity >= 2)
-    sem = SEMANTICS[language](language, titledb=titledb, trace=trace,
-                              logger=logger)
-    output = MsgpackStreamWriter(output_file)
-    for structure in read_msgpack_stream(input_file):
-        for edge in sem.parse_structured_entry(structure):
-            if verbosity >= 1:
-                print(edge['rel'], edge['start'], edge['end'])
-            output.write(edge)
+    db.execute("CREATE TABLE forms (id integer primary key, site_language text, language text, word text, pos text, root text, form text)")
+    db.execute("CREATE INDEX forms_search ON forms (language, word)")
 
 
-handle_file = run_wiktionary
+def add_title(db, file_language, language, title):
+    db.execute(
+        "INSERT INTO titles (site_language, language, title) "
+        "VALUES (?, ?, ?)",
+        (file_language, language, title)
+    )
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', help="Extracted .msgpack file of Wiktionary sections")
-    parser.add_argument('output_file', help='Output filename')
-    parser.add_argument('-v', '--verbosity', action='count', default=0,
-                        help='Increase output verbosity')
-    parser.add_argument('-l', '--language', default='en',
-                        help='The ISO code of the language this Wiktionary is written in')
-    parser.add_argument('-t', '--titles', default=None,
-                        help='a titles.db file, indicating which headwords exist in which languages')
-    parser.add_argument('-o', '--logfile', default=None,
-                        help='name of log file')
-    parser.add_argument('-g', '--loglevel', default=logging.WARN,
-                        choices=['NOTSET', 'DEBUG', 'INFO', 'WARNING', 'ERROR',
-                                 'CRITICAL'],
-                        help='logging level (all-uppercase string)')
-
-    args = parser.parse_args()
-
-    logger = None
-    if args.logfile:
-        logger = logging.getLogger('run_wiktionary')
-        handler = logging.FileHandler(args.logfile)
-        handler.setFormatter(
-            logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
-        logger.addHandler(handler)
-        if args.loglevel:
-            logger.setLevel(logging._nameToLevel[args.loglevel])
-
-    titledb = args.titles
-    run_wiktionary(args.input_file, args.output_file, titledb=titledb,
-                   language=args.language, verbosity=args.verbosity,
-                   logger=logger)
-
-if __name__ == '__main__':
-    main()
+def add_form(db, file_language, language, word, pos, root, form):
+    db.execute(
+        "INSERT INTO forms (site_language, language, word, pos, root, form) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (file_language, language, word, pos, root, form)
+    )
