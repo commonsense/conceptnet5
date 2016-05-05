@@ -1,14 +1,12 @@
 from __future__ import unicode_literals
 from hashlib import sha1
-from conceptnet5.uri import (conjunction_uri, assertion_uri, Licenses,
+from conceptnet5.uri import (conjunction_uri, assertion_uri,
                              parse_possible_compound_uri)
-from pprint import pprint
 import re
 
 
 def make_edge(rel, start, end, dataset, license, sources,
-              context='/ctx/all', surfaceText=None,
-              surfaceStart=None, surfaceEnd=None, weight=1.0):
+              surfaceText=None, surfaceStart=None, surfaceEnd=None, weight=1.0):
     """
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary form.
@@ -22,8 +20,7 @@ def make_edge(rel, start, end, dataset, license, sources,
         ...               surfaceText='[[Fire]] is [[hot]]',
         ...               weight=1.0)
         >>> pprint(e)
-        {'context': '/ctx/all',
-         'dataset': '/d/conceptnet/4/en',
+        {'dataset': '/d/conceptnet/4/en',
          'end': '/c/en/hot',
          'features': ['/c/en/fire /r/HasProperty -',
                       '/c/en/fire - /c/en/hot',
@@ -64,7 +61,9 @@ def make_edge(rel, start, end, dataset, license, sources,
     # Generate a unique ID for the edge. This is the only opaque ID
     # that appears in ConceptNet objects. You can use it as a
     # pseudo-random sort order over edges.
-    edge_unique_data = [uri, context, source_tree]
+    #
+    # The item '/ctx/all' appears here for entirely historical reasons.
+    edge_unique_data = [uri, '/ctx/all', source_tree]
     edge_unique = ' '.join(edge_unique_data).encode('utf-8')
     id = '/e/'+sha1(edge_unique).hexdigest()
     if surfaceStart is None or surfaceEnd is None:
@@ -75,7 +74,6 @@ def make_edge(rel, start, end, dataset, license, sources,
         'rel': rel,
         'start': start,
         'end': end,
-        'context': context,
         'dataset': dataset,
         'sources': flat_sources,
         'source_uri': source_tree,

@@ -71,7 +71,7 @@ def join_uri(*pieces):
     return joined
 
 
-def concept_uri(lang, text, pos=None, disambiguation=None):
+def concept_uri(lang, text, *more):
     """
     `concept_uri` builds a representation of a concept, which is a word or
     phrase of a particular language, which can participate in relations with
@@ -81,6 +81,11 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     of speech (pos), which is typically a single letter. If it does, it may
     have a disambiguation, a string that distinguishes it from other concepts
     with the same text.
+
+    This function should be called as follows, where arguments after `text`
+    are optional:
+
+        concept_uri(lang, text, pos, disambiguation...)
 
     `text` and `disambiguation` should be strings that have already been run
     through `standardize_text`.
@@ -101,17 +106,16 @@ def concept_uri(lang, text, pos=None, disambiguation=None):
     AssertionError: 'this is wrong' is not in normalized form
     """
     assert ' ' not in text, "%r is not in normalized form" % text
-    if pos is None:
-        if disambiguation is not None:
-            raise ValueError("Disambiguated concepts must have a part of speech")
-        return join_uri('/c', lang, text)
-    else:
-        if disambiguation is None:
-            return join_uri('/c', lang, text, pos)
-        else:
-            assert ' ' not in disambiguation,\
-                "%r is not in normalized form" % disambiguation
-            return join_uri('/c', lang, text, pos, disambiguation)
+    if len(more) > 0:
+        if len(more[0]) != 1:
+            # We misparsed a part of speech; everything after the text is
+            # probably junk
+            more = []
+        for dis1 in more[1:]:
+            assert ' ' not in dis1,\
+                "%r is not in normalized form" % dis1
+
+    return join_uri('/c', lang, text, *more)
 
 
 def compound_uri(op, args):
@@ -305,7 +309,7 @@ def assertion_uri(rel, *args):
     >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
     '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
-    assert rel.startswith('/r')
+    assert rel.startswith('/r'), rel
     return compound_uri('/a', (rel,) + args)
 
 

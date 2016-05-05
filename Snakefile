@@ -8,6 +8,10 @@ HTTP = HTTPRemoteProvider()
 # them.
 USE_PRECOMPUTED = False
 
+# If USE_PRECOMPUTED is False, should we upload the files we compute so they
+# can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
+UPLOAD = False
+
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
@@ -31,6 +35,7 @@ WIKTIONARY_VERSIONS = {
     'fr': '20160305',
     'de': '20160407'
 }
+WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
 # Increment this number when we incompatibly change the parser
 WIKT_PARSER_VERSION = "1"
@@ -52,6 +57,7 @@ DATASET_NAMES = [
 ]
 DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
 
 RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
@@ -106,10 +112,11 @@ rule precompute_wiktionary:
             shell("bunzip2 -c {input} "
                   "| wiktionary-parser {wildcards.language} "
                   "| gzip -c > {output}")
-            shell("aws s3 cp {output} "
-                  "{PRECOMPUTED_S3_UPLOAD}/wiktionary/"
-                  "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
-                  "--acl public-read")
+            if UPLOAD:
+                shell("aws s3 cp {output} "
+                    "{PRECOMPUTED_S3_UPLOAD}/wiktionary/"
+                    "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
+                    "--acl public-read")
 
 
 # Readers
@@ -181,20 +188,23 @@ rule prescan_wiktionary:
         expand(
             "data/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz",
             version=[WIKT_PARSER_VERSION],
-            language=sorted(list(WIKTIONARY_VERSIONS))
+            language=WIKTIONARY_LANGUAGES
         )
     output:
         "data/db/wiktionary.db"
     shell:
-        "cn5-read wiktionary_pre {input} {output}"
+        "mkdir -p data/tmp && "
+        "cn5-read wiktionary_pre {input} data/tmp/wiktionary.db && "
+        "mv data/tmp/wiktionary.db {output}"
 
 rule read_wiktionary:
     input:
-        "data/precomputed/wiktionary/parsed-{WIKT_PARSER_VERSION}/{language}.jsons"
+        "data/precomputed/wiktionary/parsed-%s/{language}.jsons.gz" % WIKT_PARSER_VERSION,
+        "data/db/wiktionary.db"
     output:
         "data/edges/wiktionary/{language}.msgpack",
     shell:
-        "python3 -m conceptnet5.readers.wiktionary {input} {output}"
+        "cn5-read wiktionary {input} {output}"
 
 rule read_wordnet:
     input:
