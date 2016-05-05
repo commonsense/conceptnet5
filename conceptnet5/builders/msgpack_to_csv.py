@@ -10,7 +10,7 @@ def convert_to_tab_separated(input_filename, output_filename):
             info['surfaceText'] = ''
         info['weight'] = str(info['weight'])
         columns = [
-            'uri', 'rel', 'start', 'end', 'context', 'weight', 'source_uri',
+            'uri', 'rel', 'start', 'end', 'weight', 'source_uri',
             'id', 'dataset', 'license', 'surfaceText'
         ]
         column_values = [info.get(col) for col in columns]
