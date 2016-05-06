@@ -127,7 +127,7 @@ def combine_assertions(input_filenames, output_file):
             # Interpret the columns of the file.
             parts = line.split('\t')
             (uri, rel, start, end, weight, source_uri, id,
-             this_dataset, this_license, surface) = parts[:11]
+             this_dataset, this_license, surface) = parts[:10]
             surface = surface.strip()
             weight = float(weight)
 
