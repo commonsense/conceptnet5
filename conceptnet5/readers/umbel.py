@@ -114,8 +114,8 @@ def run_umbel(input_dir, output_file, sw_map_file):
                     surface = frame % (labels[web_subj], labels[web_obj])
                     out.write(umbel_edge(rel_uri, subj_uri, obj_uri, surface, SOURCE))
                     map_out.write('{}\t{}'.format(web_rel, full_conceptnet_url(rel_uri)))
-                    map_out.write('{}\t{}'.format(web_subj), full_conceptnet_url(subj_uri)))
-                    map_out.write('{}\t{}'.format(web_obj), full_conceptnet_url(obj_uri)))
+                    map_out.write('{}\t{}'.format(web_subj, full_conceptnet_url(subj_uri)))
+                    map_out.write('{}\t{}'.format(web_obj, full_conceptnet_url(obj_uri)))
 
         # altLabel relations assign different texts to the same node. We'll
         # represent those in ConceptNet with Synonym relations.
