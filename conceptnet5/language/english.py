@@ -23,12 +23,26 @@ STOPWORDS = ['the', 'a', 'an', 'some', 'any',
 DROP_FIRST = ['to', 'be']
 
 
-def english_filter(tokens):
+def english_lemmatized_filter(tokens):
     """
     Given a list of tokens, remove a small list of English stopwords, and
     reduce the words to their WordNet roots using a simple lemmatizer.
     """
     non_stopwords = [lemmatize(token)[0] for token in tokens if token not in STOPWORDS]
+    if non_stopwords and non_stopwords[0] == 'to':
+        non_stopwords = non_stopwords[1:]
+    if non_stopwords:
+        return non_stopwords
+    else:
+        return tokens
+
+
+def english_filter(tokens):
+    """
+    Given a list of tokens, remove a small list of English stopwords, and
+    reduce the words to their WordNet roots using a simple lemmatizer.
+    """
+    non_stopwords = [token for token in tokens if token not in STOPWORDS]
     if non_stopwords and non_stopwords[0] == 'to':
         non_stopwords = non_stopwords[1:]
     if non_stopwords:

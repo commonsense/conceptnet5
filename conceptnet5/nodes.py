@@ -141,21 +141,18 @@ def standardize_topic(topic):
 
 def standardized_concept_name(lang, text):
     """
-    Make a normalized form of the given text in the given language. If the
-    language is English, reduce words to their root form using the tools in
-    conceptnet5.language.english. Otherwise, simply apply the function called
-    `conceptnet5.uri.standardize_text`.
+    DEPRECATED: Use `standardize_text` instead.
+
+    Pass the text on to `standardize_text` to get its normal form. Disregard
+    the language. If you want to run text through a particular filter, pass
+    that filter as the second argument to `standardize_text`.
 
     >>> standardized_concept_name('en', 'this is a test')
-    'this_be_test'
+    'this_is_a_test'
     >>> standardized_concept_name('es', 'ESTO ES UNA PRUEBA')
     'esto_es_una_prueba'
     """
-    if lang == 'en':
-        lang_filter = english_filter
-    else:
-        lang_filter = None
-    return standardize_text(text, lang_filter)
+    return standardize_text(text, None)
 
 normalized_concept_name = standardized_concept_name
 
@@ -170,9 +167,9 @@ def standardized_concept_uri(lang, text, *more):
     normalization steps.
 
     >>> standardized_concept_uri('en', 'this is a test')
-    '/c/en/this_be_test'
+    '/c/en/this_is_test'
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
-    '/c/en/this_be_test/n/example_phrase'
+    '/c/en/this_is_test/n/example_phrase'
     """
     lang = lang.lower()
     if lang in LCODE_ALIASES:

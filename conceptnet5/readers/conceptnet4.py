@@ -7,10 +7,11 @@ and builds ConceptNet 5 edges from the data.
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
-    standardized_concept_uri, standardize_text, valid_concept_name
+    standardized_concept_uri, concept_uri, standardize_text, valid_concept_name
 )
 from conceptnet5.util.node_filters import FILTERED_SOURCES
 from conceptnet5.edges import make_edge
+from conceptnet5.language.english import english_lemmatized_filter
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
@@ -58,6 +59,7 @@ AROUND_PREPOSITIONS = [
 RELATIONS_TO_DROP = {
     '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom', '/r/SimilarSize'
 }
+
 
 def can_skip(parts_dict):
     """
@@ -137,17 +139,24 @@ def build_relation(parts_dict):
     return relation
 
 
+def possibly_lemmatized_uri(lang, text):
+    if lang == 'en':
+        return concept_uri('en', standardize_text(text, english_lemmatized_filter))
+    else:
+        return standardized_concept_uri(lang, text)
+
+
 def build_start(parts_dict):
     lang = parts_dict['lang']
     startText = parts_dict["startText"]
-    start = standardized_concept_uri(lang, startText)
+    start = possibly_lemmatized_uri(lang, startText)
     return start
 
 
 def build_end(parts_dict):
     lang = parts_dict['lang']
     endText = parts_dict["endText"]
-    end = standardized_concept_uri(lang, endText)
+    end = possibly_lemmatized_uri(lang, endText)
     return end
 
 
