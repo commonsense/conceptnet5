@@ -19,10 +19,11 @@ import re
 BAD_CLUE_REGEX = re.compile(
     r'(^letter|^rhyme|^blank$|^words?$|^syllables?$|^spell|^tense$|^prefix'
     r'|^suffix|^guess|^starts?$|^ends?$|^singular$|^plural|^noun|^verb'
-    r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$|'
-    r'^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$|'
-    r'^delete|^remove|^add$|^drop$|^plus$|^more$|^less$|^combine$|^clue$|'
-    r'^my$|^uppercase$|^capital|^previous$|^next$|^last$|^no$|^without$)'
+    r'|^opposite|^homonym$|^synonym$|^antonym$|^close$|^only$|^just$'
+    r'|^different|^this$|^that$|^these$|^those$|^mince$|^said$|^same$'
+    r'|^delete|^remove|^add$|^drop$|^plus$|^more$|^less$|^combine$|^clue$'
+    r'|^my|^your|^uppercase$|^capital|^previous$|^next$|^last$|^no$|^without$'
+    r'|^sound| and$| or$| of$)'
 )
 
 # These are words we won't pull out of phrases in order to make individual
@@ -31,7 +32,7 @@ BAD_CLUE_REGEX = re.compile(
 STOPWORDS = {
     'a', 'an', 'the', 'to', 'of', 'for', 'in', 'on', 'at', 'by', 'with', 'and',
     'or', 'far', 'near', 'away', 'from', 'thing', 'something', 'things', 'be',
-    'is', 'are', 'was', 'were', 'as', 'so', 'get', 'me', 'you', 'it', 'he',
+    'is', 'are', 'was', 'were', 'as', 'so', 'get', 'i', 'me', 'you', 'it', 'he',
     'she', 'him', 'her', 'this', 'that', 'they', 'them', 'some', 'many', 'no',
     'one', 'all', 'either', 'both', 'er'
 }
