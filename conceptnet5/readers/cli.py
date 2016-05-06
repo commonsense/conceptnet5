@@ -96,8 +96,8 @@ def run_umbel(input_dir, output, mapping):
 
     input_dir: a directory containing N-Triples files of Umbel data
     output: a msgpack file of edges
-    mapping: an N-Triples output file that will map external Semantic Web URIs to
-      ConceptNet URIs
+    mapping: a tab-separated output file that will map external Semantic Web
+      URIs to ConceptNet URIs
     """
     umbel.handle_file(input_dir, output, mapping)
 
@@ -151,7 +151,7 @@ def run_wordnet(input, output, mapping):
 
     input: an .nt file of WordNet data
     output: a msgpack file of edges
-    mapping: an N-Triples output file that will map external Semantic Web URIs to
-      ConceptNet URIs
+    mapping: a tab-separated output file that will map external Semantic Web
+      URIs to ConceptNet URIs
     """
     wordnet.handle_file(input, output, mapping)

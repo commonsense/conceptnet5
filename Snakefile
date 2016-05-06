@@ -171,7 +171,7 @@ rule read_umbel:
         "data/raw/umbel/{filename}.nt"
     output:
         "data/edges/umbel/{filename}.msgpack",
-        "data/edges/umbel/{filename}.links.jsons"
+        "data/edges/umbel/{filename}.links.csv"
     shell:
         "python3 -m conceptnet5.readers.umbel data/raw/umbel/ {output}"
 
@@ -211,7 +211,7 @@ rule read_wordnet:
         "data/raw/wordnet-rdf/wn31.nt"
     output:
         "data/edges/wordnet/wordnet.msgpack",
-        "data/edges/wordnet/wordnet.links.jsons"
+        "data/edges/wordnet/wordnet.links.csv"
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
 

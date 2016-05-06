@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
-    NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
+    NTriplesReader, resource_name, full_conceptnet_url
 )
 import re
 import os
@@ -99,7 +99,6 @@ def label_sort_key(label):
 def run_wordnet(input_file, output_file, sw_map_file):
     reader = NTriplesReader()
     out = MsgpackStreamWriter(output_file)
-    map_out = NTriplesWriter(sw_map_file)
 
     synset_senses = defaultdict(list)
     sense_synsets = {}
@@ -110,7 +109,6 @@ def run_wordnet(input_file, output_file, sw_map_file):
     synset_glosses = {}
     synset_disambig = {}
     synset_uris = {}
-    term_info = {}
 
     # First pass: find data about synsets
     for subj, rel, obj, objtag in reader.parse_file(input_file):
@@ -189,7 +187,6 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 )
                 out.write(edge)
 
-
     for subj, rel, obj, objtag in reader.parse_file(input_file):
         relname = resource_name(rel)
         if relname in REL_MAPPING:
@@ -229,6 +226,11 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 license=license, sources=SOURCE, weight=2.0
             )
             out.write(edge)
+
+    with open(sw_map_file, 'w', encoding='utf-8') as map_out:
+        for wn_uri in sorted(synset_uris):
+            cn_uri = synset_uris[wn_uri]
+            print("{}\t{}".format(wn_uri, cn_uri), out=map_out)
 
 
 # Entry point for testing
