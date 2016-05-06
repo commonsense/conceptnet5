@@ -7,6 +7,7 @@ import sqlite3
 import pathlib
 import os
 import re
+from collections import Counter
 import langcodes
 from langcodes.tag_parser import LanguageTagError
 
@@ -62,7 +63,7 @@ ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
 
 
 def valid_language(code):
-    if code == '' or code == 'und':
+    if code == '' or code == 'und' or '-pro' in code:
         return False
     if ALPHA3_RE.match(code):
         return True
@@ -127,7 +128,7 @@ def transform_relation(rel):
         return WIKT_RELATIONS[rel]
 
 
-def transform_term(termdata, assumed_languages, db):
+def transform_term(termdata, assumed_languages, db, use_etyms=True):
     text = termdata['text']
     language = termdata.get('language')
     if language is None:
@@ -138,12 +139,20 @@ def transform_term(termdata, assumed_languages, db):
         return standardized_concept_uri(language, text)
     else:
         pos = termdata['pos']
-        if 'sense' not in termdata:
-            return standardized_concept_uri(language, text, pos)
+        etym_sense = None
+        if use_etyms:
+            etym_sense = etym_label(termdata)
+        if etym_sense is not None:
+            return standardized_concept_uri(language, text, pos, etym_sense)
         else:
-            etym = termdata.get('etym') or '1'
-            sense_parts = ['wikt', etym, termdata['sense']]
-            return standardized_concept_uri(language, text, pos, *sense_parts)
+            return standardized_concept_uri(language, text, pos)
+
+
+def etym_label(term):
+    if 'language' not in term or 'etym' not in term or not term['etym']:
+        return None
+
+    return "wikt_{}_{}".format(term['language'], term['etym'])
 
 
 def disambiguate_language(text, assumed_languages, db):
@@ -202,13 +211,38 @@ def segmented_stream(input_file):
 
 
 def read_wiktionary(input_file, db_file, output_file):
+    """
+    Convert a stream of parsed Wiktionary data into ConceptNet edges.
+
+    A `db_file` containing all known words in all languages must have already
+    been prepared from the same data.
+    """
     db = sqlite3.connect(db_file)
     out = MsgpackStreamWriter(output_file)
     for heading, items in segmented_stream(input_file):
         language = heading['language']
+        title = heading['title']
         dataset = '/d/wiktionary/{}'.format(language)
         url_title = heading['title'].replace(' ', '_')
         web_source = '/s/web/{}.wiktionary.org/wiki/{}'.format(language, url_title)
+
+        # Scan through the 'from' items, such as the start nodes of
+        # translations, looking for distinct etymologies. If we get more than
+        # one etymology for a language, we need to distinguish them as
+        # different senses in that language.
+        all_etyms = {
+            (item['from']['language'], etym_label(item['from']))
+            for item in items
+            if 'language' in item['from'] and item['from']['text'] == title
+            and etym_label(item['from']) is not None
+        }
+        etym_to_translation_sense = {}
+        language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
+        polysemous_languages = {
+            lang for lang in language_etym_counts
+            if language_etym_counts[lang] > 1
+        }
+
         for item in items:
             tfrom = item['from']
             tto = item['to']
@@ -220,8 +254,14 @@ def read_wiktionary(input_file, db_file, output_file):
             if lang2 and (lang2 not in assumed_languages) and valid_language(lang2):
                 assumed_languages.append(lang2)
 
-            cfrom = transform_term(tfrom, assumed_languages, db)
-            cto = transform_term(tto, assumed_languages, db)
+            cfrom = transform_term(
+                tfrom, assumed_languages, db,
+                use_etyms=(lang1 in polysemous_languages)
+            )
+            cto = transform_term(
+                tto, assumed_languages, db,
+                use_etyms=(lang2 in polysemous_languages)
+            )
             if cfrom is None or cto is None:
                 continue
 
@@ -230,6 +270,18 @@ def read_wiktionary(input_file, db_file, output_file):
                 continue
             if switch:
                 cfrom, cto = cto, cfrom
+
+            # When translations are separated by sense, use only the first
+            # sense we see for each etymology. That will have the most
+            # representative translations.
+            if rel == '/r/TranslationOf':
+                etym_key = (tfrom['language'], etym_label(tfrom))
+                sense = tfrom.get('sense', '')
+                if etym_key in etym_to_translation_sense:
+                    if etym_to_translation_sense[etym_key] != sense:
+                        continue
+                else:
+                    etym_to_translation_sense[etym_key] = sense
 
             sources = [web_source, PARSER_RULE]
             weight = 1.
