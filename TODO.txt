@@ -2,12 +2,14 @@ Design of ConceptNet 5.5:
 
 - [x] link the API responses (fix Pygments order)
 - [x] Don't stem things on the way in
-- [ ] Use the blacklist when making assertions
 - [x] Figure out how to keep more Verbosity
-- [ ] Coarsen Wiktionary using etymologies
-- [ ] Use JSON-LD when possible
-- [ ] Handle 'sw-maps' correctly, no proliferation of N-triples, no double-escaping
+- [x] Coarsen Wiktionary using etymologies
+- [x] Handle 'sw-maps' correctly, no proliferation of N-triples, no double-escaping
 - [x] Store the index in a reasonable constant database
+- [x] Use the blacklist when making assertions
+- [ ] Use JSON-LD when possible
+- [ ] Optionally build ConceptNet vectors in build process
+- [ ] Automatically test ConceptNet vectors
 
 ConceptNet 5.6 perhaps:
 
