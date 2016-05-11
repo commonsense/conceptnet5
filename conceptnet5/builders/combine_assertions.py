@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, print_function
+from conceptnet5.nodes import ALL_LANGUAGES, get_uri_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import disjunction_uri, parse_compound_uri, Licenses
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
@@ -159,9 +160,13 @@ def combine_assertions(input_filenames, output_file):
             # Otherwise, it's a new assertion.
             else:
                 if current_uri is not None:
+                    included = (
+                        get_uri_language(current_data['start']) in ALL_LANGUAGES and
+                        get_uri_language(current_data['end']) in ALL_LANGUAGES
+                    )
                     # Output the existing assertion before starting a new one.
-                    nodes = current_sources + [start, end]
-                    if set(nodes) & blacklist:
+                    nodes = current_sources + [current_data['start'], current_data['end']]
+                    if (not included) or (set(nodes) & blacklist):
                         judged_weight = 0
                     else:
                         judged_weight = weight_scale(current_weight)
