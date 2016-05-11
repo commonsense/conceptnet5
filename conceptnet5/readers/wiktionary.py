@@ -1,6 +1,6 @@
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri, ALL_LANGUAGES
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses
 import sqlite3
@@ -63,7 +63,7 @@ ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
 
 
 def valid_language(code):
-    if code == '' or code == 'und' or '-pro' in code:
+    if not code or code == 'und' or '-pro' in code:
         return False
     if ALPHA3_RE.match(code):
         return True
@@ -104,12 +104,14 @@ WIKT_RELATIONS = {
     "related": ("/r/RelatedTo", False),
     "synonym": ("/r/Synonym", False),
     "antonym": ("/r/Antonym", False),
+    "distinct": ("/r/DistinctFrom", False),
     "hypernym": ("/r/IsA", False),
     "holonym": ("/r/PartOf", False),
     "troponym": ("/r/MannerOf", True),
     "context": ("/r/HasContext", False),
     "derived": ("/r/DerivedFrom", True),
     "derived/etym": ("/r/EtymologicallyDerivedFrom", True),
+    "related/etym": ("/r/EtymologicallyRelatedTo", False),
     "form": ("/r/FormOf", False),
     "variant": ("/r/FormOf", True),
     "diminutive": ("/r/FormOf", True),
@@ -133,8 +135,13 @@ def transform_term(termdata, assumed_languages, db, use_etyms=True):
     language = termdata.get('language')
     if language is None:
         language = disambiguate_language(text, assumed_languages, db)
-        if language is None:
-            return None
+    if not valid_language(language):
+        return None
+
+    # Remove unnecessary subtags from the Wiktionary language
+    if '-' in language and language not in ALL_LANGUAGES:
+        language = language.split('-')[0]
+
     if 'pos' not in termdata:
         return standardized_concept_uri(language, text)
     else:
@@ -143,7 +150,7 @@ def transform_term(termdata, assumed_languages, db, use_etyms=True):
         if use_etyms:
             etym_sense = etym_label(termdata)
         if etym_sense is not None:
-            return standardized_concept_uri(language, text, pos, etym_sense)
+            return standardized_concept_uri(language, text, pos, 'wikt', etym_sense)
         else:
             return standardized_concept_uri(language, text, pos)
 
@@ -152,7 +159,7 @@ def etym_label(term):
     if 'language' not in term or 'etym' not in term or not term['etym']:
         return None
 
-    return "wikt_{}_{}".format(term['language'], term['etym'])
+    return "{}_{}".format(term['language'], term['etym'])
 
 
 def disambiguate_language(text, assumed_languages, db):
