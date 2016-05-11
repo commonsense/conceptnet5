@@ -11,7 +11,7 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.util.node_filters import FILTERED_SOURCES
 from conceptnet5.edges import make_edge
-from conceptnet5.language.english import english_lemmatized_filter
+from conceptnet5.language.english import english_filter
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
@@ -139,9 +139,9 @@ def build_relation(parts_dict):
     return relation
 
 
-def possibly_lemmatized_uri(lang, text):
+def filtered_uri(lang, text):
     if lang == 'en':
-        return concept_uri('en', standardize_text(text, english_lemmatized_filter))
+        return concept_uri('en', standardize_text(text, english_filter))
     else:
         return standardized_concept_uri(lang, text)
 
@@ -149,14 +149,14 @@ def possibly_lemmatized_uri(lang, text):
 def build_start(parts_dict):
     lang = parts_dict['lang']
     startText = parts_dict["startText"]
-    start = possibly_lemmatized_uri(lang, startText)
+    start = filtered_uri(lang, startText)
     return start
 
 
 def build_end(parts_dict):
     lang = parts_dict['lang']
     endText = parts_dict["endText"]
-    end = possibly_lemmatized_uri(lang, endText)
+    end = filtered_uri(lang, endText)
     return end
 
 
