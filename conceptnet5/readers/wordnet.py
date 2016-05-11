@@ -203,7 +203,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 obj_label = synset_canonical_labels[obj]
             else:
                 pos, sense = synset_disambig.get(subj, (None, None))
-                obj_uri = standardized_concept_uri(objtag, obj, pos, sense)
+                obj_uri = standardized_concept_uri(objtag, obj, pos, 'wn', sense)
                 obj_label = obj
 
             if subj not in synset_uris or subj not in synset_canonical_labels:
