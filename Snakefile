@@ -329,3 +329,11 @@ rule assertions_to_assoc:
         "data/assoc/assoc.csv"
     shell:
         "python3 -m conceptnet5.builders.msgpack_to_assoc {input} {output}"
+
+rule reduce_assoc:
+    input:
+        "data/assoc/assoc.csv"
+    output:
+        "data/assoc/reduced.csv"
+    shell:
+        "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
