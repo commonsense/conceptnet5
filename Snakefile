@@ -25,8 +25,8 @@ N_PIECES = 16
 # the size of the hash table.
 #
 # The index of the hash table will require 2 ^ (HASH_WIDTH + 4) bytes on disk,
-# so a hash width of 26 takes up half a gigabyte.
-HASH_WIDTH = 26
+# so a hash width of 27 takes up two gigabytes.
+HASH_WIDTH = 27
 
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
@@ -300,7 +300,7 @@ rule dataset_stats_left:
     output:
         "data/stats/concepts_left_datasets.txt"
     shell:
-        "cut -f 3,9 {input} > {output}"
+        "cut -f 3,8 {input} > {output}"
 
 rule dataset_stats_right:
     input:
@@ -308,7 +308,7 @@ rule dataset_stats_right:
     output:
         "data/stats/concepts_right_datasets.txt"
     shell:
-        "cut -f 4,9 {input} > {output}"
+        "cut -f 4,8 {input} > {output}"
 
 rule dataset_vs_language:
     input:
@@ -319,3 +319,13 @@ rule dataset_vs_language:
     shell:
         "cat {input} | sed -r 's:((/[^/\t]+){{2}})[^\t]*:\\1:g' "
         "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+
+# Building associations
+# =====================
+rule assertions_to_assoc:
+    input:
+        "data/assertions/assertions.msgpack"
+    output:
+        "data/assoc/assoc.csv"
+    shell:
+        "python3 -m conceptnet5.builders.msgpack_to_assoc {input} {output}"

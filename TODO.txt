@@ -7,6 +7,7 @@ Design of ConceptNet 5.5:
 - [x] Handle 'sw-maps' correctly, no proliferation of N-triples, no double-escaping
 - [x] Store the index in a reasonable constant database
 - [x] Use the blacklist when making assertions
+- [ ] Use symmetrical relations
 - [ ] Use JSON-LD when possible
 - [ ] Optionally build ConceptNet vectors in build process
 - [ ] Automatically test ConceptNet vectors
@@ -20,7 +21,3 @@ Cleaning up the data:
 
 - [ ] Relabel vague nodes like "someone" and "something"
 - [ ] Infer things from verb phrases
-
-Other things to do:
-
-- [ ] Use command-line tools such as jq to get things done quickly
