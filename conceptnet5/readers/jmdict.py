@@ -202,7 +202,7 @@ def output_edge(out, subj_concept, obj_concept):
                      dataset='/d/jmdict',
                      license=Licenses.cc_sharealike,
                      sources=['/s/jmdict/1.07'],
-                     weight=1.0)
+                     weight=2.0)
     out.write(edge)
 
 

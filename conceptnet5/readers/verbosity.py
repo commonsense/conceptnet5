@@ -145,7 +145,7 @@ def handle_file(infile, outfile):
             outcomes['low score'] += 1
             continue
 
-        weight = score / 100
+        weight = score ** .5 / 10
 
         # If the clue on the right is a two-word phrase, we make additional
         # connections to both words individually. We label them with the
