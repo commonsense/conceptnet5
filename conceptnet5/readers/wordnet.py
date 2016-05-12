@@ -230,7 +230,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
     with open(sw_map_file, 'w', encoding='utf-8') as map_out:
         for wn_uri in sorted(synset_uris):
             cn_uri = synset_uris[wn_uri]
-            print("{}\t{}".format(wn_uri, cn_uri), out=map_out)
+            print("{}\t{}".format(wn_uri, cn_uri), file=map_out)
 
 
 # Entry point for testing

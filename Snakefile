@@ -69,7 +69,8 @@ rule all:
         "data/assertions/assertions.csv",
         "data/db/assertions.index",
         "data/stats/dataset_vs_language.txt",
-        "data/stats/relations.txt"
+        "data/stats/relations.txt",
+        "data/assoc/reduced.csv"
 
 # Downloaders
 # ===========

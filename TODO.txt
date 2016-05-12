@@ -10,6 +10,7 @@ Design of ConceptNet 5.5:
 - [ ] Use symmetrical relations
 - [ ] Use JSON-LD when possible
 - [ ] Optionally build ConceptNet vectors in build process
+  - include word2vec and GloVe inputs in raw/
 - [ ] Automatically test ConceptNet vectors
 
 ConceptNet 5.6 perhaps:
