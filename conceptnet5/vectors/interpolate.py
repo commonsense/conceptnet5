@@ -75,7 +75,7 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
     # Build a matrix that will contain our final term vectors. We already know
     # the vectors for terms that appear in both vocabularies, because they're the
     # rows of `projected`, so we'll assign those to start.
-    all_vecs = pd.DataFrame(index=full_labels, columns=range(k1), dtype='f')
+    all_vecs = pd.DataFrame(index=full_labels, columns=range(k1 + k2), dtype='f')
     all_vecs.loc[vocab_intersection] = projected.loc[vocab_intersection]
 
     # Interpolate the remaining vectors.
