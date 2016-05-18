@@ -1,6 +1,5 @@
 import click
-from feather import read_dataframe, write_dataframe
-from .formats import convert_glove, convert_word2vec
+from .formats import convert_glove, convert_word2vec, read_feather, write_feather
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import retrofit
 from .interpolate import merge_interpolate
@@ -17,10 +16,10 @@ def cli():
 @click.option('--iterations', '-i', default=10)
 @click.option('--verbose', '-v', count=True)
 def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename, iterations=10, verbose=1):
-    dense_frame = read_dataframe(dense_hdf_filename)
+    dense_frame = read_feather(dense_hdf_filename)
     sparse_csr, combined_index = build_from_conceptnet_table(conceptnet_filename, orig_index=dense_frame.index)
     retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
-    write_dataframe(retrofitted, output_filename)
+    write_feather(retrofitted, output_filename)
 
 
 @cli.command(name='convert_glove')
@@ -47,8 +46,8 @@ def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000):
 @click.option('--threshold', '-t', default=50000, help="Minimum number of terms to use from each source")
 @click.option('--verbose/--quiet', '-v/-q', default=False)
 def run_interpolate(input1_filename, input2_filename, conceptnet_filename, output_filename, threshold=50000, verbose=False):
-    frame1 = read_dataframe(input1_filename).rename(columns=lambda x: int(x))
-    frame2 = read_dataframe(input2_filename).rename(columns=lambda x: int(x))
+    frame1 = read_feather(input1_filename).rename(columns=lambda x: int(x))
+    frame2 = read_feather(input2_filename).rename(columns=lambda x: int(x))
     _sparse_csr, conceptnet_labels = build_from_conceptnet_table(conceptnet_filename)
     interpolated = merge_interpolate(frame1, frame2, conceptnet_labels, vocab_threshold=threshold, verbose=verbose)
-    write_dataframe(interpolated, output_filename)
+    write_feather(interpolated, output_filename)

@@ -345,6 +345,7 @@ rule convert_word2vec:
     input:
         "data/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
     output:
+        "data/vectors/w2v-google-news.feather"
     shell:
         "cn5-vectors convert_word2vec {input} {output}"
 
@@ -352,6 +353,7 @@ rule convert_glove:
     input:
         "data/raw/vectors/glove12.840B.300d.txt.gz"
     output:
+        "data/vectors/glove12.840B.feather"
     shell:
         "cn5-vectors convert_glove {input} {output}"
 

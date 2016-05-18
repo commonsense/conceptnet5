@@ -1,8 +1,14 @@
 # coding: utf-8
 import pandas as pd
 import numpy as np
+import wordfreq
+from conceptnet5.uri import split_uri
 from ..vectors import similar_to_vec, weighted_average
 from .transforms import l2_normalize_rows
+
+
+WORDFREQ_LANGUAGES = set(wordfreq.available_languages())
+WORDFREQ_LANGUAGES_LARGE = set(wordfreq.available_languages('large'))
 
 
 def dataframe_svd_projection(frame, k):
@@ -25,6 +31,27 @@ def dataframe_svd_projection(frame, k):
     uframe = pd.DataFrame(projected[:, :k], index=frame.index, dtype='f')
     vframe = pd.DataFrame(projection[:, :k], index=frame.columns, dtype='f')
     return uframe, vframe
+
+
+def estimate_frequency(term, frame1, frame2, extra_labels):
+    freq = 0.
+    _c, lang, text = split_uri(term)[:3]
+
+    # Add the word frequency from wordfreq, if we can
+    if '_' not in text and lang in WORDFREQ_LANGUAGES:
+        if lang in WORDFREQ_LANGUAGES_LARGE:
+            freq += wordfreq.word_frequency(text, lang, 'large')
+        else:
+            freq += wordfreq.word_frequency(text, lang)
+
+    # Guess a frequency from the two frames using Zipf's law
+    if term in frame1.index:
+        freq += 1.0 / frame1.index.get_loc(term)
+    if term in frame2.index:
+        freq += 1.0 / frame2.index.get_loc(term)
+    if term in extra_labels:
+        freq *= 2
+    return freq
 
 
 def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbose=False):
@@ -108,4 +135,9 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         all_vecs.loc[label] = interpolated_vec
 
     # TODO: reorder rows by frequency
-    return l2_normalize_rows(all_vecs)
+    freqs = np.array([
+        estimate_frequency(label, frame1, frame2, extra_labels)
+        for label in full_labels
+    ])
+    reordered = np.argsort(-freqs)
+    return l2_normalize_rows(all_vecs[reordered])

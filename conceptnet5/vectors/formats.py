@@ -7,6 +7,18 @@ from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row
 from feather import read_dataframe, write_dataframe
 
 
+def read_feather(filename):
+    frame = read_dataframe(filename)
+    labels = frame['labels']
+    frame.index = labels
+    return frame.drop('labels', axis=1).rename(columns=lambda x: int(x))
+
+
+def write_feather(dataframe, filename):
+    labeled = dataframe.assign(labels=dataframe.index)
+    return write_dataframe(labeled, filename)
+
+
 def convert_glove(glove_filename, output_filename, nrows):
     """
     Convert GloVe data from a gzipped text file to a Feather dataframe.
@@ -16,7 +28,7 @@ def convert_glove(glove_filename, output_filename, nrows):
     del glove_raw
     glove_normal = l2_normalize_rows(l1_normalize_columns(glove_std))
     del glove_std
-    write_dataframe(glove_normal, output_filename)
+    write_feather(glove_normal, output_filename)
 
 
 def convert_word2vec(word2vec_filename, output_filename, nrows):
@@ -29,7 +41,7 @@ def convert_word2vec(word2vec_filename, output_filename, nrows):
     del w2v_raw
     w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
     del w2v_std
-    write_dataframe(w2v_normal, output_filename)
+    write_feather(w2v_normal, output_filename)
 
 
 def load_glove(filename, nrows=500000):
