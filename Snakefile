@@ -338,3 +338,13 @@ rule reduce_assoc:
         "data/assoc/reduced.csv"
     shell:
         "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
+
+# Building the vector space
+# =========================
+rule convert_word2vec:
+    input:
+        "data/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
+    output:
+        "data/vectors/w2v-google-news.h5"
+    shell:
+        "cn5-vectors convert_word2vec {input} {output}"
