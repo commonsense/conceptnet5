@@ -1,8 +1,8 @@
 import click
-from .formats import load_hdf, save_hdf
+from feather import read_dataframe, write_dataframe
+from .formats import convert_glove, convert_word2vec
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import retrofit
-from .convert import convert_glove, convert_word2vec
 
 
 @click.group()
@@ -17,10 +17,10 @@ def cli():
 @click.option('--iterations', '-i', default=10)
 @click.option('--verbose', '-v', count=True)
 def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename, iterations=10, verbose=1):
-    dense_frame = load_hdf(dense_hdf_filename)
+    dense_frame = read_dataframe(dense_hdf_filename)
     sparse_csr, combined_index = build_from_conceptnet_table(conceptnet_filename, orig_index=dense_frame.index)
     retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
-    save_hdf(retrofitted, output_filename)
+    write_dataframe(retrofitted, output_filename)
 
 
 @cli.command(name='convert_glove')

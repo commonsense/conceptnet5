@@ -3,15 +3,43 @@ import numpy as np
 from scipy import sparse
 import gzip
 import struct
+from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
+from feather import read_dataframe, write_dataframe
+
+
+def convert_glove(glove_filename, output_filename, nrows):
+    """
+    Convert GloVe data from a gzipped text file to a Feather dataframe.
+    """
+    glove_raw = load_glove(glove_filename, nrows)
+    glove_std = standardize_row_labels(glove_raw)
+    del glove_raw
+    glove_normal = l2_normalize_rows(l1_normalize_columns(glove_std))
+    del glove_std
+    write_dataframe(glove_normal, output_filename)
+
+
+def convert_word2vec(word2vec_filename, output_filename, nrows):
+    """
+    Convert word2vec data from its gzipped binary format to a Feather
+    dataframe.
+    """
+    w2v_raw = load_word2vec_bin(word2vec_filename, nrows)
+    w2v_std = standardize_row_labels(w2v_raw)
+    del w2v_raw
+    w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
+    del w2v_std
+    write_dataframe(w2v_normal, output_filename)
 
 
 def load_glove(filename, nrows=500000):
-    return pd.read_table(
-        filename, sep=' ', index_col=0, quoting=3,
-        keep_default_na=False, na_values=[],
-        names=['term'] + list(range(300)),
-        nrows=nrows
-    )
+    with gzip.open(filename, 'rt') as infile:
+        return pd.read_table(
+            infile, sep=' ', index_col=0, quoting=3,
+            keep_default_na=False, na_values=[],
+            names=['term'] + list(range(300)),
+            nrows=nrows
+        )
 
 
 def _read_until_space(file):
@@ -52,17 +80,9 @@ def load_word2vec_bin(filename, nrows):
     return pd.DataFrame(mat, index=label_list, dtype='f')
 
 
-def load_hdf(filename):
-    return pd.read_hdf(filename, 'mat', encoding='utf-8')
-
-
-def save_hdf(table, filename):
-    return table.to_hdf(filename, 'mat', encoding='utf-8')
-
-
 def save_csr(matrix, filename):
     np.savez(filename, data=matrix.data, indices=matrix.indices,
-                indptr=matrix.indptr, shape=matrix.shape)
+             indptr=matrix.indptr, shape=matrix.shape)
 
 
 def load_labels_and_npy(label_file, npy_file):
