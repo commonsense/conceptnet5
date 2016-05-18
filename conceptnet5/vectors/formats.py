@@ -91,6 +91,11 @@ def load_labels_and_npy(label_file, npy_file):
     return pd.DataFrame(npy, index=labels, dtype='f')
 
 
+def load_labels_as_index(label_file):
+    labels = [line.rstrip('\n') for line in open(label_file, encoding='utf-8')]
+    return pd.Index(labels)
+
+
 def load_csr(filename):
     with np.load(filename) as npz:
         mat = sparse.csr_matrix((npz['data'], npz['indices'], npz['indptr']), shape=npz['shape'])

@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 from ..vectors import similar_to_vec, weighted_average
-from ..transforms import l2_normalize_rows
+from .transforms import l2_normalize_rows
 
 
 def dataframe_svd_projection(frame, k):
@@ -45,7 +45,6 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
     # between N and 2N of these terms because the most common terms presumably
     # overlap. These terms will be used as reference points when interpolating
     # vectors for other words.
-    shared_vocab = frame1.index & frame2.index
     common1 = (frame1.index & frame2.index)[:vocab_threshold]
     common2 = (frame2.index & frame1.index)[:vocab_threshold]
     common_vocab = common1 | common2
@@ -67,7 +66,7 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
     shared_vecs.loc[vocab_intersection, k1:] = frame2.loc[vocab_intersection].rename(columns=lambda x: x + k1)
 
     # Factor the concatenated matrix using SVD.
-    projected, projection = dataframe_svd_projection(shared_vecs, k1)
+    projected, projection = dataframe_svd_projection(shared_vecs, k1 + k2)
 
     # Select the vectors for sufficiently common words, which will be used as
     # the reference points.
@@ -108,5 +107,5 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         interpolated_vec = weighted_average(reference_vecs, most_similar)
         all_vecs.loc[label] = interpolated_vec
 
+    # TODO: reorder rows by frequency
     return l2_normalize_rows(all_vecs)
-
