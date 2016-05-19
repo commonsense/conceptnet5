@@ -365,4 +365,13 @@ rule merge_interpolate:
     output:
         "data/vectors/merged.feather"
     shell:
-        "cn5-vectors interpolate -v {input} {output}"
+        "cn5-vectors interpolate -v -t 50000 {input} {output}"
+
+rule retrofit:
+    input:
+        "data/vectors/merged.feather",
+        "data/assoc/reduced.csv"
+    output:
+        "data/vectors/retrofit.feather"
+    shell:
+        "cn5-vectors retrofit -v {input} {output}"

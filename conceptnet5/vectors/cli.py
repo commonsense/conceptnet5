@@ -44,8 +44,8 @@ def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000):
 @click.argument('conceptnet_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--threshold', '-t', default=50000, help="Minimum number of terms to use from each source")
-@click.option('--verbose/--quiet', '-v/-q', default=False)
-def run_interpolate(input1_filename, input2_filename, conceptnet_filename, output_filename, threshold=50000, verbose=False):
+@click.option('--verbose', '-v', count=True)
+def run_interpolate(input1_filename, input2_filename, conceptnet_filename, output_filename, threshold=50000, verbose=0):
     frame1 = read_feather(input1_filename).rename(columns=lambda x: int(x))
     frame2 = read_feather(input2_filename).rename(columns=lambda x: int(x))
     _sparse_csr, conceptnet_labels = build_from_conceptnet_table(conceptnet_filename)

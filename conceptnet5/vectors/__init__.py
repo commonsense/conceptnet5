@@ -2,6 +2,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from sklearn.preprocessing import normalize
 import re
 import pandas as pd
+import numpy as np
 
 
 DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
@@ -23,7 +24,6 @@ def replace_numbers(s):
 
 def standardized_uri(language, term):
     return replace_numbers(standardized_concept_uri(language, term))
-
 
 
 def get_vector(frame, text, language=None):
@@ -76,8 +76,11 @@ def get_similarity(frame, text1, text2, language=None):
 
 
 def weighted_average(frame, weight_series):
-    newframe = pd.DataFrame(index=weight_series.index, columns=frame.columns, dtype='f')
+    vec = pd.Series(index=frame.columns, dtype='f')
+
     for label in weight_series.index:
         if label in frame.index:
-            newframe.loc[label] = weight_series.loc[label] * frame.loc[label]
-    return normalize_vec(newframe.sum(axis='rows'))
+            val = weight_series.loc[label]
+            vec += val * frame.loc[label]
+
+    return vec

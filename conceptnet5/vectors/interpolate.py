@@ -46,9 +46,9 @@ def estimate_frequency(term, frame1, frame2, extra_labels):
 
     # Guess a frequency from the two frames using Zipf's law
     if term in frame1.index:
-        freq += 1.0 / frame1.index.get_loc(term)
+        freq += 1.0 / (1. + frame1.index.get_loc(term))
     if term in frame2.index:
-        freq += 1.0 / frame2.index.get_loc(term)
+        freq += 1.0 / (1. + frame2.index.get_loc(term))
     if term in extra_labels:
         freq *= 2
     return freq
@@ -97,7 +97,11 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
 
     # Select the vectors for sufficiently common words, which will be used as
     # the reference points.
-    reference_vecs = projected.loc[common_vocab]
+    reference_vecs = pd.DataFrame(projected.loc[common_vocab])
+    # Get a truncation of the reference_vecs matrix so we can make quick,
+    # sloppy comparisons. Again, indices of a DataFrame are inclusive, so 0:99
+    # is the first 100 columns.
+    reference_vecs_small = pd.DataFrame(reference_vecs.ix[:, 0:99])
 
     # Build a matrix that will contain our final term vectors. We already know
     # the vectors for terms that appear in both vocabularies, because they're the
@@ -122,11 +126,14 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         # Project it into the new space, using the same matrix that projects
         # the overlapping vectors.
         query_vec = vec.dot(projection)
+        # this is a NumPy array, so endpoints are exclusive
+        query_vec_small = query_vec[:100]
 
         # Get some similar common terms
-        most_similar = similar_to_vec(reference_vecs, query_vec, num=5)
-        similar_list = ', '.join(most_similar.index)
-        if i % 100 == 0:
+        most_similar_sloppy = similar_to_vec(reference_vecs_small, query_vec_small, num=50)
+        most_similar = similar_to_vec(reference_vecs.loc[most_similar_sloppy.index], query_vec, num=5)
+        if verbose:
+            similar_list = ', '.join(most_similar.index)
             print("%s => %s" % (label, similar_list))
 
         # Our new interpolated vector is the weighted average of the vectors
@@ -134,10 +141,9 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         interpolated_vec = weighted_average(reference_vecs, most_similar)
         all_vecs.loc[label] = interpolated_vec
 
-    # TODO: reorder rows by frequency
     freqs = np.array([
         estimate_frequency(label, frame1, frame2, extra_labels)
         for label in full_labels
     ])
     reordered = np.argsort(-freqs)
-    return l2_normalize_rows(all_vecs[reordered])
+    return l2_normalize_rows(all_vecs.ix[reordered])
