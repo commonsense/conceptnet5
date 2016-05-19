@@ -63,7 +63,7 @@ def similar_to(frame, text, num=50, language=None):
 
 
 def similar_to_vec(frame, vec, num=50):
-    similarity = frame.dot(vec).sort(ascending=False, inplace=False)
+    similarity = frame.dot(vec).sort_values(ascending=False, inplace=False)
     if num is not None:
         similarity = similarity.iloc[0:num]
     return similarity.dropna()
