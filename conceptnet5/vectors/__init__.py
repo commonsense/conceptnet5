@@ -76,11 +76,11 @@ def get_similarity(frame, text1, text2, language=None):
 
 
 def weighted_average(frame, weight_series):
-    vec = pd.Series(index=frame.columns, dtype='f')
+    vec = np.zeros(frame.shape[1], dtype='f')
 
     for label in weight_series.index:
         if label in frame.index:
             val = weight_series.loc[label]
-            vec += val * frame.loc[label]
+            vec += val * frame.loc[label].values
 
-    return vec
+    return pd.Series(data=vec, index=frame.columns, dtype='f')
