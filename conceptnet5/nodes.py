@@ -48,6 +48,11 @@ LCODE_ALIASES = {
     'zsm': 'ms',
     'id': 'ms',
 
+    # Use 'hi' to represent the Hindustani (Hindi-Urdu) language in all its
+    # registers, which means we should subsume 'ur' (the separate code for Urdu)
+    # into it.
+    'ur': 'hi',
+
     # We had to make a decision here on Norwegian. Norwegian Bokmål ('nb') and
     # Nynorsk ('nn') have somewhat different vocabularies but are mutually
     # intelligible. Informal variants of Norwegian, especially when spoken,
@@ -91,6 +96,9 @@ LCODE_ALIASES = {
     # name for the language, 'Wati'. If something ignores the 'x-wati'
     # extension, it will still be distinguished as some sort of Australian
     # language.
+    #
+    # The fact that I went to the trouble of implementing this at all might
+    # mean that I listened to too much Midnight Oil as a teen.
     'ktd': 'aus-x-wati',
     'kux': 'aus-x-wati',
     'mpj': 'aus-x-wati',
@@ -141,7 +149,6 @@ LANGUAGES = {
         'ja',   # Japanese
         'zh',   # Chinese
         'nl',   # Dutch
-
 
         'fi',   # Finnish
         'pl',   # Polish
@@ -232,7 +239,6 @@ LANGUAGES = {
         'dsb',  # Lower Sorbian
         'vec',  # Venetian
         'ln',   # Lingala
-        'ur',   # Urdu
         'fur',  # Friulian
         'pap',  # Papiamento
         'nds',  # Low German
