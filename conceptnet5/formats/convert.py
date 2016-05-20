@@ -4,6 +4,7 @@ from conceptnet5.uri import uri_prefixes
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 from collections import defaultdict
 import codecs
+import click
 
 
 def msgpack_to_tab_separated(input_filename, output_filename):
@@ -104,14 +105,20 @@ def msgpack_to_assoc(input_filename, output_filename):
     print(avg_weight_by_dataset)
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='Msgpack file of input')
-    parser.add_argument('output', help='CSV file to output to')
-    args = parser.parse_args()
-    convert_to_assoc(args.input, args.output)
+@click.command()
+@click.argument('converter', type=str)
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(converter, input, output):
+    """
+    Convert a stream of data from one format to another. Available converters
+    are:
 
-
-if __name__ == '__main__':
-    main()
+        msgpack_to_tab_separated
+        msgpack_to_assoc
+    """
+    if converter == 'msgpack_to_tab_separated':
+        convert_func = msgpack_to_tab_separated
+    elif converter == 'msgpack_to_assoc':
+        convert_func = msgpack_to_assoc
+    convert_func(input, output)

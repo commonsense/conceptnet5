@@ -226,7 +226,7 @@ rule edge_msgpack_to_csv:
     output:
         "data/edges/{dir,[^/]+}/{filename}.csv"
     shell:
-        "python3 -m conceptnet5.builders.msgpack_to_csv {input} {output}"
+        "cn5-convert msgpack_to_tab_separated {input} {output}"
 
 rule assertion_msgpack_to_csv:
     input:
@@ -234,7 +234,7 @@ rule assertion_msgpack_to_csv:
     output:
         "data/assertions/{filename}.csv"
     shell:
-        "python3 -m conceptnet5.builders.msgpack_to_csv {input} {output}"
+        "cn5-convert msgpack_to_tab_separated {input} {output}"
 
 rule collate_edges:
     input:
@@ -329,7 +329,7 @@ rule assertions_to_assoc:
     output:
         "data/assoc/assoc-with-dups.csv"
     shell:
-        "python3 -m conceptnet5.builders.msgpack_to_assoc {input} {output}"
+        "cn5-convert msgpack_to_assoc {input} {output}"
 
 rule assoc_uniq:
     input:
