@@ -6,7 +6,7 @@ HTTP = HTTPRemoteProvider()
 # we have to have run those build steps first. So when USE_PRECOMPUTED is
 # True, we will download the computed files; when it's False, we will compute
 # them.
-USE_PRECOMPUTED = False
+USE_PRECOMPUTED = True
 
 # If USE_PRECOMPUTED is False, should we upload the files we compute so they
 # can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
@@ -61,7 +61,7 @@ DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
 
 RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
-PRECOMPUTED_DATA_URL = "conceptnet.s3.amazonaws.com/precomputed-data/2016" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_DATA_URL = "conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 rule all:
