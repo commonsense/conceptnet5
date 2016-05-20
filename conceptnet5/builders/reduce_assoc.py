@@ -10,10 +10,10 @@ def concept_is_bad(uri):
     specific phrase, possibly mis-parsed. A concept with a colon is probably
     detritus from a wiki.
     """
-    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/')
+    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/') or uri.endswith('/neg')
 
 
-def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=4, verbose=True):
+def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
     """
     Removes uncommon associations and associations unlikely to be useful.
     This function expects files of the form part_*.csv in `dirname` and will
@@ -32,8 +32,10 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=4, verbose=True)
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()
-        if count >= en_cutoff or
-        not concept.startswith('/c/en/') and count >= cutoff
+        if (
+            count >= en_cutoff or
+            (not concept.startswith('/c/en/') and count >= cutoff)
+        )
     }
 
     with open(output_filename, 'w', encoding='utf-8') as out:

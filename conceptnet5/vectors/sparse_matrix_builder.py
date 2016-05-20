@@ -40,9 +40,6 @@ def build_from_conceptnet_table(filename, orig_index=()):
     """
     mat = SparseMatrixBuilder()
 
-    # TODO: rebalance by dataset? Or maybe do that when building the
-    # associations in the first place.
-
     labels = OrderedSet(orig_index)
 
     totals = defaultdict(float)

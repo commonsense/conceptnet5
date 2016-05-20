@@ -130,7 +130,7 @@ def transform_relation(rel):
         return WIKT_RELATIONS[rel]
 
 
-def transform_term(termdata, assumed_languages, db, use_etyms=True):
+def transform_term(data_language, termdata, assumed_languages, db, use_etyms=True):
     text = termdata['text']
     language = termdata.get('language')
     if language is None:
@@ -148,18 +148,18 @@ def transform_term(termdata, assumed_languages, db, use_etyms=True):
         pos = termdata['pos']
         etym_sense = None
         if use_etyms:
-            etym_sense = etym_label(termdata)
+            etym_sense = etym_label(data_language, termdata)
         if etym_sense is not None:
             return standardized_concept_uri(language, text, pos, 'wikt', etym_sense)
         else:
             return standardized_concept_uri(language, text, pos)
 
 
-def etym_label(term):
-    if 'language' not in term or 'etym' not in term or not term['etym']:
+def etym_label(language, term):
+    if 'etym' not in term or not term['etym']:
         return None
 
-    return "{}_{}".format(term['language'], term['etym'])
+    return "{}_{}".format(language, term['etym'])
 
 
 def disambiguate_language(text, assumed_languages, db):
@@ -238,10 +238,10 @@ def read_wiktionary(input_file, db_file, output_file):
         # one etymology for a language, we need to distinguish them as
         # different senses in that language.
         all_etyms = {
-            (item['from']['language'], etym_label(item['from']))
+            (item['from']['language'], etym_label(language, item['from']))
             for item in items
             if 'language' in item['from'] and item['from']['text'] == title
-            and etym_label(item['from']) is not None
+            and etym_label(language, item['from']) is not None
         }
         etym_to_translation_sense = {}
         language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
@@ -262,11 +262,11 @@ def read_wiktionary(input_file, db_file, output_file):
                 assumed_languages.append(lang2)
 
             cfrom = transform_term(
-                tfrom, assumed_languages, db,
+                language, tfrom, assumed_languages, db,
                 use_etyms=(lang1 in polysemous_languages)
             )
             cto = transform_term(
-                tto, assumed_languages, db,
+                language, tto, assumed_languages, db,
                 use_etyms=(lang2 in polysemous_languages)
             )
             if cfrom is None or cto is None:
@@ -282,7 +282,7 @@ def read_wiktionary(input_file, db_file, output_file):
             # sense we see for each etymology. That will have the most
             # representative translations.
             if rel == '/r/TranslationOf':
-                etym_key = (tfrom['language'], etym_label(tfrom))
+                etym_key = (tfrom['language'], etym_label(language, tfrom))
                 sense = tfrom.get('sense', '')
                 if etym_key in etym_to_translation_sense:
                     if etym_to_translation_sense[etym_key] != sense:
