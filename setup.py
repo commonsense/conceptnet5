@@ -22,8 +22,7 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'click', 'requests', 'limits', 'mmh3',
-        'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
+        'click', 'requests', 'mmh3', 'ftfy',
         'msgpack-python', 'langcodes', 'wordfreq', 'feather-format'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
