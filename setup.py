@@ -22,7 +22,7 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'click', 'requests', 'limits',
+        'click', 'requests', 'limits', 'mmh3',
         'flask', 'flask-cors', 'flask-limiter', 'grako > 3', 'ftfy',
         'msgpack-python', 'langcodes', 'wordfreq', 'feather-format'
     ],
