@@ -327,9 +327,17 @@ rule assertions_to_assoc:
     input:
         "data/assertions/assertions.msgpack"
     output:
-        "data/assoc/assoc.csv"
+        "data/assoc/assoc-with-dups.csv"
     shell:
         "python3 -m conceptnet5.builders.msgpack_to_assoc {input} {output}"
+
+rule assoc_uniq:
+    input:
+        "data/assoc/assoc-with-dups.csv"
+    output:
+        "data/assoc/assoc.csv"
+    shell:
+        "LC_ALL=C sort {input} | LC_ALL=C uniq > {output}"
 
 rule reduce_assoc:
     input:
