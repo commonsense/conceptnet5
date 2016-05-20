@@ -1,5 +1,6 @@
 from collections import defaultdict
 import argparse
+from conceptnet5.uri import uri_prefixes
 
 
 def concept_is_bad(uri):
@@ -27,8 +28,10 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
         for line in file:
             left, right, *_ = line.rstrip().split('\t')
             if not concept_is_bad(left) and not concept_is_bad(right):
-                counts[left] += 1
-                counts[right] += 1
+                for prefix in uri_prefixes(left, 3):
+                    counts[prefix] += 1
+                for prefix in uri_prefixes(right, 3):
+                    counts[prefix] += 1
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()

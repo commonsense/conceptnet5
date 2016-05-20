@@ -1,5 +1,6 @@
 from scipy import sparse
 import pandas as pd
+from conceptnet5.uri import uri_prefixes
 from ordered_set import OrderedSet
 from collections import defaultdict
 from ..vectors import replace_numbers
@@ -54,6 +55,19 @@ def build_from_conceptnet_table(filename, orig_index=()):
             mat[index2, index1] = value
             totals[index1] += value
             totals[index2] += value
+
+    # Link nodes to their more general versions
+    for label in labels:
+        prefixes = uri_prefixes(label, 3)
+        if len(prefixes) >= 2:
+            parent_uri = prefixes[-2]
+            if parent_uri in labels:
+                index1 = labels.index(label)
+                index2 = labels.index(parent_uri)
+                mat[index1, index2] = 1
+                mat[index2, index1] = 1
+                totals[index1] += 1
+                totals[index2] += 1
 
     # add self-loops on the diagonal with equal weight to the rest of the row
     for key, value in totals.items():
