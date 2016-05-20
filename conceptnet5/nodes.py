@@ -48,11 +48,6 @@ LCODE_ALIASES = {
     'zsm': 'ms',
     'id': 'ms',
 
-    # Use 'hi' to represent the Hindustani (Hindi-Urdu) language in all its
-    # registers, which means we should subsume 'ur' (the separate code for Urdu)
-    # into it.
-    'ur': 'hi',
-
     # We had to make a decision here on Norwegian. Norwegian Bokmål ('nb') and
     # Nynorsk ('nn') have somewhat different vocabularies but are mutually
     # intelligible. Informal variants of Norwegian, especially when spoken,
