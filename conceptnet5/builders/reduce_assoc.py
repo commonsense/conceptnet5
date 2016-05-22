@@ -1,6 +1,6 @@
 from collections import defaultdict
 import argparse
-from conceptnet5.uri import uri_prefixes
+from conceptnet5.uri import split_uri, join_uri
 
 
 def concept_is_bad(uri):
@@ -14,7 +14,15 @@ def concept_is_bad(uri):
     return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/') or uri.endswith('/neg')
 
 
-def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
+def generalized_uris(uri):
+    pieces = split_uri(uri)
+    if len(pieces) >= 5:
+        return [uri, join_uri(*pieces[:3])]
+    else:
+        return [join_uri(*pieces[:3])]
+
+
+def reduce_assoc(filename, output_filename, cutoff=5, en_cutoff=5, verbose=True):
     """
     Removes uncommon associations and associations unlikely to be useful.
     This function expects files of the form part_*.csv in `dirname` and will
@@ -27,11 +35,10 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
     with open(filename, encoding='utf-8') as file:
         for line in file:
             left, right, *_ = line.rstrip().split('\t')
-            if not concept_is_bad(left) and not concept_is_bad(right):
-                for prefix in uri_prefixes(left, 3):
-                    counts[prefix] += 1
-                for prefix in uri_prefixes(right, 3):
-                    counts[prefix] += 1
+            for gleft in generalized_uris(left):
+                for gright in generalized_uris(right):
+                    counts[gleft] += 1
+                    counts[gright] += 1
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()
@@ -44,13 +51,19 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
     with open(output_filename, 'w', encoding='utf-8') as out:
         with open(filename, encoding='utf-8') as file:
             for line in file:
-                left, right, value, *_ = line.rstrip().split('\t')
-                value = float(value)
-                if (
-                    left in filtered_concepts and right in filtered_concepts
-                    and value != 0
-                ):
-                    out.write(line)
+                left, right, value, dataset, rel = line.rstrip().split('\t', 4)
+                if concept_is_bad(left) or concept_is_bad(right):
+                    continue
+                fvalue = float(value)
+                for gleft in generalized_uris(left):
+                    for gright in generalized_uris(right):
+                        if (
+                            gleft in filtered_concepts and
+                            gright in filtered_concepts and
+                            fvalue != 0
+                        ):
+                            line = '\t'.join([gleft, gright, value, dataset, rel])
+                            print(line, file=out)
 
 
 if __name__ == '__main__':

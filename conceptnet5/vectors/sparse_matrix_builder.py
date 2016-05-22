@@ -58,7 +58,7 @@ def build_from_conceptnet_table(filename, orig_index=()):
 
     # Link nodes to their more general versions
     for label in labels:
-        prefixes = uri_prefixes(label, 3)
+        prefixes = list(uri_prefixes(label, 3))
         if len(prefixes) >= 2:
             parent_uri = prefixes[-2]
             if parent_uri in labels:
