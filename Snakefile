@@ -70,7 +70,8 @@ rule all:
         "data/db/assertions.index",
         "data/stats/dataset_vs_language.txt",
         "data/stats/relations.txt",
-        "data/assoc/reduced.csv"
+        "data/assoc/reduced.csv",
+        "data/vectors/retrofit.feather"
 
 # Downloaders
 # ===========
@@ -355,7 +356,7 @@ rule convert_word2vec:
     output:
         "data/vectors/w2v-google-news.feather"
     shell:
-        "cn5-vectors convert_word2vec {input} {output}"
+        "cn5-vectors convert_word2vec -n 1000000 {input} {output}"
 
 rule convert_glove:
     input:
@@ -363,7 +364,7 @@ rule convert_glove:
     output:
         "data/vectors/glove12.840B.feather"
     shell:
-        "cn5-vectors convert_glove {input} {output}"
+        "cn5-vectors convert_glove -n 1000000 {input} {output}"
 
 rule merge_interpolate:
     input:
