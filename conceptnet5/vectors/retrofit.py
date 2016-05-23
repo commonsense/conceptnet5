@@ -40,7 +40,7 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     retroframe.update(dense_frame)
     print("retroframe:", retroframe.shape)
     # weight = 2 for known vectors, 1 for unknown vectors
-    orig_weights = 1 - retroframe.ix[0].isnull()
+    orig_weights = 1 - retroframe.ix[:, 0].isnull()
     weight_array = orig_weights.values[:, np.newaxis].astype('f')
     orig_vecs = retroframe.fillna(0).values
 
