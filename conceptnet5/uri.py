@@ -167,6 +167,11 @@ def split_uri(uri):
     return uri2.split('/')
 
 
+def uri_prefix(uri, max_pieces=3):
+    pieces = split_uri(uri)[:max_pieces]
+    return join_uri(*pieces)
+
+
 def uri_prefixes(uri, min_pieces=2):
     """
     Get URIs that are prefixes of a given URI: that is, they begin with the
