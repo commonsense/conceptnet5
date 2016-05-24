@@ -1,5 +1,6 @@
 import click
 from .formats import convert_glove, convert_word2vec, read_feather, write_feather
+from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit
 from .interpolate import merge_interpolate
 from .evaluation.wordsim import evaluate
