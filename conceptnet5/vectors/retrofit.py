@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import normalize
-from .formats import read_feather, write_feather
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .transforms import l2_normalize_rows
+from .formats import load_hdf, save_hdf
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
@@ -12,7 +12,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
     # DataFrame will at times be present or absent. When it's present, the list
     # contains one item, which is the DataFrame. When it's absent, the list
     # is empty.
-    frame_box = [read_feather(dense_hdf_filename)]
+    frame_box = [load_hdf(dense_hdf_filename)]
     sparse_csr, combined_index = build_from_conceptnet_table(conceptnet_filename, orig_index=frame_box[0].index)
     shard_width = frame_box[0].shape[1] // nshards
 
@@ -21,7 +21,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         shard_from = shard_width * i
         shard_to = shard_from + shard_width
         if len(frame_box) == 0:
-            frame_box.append(read_feather(dense_hdf_filename))
+            frame_box.append(load_hdf(dense_hdf_filename))
         dense_frame = pd.DataFrame(frame_box[0].iloc[:, shard_from:shard_to])
 
         # Delete full_dense_frame while running retrofitting, because it takes
@@ -29,15 +29,15 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         frame_box.clear()
 
         retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
-        write_feather(retrofitted, temp_filename)
+        save_hdf(retrofitted, temp_filename)
         del retrofitted
 
-    shards = [read_feather(output_filename + '.shard%d' % i)
+    shards = [load_hdf(output_filename + '.shard%d' % i)
               for i in range(nshards)]
     joined = pd.concat(shards, axis=1, ignore_index=True)
     del shards
 
-    write_feather(joined, output_filename)
+    save_hdf(joined, output_filename)
     return joined
 
 

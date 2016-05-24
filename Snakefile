@@ -40,6 +40,8 @@ WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 # Increment this number when we incompatibly change the parser
 WIKT_PARSER_VERSION = "1"
 
+CHUNKS_OF_100 = [0, 100, 200, 300, 400, 500]
+
 # Dataset filenames
 # =================
 # The goal of reader steps is to produce Msgpack files, and later CSV files,
@@ -71,7 +73,7 @@ rule all:
         "data/stats/dataset_vs_language.txt",
         "data/stats/relations.txt",
         "data/assoc/reduced.csv",
-        "data/vectors/retrofit.feather"
+        "data/vectors/retrofit.h5"
 
 # Downloaders
 # ===========
@@ -354,7 +356,7 @@ rule convert_word2vec:
     input:
         "data/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
     output:
-        "data/vectors/w2v-google-news.feather"
+        "data/vectors/w2v-google-news.h5"
     shell:
         "cn5-vectors convert_word2vec -n 1000000 {input} {output}"
 
@@ -362,25 +364,25 @@ rule convert_glove:
     input:
         "data/raw/vectors/glove12.840B.300d.txt.gz"
     output:
-        "data/vectors/glove12.840B.feather"
+        "data/vectors/glove12.840B.h5"
     shell:
         "cn5-vectors convert_glove -n 1000000 {input} {output}"
 
 rule merge_interpolate:
     input:
-        "data/vectors/glove12.840B.feather",
-        "data/vectors/w2v-google-news.feather",
+        "data/vectors/glove12.840B.h5",
+        "data/vectors/w2v-google-news.h5",
         "data/assoc/reduced.csv"
     output:
-        "data/vectors/merged.feather"
+        "data/vectors/merged.h5"
     shell:
         "cn5-vectors interpolate -v -t 50000 {input} {output}"
 
 rule retrofit:
     input:
-        "data/vectors/merged.feather",
+        "data/vectors/merged.h5",
         "data/assoc/reduced.csv"
     output:
-        "data/vectors/retrofit.feather"
+        "data/vectors/retrofit.h5"
     shell:
         "cn5-vectors retrofit -v {input} {output}"

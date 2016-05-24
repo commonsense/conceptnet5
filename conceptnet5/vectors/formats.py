@@ -4,19 +4,14 @@ from scipy import sparse
 import gzip
 import struct
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
-from feather import read_dataframe, write_dataframe
 
 
-def read_feather(filename):
-    frame = read_dataframe(filename)
-    labels = frame['labels']
-    frame.index = labels
-    return frame.drop('labels', axis=1).rename(columns=lambda x: int(x))
+def load_hdf(filename):
+    return pd.read_hdf(filename, 'mat', encoding='utf-8')
 
 
-def write_feather(dataframe, filename):
-    labeled = dataframe.assign(labels=dataframe.index)
-    return write_dataframe(labeled, filename)
+def save_hdf(table, filename):
+    return table.to_hdf(filename, 'mat', encoding='utf-8')
 
 
 def convert_glove(glove_filename, output_filename, nrows):
@@ -28,7 +23,7 @@ def convert_glove(glove_filename, output_filename, nrows):
     del glove_raw
     glove_normal = l2_normalize_rows(l1_normalize_columns(glove_std))
     del glove_std
-    write_feather(glove_normal, output_filename)
+    save_hdf(glove_normal, output_filename)
 
 
 def convert_word2vec(word2vec_filename, output_filename, nrows):
@@ -41,7 +36,7 @@ def convert_word2vec(word2vec_filename, output_filename, nrows):
     del w2v_raw
     w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
     del w2v_std
-    write_feather(w2v_normal, output_filename)
+    save_hdf(w2v_normal, output_filename)
 
 
 def load_glove(filename, nrows=500000):
@@ -112,4 +107,3 @@ def load_csr(filename):
     with np.load(filename) as npz:
         mat = sparse.csr_matrix((npz['data'], npz['indices'], npz['indptr']), shape=npz['shape'])
     return mat
-

@@ -1,5 +1,5 @@
 import click
-from .formats import convert_glove, convert_word2vec, read_feather, write_feather
+from .formats import convert_glove, convert_word2vec, load_hdf, save_hdf
 from .retrofit import sharded_retrofit
 from .interpolate import merge_interpolate
 from .evaluation.wordsim import evaluate
@@ -49,15 +49,15 @@ def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000):
 @click.option('--threshold', '-t', default=50000, help="Minimum number of terms to use from each source")
 @click.option('--verbose', '-v', count=True)
 def run_interpolate(input1_filename, input2_filename, conceptnet_filename, output_filename, threshold=50000, verbose=0):
-    frame1 = read_feather(input1_filename).rename(columns=lambda x: int(x))
-    frame2 = read_feather(input2_filename).rename(columns=lambda x: int(x))
+    frame1 = load_hdf(input1_filename)
+    frame2 = load_hdf(input2_filename)
     _sparse_csr, conceptnet_labels = build_from_conceptnet_table(conceptnet_filename)
     interpolated = merge_interpolate(frame1, frame2, conceptnet_labels, vocab_threshold=threshold, verbose=verbose)
-    write_feather(interpolated, output_filename)
+    save_hdf(interpolated, output_filename)
 
 
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 def run_evaluate(filename):
-    frame = read_feather(filename)
+    frame = load_hdf(filename)
     print(evaluate(frame))
