@@ -7,16 +7,18 @@ Design of ConceptNet 5.5:
 - [x] Handle 'sw-maps' correctly, no proliferation of N-triples, no double-escaping
 - [x] Store the index in a reasonable constant database
 - [x] Use the blacklist when making assertions
-- [ ] Use symmetrical relations
 - [ ] Use JSON-LD when possible
-- [ ] Optionally build ConceptNet vectors in build process
+- [x] Build ConceptNet vectors in build process
   - include word2vec and GloVe inputs in raw/
-- [ ] Automatically test ConceptNet vectors
+- [x] Automatically test ConceptNet vectors
+- [x] Build vectors using less than 16 GB RAM
+- [ ] fix 'FormOf' links to self
 
 ConceptNet 5.6 perhaps:
 
 - [ ] Nodes should have labels that are stored separately from their edges
 - [ ] Break down the and-or trees into more machine-readable structures
+- [ ] Use symmetrical relations
 
 Cleaning up the data:
 

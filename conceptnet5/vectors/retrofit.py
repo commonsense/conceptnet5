@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import normalize
 from .sparse_matrix_builder import build_from_conceptnet_table
-from .transforms import l2_normalize_rows
 from .formats import load_hdf, save_hdf
+from sklearn.preprocessing import normalize
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
@@ -32,13 +32,22 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         save_hdf(retrofitted, temp_filename)
         del retrofitted
 
-    shards = [load_hdf(output_filename + '.shard%d' % i)
-              for i in range(nshards)]
-    joined = pd.concat(shards, axis=1, ignore_index=True)
-    del shards
 
-    save_hdf(joined, output_filename)
-    return joined
+def join_shards(output_filename, nshards=6):
+    joined_matrix = None
+    joined_labels = None
+    for i in range(nshards):
+        shard = load_hdf(output_filename + '.shard%d' % i)
+        nrows, ncols = shard.shape
+        if joined_matrix is None:
+            joined_matrix = np.zeros((nrows, ncols * nshards), dtype='f')
+            joined_labels = shard.index
+        joined_matrix[:, (ncols * i):(ncols * (i + 1))] = shard.values
+        del shard
+
+    normalize(joined_matrix, axis=1, norm='l2', copy=False)
+    dframe = pd.DataFrame(joined_matrix, index=joined_labels)
+    save_hdf(dframe, output_filename)
 
 
 def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):

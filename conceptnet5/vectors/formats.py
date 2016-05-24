@@ -14,6 +14,11 @@ def save_hdf(table, filename):
     return table.to_hdf(filename, 'mat', encoding='utf-8')
 
 
+def save_npy_and_labels(table, filebase):
+    np.save(filebase + '.npy', table.values)
+    save_index_as_labels(table.index, filebase + '.labels.txt')
+
+
 def convert_glove(glove_filename, output_filename, nrows):
     """
     Convert GloVe data from a gzipped text file to a Feather dataframe.
@@ -98,9 +103,15 @@ def load_labels_and_npy(label_file, npy_file):
     return pd.DataFrame(npy, index=labels, dtype='f')
 
 
-def load_labels_as_index(label_file):
-    labels = [line.rstrip('\n') for line in open(label_file, encoding='utf-8')]
+def load_labels_as_index(label_filename):
+    labels = [line.rstrip('\n') for line in open(label_filename, encoding='utf-8')]
     return pd.Index(labels)
+
+
+def save_index_as_labels(index, label_filename):
+    with open(label_filename, 'w', encoding='utf-8') as out:
+        for label in index:
+            print(label, file=out)
 
 
 def load_csr(filename):

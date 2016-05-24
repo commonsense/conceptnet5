@@ -1,7 +1,7 @@
 import click
 from .formats import convert_glove, convert_word2vec, load_hdf, save_hdf
 from .sparse_matrix_builder import build_from_conceptnet_table
-from .retrofit import sharded_retrofit
+from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_interpolate
 from .evaluation.wordsim import evaluate
 
@@ -24,6 +24,13 @@ def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         dense_hdf_filename, conceptnet_filename, output_filename,
         iterations=iterations, nshards=nshards, verbose=verbose
     )
+
+
+@cli.command(name='join_retrofit')
+@click.argument('filename', type=click.Path(writable=True, dir_okay=False))
+@click.option('--nshards', '-s', default=6)
+def run_join_retrofit(filename, nshards=6):
+    join_shards(filename, nshards)
 
 
 @cli.command(name='convert_glove')

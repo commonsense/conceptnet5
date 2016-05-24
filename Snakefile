@@ -40,7 +40,7 @@ WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 # Increment this number when we incompatibly change the parser
 WIKT_PARSER_VERSION = "1"
 
-CHUNKS_OF_100 = [0, 100, 200, 300, 400, 500]
+RETROFIT_SHARDS = 6
 
 # Dataset filenames
 # =================
@@ -383,6 +383,14 @@ rule retrofit:
         "data/vectors/merged.h5",
         "data/assoc/reduced.csv"
     output:
+        expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+    shell:
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} {output}"
+
+rule join_retrofit:
+    input:
+        expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+    output:
         "data/vectors/retrofit.h5"
     shell:
-        "cn5-vectors retrofit -v {input} {output}"
+        "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"
