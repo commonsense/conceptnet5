@@ -1,8 +1,9 @@
 import click
 from .formats import convert_glove, convert_word2vec, read_feather, write_feather
-from .sparse_matrix_builder import build_from_conceptnet_table
-from .retrofit import retrofit
+from .retrofit import sharded_retrofit
 from .interpolate import merge_interpolate
+from .evaluation.wordsim import evaluate
+
 
 @click.group()
 def cli():
@@ -13,13 +14,15 @@ def cli():
 @click.argument('dense_hdf_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('conceptnet_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('--iterations', '-i', default=10)
+@click.option('--iterations', '-i', default=5)
 @click.option('--verbose', '-v', count=True)
-def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename, iterations=10, verbose=1):
-    dense_frame = read_feather(dense_hdf_filename)
-    sparse_csr, combined_index = build_from_conceptnet_table(conceptnet_filename, orig_index=dense_frame.index)
-    retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
-    write_feather(retrofitted, output_filename)
+@click.option('--nshards', '-s', default=6)
+def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
+                 iterations=5, nshards=6, verbose=1):
+    sharded_retrofit(
+        dense_hdf_filename, conceptnet_filename, output_filename,
+        iterations=iterations, nshards=nshards, verbose=verbose
+    )
 
 
 @cli.command(name='convert_glove')
@@ -51,3 +54,10 @@ def run_interpolate(input1_filename, input2_filename, conceptnet_filename, outpu
     _sparse_csr, conceptnet_labels = build_from_conceptnet_table(conceptnet_filename)
     interpolated = merge_interpolate(frame1, frame2, conceptnet_labels, vocab_threshold=threshold, verbose=verbose)
     write_feather(interpolated, output_filename)
+
+
+@cli.command(name='evaluate')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+def run_evaluate(filename):
+    frame = read_feather(filename)
+    print(evaluate(frame))

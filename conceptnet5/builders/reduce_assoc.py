@@ -22,7 +22,7 @@ def generalized_uris(uri):
         return [join_uri(*pieces[:3])]
 
 
-def reduce_assoc(filename, output_filename, cutoff=5, en_cutoff=5, verbose=True):
+def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
     """
     Removes uncommon associations and associations unlikely to be useful.
     This function expects files of the form part_*.csv in `dirname` and will
