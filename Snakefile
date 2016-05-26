@@ -357,6 +357,8 @@ rule convert_word2vec:
         "data/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
     output:
         "data/vectors/w2v-google-news.h5"
+    resources:
+        ram=16
     shell:
         "cn5-vectors convert_word2vec -n 1000000 {input} {output}"
 
@@ -365,6 +367,8 @@ rule convert_glove:
         "data/raw/vectors/glove12.840B.300d.txt.gz"
     output:
         "data/vectors/glove12.840B.h5"
+    resources:
+        ram=16
     shell:
         "cn5-vectors convert_glove -n 1000000 {input} {output}"
 
@@ -375,6 +379,8 @@ rule merge_interpolate:
         "data/assoc/reduced.csv"
     output:
         "data/vectors/merged.h5"
+    resources:
+        ram=16
     shell:
         "cn5-vectors interpolate -v -t 50000 {input} {output}"
 
@@ -384,6 +390,8 @@ rule retrofit:
         "data/assoc/reduced.csv"
     output:
         expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+    resources:
+        ram=16
     shell:
         "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} {output}"
 
@@ -392,5 +400,7 @@ rule join_retrofit:
         expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
     output:
         "data/vectors/retrofit.h5"
+    resources:
+        ram=16
     shell:
         "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"
