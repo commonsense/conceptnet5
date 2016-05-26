@@ -2,7 +2,7 @@ from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri, ALL_LANGUAGES
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import Licenses
+from conceptnet5.uri import Licenses, uri_prefix
 import sqlite3
 import pathlib
 import os
@@ -47,7 +47,7 @@ def prepare_db(inputs, dbfile):
                         form_name = item['rel'][5:]
                         pos = tfrom.get('pos', tto.get('pos', '?'))
                         language = tfrom.get('language', tto.get('language'))
-                        if language is not None:
+                        if language is not None and tfrom['text'] != tto['text']:
                             add_form(
                                 db, file_language, language,
                                 tfrom['text'], pos, tto['text'], form_name
@@ -269,7 +269,10 @@ def read_wiktionary(input_file, db_file, output_file):
                 language, tto, assumed_languages, db,
                 use_etyms=(lang2 in polysemous_languages)
             )
+
             if cfrom is None or cto is None:
+                continue
+            if uri_prefix(cfrom, 3) == uri_prefix(cto, 3):
                 continue
 
             rel, switch = transform_relation(item['rel'])
