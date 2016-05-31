@@ -393,7 +393,7 @@ rule retrofit:
     resources:
         ram=16
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} {output}"
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} data/vectors/retrofit.h5"
 
 rule join_retrofit:
     input:
