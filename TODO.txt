@@ -9,10 +9,12 @@ Design of ConceptNet 5.5:
 - [x] Use the blacklist when making assertions
 - [ ] Use JSON-LD when possible
 - [x] Build ConceptNet vectors in build process
-  - include word2vec and GloVe inputs in raw/
+- [x] include word2vec and GloVe inputs in raw/
 - [x] Automatically test ConceptNet vectors
 - [x] Build vectors using less than 16 GB RAM
-- [ ] fix 'FormOf' links to self
+- [x] fix 'FormOf' links to self
+- [ ] Try new lemmatizer as part of Numberbatch
+- [ ] Use standardized language codes in Wiktionary forms
 
 ConceptNet 5.6 perhaps:
 

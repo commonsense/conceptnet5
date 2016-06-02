@@ -87,7 +87,7 @@ def add_title(db, file_language, language, title):
     db.execute(
         "INSERT OR IGNORE INTO titles (site_language, language, title) "
         "VALUES (?, ?, ?)",
-        (file_language, language, title)
+        (file_language, language, title.lower())
     )
 
 
@@ -95,7 +95,7 @@ def add_form(db, file_language, language, word, pos, root, form):
     db.execute(
         "INSERT INTO forms (site_language, language, word, pos, root, form) "
         "VALUES (?, ?, ?, ?, ?, ?)",
-        (file_language, language, word, pos, root, form)
+        (file_language, language, word.lower(), pos.lower(), root.lower(), form.lower())
     )
 
 
