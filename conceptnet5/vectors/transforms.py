@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 from ..vectors import standardized_uri
+from conceptnet5.language.lemmatize import lemmatize_uri
 
 
-def standardize_row_labels(frame, language='en'):
+def standardize_row_labels(frame, language='en', forms=True):
     """
     Convert a frame whose row labels are bare English terms to one whose row
     labels are standardized ConceptNet URIs (with some extra word2vec-style
@@ -21,6 +22,15 @@ def standardize_row_labels(frame, language='en'):
     # groupby(level=0).sum() means to add rows that have the same label
     relabeled = frame.mul(weights, axis='rows').sort_index().groupby(level=0).sum()
     combined_weights = label_weights.sort_index().groupby(level=0).sum()
+
+    # Optionally adjust words to be more like their word forms
+    if forms:
+        for label in relabeled.index:
+            lemmatized = lemmatize_uri(label)
+            if lemmatized != label and lemmatized in relabeled.index:
+                relabeled.loc[lemmatized] += relabeled.loc[label] / 2
+                combined_weights.loc[lemmatized] += combined_weights.loc[label] / 2
+
     scaled = relabeled.div(combined_weights, axis='rows')
 
     # Rearrange the items in descending order of weight, similar to the order

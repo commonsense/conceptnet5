@@ -15,15 +15,23 @@ LEMMATIZED_LANGUAGES = {
     'sv', 'tr',
 
     # Other languages:
-    'ast', 'gl', 'ca', 'no', 'da', 'ga', 'gd', 'fi', 'hu', 'ro', 'is', 'lv',
-    'cs', 'bg', 'hy',
+    'ast', 'gl', 'ca', 'oc', 'nrf',
+    'no', 'da', 'af',
+    'ga', 'gd', 'is', 'fo', 'gv', 'cy',
+    'hsb', 'cs', 'sh', 'sk', 'sl', 'lv',
+    'fi', 'hu', 'ro', 'bg',
+    'hy', 'ka', 'rup', 'uk',
+    'la', 'ang', 'grc', 'xcl', 'fro', 'non',
+    'eo', 'io', 'vo',
 
     # Languages left out:
-    #   'ja': Wiktionary doesn't have many word form links in Japanese
-    #   'zh': Chinese doesn't really need to be lemmatized
-    #   'sh': script mismatch needs to be dealt with
-    #   'se': not enough information
-    #   'ms': Malay has very few productive word forms
+    #   - No lemmatizer needed: zh, ms
+    #   - Not enough information in:
+    #     ja, se, fa, sq, mg, he, mk, sa, nv, hi, fil, eu
+    #   - Script problems: sh
+    #   - Parsing problems: et
+    #   - Tokenization problems: th
+
 }
 
 
