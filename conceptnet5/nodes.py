@@ -6,7 +6,7 @@ puts the tools in conceptnet5.uri together with functions that normalize
 terms and languages into a standard form.
 """
 
-from conceptnet5.language.english import english_filter
+from conceptnet5.language.english import english_filter, english_lemmatized_filter
 from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import concept_uri, split_uri, parse_possible_compound_uri
 from ftfy import fix_text
@@ -587,15 +587,20 @@ def standardized_concept_uri(lang, text, *more):
     normalization steps.
 
     >>> standardized_concept_uri('en', 'this is a test')
-    '/c/en/this_is_test'
+    '/c/en/test'
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
-    '/c/en/this_is_test/n/example_phrase'
+    '/c/en/test/n/example_phrase'
     """
+    if lang == 'en':
+        token_filter = english_filter
+    else:
+        token_filter = None
     lang = lang.lower()
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
-    norm_text = standardized_concept_name(lang, text)
-    more_text = [standardize_text(item) for item in more if item is not None]
+    norm_text = standardize_text(text, token_filter)
+    more_text = [standardize_text(item, token_filter) for item in more
+                 if item is not None]
     return concept_uri(lang, norm_text, *more_text)
 
 normalized_concept_uri = standardized_concept_uri

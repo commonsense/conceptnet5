@@ -1,6 +1,7 @@
 """
 Tools for working with English text.
 """
+from .lemmatize import LEMMATIZER
 
 STOPWORDS = ['the', 'a', 'an', 'some', 'any',
              'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
@@ -8,13 +9,12 @@ STOPWORDS = ['the', 'a', 'an', 'some', 'any',
              'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they']
 
 
-DROP_FIRST = ['to', 'be']
+DROP_FIRST = ['to', 'be', 'is', 'are']
 
 
 def english_filter(tokens):
     """
-    Given a list of tokens, remove a small list of English stopwords, and
-    reduce the words to their WordNet roots using a simple lemmatizer.
+    Given a list of tokens, remove a small list of English stopwords.
     """
     non_stopwords = [token for token in tokens if token not in STOPWORDS]
     while non_stopwords and non_stopwords[0] in DROP_FIRST:
@@ -23,3 +23,12 @@ def english_filter(tokens):
         return non_stopwords
     else:
         return tokens
+
+
+def english_lemmatized_filter(tokens):
+    """
+    Given a list of tokens, remove a small list of English stopwords, and
+    reduce the words to their roots using a Wiktionary-based lemmatizer.
+    """
+    lemmas = [LEMMATIZER.lookup('en', tok)[0] for tok in tokens]
+    return english_filter(lemmas)

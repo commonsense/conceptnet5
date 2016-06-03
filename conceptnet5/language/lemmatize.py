@@ -172,16 +172,15 @@ def lemmatize(language, word, pos=None):
     word and the word form that was found. The word form will be the empty
     string if the word was unchanged.
 
-    >>> lemmatize('eating')
+    >>> lemmatize('en', 'eating')
     ('eat', 'pres+ptcp')
-    >>> lemmatize('carrots')
+    >>> lemmatize('en', 'carrots')
     ('carrot', 'p')
-    >>> lemmatize('is')
+    >>> lemmatize('en', 'is')
     ('be', '3+s+pres')
-    >>> lemmatize('good')
+    >>> lemmatize('en', 'good')
     ('good', '')
-
-    >>> lem.lookup('es', 'tengo', 'v')
+    >>> lemmatize('es', 'tengo', 'v')
     ('tener', '1+s+pres+ind')
     """
     return LEMMATIZER.lookup(language, word, pos)
