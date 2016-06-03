@@ -360,7 +360,7 @@ rule convert_word2vec:
     resources:
         ram=16
     shell:
-        "cn5-vectors convert_word2vec -n 3000000 {input} {output}"
+        "cn5-vectors convert_word2vec -n 1500000 {input} {output}"
 
 rule convert_glove:
     input:
@@ -370,7 +370,7 @@ rule convert_glove:
     resources:
         ram=16
     shell:
-        "cn5-vectors convert_glove -n 3000000 {input} {output}"
+        "cn5-vectors convert_glove -n 1500000 {input} {output}"
 
 rule merge_interpolate:
     input:
