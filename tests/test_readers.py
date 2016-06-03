@@ -1,7 +1,6 @@
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.readers import (
-    conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, extract_wiktionary,
-    wiktionary, wordnet)
+    conceptnet4, dbpedia, jmdict, ptt_petgame, verbosity, wiktionary, wordnet)
 from conceptnet5.builders.combine_assertions import AssertionCombiner
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 import codecs
@@ -39,7 +38,6 @@ def test_reader_modules():
         (wordnet, 'input/wordnet',
          ['output/wordnet.msgpack', 'output/wordnet_map.nt']),
         (combiner, 'input/combiner.csv', ['output/combiner.msgpack'])
-        # (wiktionary, 'input/wiktionary_extracted.msgpack', ['output/wiktionary.msgpack']),
     ]
     for (reader_module, _input, outputs) in io_mappings:
         yield compare_input_and_output, reader_module, _input, outputs
@@ -95,17 +93,4 @@ def compare_text(text1, text2):
     eq_(text1.strip('\n'), text2.strip('\n'))
 
 
-# Wiktionary reader cannot be included in the test generator because it takes a
-# different number of arguments and different input and output formats
-def test_wiktionary_extraction():
-    input_file = data_path('input/wiktionary.xml')
-    reference_output = data_path('output/en_wiktionary.msgpack')
-    with TemporaryDirectory() as tempdir:
-        extract_wiktionary.handle_file(input_file, tempdir, 'en', nfiles=1)
-        reference_output = list(read_msgpack_stream(reference_output))
-        actual_output = list(read_msgpack_stream(os.path.join(tempdir, 'wiktionary_00.msgpack')))
-        reference_output.sort(key=lambda x: x['title'])
-        actual_output.sort(key=lambda x: x['title'])
-
-        for (expected, actual) in zip_longest(reference_output, actual_output):
-            eq_(expected, actual)
+# TODO: test new Wiktionary reader
