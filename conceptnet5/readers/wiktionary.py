@@ -38,14 +38,22 @@ def prepare_db(inputs, dbfile):
                 if 'rel' in item:
                     tfrom = item['from']
                     tto = item['to']
+                    # For all non-definition relations, record the fact that
+                    # the given entry name exists in the given language. We'll
+                    # use these to disambiguate definitions later.
                     if item['rel'] != 'definition':
                         if 'language' in tfrom and valid_language(tfrom['language']):
                             add_title(db, file_language, tfrom['language'], tfrom['text'])
                         if 'language' in tto and valid_language(tto['language']):
                             add_title(db, file_language, tto['language'], tto['text'])
+
+                    # Record word forms so we can build a lemmatizer from them.
                     if item['rel'].startswith('form/'):
                         form_name = item['rel'][5:]
+                        # Look for the part of speech, first in the 'from' term,
+                        # then in the 'to' term.
                         pos = tfrom.get('pos', tto.get('pos', '?'))
+
                         language = tfrom.get('language', tto.get('language'))
                         if language is not None and tfrom['text'] != tto['text']:
                             add_form(
