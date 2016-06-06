@@ -1,6 +1,7 @@
 from collections import defaultdict
 import argparse
 from conceptnet5.uri import split_uri, join_uri
+from conceptnet5.nodes import is_negative_relation
 
 
 def concept_is_bad(uri):
@@ -11,12 +12,14 @@ def concept_is_bad(uri):
     specific phrase, possibly mis-parsed. A concept with a colon is probably
     detritus from a wiki.
     """
-    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/') or uri.endswith('/neg')
+    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/')
 
 
 def generalized_uris(uri):
     pieces = split_uri(uri)
     if len(pieces) >= 5:
+        return [uri, join_uri(*pieces[:4]), join_uri(*pieces[:3])]
+    elif len(pieces) >= 4:
         return [uri, join_uri(*pieces[:3])]
     else:
         return [join_uri(*pieces[:3])]
@@ -52,18 +55,16 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
         with open(filename, encoding='utf-8') as file:
             for line in file:
                 left, right, value, dataset, rel = line.rstrip().split('\t', 4)
-                if concept_is_bad(left) or concept_is_bad(right):
+                if concept_is_bad(left) or concept_is_bad(right) or is_negative_relation(rel):
                     continue
                 fvalue = float(value)
-                for gleft in generalized_uris(left):
-                    for gright in generalized_uris(right):
-                        if (
-                            gleft in filtered_concepts and
-                            gright in filtered_concepts and
-                            fvalue != 0
-                        ):
-                            line = '\t'.join([gleft, gright, value, dataset, rel])
-                            print(line, file=out)
+                if (
+                    left in filtered_concepts and
+                    right in filtered_concepts and
+                    fvalue != 0
+                ):
+                    line = '\t'.join([left, right, value, dataset, rel])
+                    print(line, file=out)
 
 
 if __name__ == '__main__':
@@ -73,4 +74,3 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     reduce_assoc(args.input_filename, args.output_filename)
-
