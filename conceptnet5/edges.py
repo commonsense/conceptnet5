@@ -75,7 +75,7 @@ def source_uri_to_resource(uri):
             resource['process'] = component
         elif uri_pieces[1] in {'activity', 'site'}:
             resource['activity'] = component
-        elif uri_pieces[1] == 'contributor':
+        elif uri_pieces[1] in {'contributor', 'resource'}:
             resource['contributor'] = component
         else:
             raise ValueError(component)

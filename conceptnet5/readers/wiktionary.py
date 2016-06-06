@@ -241,7 +241,7 @@ def read_wiktionary(input_file, db_file, output_file):
         title = heading['title']
         dataset = '/d/wiktionary/{}'.format(language)
         url_title = heading['title'].replace(' ', '_')
-        web_source = '/s/web/{}.wiktionary.org/wiki/{}'.format(language, url_title)
+        web_source = '/s/resource/{}.wiktionary.org/wiki/{}'.format(language, url_title)
 
         # Scan through the 'from' items, such as the start nodes of
         # translations, looking for distinct etymologies. If we get more than

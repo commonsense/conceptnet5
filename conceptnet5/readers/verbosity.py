@@ -41,7 +41,7 @@ def handle_file(infile, outfile):
     count = 0
     outcomes = defaultdict(int)
 
-    sources = ['/s/site/verbosity']
+    sources = ['/s/resource/verbosity']
 
     writer = MsgpackStreamWriter(outfile)
 

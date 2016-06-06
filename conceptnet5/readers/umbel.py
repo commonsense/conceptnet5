@@ -21,8 +21,7 @@ import os
 
 # As far as I can tell, Umbel doesn't have version identifiers. I use the year
 # the resource seems to have been created as a version.
-SOURCE = '/s/umbel/2013'
-LINK_SOURCE = '/s/dbpedia/3.9/umbel'
+SOURCE = '/s/resource/umbel/2013'
 
 # OpenCyc really only has things that ConceptNet would call IsA relationships.
 # Because our policy is not to try to make the type-token distinction, this

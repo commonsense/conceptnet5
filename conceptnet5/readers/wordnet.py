@@ -19,7 +19,7 @@ import os
 # multiple labels are marked as synonyms of each other
 # word senses get disambiguations that are the canonical label of their domain category, or lexical category
 
-SOURCE = '/s/wordnet/rdf/3.1'
+SOURCE = '/s/resource/wordnet/rdf/3.1'
 DATASET = '/d/wordnet/3.1'
 WN20_URL = 'http://www.w3.org/2006/03/wn/wn20/instances/'
 
