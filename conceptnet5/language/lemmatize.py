@@ -123,9 +123,11 @@ AND NOT (site_language='de' AND
 
 class DBLemmatizer:
     def __init__(self):
-        self.db = sqlite3.connect(get_data_filename('db/wiktionary.db'))
+        self.db = None
 
     def lookup(self, language, word, pos=None):
+        if self.db is None:
+            self.db = sqlite3.connect(get_data_filename('db/wiktionary.db'))
         if language not in LEMMATIZED_LANGUAGES:
             return word, ''
         exceptions = EXCEPTIONS.get(language, {})
