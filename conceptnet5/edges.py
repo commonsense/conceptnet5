@@ -50,7 +50,7 @@ def make_edge(rel, start, end, dataset, license, sources,
     if surfaceStart is None or surfaceEnd is None:
         surfaceStart, surfaceEnd = extract_surface_terms(surfaceText)
     obj = {
-        'uri': uri,
+        '@id': uri,
         'rel': rel,
         'start': start,
         'end': end,
@@ -68,7 +68,7 @@ def make_edge(rel, start, end, dataset, license, sources,
 
 def source_uri_to_resource(uri):
     components = parse_possible_compound_uri('and', uri)
-    resource = {}
+    resource = {'@id': uri}
     for component in components:
         uri_pieces = split_uri(component)
         if uri_pieces[1] in {'rule', 'process'}:

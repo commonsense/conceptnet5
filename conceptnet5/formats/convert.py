@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.nodes import COMMON_LANGUAGES, get_uri_language
-from conceptnet5.uri import split_uri, join_uri
+from conceptnet5.uri import split_uri, join_uri, disjunction_uri
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 from collections import defaultdict
 import codecs
@@ -16,8 +16,10 @@ def msgpack_to_tab_separated(input_filename, output_filename):
         if info.get('surfaceText') is None:
             info['surfaceText'] = ''
         info['weight'] = str(info['weight'])
+        print(info['sources'])
+        info['source_uri'] = disjunction_uri([item['@id'] for item in info['sources']])
         columns = [
-            'uri', 'rel', 'start', 'end', 'weight', 'source_uri',
+            '@id', 'rel', 'start', 'end', 'weight', 'source_uri',
             'id', 'dataset', 'license', 'surfaceText'
         ]
         column_values = [info.get(col) for col in columns]

@@ -223,7 +223,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
 
             edge = make_edge(
                 rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
-                license=license, sources=SOURCE, weight=2.0
+                license=license, sources=[SOURCE], weight=2.0
             )
             out.write(edge)
 
