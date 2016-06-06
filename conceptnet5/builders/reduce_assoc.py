@@ -17,7 +17,10 @@ def concept_is_bad(uri):
 
 def generalized_uri(uri):
     pieces = split_uri(uri)
-    return join_uri(*pieces[:3])
+    if len(pieces) >= 5:
+        return join_uri(*pieces[:4])
+    else:
+        return join_uri(*pieces[:3])
 
 
 def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
@@ -30,10 +33,16 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
     All English concepts that occur fewer than `en_cutoff` times will be removed.
     """
     counts = defaultdict(int)
+    senses = {}
     with open(filename, encoding='utf-8') as file:
         for line in file:
             left, right, _value, _dataset, rel = line.rstrip().split('\t')
-            if rel != '/r/SenseOf':
+            if rel == '/r/SenseOf':
+                if right in senses:
+                    senses[right] = '*'
+                else:
+                    senses[right] = left
+            else:
                 gleft = generalized_uri(left)
                 gright = generalized_uri(right)
                 counts[gleft] += 1
@@ -61,8 +70,17 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
                     gright in filtered_concepts and
                     fvalue != 0
                 ):
-                    line = '\t'.join([left, right, value, dataset, rel])
-                    print(line, file=out)
+                    if left in senses and senses[left] != '*':
+                        sleft = senses[left]
+                    else:
+                        sleft = left
+                    if right in senses and senses[right] != '*':
+                        sright = senses[right]
+                    else:
+                        sright = right
+                    if sleft != sright:
+                        line = '\t'.join([sleft, sright, value, dataset, rel])
+                        print(line, file=out)
 
 
 if __name__ == '__main__':
