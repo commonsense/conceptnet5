@@ -75,12 +75,13 @@ LCODE_ALIASES = {
     # too.
     #
     # Applying the same principle as Chinese, we will unify the language codes
-    # without unifying the scripts.
-    'bs': 'sh',
-    'hr': 'sh',
-    'sr': 'sh',
-    'sr-latn': 'sh',
-    'sr-cyrl': 'sh',
+    # into the macrolanguage 'hbs' without unifying the scripts.
+    'bs': 'hbs',
+    'hr': 'hbs',
+    'sr': 'hbs',
+    'sh': 'hbs',
+    'sr-latn': 'hbs',
+    'sr-cyrl': 'hbs',
 
     # Wikipedia believes that many separately catalogued languages are
     # dialects of the Western Desert language of Australia. If combined, this
@@ -91,9 +92,6 @@ LCODE_ALIASES = {
     # name for the language, 'Wati'. If something ignores the 'x-wati'
     # extension, it will still be distinguished as some sort of Australian
     # language.
-    #
-    # The fact that I went to the trouble of implementing this at all might
-    # mean that I listened to too much Midnight Oil as a teen.
     'ktd': 'aus-x-wati',
     'kux': 'aus-x-wati',
     'mpj': 'aus-x-wati',
