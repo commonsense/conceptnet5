@@ -12,7 +12,7 @@ import langcodes
 from langcodes.tag_parser import LanguageTagError
 
 
-PARSER_RULE = '/s/rule/wikiparsec/1'
+PARSER_RULE = '/s/process/wikiparsec/1'
 
 
 def prepare_db(inputs, dbfile):
@@ -54,12 +54,14 @@ def prepare_db(inputs, dbfile):
                         # then in the 'to' term.
                         pos = tfrom.get('pos', tto.get('pos', '?'))
 
-                        language = tfrom.get('language', tto.get('language'))
-                        if language is not None and tfrom['text'] != tto['text']:
-                            add_form(
-                                db, file_language, language,
-                                tfrom['text'], pos, tto['text'], form_name
-                            )
+                        # Use only Etymology 1 entries for learning word forms.
+                        if (tfrom.get('etym') or '1') == '1':
+                            language = tfrom.get('language', tto.get('language'))
+                            if language is not None and tfrom['text'] != tto['text']:
+                                add_form(
+                                    db, file_language, language,
+                                    tfrom['text'], pos, tto['text'], form_name
+                                )
             db.commit()
     finally:
         db.close()
@@ -307,7 +309,8 @@ def read_wiktionary(input_file, db_file, output_file):
                 weight = 0.5
             edge = make_edge(rel, cfrom, cto, dataset=dataset, weight=weight,
                              sources=sources,
-                             surfaceStart=tfrom['text'], surfaceEnd=tto['text'],
+                             surfaceStart=tfrom['text'],
+                             surfaceEnd=tto['text'],
                              license=Licenses.cc_sharealike)
             out.write(edge)
     out.close()

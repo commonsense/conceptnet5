@@ -15,14 +15,9 @@ def concept_is_bad(uri):
     return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/')
 
 
-def generalized_uris(uri):
+def generalized_uri(uri):
     pieces = split_uri(uri)
-    if len(pieces) >= 5:
-        return [uri, join_uri(*pieces[:4]), join_uri(*pieces[:3])]
-    elif len(pieces) >= 4:
-        return [uri, join_uri(*pieces[:3])]
-    else:
-        return [join_uri(*pieces[:3])]
+    return join_uri(*pieces[:3])
 
 
 def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
@@ -37,11 +32,12 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
     counts = defaultdict(int)
     with open(filename, encoding='utf-8') as file:
         for line in file:
-            left, right, *_ = line.rstrip().split('\t')
-            for gleft in generalized_uris(left):
-                for gright in generalized_uris(right):
-                    counts[gleft] += 1
-                    counts[gright] += 1
+            left, right, _value, _dataset, rel = line.rstrip().split('\t')
+            if rel != '/r/SenseOf':
+                gleft = generalized_uri(left)
+                gright = generalized_uri(right)
+                counts[gleft] += 1
+                counts[gright] += 1
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()
@@ -58,9 +54,11 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
                 if concept_is_bad(left) or concept_is_bad(right) or is_negative_relation(rel):
                     continue
                 fvalue = float(value)
+                gleft = generalized_uri(left)
+                gright = generalized_uri(right)
                 if (
-                    left in filtered_concepts and
-                    right in filtered_concepts and
+                    gleft in filtered_concepts and
+                    gright in filtered_concepts and
                     fvalue != 0
                 ):
                     line = '\t'.join([left, right, value, dataset, rel])

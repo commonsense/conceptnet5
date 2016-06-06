@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
-from hashlib import sha1
-from conceptnet5.uri import (conjunction_uri, assertion_uri,
+from conceptnet5.uri import (assertion_uri, split_uri,
                              parse_possible_compound_uri)
 import re
 
@@ -16,7 +15,7 @@ def make_edge(rel, start, end, dataset, license, sources,
         ...               end='/c/en/hot',
         ...               dataset='/d/conceptnet/4/en',
         ...               license=Licenses.cc_attribution,
-        ...               sources='/and/[/.../]',
+        ...               sources=['/s/contributor/omcs/dev'],
         ...               surfaceText='[[Fire]] is [[hot]]',
         ...               weight=1.0)
         >>> pprint(e)
@@ -25,11 +24,9 @@ def make_edge(rel, start, end, dataset, license, sources,
          'features': ['/c/en/fire /r/HasProperty -',
                       '/c/en/fire - /c/en/hot',
                       '- /r/HasProperty /c/en/hot'],
-         'id': '/e/ee13e234ee835eabfcf7c906b358cc2229366b42',
          'license': '/l/CC/By',
          'rel': '/r/HasProperty',
-         'source_uri': '/and/[/.../]',
-         'sources': ['/...'],
+         'sources': [{'contributor': '/s/contributor/omcs/dev'}],
          'start': '/c/en/fire',
          'surfaceEnd': 'hot',
          'surfaceStart': 'Fire',
@@ -44,39 +41,21 @@ def make_edge(rel, start, end, dataset, license, sources,
     ]
     uri = assertion_uri(rel, start, end)
     if isinstance(sources, list):
-        source_tree = conjunction_uri(*sources)
         source_list = sources
     else:
-        source_tree = sources
-        source_list = parse_possible_compound_uri('or', sources)
+        raise ValueError("Got a non-list for 'sources': %r" % sources)
 
-    separate_source_lists = [
-        parse_possible_compound_uri('and', source)
-        for source in source_list
-    ]
-    flat_sources = [inner for outer in separate_source_lists
-                          for inner in outer]
-    flat_sources = sorted(set(flat_sources))
+    source_resources = [source_uri_to_resource(source) for source in source_list]
 
-    # Generate a unique ID for the edge. This is the only opaque ID
-    # that appears in ConceptNet objects. You can use it as a
-    # pseudo-random sort order over edges.
-    #
-    # The item '/ctx/all' appears here for entirely historical reasons.
-    edge_unique_data = [uri, '/ctx/all', source_tree]
-    edge_unique = ' '.join(edge_unique_data).encode('utf-8')
-    id = '/e/'+sha1(edge_unique).hexdigest()
     if surfaceStart is None or surfaceEnd is None:
         surfaceStart, surfaceEnd = extract_surface_terms(surfaceText)
     obj = {
-        'id': id,
         'uri': uri,
         'rel': rel,
         'start': start,
         'end': end,
         'dataset': dataset,
-        'sources': flat_sources,
-        'source_uri': source_tree,
+        'sources': source_resources,
         'features': features,
         'license': license,
         'weight': weight,
@@ -85,6 +64,22 @@ def make_edge(rel, start, end, dataset, license, sources,
         'surfaceEnd': surfaceEnd
     }
     return obj
+
+
+def source_uri_to_resource(uri):
+    components = parse_possible_compound_uri('and', uri)
+    resource = {}
+    for component in components:
+        uri_pieces = split_uri(component)
+        if uri_pieces[1] in {'rule', 'process'}:
+            resource['process'] = component
+        elif uri_pieces[1] in {'activity', 'site'}:
+            resource['activity'] = component
+        elif uri_pieces[1] == 'contributor':
+            resource['contributor'] = component
+        else:
+            raise ValueError(component)
+    return resource
 
 
 SURFACE_FORM_PATTERN = re.compile(r'\[\[(.*?)\]\]')

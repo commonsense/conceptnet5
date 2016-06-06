@@ -183,7 +183,7 @@ def build_sources(parts_dict, preposition_fix=False):
     )
     activity_node = join_uri('/s/activity/omcs', standardize_text(activity))
     if preposition_fix:
-        conjunction = [creator_node, activity_node, '/s/rule/preposition_fix']
+        conjunction = [creator_node, activity_node, '/s/process/preposition_fix']
     else:
         conjunction = [creator_node, activity_node]
     weighted_sources = [(conjunction, 1)]
