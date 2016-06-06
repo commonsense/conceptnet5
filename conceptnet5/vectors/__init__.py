@@ -1,4 +1,5 @@
 from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.language.lemmatize import lemmatize_uri
 from sklearn.preprocessing import normalize
 import re
 import pandas as pd
@@ -38,7 +39,11 @@ def get_vector(frame, text, language=None):
     try:
         return frame.loc[text]
     except KeyError:
-        return pd.Series(index=frame.columns)
+        lem = lemmatize_uri(text)
+        try:
+            return frame.loc[text]
+        except KeyError:
+            return pd.Series(index=frame.columns)
 
 
 def normalize_vec(vec):
