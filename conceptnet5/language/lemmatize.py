@@ -93,29 +93,31 @@ EXCEPTIONS_FIXED = {
     # lemmatize to themselves.
     'en': {
         'agenda', 'alba', 'archer', 'art', 'ascii', 'bad', 'bare', 'bee',
-        'belated', 'bin', 'bio', 'bonkers', 'book', 'bummer', 'camper',
+        'belated', 'bin', 'bio', 'bonkers', 'book', 'brake', 'bummer', 'camper',
         'carmen', 'ceiling', 'cola', 'conceited', 'crew', 'crown', 'di',
-        'drug', 'dui', 'during', 'fleming', 'fore', 'greece',
-        'hades', 'hinder', 'hole', 'holmes', 'kent', 'ky', 'liver', 'low',
-        'ment', 'mini', 'molasses', 'mos', 'naked', 'number', 'plaid', 'prove',
+        'dive', 'drug', 'dui', 'during', 'feed', 'fleming', 'fore', 'greece',
+        'hades', 'hinder', 'hole', 'holmes', 'jus', 'kent', 'ky', 'liver', 'low',
+        'ment', 'mini', 'molasses', 'mos', 'naked', 'number', 'physics', 'plaid', 'prove',
         'raft', 'rebound', 'red', 'reed', 'rid', 'rift', 'rowling', 'rugged',
         'sacred', 'seed', 'sept', 'sheep', 'shore', 'sideways', 'slang', 'sod',
-        'spice', 'sticker', 'stove', 'wan', 'weed', 'wilt', 'writ',
+        'span', 'spice', 'sticker', 'stove', 'vegas', 'wan', 'weed', 'wilt', 'writ',
 
         # These have to be included because of German
         'the', 'most', 'put', 'gun'
     },
+    'de': {
+        'die', 'der', 'das', 'ein', 'mir', 'uns', 'klein'
+    }
 }
 
 
 QUERY = """
-SELECT root, form FROM forms
+SELECT root, form, pos FROM forms
 WHERE language=? AND word=?
 AND root LIKE '__%' AND form != 'alternate'
 AND form NOT LIKE '%short%' AND form NOT LIKE '%Short%'
 AND NOT (site_language='de' AND
-  (form='positiv' OR form='singular' OR form='masculine' OR form='feminine'
-   OR form='diminutive'))
+  (form='masculine' OR form='feminine' OR form='diminutive'))
 """
 
 
@@ -143,20 +145,27 @@ class DBLemmatizer:
         if len(rows) == 0:
             return word, ''
         elif len(rows) == 1:
-            root, form = rows[0]
+            root, form, pos = rows[0]
             return root, form
         else:
             possibilities = []
             for row in rows:
-                root, form = row
+                root, form, pos = row
                 if language in WORDFREQ_LANGUAGES_LARGE:
                     goodness = wordfreq.word_frequency(root, language, 'large')
                 elif language in WORDFREQ_LANGUAGES:
                     goodness = wordfreq.word_frequency(root, language)
                 else:
                     goodness = 0.
-                possibilities.append((-goodness, root, form))
+                if pos == 'n':
+                    goodness += 1.
+                if form == 'positiv' or form == 'singular' and root != word:
+                    goodness -= 2.
+                if goodness >= 0:
+                    possibilities.append((-goodness, root, form))
             possibilities.sort()
+            if not possibilities:
+                return word, ''
             _, root, form = possibilities[0]
 
             if root == word:
