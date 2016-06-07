@@ -4,6 +4,7 @@ from conceptnet5.edges import make_edge
 from conceptnet5.uri import disjunction_uri, parse_compound_uri, Licenses
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util import get_support_data_filename
+import itertools
 import os
 
 N = 100
@@ -15,26 +16,6 @@ def weight_scale(weight):
     This scale starts out linear, then switches to a square-root scale at x=2.
     """
     return 2 * max(weight - 1, 1) ** .5 + min(weight, 2) - 2
-
-
-def read_reliability_file(filename):
-    reliability = {}
-    for line in open(filename, encoding='utf-8'):
-        line = line.rstrip()
-        if line:
-            score_str, source = line.rstrip().split('\t')
-            score = float(score_str)
-            reliability[source] = score
-    return reliability
-
-
-def read_blacklist(filename):
-    blacklisted = set()
-    for line in open(filename, encoding='utf-8'):
-        before_comment = line.split('#')[0].strip()
-        if before_comment:
-            blacklisted.add(before_comment)
-    return blacklisted
 
 
 def truncate_term(term):
@@ -92,6 +73,43 @@ def extract_contributors(source):
         return set()
 
 
+def make_assertion(line_group):
+    lines = [line.rstrip() for line in line_group]
+    lines = [line for line in lines if line]
+    if not lines:
+        return None
+
+    uri, rel, start, end, _ = lines[0].split('\t')
+    if not (
+        get_uri_language(start) in ALL_LANGUAGES and
+        get_uri_language(end) in ALL_LANGUAGES
+    ):
+        return None
+
+    info_dicts = [json.loads(line.split('\t')[4]) for line in lines]
+    unscaled_weight = sum(info['weight'] for info in info_dicts)
+    licenses = {info['license'] for info in info_dicts}
+    dataset = info_dicts[0]['dataset']
+    surface_text = None
+    sources = []
+    for info in info_dicts:
+        if surface_text is None and 'surfaceText' in info:
+            surface_text = info['surfaceText']
+        sources.extend(info['sources'])
+
+    weight = weight_scale(unscaled_weight)
+    if Licenses.cc_sharealike in licenses:
+        license = Licenses.cc_sharealike
+    else:
+        license = Licenses.cc_attribution
+
+    return make_edge(
+        rel=rel, start=start, end=end, weight=weight,
+        dataset=dataset, license=license, sources=sources,
+        surfaceText=surface_text
+    )
+
+
 def combine_assertions(input_filenames, output_file):
     """
     Take in a number of tab-separated, sorted "CSV" files, indicated by
@@ -104,24 +122,30 @@ def combine_assertions(input_filenames, output_file):
     This process requires its input to be a sorted CSV so that all edges for
     the same assertion will appear consecutively.
     """
-    # The current_... variables accumulate information about the current
-    # assertion. When the URI changes, we can output this assertion.
-    current_uri = None
-    current_data = {}
-    current_contributors = set()
-    current_surface = None
-    current_dataset = None
-    current_weight = 0.
-    current_sources = []
-    current_license = Licenses.cc_attribution
-    blacklist = read_blacklist(
-        get_support_data_filename('blacklist.txt')
-    )
+    def group_func(line):
+        "Group lines by their URI (their first column)."
+        return line.split('\t', 1)[0]
+
 
     out = MsgpackStreamWriter(output_file)
     out_bad = MsgpackStreamWriter(output_file + '.reject')
+
     for csv_filename in input_filenames:
-        for line in open(csv_filename, encoding='utf-8'):
+        with open(csv_filename, encoding='utf-8') as stream:
+            for line_group in itertools.groupby(stream, group_func):
+                assertion = make_assertion(line_group)
+                if assertion is None:
+                    break
+                if assertion['weight'] > 0:
+                    destination = out
+                else:
+                    destination = out_bad
+                destination.write(assertion)
+
+    out.close()
+    out_bad.close()
+
+if False:
             line = line.rstrip('\n')
             if not line:
                 continue

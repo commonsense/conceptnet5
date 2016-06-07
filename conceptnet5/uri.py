@@ -330,6 +330,6 @@ def and_or_tree(list_of_lists):
     return disjunction_uri(*conjunctions)
 
 
-class Licenses(object):
+class Licenses:
     cc_attribution = '/l/CC/By'
     cc_sharealike = '/l/CC/By-SA'

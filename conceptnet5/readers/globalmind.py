@@ -128,8 +128,8 @@ def build_from_dir(dirname, output_file):
         obj = translation['fields']
         assertion1 = assertions[obj['assertion1']]
         assertion2 = assertions[obj['assertion2']]
-        start = assertion1['@id']
-        end = assertion2['@id']
+        start = assertion1['uri']
+        end = assertion2['uri']
         rel = '/r/TranslationOf'
         text1 = assertion1['surfaceText'].replace('[[', '').replace(']]', '')
         text2 = assertion2['surfaceText'].replace('[[', '').replace(']]', '')

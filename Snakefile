@@ -239,7 +239,7 @@ rule assertion_msgpack_to_csv:
     shell:
         "cn5-convert msgpack_to_tab_separated {input} {output}"
 
-rule collate_edges:
+rule distribute_edges:
     input:
         expand("data/edges/{dataset}.csv", dataset=DATASET_NAMES)
     output:

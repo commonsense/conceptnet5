@@ -59,6 +59,15 @@ AROUND_PREPOSITIONS = [
 RELATIONS_TO_DROP = {
     '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom', '/r/SimilarSize'
 }
+CONTRIBUTOR_BLACKLIST = {
+    'brunogodoifred', 'thisislike', 'davidhere40', 'tdpoets', 'gcgirl',
+    'maratrea', 'poorrichard', 'coolio', 'wendybendy', 'kaaru'
+}
+CONCEPT_BLACKLIST = {
+    '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/often', '/c/en/she',
+    '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
+    '/c/en/they', '/c/en/this', '/c/en/you',
+}
 
 
 def can_skip(parts_dict):
@@ -202,10 +211,17 @@ def build_sources(parts_dict, preposition_fix=False):
     return weighted_sources
 
 
-def by_bedume_and_bad(source_list,start,end):
+def skip_assertion(source_list, start, end):
+    """
+    Filter out assertions that we can tell a priori will be unhelpful.
+    """
+    if start in CONCEPT_BLACKLIST or end in CONCEPT_BLACKLIST:
+        return True
+    if set(source_list) & CONTRIBUTOR_BLACKLIST:
+        return True
     if 'bedume' in ' '.join(source_list):
         for flagged in BEDUME_FLAGGED_CONCEPTS + BEDUME_FLAGGED_PLACES:
-            check = '/'+flagged.replace(' ', '_')
+            check = '/' + flagged.replace(' ', '_')
             if start.endswith(check) or end.endswith(check):
                 return True
     return False
@@ -271,7 +287,7 @@ class CN4Builder(object):
                     return
 
         for source_list, weight in weighted_sources:
-            if not by_bedume_and_bad(source_list, start, end):
+            if not skip_assertion(source_list, start, end):
                 yield make_edge(
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
