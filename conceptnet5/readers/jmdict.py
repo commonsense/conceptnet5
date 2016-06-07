@@ -85,6 +85,8 @@ GLOSS_RE = re.compile(r'''
     ( \(.*?\)|\[.*?\])?   # possibly a bracketed expression after the gloss
     $
 ''', re.VERBOSE)
+
+
 def parse_gloss(text):
     matched = GLOSS_RE.match(text)
     if matched:
@@ -184,8 +186,8 @@ def handle_file(filename, output_file):
                 # we can't expand them), and we also don't want to deal with texts
                 # that are more than five words long.
                 if (
-                    text is not None and '.' not in text and text.count(' ') <= 4
-                    and valid_concept_name(text)
+                    text is not None and '.' not in text and
+                    text.count(' ') <= 4 and valid_concept_name(text)
                 ):
                     for head in headwords:
                         ja_concept = standardized_concept_uri('ja', head)
@@ -201,7 +203,7 @@ def output_edge(out, subj_concept, obj_concept):
     edge = make_edge(rel, subj_concept, obj_concept,
                      dataset='/d/jmdict',
                      license=Licenses.cc_sharealike,
-                     sources=['/s/resource/jmdict/1.07'],
+                     sources=[{'contributor': '/s/resource/jmdict/1.07'}],
                      weight=2.0)
     out.write(edge)
 

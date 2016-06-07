@@ -1,25 +1,15 @@
 from __future__ import unicode_literals
 from collections import defaultdict
-from conceptnet5.uri import join_uri, Licenses
+from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
     NTriplesReader, resource_name, full_conceptnet_url
 )
-import re
-import os
 
 
-# new plan
-#
-# parse wn31.nt using our streaming reader
-# one pass identifies synsets with English labels and canonical labels
-# canonical labels come from the wn20 link if possible, otherwise the shortest label
-# multiple labels are marked as synonyms of each other
-# word senses get disambiguations that are the canonical label of their domain category, or lexical category
-
-SOURCE = '/s/resource/wordnet/rdf/3.1'
+SOURCE = {'contributor': '/s/resource/wordnet/rdf/3.1'}
 DATASET = '/d/wordnet/3.1'
 WN20_URL = 'http://www.w3.org/2006/03/wn/wn20/instances/'
 
@@ -149,7 +139,8 @@ def run_wordnet(input_file, output_file, sw_map_file):
     used_labels = set(synset_canonical_labels.values())
     for synset, values in synset_labels.items():
         values.sort(key=lambda label: (label in used_labels,) + label_sort_key(label))
-        if (synset not in synset_canonical_labels or
+        if (
+            synset not in synset_canonical_labels or
             synset_canonical_labels[synset][0].isupper() and synset_domains.get(synset) == 'person'
         ):
             label = values[0]

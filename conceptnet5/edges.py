@@ -40,12 +40,9 @@ def make_edge(rel, start, end, dataset, license, sources,
         "- %s %s" % (rel, end)
     ]
     uri = assertion_uri(rel, start, end)
-    if isinstance(sources, list):
-        source_list = sources
-    else:
-        raise ValueError("Got a non-list for 'sources': %r" % sources)
 
-    source_resources = [source_uri_to_resource(source) for source in source_list]
+    assert isinstance(sources, list), sources
+    assert [isinstance(source, dict) for source in sources], sources
 
     if surfaceStart is None or surfaceEnd is None:
         surfaceStart, surfaceEnd = extract_surface_terms(surfaceText)
@@ -55,7 +52,7 @@ def make_edge(rel, start, end, dataset, license, sources,
         'start': start,
         'end': end,
         'dataset': dataset,
-        'sources': source_resources,
+        'sources': sources,
         'features': features,
         'license': license,
         'weight': weight,

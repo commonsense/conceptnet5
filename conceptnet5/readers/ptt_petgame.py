@@ -22,10 +22,14 @@ def handle_raw_assertion(line):
     surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace('{2}', '[[' + concept2 + ']]')
     start = standardized_concept_uri('zh_TW', concept1)
     end = standardized_concept_uri('zh_TW', concept2)
-    sources = ['/s/activity/ptt/petgame', '/s/contributor/petgame/' + user]
+    source = {
+        'contributor': '/s/contributor/petgame/' + user,
+        'activity': '/s/activity/ptt/petgame'
+    }
     yield make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
-                    license='/l/CC/By', sources=sources,
+                    license='/l/CC/By', sources=[source],
                     surfaceText=surfaceText, weight=1)
+
 
 def handle_file(input_filename, output_file):
     out = MsgpackStreamWriter(output_file)
@@ -34,6 +38,7 @@ def handle_file(input_filename, output_file):
         if line:
             for new_obj in handle_raw_assertion(line):
                 out.write(new_obj)
+
 
 def main():
     import argparse
@@ -46,4 +51,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

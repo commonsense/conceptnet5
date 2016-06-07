@@ -9,7 +9,6 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
     standardized_concept_uri, concept_uri, standardize_text, valid_concept_name
 )
-from conceptnet5.util.node_filters import FILTERED_SOURCES
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
 from conceptnet5.uri import join_uri, Licenses
@@ -61,12 +60,21 @@ RELATIONS_TO_DROP = {
 }
 CONTRIBUTOR_BLACKLIST = {
     'brunogodoifred', 'thisislike', 'davidhere40', 'tdpoets', 'gcgirl',
-    'maratrea', 'poorrichard', 'coolio', 'wendybendy', 'kaaru'
+    'maratrea', 'poorrichard', 'coolio', 'wendybendy', 'kaaru',
+    'bntman', 'cyberguy', 'ddiblasi', 'glneumiller', 'imn8xtc', 'holyrobot',
+    'lbeckwith', 'maliki', 'sarcastro98', 'wellner'
 }
 CONCEPT_BLACKLIST = {
     '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/often', '/c/en/she',
     '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
     '/c/en/they', '/c/en/this', '/c/en/you',
+}
+ACTIVITY_BLACKLIST = {
+    "20 Questions",
+    "picture description",
+    "response to diagram",
+    "commons2_reject",
+    "pycommons/question"
 }
 
 
@@ -99,11 +107,30 @@ def can_skip(parts_dict):
         return True
     if 'testing' in parts_dict["activity"]:
         return True
+    if parts_dict["activity"] in ACTIVITY_BLACKLIST:
+        return True
     if not (
         valid_concept_name(parts_dict["startText"]) and
         valid_concept_name(parts_dict["endText"])
     ):
         return True
+    return False
+
+
+def skip_assertion(source_dict, start, end):
+    """
+    Filter out assertions that we can tell will be unhelpful after we've
+    extracted them.
+    """
+    if start in CONCEPT_BLACKLIST or end in CONCEPT_BLACKLIST:
+        return True
+    if source_dict['contributor'] in CONTRIBUTOR_BLACKLIST:
+        return True
+    if 'bedume' in source_dict['contributor']:
+        for flagged in BEDUME_FLAGGED_CONCEPTS + BEDUME_FLAGGED_PLACES:
+            check = '/' + flagged.replace(' ', '_')
+            if start.endswith(check) or end.endswith(check):
+                return True
     return False
 
 
@@ -184,18 +211,21 @@ def build_sources(parts_dict, preposition_fix=False):
     inside the 'make_edge' function, these will be combined into an '/and'
     node.
     """
-    activity = parts_dict["activity"]
-
+    creator_source = {}
     creator_node = join_uri(
         '/s/contributor/omcs',
         standardize_text(parts_dict["creator"])
     )
+    creator_source['contributor'] = creator_node
+
+    activity = parts_dict["activity"]
     activity_node = join_uri('/s/activity/omcs', standardize_text(activity))
+    creator_source['activity'] = activity_node
+
     if preposition_fix:
-        conjunction = [creator_node, activity_node, '/s/process/preposition_fix']
-    else:
-        conjunction = [creator_node, activity_node]
-    weighted_sources = [(conjunction, 1)]
+        creator_source['process'] = '/s/process/preposition_fix'
+    creator_source['weight'] = 1.
+    sources = [creator_source]
 
     for vote in parts_dict["votes"]:
         username = vote[0]
@@ -203,28 +233,13 @@ def build_sources(parts_dict, preposition_fix=False):
             continue
 
         vote_int = vote[1]
-        conjunction = [
-            join_uri('/s/contributor/omcs', standardize_text(username)),
-            '/s/activity/omcs/vote'
-        ]
-        weighted_sources.append((conjunction, vote_int))
-    return weighted_sources
-
-
-def skip_assertion(source_list, start, end):
-    """
-    Filter out assertions that we can tell a priori will be unhelpful.
-    """
-    if start in CONCEPT_BLACKLIST or end in CONCEPT_BLACKLIST:
-        return True
-    if set(source_list) & CONTRIBUTOR_BLACKLIST:
-        return True
-    if 'bedume' in ' '.join(source_list):
-        for flagged in BEDUME_FLAGGED_CONCEPTS + BEDUME_FLAGGED_PLACES:
-            check = '/' + flagged.replace(' ', '_')
-            if start.endswith(check) or end.endswith(check):
-                return True
-    return False
+        vote_source = {
+            'contributor': join_uri('/s/contributor/omcs', standardize_text(username)),
+            'activity': '/s/activity/omcs/vote',
+            'weight': vote_int
+        }
+        sources.append(vote_source)
+    return sources
 
 
 class CN4Builder(object):
@@ -279,19 +294,13 @@ class CN4Builder(object):
             # Fix an inconsistently-named relation from GlobalMind
             relation = '/r/Desires'
 
-        for source_list, weight in weighted_sources:
-            for source in source_list:
-                if 'commons2_reject' in source:
-                    return
-                if source in FILTERED_SOURCES:
-                    return
-
-        for source_list, weight in weighted_sources:
-            if not skip_assertion(source_list, start, end):
+        for source_dict in weighted_sources:
+            if not skip_assertion(source_dict, start, end):
+                weight = source_dict.pop('weight')
                 yield make_edge(
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
-                    sources=source_list, surfaceText=frame_text,
+                    sources=[source_dict], surfaceText=frame_text,
                     weight=weight
                 )
 

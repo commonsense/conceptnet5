@@ -13,15 +13,14 @@ from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, standardized_concept_name, standardize_text
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import NTriplesReader, NTriplesWriter, resource_name, full_conceptnet_url
-from conceptnet5.readers.dbpedia import translate_dbpedia_url
+from conceptnet5.formats.semantic_web import NTriplesReader, resource_name, full_conceptnet_url
 from collections import defaultdict
 import os
 
 
 # As far as I can tell, Umbel doesn't have version identifiers. I use the year
 # the resource seems to have been created as a version.
-SOURCE = '/s/resource/umbel/2013'
+SOURCE = {'contributor': '/s/resource/umbel/2013'}
 
 # OpenCyc really only has things that ConceptNet would call IsA relationships.
 # Because our policy is not to try to make the type-token distinction, this
@@ -57,9 +56,10 @@ IGNORED_WORDS = set([
     'will', 'have', 'has', 'had', 'cw', 'pcw'
 ])
 
+
 def acceptable_node(url):
-    return not (url.endswith('Type') or url.endswith('Concept')
-                or resource_name(url) in IGNORED_NODES)
+    return not (url.endswith('Type') or url.endswith('Concept') or
+                resource_name(url) in IGNORED_NODES)
 
 
 def run_umbel(input_dir, output_file, sw_map_file):

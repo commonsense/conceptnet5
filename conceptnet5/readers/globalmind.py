@@ -4,7 +4,6 @@ from conceptnet5.nodes import standardized_concept_uri, standardize_text
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-import yaml
 
 
 # The language codes used by GlobalMind were idiosyncratic, and need to be
@@ -83,10 +82,10 @@ def build_from_dir(dirname, output_file):
         username = standardize_text(usernames[user_id])
         user_source = "/s/contributor/globalmind/%s" % username
 
-        sources = [
-            user_source,
-            "/s/activity/globalmind/assert"
-        ]
+        source = {
+            'contributor': user_source,
+            'activity': "/s/activity/globalmind/assert"
+        }
 
         lang = LANG_CODES[obj['lcode']]
         start = standardized_concept_uri(lang, obj['node1'])
@@ -114,7 +113,7 @@ def build_from_dir(dirname, output_file):
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
                          license='/l/CC/By',
-                         sources=sources,
+                         sources=[source],
                          surfaceText=surfaceText,
                          weight=1)
 
@@ -140,14 +139,14 @@ def build_from_dir(dirname, output_file):
         username = standardize_text(usernames[user_id])
         user_source = "/s/contributor/globalmind/%s" % username
 
-        sources = [
-            user_source,
-            "/s/activity/globalmind/translate"
-        ]
+        source = {
+            'contributor': user_source,
+            'activity': "/s/activity/globalmind/translate"
+        }
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
                          license=Licenses.cc_attribution,
-                         sources=sources,
+                         sources=[source],
                          surfaceText=surfaceText,
                          weight=1)
         out.write(edge)

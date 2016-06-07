@@ -15,7 +15,6 @@ can be referred to, or retrieved, using this complete URI (in version 5.2):
 
 import sys
 import re
-from ftfy import fix_text
 from conceptnet5 import __version__ as VERSION
 
 if sys.version_info.major >= 3:

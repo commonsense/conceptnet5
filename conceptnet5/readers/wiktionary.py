@@ -303,12 +303,15 @@ def read_wiktionary(input_file, db_file, output_file):
                 else:
                     etym_to_translation_sense[etym_key] = sense
 
-            sources = [web_source, PARSER_RULE]
+            source = {
+                'contributor': web_source,
+                'process': PARSER_RULE
+            }
             weight = 1.
             if rel == '/r/EtymologicallyDerivedFrom':
                 weight = 0.5
             edge = make_edge(rel, cfrom, cto, dataset=dataset, weight=weight,
-                             sources=sources,
+                             sources=[source],
                              surfaceStart=tfrom['text'],
                              surfaceEnd=tto['text'],
                              license=Licenses.cc_sharealike)

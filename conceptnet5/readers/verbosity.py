@@ -37,11 +37,10 @@ STOPWORDS = {
     'one', 'all', 'either', 'both', 'er'
 }
 
+
 def handle_file(infile, outfile):
     count = 0
     outcomes = defaultdict(int)
-
-    sources = ['/s/resource/verbosity']
 
     writer = MsgpackStreamWriter(outfile)
 
@@ -149,16 +148,19 @@ def handle_file(infile, outfile):
 
         # If the clue on the right is a two-word phrase, we make additional
         # connections to both words individually. We label them with the
-        # rule-based source '/s/rule/split_words' to track that this happened.
+        # rule-based source '/s/process/split_words' to track that this
+        # happened.
         rightwords = [right]
         if ' ' in right:
             morewords = [word for word in right.split(' ') if word not in STOPWORDS]
             rightwords.extend(morewords)
 
         for i, rightword in enumerate(rightwords):
-            edge_sources = list(sources)
+            source = {
+                'contributor': '/s/resource/verbosity'
+            }
             if i > 0:
-                edge_sources.append('/s/rule/split_words')
+                source['process'] = '/s/process/split_words'
 
             # Build the natural-language-ish surface text for this clue
             text = '[[%s]] %s [[%s]]' % (left, reltext, rightword)
@@ -169,13 +171,10 @@ def handle_file(infile, outfile):
             rightc = standardized_concept_uri('en', rightword)
             edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
                              license=Licenses.cc_attribution,
-                             sources=sources, surfaceText=text,
+                             sources=[source], surfaceText=text,
                              weight=weight)
             writer.write(edge)
 
-    # Count the various outcomes. This can be used as a sanity-check. It
-    # also was used for a graph in a ConceptNet 5 paper.
-    print("Verbosity outcomes: %s" % outcomes)
 
 if __name__ == '__main__':
     import argparse
