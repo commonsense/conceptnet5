@@ -16,11 +16,10 @@ def msgpack_to_tab_separated(input_filename, output_filename):
         if info.get('surfaceText') is None:
             info['surfaceText'] = ''
         info['weight'] = str(info['weight'])
-        print(info['sources'])
-        info['source_uri'] = disjunction_uri([item['@id'] for item in info['sources']])
+        info['source_uri'] = disjunction_uri(*[item['@id'] for item in info['sources']])
         columns = [
             '@id', 'rel', 'start', 'end', 'weight', 'source_uri',
-            'id', 'dataset', 'license', 'surfaceText'
+            '@id', 'dataset', 'license', 'surfaceText'
         ]
         column_values = [info.get(col) for col in columns]
         line = '\t'.join(column_values)

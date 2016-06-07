@@ -180,7 +180,6 @@ def combine_assertions(input_filenames, output_file):
                         sources=current_sources,
                         surfaceText=current_surface,
                         weight=judged_weight,
-                        uri=current_uri,
                         **current_data
                     )
 
@@ -214,7 +213,6 @@ def combine_assertions(input_filenames, output_file):
                 sources=current_sources,
                 surfaceText=current_surface,
                 weight=judged_weight,
-                uri=current_uri
             )
 
 
@@ -223,18 +221,8 @@ def output_assertion(out, **kwargs):
     Output an assertion to the given output stream. All keyword arguments
     become arguments to `make_edge`. (An assertion is a kind of edge.)
     """
-    # Remove the URI, because make_edge computes it for us.
-    uri = kwargs.pop('uri')
-
-    # Combine the sources into one AND-OR tree.
-    sources = set(kwargs.pop('sources'))
-    source_tree = disjunction_uri(*sources)
-
     # Build the assertion object.
-    assertion = make_edge(sources=source_tree, **kwargs)
-
-    # Make sure the computed URI is the same as the one we had.
-    assert assertion['uri'] == uri, (assertion['uri'], uri)
+    assertion = make_edge(**kwargs)
 
     # Output the result in a Msgpack stream.
     out.write(assertion)
