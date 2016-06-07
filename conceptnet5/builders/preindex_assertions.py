@@ -11,7 +11,8 @@ def get_indices(edge):
     indices = []
     for field in ('uri', 'rel', 'start', 'end', 'dataset'):
         indices.extend(uri_prefixes(edge[field]))
-    indices.extend(edge['sources'])
+    for source in edge['sources']:
+        indices.extend(source.values())
     indices.extend(edge['features'])
     return indices
 

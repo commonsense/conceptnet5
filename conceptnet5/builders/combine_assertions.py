@@ -89,10 +89,10 @@ def combine_assertions(input_filenames, output_file):
 
     for csv_filename in input_filenames:
         with open(csv_filename, encoding='utf-8') as stream:
-            for line_group in itertools.groupby(stream, group_func):
+            for key, line_group in itertools.groupby(stream, group_func):
                 assertion = make_assertion(line_group)
                 if assertion is None:
-                    break
+                    continue
                 if assertion['weight'] > 0:
                     destination = out
                 else:
