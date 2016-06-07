@@ -361,7 +361,7 @@ rule convert_word2vec:
     resources:
         ram=16
     shell:
-        "cn5-vectors convert_word2vec -n 1500000 data/raw/vectors/GoogleNews-vectors-negative300.bin.gz {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n 1500000 data/raw/vectors/GoogleNews-vectors-negative300.bin.gz {output}"
 
 rule convert_glove:
     input:
@@ -372,7 +372,7 @@ rule convert_glove:
     resources:
         ram=16
     shell:
-        "cn5-vectors convert_glove -n 1500000 data/raw/vectors/glove12.840B.300d.txt.gz {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 data/raw/vectors/glove12.840B.300d.txt.gz {output}"
 
 rule merge_interpolate:
     input:
@@ -384,7 +384,7 @@ rule merge_interpolate:
     resources:
         ram=16
     shell:
-        "cn5-vectors interpolate -v -t 50000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors interpolate -v -t 50000 {input} {output}"
 
 rule retrofit:
     input:
