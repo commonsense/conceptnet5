@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.nodes import ALL_LANGUAGES, get_uri_language
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import Licenses
+from conceptnet5.uri import Licenses, split_uri
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import itertools
 import json
@@ -31,6 +31,13 @@ def weight_scale(weight):
     return 2 * max(weight - 1, 1) ** .5 + min(weight, 2) - 2
 
 
+def keep_concept(uri):
+    if get_uri_language(uri) not in ALL_LANGUAGES:
+        return False
+    pieces = split_uri(uri)
+    return bool(pieces[2])
+
+
 def make_assertion(line_group):
     lines = [line.rstrip() for line in line_group]
     lines = [line for line in lines if line]
@@ -38,10 +45,7 @@ def make_assertion(line_group):
         return None
 
     uri, rel, start, end, _ = lines[0].split('\t')
-    if not (
-        get_uri_language(start) in ALL_LANGUAGES and
-        get_uri_language(end) in ALL_LANGUAGES
-    ):
+    if not (keep_concept(start) and keep_concept(end)):
         return None
 
     info_dicts = [json.loads(line.split('\t')[4]) for line in lines]
