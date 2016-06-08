@@ -70,11 +70,11 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True)
                     gright in filtered_concepts and
                     fvalue != 0
                 ):
-                    if left in senses and senses[left] != '*':
+                    if rel != '/r/SenseOf' and left in senses and senses[left] != '*':
                         sleft = senses[left]
                     else:
                         sleft = left
-                    if right in senses and senses[right] != '*':
+                    if rel != '/r/SenseOf' and right in senses and senses[right] != '*':
                         sright = senses[right]
                     else:
                         sright = right
