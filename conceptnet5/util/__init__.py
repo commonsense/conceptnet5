@@ -2,6 +2,8 @@ import pkg_resources
 import os
 
 DATA_DIR = os.environ.get('CONCEPTNET_DATA') or os.path.expanduser('~/.conceptnet5')
+if not os.path.exists(DATA_DIR):
+    DATA_DIR = 'data'
 
 
 def get_support_data_filename(filename):
