@@ -99,9 +99,9 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
     # the reference points.
     reference_vecs = pd.DataFrame(projected.loc[common_vocab])
     # Get a truncation of the reference_vecs matrix so we can make quick,
-    # sloppy comparisons. Again, indices of a DataFrame are inclusive, so 0:99
-    # is the first 100 columns.
-    reference_vecs_small = pd.DataFrame(reference_vecs.ix[:, 0:99])
+    # sloppy comparisons. Again, indices of a DataFrame are inclusive, so 0:199
+    # is the first 200 columns.
+    reference_vecs_small = pd.DataFrame(reference_vecs.ix[:, 0:199])
 
     # Build a matrix that will contain our final term vectors. We already know
     # the vectors for terms that appear in both vocabularies, because they're the
@@ -127,7 +127,7 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         # the overlapping vectors.
         query_vec = vec.dot(projection)
         # this is a NumPy array, so endpoints are exclusive
-        query_vec_small = query_vec[:100]
+        query_vec_small = query_vec[:200]
 
         # Get some similar common terms
         most_similar_sloppy = similar_to_vec(reference_vecs_small, query_vec_small, num=50)
