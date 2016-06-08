@@ -35,14 +35,17 @@ def get_vector(frame, text, language=None):
     a label that is already in ConceptNet form.
     """
     if language is not None and not text.startswith('/'):
-        text = standardized_concept_uri(language, text)
+        text = standardized_uri(language, text)
     try:
         return frame.loc[text]
     except KeyError:
         lem = lemmatize_uri(text)
         try:
-            return frame.loc[text]
+            vec = frame.loc[lem]
+            print("Lemmatized: %r => %r" % (text, lem))
+            return vec
         except KeyError:
+            print("No vector found for %r or %r" % (text, lem))
             return pd.Series(index=frame.columns)
 
 
