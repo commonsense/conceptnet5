@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.nodes import ALL_LANGUAGES, get_uri_language
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import Licenses, split_uri
+from conceptnet5.uri import Licenses, split_uri, conjunction_uri
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import itertools
 import json
@@ -54,10 +54,15 @@ def make_assertion(line_group):
     dataset = info_dicts[0]['dataset']
     surface_text = None
     sources = []
+    seen_sources = set()
     for info in info_dicts:
         if surface_text is None and 'surfaceText' in info:
             surface_text = info['surfaceText']
-        sources.extend(info['sources'])
+        for subsource in info['sources']:
+            conjunction = conjunction_uri(*sorted(subsource.values()))
+            if conjunction not in seen_sources:
+                sources.append(subsource)
+                seen_sources.add(conjunction)
 
     weight = weight_scale(unscaled_weight)
     if Licenses.cc_sharealike in licenses:

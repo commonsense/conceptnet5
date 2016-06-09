@@ -59,15 +59,32 @@ RELATIONS_TO_DROP = {
     '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom', '/r/SimilarSize'
 }
 CONTRIBUTOR_BLACKLIST = {
-    'brunogodoifred', 'thisislike', 'davidhere40', 'tdpoets', 'gcgirl',
-    'maratrea', 'poorrichard', 'coolio', 'wendybendy', 'kaaru',
-    'bntman', 'cyberguy', 'ddiblasi', 'glneumiller', 'imn8xtc', 'holyrobot',
-    'lbeckwith', 'maliki', 'sarcastro98', 'wellner'
+    '/s/contributor/omcs/brunogodoifred',
+    '/s/contributor/omcs/thisislike',
+    '/s/contributor/omcs/davidhere40',
+    '/s/contributor/omcs/tdpoets',
+    '/s/contributor/omcs/gcgirl',
+    '/s/contributor/omcs/maratrea',
+    '/s/contributor/omcs/poorrichard',
+    '/s/contributor/omcs/coolio',
+    '/s/contributor/omcs/wendybendy',
+    '/s/contributor/omcs/kaaru',
+    '/s/contributor/omcs/bntman',
+    '/s/contributor/omcs/cyberguy',
+    '/s/contributor/omcs/ddiblasi',
+    '/s/contributor/omcs/glneumiller',
+    '/s/contributor/omcs/imn8xtc',
+    '/s/contributor/omcs/holyrobot',
+    '/s/contributor/omcs/lbeckwith',
+    '/s/contributor/omcs/maliki',
+    '/s/contributor/omcs/sarcastro98',
+    '/s/contributor/omcs/wellner'
 }
 CONCEPT_BLACKLIST = {
-    '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/often', '/c/en/she',
+    '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/she',
     '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
     '/c/en/they', '/c/en/this', '/c/en/you',
+    '/c/en/often', '/c/en/sometimes', '/c/en/usually'
 }
 ACTIVITY_BLACKLIST = {
     "20 Questions",

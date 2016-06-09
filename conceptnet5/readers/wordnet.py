@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
-    NTriplesReader, resource_name, full_conceptnet_url
+    NTriplesReader, resource_name
 )
 
 
@@ -164,12 +164,12 @@ def run_wordnet(input_file, output_file, sw_map_file):
         synset_disambig[synset] = (pos, category_name)
 
         canon = synset_canonical_labels[synset]
-        canon_uri = standardized_concept_uri('en', canon, pos, category_name)
+        canon_uri = standardized_concept_uri('en', canon, pos, 'wn', category_name)
         synset_uris[synset] = canon_uri
 
         for label in labels:
             if label != canon:
-                other_uri = standardized_concept_uri('en', label, pos, category_name)
+                other_uri = standardized_concept_uri('en', label, pos, 'wn', category_name)
                 rel_uri = '/r/Synonym'
                 surface = '[[{0}]] is a synonym of [[{1}]]'.format(label, canon)
                 edge = make_edge(
@@ -236,6 +236,7 @@ def main():
     parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
     args = parser.parse_args()
     run_wordnet(args.input_file, args.output, args.sw_map)
+
 
 if __name__ == '__main__':
     main()

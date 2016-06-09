@@ -1,5 +1,3 @@
-# coding: utf-8
-from conceptnet5.uri import ROOT_URL
 from ftfy.fixes import decode_escapes
 import sys
 import urllib
@@ -8,17 +6,9 @@ import langcodes
 SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
 
 
-if sys.version_info.major >= 3:
-    unquote = urllib.parse.unquote_to_bytes
-    quote = urllib.parse.quote
-    urlsplit = urllib.parse.urlsplit
-    string_type = str
-else:
-    import urlparse
-    urlsplit = urlparse.urlsplit
-    unquote = urllib.unquote
-    quote = urllib.quote
-    string_type = basestring
+unquote = urllib.parse.unquote_to_bytes
+quote = urllib.parse.quote
+urlsplit = urllib.parse.urlsplit
 
 
 def decode_url(url):
@@ -94,17 +84,6 @@ def resource_name(url):
             return path.split('/resource/')[-1]
         else:
             return path.split('/')[-1]
-
-
-def full_conceptnet_url(uri):
-    """
-    Translate a ConceptNet URI into a fully-specified URL.
-
-    >>> full_conceptnet_url('/c/en/dog')
-    'http://conceptnet5.media.mit.edu/data/5.4/c/en/dog'
-    """
-    assert uri.startswith('/')
-    return ROOT_URL + safe_quote(uri)
 
 
 class NTriplesWriter(object):

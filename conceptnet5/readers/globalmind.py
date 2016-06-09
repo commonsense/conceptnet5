@@ -50,6 +50,8 @@ RELATION_MAP = {
     'PrerequisiteEventOf': 'HasPrerequisite',
     'PropertyOf': 'HasProperty',
     'LocationOf': 'AtLocation',
+    'DesireOf': 'Desires',
+    'InstanceOf': 'IsA',
 }
 
 
@@ -109,13 +111,15 @@ def build_from_dir(dirname, output_file):
         node2 = u'[[' + obj['node2'] + u']]'
         surfaceText = frametext.replace('//', '')\
                                .replace('[node1]', node1)\
-                               .replace('[node2]', node2)
+                               .replace('[node2]', node2)\
+                               .replace('[nodo1]', node1)\
+                               .replace('[nodo2]', node2)
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
                          license='/l/CC/By',
                          sources=[source],
                          surfaceText=surfaceText,
-                         weight=1)
+                         weight=0.5)
 
         # User IDs 2 and 3 contain data duplicated from OMCS.
         if user_id >= 4:
@@ -148,7 +152,7 @@ def build_from_dir(dirname, output_file):
                          license=Licenses.cc_attribution,
                          sources=[source],
                          surfaceText=surfaceText,
-                         weight=1)
+                         weight=0.5)
         out.write(edge)
 
 
