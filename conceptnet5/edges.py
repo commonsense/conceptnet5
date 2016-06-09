@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from conceptnet5.uri import (assertion_uri, split_uri,
+from conceptnet5.uri import (assertion_uri, split_uri, uri_prefix,
                              parse_possible_compound_uri)
 import re
 
@@ -34,10 +34,12 @@ def make_edge(rel, start, end, dataset, license, sources,
          'uri': '/a/[/r/HasProperty/,/c/en/fire/,/c/en/hot/]',
          'weight': 1.0}
     """
+    pstart = uri_prefix(start)
+    pend = uri_prefix(end)
     features = [
-        "%s %s -" % (start, rel),
-        "%s - %s" % (start, end),
-        "- %s %s" % (rel, end)
+        "%s %s -" % (pstart, rel),
+        "%s - %s" % (pstart, pend),
+        "- %s %s" % (rel, pend)
     ]
     uri = assertion_uri(rel, start, end)
 

@@ -1,3 +1,4 @@
+from conceptnet5.uri import uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.msgpack_stream import read_msgpack_value
 from conceptnet5.hashtable.index import HashTableIndex
@@ -28,6 +29,8 @@ def field_match(matchable, query):
     query = query.rstrip('/')
     if isinstance(matchable, list):
         return any(field_match(subval, query) for subval in matchable)
+    elif isinstance(matchable, dict):
+        return any(field_match(subval, query) for subval in matchable.values())
     elif query.endswith('/.'):
         return matchable == query[:-2]
     else:
@@ -80,7 +83,7 @@ class AssertionFinder(object):
         pointer = self.search_index.weighted_random()
         return read_msgpack_value(self.edge_file, pointer)
 
-    def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10, offset=0):
+    def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10):
         """
         Given a query for a concept, return assertions about that concept grouped by
         their features (for example, "A dog wants to ..." could be a group).
@@ -90,12 +93,35 @@ class AssertionFinder(object):
         """
         groups = defaultdict(list)
         more = set()
-        for assertion in self.lookup(query, limit=scan_limit, offset=offset):
+        for assertion in self.lookup(query, limit=scan_limit):
             groupkeys = []
             if field_match(assertion['start'], query):
-                groupkeys.append('%s %s -' % (assertion['start'], assertion['rel']))
+                groupkeys.append(
+                    '{} {} -'.format(
+                        uri_prefix(assertion['start']),
+                        uri_prefix(assertion['rel'])
+                    )
+                )
+            if field_match(assertion['rel'], query):
+                groupkeys.append(
+                    '{} {} -'.format(
+                        uri_prefix(assertion['start']),
+                        uri_prefix(assertion['rel'])
+                    )
+                )
+                groupkeys.append(
+                    '- {} {}'.format(
+                        uri_prefix(assertion['rel']),
+                        uri_prefix(assertion['end'])
+                    )
+                )
             if field_match(assertion['end'], query):
-                groupkeys.append('- %s %s' % (assertion['rel'], assertion['end']))
+                groupkeys.append(
+                    '- {} {}'.format(
+                        uri_prefix(assertion['rel']),
+                        uri_prefix(assertion['end'])
+                    )
+                )
             for groupkey in groupkeys:
                 if len(groups[groupkey]) < group_limit:
                     groups[groupkey].append(assertion)
@@ -115,14 +141,13 @@ class AssertionFinder(object):
                 'feature': groupkey,
                 'more': groupkey in more,
                 'largest_weight': max(assertion['weight'] for assertion in assertions),
-                'assertions': assertions
+                'edges': assertions
             })
 
         grouped.sort(key=lambda g: -g['largest_weight'])
         return grouped
 
-    def query(self, criteria, search_key=None, limit=20, offset=0,
-              scan_limit=1000):
+    def query(self, criteria, limit=20, offset=0, scan_limit=200):
         """
         Given a dictionary of criteria, return up to `limit` assertions that
         match all of the criteria.
@@ -144,13 +169,28 @@ class AssertionFinder(object):
         if not criteria:
             return []
 
-        queries = []
         criterion_pairs = sorted(list(criteria.items()))
-        if search_key is not None:
-            if search_key not in VALID_KEYS:
-                raise KeyError("Unknown criterion: %s" % search_key)
-            search_value = criteria[search_key].rstrip('/')
-            queries = [self.lookup(search_value, limit=scan_limit)]
+        features = []
+        if 'start' in criteria and 'end' in criteria:
+            features = ['{} - {}'.format(uri_prefix(criteria['start']),
+                                         uri_prefix(criteria['end']))]
+        elif 'start' in criteria and 'rel' in criteria:
+            features = ['{} {} -'.format(uri_prefix(criteria['start']),
+                                         uri_prefix(criteria['rel']))]
+        elif 'rel' in criteria and 'end' in criteria:
+            features = ['- {} {}'.format(uri_prefix(criteria['rel']),
+                                         uri_prefix(criteria['end']))]
+        elif 'rel' in criteria and 'node' in criteria:
+            node = uri_prefix(criteria['node'])
+            rel = uri_prefix(criteria['rel'])
+            features = [
+                '{} {} -'.format(node, rel),
+                '- {} {}'.format(rel, node)
+            ]
+
+        if features:
+            queries = [self.lookup(feature, limit=scan_limit)
+                       for feature in features]
         else:
             queries = [
                 self.lookup(val, limit=scan_limit)
@@ -161,9 +201,12 @@ class AssertionFinder(object):
         queryzip = zip(*queries)
 
         matches = []
+        done = False
         for result_set in queryzip:
             for candidate in result_set:
-                if candidate is not None:
+                if candidate is None:
+                    done = True
+                else:
                     okay = True
                     for key, val in criterion_pairs:
                         if key == 'node':
@@ -177,6 +220,8 @@ class AssertionFinder(object):
                         matches.append(candidate)
                         if len(matches) >= offset + limit:
                             return matches[offset:]
+            if done:
+                break
         return matches[offset:]
 
 FINDER = AssertionFinder()
