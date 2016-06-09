@@ -5,16 +5,16 @@ from collections import defaultdict
 
 
 VALID_KEYS = {
-    'rel', 'start', 'end', 'dataset', 'license', 'sources',
+    'rel', 'start', 'end', 'node', 'dataset', 'license', 'sources',
     'surfaceText', 'uri'
 }
 INDEXED_KEYS = {
-    'rel', 'start', 'end', 'dataset', 'sources',
+    'rel', 'start', 'end', 'node', 'dataset', 'sources',
     'surfaceText', 'uri'
 }
 
 
-def field_match(value, query):
+def field_match(matchable, query):
     """
     Determines whether a given field of an edge (or, in particular, an
     assertion) matches the given query.
@@ -26,13 +26,13 @@ def field_match(value, query):
     but `/c/en/dog/.` will only match assertions about `/c/en/dog`.
     """
     query = query.rstrip('/')
-    if isinstance(value, list):
-        return any(field_match(subval, query) for subval in value)
+    if isinstance(matchable, list):
+        return any(field_match(subval, query) for subval in matchable)
     elif query.endswith('/.'):
-        return value == query[:-2]
+        return matchable == query[:-2]
     else:
-        return (value[:len(query)] == query and
-                (len(value) == len(query) or value[len(query)] == '/'))
+        return (matchable[:len(query)] == query and
+                (len(matchable) == len(query) or matchable[len(query)] == '/'))
 
 
 class AssertionFinder(object):
@@ -134,9 +134,9 @@ class AssertionFinder(object):
         will return assertions such as
 
             {
-                'start': '/c/tr/örnek/',
-                'rel': '/r/TranslationOf/',
-                'end': '/c/en/example/n/something_representative_of_a_group',
+                'start': '/c/tr/örnek',
+                'rel': '/r/TranslationOf',
+                'end': '/c/en/example/n',
                 ...
             }
         """
@@ -166,7 +166,11 @@ class AssertionFinder(object):
                 if candidate is not None:
                     okay = True
                     for key, val in criterion_pairs:
-                        if not field_match(candidate[key], val):
+                        if key == 'node':
+                            matchable = [candidate['start'], candidate['end']]
+                        else:
+                            matchable = [candidate[key]]
+                        if not field_match(matchable, val):
                             okay = False
                             break
                     if okay:
