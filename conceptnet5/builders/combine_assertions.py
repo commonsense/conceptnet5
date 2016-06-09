@@ -59,7 +59,7 @@ def make_assertion(line_group):
         if surface_text is None and 'surfaceText' in info:
             surface_text = info['surfaceText']
         for subsource in info['sources']:
-            conjunction = conjunction_uri(sorted(subsource.values()))
+            conjunction = conjunction_uri(*sorted(subsource.values()))
             if conjunction not in seen_sources:
                 sources.append(subsource)
                 seen_sources.add(conjunction)
