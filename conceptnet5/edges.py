@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from conceptnet5.uri import (assertion_uri, split_uri, uri_prefix,
-                             parse_possible_compound_uri)
+                             conjunction_uri, parse_possible_compound_uri)
 import re
 
 
@@ -65,22 +65,6 @@ def make_edge(rel, start, end, dataset, license, sources,
     return obj
 
 
-def source_uri_to_resource(uri):
-    components = parse_possible_compound_uri('and', uri)
-    resource = {'uri': uri}
-    for component in components:
-        uri_pieces = split_uri(component)
-        if uri_pieces[1] in {'rule', 'process'}:
-            resource['process'] = component
-        elif uri_pieces[1] in {'activity', 'site'}:
-            resource['activity'] = component
-        elif uri_pieces[1] in {'contributor', 'resource'}:
-            resource['contributor'] = component
-        else:
-            raise ValueError(component)
-    return resource
-
-
 SURFACE_FORM_PATTERN = re.compile(r'\[\[(.*?)\]\]')
 
 
@@ -111,3 +95,27 @@ def extract_surface_terms(surface):
     if surface.startswith('*'):
         surface_terms = surface_terms[::-1]
     return surface_terms
+
+
+def transform_for_linked_data(edge):
+    """
+    Modify an edge (assertion) in place to contain values that are appropriate
+    for a Linked Data API.
+
+    Although this code isn't actually responsible for what an API returns
+    (see the conceptnet-web repository for that), it helps to deal with what
+    edge dictionaries should contain here.
+
+    The relevant changes are:
+
+    - Remove the 'features' list
+    - All dictionaries should have an '@id'. For the edge itself, it's the
+      URI. Without this, we get RDF blank nodes, which are awful.
+    """
+    if 'features' in edge:
+        del edge['features']
+    for source in edge['sources']:
+        conj = conjunction_uri(*sorted(source.values()))
+        source['@id'] = conj
+    edge['@id'] = edge['uri']
+    return edge
