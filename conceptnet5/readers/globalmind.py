@@ -111,7 +111,9 @@ def build_from_dir(dirname, output_file):
         node2 = u'[[' + obj['node2'] + u']]'
         surfaceText = frametext.replace('//', '')\
                                .replace('[node1]', node1)\
-                               .replace('[node2]', node2)
+                               .replace('[node2]', node2)\
+                               .replace('[nodo1]', node1)\
+                               .replace('[nodo2]', node2)
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
                          license='/l/CC/By',
