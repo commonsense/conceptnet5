@@ -119,7 +119,7 @@ def build_from_dir(dirname, output_file):
                          license='/l/CC/By',
                          sources=[source],
                          surfaceText=surfaceText,
-                         weight=1)
+                         weight=0.5)
 
         # User IDs 2 and 3 contain data duplicated from OMCS.
         if user_id >= 4:
@@ -152,7 +152,7 @@ def build_from_dir(dirname, output_file):
                          license=Licenses.cc_attribution,
                          sources=[source],
                          surfaceText=surfaceText,
-                         weight=1)
+                         weight=0.5)
         out.write(edge)
 
 
