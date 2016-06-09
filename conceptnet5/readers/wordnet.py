@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
-    NTriplesReader, resource_name, full_conceptnet_url
+    NTriplesReader, resource_name
 )
 
 

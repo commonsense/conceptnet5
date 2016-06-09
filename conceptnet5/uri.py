@@ -5,12 +5,12 @@ URIs are Unicode strings that represent the canonical name for any object in
 ConceptNet. These can be used with the ConceptNet Web API, or referred to in a
 Semantic Web application, by attaching the prefix:
 
-    http://conceptnet5.media.mit.edu/data/VERSION
+    http://api.conceptnet.io
 
 For example, the English concept "book" has the URI '/c/en/book'. This concept
 can be referred to, or retrieved, using this complete URI (in version 5.2):
 
-    http://conceptnet5.media.mit.edu/data/5.2/c/en/book
+    http://api.conceptnet.io/c/en/book
 """
 
 import sys
@@ -19,10 +19,6 @@ from conceptnet5 import __version__ as VERSION
 
 if sys.version_info.major >= 3:
     unicode = str
-
-# All URIs are conceptually appended to this URL, when we need to interoperate
-# with Semantic Web-style resources.
-ROOT_URL = 'http://conceptnet5.media.mit.edu/data/%s' % VERSION
 
 # Whitespace should be replaced with underscores in URIs.
 WHITESPACE_RE = re.compile('[\s]')

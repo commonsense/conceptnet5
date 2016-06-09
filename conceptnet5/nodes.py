@@ -6,22 +6,11 @@ puts the tools in conceptnet5.uri together with functions that normalize
 terms and languages into a standard form.
 """
 
-from conceptnet5.language.english import english_filter, english_lemmatized_filter
+from conceptnet5.language.english import english_filter
 from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import concept_uri, split_uri, parse_possible_compound_uri
 from ftfy import fix_text
 import re
-
-
-SYMMETRIC_RELATIONS = {
-    '/r/RelatedTo',
-    '/r/SimilarTo',
-    '/r/TranslationOf',
-    '/r/EtymologicallyRelatedTo',
-    '/r/Synonym',
-    '/r/Antonym',
-    '/r/DistinctFrom'
-}
 
 
 LCODE_ALIASES = {
