@@ -17,13 +17,10 @@ def concept_is_bad(uri):
 
 def generalized_uri(uri):
     pieces = split_uri(uri)
-    if len(pieces) >= 5:
-        return join_uri(*pieces[:4])
-    else:
-        return join_uri(*pieces[:3])
+    return join_uri(*pieces[:3])
 
 
-def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4, verbose=True):
+def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3, verbose=True):
     """
     Removes uncommon associations and associations unlikely to be useful.
     This function expects files of the form part_*.csv in `dirname` and will

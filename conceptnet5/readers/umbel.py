@@ -13,7 +13,7 @@ from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, standardized_concept_name, standardize_text
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import NTriplesReader, resource_name, full_conceptnet_url
+from conceptnet5.formats.semantic_web import NTriplesReader, resource_name
 from collections import defaultdict
 import os
 
@@ -112,9 +112,9 @@ def run_umbel(input_dir, output_file, sw_map_file):
                     rel_uri, frame = REL_MAPPING[rel_name]
                     surface = frame % (labels[web_subj], labels[web_obj])
                     out.write(umbel_edge(rel_uri, subj_uri, obj_uri, surface, SOURCE))
-                    map_out.write('{}\t{}'.format(web_rel, full_conceptnet_url(rel_uri)))
-                    map_out.write('{}\t{}'.format(web_subj, full_conceptnet_url(subj_uri)))
-                    map_out.write('{}\t{}'.format(web_obj, full_conceptnet_url(obj_uri)))
+                    map_out.write('{}\t{}'.format(web_rel, rel_uri))
+                    map_out.write('{}\t{}'.format(web_subj, subj_uri))
+                    map_out.write('{}\t{}'.format(web_obj, obj_uri))
 
         # altLabel relations assign different texts to the same node. We'll
         # represent those in ConceptNet with Synonym relations.
