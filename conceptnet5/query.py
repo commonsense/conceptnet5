@@ -1,16 +1,7 @@
-# coding: utf-8
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.msgpack_stream import read_msgpack_value
 from conceptnet5.hashtable.index import HashTableIndex
 from collections import defaultdict
-import sys
-import itertools
-
-
-if sys.version_info.major == 2:
-    from itertools import izip
-else:
-    izip = zip
 
 
 VALID_KEYS = {
@@ -40,8 +31,8 @@ def field_match(value, query):
     elif query.endswith('/.'):
         return value == query[:-2]
     else:
-        return (value[:len(query)] == query
-                and (len(value) == len(query) or value[len(query)] == '/'))
+        return (value[:len(query)] == query and
+                (len(value) == len(query) or value[len(query)] == '/'))
 
 
 class AssertionFinder(object):
@@ -167,7 +158,7 @@ class AssertionFinder(object):
                 if key in INDEXED_KEYS
             ]
 
-        queryzip = izip(*queries)
+        queryzip = zip(*queries)
 
         matches = []
         for result_set in queryzip:
