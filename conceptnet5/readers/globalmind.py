@@ -50,6 +50,8 @@ RELATION_MAP = {
     'PrerequisiteEventOf': 'HasPrerequisite',
     'PropertyOf': 'HasProperty',
     'LocationOf': 'AtLocation',
+    'DesireOf': 'Desires',
+    'InstanceOf': 'IsA',
 }
 
 
