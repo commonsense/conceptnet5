@@ -76,8 +76,8 @@ def make_paginated_view(uri, offset, limit, more):
 
 class AssertionFinder(object):
     def __init__(self, index_filename=None, edge_filename=None):
-        self._index_filename = index_filename or get_data_filename('old/db/assertions.index')
-        self._edge_filename = edge_filename or get_data_filename('old/assertions/assertions.msgpack')
+        self._index_filename = index_filename or get_data_filename('db/assertions.index')
+        self._edge_filename = edge_filename or get_data_filename('assertions/assertions.msgpack')
         self.search_index = None
 
     def load_index(self):
