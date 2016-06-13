@@ -3,8 +3,6 @@ from conceptnet5.edges import transform_for_linked_data
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.msgpack_stream import read_msgpack_value
 from conceptnet5.hashtable.index import HashTableIndex
-from conceptnet5.relations import SYMMETRIC_RELATIONS
-from collections import defaultdict
 
 
 VALID_KEYS = {
@@ -38,40 +36,6 @@ def field_match(matchable, query):
     else:
         return (matchable[:len(query)] == query and
                 (len(matchable) == len(query) or matchable[len(query)] == '/'))
-
-
-def groupkey_to_features(groupkey):
-    groupdict = dict(groupkey)
-    if 'node' in groupdict:
-        return ['{} {} -'.format(groupdict['node'], groupdict['rel']),
-                '- {} {}'.format(groupdict['rel'], groupdict['node'])]
-    else:
-        feat = '{} {} {}'.format(
-            groupdict.get('start', '-'),
-            groupdict.get('rel', '-'),
-            groupdict.get('end', '-')
-        )
-        return [feat]
-
-
-def groupkey_to_query(groupkey):
-    params = ['{}={}'.format(key, val) for key, val in groupkey]
-    return '&'.join(params)
-
-
-def make_paginated_view(uri, offset, limit, more):
-    prev_offset = max(0, offset - limit)
-    next_offset = offset + limit
-    pager = {
-        '@id': '{}&offset={}&limit={}'.format(uri, offset, limit),
-        'firstPage': '{}&offset=0&limit={}'.format(uri, limit),
-        'paginatedProperty': 'edges'
-    }
-    if offset > 0:
-        pager['previousPage'] = '{}&offset={}&limit={}'.format(uri, prev_offset, limit)
-    if more:
-        pager['nextPage'] = '{}&offset={}&limit={}'.format(uri, next_offset, limit)
-    return pager
 
 
 class AssertionFinder(object):
@@ -119,65 +83,6 @@ class AssertionFinder(object):
         pointer = self.search_index.weighted_random()
         return transform_for_linked_data(read_msgpack_value(self.edge_file, pointer))
 
-    def lookup_grouped_by_feature(self, query, scan_limit=200, group_limit=10):
-        """
-        Given a query for a concept, return assertions about that concept grouped by
-        their features (for example, "A dog wants to ..." could be a group).
-
-        It will scan up to `scan_limit` assertions to find out which features exist,
-        then retrieve `group_limit` assertions for each feature if possible.
-        """
-        groups = defaultdict(list)
-        more = set()
-        for assertion in self.lookup(query, limit=scan_limit):
-            groupkeys = []
-            start = uri_prefix(assertion['start'])
-            rel = assertion['rel']
-            end = uri_prefix(assertion['end'])
-            symmetric = rel in SYMMETRIC_RELATIONS
-            if symmetric:
-                groupkeys.append((('rel', rel), ('node', uri_prefix(query))))
-            else:
-                if field_match(assertion['start'], query):
-                    groupkeys.append((('rel', rel), ('start', start)))
-                if field_match(assertion['end'], query):
-                    groupkeys.append((('rel', rel), ('end', end)))
-            for groupkey in groupkeys:
-                print(groupkey)
-                if len(groups[groupkey]) < group_limit:
-                    groups[groupkey].append(assertion)
-                else:
-                    more.add(groupkey)
-
-        for groupkey in groups:
-            if len(groups[groupkey]) < group_limit:
-                num_more = group_limit - len(groups[groupkey])
-                for feature in groupkey_to_features(groupkey):
-                    # TODO: alternate between features when there are
-                    # multiple possibilities?
-                    for assertion in self.lookup(feature, limit=num_more):
-                        groups[groupkey].append(assertion)
-
-        grouped = []
-        for groupkey in groups:
-            base_uri = '/query?'
-            group_uri = base_uri + groupkey_to_query(groupkey)
-            assertions = groups[groupkey]
-            group = {
-                '@id': group_uri,
-                'largest_weight': max(assertion['weight'] for assertion in assertions),
-                'edges': assertions
-            }
-            if groupkey in more:
-                view = make_paginated_view(group_uri, 0, group_limit, more=True)
-                group['view'] = view
-            grouped.append(group)
-
-        grouped.sort(key=lambda g: -g['largest_weight'])
-        for group in grouped:
-            del group['largest_weight']
-        return grouped
-
     def query(self, criteria, limit=20, offset=0, scan_limit=200):
         """
         Given a dictionary of criteria, return up to `limit` assertions that
@@ -220,7 +125,7 @@ class AssertionFinder(object):
             ]
 
         if features:
-            queries = [self.lookup(feature, limit=scan_limit)
+            queries = [self.lookup(feature, limit=limit)
                        for feature in features]
         else:
             queries = [
