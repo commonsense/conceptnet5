@@ -326,5 +326,5 @@ def and_or_tree(list_of_lists):
 
 
 class Licenses:
-    cc_attribution = '/l/CC/By'
-    cc_sharealike = '/l/CC/By-SA'
+    cc_attribution = 'cc:by/4.0'
+    cc_sharealike = 'cc:by-sa/4.0'
