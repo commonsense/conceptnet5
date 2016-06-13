@@ -121,13 +121,17 @@ AND NOT (site_language='de' AND
 """
 
 
+LEMMA_FILENAME = get_data_filename('db/wiktionary.db')
+
+
 class DBLemmatizer:
-    def __init__(self):
+    def __init__(self, filename=LEMMA_FILENAME):
+        self.filename = filename
         self.db = None
 
     def lookup(self, language, word, pos=None):
         if self.db is None:
-            self.db = sqlite3.connect(get_data_filename('db/wiktionary.db'))
+            self.db = sqlite3.connect(self.filename)
         if language not in LEMMATIZED_LANGUAGES:
             return word, ''
         exceptions = EXCEPTIONS.get(language, {})
@@ -174,6 +178,19 @@ class DBLemmatizer:
                 form = ''
             return root, form
 
+    def lemmatize_uri(self, uri):
+        pieces = split_uri(uri)
+        language = pieces[1]
+        text = pieces[2]
+        rest = pieces[3:]
+        if rest:
+            pos = rest[0]
+        else:
+            pos = None
+
+        root, _form = self.lookup(language, text, pos)
+        return join_uri('c', language, root, *rest)
+
 LEMMATIZER = DBLemmatizer()
 
 
@@ -198,14 +215,4 @@ def lemmatize(language, word, pos=None):
 
 
 def lemmatize_uri(uri):
-    pieces = split_uri(uri)
-    language = pieces[1]
-    text = pieces[2]
-    rest = pieces[3:]
-    if rest:
-        pos = rest[0]
-    else:
-        pos = None
-
-    root, _form = LEMMATIZER.lookup(language, text, pos)
-    return join_uri('c', language, root, *rest)
+    return LEMMATIZER.lemmatize_uri(uri)

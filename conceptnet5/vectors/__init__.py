@@ -27,21 +27,21 @@ def standardized_uri(language, term):
     return replace_numbers(standardized_concept_uri(language, term))
 
 
-def get_vector(frame, text, language=None):
+def get_vector(frame, label, language=None):
     """
     Returns the row of a vector-space DataFrame `frame` corresponding
     to the text `text`. If `language` is set, this can take in plain text
     and normalize it to ConceptNet form. Either way, it can also take in
     a label that is already in ConceptNet form.
     """
-    if language is not None and not text.startswith('/'):
-        text = standardized_concept_uri(language, text)
+    if language is not None and not label.startswith('/'):
+        label = standardized_uri(language, label)
     try:
-        return frame.loc[text]
+        return frame.loc[label]
     except KeyError:
-        lem = lemmatize_uri(text)
+        label = lemmatize_uri(label)
         try:
-            return frame.loc[text]
+            return frame.loc[label]
         except KeyError:
             return pd.Series(index=frame.columns)
 
@@ -81,6 +81,9 @@ def get_similarity(frame, text1, text2, language=None):
 
 
 def weighted_average(frame, weight_series):
+    if isinstance(weight_series, list):
+        weight_dict = dict(weight_series)
+        weight_series = pd.Series(weight_dict)
     vec = np.zeros(frame.shape[1], dtype='f')
 
     for label in weight_series.index:
