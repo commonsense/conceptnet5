@@ -2,6 +2,7 @@ from __future__ import unicode_literals, print_function
 from conceptnet5.nodes import COMMON_LANGUAGES, get_uri_language
 from conceptnet5.uri import split_uri, join_uri
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
+from conceptnet5.formats.semantic_web import NTriplesWriter
 from collections import defaultdict
 import click
 import json
@@ -116,6 +117,16 @@ def msgpack_to_assoc(input_filename, output_filename):
         print(avg_weight_by_dataset)
 
 
+def assoc_to_n_triples(input_filename, output_filename):
+    with open(input_filename, encoding='utf-8') as infile:
+        writer = NTriplesWriter(output_filename)
+        for line in infile:
+            line = line.rstrip()
+            if line:
+                c1, c2, _wt, _dataset, rel = line.split('\t', 4)
+                writer.write((c1, rel, c2))
+
+
 @click.command()
 @click.argument('converter', type=str)
 @click.argument('input', type=click.Path(readable=True, dir_okay=False))
@@ -132,4 +143,6 @@ def cli(converter, input, output):
         convert_func = msgpack_to_tab_separated
     elif converter == 'msgpack_to_assoc':
         convert_func = msgpack_to_assoc
+    elif converter == 'assoc_to_n_triples':
+        convert_func = assoc_to_n_triples
     convert_func(input, output)

@@ -174,7 +174,7 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 surface = '[[{0}]] is a synonym of [[{1}]]'.format(label, canon)
                 edge = make_edge(
                     rel_uri, other_uri, canon_uri, dataset=DATASET, surfaceText=surface,
-                    license='/l/CC/By', sources=[SOURCE], weight=2.0
+                    license=Licenses.cc_attribution, sources=[SOURCE], weight=2.0
                 )
                 out.write(edge)
 

@@ -116,7 +116,7 @@ def build_from_dir(dirname, output_file):
                                .replace('[nodo2]', node2)
         edge = make_edge(rel, start, end,
                          dataset='/d/globalmind',
-                         license='/l/CC/By',
+                         license=Licenses.cc_attribution,
                          sources=[source],
                          surfaceText=surfaceText,
                          weight=0.5)

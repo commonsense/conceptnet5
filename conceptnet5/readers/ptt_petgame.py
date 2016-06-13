@@ -5,6 +5,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.util import get_support_data_filename
+from conceptnet5.uri import Licenses
 
 
 FRAME_DATA = json.load(
@@ -27,7 +28,7 @@ def handle_raw_assertion(line):
         'activity': '/s/activity/ptt/petgame'
     }
     yield make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
-                    license='/l/CC/By', sources=[source],
+                    license=Licenses.cc_attribution, sources=[source],
                     surfaceText=surfaceText, weight=1)
 
 

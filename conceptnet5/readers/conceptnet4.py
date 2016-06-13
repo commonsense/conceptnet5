@@ -78,7 +78,8 @@ CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/lbeckwith',
     '/s/contributor/omcs/maliki',
     '/s/contributor/omcs/sarcastro98',
-    '/s/contributor/omcs/wellner'
+    '/s/contributor/omcs/wellner',
+    '/s/contributor/omcs/talshadar'
 }
 CONCEPT_BLACKLIST = {
     '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/she',
