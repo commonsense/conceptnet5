@@ -46,7 +46,7 @@ class VectorSpaceWrapper(object):
         try:
             self.frame = load_hdf(self.vector_filename)
             self.k = self.frame.shape[1]
-            self.small_k = self.k // 4
+            self.small_k = self.k // 3
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
         except OSError:
             raise MissingVectorSpace(
