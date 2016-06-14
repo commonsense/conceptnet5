@@ -24,7 +24,18 @@ def replace_numbers(s):
 
 
 def standardized_uri(language, term):
-    return replace_numbers(standardized_concept_uri(language, term))
+    """
+    Get a URI that is suitable to label a row of a vector space, by making sure
+    that both ConceptNet's and word2vec's normalizations are applied to it.
+
+    If the term already looks like a ConceptNet URI, it will only have its
+    sequences of digits replaced by #. Otherwise, it will be turned into a
+    ConceptNet URI in the given language, and then have its sequences of digits
+    replaced.
+    """
+    if not term.startswith('/'):
+        term = standardized_concept_uri(language, term)
+    return replace_numbers(term)
 
 
 def get_vector(frame, label, language=None):

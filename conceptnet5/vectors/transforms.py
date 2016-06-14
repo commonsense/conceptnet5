@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from ..vectors import standardized_uri
+from conceptnet5.uri import uri_prefix
 from conceptnet5.language.lemmatize import lemmatize_uri
 
 
@@ -12,7 +13,7 @@ def standardize_row_labels(frame, language='en', forms=True):
     standardized URI get combined, with earlier rows given more weight.
     """
     # Re-label the DataFrame with standardized, non-unique row labels
-    frame.index = [standardized_uri(language, label) for label in frame.index]
+    frame.index = [uri_prefix(standardized_uri(language, label)) for label in frame.index]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
     nrows = frame.shape[0]
