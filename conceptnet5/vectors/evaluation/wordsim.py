@@ -1,5 +1,6 @@
-from conceptnet5.util import get_data_filename, get_support_data_filename
-from conceptnet5.vectors import get_vector, get_similarity
+from conceptnet5.util import get_support_data_filename
+from conceptnet5.vectors import get_vector, standardized_uri
+from conceptnet5.vectors.query import VectorSpaceWrapper
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
@@ -15,9 +16,20 @@ def read_ws353():
     """
     with open(get_support_data_filename('wordsim-353/combined.csv')) as file:
         for line in file:
-            if line.startswith('Word 1'): # Skip the header
+            if line.startswith('Word 1'):  # Skip the header
                 continue
             term1, term2, sscore = line.split(',')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score
+
+
+def read_ws353_multilingual(language):
+    if language == 'es':
+        language = 'es.fixed'
+    filename = 'wordsim-353/{}.tab'.format(language)
+    with open(get_support_data_filename(filename)) as file:
+        for line in file:
+            term1, term2, sscore = line.split('\t')
             gold_score = float(sscore)
             yield term1, term2, gold_score
 
@@ -72,7 +84,7 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def spearman_evaluate(frame, standard, language='en', verbose=0):
+def spearman_evaluate(vectors, standard, language='en', verbose=0):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word
@@ -82,7 +94,9 @@ def spearman_evaluate(frame, standard, language='en', verbose=0):
     our_scores = []
 
     for term1, term2, gold_score in standard:
-        our_score = get_similarity(frame, term1, term2, language)
+        uri1 = standardized_uri(language, term1)
+        uri2 = standardized_uri(language, term2)
+        our_score = vectors.get_similarity(uri1, uri2)
         if verbose > 1:
             print('%s\t%s\t%3.3f\t%3.3f' % (term1, term2, gold_score, our_score))
         gold_scores.append(gold_score)
@@ -102,8 +116,12 @@ def evaluate(frame, subset='dev'):
     term relatedness, according to MEN-3000, RW, and WordSim-353. Return
     a Series containing these three labeled results.
     """
-    men_score = spearman_evaluate(frame, read_men3000(subset))
-    rw_score = spearman_evaluate(frame, read_rw(subset))
-    ws_score = spearman_evaluate(frame, read_ws353())
-    results = pd.Series([men_score, rw_score, ws_score], index=['men3000', 'rw', 'ws353'])
+    vectors = VectorSpaceWrapper(frame=frame)
+    men_score = spearman_evaluate(vectors, read_men3000(subset))
+    rw_score = spearman_evaluate(vectors, read_rw(subset))
+    ws_score = spearman_evaluate(vectors, read_ws353())
+    ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
+    ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
+    results = pd.Series([men_score, rw_score, ws_score, ws_es_score, ws_ro_score],
+                        index=['men3000', 'rw', 'ws353', 'ws353-es', 'ws353-ro'])
     return results

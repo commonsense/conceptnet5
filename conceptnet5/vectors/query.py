@@ -1,7 +1,9 @@
 from conceptnet5.query import field_match, AssertionFinder
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
-from conceptnet5.vectors import similar_to_vec, weighted_average, normalize_vec
+from conceptnet5.vectors import (
+    similar_to_vec, weighted_average, normalize_vec, cosine_similarity
+)
 from conceptnet5.language.lemmatize import DBLemmatizer, LEMMA_FILENAME
 from conceptnet5.uri import uri_prefix
 import pandas as pd
@@ -26,25 +28,32 @@ class VectorSpaceWrapper(object):
     def __init__(self, vector_filename=None,
                  index_filename=None,
                  edge_filename=None,
-                 lemma_filename=None):
-        self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch-small-1606.h5')
+                 lemma_filename=None,
+                 frame=None):
+        if frame is None:
+            self.frame = None
+            self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch-small-1606.h5')
+        else:
+            self.frame = frame
+            self.vector_filename = None
         self.index_filename = index_filename
         self.edge_filename = edge_filename
         self.lemma_filename = lemma_filename or LEMMA_FILENAME
-        self.frame = None
         self.small_frame = None
         self.k = None
         self.small_k = None
         self.finder = None
+        self.lemmatizer = None
 
     def load(self):
         """
         Ensure that all the data is loaded.
         """
-        if self.frame is not None:
+        if self.finder is not None:
             return
         try:
-            self.frame = load_hdf(self.vector_filename)
+            if self.frame is None:
+                self.frame = load_hdf(self.vector_filename)
             self.k = self.frame.shape[1]
             self.small_k = self.k // 3
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
@@ -80,7 +89,7 @@ class VectorSpaceWrapper(object):
             expanded.append((lemma, weight / 10))
             if not list(self.finder.lookup(term, limit=1)):
                 term = lemma
-            if include_neighbors:
+            if include_neighbors and term not in self.frame.index:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
                     if field_match(edge['start'], term) and not field_match(edge['end'], term):
                         neighbor = edge['end']
@@ -112,6 +121,7 @@ class VectorSpaceWrapper(object):
         If there are 5 or fewer terms involved, this will allow expanded_vector
         to look up neighboring terms in ConceptNet.
         """
+        self.load()
         if isinstance(query, pd.DataFrame) or isinstance(query, dict):
             terms = list(query.items())
         elif isinstance(query, str):
@@ -153,3 +163,8 @@ class VectorSpaceWrapper(object):
         similar_choices = self.frame.loc[similar_sloppy.index]
         similar = similar_to_vec(similar_choices, vec, num=limit)
         return similar
+
+    def get_similarity(self, query1, query2):
+        vec1 = self.get_vector(query1)
+        vec2 = self.get_vector(query2)
+        return cosine_similarity(vec1, vec2)

@@ -54,11 +54,20 @@ def get_vector(frame, label, language=None):
         try:
             return frame.loc[label]
         except KeyError:
+            print("Out of vocabulary: %r" % label)
             return pd.Series(index=frame.columns)
 
 
 def normalize_vec(vec):
-    return normalize(vec.fillna(0).reshape(1, -1))[0]
+    """
+    Normalize a single vector, as a 1-D ndarray or a Series.
+    """
+    if isinstance(vec, pd.Series):
+        return normalize(vec.fillna(0).reshape(1, -1))[0]
+    elif isinstance(vec, np.ndarray):
+        return normalize(vec.reshape(1, -1))[0]
+    else:
+        raise TypeError(vec)
 
 
 def cosine_similarity(vec1, vec2):
@@ -70,25 +79,11 @@ def cosine_similarity(vec1, vec2):
     return normalize_vec(vec1).dot(normalize_vec(vec2))
 
 
-def similar_to(frame, text, num=50, language=None):
-    """
-    Returns a sorted Series of the items with vectors most similar to `text`.
-    """
-    vec = get_vector(frame, text, language)
-    return similar_to_vec(frame, vec)
-
-
 def similar_to_vec(frame, vec, num=50):
     similarity = frame.dot(vec).sort_values(ascending=False, inplace=False)
     if num is not None:
         similarity = similarity.iloc[0:num]
     return similarity.dropna()
-
-
-def get_similarity(frame, text1, text2, language=None):
-    vec1 = get_vector(frame, text1, language)
-    vec2 = get_vector(frame, text2, language)
-    return cosine_similarity(vec1, vec2)
 
 
 def weighted_average(frame, weight_series):
