@@ -44,7 +44,7 @@ def make_edge(rel, start, end, dataset, license, sources,
     uri = assertion_uri(rel, start, end)
 
     assert isinstance(sources, list), sources
-    assert [isinstance(source, dict) for source in sources], sources
+    assert all([isinstance(source, dict) for source in sources]), sources
 
     if surfaceStart is None or surfaceEnd is None:
         surfaceStart, surfaceEnd = extract_surface_terms(surfaceText)

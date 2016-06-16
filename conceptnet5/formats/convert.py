@@ -21,8 +21,9 @@ def msgpack_to_tab_separated(input_filename, output_filename):
                 'dataset': info['dataset'],
                 'license': info['license']
             }
-            if info.get('surfaceText'):
-                extra_info['surfaceText'] = info['surfaceText']
+            for extra_key in 'surfaceText', 'surfaceStart', 'surfaceEnd':
+                if info.get(extra_key):
+                    extra_info[extra_key] = info[extra_key]
 
             json_info = json.dumps(extra_info, ensure_ascii=False)
             column_values = [info[col] for col in columns] + [json_info]
