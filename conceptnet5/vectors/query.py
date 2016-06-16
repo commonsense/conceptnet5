@@ -159,9 +159,9 @@ class VectorSpaceWrapper(object):
             start_idx = search_frame.index.get_loc(start_key, method='ffill')
             end_idx = search_frame.index.get_loc(end_key, method='bfill')
             search_frame = search_frame.iloc[start_idx:end_idx]
-        similar_sloppy = similar_to_vec(search_frame, small_vec, num=limit * 50)
+        similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
         similar_choices = self.frame.loc[similar_sloppy.index]
-        similar = similar_to_vec(similar_choices, vec, num=limit)
+        similar = similar_to_vec(similar_choices, vec, limit=limit)
         return similar
 
     def get_similarity(self, query1, query2):

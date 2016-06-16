@@ -79,11 +79,11 @@ def cosine_similarity(vec1, vec2):
     return normalize_vec(vec1).dot(normalize_vec(vec2))
 
 
-def similar_to_vec(frame, vec, num=50):
-    similarity = frame.dot(vec).sort_values(ascending=False, inplace=False)
-    if num is not None:
-        similarity = similarity.iloc[0:num]
-    return similarity.dropna()
+def similar_to_vec(frame, vec, limit=50):
+    if vec.dot(vec) == 0.:
+        return pd.Series(data=[], index=[], dtype='f')
+    similarity = frame.dot(vec)
+    return similarity.dropna().nlargest(limit)
 
 
 def weighted_average(frame, weight_series):
