@@ -42,14 +42,14 @@ class VectorSpaceWrapper(object):
         self.small_frame = None
         self.k = None
         self.small_k = None
-        self.finder = None
-        self.lemmatizer = None
+        self.finder = AssertionFinder(self.index_filename, self.edge_filename)
+        self.lemmatizer = DBLemmatizer(self.lemma_filename)
 
     def load(self):
         """
         Ensure that all the data is loaded.
         """
-        if self.finder is not None:
+        if self.small_frame is not None:
             return
         try:
             if self.frame is None:
@@ -62,8 +62,6 @@ class VectorSpaceWrapper(object):
                 "Couldn't load the vector space %r. Do you need to build or "
                 "download it?" % self.path
             )
-        self.finder = AssertionFinder(self.index_filename, self.edge_filename)
-        self.lemmatizer = DBLemmatizer(self.lemma_filename)
 
     @staticmethod
     def passes_filter(label, filter):
