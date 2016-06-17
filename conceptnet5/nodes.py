@@ -475,6 +475,7 @@ def standardize_as_list(text, token_filter=None):
     performing language-specific lemmatization and stopword removal. In
     practice, the only such filter is for English.
 
+    >>> from conceptnet5.language.english import english_filter, english_lemmatized_filter
     >>> standardize_as_list('the dog', token_filter=english_filter)
     ['dog']
     >>> standardize_as_list('a big dog', token_filter=english_filter)

@@ -14,12 +14,14 @@ def make_edge(rel, start, end, dataset, license, sources,
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary form.
 
+        >>> from pprint import pprint
+        >>> from conceptnet5.uri import Licenses
         >>> e = make_edge(rel='/r/HasProperty',
         ...               start='/c/en/fire',
         ...               end='/c/en/hot',
         ...               dataset='/d/conceptnet/4/en',
         ...               license=Licenses.cc_attribution,
-        ...               sources=['/s/contributor/omcs/dev'],
+        ...               sources=[{'contributor': '/s/contributor/omcs/dev'}],
         ...               surfaceText='[[Fire]] is [[hot]]',
         ...               weight=1.0)
         >>> pprint(e)
@@ -28,7 +30,7 @@ def make_edge(rel, start, end, dataset, license, sources,
          'features': ['/c/en/fire /r/HasProperty -',
                       '/c/en/fire - /c/en/hot',
                       '- /r/HasProperty /c/en/hot'],
-         'license': '/l/CC/By',
+         'license': 'cc:by/4.0',
          'rel': '/r/HasProperty',
          'sources': [{'contributor': '/s/contributor/omcs/dev'}],
          'start': '/c/en/fire',

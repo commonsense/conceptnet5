@@ -58,6 +58,9 @@ EXCEPTIONS = {
         # Not 'secret'
         'secreted': ('secrete', 'past'),
 
+        # The informal usage 'you is' ended up overriding the normal usage
+        'is': ('be', '3+s+pres'),
+
         # Convert Penn Treebank word fragments into appropriate words
         "n't": ('not', 'treebank+contraction'),
         'wo': ('will', 'treebank+contraction'),
