@@ -1,6 +1,8 @@
 """
 Tools for looking up data in ConceptNet, such as the edges (assertions)
-surrounding a particular node (concept). Provides the AssertionFinder,
+surrounding a particular node (concept). Provides the AssertionFinder, a
+lazily-loaded object for looking up assertions in a hashtable index
+(see the conceptnet5.hashtable package).
 """
 
 from conceptnet5.uri import uri_prefix
@@ -44,6 +46,9 @@ def field_match(matchable, query):
 
 
 class AssertionFinder(object):
+    """
+    A lazily-loaded object for looking up assertions in an index.
+    """
     def __init__(self, index_filename=None, edge_filename=None):
         self._index_filename = index_filename or get_data_filename('index/assertions.index')
         self._edge_filename = edge_filename or get_data_filename('assertions/assertions.msgpack')
@@ -60,14 +65,17 @@ class AssertionFinder(object):
     def lookup(self, query, limit=1000, offset=0):
         """
         Look up all assertions associated with the given URI or string
-        property. Any of these fields can be matched:
+        property. An assertion will match if the query matches any of these
+        fields:
 
             ['rel', 'start', 'end', 'dataset', 'sources', 'uri', 'features']
         """
         self.load_index()
         if query.endswith('/.'):
-            # We can't filter for complete matches here, but let's at least
-            # deal with the syntax
+            # Ending a URI with '/.' has been used as a way to ask for only
+            # complete matches. It would actually be difficult to filter for
+            # complete matches here, but we can at least cope with the syntax
+            # and return the matches we would otherwise return.
             query = query[:-2]
         pointers = self.search_index.lookup(query)
         for i, pointer in enumerate(pointers[offset:]):
@@ -84,6 +92,9 @@ class AssertionFinder(object):
             yield val
 
     def lookup_random(self):
+        """
+        Get a random assertion from the index.
+        """
         self.load_index()
         pointer = self.search_index.weighted_random()
         return transform_for_linked_data(read_msgpack_value(self.edge_file, pointer))
@@ -110,6 +121,9 @@ class AssertionFinder(object):
         if not criteria:
             return []
 
+        # Certain pairs of criteria, such as 'start' and 'rel', can be
+        # looked up quickly by turning them into features that we have
+        # already indexed. Find out if we can transform the given criteria.
         criterion_pairs = sorted(list(criteria.items()))
         features = []
         if 'start' in criteria and 'end' in criteria:
@@ -129,6 +143,10 @@ class AssertionFinder(object):
                 '- {} {}'.format(rel, node)
             ]
 
+        # If we could turn the query into a query on features, use that.
+        # Otherwise, we'll need to look up the query criteria separately,
+        # intersperse their results, and filter for the ones that match
+        # all the criteria.
         if features:
             queries = [self.lookup(feature, limit=limit)
                        for feature in features]
@@ -139,32 +157,51 @@ class AssertionFinder(object):
                 if key in INDEXED_KEYS
             ]
 
+        # If we made multiple queries, group their results into tuples:
+        # for example, the first match to each of the queries, then the second
+        # match to each of the queries, and so on. We'll iterate through this
+        # zipped list of assertions that match *any* of the criteria, looking
+        # for assertions that match *all* of the criteria.
+        #
+        # Querying by different criteria gives us a better chance of finding
+        # intersections, as one of the criteria is probably sufficiently
+        # specific that any intersections that exist will show up fairly soon.
+        # We may end up missing results in cases where each criterion matches
+        # a lot of assertions, but few assertions match all the criteria.
+        #
+        # This list can end as soon as any of the lists it's built from ends.
+        # If one of the lists ends before the others, that means the list was
+        # complete, and any match to our criteria must have already shown up
+        # in it.
         queryzip = zip(*queries)
 
         matches = []
-        done = False
         for result_set in queryzip:
             for candidate in result_set:
-                if candidate is None:
-                    done = True
-                else:
-                    okay = True
-                    for key, val in criterion_pairs:
-                        if key == 'node':
-                            matchable = [candidate['start'], candidate['end']]
-                        else:
-                            matchable = [candidate[key]]
-                        if not field_match(matchable, val):
-                            okay = False
-                            break
-                    if okay:
-                        matches.append(candidate)
-                        if len(matches) >= offset + limit:
-                            return matches[offset:]
-            if done:
-                break
+                # Find out if the candidate matched all of our criteria, by
+                # setting okay=False when one fails to match.
+                okay = True
+                for key, val in criterion_pairs:
+                    # If the criterion is 'node', either the start or end is
+                    # allowed to match. Otherwise, the field with the same
+                    # name as the criterion needs to match.
+                    if key == 'node':
+                        matchable = [candidate['start'], candidate['end']]
+                    else:
+                        matchable = [candidate[key]]
+                    if not field_match(matchable, val):
+                        okay = False
+                        break
+                if okay:
+                    matches.append(candidate)
+                    if len(matches) >= offset + limit:
+                        return matches[offset:]
+
         return matches[offset:]
 
+
+# Make a global default AssertionFinder and some convenient functions for
+# using it
 FINDER = AssertionFinder()
 lookup = FINDER.lookup
 query = FINDER.query
