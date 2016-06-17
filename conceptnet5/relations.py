@@ -1,4 +1,10 @@
-# Information about the relations we currently support in ConceptNet.
+"""
+This module provides a bit of ontological information about the relations
+that we support in ConceptNet. Every relation that ConceptNet supports
+appears in this module.
+"""
+
+
 def _make_symmetric_dict(d):
     newdict = dict(d)
     for key, val in d.items():
@@ -84,3 +90,13 @@ ENTAILED_RELATIONS = {
     '/r/Synonym': '/r/SimilarTo',
     '/r/TranslationOf': '/r/SimilarTo',
 }
+
+
+def is_negative_relation(rel):
+    """
+    Negative relations describe ways that concepts are different or unrelated.
+    In cases where we our goal is to determine how related concepts are, such
+    as conceptnet5.builders.reduce_assoc, we should disregard negative
+    relations.
+    """
+    return rel.startswith('/r/Not') or rel == '/r/Antonym' or rel == '/r/DistinctFrom'

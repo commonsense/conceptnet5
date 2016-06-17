@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import print_function, unicode_literals
 """
 URIs are Unicode strings that represent the canonical name for any object in
 ConceptNet. These can be used with the ConceptNet Web API, or referred to in a
@@ -8,20 +6,10 @@ Semantic Web application, by attaching the prefix:
     http://api.conceptnet.io
 
 For example, the English concept "book" has the URI '/c/en/book'. This concept
-can be referred to, or retrieved, using this complete URI (in version 5.2):
+can be referred to, or retrieved, using this complete URI:
 
     http://api.conceptnet.io/c/en/book
 """
-
-import sys
-import re
-from conceptnet5 import __version__ as VERSION
-
-if sys.version_info.major >= 3:
-    unicode = str
-
-# Whitespace should be replaced with underscores in URIs.
-WHITESPACE_RE = re.compile('[\s]')
 
 
 def standardize_text(text, lowercase=True):
@@ -151,8 +139,8 @@ def split_uri(uri):
     """
     Get the slash-delimited pieces of a URI.
 
-    >>> split_uri('/c/en/cat/n/feline')
-    ['c', 'en', 'cat', 'n', 'feline']
+    >>> split_uri('/c/en/cat/n/animal')
+    ['c', 'en', 'cat', 'n', 'animal']
     >>> split_uri('/')
     []
     """
@@ -163,6 +151,24 @@ def split_uri(uri):
 
 
 def uri_prefix(uri, max_pieces=3):
+    """
+    Strip off components that might make a URI too detailed. Only the first
+    `max_pieces` components will be kept.
+
+    By default, `max_pieces` is 3, making this function useful for converting
+    disambiguated concepts into their more general ambiguous forms:
+
+    >>> uri_prefix('/c/en/cat/n/animal')
+    '/c/en/cat'
+    >>> uri_prefix('/c/en/cat/n')
+    '/c/en/cat'
+    >>> uri_prefix('/c/en/cat')
+    '/c/en/cat'
+    >>> uri_prefix('/c/en')
+    '/c/en'
+    >>> uri_prefix('/c/en/cat', 2)
+    '/c/en'
+    """
     pieces = split_uri(uri)[:max_pieces]
     return join_uri(*pieces)
 
@@ -176,8 +182,8 @@ def uri_prefixes(uri, min_pieces=2):
     If the URI has sub-parts that are grouped by square brackets, then
     only complete sub-parts will be allowed in prefixes.
 
-    >>> list(uri_prefixes('/c/en/cat/n/feline'))
-    ['/c/en', '/c/en/cat', '/c/en/cat/n', '/c/en/cat/n/feline']
+    >>> list(uri_prefixes('/c/en/cat/n/animal'))
+    ['/c/en', '/c/en/cat', '/c/en/cat/n', '/c/en/cat/n/animal']
     >>> list(uri_prefixes('/test/[/group/one/]/[/group/two/]'))
     ['/test/[/group/one/]', '/test/[/group/one/]/[/group/two/]']
     """
@@ -277,52 +283,16 @@ def conjunction_uri(*sources):
         return compound_uri('/and', sorted(set(sources)))
 
 
-def disjunction_uri(*sources):
+def assertion_uri(rel, start, end):
     """
-    Make a URI representing a choice of sources that provide the same assertion. The
-    sources will be sorted in lexicographic order.
-
-    >>> disjunction_uri('/s/contributor/omcs/dev')
-    '/s/contributor/omcs/dev'
-
-    >>> disjunction_uri('/s/contributor/omcs/rspeer', '/s/contributor/omcs/dev')
-    '/or/[/s/contributor/omcs/dev/,/s/contributor/omcs/rspeer/]'
-    """
-    if len(sources) == 0:
-        # If something has a disjunction of 0 sources, we have no reason to
-        # believe it, and therefore it shouldn't be here.
-        raise ValueError("Disjunctions of 0 things are not allowed")
-    elif len(sources) == 1:
-        return sources[0]
-    else:
-        return compound_uri('/or', sorted(set(sources)))
-
-
-def assertion_uri(rel, *args):
-    """
-    Make a URI for an assertion.
-
-    There will usually be two items in *args, the 'start' and 'end' of the
-    assertion. However, this can support relations with different number
-    of arguments.
+    Make a URI for an assertion, as a compound URI of its relation, start node,
+    and end node.
 
     >>> assertion_uri('/r/CapableOf', '/c/en/cat', '/c/en/sleep')
     '/a/[/r/CapableOf/,/c/en/cat/,/c/en/sleep/]'
     """
     assert rel.startswith('/r'), rel
-    return compound_uri('/a', (rel,) + args)
-
-
-def and_or_tree(list_of_lists):
-    """
-    An and-or tree represents a disjunction of conjunctions. In ConceptNet terms,
-    it represents all the reasons we might believe a particular assertion.
-
-    >>> and_or_tree([['/s/one', '/s/two'], ['/s/three', '/s/four']])
-    '/or/[/and/[/s/four/,/s/three/]/,/and/[/s/one/,/s/two/]/]'
-    """
-    conjunctions = [conjunction_uri(*sublist) for sublist in list_of_lists]
-    return disjunction_uri(*conjunctions)
+    return compound_uri('/a', (rel, start, end))
 
 
 class Licenses:

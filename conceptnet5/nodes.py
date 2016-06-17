@@ -112,7 +112,8 @@ LCODE_ALIASES = {
 
 
 # These are all the languages we currently support in ConceptNet. Concepts
-# from languages not in this list get filtered out.
+# from languages not in this list get filtered out at the point where we merge
+# assertions.
 #
 # The main criteria are that the language should:
 #
@@ -120,8 +121,8 @@ LCODE_ALIASES = {
 # - have a consistent BCP 47 language code
 # - not be a sign language
 #   (we don't have a good computational representation of signing)
-# - *either* have extant native speakers, be historically important,
-#   or be a fully-developed artificial language
+# - have extant native speakers, be historically important, or be a
+#   fully-developed artificial language
 
 LANGUAGES = {
     # Languages with extant native speakers and at least 25,000 edges
@@ -629,7 +630,3 @@ def valid_concept_name(text):
     False
     """
     return bool(standardize_text(text))
-
-
-def is_negative_relation(rel):
-    return rel.startswith('/r/Not') or rel == '/r/Antonym' or rel == '/r/DistinctFrom'

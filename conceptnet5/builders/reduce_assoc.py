@@ -1,7 +1,12 @@
+"""
+Implements the `reduce_assoc` builder, which filters a tab-separated list of
+associations.
+"""
+
 from collections import defaultdict
 import argparse
-from conceptnet5.uri import split_uri, join_uri
-from conceptnet5.nodes import is_negative_relation
+from conceptnet5.uri import uri_prefix
+from conceptnet5.relations import is_negative_relation
 
 
 def concept_is_bad(uri):
@@ -12,19 +17,14 @@ def concept_is_bad(uri):
     specific phrase, possibly mis-parsed. A concept with a colon is probably
     detritus from a wiki.
     """
-    return ':' in uri or uri.count('_') >= 3 or uri.startswith('/a/')
+    return (':' in uri or uri.count('_') >= 3 or
+            uri.startswith('/a/') or uri.count('/') <= 2)
 
 
-def generalized_uri(uri):
-    pieces = split_uri(uri)
-    return join_uri(*pieces[:3])
-
-
-def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3, verbose=True):
+def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
     """
-    Removes uncommon associations and associations unlikely to be useful.
-    This function expects files of the form part_*.csv in `dirname` and will
-    create `reduced.csv` in `dirname`.
+    Takes in a file of tab-separated simple associations, and removes
+    uncommon associations and associations unlikely to be useful.
 
     All concepts that occur fewer than `cutoff` times will be removed.
     All English concepts that occur fewer than `en_cutoff` times will be removed.
@@ -36,8 +36,8 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3, verbose=True)
             if rel == '/r/SenseOf':
                 pass
             else:
-                gleft = generalized_uri(left)
-                gright = generalized_uri(right)
+                gleft = uri_prefix(left)
+                gright = uri_prefix(right)
                 counts[gleft] += 1
                 counts[gright] += 1
 
@@ -56,8 +56,8 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3, verbose=True)
                 if concept_is_bad(left) or concept_is_bad(right) or is_negative_relation(rel):
                     continue
                 fvalue = float(value)
-                gleft = generalized_uri(left)
-                gright = generalized_uri(right)
+                gleft = uri_prefix(left)
+                gright = uri_prefix(right)
                 if (
                     gleft in filtered_concepts and
                     gright in filtered_concepts and
@@ -68,6 +68,7 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3, verbose=True)
                         print(line, file=out)
 
 
+# TODO: convert to a Click command-line interface
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input_filename')
