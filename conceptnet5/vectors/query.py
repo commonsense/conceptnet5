@@ -150,13 +150,24 @@ class VectorSpaceWrapper(object):
         small_vec = vec[:self.small_k]
         search_frame = self.small_frame
         if filter:
-            start_key = filter
-            # '0' is the character after '/', so end_key is the first possible
-            # key that's not a descendant of the given filter key
-            end_key = filter + '0'
-            start_idx = search_frame.index.get_loc(start_key, method='ffill')
-            end_idx = search_frame.index.get_loc(end_key, method='bfill')
-            search_frame = search_frame.iloc[start_idx:end_idx]
+            exact_only = filter.count('/') >= 3
+            if filter.endswith('/.'):
+                filter = filter[:-2]
+                exact_only = True
+            if exact_only:
+                if filter in search_frame.index:
+                    idx = search_frame.index.get_loc(filter)
+                    search_frame = search_frame[idx:idx+1]
+                else:
+                    search_frame = search_frame.iloc[0:0]
+            else:
+                start_key = filter
+                # '0' is the character after '/', so end_key is the first possible
+                # key that's not a descendant of the given filter key
+                end_key = filter + '0'
+                start_idx = search_frame.index.get_loc(start_key, method='ffill')
+                end_idx = search_frame.index.get_loc(end_key, method='bfill')
+                search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
         similar_choices = self.frame.loc[similar_sloppy.index]
         similar = similar_to_vec(similar_choices, vec, limit=limit)
