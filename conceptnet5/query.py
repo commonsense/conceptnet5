@@ -1,3 +1,8 @@
+"""
+Tools for looking up data in ConceptNet, such as the edges (assertions)
+surrounding a particular node (concept). Provides the AssertionFinder,
+"""
+
 from conceptnet5.uri import uri_prefix
 from conceptnet5.edges import transform_for_linked_data
 from conceptnet5.util import get_data_filename
@@ -40,7 +45,7 @@ def field_match(matchable, query):
 
 class AssertionFinder(object):
     def __init__(self, index_filename=None, edge_filename=None):
-        self._index_filename = index_filename or get_data_filename('db/assertions.index')
+        self._index_filename = index_filename or get_data_filename('index/assertions.index')
         self._edge_filename = edge_filename or get_data_filename('assertions/assertions.msgpack')
         self.search_index = None
 

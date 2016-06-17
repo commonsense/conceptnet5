@@ -69,7 +69,7 @@ PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 rule all:
     input:
         "data/assertions/assertions.csv",
-        "data/db/assertions.index",
+        "data/index/assertions.index",
         "data/stats/dataset_vs_language.txt",
         "data/stats/relations.txt",
         "data/assoc/reduced.csv",
@@ -272,7 +272,7 @@ rule build_preindex:
     input:
         "data/assertions/assertions.msgpack"
     output:
-        "data/db/assertions.preindex.txt"
+        "data/index/assertions.preindex.txt"
     shell:
         "mkdir -p data/tmp "
         "&& python -m conceptnet5.builders.preindex_assertions {input} "
@@ -281,9 +281,9 @@ rule build_preindex:
 
 rule build_index:
     input:
-        "data/db/assertions.preindex.txt"
+        "data/index/assertions.preindex.txt"
     output:
-        "data/db/assertions.index"
+        "data/index/assertions.index"
     shell:
         "cn5-build-index {input} {output} {HASH_WIDTH}"
 
