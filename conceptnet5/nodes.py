@@ -13,13 +13,18 @@ from ftfy import fix_text
 import re
 
 
+# There are various cases of language codes that we want to merge or redirect
+# to another language code. To promote data alignment, when there is
+# uncertainty about whether multiple language codes are just variations of the
+# "same language", we favor treating them as the same language.
+
 LCODE_ALIASES = {
     # Pretend that various Chinese languages and variants are equivalent. This
     # is linguistically problematic, but it's also very helpful for aligning
     # them on terms where they actually are the same.
     #
     # This would mostly be a problem if ConceptNet was being used to *generate*
-    # Chinese natural language text, and I don't believe it is.
+    # Chinese natural language text.
     'cmn': 'zh',
     'yue': 'zh',
     'zh_tw': 'zh',
@@ -68,7 +73,7 @@ LCODE_ALIASES = {
     'bs': 'sh',
     'hr': 'sh',
     'sr': 'sh',
-    'sh': 'sh',
+    'hbs': 'sh',
     'sr-latn': 'sh',
     'sr-cyrl': 'sh',
 
