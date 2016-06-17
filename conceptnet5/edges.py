@@ -1,6 +1,10 @@
-from __future__ import unicode_literals
-from conceptnet5.uri import (assertion_uri, split_uri, uri_prefix,
-                             conjunction_uri, parse_possible_compound_uri)
+"""
+Utilities for representing edges (assertions). Most notably, this module
+includes the `make_edge` function, which builds the dictionary representing
+an edge.
+"""
+
+from conceptnet5.uri import (assertion_uri, uri_prefix, conjunction_uri)
 import re
 
 
