@@ -1,5 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with functions that normalize
@@ -306,7 +304,6 @@ LANGUAGES = {
         'twf',  # Northern Tiwa / Taos
         'jv',   # Javanese
         'fon',  # Fon
-        'qya',  # Quenya
         'nah',  # Nahuatl languages
         'pa',   # Punjabi
         'myv',  # Erzya
@@ -450,6 +447,7 @@ LANGUAGES = {
         'ia',   # Interlingua
         'nov',  # Novial
         'ie',   # Interlingue
+        'qya',  # Quenya
     }
 }
 
@@ -460,6 +458,9 @@ HISTORICAL_LANGUAGES = LANGUAGES['common-historical'] | LANGUAGES['more-historic
 # The top languages we support, in order
 CORE_LANGUAGES = ['en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl']
 
+# If we want to output human-readable language names (for example, using
+# langcodes), here are some specific language names we should use instead of
+# what we'd get by looking them up
 LANGUAGE_NAME_OVERRIDES = {
     'sh': 'Serbo-Croatian',
     'aus-x-wati': 'Western Desert'
