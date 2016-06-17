@@ -92,6 +92,7 @@ ACTIVITY_BLACKLIST = {
     "picture description",
     "response to diagram",
     "commons2_reject",
+    "globalmind",    # avoid double-counting with the GlobalMind reader
     "pycommons/question"
 }
 
