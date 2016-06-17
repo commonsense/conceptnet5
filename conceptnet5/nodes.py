@@ -64,13 +64,13 @@ LCODE_ALIASES = {
     # too.
     #
     # Applying the same principle as Chinese, we will unify the language codes
-    # into the macrolanguage 'hbs' without unifying the scripts.
-    'bs': 'hbs',
-    'hr': 'hbs',
-    'sr': 'hbs',
-    'sh': 'hbs',
-    'sr-latn': 'hbs',
-    'sr-cyrl': 'hbs',
+    # into the macrolanguage 'sh' without unifying the scripts.
+    'bs': 'sh',
+    'hr': 'sh',
+    'sr': 'sh',
+    'sh': 'sh',
+    'sr-latn': 'sh',
+    'sr-cyrl': 'sh',
 
     # Wikipedia believes that many separately catalogued languages are
     # dialects of the Western Desert language of Australia. If combined, this
