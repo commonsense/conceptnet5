@@ -180,6 +180,8 @@ class DBLemmatizer:
 
     def lemmatize_uri(self, uri):
         pieces = split_uri(uri)
+        if len(pieces) < 2:
+            return uri
         language = pieces[1]
         text = pieces[2]
         rest = pieces[3:]
