@@ -54,7 +54,6 @@ RETROFIT_SHARDS = 6
 # with these names.
 
 DATASET_NAMES = [
-    "globalmind/globalmind",
     "jmdict/jmdict",
     "nadya/nadya",
     "ptt_petgame/api",
@@ -140,17 +139,6 @@ rule read_conceptnet4:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     shell:
         "python3 -m conceptnet5.readers.conceptnet4 {input} {output}"
-
-rule read_globalmind:
-    input:
-        DATA + "/raw/globalmind/frames.jsons",
-        DATA + "/raw/globalmind/users.jsons",
-        DATA + "/raw/globalmind/assertions.jsons",
-        DATA + "/raw/globalmind/translations.jsons"
-    output:
-        DATA + "/edges/globalmind/globalmind.msgpack"
-    shell:
-        "python3 -m conceptnet5.readers.globalmind data/raw/globalmind {output}"
 
 rule read_jmdict:
     input:
