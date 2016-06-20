@@ -1,5 +1,11 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+import os
 HTTP = HTTPRemoteProvider()
+
+# The directory containing the data files. By default, this is "data" under
+# the current directory, but it can be overridden using the
+# CONCEPTNET_BUILD_DATA environment variable. This will happen during testing.
+DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "data")
 
 # Some build steps are difficult to run, so we've already run them and put
 # the results in S3. Of course, that can't be the complete solution, because
@@ -68,18 +74,18 @@ PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 rule all:
     input:
-        "data/assertions/assertions.csv",
-        "data/index/assertions.index",
-        "data/stats/dataset_vs_language.txt",
-        "data/stats/relations.txt",
-        "data/assoc/reduced.csv",
-        "data/vectors/retrofit.h5"
+        DATA + "/assertions/assertions.csv",
+        DATA + "/index/assertions.index",
+        DATA + "/stats/dataset_vs_language.txt",
+        DATA + "/stats/relations.txt",
+        DATA + "/assoc/reduced.csv",
+        DATA + "/vectors/retrofit.h5"
 
 # Downloaders
 # ===========
 rule download_raw:
     output:
-        "data/raw/{dirname}/{filename}"
+        DATA + "/raw/{dirname}/{filename}"
     shell:
         "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
 
@@ -95,7 +101,7 @@ def find_wiktionary_input(wildcards):
     else:
         language = wildcards.language
         version = WIKTIONARY_VERSIONS[wildcards.language]
-        filename = "data/raw/wiktionary/{0}wiktionary-{1}-pages-articles.xml.bz2".format(
+        filename = DATA + "/raw/wiktionary/{0}wiktionary-{1}-pages-articles.xml.bz2".format(
             language, version
         )
         return [filename]
@@ -104,7 +110,7 @@ rule precompute_wiktionary:
     input:
         find_wiktionary_input
     output:
-        "data/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
+        DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
             shell("curl {PRECOMPUTED_DATA_URL}/wiktionary/"
@@ -129,73 +135,73 @@ rule precompute_wiktionary:
 
 rule read_conceptnet4:
     input:
-        "data/raw/conceptnet4/conceptnet4_flat_{num}.jsons"
+        DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons"
     output:
-        "data/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
+        DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     shell:
         "python3 -m conceptnet5.readers.conceptnet4 {input} {output}"
 
 rule read_globalmind:
     input:
-        "data/raw/globalmind/frames.jsons",
-        "data/raw/globalmind/users.jsons",
-        "data/raw/globalmind/assertions.jsons",
-        "data/raw/globalmind/translations.jsons"
+        DATA + "/raw/globalmind/frames.jsons",
+        DATA + "/raw/globalmind/users.jsons",
+        DATA + "/raw/globalmind/assertions.jsons",
+        DATA + "/raw/globalmind/translations.jsons"
     output:
-        "data/edges/globalmind/globalmind.msgpack"
+        DATA + "/edges/globalmind/globalmind.msgpack"
     shell:
         "python3 -m conceptnet5.readers.globalmind data/raw/globalmind {output}"
 
 rule read_jmdict:
     input:
-        "data/raw/jmdict/JMdict.xml"
+        DATA + "/raw/jmdict/JMdict.xml"
     output:
-        "data/edges/jmdict/jmdict.msgpack"
+        DATA + "/edges/jmdict/jmdict.msgpack"
     shell:
         "python3 -m conceptnet5.readers.jmdict {input} {output}"
 
 rule read_nadya:
     input:
-        "data/raw/nadya/nadya-2014.csv"
+        DATA + "/raw/nadya/nadya-2014.csv"
     output:
-        "data/edges/nadya/nadya.msgpack"
+        DATA + "/edges/nadya/nadya.msgpack"
     shell:
         "python3 -m conceptnet5.readers.nadya {input} {output}"
 
 rule read_ptt_petgame:
     input:
-        "data/raw/ptt_petgame/conceptnet_zh_{part}.txt"
+        DATA + "/raw/ptt_petgame/conceptnet_zh_{part}.txt"
     output:
-        "data/edges/ptt_petgame/{part}.msgpack"
+        DATA + "/edges/ptt_petgame/{part}.msgpack"
     shell:
         "python3 -m conceptnet5.readers.ptt_petgame {input} {output}"
 
 rule read_umbel:
     input:
-        "data/raw/umbel/{filename}.nt"
+        DATA + "/raw/umbel/{filename}.nt"
     output:
-        "data/edges/umbel/{filename}.msgpack",
-        "data/edges/umbel/{filename}.links.csv"
+        DATA + "/edges/umbel/{filename}.msgpack",
+        DATA + "/edges/umbel/{filename}.links.csv"
     shell:
         "python3 -m conceptnet5.readers.umbel data/raw/umbel/ {output}"
 
 rule read_verbosity:
     input:
-        "data/raw/verbosity/verbosity.txt"
+        DATA + "/raw/verbosity/verbosity.txt"
     output:
-        "data/edges/verbosity/verbosity.msgpack"
+        DATA + "/edges/verbosity/verbosity.msgpack"
     shell:
         "python3 -m conceptnet5.readers.verbosity {input} {output}"
 
 rule prescan_wiktionary:
     input:
         expand(
-            "data/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz",
+            DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz",
             version=[WIKT_PARSER_VERSION],
             language=WIKTIONARY_LANGUAGES
         )
     output:
-        "data/db/wiktionary.db"
+        DATA + "/db/wiktionary.db"
     shell:
         "mkdir -p data/tmp && "
         "cn5-read wiktionary_pre {input} data/tmp/wiktionary.db && "
@@ -203,19 +209,19 @@ rule prescan_wiktionary:
 
 rule read_wiktionary:
     input:
-        "data/precomputed/wiktionary/parsed-%s/{language}.jsons.gz" % WIKT_PARSER_VERSION,
-        "data/db/wiktionary.db"
+        DATA + "/precomputed/wiktionary/parsed-%s/{language}.jsons.gz" % WIKT_PARSER_VERSION,
+        DATA + "/db/wiktionary.db"
     output:
-        "data/edges/wiktionary/{language}.msgpack",
+        DATA + "/edges/wiktionary/{language}.msgpack",
     shell:
         "cn5-read wiktionary {input} {output}"
 
 rule read_wordnet:
     input:
-        "data/raw/wordnet-rdf/wn31.nt"
+        DATA + "/raw/wordnet-rdf/wn31.nt"
     output:
-        "data/edges/wordnet/wordnet.msgpack",
-        "data/edges/wordnet/wordnet.links.csv"
+        DATA + "/edges/wordnet/wordnet.msgpack",
+        DATA + "/edges/wordnet/wordnet.links.csv"
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
 
@@ -225,25 +231,25 @@ rule read_wordnet:
 
 rule edge_msgpack_to_csv:
     input:
-        "data/edges/{dir}/{filename}.msgpack"
+        DATA + "/edges/{dir}/{filename}.msgpack"
     output:
-        "data/edges/{dir,[^/]+}/{filename}.csv"
+        DATA + "/edges/{dir,[^/]+}/{filename}.csv"
     shell:
         "cn5-convert msgpack_to_tab_separated {input} {output}"
 
 rule assertion_msgpack_to_csv:
     input:
-        "data/assertions/{filename}.msgpack"
+        DATA + "/assertions/{filename}.msgpack"
     output:
-        "data/assertions/{filename}.csv"
+        DATA + "/assertions/{filename}.csv"
     shell:
         "cn5-convert msgpack_to_tab_separated {input} {output}"
 
 rule distribute_edges:
     input:
-        expand("data/edges/{dataset}.csv", dataset=DATASET_NAMES)
+        expand(DATA + "/edges/{dataset}.csv", dataset=DATASET_NAMES)
     output:
-        ["data/collated/unsorted/edges_{:02d}.csv".format(num)
+        [DATA + "/collated/unsorted/edges_{:02d}.csv".format(num)
          for num in range(N_PIECES)]
     shell:
         "python3 -m conceptnet5.builders.distribute_edges "
@@ -251,18 +257,18 @@ rule distribute_edges:
 
 rule sort_edges:
     input:
-        "data/collated/unsorted/{filename}.csv"
+        DATA + "/collated/unsorted/{filename}.csv"
     output:
-        "data/collated/sorted/{filename}.csv"
+        DATA + "/collated/sorted/{filename}.csv"
     shell:
         "LC_ALL=C sort {input} | uniq > {output}"
 
 rule combine_assertions:
     input:
-        ["data/collated/sorted/edges_{:02d}.csv".format(num)
+        [DATA + "/collated/sorted/edges_{:02d}.csv".format(num)
          for num in range(N_PIECES)]
     output:
-        "data/assertions/assertions.msgpack"
+        DATA + "/assertions/assertions.msgpack"
     shell:
         "python3 -m conceptnet5.builders.combine_assertions -o {output} {input}"
 
@@ -270,9 +276,9 @@ rule combine_assertions:
 # ====================
 rule build_preindex:
     input:
-        "data/assertions/assertions.msgpack"
+        DATA + "/assertions/assertions.msgpack"
     output:
-        "data/index/assertions.preindex.txt"
+        DATA + "/index/assertions.preindex.txt"
     shell:
         "mkdir -p data/tmp "
         "&& python -m conceptnet5.builders.preindex_assertions {input} "
@@ -281,9 +287,9 @@ rule build_preindex:
 
 rule build_index:
     input:
-        "data/index/assertions.preindex.txt"
+        DATA + "/index/assertions.preindex.txt"
     output:
-        "data/index/assertions.index"
+        DATA + "/index/assertions.index"
     shell:
         "cn5-build-index {input} {output} {HASH_WIDTH}"
 
@@ -291,35 +297,35 @@ rule build_index:
 # =====================
 rule relation_stats:
     input:
-        "data/assertions/assertions.csv"
+        DATA + "/assertions/assertions.csv"
     output:
-        "data/stats/relations.txt"
+        DATA + "/stats/relations.txt"
     shell:
         "cut -f 2 {input} | LC_ALL=C sort | LC_ALL=C uniq -c "
         "| LC_ALL=C sort -nbr > {output}"
 
 rule dataset_stats_left:
     input:
-        "data/assertions/assertions.csv"
+        DATA + "/assertions/assertions.csv"
     output:
-        "data/stats/concepts_left_datasets.txt"
+        DATA + "/stats/concepts_left_datasets.txt"
     shell:
         "cut -f 3,8 {input} > {output}"
 
 rule dataset_stats_right:
     input:
-        "data/assertions/assertions.csv"
+        DATA + "/assertions/assertions.csv"
     output:
-        "data/stats/concepts_right_datasets.txt"
+        DATA + "/stats/concepts_right_datasets.txt"
     shell:
         "cut -f 4,8 {input} > {output}"
 
 rule dataset_vs_language:
     input:
-        "data/stats/concepts_left_datasets.txt",
-        "data/stats/concepts_right_datasets.txt"
+        DATA + "/stats/concepts_left_datasets.txt",
+        DATA + "/stats/concepts_right_datasets.txt"
     output:
-        "data/stats/dataset_vs_language.txt"
+        DATA + "/stats/dataset_vs_language.txt"
     shell:
         "cat {input} | sed -r 's:((/[^/\t]+){{2}})[^\t]*:\\1:g' "
         "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
@@ -328,25 +334,25 @@ rule dataset_vs_language:
 # =====================
 rule assertions_to_assoc:
     input:
-        "data/assertions/assertions.msgpack"
+        DATA + "/assertions/assertions.msgpack"
     output:
-        "data/assoc/assoc-with-dups.csv"
+        DATA + "/assoc/assoc-with-dups.csv"
     shell:
         "cn5-convert msgpack_to_assoc {input} {output}"
 
 rule assoc_uniq:
     input:
-        "data/assoc/assoc-with-dups.csv"
+        DATA + "/assoc/assoc-with-dups.csv"
     output:
-        "data/assoc/assoc.csv"
+        DATA + "/assoc/assoc.csv"
     shell:
         "LC_ALL=C sort {input} | LC_ALL=C uniq > {output}"
 
 rule reduce_assoc:
     input:
-        "data/assoc/assoc.csv"
+        DATA + "/assoc/assoc.csv"
     output:
-        "data/assoc/reduced.csv"
+        DATA + "/assoc/reduced.csv"
     shell:
         "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
 
@@ -354,10 +360,10 @@ rule reduce_assoc:
 # =========================
 rule convert_word2vec:
     input:
-        "data/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
-        "data/db/wiktionary.db"
+        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
+        DATA + "/db/wiktionary.db"
     output:
-        "data/vectors/w2v-google-news.h5"
+        DATA + "/vectors/w2v-google-news.h5"
     resources:
         ram=16
     shell:
@@ -365,10 +371,10 @@ rule convert_word2vec:
 
 rule convert_glove:
     input:
-        "data/raw/vectors/glove12.840B.300d.txt.gz",
-        "data/db/wiktionary.db"
+        DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
+        DATA + "/db/wiktionary.db"
     output:
-        "data/vectors/glove12.840B.h5"
+        DATA + "/vectors/glove12.840B.h5"
     resources:
         ram=16
     shell:
@@ -376,11 +382,11 @@ rule convert_glove:
 
 rule merge_interpolate:
     input:
-        "data/vectors/glove12.840B.h5",
-        "data/vectors/w2v-google-news.h5",
-        "data/assoc/reduced.csv"
+        DATA + "/vectors/glove12.840B.h5",
+        DATA + "/vectors/w2v-google-news.h5",
+        DATA + "/assoc/reduced.csv"
     output:
-        "data/vectors/merged.h5"
+        DATA + "/vectors/merged.h5"
     resources:
         ram=16
     shell:
@@ -388,10 +394,10 @@ rule merge_interpolate:
 
 rule retrofit:
     input:
-        "data/vectors/merged.h5",
-        "data/assoc/reduced.csv"
+        DATA + "/vectors/merged.h5",
+        DATA + "/assoc/reduced.csv"
     output:
-        expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        expand(DATA + "/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
     resources:
         ram=16
     shell:
@@ -399,9 +405,9 @@ rule retrofit:
 
 rule join_retrofit:
     input:
-        expand("data/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        expand(DATA + "/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
     output:
-        "data/vectors/retrofit.h5"
+        DATA + "/vectors/retrofit.h5"
     resources:
         ram=16
     shell:
