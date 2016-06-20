@@ -1,0 +1,14 @@
+1346493	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_guest_77	nadyajp_guest_58
+1346493	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_guest_77	nadyajp_guest_21
+1346493	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_guest_77	nadyajp_guest_20
+1346493	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_guest_77	nadyajp_twitter_175685560
+1348346	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_twitter_104407467	nadyajp_guest_58
+1348346	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_twitter_104407467	nadyajp_guest_21
+1348346	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_twitter_104407467	nadyajp_guest_20
+1348346	ja	あなたが{1}の際にすることの一つは{2}である．	HasSubevent	テスト	名前を書くこと	5	1	nadyajp_twitter_104407467	nadyajp_twitter_175685560
+1499183	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_guest_19	nadyajp_twitter_235086139
+1499183	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_guest_19	nadyajp_twitter_50251265
+1552355	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_twitter_50251265	nadyajp_twitter_235086139
+1552355	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_twitter_50251265	nadyajp_twitter_50251265
+1562140	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_twitter_235086139	nadyajp_twitter_235086139
+1562140	ja	あなたが{1}のときに，それより先にすることは{2}である．	HasPrerequisite	テスト	勉強	5	1	nadyajp_twitter_235086139	nadyajp_twitter_50251265

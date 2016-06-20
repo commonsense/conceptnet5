@@ -1,0 +1,105 @@
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Appraising> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/AuditingFinancialRecords> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Contrast> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Counting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Diagnosing> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/DreamInterpretation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/DrugEvaluation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Experimenting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/FinancialRiskEvaluation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/FundamentalStockAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Hearing_LegalProceeding> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/HumanAttributeTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/InformationAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Inspecting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/IntelligenceAnalysisProcess> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/LocalAuthoritySearch> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/MedicalTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/Navigating> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/PerformanceReview> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/PerformanceTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/TechnicalStockAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://umbel.org/umbel#superClassOf> <http://umbel.org/umbel/rc/TestDrive> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://umbel.org/umbel/rc/TemporalStuffType> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://umbel.org/umbel#RefConcept> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://umbel.org/umbel/rc/IntentionalMentalSituation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://umbel.org/umbel/rc/PurposefulAction> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assess" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assessed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assesses" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assessing" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assessment" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "assessments" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "evaluate" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "evaluated" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "evaluates" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "evaluation" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "evaluations" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "had assessed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "had evaluated" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "had judged" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "had probed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "had reviewed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "has assessed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "has evaluated" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "has judged" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "has probed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "has reviewed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "have assessed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "have evaluated" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "have judged" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "have probed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "have reviewed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judge" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judged" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judgement" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judges" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judging" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "judgment" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "probe" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "probed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "probes" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "probing" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "review" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "reviewed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "reviewing" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "reviews" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "testing" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will assess" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will evaluate" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will have assessed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will have evaluated" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will have judged" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will have probed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will have reviewed" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will judge" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will probe" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#altLabel> "will review" .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#broaderTransitive> <http://umbel.org/umbel/rc/IntentionalMentalSituation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#broaderTransitive> <http://umbel.org/umbel/rc/PurposefulAction> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#definition> "A specialization of PurposefulAction and Thinking. Each instance of this collection is an event in which at least one agent evaluates some real-world thing or situation.  Notable specializations of Evaluating include MeasuringSomething, MedicalTesting, and Navigating. This collection differs from AnalyzingSomething in that the latter does not necessarily involve some extra-mental entity." .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Appraising> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/AuditingFinancialRecords> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Contrast> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Counting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Diagnosing> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/DreamInterpretation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/DrugEvaluation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Experimenting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/FinancialRiskEvaluation> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/FundamentalStockAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Hearing_LegalProceeding> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/HumanAttributeTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/InformationAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Inspecting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/IntelligenceAnalysisProcess> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/LocalAuthoritySearch> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/MedicalTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/Navigating> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/PerformanceReview> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/PerformanceTesting> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/TechnicalStockAnalysis> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#narrowerTransitive> <http://umbel.org/umbel/rc/TestDrive> .
+<http://umbel.org/umbel/rc/Evaluating> <http://www.w3.org/2004/02/skos/core#prefLabel> "evaluating" .

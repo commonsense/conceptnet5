@@ -7,12 +7,15 @@ HTTP = HTTPRemoteProvider()
 # CONCEPTNET_BUILD_DATA environment variable. This will happen during testing.
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "data")
 
+# If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
+TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
+
 # Some build steps are difficult to run, so we've already run them and put
 # the results in S3. Of course, that can't be the complete solution, because
 # we have to have run those build steps first. So when USE_PRECOMPUTED is
 # True, we will download the computed files; when it's False, we will compute
 # them.
-USE_PRECOMPUTED = True
+USE_PRECOMPUTED = not os.environ.get("CONCEPTNET_REBUILD_PRECOMPUTED")
 
 # If USE_PRECOMPUTED is False, should we upload the files we compute so they
 # can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
@@ -66,10 +69,20 @@ DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range
 DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
 
-RAW_DATA_URL = "conceptnet.s3.amazonaws.com/raw-data/2016"
+RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
-PRECOMPUTED_DATA_URL = "conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
+
+
+# Test mode overrides some of these settings.
+if TESTMODE:
+    DATA = "testdata"
+    USE_PRECOMPUTED = True
+    HASH_WIDTH = 10
+    RAW_DATA_URL = "/missing/data"
+    PRECOMPUTED_DATA_URL = "/missing/data"
+
 
 rule all:
     input:
@@ -171,7 +184,7 @@ rule read_umbel:
         DATA + "/edges/umbel/{filename}.msgpack",
         DATA + "/edges/umbel/{filename}.links.csv"
     shell:
-        "python3 -m conceptnet5.readers.umbel data/raw/umbel/ {output}"
+        "python3 -m conceptnet5.readers.umbel %s/raw/umbel/ {output}" % DATA
 
 rule read_verbosity:
     input:
@@ -191,9 +204,9 @@ rule prescan_wiktionary:
     output:
         DATA + "/db/wiktionary.db"
     shell:
-        "mkdir -p data/tmp && "
-        "cn5-read wiktionary_pre {input} data/tmp/wiktionary.db && "
-        "mv data/tmp/wiktionary.db {output}"
+        "mkdir -p %(data)s/tmp && "
+        "cn5-read wiktionary_pre {input} %(data)s/tmp/wiktionary.db && "
+        "mv %(data)s/tmp/wiktionary.db {output}" % {'data': DATA}
 
 rule read_wiktionary:
     input:
@@ -241,7 +254,7 @@ rule distribute_edges:
          for num in range(N_PIECES)]
     shell:
         "python3 -m conceptnet5.builders.distribute_edges "
-        "-o data/collated/unsorted/ -n {N_PIECES} {input}"
+        "-o %s/collated/unsorted/ -n {N_PIECES} {input}" % DATA
 
 rule sort_edges:
     input:
@@ -268,10 +281,10 @@ rule build_preindex:
     output:
         DATA + "/index/assertions.preindex.txt"
     shell:
-        "mkdir -p data/tmp "
+        "mkdir -p %(data)s/tmp "
         "&& python -m conceptnet5.builders.preindex_assertions {input} "
-        "| LANG=C sort -T data/tmp "
-        "| LANG=C uniq > {output}"
+        "| LANG=C sort -T %(data)s/tmp "
+        "| LANG=C uniq > {output}" % {'data': DATA}
 
 rule build_index:
     input:

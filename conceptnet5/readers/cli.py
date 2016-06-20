@@ -1,6 +1,6 @@
 import click
 from . import (
-    conceptnet4, globalmind, jmdict, nadya, ptt_petgame, umbel, verbosity,
+    conceptnet4, jmdict, nadya, ptt_petgame, umbel, verbosity,
     wiktionary, wordnet
 )
 
@@ -21,20 +21,6 @@ def run_conceptnet4(input, output):
     output: a msgpack file of edges
     """
     conceptnet4.handle_file(input, output)
-
-
-@cli.command(name='globalmind')
-@click.argument('input_dir',
-                type=click.Path(readable=True, dir_okay=True, file_okay=False))
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def run_globalmind(input_dir, output):
-    """
-    Import a file of data exported from GlobalMind.
-
-    input_dir: a directory containing .jsons files exported from GlobalMind
-    output: a msgpack file of edges
-    """
-    globalmind.handle_file(input_dir, output)
 
 
 @cli.command(name='jmdict')

@@ -179,6 +179,10 @@ def run_wordnet(input_file, output_file, sw_map_file):
                 out.write(edge)
 
     for subj, rel, obj, objtag in reader.parse_file(input_file):
+        # Some WordNets use strings with "!" in them to indicate out-of-band
+        # information, such as a missing translation
+        if '!' in obj:
+            continue
         relname = resource_name(rel)
         if relname in REL_MAPPING:
             rel, frame = REL_MAPPING[relname]

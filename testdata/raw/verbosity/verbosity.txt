@@ -1,0 +1,79 @@
+test	it looks like	fest	9	333	1	200
+test	it looks like	fest nest	1	400	0	250
+test	it looks like	finals	7	433	1	7000
+test	it looks like	four letters	11	429	2	44
+test	it looks like	four word	1	333	0	142
+test	about the same size as	a grade	2	333	0	666
+test	about the same size as	a quiz	2	350	0	2000
+test	about the same size as	a report	1	500	0	500
+test	about the same size as	best	6	550	1	461
+test	about the same size as	cram for	1	428	0	1000
+test	it has	a blank	1	250	0	111
+test	it has	a grade	2	425	0	500
+test	it has	a mark	1	333	0	500
+test	it has	a quiz	3	66	0	1000
+test	it has	a result	2	333	0	666
+test	it is	a	1	333	0	3
+test	it is	a blank	1	250	0	66
+test	it is	a challenge	2	291	0	37
+test	it is	a control	1	0	0	200
+test	it is	a drill	1	333	0	1000
+test	it is	a exam	1	0	0	250
+test	it is	a pop	2	266	0	1000
+test	it is	a question	1	333	0	9
+test	it is	a quiz	44	123	8	44000
+test	it is	a trial	2	250	0	166
+test	it is a kind of	a	1	714	0	25
+test	it is a kind of	a pain	1	714	0	1000
+test	it is a kind of	a quiz	2	125	0	1000
+test	it is a kind of	academic measure	4	0	0	2000
+test	it is a kind of	analysis	1	333	0	1000
+test	it is a type of	a blank	1	142	0	45
+test	it is a type of	acid bland	1	333	0	333
+test	it is a type of	act	1	333	0	50
+test	it is a type of	an exam	1	0	0	500
+test	it is a type of	aptitude evaluation	1	666	0	1000
+test	it is related to	a quiz	4	500	0	1333
+test	it is related to	academic challenge	1	400	0	1000
+test	it is related to	academic courses	1	333	0	1000
+test	it is related to	academic standard	1	500	0	1000
+test	it is related to	achievement	1	400	0	250
+test	it is the opposite of	affirm	1	600	0	500
+test	it is the opposite of	an answer	1	0	0	500
+test	it is the opposite of	answer	1	0	0	3
+test	it is the opposite of	best	1	600	0	333
+test	it is the opposite of	confirm	1	571	0	1000
+test	it is typically in	a classroom	3	387	0	300
+test	it is typically in	a school	5	333	0	250
+test	it is typically in	best	1	500	0	1000
+test	it is typically in	blue book	1	166	0	1000
+test	it is typically in	class	11	413	2	550
+test	it is typically in	t	4	600	0	153
+test	it is typically in	t starts	1	400	0	1000
+test	it is typically in	tee	1	600	0	333
+test	it is typically in	tee best	1	428	0	1000
+test	it is typically in	with t	1	333	0	83
+test	it is typically near	a classroom	1	0	0	1000
+test	it is typically near	a school	3	500	0	300
+test	it is typically near	a student	4	258	0	4000
+test	it is typically near	check	1	400	0	250
+test	it is typically near	class	1	400	0	1000
+test	it is used for	academics	1	333	0	1000
+test	it is used for	assessment	2	550	0	2000
+test	it is used for	big quiz	1	600	0	1000
+test	it is used for	blood	1	600	0	200
+test	it is used for	checking intelligence	1	333	0	1000
+test	it looks like	a challenge	1	333	0	250
+test	it looks like	a final	1	500	0	500
+test	it looks like	a paper	8	404	1	421
+test	it looks like	a quiz	8	135	1	8000
+test	it looks like	a rest	1	250	0	200
+examination	it is	a test	4	0	44	250
+experiment	it is	a test	15	177	19	937
+interview	it is a kind of	a test	1	250	1	500
+experiment	it is a type of	a test	1	0	1	1000
+question	it is related to	a test	2	333	0	1000
+problem	it is typically in	a test	1	500	1	166
+question	it is typically in	a test	5	0	2	833
+answer	it looks like	a test	1	500	0	250
+bar	it looks like	a test	3	500	0	750
