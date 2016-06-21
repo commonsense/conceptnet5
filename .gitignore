@@ -27,3 +27,11 @@ static/img/build/
 lib/apsw-3.8.5-r1/
 lib/apsw-3.8.6-r1/
 .snakemake/
+testdata/assertions
+testdata/assoc
+testdata/collated
+testdata/db
+testdata/edges
+testdata/external
+testdata/index
+testdata/vectors

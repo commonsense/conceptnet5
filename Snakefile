@@ -61,7 +61,6 @@ DATASET_NAMES = [
     "nadya/nadya",
     "ptt_petgame/api",
     "umbel/umbel",
-    "umbel/umbel_links",
     "verbosity/verbosity",
     "wordnet/wordnet"
 ]
@@ -79,7 +78,7 @@ PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 if TESTMODE:
     DATA = "testdata"
     USE_PRECOMPUTED = True
-    HASH_WIDTH = 10
+    HASH_WIDTH = 12
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
 
@@ -92,6 +91,18 @@ rule all:
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/retrofit.h5"
+
+rule clean:
+    shell:
+        "for subdir in assertions collated db edges index tmp vectors; "
+        "do echo Removing %(data)s/$subdir; "
+        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
+
+rule test:
+    input:
+        DATA + "/assertions/assertions.csv",
+        DATA + "/index/assertions.index",
+        DATA + "/assoc/reduced.csv"
 
 # Downloaders
 # ===========
@@ -179,12 +190,12 @@ rule read_ptt_petgame:
 
 rule read_umbel:
     input:
-        DATA + "/raw/umbel/{filename}.nt"
+        DATA + "/raw/umbel/umbel.nt"
     output:
-        DATA + "/edges/umbel/{filename}.msgpack",
-        DATA + "/edges/umbel/{filename}.links.csv"
+        DATA + "/edges/umbel/umbel.msgpack",
+        DATA + "/external/umbel.csv"
     shell:
-        "python3 -m conceptnet5.readers.umbel %s/raw/umbel/ {output}" % DATA
+        "python3 -m conceptnet5.readers.umbel {input} {output}"
 
 rule read_verbosity:
     input:
@@ -222,7 +233,7 @@ rule read_wordnet:
         DATA + "/raw/wordnet-rdf/wn31.nt"
     output:
         DATA + "/edges/wordnet/wordnet.msgpack",
-        DATA + "/edges/wordnet/wordnet.links.csv"
+        DATA + "/external/wordnet.csv"
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
 
