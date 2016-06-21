@@ -1,5 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
 """
 A reader for information from Umbel, an RDF transformation of OpenCyc.
 
@@ -62,9 +60,9 @@ def acceptable_node(url):
                 resource_name(url) in IGNORED_NODES)
 
 
-def run_umbel(input_dir, output_file, sw_map_file):
+def run_umbel(input_file, output_file, sw_map_file):
     """
-    Read N-Triples files containing Umbel data, outputting a file of
+    Read an N-Triples file containing Umbel data, outputting a file of
     ConceptNet edges and a file of mappings between the Semantic Web and
     ConceptNet.
     """
@@ -75,18 +73,9 @@ def run_umbel(input_dir, output_file, sw_map_file):
     labels = {}
     label_sets = defaultdict(set)
 
-    # There are two files we want to parse:
-    # - umbel.nt, a transformation of umbel.n3, which is available from
-    #   https://github.com/structureddynamics/UMBEL/.
-    # - umbel_links.nt, distributed with DBPedia 3.9.
-    #
-    # We parse them both in this file so that umbel_links can reuse the
-    # concept names extracted from umbel.nt.
-    main_file = os.path.join(input_dir, 'umbel.nt')
-
     # Read through umbel.nt once, finding all the "preferred labels". We will
     # use these as the surface texts for the nodes.
-    for web_subj, web_rel, web_obj, objtag in reader.parse_file(main_file):
+    for web_subj, web_rel, web_obj, objtag in reader.parse_file(input_file):
         if resource_name(web_rel) == 'prefLabel':
             # 'CW' and 'PCW' are Cyc jargon for 'conceptual works'. If a node
             # cannot be described except as a CW, we're probably not
@@ -98,7 +87,7 @@ def run_umbel(input_dir, output_file, sw_map_file):
             label_sets[text].add(web_subj)
 
     # Read through umbel.nt again and extract ConceptNet edges.
-    for web_subj, web_rel, web_obj, objtag in reader.parse_file(main_file):
+    for web_subj, web_rel, web_obj, objtag in reader.parse_file(input_file):
         if objtag == 'URL' and acceptable_node(web_obj) and acceptable_node(web_subj):
             # Only use nodes for which we've seen preferred labels.
             # (This skips some anonymous OWL-cruft nodes.)
@@ -146,11 +135,11 @@ handle_file = run_umbel
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', help="Directory containing .nt files of input")
+    parser.add_argument('input', help="An N-triples file of input")
     parser.add_argument('output', help='msgpack file to output to')
-    parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
+    parser.add_argument('sw_map', help='A tab-separated file of Semantic Web equivalences to write')
     args = parser.parse_args()
-    run_umbel(args.input_dir, args.output, args.sw_map)
+    run_umbel(args.input, args.output, args.sw_map)
 
 if __name__ == '__main__':
     main()
