@@ -255,7 +255,7 @@ def build_sources(parts_dict, preposition_fix=False):
         vote_source = {
             'contributor': join_uri('/s/contributor/omcs', standardize_text(username)),
             'activity': '/s/activity/omcs/vote',
-            'weight': vote_int
+            'weight': float(vote_int)
         }
         sources.append(vote_source)
     return sources
