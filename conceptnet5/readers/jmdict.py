@@ -58,6 +58,13 @@ def convert_lang_code(code):
     return str(langcodes.get(code))
 
 
+def fix_context(context):
+    ending = ' term'
+    if context.endswith(ending):
+        return context[:-len(ending)]
+    return context
+
+
 def get_list(node, tag):
     """
     Get sub-nodes of this node by their tag, and make sure to return a list.
@@ -157,15 +164,30 @@ def handle_file(filename, output_file):
         # different senses. However, we have no way to refer to the different
         # senses. So for now, we disregard word senses. One day we might have
         # a better overall plan for word senses in ConceptNet.
-        for sense in get_list(entry, 'sense'):
+        senses = get_list(entry, 'sense')
+        for sense_num, sense in enumerate(senses):
             # Glosses are translations of the word to different languages.
             # If the word is a loan-word, the foreign word it was derived from
             # will be marked with the <lsource> tag instead of <gloss>.
             #
             # Get all the glosses, including the lsource if it's there.
             glosses = get_list(sense, 'gloss') + get_list(sense, 'lsource')
+            contexts = [
+                fix_context(context)
+                for context in get_list(sense, 'field')
+            ]
+            pos = '_'
+            for pos_tag in get_list(sense, 'pos'):
+                if pos_tag[:10] in NOUN_TYPES:
+                    pos = 'n'
+                elif pos_tag[:10] in VERB_TYPES:
+                    pos = 'v'
+                elif pos_tag[:10] in ADJ_TYPES:
+                    pos = 'a'
+                elif pos_tag[:10] in ADV_TYPES:
+                    pos = 'r'
+
             for gloss in glosses:
-                text = lang = None
                 if '#text' in gloss:
                     # A gloss node might be marked with a 'lang' attribute. If so,
                     # xmltodict represents it as a dictionary with '#text' and
@@ -190,16 +212,23 @@ def handle_file(filename, output_file):
                     text.count(' ') <= 4 and valid_concept_name(text)
                 ):
                     for head in headwords:
-                        ja_concept = standardized_concept_uri('ja', head)
+                        if len(senses) >= 2:
+                            sensekey = '%d' % (sense_num + 1)
+                            ja_concept = standardized_concept_uri('ja', head, pos, 'jmdict', sensekey)
+                        else:
+                            ja_concept = standardized_concept_uri('ja', head, pos)
                         other_concept = standardized_concept_uri(lang, text)
-                        output_edge(out, ja_concept, other_concept)
+                        output_edge(out, '/r/TranslationOf', ja_concept, other_concept)
+
+                        for context in contexts:
+                            context_node = standardized_concept_uri('en', context)
+                            output_edge(out, '/r/HasContext', ja_concept, context_node)
 
 
-def output_edge(out, subj_concept, obj_concept):
+def output_edge(out, rel, subj_concept, obj_concept):
     """
     Write an edge to `out`, an instance of MsgpackStreamWriter.
     """
-    rel = '/r/TranslationOf'
     edge = make_edge(rel, subj_concept, obj_concept,
                      dataset='/d/jmdict',
                      license=Licenses.cc_sharealike,
