@@ -86,7 +86,7 @@ def resource_name(url):
             return path.split('/')[-1]
 
 
-class NTriplesWriter(object):
+class NTriplesWriter:
     """
     Write to a file in N-Triples format.
 
@@ -118,22 +118,20 @@ class NTriplesWriter(object):
             line = ' '.join(line_pieces)
             print(line, file=self.stream)
 
-    def write_link(self, node1, node2):
-        """
-        Write a line expressing that node1 is linked to node2, using the RDF
-        "seeAlso" property.
-        """
-        self.write((node1, SEE_ALSO, node2))
-
     def close(self):
         if self.stream is not sys.stdout:
             self.stream.close()
 
 
-class NTriplesReader(object):
+class NTriplesReader:
     """
     A class for reading multiple files in N-Triples format, keeping track of
     prefixes that they define and expanding them when they appear.
+
+    The URIs in the N-Triples can contain Unicode in UTF-8, which technically
+    makes them IRIs, and technically makes the file N-Quads with no graphs,
+    as N-Triples doesn't allow Unicode. But for now let's just call that a
+    variant of N-Triples that we can handle.
     """
     def __init__(self):
         self.prefixes = {'_': '_'}
@@ -210,3 +208,22 @@ class NTriplesReader(object):
             return 'URL', decode_url(url_base + resource)
         else:
             return (None, decode_escapes(node_text))
+
+
+class ExternalReferenceWriter:
+    def __init__(self, filename):
+        self.stream = open(filename, 'w', encoding='utf-8')
+        self.seen = set()
+
+    def write_link(self, conceptnet_uri, external_uri):
+        """
+        Record in a tab-separated file the fact that `conceptnet_uri` is
+        the representation in ConceptNet of `external_uri`.
+        """
+        pair = (conceptnet_uri, external_uri)
+        if pair not in self.seen:
+            self.seen.add(pair)
+            print('{}\t{}'.format(conceptnet_uri, external_uri), file=self.stream)
+
+    def close(self):
+        self.stream.close()
