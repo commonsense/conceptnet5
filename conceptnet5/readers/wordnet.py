@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
-    NTriplesReader, resource_name
+    NTriplesReader, resource_name, ExternalReferenceWriter
 )
 
 
@@ -86,9 +86,10 @@ def label_sort_key(label):
     return (not label[0].isdigit(), label[-1].isdigit(), not label.islower(), -len(label), label)
 
 
-def run_wordnet(input_file, output_file, sw_map_file):
+def run_wordnet(input_file, output_file, refs_file):
     reader = NTriplesReader()
     out = MsgpackStreamWriter(output_file)
+    refs = ExternalReferenceWriter(refs_file)
 
     synset_senses = defaultdict(list)
     sense_synsets = {}
@@ -222,10 +223,12 @@ def run_wordnet(input_file, output_file, sw_map_file):
             )
             out.write(edge)
 
-    with open(sw_map_file, 'w', encoding='utf-8') as map_out:
-        for wn_uri in sorted(synset_uris):
-            cn_uri = synset_uris[wn_uri]
-            print("{}\t{}".format(wn_uri, cn_uri), file=map_out)
+    for wn_uri in sorted(synset_uris):
+        cn_uri = synset_uris[wn_uri]
+        refs.write_link(cn_uri, wn_uri)
+
+    out.close()
+    refs.close()
 
 
 # Entry point for testing
@@ -236,10 +239,10 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file', help="An .nt file containing WordNet RDF")
-    parser.add_argument('output', help='Msgpack file to output to')
-    parser.add_argument('sw_map', help='A .nt file of Semantic Web equivalences')
+    parser.add_argument('output_file', help='Msgpack file to output to')
+    parser.add_argument('refs', help='A tab-separated file of Semantic Web equivalences to write')
     args = parser.parse_args()
-    run_wordnet(args.input_file, args.output, args.sw_map)
+    run_wordnet(args.input_file, args.output_file, args.refs)
 
 
 if __name__ == '__main__':
