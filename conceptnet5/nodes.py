@@ -536,22 +536,22 @@ def standardize_text(text, token_filter=None):
     return '_'.join(standardize_as_list(text, token_filter))
 
 
-def standardize_topic(topic):
+def standardize_topic(language, topic):
     """
     Get a canonical representation of a Wikipedia topic, which may include
     a disambiguation string in parentheses. Returns a concept URI that
     may be disambiguated as a noun.
 
-    >>> standardize_topic('Township (United States)')
+    >>> standardize_topic('en', 'Township (United States)')
     '/c/en/township/n/wp/united_states'
     """
     # find titles of the form Foo (bar)
     topic = topic.replace('_', ' ')
     match = re.match(r'([^(]+) \(([^)]+)\)', topic)
     if not match:
-        return standardized_concept_uri('en', topic)
+        return standardized_concept_uri(language, topic)
     else:
-        return standardized_concept_uri('en', match.group(1), 'n', 'wp', match.group(2))
+        return standardized_concept_uri(language, match.group(1), 'n', 'wp', match.group(2))
 
 
 def standardized_concept_name(lang, text):

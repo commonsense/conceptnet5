@@ -1,20 +1,20 @@
-from __future__ import unicode_literals, print_function
 """
 Get data from DBPedia.
 """
-
-__author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
 
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, full_conceptnet_url, resource_name
+from conceptnet5.formats.semantic_web import NTriplesWriter, NTriplesReader, resource_name
 import langcodes
 import urllib
 import sys
 import re
+
+__author__ = 'Justin Venezuela (jven@mit.edu), Rob Speer (rspeer@mit.edu)'
+
 
 
 # Python 2/3 compatibility
@@ -29,43 +29,84 @@ else:
     quote = urllib.quote
 
 
-def make_surface_text(rel, start, end):
-    if rel == '/r/IsA':
-        return '[[{0}]] is a kind of [[{1}]]'.format(start, end)
-    if rel == '/r/InstanceOf':
-        return '[[{0}]] is an instance of [[{1}]]'.format(start, end)
-    elif rel == '/r/PartOf':
-        return '[[{0}]] is part of [[{1}]]'.format(start, end)
-    elif rel == '/r/AtLocation':
-        return '[[{0}]] is located in [[{1}]]'.format(start, end)
-    elif rel == '/r/TranslationOf':
-        return '[[{0}]] is a translation of [[{1}]]'.format(start, end)
-    else:
-        return '[[{0}]] {1} [[{2}]]'.format(start, rel.split('/')[-1], end)
+RELATIONS = {
+    'isPartOf': '/r/PartOf',
+    'series': '/r/PartOf',
+    'location': '/r/AtLocation',
+    'place': '/r/AtLocation',
+    'locatedInArea': '/r/AtLocation',
+    'sameAs': '/r/Synonym',
+    # leave out differentFrom, as it is mostly about confusable names
+    'similar': '/r/SimilarTo',
+    'related': '/r/RelatedTo',
+    'seeAlso': '/r/RelatedTo',
+    'type': '/r/InstanceOf',
 
+    'field': '/r/dbpedia/field',
+    'genre': '/r/dbpedia/genre',
+    'influencedBy': '/r/dbpedia/influencedBy',
+    'knownFor': '/r/dbpedia/knownFor',
+    'language': '/r/dbpedia/language',
+    'languageFamily': '/r/dbpedia/languageFamily',
+    'notableIdea': '/r/dbpedia/notableIdea',
+    'notableWork': '/r/dbpedia/notableWork',
+    'occupation': '/r/dbpedia/occupation',
 
-# We're going to be building a mapping from Semantic Web URIs to ConceptNet
-# URIs. This set keeps track of the ones we already used, so we don't have to
-# output them again.
-def parse_topic_name(text):
-    """
-    Get a canonical representation of a Wikipedia topic, which may include
-    a disambiguation string in parentheses.
+    # Things to add later if they would help:
+    #   leader / movement / predecessor / successor
+    #   author
+    #   writer / director / producer / starring / etc.
+    #   associatedBand / associatedMusicalArtist / bandMember
+    #   kingdom / phylum / ...
 
-    Returns a list of URI pieces, which could be simply [name], or
-    [name, pos], or [name, pos, disambiguation].
-    """
-    # Convert space-substitutes to spaces, and eliminate redundant spaces
-    text = text.replace('_', ' ')
-    while '  ' in text:
-        text = text.replace('  ', ' ')
-    # Find titles of the form "Topic (disambiguation)"
-    match = re.match(r'([^(]+) \((.+)\)', text)
-    if not match:
-        return [text]
-    else:
-        # Assume all topics are nouns
-        return [match.group(1), 'n', match.group(2).strip(' ')]
+}
+
+# Ban some concepts that are way too generic and often differ from the common
+# way that people use these words
+CONCEPT_BLACKLIST = {
+    '/c/en/work', '/c/en/agent', '/c/en/artist',
+    '/c/en/thing', '/c/en/settlement'
+}
+
+# Every item has one type in 'instancetypes'. There are many types that have
+# lots of objects we're not interested in representing in ConceptNet, such as
+# 'Road', 'RailwayStation', and 'Album'. Here are the types we *are* okay with.
+TYPE_WHITELIST = {
+    'Insect',
+    'Thing',
+    'Plant',
+    'City',
+    'Fish',
+    'Mammal',
+    'Country',
+    'AnatomicalStructure',
+    'Language',
+    'Animal',
+    'Drug',
+    'Weapon',
+    'Disease',
+    'Reptile',
+    'Food',
+    'Planet',
+    'MountainRange',
+    'Game',
+    'Mineral',
+    'MusicGenre',
+    'ProgrammingLanguage',
+    'Colour',
+    'Holiday',
+    'Eukaryote',
+    'WorldHeritageSite',
+    'Fern',
+    'Conifer',
+    'Fashion',
+    'Bone',
+    'Currency',
+    'Nerve',
+    'Muscle',
+    'Sport',
+    'Continent',
+}
 
 
 def translate_dbpedia_url(url):
@@ -109,19 +150,6 @@ def translate_dbpedia_url(url):
     pieces[0] = un_camel_case(pieces[0])
     return standardized_concept_uri(lang, *pieces)
 
-
-SPECIFIC_RELATION_WHITELIST = {
-    'genre', 'field', 'knownFor', 'mainInterest', 'notableIdea',
-    'spokenIn', 'languageFamily', 'influenced', 'influencedBy'
-}
-
-# Ban some concepts that are way too generic *and* differ from the common way that
-# people use these words
-CONCEPT_BLACKLIST = {
-    '/c/en/work', '/c/en/agent', '/c/en/artist'
-}
-
-
 def map_dbpedia_relation(url):
     """
     Recognize some relations that we can extract from DBPedia, and convert
@@ -136,14 +164,8 @@ def map_dbpedia_relation(url):
     '/r/dbpedia/genre'
     """
     name = resource_name(url)
-    if name in {'type', 'occupation'}:
-        return '/r/InstanceOf'
-    elif name.startswith('location'):
-        return '/r/AtLocation'
-    elif name == 'sameAs':
-        return '/r/TranslationOf'
-    elif name in SPECIFIC_RELATION_WHITELIST:
-        return '/r/dbpedia/%s' % name
+    if name in RELATIONS:
+        return RELATIONS[name]
     else:
         return None
 
