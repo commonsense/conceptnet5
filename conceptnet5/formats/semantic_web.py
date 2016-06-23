@@ -2,6 +2,7 @@ from ftfy.fixes import decode_escapes
 import sys
 import urllib
 import langcodes
+import re
 
 SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
 
@@ -208,6 +209,52 @@ class NTriplesReader:
             return 'URL', decode_url(url_base + resource)
         else:
             return (None, decode_escapes(node_text))
+
+
+NQUADS_ITEM_RE = re.compile(r'''
+    ( <                         # A URI/IRI enclosed in angle brackets
+        (?P<uri> [^> ]+)
+      >
+    | "                         # A double-quoted string
+      (?P<text>                 # If the string contains quotation marks,
+        (\\"|[^"])+             # they must be escaped
+      )
+      "
+      ( @(?P<lang> [A-Za-z_]+)  # The string can be tagged with a language code
+      | ^^<(?P<type> [^> ]+)>   # Or a type
+      )?                        # Or neither
+    )
+    ''', re.VERBOSE)
+
+
+def parse_nquads_line(line):
+    items = []
+    for match in NQUADS_ITEM_RE.finditer(line):
+        item = {}
+        for group in ['uri', 'text', 'lang', 'type']:
+            matched = match.group(group)
+            if matched is not None:
+                item[group] = matched
+        if 'uri' in item:
+            item['uri'] = decode_url(item['uri'])
+        if 'lang' in item:
+            item['lang'] = langcodes.standardize_tag(item['lang'])
+        if 'type' in item:
+            item['type'] = decode_url(item['type'])
+        if 'text' in item:
+            item['text'] = decode_escapes(item['text'])
+        items.append(item)
+    if len(items) == 3:
+        items.append({})
+    assert len(items) == 4
+    return items
+
+
+def parse_nquads(stream):
+    for line in stream:
+        line = line.strip()
+        if line:
+            yield parse_nquads_line(line)
 
 
 class ExternalReferenceWriter:

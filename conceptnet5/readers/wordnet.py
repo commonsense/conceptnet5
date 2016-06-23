@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
-    NTriplesReader, resource_name, ExternalReferenceWriter
+    resource_name, ExternalReferenceWriter, parse_nquads
 )
 
 
@@ -87,7 +87,6 @@ def label_sort_key(label):
 
 
 def run_wordnet(input_file, output_file, refs_file):
-    reader = NTriplesReader()
     out = MsgpackStreamWriter(output_file)
     refs = ExternalReferenceWriter(refs_file)
 
@@ -102,11 +101,17 @@ def run_wordnet(input_file, output_file, refs_file):
     synset_uris = {}
 
     # First pass: find data about synsets
-    for subj, rel, obj, objtag in reader.parse_file(input_file):
+    quads = parse_nquads(open(input_file, encoding='utf-8'))
+    for subj_dict, rel_dict, obj_dict, _graph in quads:
+        subj = subj_dict['uri']
+        rel = rel_dict['uri']
+        obj = obj_dict.get('uri')
+        objtext = obj_dict.get('text')
+
         relname = resource_name(rel)
         if relname == 'label':
-            if objtag == 'en':
-                synset_labels[subj].append(obj)
+            if obj_dict['lang'] == 'en':
+                synset_labels[subj].append(objtext)
         elif relname == 'sameAs':
             if obj.startswith(WN20_URL):
                 # If we have a link to RDF WordNet 2.0, the URL (URI? IRI?)
@@ -130,7 +135,7 @@ def run_wordnet(input_file, output_file, refs_file):
                 domain = target.split('.')[1]
                 synset_domains[subj] = domain
         elif relname == 'gloss':
-            synset_glosses[subj] = obj
+            synset_glosses[subj] = objtext
         elif relname == 'reference':
             lemma = resource_name(subj)
             synset = obj
@@ -179,11 +184,13 @@ def run_wordnet(input_file, output_file, refs_file):
                 )
                 out.write(edge)
 
-    for subj, rel, obj, objtag in reader.parse_file(input_file):
+    quads = parse_nquads(open(input_file, encoding='utf-8'))
+    for subj_dict, rel_dict, obj_dict, _graph in quads:
+        subj = subj_dict['uri']
+        rel = rel_dict['uri']
+        obj = obj_dict.get('uri')
         # Some WordNets use strings with "!" in them to indicate out-of-band
         # information, such as a missing translation
-        if '!' in obj:
-            continue
         relname = resource_name(rel)
         if relname in REL_MAPPING:
             rel, frame = REL_MAPPING[relname]
@@ -192,15 +199,20 @@ def run_wordnet(input_file, output_file, refs_file):
                 rel = rel[1:]
                 reversed_frame = True
             rel_uri = '/r/' + rel
-            if objtag == 'URL':
+            if obj is not None:
                 obj_uri = synset_uris.get(obj)
                 if obj not in synset_canonical_labels:
                     continue
                 obj_label = synset_canonical_labels[obj]
             else:
+                print(obj_dict)
+                text = obj_dict['text']
+                if '!' in text:
+                    continue
+                lang = obj_dict['lang']
                 pos, sense = synset_disambig.get(subj, (None, None))
-                obj_uri = standardized_concept_uri(objtag, obj, pos, 'wn', sense)
-                obj_label = obj
+                obj_uri = standardized_concept_uri(lang, text, pos, 'wn', sense)
+                obj_label = text
 
             if subj not in synset_uris or subj not in synset_canonical_labels:
                 continue
