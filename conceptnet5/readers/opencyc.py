@@ -89,6 +89,9 @@ def run_opencyc(input_file, output_file, ref_file):
             subj_uri = standardized_concept_uri('en', subj_label)
             refs.write_link(subj_uri, web_obj)
 
+    out.close()
+    refs.close()
+
 
 def cyc_to_conceptnet_uri(labels, unlabels, uri):
     """

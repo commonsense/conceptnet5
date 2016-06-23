@@ -60,7 +60,7 @@ DATASET_NAMES = [
     "jmdict/jmdict",
     "nadya/nadya",
     "ptt_petgame/api",
-    "umbel/umbel",
+    "opencyc/opencyc",
     "verbosity/verbosity",
     "wordnet/wordnet"
 ]
@@ -188,14 +188,14 @@ rule read_ptt_petgame:
     shell:
         "python3 -m conceptnet5.readers.ptt_petgame {input} {output}"
 
-rule read_umbel:
+rule read_opencyc:
     input:
-        DATA + "/raw/umbel/umbel.nt"
+        DATA + "/raw/opencyc/opencyc-2012-05-10-readable.nq"
     output:
-        DATA + "/edges/umbel/umbel.msgpack",
-        DATA + "/external/umbel.csv"
+        DATA + "/edges/opencyc/opencyc.msgpack",
+        DATA + "/external/opencyc.csv"
     shell:
-        "python3 -m conceptnet5.readers.umbel {input} {output}"
+        "python3 -m conceptnet5.readers.opencyc {input} {output}"
 
 rule read_verbosity:
     input:

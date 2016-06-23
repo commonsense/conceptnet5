@@ -16,7 +16,7 @@ def msgpack_to_tab_separated(input_filename, output_filename):
         for info in read_msgpack_stream(input_filename):
             columns = ['uri', 'rel', 'start', 'end']
             extra_info = {
-                'weight': info['weight'],
+                'weight': round(info['weight'], 3),
                 'sources': info['sources'],
                 'dataset': info['dataset'],
                 'license': info['license']
@@ -25,7 +25,7 @@ def msgpack_to_tab_separated(input_filename, output_filename):
                 if info.get(extra_key):
                     extra_info[extra_key] = info[extra_key]
 
-            json_info = json.dumps(extra_info, ensure_ascii=False)
+            json_info = json.dumps(extra_info, ensure_ascii=False, sort_keys=True)
             column_values = [info[col] for col in columns] + [json_info]
             line = '\t'.join(column_values)
             assert '\n' not in line
