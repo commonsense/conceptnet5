@@ -33,14 +33,18 @@ RELATIONS = {
     'type': '/r/InstanceOf',
 
     'field': '/r/dbpedia/field',
+    'academicDiscipline': '/r/dbpedia/field',
     'genre': '/r/dbpedia/genre',
+    'literaryGenre': '/r/dbpedia/genre',
     'influencedBy': '/r/dbpedia/influencedBy',
     'knownFor': '/r/dbpedia/knownFor',
     'language': '/r/dbpedia/language',
     'languageFamily': '/r/dbpedia/languageFamily',
+    'spokenIn': '/r/dbpedia/spokenIn',
     'notableIdea': '/r/dbpedia/notableIdea',
     'notableWork': '/r/dbpedia/notableWork',
     'occupation': '/r/dbpedia/occupation',
+    'profession': '/r/dbpedia/occupation',
     'author': '/r/dbpedia/author',
     'writer': '/r/dbpedia/writer',
     'director': '/r/dbpedia/director',
@@ -53,7 +57,13 @@ RELATIONS = {
     'bandMember': '/r/dbpedia/bandMember',
     'artist': '/r/dbpedia/artist',
     'musicalArtist': '/r/dbpedia/artist',
-    'musicalBand': '/r/dbpedia/artist'
+    'musicalBand': '/r/dbpedia/artist',
+    'capital': '/r/dbpedia/capital',
+    'country': '/r/dbpedia/country',
+    'region': '/r/dbpedia/region',
+    'era': '/r/dbpedia/era',
+    'service': '/r/dbpedia/service',
+    'product': '/r/dbpedia/product',
 }
 
 # Ban some concepts that are way too generic and often differ from the common
@@ -90,6 +100,8 @@ def translate_dbpedia_url(url):
         return None
     parsed = parse_url(url)
     domain = parsed.netloc
+    if '.' not in domain:
+        return None
 
     if domain == 'dbpedia.org':
         # Handle old DBPedia URLs that had no language code
@@ -183,6 +195,24 @@ def process_dbpedia(input_dir, output_file, refs_file):
                                     weight=0.5
                                 )
                                 out.write(edge)
+
+    relations_path = input_path / 'mappingbased_objects_en.tql.bz2'
+    quads = parse_nquads(bz2.open(str(relations_path), 'rt'))
+    for subj, pred, obj, _graph in quads:
+        subj_concept = translate_dbpedia_url(subj['url'])
+        obj_concept = translate_dbpedia_url(obj['url'])
+        rel_name = resource_name(pred['url'])
+        if subj_concept in ok_concepts and obj_concept in ok_concepts:
+            if rel_name in RELATIONS:
+                rel = RELATIONS[rel_name]
+                edge = make_edge(
+                    rel, subj_concept, obj_concept,
+                    dataset='/d/dbpedia/en',
+                    license=Licenses.cc_sharealike,
+                    sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                    weight=0.5
+                )
+
     refs.close()
     out.close()
 

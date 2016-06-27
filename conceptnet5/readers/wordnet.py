@@ -205,7 +205,6 @@ def run_wordnet(input_file, output_file, refs_file):
                     continue
                 obj_label = synset_canonical_labels[obj]
             else:
-                print(obj_dict)
                 text = obj_dict['text']
                 if '!' in text:
                     continue

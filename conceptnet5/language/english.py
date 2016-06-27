@@ -3,10 +3,13 @@ Tools for working with English text.
 """
 from .lemmatize import LEMMATIZER
 
-STOPWORDS = ['the', 'a', 'an', 'some', 'any',
-             'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
-             'these', 'those', 'something', 'someone', 'anything',
-             'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they']
+STOPWORDS = [
+    'the', 'a', 'an', 'some', 'any',
+    'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they',
+    'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
+    'these', 'those', 'something', 'someone', 'somebody', 'anything', 'anyone',
+    "someone's", "something's", "anything's", "somebody's", "anyone's",
+]
 
 
 DROP_FIRST = ['to', 'be', 'is', 'are']

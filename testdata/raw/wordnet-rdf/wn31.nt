@@ -66,6 +66,7 @@
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://wordnet-rdf.princeton.edu/ontology#Synset> .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#synset_member> <http://wordnet-rdf.princeton.edu/wn31/test-n> .
 <http://wordnet-rdf.princeton.edu/wn31/100793188-n> <http://wordnet-rdf.princeton.edu/ontology#hypernym> <http://wordnet-rdf.princeton.edu/wn31/100792739-n> .
+<http://wordnet-rdf.princeton.edu/wn31/100793188-n> <http://www.w3.org/2000/01/rdf-schema#label> "assay"@eng .
 <http://wordnet-rdf.princeton.edu/wn31/100794017-n> <http://wordnet-rdf.princeton.edu/ontology#hypernym> <http://wordnet-rdf.princeton.edu/wn31/100792739-n> .
 <http://wordnet-rdf.princeton.edu/wn31/100795505-n> <http://wordnet-rdf.princeton.edu/ontology#hypernym> <http://wordnet-rdf.princeton.edu/wn31/100792739-n> .
 <http://wordnet-rdf.princeton.edu/wn31/100795784-n> <http://wordnet-rdf.princeton.edu/ontology#hypernym> <http://wordnet-rdf.princeton.edu/wn31/100792739-n> .

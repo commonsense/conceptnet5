@@ -21,7 +21,6 @@ STRING_TYPE = type("")
 # of their category in JMdict (because they're automatically decoded
 # from their more helpful entity form).
 NOUN_TYPES = [
-    "nouns whic",
     "noun (comm",
     "adverbial ",
     "noun, used",
@@ -29,6 +28,7 @@ NOUN_TYPES = [
     "noun or pa",
 ]
 ADJ_TYPES = [
+    "nouns whic",  # I promise this is more like an adjective than a noun. Its entity is &adj-no;
     "adjective ",
     "adjectival",
     "pre-noun a",

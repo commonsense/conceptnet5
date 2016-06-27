@@ -528,7 +528,7 @@ def standardize_text(text, token_filter=None):
         'embedded_tab'
 
         >>> standardize_text('_')
-        '_'
+        ''
 
         >>> standardize_text(',')
         ''
