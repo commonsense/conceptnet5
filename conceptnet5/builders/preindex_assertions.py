@@ -2,9 +2,6 @@ from __future__ import print_function
 from conceptnet5.uri import uri_prefixes
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 from conceptnet5.hashtable.preindex import preindex_data
-import struct
-import math
-from binascii import b2a_base64
 
 
 def get_indices(edge):

@@ -493,7 +493,9 @@ def standardize_as_list(text, token_filter=None):
     >>> standardize_as_list('to', token_filter=english_filter)
     ['to']
     """
-    text = fix_text(text)
+    # Apply ftfy normalizers, but don't fix encoding, because that's slow and
+    # it's unnecessary when we control the data sources
+    text = fix_text(text, fix_encoding=False)
     tokens = [token for token in simple_tokenize(text)]
     if token_filter is not None:
         tokens = token_filter(tokens)
@@ -536,13 +538,13 @@ def standardize_text(text, token_filter=None):
     return '_'.join(standardize_as_list(text.replace('_', ' '), token_filter))
 
 
-def standardize_topic(language, topic):
+def topic_to_concept(language, topic):
     """
     Get a canonical representation of a Wikipedia topic, which may include
     a disambiguation string in parentheses. Returns a concept URI that
     may be disambiguated as a noun.
 
-    >>> standardize_topic('en', 'Township (United States)')
+    >>> topic_to_concept('en', 'Township (United States)')
     '/c/en/township/n/wp/united_states'
     """
     # find titles of the form Foo (bar)
@@ -590,6 +592,7 @@ def standardized_concept_uri(lang, text, *more):
     return concept_uri(lang, norm_text, *more_text)
 
 normalized_concept_uri = standardized_concept_uri
+standardize_concept_uri = standardized_concept_uri
 
 
 def get_uri_language(uri):

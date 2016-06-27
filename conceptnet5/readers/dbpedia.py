@@ -1,10 +1,34 @@
 """
-Get data from DBPedia.
+Filter data from DBPedia for inclusion in ConceptNet.
+
+The data we use here is far from the entirety of DBPedia, which lists millions
+of things that are not general knowledge, such as villages with a population of
+20, individual roads, sports team rosters from a particular season, and so on.
+We try to filter this information to get data that's suitable for ConceptNet.
+
+We only extract information from the 'instance_types', 'interlanguage_links',
+and 'mappingbased_objects' files, using 'page_links' as a filter.
+
+We filter for relevant concepts in the following way:
+
+- Use only pages whose English version is the target of at least 100 Wikipedia
+  links, as seen in the 'page_links_en' file.
+- Skip pages that are lists or Wikipedia internals.
+- Filter out the instances of specific types, such as 'Settlement' and 'Road'.
+- Use only pages that have been translated to at least 5 languages in the
+  'interlanguage_links' file.
+- Use only pages that have a Wikidata ID of less than 1000000. This is a crude
+  heuristic, based on the fact that higher-numbered pages are likely to be
+  less well known, but it lets us cut off reading the translation file early.
+
+We extract types and certain relations from the pages that remain using the
+'instance_types' and 'mappingbased_objects' files.
+
 """
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import (
-    standardized_concept_uri, standardize_topic, ALL_LANGUAGES, LCODE_ALIASES
+    standardized_concept_uri, topic_to_concept, ALL_LANGUAGES, LCODE_ALIASES
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
@@ -59,9 +83,6 @@ RELATIONS = {
     'musicalArtist': '/r/dbpedia/artist',
     'musicalBand': '/r/dbpedia/artist',
     'capital': '/r/dbpedia/capital',
-    'country': '/r/dbpedia/country',
-    'region': '/r/dbpedia/region',
-    'era': '/r/dbpedia/era',
     'service': '/r/dbpedia/service',
     'product': '/r/dbpedia/product',
 }
@@ -73,9 +94,9 @@ CONCEPT_BLACKLIST = {
 }
 
 TYPE_BLACKLIST = {
-    'Settlement', 'Railway Line', 'Road', 'Sports Event',
+    'Settlement', 'Railway Line', 'Road', 'Sports Event', 'Event',
     'Olympic Event', 'Soccer Tournament', 'Election', 'Diocese',
-    'Year', 'Football League Season',
+    'Year', 'Football League Season', 'Grand Prix'
 }
 
 
@@ -92,11 +113,11 @@ def translate_dbpedia_url(url):
 
     The problem here is that the "name" relation is not unique in either
     direction. A URL can have many names, and the same name can refer to
-    many URLs, and some of these names are the result of parsing glitches.
-    The URL itself is a stable thing that we can build a ConceptNet URI from,
-    on the other hand.
+    many URLs, and some of these names are rarely used or are the result of
+    parsing glitches. The URL itself is a stable thing that we can build a
+    ConceptNet URI from, on the other hand.
     """
-    if '__' in url:
+    if '__' in url or 'dbpedia.org' not in url:
         return None
     parsed = parse_url(url)
     domain = parsed.netloc
@@ -115,7 +136,7 @@ def translate_dbpedia_url(url):
         if lang not in ALL_LANGUAGES:
             return None
         text = resource_name(url).replace('_', ' ')
-        uri = standardize_topic(lang, text)
+        uri = topic_to_concept(lang, text)
         if uri in CONCEPT_BLACKLIST:
             return None
         else:
@@ -144,10 +165,29 @@ def map_dbpedia_relation(url):
         return None
 
 
-def process_dbpedia(input_dir, output_file, refs_file):
+def get_urls_from_degree_file(in_degree_file):
+    urls = set()
+    for line in open(in_degree_file, encoding='utf-8'):
+        line = line.strip()
+        if line:
+            count_str, url_str = line.split(' ', 1)
+            assert url_str[0] == '<'
+            assert url_str[-1] == '>'
+            url = url_str[1:-1]
+            urls.add(url)
+    return urls
+
+
+def process_dbpedia(input_dir, output_file, in_degree_file, refs_file):
+    """
+    Read through multiple DBPedia files and output filtered assertions to
+    `output_file`.
+    """
+    high_degree_urls = get_urls_from_degree_file(in_degree_file)
+
     input_path = pathlib.Path(input_dir)
     interlang_path = input_path / 'interlanguage_links_en.tql.bz2'
-    mapped_urls = interlanguage_mapping(interlang_path)
+    mapped_urls = interlanguage_mapping(interlang_path, high_degree_urls)
 
     ok_concepts = set()
     out = MsgpackStreamWriter(output_file)
@@ -159,7 +199,8 @@ def process_dbpedia(input_dir, output_file, refs_file):
         subj_url = subj['url']
         if (
             'Category:' in subj_url or 'File:' in subj_url or
-            'List_of' in subj_url or '__' in subj_url
+            'List_of' in subj_url or '__' in subj_url or
+            'Template:' in subj_url
         ):
             continue
         if subj_url in mapped_urls:
@@ -176,7 +217,9 @@ def process_dbpedia(input_dir, output_file, refs_file):
                             dataset='/d/dbpedia/en',
                             license=Licenses.cc_sharealike,
                             sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                            weight=0.5
+                            weight=0.5,
+                            surfaceStart=url_to_label(subj['url']),
+                            surfaceEnd=url_to_label(obj['url'])
                         )
                         out.write(edge)
                     for other_url in mapped_urls[subj_url]:
@@ -192,7 +235,9 @@ def process_dbpedia(input_dir, output_file, refs_file):
                                     dataset='/d/dbpedia/en',
                                     license=Licenses.cc_sharealike,
                                     sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                                    weight=0.5
+                                    weight=0.5,
+                                    surfaceStart=url_to_label(other_url),
+                                    surfaceEnd=url_to_label(subj_url)
                                 )
                                 out.write(edge)
 
@@ -202,7 +247,10 @@ def process_dbpedia(input_dir, output_file, refs_file):
         subj_concept = translate_dbpedia_url(subj['url'])
         obj_concept = translate_dbpedia_url(obj['url'])
         rel_name = resource_name(pred['url'])
-        if subj_concept in ok_concepts and obj_concept in ok_concepts:
+        if (
+            subj_concept in ok_concepts and obj_concept in ok_concepts and
+            subj['url'] in mapped_urls and obj['url'] in mapped_urls
+        ):
             if rel_name in RELATIONS:
                 rel = RELATIONS[rel_name]
                 edge = make_edge(
@@ -210,36 +258,56 @@ def process_dbpedia(input_dir, output_file, refs_file):
                     dataset='/d/dbpedia/en',
                     license=Licenses.cc_sharealike,
                     sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                    weight=0.5
+                    weight=0.5,
+                    surfaceStart=url_to_label(subj['url']),
+                    surfaceEnd=url_to_label(obj['url'])
                 )
+                out.write(edge)
 
     refs.close()
     out.close()
 
 
-def interlanguage_mapping(interlang_path):
+def url_to_label(url):
+    return resource_name(url).replace('_', ' ')
+
+
+def interlanguage_mapping(interlang_path, acceptable_urls):
     quads = parse_nquads(bz2.open(str(interlang_path), 'rt'))
     mapping = {}
     for subj, values in itertools.groupby(quads, itemgetter(0)):
         subj_url = subj['url']
-        vals_list = list(values)
+        if subj_url in acceptable_urls:
+            vals_list = list(values)
 
-        # Keep nodes with at least 5 translations plus the Wikidata links
-        if len(vals_list) >= 7:
-            concepts = [subj_url]
-            for _subj, _pred, obj, _graph in vals_list:
-                url = obj['url']
-                if 'www.wikidata.org' in url:
-                    continue
-                if url.startswith('http://wikidata.dbpedia.org/'):
-                    wikidata_id = resource_name(url)
+            # Keep nodes with at least 5 translations plus the Wikidata links
+            if len(vals_list) >= 7:
+                concepts = [subj_url]
+                for _subj, _pred, obj, _graph in vals_list:
+                    url = obj['url']
+                    if 'www.wikidata.org' in url:
+                        continue
+                    if url.startswith('http://wikidata.dbpedia.org/'):
+                        wikidata_id = resource_name(url)
 
-                    # Return early when we see a high-numbered Wikidata ID
-                    print(wikidata_id, resource_name(subj_url))
-                    if int(wikidata_id[1:]) >= 50000:
-                        return mapping
-                concepts.append(url)
+                        # Return early when we see a high-numbered Wikidata ID
+                        if int(wikidata_id[1:]) >= 1000000:
+                            return mapping
+                    concepts.append(url)
 
-            mapping[subj_url] = concepts
+                mapping[subj_url] = concepts
 
 
+def main():
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_dir', help="Directory containing DBPedia files")
+    parser.add_argument('output_file', help='msgpack file to output to')
+    parser.add_argument('in_degree_file', help="File listing the in-degrees of DBPedia nodes")
+    parser.add_argument('refs', help='A tab-separated file of Semantic Web equivalences to write')
+    args = parser.parse_args()
+    process_dbpedia(args.input_dir, args.output_file, args.in_degree_file, args.refs)
+
+
+if __name__ == '__main__':
+    main()

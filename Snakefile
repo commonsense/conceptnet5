@@ -57,6 +57,7 @@ RETROFIT_SHARDS = 6
 # with these names.
 
 DATASET_NAMES = [
+    "dbpedia/dbpedia_en",
     "jmdict/jmdict",
     "nadya/nadya",
     "ptt_petgame/api",
@@ -87,6 +88,7 @@ rule all:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/index/assertions.index",
+        # DATA + "/index/external_links.index",
         DATA + "/stats/dataset_vs_language.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
@@ -152,6 +154,24 @@ rule precompute_wiktionary:
                     "--acl public-read")
 
 
+rule filter_dbpedia_links:
+    input:
+        DATA + "/raw/dbpedia/page_links_en.tql.bz2"
+    output:
+        DATA + "/precomputed/dbpedia/in_degree_en.txt"
+    run:
+        if USE_PRECOMPUTED:
+            shell("curl {PRECOMPUTED_DATA_URL}/dbpedia/in_degree_en.txt > {output}")
+        else:
+            shell("bunzip2 -c {input} "
+                  "| cut -f 3 -d ' ' | sort | uniq -c "
+                  "| egrep -v ' [0-9][0-9]? ' | sort -nrk 1 > {output}")
+            if UPLOAD:
+                shell("aws s3 cp {output} "
+                    "{PRECOMPUTED_S3_UPLOAD}/dbpedia/in_degree_en.txt "
+                    "--acl public-read")
+
+
 # Readers
 # =======
 # These are steps that turn raw data into files of uncombined 'edges'.
@@ -163,6 +183,20 @@ rule read_conceptnet4:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     shell:
         "python3 -m conceptnet5.readers.conceptnet4 {input} {output}"
+
+rule read_dbpedia:
+    input:
+        DATA + "/raw/dbpedia/instance_types_en.tql.bz2",
+        DATA + "/raw/dbpedia/interlanguage_links_en.tql.bz2",
+        DATA + "/raw/dbpedia/mappingbased_objects_en.tql.bz2"
+    output:
+        DATA + "/edges/dbpedia/dbpedia_en.msgpack",
+        DATA + "/external/dbpedia.csv"
+    shell:
+        "python3 -m conceptnet5.readers.dbpedia %(data)s/raw/dbpedia "
+        "%(data)s/edges/dbpedia/dbpedia_en.msgpack "
+        "%(data)s/precomputed/dbpedia/in_degree_en.txt "
+        "%(data)s/external/dbpedia.csv" % {'data': DATA}
 
 rule read_jmdict:
     input:
@@ -286,7 +320,7 @@ rule combine_assertions:
 
 # Making an index file
 # ====================
-rule build_preindex:
+rule build_assertion_preindex:
     input:
         DATA + "/assertions/assertions.msgpack"
     output:
@@ -297,11 +331,12 @@ rule build_preindex:
         "| LANG=C sort -T %(data)s/tmp "
         "| LANG=C uniq > {output}" % {'data': DATA}
 
+
 rule build_index:
     input:
-        DATA + "/index/assertions.preindex.txt"
+        DATA + "/index/{name}.preindex.txt"
     output:
-        DATA + "/index/assertions.index"
+        DATA + "/index/{name}.index"
     shell:
         "cn5-build-index {input} {output} {HASH_WIDTH}"
 

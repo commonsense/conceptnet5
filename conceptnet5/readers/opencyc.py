@@ -39,8 +39,8 @@ def opencyc_edge(rel, start, end, start_text, end_text):
 BLACKLIST_WORDS = {
     'arg', 'arity', 'aura', 'bugzilla', 'cbl', 'cblask', 'cblassign',
     'centroid', 'cw', 'cwe', 'cyc', 'cycl', 'deprecated', 'fn', 'individual',
-    'mett', 'microtheory', 'mr', 'mt', 'opencyc', 'pcw', 'temporally', 'type',
-    'union', 'underspecified', 'wn', 'wordnet'
+    'mett', 'microtheory', 'mr', 'mt', 'obo', 'opencyc', 'pcw', 'temporally',
+    'type', 'union', 'underspecified', 'wn', 'wordnet'
 }
 
 
@@ -71,6 +71,8 @@ def run_opencyc(input_file, output_file, ref_file):
             subj_label = labels[web_subj]
             obj_label = labels[web_obj]
             if '_' in subj_label or '_' in obj_label:
+                continue
+            if subj_label.startswith('xsd:') or obj_label.startswith('xsd:'):
                 continue
             subj_words = set(standardize_as_list(subj_label))
             obj_words = set(standardize_as_list(obj_label))
