@@ -533,7 +533,7 @@ def standardize_text(text, token_filter=None):
         >>> standardize_text(',')
         ''
     """
-    return '_'.join(standardize_as_list(text, token_filter))
+    return '_'.join(standardize_as_list(text.replace('_', ' '), token_filter))
 
 
 def standardize_topic(language, topic):
@@ -555,19 +555,10 @@ def standardize_topic(language, topic):
 
 
 def standardized_concept_name(lang, text):
-    """
-    DEPRECATED: Use `standardize_text` instead.
-
-    Pass the text on to `standardize_text` to get its normal form. Disregard
-    the language. If you want to run text through a particular filter, pass
-    that filter as the second argument to `standardize_text`.
-
-    >>> standardized_concept_name('en', 'this is a test')
-    'this_is_a_test'
-    >>> standardized_concept_name('es', 'ESTO ES UNA PRUEBA')
-    'esto_es_una_prueba'
-    """
-    return standardize_text(text, None)
+    raise NotImplementedError(
+        "standardized_concept_name has been removed. "
+        "Use standardize_text instead."
+    )
 
 normalized_concept_name = standardized_concept_name
 
