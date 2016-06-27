@@ -103,9 +103,9 @@ def run_wordnet(input_file, output_file, refs_file):
     # First pass: find data about synsets
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        subj = subj_dict['uri']
-        rel = rel_dict['uri']
-        obj = obj_dict.get('uri')
+        subj = subj_dict['url']
+        rel = rel_dict['url']
+        obj = obj_dict.get('url')
         objtext = obj_dict.get('text')
 
         relname = resource_name(rel)
@@ -186,9 +186,9 @@ def run_wordnet(input_file, output_file, refs_file):
 
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        subj = subj_dict['uri']
-        rel = rel_dict['uri']
-        obj = obj_dict.get('uri')
+        subj = subj_dict['url']
+        rel = rel_dict['url']
+        obj = obj_dict.get('url')
         # Some WordNets use strings with "!" in them to indicate out-of-band
         # information, such as a missing translation
         relname = resource_name(rel)
@@ -235,9 +235,9 @@ def run_wordnet(input_file, output_file, refs_file):
             )
             out.write(edge)
 
-    for wn_uri in sorted(synset_uris):
-        cn_uri = synset_uris[wn_uri]
-        refs.write_link(cn_uri, wn_uri)
+    for wn_url in sorted(synset_uris):
+        cn_uri = synset_uris[wn_url]
+        refs.write_link(cn_uri, wn_url)
 
     out.close()
     refs.close()

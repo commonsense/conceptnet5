@@ -212,8 +212,8 @@ class NTriplesReader:
 
 
 NQUADS_ITEM_RE = re.compile(r'''
-    ( <                         # A URI/IRI enclosed in angle brackets
-        (?P<uri> [^> ]+)
+    ( <                         # A URL (URI, IRI) enclosed in angle brackets
+        (?P<url> [^> ]+)
       >
     | "                         # A double-quoted string
       (?P<text>                 # If the string contains quotation marks,
@@ -223,7 +223,8 @@ NQUADS_ITEM_RE = re.compile(r'''
       ( @(?P<lang> [A-Za-z_]+)  # The string can be tagged with a language code
       | ^^<(?P<type> [^> ]+)>   # Or a type
       )?                        # Or neither
-    )
+    | [#] (?P<comment>.*)       # The line could end with a comment
+    )\s*
     ''', re.VERBOSE)
 
 
@@ -231,22 +232,26 @@ def parse_nquads_line(line):
     items = []
     for match in NQUADS_ITEM_RE.finditer(line):
         item = {}
-        for group in ['uri', 'text', 'lang', 'type']:
+        for group in ['url', 'text', 'lang', 'type', 'comment']:
             matched = match.group(group)
             if matched is not None:
                 item[group] = matched
-        if 'uri' in item:
-            item['uri'] = decode_url(item['uri'])
+        if 'comment' in item:
+            continue
+        if 'url' in item:
+            item['url'] = decode_url(item['url'])
         if 'lang' in item:
             item['lang'] = langcodes.standardize_tag(item['lang'])
         if 'type' in item:
             item['type'] = decode_url(item['type'])
         if 'text' in item:
             item['text'] = decode_escapes(item['text'])
-        items.append(item)
+        if item:
+            items.append(item)
     if len(items) == 3:
         items.append({})
-    assert len(items) == 4
+    # The line is either empty aside from comments, or contains a quad
+    assert len(items) == 0 or len(items) == 4
     return items
 
 
@@ -254,7 +259,9 @@ def parse_nquads(stream):
     for line in stream:
         line = line.strip()
         if line:
-            yield parse_nquads_line(line)
+            quad = parse_nquads_line(line)
+            if quad:
+                yield quad
 
 
 class ExternalReferenceWriter:
