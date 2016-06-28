@@ -188,7 +188,8 @@ rule read_dbpedia:
     input:
         DATA + "/raw/dbpedia/instance_types_en.tql.bz2",
         DATA + "/raw/dbpedia/interlanguage_links_en.tql.bz2",
-        DATA + "/raw/dbpedia/mappingbased_objects_en.tql.bz2"
+        DATA + "/raw/dbpedia/mappingbased_objects_en.tql.bz2",
+        DATA + "/precomputed/dbpedia/in_degree_en.txt"
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
         DATA + "/external/dbpedia.csv"

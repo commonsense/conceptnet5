@@ -130,8 +130,8 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         query_vec_small = query_vec[:200]
 
         # Get some similar common terms
-        most_similar_sloppy = similar_to_vec(reference_vecs_small, query_vec_small, num=50)
-        most_similar = similar_to_vec(reference_vecs.loc[most_similar_sloppy.index], query_vec, num=5)
+        most_similar_sloppy = similar_to_vec(reference_vecs_small, query_vec_small, limit=50)
+        most_similar = similar_to_vec(reference_vecs.loc[most_similar_sloppy.index], query_vec, limit=5)
         if verbose:
             similar_list = ', '.join(most_similar.index)
             print("%s => %s" % (label, similar_list))
