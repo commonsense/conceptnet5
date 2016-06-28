@@ -4,7 +4,7 @@ includes the `make_edge` function, which builds the dictionary representing
 an edge.
 """
 
-from conceptnet5.uri import (assertion_uri, uri_prefix, conjunction_uri)
+from conceptnet5.uri import (assertion_uri, uri_prefix, conjunction_uri, is_concept)
 import re
 
 
@@ -42,11 +42,12 @@ def make_edge(rel, start, end, dataset, license, sources,
     """
     pstart = uri_prefix(start)
     pend = uri_prefix(end)
-    features = [
-        "%s %s -" % (pstart, rel),
-        "%s - %s" % (pstart, pend),
-        "- %s %s" % (rel, pend)
-    ]
+    if is_concept(pstart) and is_concept(pend):
+        features = [
+            "%s %s -" % (pstart, rel),
+            "%s - %s" % (pstart, pend),
+            "- %s %s" % (rel, pend)
+        ]
     uri = assertion_uri(rel, start, end)
 
     assert isinstance(sources, list), sources

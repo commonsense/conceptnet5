@@ -144,6 +144,7 @@ def split_uri(uri):
     >>> split_uri('/')
     []
     """
+    assert uri.startswith('/')
     uri2 = uri.lstrip('/')
     if not uri2:
         return []
@@ -152,11 +153,13 @@ def split_uri(uri):
 
 def uri_prefix(uri, max_pieces=3):
     """
-    Strip off components that might make a URI too detailed. Only the first
-    `max_pieces` components will be kept.
+    Strip off components that might make a ConceptNet URI too detailed. Only
+    the first `max_pieces` components will be kept.
 
     By default, `max_pieces` is 3, making this function useful for converting
-    disambiguated concepts into their more general ambiguous forms:
+    disambiguated concepts into their more general ambiguous forms.
+
+    If the URI is actually a fully qualified URL, no components are removed.
 
     >>> uri_prefix('/c/en/cat/n/animal')
     '/c/en/cat'
@@ -168,7 +171,11 @@ def uri_prefix(uri, max_pieces=3):
     '/c/en'
     >>> uri_prefix('/c/en/cat', 2)
     '/c/en'
+    >>> uri_prefix('http://en.wikipedia.org/wiki/Example')
+    'http://en.wikipedia.org/wiki/Example'
     """
+    if is_absolute_url(uri):
+        return uri
     pieces = split_uri(uri)[:max_pieces]
     return join_uri(*pieces)
 
@@ -187,6 +194,8 @@ def uri_prefixes(uri, min_pieces=2):
     >>> list(uri_prefixes('/test/[/group/one/]/[/group/two/]'))
     ['/test/[/group/one/]', '/test/[/group/one/]/[/group/two/]']
     """
+    if is_absolute_url(uri):
+        return [uri]
     pieces = []
     for piece in split_uri(uri):
         pieces.append(piece)
@@ -293,6 +302,14 @@ def assertion_uri(rel, start, end):
     """
     assert rel.startswith('/r'), rel
     return compound_uri('/a', (rel, start, end))
+
+
+def is_concept(uri):
+    return uri.startswith('/c/')
+
+
+def is_absolute_url(uri):
+    return uri.startswith('http')
 
 
 class Licenses:

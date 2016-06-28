@@ -602,8 +602,10 @@ def get_uri_language(uri):
     """
     if uri.startswith('/a/'):
         return get_uri_language(parse_possible_compound_uri('a', uri)[0])
-    else:
+    elif uri.startswith('/c/'):
         return split_uri(uri)[1]
+    else:
+        return None
 
 
 def valid_concept_name(text):
