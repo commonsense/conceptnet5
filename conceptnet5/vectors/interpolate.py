@@ -146,4 +146,7 @@ def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbo
         for label in full_labels
     ])
     reordered = np.argsort(-freqs)
-    return l2_normalize_rows(all_vecs.ix[reordered])
+
+    # Truncate the columns of the matrix, as it saves memory in later steps
+    # and doesn't cost much performance after this
+    return l2_normalize_rows(all_vecs.iloc[reordered, :k1])
