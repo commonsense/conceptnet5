@@ -32,6 +32,7 @@
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#translation> "\u062A\u064E\u062C\u0652\u0631\u0650\u0628\u064E\u0629"@ara .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#translation> "cimento"@ita .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#translation> "proba"@eus .
+<http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#translation> "\u0E01\u0E32\u0E23\u0E25\u0E07\u0E42\u0E17\u0E29\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E22\u0E35\u0E48\u0E22\u0E07\u0E2D\u0E22\u0E48\u0E32\u0E07"@tha .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#hypernym> <http://wordnet-rdf.princeton.edu/wn31/100787849-n> .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#hyponym> <http://wordnet-rdf.princeton.edu/wn31/100795505-n> .
 <http://wordnet-rdf.princeton.edu/wn31/100792739-n> <http://wordnet-rdf.princeton.edu/ontology#hyponym> <http://wordnet-rdf.princeton.edu/wn31/100797013-n> .

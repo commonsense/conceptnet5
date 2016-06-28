@@ -212,6 +212,8 @@
 /c/ja/明白/a	/c/nl/voorlopig	2.0	/d/jmdict	/r/TranslationOf
 /c/ja/白地/a	/c/de/klar	2.0	/d/jmdict	/r/TranslationOf
 /c/ja/白地/a	/c/nl/tijdelijk	2.0	/d/jmdict	/r/TranslationOf
+/c/th/การลงโทษเป็นเยี่ยงอย่าง/n/wn/act	/c/th/การลงโทษเป็นเยี่ยงอย่าง	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/th/การลงโทษเป็นเยี่ยงอย่าง/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/TranslationOf
 /c/en/test_flight	/c/en/test/n/wikt/en_1	1.0	/d/wiktionary/en	/r/DerivedFrom
 /c/fr/test	/c/en/test	1.0	/d/wiktionary/en	/r/EtymologicallyRelatedTo
 /c/hu/test/n	/c/en/geometry	1.0	/d/wiktionary/en	/r/HasContext
