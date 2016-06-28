@@ -217,12 +217,14 @@ NQUADS_ITEM_RE = re.compile(r'''
       >
     | "                         # A double-quoted string
       (?P<text>                 # If the string contains quotation marks,
-        (\\"|[^"])+             # they must be escaped
+        (\\"|[^"])*             # they must be escaped
       )
       "
       ( @(?P<lang> [A-Za-z_]+)  # The string can be tagged with a language code
       | ^^<(?P<type> [^> ]+)>   # Or a type
       )?                        # Or neither
+    | _:
+      (?P<blank>[A-Za-z0-9_]+)  # A blank node identifier
     | [#] (?P<comment>.*)       # The line could end with a comment
     )\s*
     ''', re.VERBOSE)
@@ -232,7 +234,7 @@ def parse_nquads_line(line):
     items = []
     for match in NQUADS_ITEM_RE.finditer(line):
         item = {}
-        for group in ['url', 'text', 'lang', 'type', 'comment']:
+        for group in ['url', 'text', 'lang', 'type', 'blank', 'comment']:
             matched = match.group(group)
             if matched is not None:
                 item[group] = matched
@@ -251,7 +253,7 @@ def parse_nquads_line(line):
     if len(items) == 3:
         items.append({})
     # The line is either empty aside from comments, or contains a quad
-    assert len(items) == 0 or len(items) == 4
+    assert len(items) == 0 or len(items) == 4, line
     return items
 
 

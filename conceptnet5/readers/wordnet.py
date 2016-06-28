@@ -103,9 +103,11 @@ def run_wordnet(input_file, output_file, refs_file):
     # First pass: find data about synsets
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
+        if 'url' not in subj_dict or 'url' not in rel_dict or 'url' not in obj_dict:
+            continue
         subj = subj_dict['url']
         rel = rel_dict['url']
-        obj = obj_dict.get('url')
+        obj = obj_dict['url']
         objtext = obj_dict.get('text')
 
         relname = resource_name(rel)
@@ -186,11 +188,11 @@ def run_wordnet(input_file, output_file, refs_file):
 
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
+        if 'url' not in subj_dict or 'url' not in rel_dict or 'url' not in obj_dict:
+            continue
         subj = subj_dict['url']
         rel = rel_dict['url']
         obj = obj_dict.get('url')
-        # Some WordNets use strings with "!" in them to indicate out-of-band
-        # information, such as a missing translation
         relname = resource_name(rel)
         if relname in REL_MAPPING:
             rel, frame = REL_MAPPING[relname]
@@ -206,7 +208,9 @@ def run_wordnet(input_file, output_file, refs_file):
                 obj_label = synset_canonical_labels[obj]
             else:
                 text = obj_dict['text']
-                if '!' in text:
+                # Some WordNets use strings with "!" in them to indicate
+                # out-of-band information, such as a missing translation
+                if (not text) or '!' in text:
                     continue
                 lang = obj_dict['lang']
                 pos, sense = synset_disambig.get(subj, (None, None))
