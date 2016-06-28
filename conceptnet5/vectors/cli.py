@@ -4,6 +4,7 @@ from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_interpolate
 from .evaluation.wordsim import evaluate
+from .transforms import shrink
 
 
 @click.group()
@@ -69,3 +70,15 @@ def run_interpolate(input1_filename, input2_filename, conceptnet_filename, outpu
 def run_evaluate(filename):
     frame = load_hdf(filename)
     print(evaluate(frame))
+
+
+@cli.command(name='shrink')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+@click.option('-n', default=1000000, help="Number of rows to truncate to")
+@click.option('-k', default=300, help="Number of columns to truncate to")
+def run_shrink(input_filename, output_filename, n, k):
+    frame = load_hdf(input_filename)
+    shrunk = shrink(frame, n, k)
+    save_hdf(shrunk, output_filename)
+    print(evaluate(shrunk))

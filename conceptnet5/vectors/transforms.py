@@ -64,3 +64,9 @@ def l2_normalize_rows(frame):
     row_norms = np.sqrt(np.sum(np.power(frame, 2), axis='columns'))
     return frame.div(row_norms, axis='rows')
 
+
+def shrink(frame, n, k):
+    """
+    Truncate a matrix to NxK and re-normalize it.
+    """
+    return l2_normalize_rows(frame.iloc[:n, :k])

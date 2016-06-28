@@ -32,7 +32,7 @@ class VectorSpaceWrapper(object):
                  frame=None):
         if frame is None:
             self.frame = None
-            self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch-small-1606.h5')
+            self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch.h5')
         else:
             self.frame = frame
             self.vector_filename = None
@@ -60,7 +60,7 @@ class VectorSpaceWrapper(object):
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
-                "download it?" % self.path
+                "download it?" % self.vector_filename
             )
 
     @staticmethod

@@ -92,7 +92,7 @@ rule all:
         DATA + "/stats/dataset_vs_language.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/retrofit.h5"
+        DATA + "/vectors/numberbatch.h5"
 
 rule clean:
     shell:
@@ -450,6 +450,14 @@ rule retrofit:
         ram=16
     shell:
         "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} data/vectors/retrofit.h5"
+
+rule shrink_embeddings:
+    input:
+        DATA + "/vectors/retrofit.h5"
+    output:
+        DATA + "/vectors/numberbatch.h5"
+    shell:
+        "cn5-vectors shrink {input} {output} -n 1000000 -k 300"
 
 rule join_retrofit:
     input:
