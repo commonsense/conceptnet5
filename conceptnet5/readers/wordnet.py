@@ -103,11 +103,11 @@ def run_wordnet(input_file, output_file, refs_file):
     # First pass: find data about synsets
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        if 'url' not in subj_dict or 'url' not in rel_dict or 'url' not in obj_dict:
+        if 'url' not in subj_dict or 'url' not in rel_dict:
             continue
         subj = subj_dict['url']
         rel = rel_dict['url']
-        obj = obj_dict['url']
+        obj = obj_dict.get('url')
         objtext = obj_dict.get('text')
 
         relname = resource_name(rel)
@@ -188,7 +188,7 @@ def run_wordnet(input_file, output_file, refs_file):
 
     quads = parse_nquads(open(input_file, encoding='utf-8'))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        if 'url' not in subj_dict or 'url' not in rel_dict or 'url' not in obj_dict:
+        if 'url' not in subj_dict or 'url' not in rel_dict:
             continue
         subj = subj_dict['url']
         rel = rel_dict['url']
