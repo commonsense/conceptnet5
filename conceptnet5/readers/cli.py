@@ -25,10 +25,10 @@ def run_conceptnet4(input, output):
 
 @cli.command(name='jmdict')
 @click.argument('input', type=click.Path(readable=True, dir_okay=False),
-                #help='XML file containing JMDict'
+                # help='XML file containing JMDict'
                 )
 @click.argument('output', type=click.Path(writable=True, dir_okay=False),
-                #help='msgpack file to output to'
+                # help='msgpack file to output to'
                 )
 def run_jmdict(input, output):
     """

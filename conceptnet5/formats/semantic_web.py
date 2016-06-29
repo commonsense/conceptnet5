@@ -1,5 +1,4 @@
 from ftfy.fixes import decode_escapes
-import sys
 import urllib
 import langcodes
 import re
@@ -107,6 +106,21 @@ NQUADS_ITEM_RE = re.compile(r'''
 
 
 def parse_nquads_line(line):
+    """
+    Parse a line in N-Triples or N-Quads format, returning four dictionaries:
+    (subj, pred, obj, graph).
+
+    Each of the dictionaries contains fields that may or may not be present,
+    indicating their parsed content:
+
+        - 'url': a complete URL indicating a resource. (Pedants: It's an IRI,
+          but it's also a URL.)
+        - 'text': a string value.
+        - 'lang': the language code associated with the given 'text'.
+        - 'type': a URL pointing to something in the 'xsd:' namespace,
+          indicating for how to interpret the given 'text' as a value.
+        - 'blank': the arbitrary ID of a blank node.
+    """
     items = []
     for match in NQUADS_ITEM_RE.finditer(line):
         item = {}
@@ -134,28 +148,14 @@ def parse_nquads_line(line):
 
 
 def parse_nquads(stream):
+    """
+    Read an open file in .nt or .nq format, yielding each of its lines as
+    (subject, predicate, object, graph) quads that result from
+    `parse_nquads_line`.
+    """
     for line in stream:
         line = line.strip()
         if line:
             quad = parse_nquads_line(line)
             if quad:
                 yield quad
-
-
-class ExternalReferenceWriter:
-    def __init__(self, filename):
-        self.stream = open(filename, 'w', encoding='utf-8')
-        self.seen = set()
-
-    def write_link(self, conceptnet_uri, external_uri):
-        """
-        Record in a tab-separated file the fact that `conceptnet_uri` is
-        the representation in ConceptNet of `external_uri`.
-        """
-        pair = (conceptnet_uri, external_uri)
-        if pair not in self.seen:
-            self.seen.add(pair)
-            print('{}\t{}'.format(conceptnet_uri, external_uri), file=self.stream)
-
-    def close(self):
-        self.stream.close()
