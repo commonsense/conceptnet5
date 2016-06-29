@@ -81,4 +81,3 @@ def run_shrink(input_filename, output_filename, n, k):
     frame = load_hdf(input_filename)
     shrunk = shrink(frame, n, k)
     save_hdf(shrunk, output_filename)
-    print(evaluate(shrunk))
