@@ -88,7 +88,6 @@ rule all:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/index/assertions.index",
-        # DATA + "/index/external_links.index",
         DATA + "/stats/dataset_vs_language.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
@@ -192,12 +191,10 @@ rule read_dbpedia:
         DATA + "/precomputed/dbpedia/in_degree_en.txt"
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
-        DATA + "/external/dbpedia.csv"
     shell:
         "python3 -m conceptnet5.readers.dbpedia %(data)s/raw/dbpedia "
-        "%(data)s/edges/dbpedia/dbpedia_en.msgpack "
-        "%(data)s/precomputed/dbpedia/in_degree_en.txt "
-        "%(data)s/external/dbpedia.csv" % {'data': DATA}
+        "{output} "
+        "%(data)s/precomputed/dbpedia/in_degree_en.txt " % {'data': DATA}
 
 rule read_jmdict:
     input:
@@ -227,8 +224,7 @@ rule read_opencyc:
     input:
         DATA + "/raw/opencyc/opencyc-2012-05-10-readable.nq"
     output:
-        DATA + "/edges/opencyc/opencyc.msgpack",
-        DATA + "/external/opencyc.csv"
+        DATA + "/edges/opencyc/opencyc.msgpack"
     shell:
         "python3 -m conceptnet5.readers.opencyc {input} {output}"
 
@@ -268,7 +264,6 @@ rule read_wordnet:
         DATA + "/raw/wordnet-rdf/wn31.nt"
     output:
         DATA + "/edges/wordnet/wordnet.msgpack",
-        DATA + "/external/wordnet.csv"
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
 

@@ -11,7 +11,7 @@ from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, standardize_as_list
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import resource_name, ExternalReferenceWriter, parse_nquads
+from conceptnet5.formats.semantic_web import resource_name, parse_nquads
 from conceptnet5.language.token_utils import un_camel_case
 from collections import defaultdict
 
@@ -34,6 +34,16 @@ def opencyc_edge(rel, start, end, start_text, end_text):
     )
 
 
+def external_url_edge(start, end):
+    return make_edge(
+        rel='/r/ExternalURL', start=start, end=end,
+        dataset='/d/opencyc',
+        license=Licenses.cc_attribution,
+        sources=[SOURCE],
+        weight=1.0
+    )
+
+
 # These words tend to indicate Cyc internals that are presented the same way
 # as facts about the external world.
 BLACKLIST_WORDS = {
@@ -44,17 +54,17 @@ BLACKLIST_WORDS = {
 }
 
 
-def run_opencyc(input_file, output_file, ref_file):
+def run_opencyc(input_file, output_file):
     """
     Read an .nq file containing OpenCyc data, outputting a file of
     ConceptNet edges and a file of mappings between the Semantic Web and
     ConceptNet.
     """
     out = MsgpackStreamWriter(output_file)
-    refs = ExternalReferenceWriter(ref_file)
 
     labels = {}
     unlabels = defaultdict(set)
+    seen_external_urls = set()
 
     # Read through the file once, finding all the "preferred labels". We will
     # use these as the surface texts for the nodes.
@@ -85,15 +95,20 @@ def run_opencyc(input_file, output_file, ref_file):
             subj_uri = cyc_to_conceptnet_uri(labels, unlabels, web_subj)
             obj_uri = cyc_to_conceptnet_uri(labels, unlabels, web_obj)
             out.write(opencyc_edge('/r/IsA', subj_uri, obj_uri, subj_label, obj_label))
-            refs.write_link(subj_uri, web_subj)
-            refs.write_link(obj_uri, web_obj)
+            if (subj_uri, web_subj) not in seen_external_urls:
+                out.write(external_url_edge(subj_uri, web_subj))
+                seen_external_urls.add((subj_uri, web_subj))
+            if (obj_uri, web_obj) not in seen_external_urls:
+                out.write(external_url_edge(obj_uri, web_obj))
+                seen_external_urls.add((obj_uri, web_obj))
         elif rel_name == 'sameAs' and web_subj in labels and web_obj.startswith('http://umbel.org/'):
             subj_label = labels[web_subj]
             subj_uri = standardized_concept_uri('en', subj_label)
-            refs.write_link(subj_uri, web_obj)
+            if (subj_uri, web_obj) not in seen_external_urls:
+                out.write(external_url_edge(subj_uri, web_obj))
+                seen_external_urls.add((subj_uri, web_obj))
 
     out.close()
-    refs.close()
 
 
 def cyc_to_conceptnet_uri(labels, unlabels, uri):
@@ -135,9 +150,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input', help="An N-triples or N-quads file of input")
     parser.add_argument('output', help='msgpack file to output to')
-    parser.add_argument('refs', help='A tab-separated file of Semantic Web equivalences to write')
     args = parser.parse_args()
-    run_opencyc(args.input, args.output, args.refs)
+    run_opencyc(args.input, args.output)
 
 if __name__ == '__main__':
     main()

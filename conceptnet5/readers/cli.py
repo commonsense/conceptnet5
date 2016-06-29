@@ -72,19 +72,15 @@ def run_ptt_petgame(input, output):
 @cli.command(name='opencyc')
 @click.argument('input_file', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_file', type=click.Path(writable=True, dir_okay=False))
-@click.option('--mapping', '-m', type=click.Path(writable=True, dir_okay=False),
-              help='write a mapping of Semantic Web URIs to this file')
 def run_opencyc(input_file, output_file, mapping):
     """
     Import data from Umbel, a Semantic Web-ish wrapper around structured
     ontologies such as OpenCyc.
 
-    input_file: an N-Quads file of OpenCyc data
-    output_file: a msgpack file of edges
-    mapping: a tab-separated output file that will map external Semantic Web
-      URIs to ConceptNet URIs
+    input: an N-Quads file of OpenCyc data
+    output: a msgpack file of edges
     """
-    opencyc.run_opencyc(input_file, output_file, mapping)
+    opencyc.handle_file(input_file, output_file)
 
 
 @cli.command(name='verbosity')
@@ -128,8 +124,7 @@ def run_wiktionary(input, db, output):
 @cli.command(name='wordnet')
 @click.argument('input', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
-@click.option('--mapping', '-m', type=click.Path(writable=True, dir_okay=False))
-def run_wordnet(input, output, mapping):
+def run_wordnet(input, output):
     """
     Import a file of N-Triples data from WordNet-RDF, a Linked Data version of
     Open Multilingual WordNet.
@@ -139,4 +134,4 @@ def run_wordnet(input, output, mapping):
     mapping: a tab-separated output file that will map external Semantic Web
       URIs to ConceptNet URIs
     """
-    wordnet.handle_file(input, output, mapping)
+    wordnet.handle_file(input, output)

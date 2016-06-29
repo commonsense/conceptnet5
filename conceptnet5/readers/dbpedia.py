@@ -32,9 +32,7 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import (
-    resource_name, parse_nquads, ExternalReferenceWriter
-)
+from conceptnet5.formats.semantic_web import resource_name, parse_nquads
 import urllib
 import bz2
 import pathlib
@@ -178,7 +176,7 @@ def get_urls_from_degree_file(in_degree_file):
     return urls
 
 
-def process_dbpedia(input_dir, output_file, in_degree_file, refs_file):
+def process_dbpedia(input_dir, output_file, in_degree_file):
     """
     Read through multiple DBPedia files and output filtered assertions to
     `output_file`.
@@ -191,7 +189,6 @@ def process_dbpedia(input_dir, output_file, in_degree_file, refs_file):
 
     ok_concepts = set()
     out = MsgpackStreamWriter(output_file)
-    refs = ExternalReferenceWriter(refs_file)
 
     types_path = input_path / 'instance_types_en.tql.bz2'
     quads = parse_nquads(bz2.open(str(types_path), 'rt'))
@@ -224,11 +221,27 @@ def process_dbpedia(input_dir, output_file, in_degree_file, refs_file):
                         out.write(edge)
                     for other_url in mapped_urls[subj_url]:
                         if other_url.startswith('http://wikidata.dbpedia.org/'):
-                            refs.write_link(subj_concept, other_url)
+                            urledge = make_edge(
+                                '/r/ExternalURL',
+                                subj_concept, other_url,
+                                dataset='/d/dbpedia/en',
+                                license=Licenses.cc_sharealike,
+                                sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                                weight=1.0
+                            )
+                            out.write(urledge)
                         else:
                             other_concept = translate_dbpedia_url(other_url)
                             if other_concept:
-                                refs.write_link(other_concept, other_url)
+                                urledge = make_edge(
+                                    '/r/ExternalURL',
+                                    other_concept, other_url,
+                                    dataset='/d/dbpedia/en',
+                                    license=Licenses.cc_sharealike,
+                                    sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                                    weight=1.0
+                                )
+                                out.write(urledge)
                                 edge = make_edge(
                                     '/r/TranslationOf',
                                     other_concept, subj_concept,
@@ -264,7 +277,6 @@ def process_dbpedia(input_dir, output_file, in_degree_file, refs_file):
                 )
                 out.write(edge)
 
-    refs.close()
     out.close()
 
 
@@ -304,9 +316,8 @@ def main():
     parser.add_argument('input_dir', help="Directory containing DBPedia files")
     parser.add_argument('output_file', help='msgpack file to output to')
     parser.add_argument('in_degree_file', help="File listing the in-degrees of DBPedia nodes")
-    parser.add_argument('refs', help='A tab-separated file of Semantic Web equivalences to write')
     args = parser.parse_args()
-    process_dbpedia(args.input_dir, args.output_file, args.in_degree_file, args.refs)
+    process_dbpedia(args.input_dir, args.output_file, args.in_degree_file)
 
 
 if __name__ == '__main__':

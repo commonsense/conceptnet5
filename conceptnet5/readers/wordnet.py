@@ -86,9 +86,8 @@ def label_sort_key(label):
     return (not label[0].isdigit(), label[-1].isdigit(), not label.islower(), -len(label), label)
 
 
-def run_wordnet(input_file, output_file, refs_file):
+def run_wordnet(input_file, output_file):
     out = MsgpackStreamWriter(output_file)
-    refs = ExternalReferenceWriter(refs_file)
 
     synset_senses = defaultdict(list)
     sense_synsets = {}
@@ -240,10 +239,13 @@ def run_wordnet(input_file, output_file, refs_file):
 
     for wn_url in sorted(synset_uris):
         cn_uri = synset_uris[wn_url]
-        refs.write_link(cn_uri, wn_url)
+        edge = make_edge(
+            '/r/ExternalURL', cn_uri, wn_url, dataset=DATASET,
+            license=Licenses.cc_sharealike, sources=[SOURCE], weight=1.0
+        )
+        out.write(edge)
 
     out.close()
-    refs.close()
 
 
 # Entry point for testing
@@ -255,9 +257,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_file', help="An .nt file containing WordNet RDF")
     parser.add_argument('output_file', help='Msgpack file to output to')
-    parser.add_argument('refs', help='A tab-separated file of Semantic Web equivalences to write')
     args = parser.parse_args()
-    run_wordnet(args.input_file, args.output_file, args.refs)
+    run_wordnet(args.input_file, args.output_file)
 
 
 if __name__ == '__main__':

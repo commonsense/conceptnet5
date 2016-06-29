@@ -48,6 +48,8 @@ def make_edge(rel, start, end, dataset, license, sources,
             "%s - %s" % (pstart, pend),
             "- %s %s" % (rel, pend)
         ]
+    else:
+        features = []
     uri = assertion_uri(rel, start, end)
 
     assert isinstance(sources, list), sources
