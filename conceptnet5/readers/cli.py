@@ -1,6 +1,6 @@
 import click
 from . import (
-    conceptnet4, jmdict, nadya, ptt_petgame, umbel, verbosity,
+    conceptnet4, jmdict, nadya, ptt_petgame, opencyc, verbosity,
     wiktionary, wordnet
 )
 
@@ -69,23 +69,22 @@ def run_ptt_petgame(input, output):
     ptt_petgame.handle_file(input, output)
 
 
-@cli.command(name='umbel')
-@click.argument('input_dir',
-                type=click.Path(readable=True, dir_okay=True, file_okay=False))
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+@cli.command(name='opencyc')
+@click.argument('input_file', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_file', type=click.Path(writable=True, dir_okay=False))
 @click.option('--mapping', '-m', type=click.Path(writable=True, dir_okay=False),
               help='write a mapping of Semantic Web URIs to this file')
-def run_umbel(input_dir, output, mapping):
+def run_opencyc(input_file, output_file, mapping):
     """
     Import data from Umbel, a Semantic Web-ish wrapper around structured
     ontologies such as OpenCyc.
 
-    input_dir: a directory containing N-Triples files of Umbel data
-    output: a msgpack file of edges
+    input_file: an N-Quads file of OpenCyc data
+    output_file: a msgpack file of edges
     mapping: a tab-separated output file that will map external Semantic Web
       URIs to ConceptNet URIs
     """
-    umbel.handle_file(input_dir, output, mapping)
+    opencyc.run_opencyc(input_file, output_file, mapping)
 
 
 @cli.command(name='verbosity')

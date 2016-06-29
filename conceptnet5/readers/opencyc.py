@@ -11,7 +11,7 @@ from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, standardize_as_list
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import NTriplesReader, resource_name, ExternalReferenceWriter
+from conceptnet5.formats.semantic_web import resource_name, ExternalReferenceWriter, parse_nquads
 from conceptnet5.language.token_utils import un_camel_case
 from collections import defaultdict
 
@@ -52,22 +52,23 @@ def run_opencyc(input_file, output_file, ref_file):
     """
     out = MsgpackStreamWriter(output_file)
     refs = ExternalReferenceWriter(ref_file)
-    reader = NTriplesReader()
 
     labels = {}
     unlabels = defaultdict(set)
 
     # Read through the file once, finding all the "preferred labels". We will
     # use these as the surface texts for the nodes.
-    for web_subj, web_rel, web_obj, objtag in reader.parse_file(input_file):
-        if web_rel == RDF_LABEL:
-            labels[web_subj] = web_obj
-            unlabels[web_obj].add(web_subj)
+    for subj, pred, obj, _graph in parse_nquads(open(input_file, encoding='utf-8')):
+        if pred['url'] == RDF_LABEL:
+            labels[subj['url']] = obj['text']
+            unlabels[obj['text']].add(subj['url'])
 
     # Read through the file again and extract ConceptNet edges.
-    for web_subj, web_rel, web_obj, objtag in reader.parse_file(input_file):
-        rel_name = resource_name(web_rel)
-        if rel_name == 'subClassOf' and objtag == 'URL' and web_subj in labels and web_obj in labels:
+    for subj, pred, obj, _graph in parse_nquads(open(input_file, encoding='utf-8')):
+        rel_name = resource_name(pred['url'])
+        web_subj = subj.get('url')
+        web_obj = obj.get('url')
+        if rel_name == 'subClassOf' and web_obj is not None and web_subj in labels and web_obj in labels:
             subj_label = labels[web_subj]
             obj_label = labels[web_obj]
             if '_' in subj_label or '_' in obj_label:
