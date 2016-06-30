@@ -467,41 +467,6 @@ LANGUAGE_NAME_OVERRIDES = {
 }
 
 
-def standardize_as_list(text, token_filter=None):
-    """
-    Get a list of tokens or stems that appear in the text.
-
-    `token_filter` is an optional function to apply to the list of tokens,
-    performing language-specific lemmatization and stopword removal. In
-    practice, the only such filter is for English.
-
-    >>> from conceptnet5.language.english import english_filter, english_lemmatized_filter
-    >>> standardize_as_list('the dog', token_filter=english_filter)
-    ['dog']
-    >>> standardize_as_list('a big dog', token_filter=english_filter)
-    ['big', 'dog']
-    >>> standardize_as_list('a big dog')
-    ['a', 'big', 'dog']
-    >>> standardize_as_list('big dogs', token_filter=english_lemmatized_filter)
-    ['big', 'dog']
-    >>> standardize_as_list('BIG DOGS', token_filter=english_filter)
-    ['big', 'dogs']
-    >>> standardize_as_list('to go', token_filter=english_filter)
-    ['go']
-    >>> standardize_as_list('the', token_filter=english_filter)
-    ['the']
-    >>> standardize_as_list('to', token_filter=english_filter)
-    ['to']
-    """
-    # Apply ftfy normalizers, but don't fix encoding, because that's slow and
-    # it's unnecessary when we control the data sources
-    text = fix_text(text, fix_encoding=False)
-    tokens = [token for token in simple_tokenize(text)]
-    if token_filter is not None:
-        tokens = token_filter(tokens)
-    return tokens
-
-
 def standardize_text(text, token_filter=None):
     """
     Get a string made from the tokens in the text, joined by
@@ -511,8 +476,20 @@ def standardize_text(text, token_filter=None):
         >>> standardize_text(' cat')
         'cat'
 
+        >>> standardize_text('a big dog', token_filter=english_filter)
+        'big_dog'
+
         >>> standardize_text('Italian supercat')
         'italian_supercat'
+
+        >>> standardize_text('a big dog')
+        'a_big_dog'
+
+        >>> standardize_text('a big dog', token_filter=english_filter)
+        'big_dog'
+
+        >>> standardize_text('to go', token_filter=english_filter)
+        'go'
 
         >>> standardize_text('Test?!')
         'test'
@@ -535,7 +512,10 @@ def standardize_text(text, token_filter=None):
         >>> standardize_text(',')
         ''
     """
-    return '_'.join(standardize_as_list(text.replace('_', ' '), token_filter))
+    tokens = simple_tokenize(text.replace('_', ' '))
+    if token_filter is not None:
+        tokens = token_filter(tokens)
+    return '_'.join(tokens)
 
 
 def topic_to_concept(language, topic):
@@ -575,9 +555,9 @@ def standardized_concept_uri(lang, text, *more):
     normalization steps.
 
     >>> standardized_concept_uri('en', 'this is a test')
-    '/c/en/test'
+    '/c/en/this_is_test'
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
-    '/c/en/test/n/example_phrase'
+    '/c/en/this_is_test/n/example_phrase'
     """
     if lang == 'en':
         token_filter = english_filter

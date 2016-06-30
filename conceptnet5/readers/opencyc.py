@@ -8,11 +8,12 @@ limited to ASCII.)
 """
 
 from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri, standardize_as_list
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import resource_name, parse_nquads
-from conceptnet5.language.token_utils import un_camel_case
+from conceptnet5.language.token_utils import un_camel_case, simple_tokenize
+from conceptnet5.readers.conceptnet4 import filter_stopwords
 from collections import defaultdict
 
 SOURCE = {'contributor': '/s/resource/opencyc/2012'}
@@ -85,8 +86,8 @@ def run_opencyc(input_file, output_file):
                 continue
             if subj_label.startswith('xsd:') or obj_label.startswith('xsd:'):
                 continue
-            subj_words = set(standardize_as_list(subj_label))
-            obj_words = set(standardize_as_list(obj_label))
+            subj_words = set(simple_tokenize(subj_label))
+            obj_words = set(simple_tokenize(obj_label))
             if (subj_words & BLACKLIST_WORDS) or (obj_words & BLACKLIST_WORDS):
                 continue
             if len(subj_words) > 4 or len(obj_words) > 4:
@@ -137,10 +138,10 @@ def cyc_to_conceptnet_uri(labels, unlabels, uri):
     Even so, we end up with some unnecessary word senses, such as different
     senses for "mens clothing", "men's clothing", and "men s clothing".
     """
-    label = labels[uri]
+    label = filter_stopwords(labels[uri])
     if len(unlabels[label]) >= 2:
-        disambig = un_camel_case(resource_name(uri))
-        if standardize_as_list(disambig) != standardize_as_list(label):
+        disambig = filter_stopwords(un_camel_case(resource_name(uri)))
+        if simple_tokenize(disambig) != simple_tokenize(label):
             return standardized_concept_uri('en', label, 'n', 'opencyc', disambig)
     return standardized_concept_uri('en', label, 'n')
 

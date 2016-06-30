@@ -11,6 +11,7 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
+from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
@@ -95,6 +96,14 @@ ACTIVITY_BLACKLIST = {
     "globalmind",    # avoid double-counting with the GlobalMind reader
     "pycommons/question"
 }
+
+MORE_STOPWORDS = [
+    'a', 'an', 'the', 'be', 'is', 'are',
+    'some', 'any', 'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they',
+    'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
+    'these', 'those', 'something', 'someone', 'somebody', 'anything', 'anyone',
+    "someone's", "something's", "anything's", "somebody's", "anyone's",
+]
 
 
 def can_skip(parts_dict):
@@ -196,9 +205,21 @@ def build_relation(parts_dict):
 
 def filtered_uri(lang, text):
     if lang == 'en':
+        text = filter_stopwords(text)
         return concept_uri('en', standardize_text(text, english_filter))
     else:
         return standardized_concept_uri(lang, text)
+
+
+def filter_stopwords(text):
+    words = [
+        word for word in simple_tokenize(text)
+        if word not in MORE_STOPWORDS
+    ]
+    text2 = ' '.join(words)
+    if not text2:
+        text2 = text
+    return text2
 
 
 def build_start(parts_dict):

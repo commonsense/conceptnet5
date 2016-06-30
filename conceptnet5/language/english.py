@@ -4,15 +4,10 @@ Tools for working with English text.
 from .lemmatize import LEMMATIZER
 
 STOPWORDS = [
-    'the', 'a', 'an', 'some', 'any',
-    'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they',
-    'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
-    'these', 'those', 'something', 'someone', 'somebody', 'anything', 'anyone',
-    "someone's", "something's", "anything's", "somebody's", "anyone's",
+    'the', 'a', 'an'
 ]
 
-
-DROP_FIRST = ['to', 'be', 'is', 'are']
+DROP_FIRST = ['to']
 
 
 def english_filter(tokens):
