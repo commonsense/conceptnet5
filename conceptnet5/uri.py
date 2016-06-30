@@ -193,9 +193,12 @@ def uri_prefixes(uri, min_pieces=2):
     ['/c/en', '/c/en/cat', '/c/en/cat/n', '/c/en/cat/n/animal']
     >>> list(uri_prefixes('/test/[/group/one/]/[/group/two/]'))
     ['/test/[/group/one/]', '/test/[/group/one/]/[/group/two/]']
+    >>> list(uri_prefixes('http://en.wikipedia.org/wiki/Example'))
+    ['http://en.wikipedia.org/wiki/Example']
     """
     if is_absolute_url(uri):
-        return [uri]
+        yield uri
+        return
     pieces = []
     for piece in split_uri(uri):
         pieces.append(piece)

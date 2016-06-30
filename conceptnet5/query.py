@@ -126,28 +126,26 @@ class AssertionFinder(object):
         # already indexed. Find out if we can transform the given criteria.
         criterion_pairs = sorted(list(criteria.items()))
 
-        searchable_criteria = dict(criteria)
-        for nodetype in ('start', 'end'):
-            if nodetype in searchable_criteria:
-                node = searchable_criteria[nodetype]
+        feature_criteria = dict(criteria)
+        for nodetype in ('start', 'end', 'node'):
+            if nodetype in feature_criteria:
+                node = feature_criteria[nodetype]
                 if is_concept(node) and len(split_uri(node)) < 3:
-                    del searchable_criteria[nodetype]
-
-        searchable_criterion_pairs = sorted(list(searchable_criteria.items()))
+                    del feature_criteria[nodetype]
 
         features = []
-        if 'start' in searchable_criteria and 'end' in searchable_criteria:
-            features = ['{} - {}'.format(uri_prefix(searchable_criteria['start']),
-                                         uri_prefix(searchable_criteria['end']))]
-        elif 'start' in searchable_criteria and 'rel' in searchable_criteria:
-            features = ['{} {} -'.format(uri_prefix(searchable_criteria['start']),
-                                         uri_prefix(searchable_criteria['rel']))]
-        elif 'rel' in searchable_criteria and 'end' in searchable_criteria:
-            features = ['- {} {}'.format(uri_prefix(searchable_criteria['rel']),
-                                         uri_prefix(searchable_criteria['end']))]
-        elif 'rel' in searchable_criteria and 'node' in searchable_criteria:
-            node = uri_prefix(searchable_criteria['node'])
-            rel = uri_prefix(searchable_criteria['rel'])
+        if 'start' in feature_criteria and 'end' in feature_criteria:
+            features = ['{} - {}'.format(uri_prefix(feature_criteria['start']),
+                                         uri_prefix(feature_criteria['end']))]
+        elif 'start' in feature_criteria and 'rel' in feature_criteria:
+            features = ['{} {} -'.format(uri_prefix(feature_criteria['start']),
+                                         uri_prefix(feature_criteria['rel']))]
+        elif 'rel' in feature_criteria and 'end' in feature_criteria:
+            features = ['- {} {}'.format(uri_prefix(feature_criteria['rel']),
+                                         uri_prefix(feature_criteria['end']))]
+        elif 'rel' in feature_criteria and 'node' in feature_criteria:
+            node = uri_prefix(feature_criteria['node'])
+            rel = uri_prefix(feature_criteria['rel'])
             features = [
                 '{} {} -'.format(node, rel),
                 '- {} {}'.format(rel, node)
@@ -163,7 +161,7 @@ class AssertionFinder(object):
         else:
             queries = [
                 self.lookup(val, limit=scan_limit)
-                for (key, val) in searchable_criterion_pairs
+                for (key, val) in criterion_pairs
                 if key in INDEXED_KEYS
             ]
 

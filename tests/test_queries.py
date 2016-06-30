@@ -55,11 +55,25 @@ def test_query_en_form():
     eq_(q, ['/a/[/r/FormOf/,/c/en/tests/,/c/en/test/n/]'])
 
 
-def test_query_es():
+def test_query_en_es():
     q = get_query_ids({'start': '/c/en/test', 'end': '/c/es'})
     eq_(q, ['/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/es/prueba/]'])
+
+
+def test_query_es():
+    q1 = get_query_ids({'node': '/c/es', 'rel': '/r/RelatedTo'})
+    eq_(q1, ['/a/[/r/RelatedTo/,/c/es/test/n/,/c/en/test/]'])
+
+    q2 = get_query_ids({'start': '/c/es', 'end': '/c/es', 'rel': '/r/Synonym'})
+    eq_(q2, ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]'])
 
 
 def test_query_source():
     q = get_query_ids({'node': '/c/en/test', 'source': '/s/resource/jmdict/1.07'})
     eq_(q, ['/a/[/r/Synonym/,/c/ja/テスト/n/,/c/en/test/]'])
+
+
+def test_lookup_external():
+    found = list(test_finder.lookup('http://dbpedia.org/resource/Test_(assessment)'))
+    eq_(len(found), 1)
+    eq_(found[0]['start'], '/c/en/test/n/wp/assessment')

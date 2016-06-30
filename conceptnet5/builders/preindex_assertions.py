@@ -7,7 +7,7 @@ from conceptnet5.hashtable.preindex import preindex_data
 def get_indices(edge):
     indices = []
     for field in ('uri', 'rel', 'start', 'end', 'dataset'):
-        indices.extend(uri_prefixes(edge[field]))
+        indices.extend(uri_prefixes(edge[field], 2))
     for source in edge['sources']:
         indices.extend(source.values())
     indices.extend(edge['features'])
