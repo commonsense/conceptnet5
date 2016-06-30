@@ -128,7 +128,7 @@ WIKT_RELATIONS = {
     "augmentative": ("/r/FormOf", True),
     "coordinate": ("/r/SimilarTo", False),
     "quasi-synonym": ("/r/SimilarTo", False),
-    "translation": ("/r/TranslationOf", False),
+    "translation": ("/r/Synonym", False),
     "definition": (None, False)
 }
 
@@ -294,7 +294,7 @@ def read_wiktionary(input_file, db_file, output_file):
             # When translations are separated by sense, use only the first
             # sense we see for each etymology. That will have the most
             # representative translations.
-            if rel == '/r/TranslationOf':
+            if item['rel'] == 'translation':
                 etym_key = (tfrom['language'], etym_label(language, tfrom))
                 sense = tfrom.get('sense', '')
                 if etym_key in etym_to_translation_sense:
@@ -308,8 +308,8 @@ def read_wiktionary(input_file, db_file, output_file):
                 'process': PARSER_RULE
             }
             weight = 1.
-            if rel == '/r/EtymologicallyDerivedFrom':
-                weight = 0.5
+            if rel == '/r/EtymologicallyRelatedTo':
+                weight = 0.25
             edge = make_edge(rel, cfrom, cto, dataset=dataset, weight=weight,
                              sources=[source],
                              surfaceStart=tfrom['text'],

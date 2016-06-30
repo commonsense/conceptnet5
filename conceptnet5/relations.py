@@ -17,7 +17,6 @@ def _make_symmetric_dict(d):
 SYMMETRIC_RELATIONS = {
     '/r/RelatedTo',
     '/r/SimilarTo',
-    '/r/TranslationOf',
     '/r/EtymologicallyRelatedTo',
     '/r/Synonym',
     '/r/Antonym',
@@ -88,7 +87,6 @@ ENTAILED_RELATIONS = {
     '/r/LocationOfAction': '/r/AtLocation',
 
     '/r/Synonym': '/r/SimilarTo',
-    '/r/TranslationOf': '/r/SimilarTo',
 }
 
 

@@ -44,7 +44,7 @@ REL_MAPPING = {
     'antonym': ('Antonym', '{0} is the opposite of {1}'),
     'derivation': ('DerivedFrom', 'The word "{0}" is derived from "{1}"'),
     'pertainym': ('PertainsTo', '{0} pertains to {1}'),
-    'translation': ('~TranslationOf', '{0} is a translation of {1}')
+    'translation': ('~Synonym', '{0} is a translation of {1}')
     # Do we want a relation for verbs in the same VerbNet group?
 }
 

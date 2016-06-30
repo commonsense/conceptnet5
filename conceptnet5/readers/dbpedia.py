@@ -73,10 +73,10 @@ RELATIONS = {
     'writer': '/r/dbpedia/writer',
     'director': '/r/dbpedia/director',
     'starring': '/r/dbpedia/starring',
-    # 'producer': '/r/dbpedia/producer',
-    # 'associatedBand': '/r/dbpedia/associatedBand',
-    # 'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
-    # 'bandMember': '/r/dbpedia/bandMember',
+    'producer': '/r/dbpedia/producer',
+    'associatedBand': '/r/dbpedia/associatedBand',
+    'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
+    'bandMember': '/r/dbpedia/bandMember',
     'artist': '/r/dbpedia/artist',
     'musicalArtist': '/r/dbpedia/artist',
     'musicalBand': '/r/dbpedia/artist',
@@ -245,7 +245,7 @@ def process_dbpedia(input_dir, output_file, in_degree_file):
                                 )
                                 out.write(urledge)
                                 edge = make_edge(
-                                    '/r/TranslationOf',
+                                    '/r/Synonym',
                                     other_concept, subj_concept,
                                     dataset='/d/dbpedia/en',
                                     license=Licenses.cc_sharealike,

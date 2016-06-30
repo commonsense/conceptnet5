@@ -218,7 +218,7 @@ def handle_file(filename, output_file):
                         else:
                             ja_concept = standardized_concept_uri('ja', head, pos)
                         other_concept = standardized_concept_uri(lang, text)
-                        output_edge(out, '/r/TranslationOf', ja_concept, other_concept)
+                        output_edge(out, '/r/Synonym', ja_concept, other_concept)
 
                         for context in contexts:
                             context_node = standardized_concept_uri('en', context)
