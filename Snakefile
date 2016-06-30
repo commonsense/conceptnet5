@@ -34,8 +34,8 @@ N_PIECES = 16
 # the size of the hash table.
 #
 # The index of the hash table will require 2 ^ (HASH_WIDTH + 4) bytes on disk,
-# so a hash width of 27 takes up two gigabytes.
-HASH_WIDTH = 27
+# so a hash width of 28 takes up four gigabytes.
+HASH_WIDTH = 28
 
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
@@ -88,7 +88,7 @@ rule all:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/index/assertions.index",
-        DATA + "/stats/dataset_vs_language.txt",
+        DATA + "/stats/languages.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/numberbatch.h5"
@@ -347,31 +347,31 @@ rule relation_stats:
         "cut -f 2 {input} | LC_ALL=C sort | LC_ALL=C uniq -c "
         "| LC_ALL=C sort -nbr > {output}"
 
-rule dataset_stats_left:
+rule concepts_left:
     input:
         DATA + "/assertions/assertions.csv"
     output:
-        DATA + "/stats/concepts_left_datasets.txt"
+        DATA + "/stats/concepts_left.txt"
     shell:
-        "cut -f 3,8 {input} > {output}"
+        "cut -f 3 {input} > {output}"
 
-rule dataset_stats_right:
+rule concepts_right:
     input:
         DATA + "/assertions/assertions.csv"
     output:
         DATA + "/stats/concepts_right_datasets.txt"
     shell:
-        "cut -f 4,8 {input} > {output}"
+        "cut -f 4 {input} > {output}"
 
-rule dataset_vs_language:
+rule language_stats:
     input:
-        DATA + "/stats/concepts_left_datasets.txt",
-        DATA + "/stats/concepts_right_datasets.txt"
+        DATA + "/stats/concepts_left.txt",
+        DATA + "/stats/concepts_right.txt"
     output:
-        DATA + "/stats/dataset_vs_language.txt"
+        DATA + "/stats/languages.txt"
     shell:
-        "cat {input} | sed -r 's:((/[^/\t]+){{2}})[^\t]*:\\1:g' "
-        "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+        "cat {input} | grep '^/c/' | LC_ALL=C sort | LC_ALL=C uniq | cut -d '/' -f 3 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c | sort -nbr > {output}"
 
 # Building associations
 # =====================
