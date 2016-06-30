@@ -5,7 +5,7 @@ lazily-loaded object for looking up assertions in a hashtable index
 (see the conceptnet5.hashtable package).
 """
 
-from conceptnet5.uri import uri_prefix
+from conceptnet5.uri import uri_prefix, is_concept, split_uri
 from conceptnet5.edges import transform_for_linked_data
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.msgpack_stream import read_msgpack_value
@@ -13,11 +13,11 @@ from conceptnet5.hashtable.index import HashTableIndex
 
 
 VALID_KEYS = {
-    'rel', 'start', 'end', 'node', 'dataset', 'license', 'sources',
+    'rel', 'start', 'end', 'node', 'dataset', 'license', 'source', 'sources',
     'surfaceText', 'uri'
 }
 INDEXED_KEYS = {
-    'rel', 'start', 'end', 'node', 'dataset', 'sources',
+    'rel', 'start', 'end', 'node', 'dataset', 'source', 'sources',
     'surfaceText', 'uri'
 }
 
@@ -106,13 +106,13 @@ class AssertionFinder(object):
 
         For example, a query for the criteria
 
-            {'rel': '/r/TranslationOf', 'end': '/c/en/example'}
+            {'rel': '/r/Synonym', 'end': '/c/en/example'}
 
         will return assertions such as
 
             {
                 'start': '/c/tr/örnek',
-                'rel': '/r/TranslationOf',
+                'rel': '/r/Synonym',
                 'end': '/c/en/example/n',
                 ...
             }
@@ -125,19 +125,29 @@ class AssertionFinder(object):
         # looked up quickly by turning them into features that we have
         # already indexed. Find out if we can transform the given criteria.
         criterion_pairs = sorted(list(criteria.items()))
+
+        searchable_criteria = dict(criteria)
+        for nodetype in ('start', 'end'):
+            if nodetype in searchable_criteria:
+                node = searchable_criteria[nodetype]
+                if is_concept(node) and len(split_uri(node)) < 3:
+                    del searchable_criteria[nodetype]
+
+        searchable_criterion_pairs = sorted(list(searchable_criteria.items()))
+
         features = []
-        if 'start' in criteria and 'end' in criteria:
-            features = ['{} - {}'.format(uri_prefix(criteria['start']),
-                                         uri_prefix(criteria['end']))]
-        elif 'start' in criteria and 'rel' in criteria:
-            features = ['{} {} -'.format(uri_prefix(criteria['start']),
-                                         uri_prefix(criteria['rel']))]
-        elif 'rel' in criteria and 'end' in criteria:
-            features = ['- {} {}'.format(uri_prefix(criteria['rel']),
-                                         uri_prefix(criteria['end']))]
-        elif 'rel' in criteria and 'node' in criteria:
-            node = uri_prefix(criteria['node'])
-            rel = uri_prefix(criteria['rel'])
+        if 'start' in searchable_criteria and 'end' in searchable_criteria:
+            features = ['{} - {}'.format(uri_prefix(searchable_criteria['start']),
+                                         uri_prefix(searchable_criteria['end']))]
+        elif 'start' in searchable_criteria and 'rel' in searchable_criteria:
+            features = ['{} {} -'.format(uri_prefix(searchable_criteria['start']),
+                                         uri_prefix(searchable_criteria['rel']))]
+        elif 'rel' in searchable_criteria and 'end' in searchable_criteria:
+            features = ['- {} {}'.format(uri_prefix(searchable_criteria['rel']),
+                                         uri_prefix(searchable_criteria['end']))]
+        elif 'rel' in searchable_criteria and 'node' in searchable_criteria:
+            node = uri_prefix(searchable_criteria['node'])
+            rel = uri_prefix(searchable_criteria['rel'])
             features = [
                 '{} {} -'.format(node, rel),
                 '- {} {}'.format(rel, node)
@@ -153,7 +163,7 @@ class AssertionFinder(object):
         else:
             queries = [
                 self.lookup(val, limit=scan_limit)
-                for (key, val) in criterion_pairs
+                for (key, val) in searchable_criterion_pairs
                 if key in INDEXED_KEYS
             ]
 
@@ -176,17 +186,23 @@ class AssertionFinder(object):
         queryzip = zip(*queries)
 
         matches = []
+        seen = set()
         for result_set in queryzip:
             for candidate in result_set:
                 # Find out if the candidate matched all of our criteria, by
                 # setting okay=False when one fails to match.
                 okay = True
+                if candidate['@id'] in seen:
+                    continue
+                seen.add(candidate['@id'])
                 for key, val in criterion_pairs:
                     # If the criterion is 'node', either the start or end is
                     # allowed to match. Otherwise, the field with the same
                     # name as the criterion needs to match.
                     if key == 'node':
                         matchable = [candidate['start'], candidate['end']]
+                    elif key == 'source':
+                        matchable = [candidate['sources']]
                     else:
                         matchable = [candidate[key]]
                     if not field_match(matchable, val):
