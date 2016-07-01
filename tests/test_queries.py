@@ -49,6 +49,11 @@ def test_query_en_quiz():
     q2 = get_query_ids({'node': '/c/en/quiz'})
     eq_(q2, testquiz)
 
+    q3 = get_query_ids({'node': '/c/en/test', 'other': '/c/en/quiz'})
+    q4 = get_query_ids({'node': '/c/en/quiz', 'other': '/c/en/test'})
+    eq_(q3, testquiz)
+    eq_(q4, testquiz)
+
 
 def test_query_en_form():
     q = get_query_ids({'rel': '/r/FormOf', 'end': '/c/en/test'})
@@ -66,6 +71,9 @@ def test_query_es():
 
     q2 = get_query_ids({'start': '/c/es', 'end': '/c/es', 'rel': '/r/Synonym'})
     eq_(q2, ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]'])
+
+    q3 = get_query_ids({'node': '/c/es', 'other': '/c/es'})
+    eq_(q3, ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]'])
 
 
 def test_query_source():

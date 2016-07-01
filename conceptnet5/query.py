@@ -10,15 +10,16 @@ from conceptnet5.edges import transform_for_linked_data
 from conceptnet5.util import get_data_filename
 from conceptnet5.formats.msgpack_stream import read_msgpack_value
 from conceptnet5.hashtable.index import HashTableIndex
+import itertools
 
 
 VALID_KEYS = {
-    'rel', 'start', 'end', 'node', 'dataset', 'license', 'source', 'sources',
-    'surfaceText', 'uri'
+    'rel', 'start', 'end', 'node', 'other', 'dataset', 'license', 'source',
+    'sources', 'surfaceText', 'uri'
 }
 INDEXED_KEYS = {
-    'rel', 'start', 'end', 'node', 'dataset', 'source', 'sources',
-    'surfaceText', 'uri'
+    'rel', 'start', 'end', 'node', 'other', 'dataset', 'source', 'sources',
+    'uri'
 }
 
 
@@ -127,7 +128,7 @@ class AssertionFinder(object):
         criterion_pairs = sorted(list(criteria.items()))
 
         feature_criteria = dict(criteria)
-        for nodetype in ('start', 'end', 'node'):
+        for nodetype in ('start', 'end', 'node', 'other'):
             if nodetype in feature_criteria:
                 node = feature_criteria[nodetype]
                 if is_concept(node) and len(split_uri(node)) < 3:
@@ -150,21 +151,19 @@ class AssertionFinder(object):
                 '{} {} -'.format(node, rel),
                 '- {} {}'.format(rel, node)
             ]
+        elif 'node' in feature_criteria and 'other' in feature_criteria:
+            node = uri_prefix(feature_criteria['node'])
+            other = uri_prefix(feature_criteria['other'])
+            features = [
+                '{} - {}'.format(node, other),
+                '{} - {}'.format(other, node)
+            ]
 
         # If we could turn the query into a query on features, use that.
         # Otherwise, we'll need to look up the query criteria separately,
         # intersperse their results, and filter for the ones that match
         # all the criteria.
-        if features:
-            queries = [self.lookup(feature, limit=limit)
-                       for feature in features]
-        else:
-            queries = [
-                self.lookup(val, limit=scan_limit)
-                for (key, val) in criterion_pairs
-                if key in INDEXED_KEYS
-            ]
-
+        #
         # If we made multiple queries, group their results into tuples:
         # for example, the first match to each of the queries, then the second
         # match to each of the queries, and so on. We'll iterate through this
@@ -177,16 +176,32 @@ class AssertionFinder(object):
         # We may end up missing results in cases where each criterion matches
         # a lot of assertions, but few assertions match all the criteria.
         #
-        # This list can end as soon as any of the lists it's built from ends.
+        # If we don't make a feature query, then this list can end as soon
+        # as any of the lists it's built from ends.
         # If one of the lists ends before the others, that means the list was
         # complete, and any match to our criteria must have already shown up
         # in it.
-        queryzip = zip(*queries)
+        #
+        # But if we *do* make a feature query, those are mutually exclusive,
+        # so we need to check all of them.
+        if features:
+            queries = [self.lookup(feature, limit=limit)
+                       for feature in features]
+            queryzip = itertools.zip_longest(*queries)
+        else:
+            queries = [
+                self.lookup(val, limit=scan_limit)
+                for (key, val) in criterion_pairs
+                if key in INDEXED_KEYS
+            ]
+            queryzip = zip(*queries)
 
         matches = []
         seen = set()
         for result_set in queryzip:
             for candidate in result_set:
+                if candidate is None:
+                    continue
                 # Find out if the candidate matched all of our criteria, by
                 # setting okay=False when one fails to match.
                 okay = True
@@ -197,7 +212,7 @@ class AssertionFinder(object):
                     # If the criterion is 'node', either the start or end is
                     # allowed to match. Otherwise, the field with the same
                     # name as the criterion needs to match.
-                    if key == 'node':
+                    if key == 'node' or key == 'other':
                         matchable = [candidate['start'], candidate['end']]
                     elif key == 'source':
                         matchable = [candidate['sources']]
@@ -206,6 +221,21 @@ class AssertionFinder(object):
                     if not field_match(matchable, val):
                         okay = False
                         break
+
+                # If we're given 'node' and 'other', make sure they match
+                # different nodes
+                if 'node' in criteria and 'other' in criteria:
+                    if not (
+                        (
+                            field_match(candidate['start'], criteria['node']) and
+                            field_match(candidate['end'], criteria['other'])
+                        ) or (
+                            field_match(candidate['end'], criteria['node']) and
+                            field_match(candidate['start'], criteria['other'])
+                        )
+                    ):
+                        okay = False
+
                 if okay:
                     matches.append(candidate)
                     if len(matches) >= offset + limit:
