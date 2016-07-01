@@ -7,7 +7,6 @@ terms and languages into a standard form.
 from conceptnet5.language.english import english_filter
 from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import concept_uri, split_uri, parse_possible_compound_uri
-from ftfy import fix_text
 import re
 
 
@@ -134,7 +133,6 @@ LANGUAGES = {
         'lv',   # Latvian
         'ms',   # Malay
         'tr',   # Turkish
-        'nb',   # Norwegian Bokmål
         'da',   # Danish
         'ga',   # Irish
         'vi',   # Vietnamese
@@ -145,12 +143,11 @@ LANGUAGES = {
         'fo',   # Faroese
         'gd',   # Scottish Gaelic
         'fa',   # Persian
-        'nn',   # Norwegian Nynorsk
         'ast',  # Asturian
         'hsb',  # Upper Sorbian
         'ka',   # Georgian
         'he',   # Hebrew
-        'no',   # Norwegian Bokmål
+        'no',   # Norwegian (Bokmål or Nynorsk)
         'sq',   # Albanian
         'mg',   # Malagasy
         'nrf',  # Jèrriais
