@@ -75,25 +75,6 @@ LCODE_ALIASES = {
     'sr-latn': 'sh',
     'sr-cyrl': 'sh',
 
-    # Wikipedia believes that many separately catalogued languages are
-    # dialects of the Western Desert language of Australia. If combined, this
-    # language would meet the criteria for inclusion in ConceptNet. But this
-    # language has no code.
-    #
-    # That means we can make one up. We'll call it 'aus-x-wati', after one
-    # name for the language, 'Wati'. If something ignores the 'x-wati'
-    # extension, it will still be distinguished as some sort of Australian
-    # language.
-    'ktd': 'aus-x-wati',
-    'kux': 'aus-x-wati',
-    'mpj': 'aus-x-wati',
-    'ntj': 'aus-x-wati',
-    'piu': 'aus-x-wati',
-    'pjt': 'aus-x-wati',
-    'kdd': 'aus-x-wati',
-    'pti': 'aus-x-wati',
-    'pii': 'aus-x-wati',
-
     # More language codes that we would rather group into a broader language:
     'arb': 'ar',   # Modern Standard Arabic -> Arabic
     'arz': 'ar',   # Egyptian Arabic -> Arabic
@@ -370,7 +351,7 @@ LANGUAGES = {
         'yo',   # Yoruba
         'mh',   # Marshallese
         'szl',  # Silesian
-        'aus-x-wati',  # Western Desert macrolanguage of Australia
+        'pjt',  # Pitjantjatjara (Western Desert)
         'khb',  # Tai Lü
         'dv',   # Divehi
         'udm',  # Udmurt
@@ -392,7 +373,6 @@ LANGUAGES = {
         'sd',   # Sindhi
         'st',   # Sotho
         'shh',  # Shoshoni
-        'ryu',  # Central Okinawan (Ryukyuan)
         'bi',   # Bislama
         'ch',   # Chamorro
         'akz',  # Alabama
@@ -463,7 +443,6 @@ CORE_LANGUAGES = ['en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl']
 # what we'd get by looking them up
 LANGUAGE_NAME_OVERRIDES = {
     'sh': 'Serbo-Croatian',
-    'aus-x-wati': 'Western Desert'
 }
 
 
