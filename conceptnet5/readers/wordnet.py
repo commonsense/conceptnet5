@@ -27,11 +27,6 @@ REL_MAPPING = {
     'part_meronym': ('PartOf', '{0} is a part of {1}'),
     'domain_category': ('HasContext', '{0} is used in the context of {1}'),
     'domain_region': ('HasContext', '{0} is used in the region of {1}'),
-    'agent': ('HasAgent', '{0} is controlled by {1}'),
-    'patient': ('HasPatient', '{0} acts upon {1}'),
-    'theme': ('HasTheme', '{0} is related to the theme of {1}'),
-    'instrument': ('HasInstrument', '{0} is controlled using {1}'),
-    'goal': ('AtLocation', '{0} goes to the location {1}'),
     'cause': ('Causes', '{0} causes {1}'),
     'action': ('UsedFor', '{0} is used for {1}'),
     'result': ('UsedFor', '{0} is used for {1}'),
@@ -43,8 +38,18 @@ REL_MAPPING = {
     'also': ('RelatedTo', '{0} is related to {1}'),
     'antonym': ('Antonym', '{0} is the opposite of {1}'),
     'derivation': ('DerivedFrom', 'The word "{0}" is derived from "{1}"'),
-    'pertainym': ('PertainsTo', '{0} pertains to {1}'),
     'translation': ('~Synonym', '{0} is a translation of {1}')
+
+    # We may want some of these to be more specific, but it's hard to classify
+    # them in terms of existing relations, and there aren't enough of them to
+    # justify their own relations.
+    'pertainym': ('RelatedTo', '{0} is related to {1}'),
+    'agent': ('RelatedTo', '{0} is related to {1}'),
+    'patient': ('RelatedTo', '{0} is related to {1}'),
+    'theme': ('RelatedTo', '{0} is related to {1}'),
+    'instrument': ('RelatedTo', '{0} is related to {1}'),
+    'goal': ('RelatedTo', '{0} is related to {1}'),
+    
     # Do we want a relation for verbs in the same VerbNet group?
 }
 

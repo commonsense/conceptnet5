@@ -24,7 +24,7 @@ setup(
     install_requires=[
         'snakemake', 'click', 'requests', 'mmh3', 'ftfy',
         'msgpack-python', 'langcodes', 'wordfreq >= 1.4.1',
-        'xmltodict'
+        'xmltodict', 'ordered_set'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
@@ -38,6 +38,6 @@ setup(
         ]
     },
     extras_require={
-        'vectors': 'tables'
+        'vectors': ['tables', 'pandas']
     },
 )
