@@ -95,7 +95,7 @@ rule all:
 
 rule clean:
     shell:
-        "for subdir in assertions collated db edges index tmp vectors; "
+        "for subdir in assertions collated db edges index tmp vectors stats; "
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
@@ -359,7 +359,7 @@ rule concepts_right:
     input:
         DATA + "/assertions/assertions.csv"
     output:
-        DATA + "/stats/concepts_right_datasets.txt"
+        DATA + "/stats/concepts_right.txt"
     shell:
         "cut -f 4 {input} > {output}"
 
