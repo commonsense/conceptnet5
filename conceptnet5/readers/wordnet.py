@@ -38,7 +38,7 @@ REL_MAPPING = {
     'also': ('RelatedTo', '{0} is related to {1}'),
     'antonym': ('Antonym', '{0} is the opposite of {1}'),
     'derivation': ('DerivedFrom', 'The word "{0}" is derived from "{1}"'),
-    'translation': ('~Synonym', '{0} is a translation of {1}')
+    'translation': ('~Synonym', '{0} is a translation of {1}'),
 
     # We may want some of these to be more specific, but it's hard to classify
     # them in terms of existing relations, and there aren't enough of them to
