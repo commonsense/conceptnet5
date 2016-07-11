@@ -4,7 +4,7 @@ from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_interpolate
 from .evaluation.wordsim import evaluate
-from .transforms import shrink
+from .transforms import shrink_and_sort
 
 
 @click.group()
@@ -79,5 +79,5 @@ def run_evaluate(filename):
 @click.option('-k', default=300, help="Number of columns to truncate to")
 def run_shrink(input_filename, output_filename, n, k):
     frame = load_hdf(input_filename)
-    shrunk = shrink(frame, n, k)
+    shrunk = shrink_and_sort(frame, n, k)
     save_hdf(shrunk, output_filename)

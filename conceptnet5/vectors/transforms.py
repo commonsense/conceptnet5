@@ -65,8 +65,11 @@ def l2_normalize_rows(frame):
     return frame.div(row_norms, axis='rows')
 
 
-def shrink(frame, n, k):
+def shrink_and_sort(frame, n, k):
     """
-    Truncate a matrix to NxK and re-normalize it.
+    Truncate a matrix to NxK, re-normalize it, and arrange the rows in
+    lexicographic order for querying.
     """
-    return l2_normalize_rows(frame.iloc[:n, :k])
+    shrunk = l2_normalize_rows(frame.iloc[:n, :k])
+    shrunk.sort_index(inplace=True)
+    return shrunk
