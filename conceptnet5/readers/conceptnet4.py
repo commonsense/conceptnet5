@@ -67,6 +67,7 @@ CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/gcgirl',
     '/s/contributor/omcs/maratrea',
     '/s/contributor/omcs/poorrichard',
+    '/s/contributor/omcs/fabian',
     '/s/contributor/omcs/coolio',
     '/s/contributor/omcs/wendybendy',
     '/s/contributor/omcs/kaaru',
