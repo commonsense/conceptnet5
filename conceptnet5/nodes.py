@@ -8,6 +8,7 @@ from conceptnet5.language.english import english_filter
 from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import concept_uri, split_uri, parse_possible_compound_uri
 import re
+import langcodes
 
 
 # There are various cases of language codes that we want to merge or redirect
@@ -431,6 +432,12 @@ LANGUAGES = {
 COMMON_LANGUAGES = LANGUAGES['common'] | LANGUAGES['common-historical'] | LANGUAGES['common-artificial']
 ALL_LANGUAGES = COMMON_LANGUAGES | LANGUAGES['more'] | LANGUAGES['more-historical'] | LANGUAGES['more-artificial']
 HISTORICAL_LANGUAGES = LANGUAGES['common-historical'] | LANGUAGES['more-historical']
+RTL_LANGUAGES = {
+    # Arabic script
+    'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur',
+    # Hebrew script
+    'he', 'yi'
+}
 
 # The top languages we support, in order
 CORE_LANGUAGES = ['en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl']
@@ -439,8 +446,21 @@ CORE_LANGUAGES = ['en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl']
 # langcodes), here are some specific language names we should use instead of
 # what we'd get by looking them up
 LANGUAGE_NAME_OVERRIDES = {
-    'sh': 'Serbo-Croatian',
+    'en': {
+        'ga': 'Irish Gaelic',
+        'sh': 'Serbo-Croatian',
+    }
 }
+
+
+def get_language_name(code, target_language='en'):
+    """
+    Get the natural-language name of a language ConceptNet supports.
+    """
+    if code in LANGUAGE_NAME_OVERRIDES.get(target_language, {}):
+        return LANGUAGE_NAME_OVERRIDES[target_language][code]
+    else:
+        return langcodes.get(code).language_name(target_language)
 
 
 def standardize_text(text, token_filter=None):
