@@ -4,7 +4,10 @@ includes the `make_edge` function, which builds the dictionary representing
 an edge.
 """
 
-from conceptnet5.uri import (assertion_uri, uri_prefix, conjunction_uri, is_concept)
+from conceptnet5.uri import (
+    assertion_uri, uri_prefix, conjunction_uri, is_concept, split_uri
+)
+from conceptnet5.nodes import ld_node
 import re
 
 
@@ -106,10 +109,6 @@ def extract_surface_terms(surface):
     return surface_terms
 
 
-def uri_to_label(uri):
-    return uri.split('/')[-1].replace('_', ' ')
-
-
 def transform_for_linked_data(edge):
     """
     Modify an edge (assertion) in place to contain values that are appropriate
@@ -122,6 +121,7 @@ def transform_for_linked_data(edge):
     The relevant changes are:
 
     - Remove the 'features' list
+    - Rename 'uri' to '@id'
     - Make 'start', 'end', and 'rel' into dictionaries with an '@id' and
       'label', removing the separate 'surfaceStart' and 'surfaceEnd'
       attributes
@@ -134,23 +134,17 @@ def transform_for_linked_data(edge):
         conj = conjunction_uri(*sorted(source.values()))
         source['@id'] = conj
     edge['@id'] = edge['uri']
+    del edge['uri']
 
     start_uri = edge['start']
     end_uri = edge['end']
     rel_uri = edge['rel']
-    if edge['surfaceStart'] is not None:
-        start_label = edge['surfaceStart']
-    else:
-        start_label = uri_to_label(edge['start'])
-    if edge['surfaceEnd'] is not None:
-        end_label = edge['surfaceEnd']
-    else:
-        end_label = uri_to_label(edge['end'])
+    start_label = edge.get('surfaceStart')
+    end_label = edge.get('surfaceEnd')
     del edge['surfaceStart']
     del edge['surfaceEnd']
-    rel_label = uri_to_label(edge['rel'])
-    edge['start'] = {'@id': start_uri, 'label': start_label}
-    edge['end'] = {'@id': end_uri, 'label': end_label}
-    edge['rel'] = {'@id': rel_uri, 'label': rel_label}
+    edge['start'] = ld_node(start_uri, start_label)
+    edge['end'] = ld_node(end_uri, end_label)
+    edge['rel'] = ld_node(rel_uri, None)
 
     return edge

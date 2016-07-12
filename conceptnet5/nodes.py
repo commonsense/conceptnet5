@@ -6,7 +6,8 @@ terms and languages into a standard form.
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.language.token_utils import simple_tokenize
-from conceptnet5.uri import concept_uri, split_uri, parse_possible_compound_uri
+from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri
+from urllib.parse import urlparse
 import re
 import langcodes
 
@@ -436,7 +437,11 @@ RTL_LANGUAGES = {
     # Arabic script
     'ar', 'bal', 'fa', 'ku', 'ps', 'sd', 'tk', 'ug', 'ur',
     # Hebrew script
-    'he', 'yi'
+    'he', 'yi',
+    # Syriac script
+    'syc',
+    # Thaana script
+    'dv',
 }
 
 # The top languages we support, in order
@@ -449,6 +454,7 @@ LANGUAGE_NAME_OVERRIDES = {
     'en': {
         'ga': 'Irish Gaelic',
         'sh': 'Serbo-Croatian',
+        'mul': 'Multilingual',
     }
 }
 
@@ -604,3 +610,32 @@ def valid_concept_name(text):
     False
     """
     return bool(standardize_text(text))
+
+
+def uri_to_label(uri):
+    if uri.startswith('/c/'):
+        uri = uri_prefix(uri)
+    return uri.split('/')[-1].replace('_', ' ')
+
+
+def ld_node(uri, label=None):
+    """
+    Convert a ConceptNet URI into a dictionary suitable for Linked Data.
+    """
+    if label is None:
+        label = uri_to_label(uri)
+    ld = {
+        '@id': uri,
+        'label': label
+    }
+    if uri.startswith('/c/'):
+        pieces = split_uri(uri)
+        ld['language'] = pieces[1]
+        if len(pieces) > 3:
+            ld['sense_label'] = '/'.join(pieces[3:])
+        ld['term'] = uri_prefix(uri)
+    elif uri.startswith('http'):
+        domain = urlparse(uri).netloc
+        ld['site'] = domain
+        ld['term'] = uri
+    return ld
