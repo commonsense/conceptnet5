@@ -13,12 +13,14 @@ Design of ConceptNet 5.5:
 - [x] Build vectors using less than 16 GB RAM
 - [x] fix 'FormOf' links to self
 - [x] Try new lemmatizer as part of Numberbatch
+- [x] Break down the and-or trees into more machine-readable structures
+- [x] Use symmetrical relations
 - [ ] Use standardized language codes in Wiktionary forms
+- [ ] Remove "obsolete", "archaic", "dated", "rare", "archaïque" contexts when other contexts exist
+- [ ] Higher weights on monolingual things, lower weights on uncommon languages
 
 ConceptNet 5.6 perhaps:
 
 - [ ] Nodes should have labels that are stored separately from their edges
-- [ ] Break down the and-or trees into more machine-readable structures
-- [ ] Use symmetrical relations
 - [ ] Relabel vague nodes like "someone" and "something"
 - [ ] Infer things from verb phrases
