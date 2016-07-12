@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.nodes import ALL_LANGUAGES, get_uri_language
 from conceptnet5.edges import make_edge
-from conceptnet5.uri import Licenses, split_uri, conjunction_uri, is_absolute_url
+from conceptnet5.uri import Licenses, split_uri, conjunction_uri, is_absolute_url, uri_prefix
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 import itertools
 import json
@@ -47,6 +47,12 @@ def make_assertion(line_group):
         return None
 
     uri, rel, start, end, _ = lines[0].split('\t')
+
+    # We can't distinguish word senses well enough yet, so only keep them
+    # up to the part of speech
+    start = uri_prefix(start, 4)
+    end = uri_prefix(end, 4)
+
     if not (keep_concept(start) and keep_concept(end)):
         return None
 
