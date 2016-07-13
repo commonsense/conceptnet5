@@ -89,7 +89,8 @@ CONCEPT_BLACKLIST = {
     '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
     '/c/en/they', '/c/en/this', '/c/en/you',
     '/c/en/often', '/c/en/sometimes', '/c/en/usually', '/c/en/if',
-    '/c/en/when', '/c/en/whether',
+    '/c/en/when', '/c/en/whether', '/c/en/nothing', '/c/en/nobody',
+    '/c/en/no_one',
 }
 ACTIVITY_BLACKLIST = {
     "20 Questions",
