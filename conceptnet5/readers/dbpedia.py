@@ -26,7 +26,7 @@ We extract types and certain relations from the pages that remain using the
 
 """
 from conceptnet5.language.token_utils import un_camel_case
-from conceptnet5.uri import Licenses
+from conceptnet5.uri import Licenses, uri_prefix, split_uri
 from conceptnet5.nodes import (
     standardized_concept_uri, topic_to_concept, ALL_LANGUAGES, LCODE_ALIASES
 )
@@ -69,17 +69,19 @@ RELATIONS = {
     'language': '/r/dbpedia/language',
     'occupation': '/r/dbpedia/occupation',
     'profession': '/r/dbpedia/occupation',
-    'author': '/r/dbpedia/writer',
-    'writer': '/r/dbpedia/writer',
-    'director': '/r/dbpedia/director',
-    'starring': '/r/dbpedia/starring',
-    'producer': '/r/dbpedia/producer',
-    'associatedBand': '/r/dbpedia/associatedBand',
-    'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
-    'bandMember': '/r/dbpedia/bandMember',
-    'artist': '/r/dbpedia/artist',
-    'musicalArtist': '/r/dbpedia/artist',
-    'musicalBand': '/r/dbpedia/artist',
+
+    #'author': '/r/dbpedia/writer',
+    #'writer': '/r/dbpedia/writer',
+    #'director': '/r/dbpedia/director',
+    #'starring': '/r/dbpedia/starring',
+    #'producer': '/r/dbpedia/producer',
+    #'associatedBand': '/r/dbpedia/associatedBand',
+    #'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
+    #'bandMember': '/r/dbpedia/bandMember',
+    #'artist': '/r/dbpedia/artist',
+    #'musicalArtist': '/r/dbpedia/artist',
+    #'musicalBand': '/r/dbpedia/artist',
+
     'genus': '/r/dbpedia/genus',
     'leader': '/r/dbpedia/leader',
     'capital': '/r/dbpedia/capital',
@@ -178,18 +180,26 @@ def get_urls_from_degree_file(in_degree_file):
     return urls
 
 
-def process_dbpedia(input_dir, output_file, in_degree_file):
+def read_concept_file(concept_file):
+    concepts = set()
+    for line in open(concept_file, encoding='utf-8'):
+        concept = uri_prefix(line.strip())
+        concepts.add(concept)
+    return concepts
+
+
+def process_dbpedia(input_dir, output_file, concept_file):
     """
     Read through multiple DBPedia files and output filtered assertions to
     `output_file`.
     """
-    high_degree_urls = get_urls_from_degree_file(in_degree_file)
+    ok_concepts = read_concept_file(concept_file)
 
     input_path = pathlib.Path(input_dir)
     interlang_path = input_path / 'interlanguage_links_en.tql.bz2'
-    mapped_urls = interlanguage_mapping(interlang_path, high_degree_urls)
+    mapped_urls = interlanguage_mapping(interlang_path, ok_concepts)
+    print("URLs mapped: ", len(mapped_urls))
 
-    ok_concepts = set()
     out = MsgpackStreamWriter(output_file)
 
     types_path = input_path / 'instance_types_en.tql.bz2'
@@ -204,57 +214,54 @@ def process_dbpedia(input_dir, output_file, in_degree_file):
             continue
         if subj_url in mapped_urls:
             subj_concept = translate_dbpedia_url(subj_url)
-            if subj_concept:
-                obj_type = un_camel_case(resource_name(obj['url']))
-                if obj_type not in TYPE_BLACKLIST:
-                    ok_concepts.add(subj_concept)
-                    obj_concept = standardized_concept_uri('en', obj_type, 'n')
-                    if obj_concept not in CONCEPT_BLACKLIST:
-                        ok_concepts.add(obj_concept)
-                        edge = make_edge(
-                            '/r/IsA', subj_concept, obj_concept,
+            obj_type = un_camel_case(resource_name(obj['url']))
+            if obj_type not in TYPE_BLACKLIST:
+                obj_concept = standardized_concept_uri('en', obj_type, 'n')
+                if obj_concept not in CONCEPT_BLACKLIST:
+                    edge = make_edge(
+                        '/r/IsA', subj_concept, obj_concept,
+                        dataset='/d/dbpedia/en',
+                        license=Licenses.cc_sharealike,
+                        sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                        weight=0.5,
+                        surfaceStart=url_to_label(subj['url']),
+                        surfaceEnd=url_to_label(obj['url'])
+                    )
+                    out.write(edge)
+                for other_url in mapped_urls[subj_url]:
+                    if other_url.startswith('http://wikidata.dbpedia.org/'):
+                        urledge = make_edge(
+                            '/r/ExternalURL',
+                            subj_concept, other_url,
                             dataset='/d/dbpedia/en',
                             license=Licenses.cc_sharealike,
                             sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                            weight=0.5,
-                            surfaceStart=url_to_label(subj['url']),
-                            surfaceEnd=url_to_label(obj['url'])
+                            weight=1.0
                         )
-                        out.write(edge)
-                    for other_url in mapped_urls[subj_url]:
-                        if other_url.startswith('http://wikidata.dbpedia.org/'):
+                        out.write(urledge)
+                    else:
+                        other_concept = translate_dbpedia_url(other_url)
+                        if other_concept:
                             urledge = make_edge(
                                 '/r/ExternalURL',
-                                subj_concept, other_url,
+                                other_concept, other_url,
                                 dataset='/d/dbpedia/en',
                                 license=Licenses.cc_sharealike,
                                 sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
                                 weight=1.0
                             )
                             out.write(urledge)
-                        else:
-                            other_concept = translate_dbpedia_url(other_url)
-                            if other_concept:
-                                urledge = make_edge(
-                                    '/r/ExternalURL',
-                                    other_concept, other_url,
-                                    dataset='/d/dbpedia/en',
-                                    license=Licenses.cc_sharealike,
-                                    sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                                    weight=1.0
-                                )
-                                out.write(urledge)
-                                edge = make_edge(
-                                    '/r/Synonym',
-                                    other_concept, subj_concept,
-                                    dataset='/d/dbpedia/en',
-                                    license=Licenses.cc_sharealike,
-                                    sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                                    weight=0.5,
-                                    surfaceStart=url_to_label(other_url),
-                                    surfaceEnd=url_to_label(subj_url)
-                                )
-                                out.write(edge)
+                            edge = make_edge(
+                                '/r/Synonym',
+                                other_concept, subj_concept,
+                                dataset='/d/dbpedia/en',
+                                license=Licenses.cc_sharealike,
+                                sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                                weight=0.5,
+                                surfaceStart=url_to_label(other_url),
+                                surfaceEnd=url_to_label(subj_url)
+                            )
+                            out.write(edge)
 
     relations_path = input_path / 'mappingbased_objects_en.tql.bz2'
     quads = parse_nquads(bz2.open(str(relations_path), 'rt'))
@@ -263,7 +270,7 @@ def process_dbpedia(input_dir, output_file, in_degree_file):
         obj_concept = translate_dbpedia_url(obj['url'])
         rel_name = resource_name(pred['url'])
         if (
-            subj_concept in ok_concepts and obj_concept in ok_concepts and
+            uri_prefix(subj_concept) in ok_concepts and
             subj['url'] in mapped_urls and obj['url'] in mapped_urls
         ):
             if rel_name in RELATIONS:
@@ -286,30 +293,34 @@ def url_to_label(url):
     return resource_name(url).replace('_', ' ')
 
 
-def interlanguage_mapping(interlang_path, acceptable_urls):
+def interlanguage_mapping(interlang_path, ok_concepts):
     quads = parse_nquads(bz2.open(str(interlang_path), 'rt'))
     mapping = {}
     for subj, values in itertools.groupby(quads, itemgetter(0)):
         subj_url = subj['url']
-        if subj_url in acceptable_urls:
-            vals_list = list(values)
+        subj_concept = translate_dbpedia_url(subj_url)
+        pieces = split_uri(subj_concept)
+        if len(pieces) >= 6:
+            sense = pieces[5]
+            if 'album' in sense or 'film' in sense or 'series' in sense or 'disambiguation' in sense or 'song' in sense or 'album' in sense or 'band' in sense:
+                continue
+        if uri_prefix(subj_concept) in ok_concepts:
+            targets = [subj_url]
 
-            # Keep nodes with at least 5 translations plus the Wikidata links
-            if len(vals_list) >= 7:
-                concepts = [subj_url]
-                for _subj, _pred, obj, _graph in vals_list:
-                    url = obj['url']
-                    if 'www.wikidata.org' in url:
-                        continue
-                    if url.startswith('http://wikidata.dbpedia.org/'):
-                        wikidata_id = resource_name(url)
+            for _subj, _pred, obj, _graph in values:
+                url = obj['url']
+                if 'www.wikidata.org' in url:
+                    continue
+                if url.startswith('http://wikidata.dbpedia.org/'):
+                    wikidata_id = resource_name(url)
+                    print(wikidata_id, subj_url)
 
-                        # Return early when we see a high-numbered Wikidata ID
-                        if int(wikidata_id[1:]) >= 1000000:
-                            return mapping
-                    concepts.append(url)
+                    # Return early when we see a high-numbered Wikidata ID
+                    if int(wikidata_id[1:]) >= 1000000:
+                        return mapping
+                targets.append(url)
 
-                mapping[subj_url] = concepts
+            mapping[subj_url] = targets
 
 
 def main():
@@ -317,9 +328,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help="Directory containing DBPedia files")
     parser.add_argument('output_file', help='msgpack file to output to')
-    parser.add_argument('in_degree_file', help="File listing the in-degrees of DBPedia nodes")
+    parser.add_argument('concept_file', help="Text file of concepts used elsewhere in ConceptNet")
     args = parser.parse_args()
-    process_dbpedia(args.input_dir, args.output_file, args.in_degree_file)
+    process_dbpedia(args.input_dir, args.output_file, args.concept_file)
 
 
 if __name__ == '__main__':

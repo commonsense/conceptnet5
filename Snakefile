@@ -55,9 +55,12 @@ RETROFIT_SHARDS = 6
 # =================
 # The goal of reader steps is to produce Msgpack files, and later CSV files,
 # with these names.
+#
+# We distingish *core dataset names*, which collectively determine the set of
+# terms that ConceptNet will attempt to represent, from the additional datasets
+# that will mainly be used to find more information about those terms.
 
-DATASET_NAMES = [
-    "dbpedia/dbpedia_en",
+CORE_DATASET_NAMES = [
     "jmdict/jmdict",
     "nadya/nadya",
     "ptt_petgame/api",
@@ -65,9 +68,11 @@ DATASET_NAMES = [
     "verbosity/verbosity",
     "wordnet/wordnet"
 ]
-DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
-DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
-DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
+CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+
+DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
 RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
@@ -153,24 +158,6 @@ rule precompute_wiktionary:
                     "--acl public-read")
 
 
-rule filter_dbpedia_links:
-    input:
-        DATA + "/raw/dbpedia/page_links_en.tql.bz2"
-    output:
-        DATA + "/precomputed/dbpedia/in_degree_en.txt"
-    run:
-        if USE_PRECOMPUTED:
-            shell("curl {PRECOMPUTED_DATA_URL}/dbpedia/in_degree_en.txt > {output}")
-        else:
-            shell("bunzip2 -c {input} "
-                  "| cut -f 3 -d ' ' | sort | uniq -c "
-                  "| egrep -v ' [0-9][0-9]? ' | sort -nrk 1 > {output}")
-            if UPLOAD:
-                shell("aws s3 cp {output} "
-                    "{PRECOMPUTED_S3_UPLOAD}/dbpedia/in_degree_en.txt "
-                    "--acl public-read")
-
-
 # Readers
 # =======
 # These are steps that turn raw data into files of uncombined 'edges'.
@@ -188,13 +175,13 @@ rule read_dbpedia:
         DATA + "/raw/dbpedia/instance_types_en.tql.bz2",
         DATA + "/raw/dbpedia/interlanguage_links_en.tql.bz2",
         DATA + "/raw/dbpedia/mappingbased_objects_en.tql.bz2",
-        DATA + "/precomputed/dbpedia/in_degree_en.txt"
+        DATA + "/stats/core_concepts.txt"
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
         "python3 -m conceptnet5.readers.dbpedia %(data)s/raw/dbpedia "
         "{output} "
-        "%(data)s/precomputed/dbpedia/in_degree_en.txt " % {'data': DATA}
+        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
 
 rule read_jmdict:
     input:
@@ -346,6 +333,33 @@ rule relation_stats:
     shell:
         "cut -f 2 {input} | LC_ALL=C sort | LC_ALL=C uniq -c "
         "| LC_ALL=C sort -nbr > {output}"
+
+
+rule core_concepts_left:
+    input:
+        expand(DATA + "/edges/{dataset}.csv", dataset=CORE_DATASET_NAMES)
+    output:
+        DATA + "/stats/core_concepts_left.txt"
+    shell:
+        "cut -f 3 {input} > {output}"
+
+rule core_concepts_right:
+    input:
+        expand(DATA + "/edges/{dataset}.csv", dataset=CORE_DATASET_NAMES)
+    output:
+        DATA + "/stats/core_concepts_right.txt"
+    shell:
+        "cut -f 3 {input} > {output}"
+
+rule core_concepts:
+    input:
+        DATA + "/stats/core_concepts_left.txt",
+        DATA + "/stats/core_concepts_right.txt"
+    output:
+        DATA + "/stats/core_concepts.txt"
+    shell:
+        "LC_ALL=C sort -u {input} > {output}"
+
 
 rule concepts_left:
     input:
