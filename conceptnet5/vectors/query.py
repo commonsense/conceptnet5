@@ -89,10 +89,10 @@ class VectorSpaceWrapper(object):
                 term = lemma
             if include_neighbors and term not in self.frame.index:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
-                    if field_match(edge['start'], term) and not field_match(edge['end'], term):
-                        neighbor = edge['end']
-                    elif field_match(edge['end'], term) and not field_match(edge['start'], term):
-                        neighbor = edge['start']
+                    if field_match(edge['start']['term'], term) and not field_match(edge['end']['term'], term):
+                        neighbor = edge['end']['term']
+                    elif field_match(edge['end']['term'], term) and not field_match(edge['start']['term'], term):
+                        neighbor = edge['start']['term']
                     else:
                         continue
                     neighbor_weight = weight * min(10, edge['weight']) * 0.001
