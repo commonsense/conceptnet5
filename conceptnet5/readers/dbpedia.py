@@ -270,7 +270,7 @@ def process_dbpedia(input_dir, output_file, concept_file):
         obj_concept = translate_dbpedia_url(obj['url'])
         rel_name = resource_name(pred['url'])
         if (
-            uri_prefix(subj_concept) in ok_concepts and
+            subj_concept and obj_concept and
             subj['url'] in mapped_urls and obj['url'] in mapped_urls
         ):
             if rel_name in RELATIONS:
