@@ -198,7 +198,6 @@ def process_dbpedia(input_dir, output_file, concept_file):
     input_path = pathlib.Path(input_dir)
     interlang_path = input_path / 'interlanguage_links_en.tql.bz2'
     mapped_urls = interlanguage_mapping(interlang_path, ok_concepts)
-    print("URLs mapped: ", len(mapped_urls))
 
     out = MsgpackStreamWriter(output_file)
 
@@ -321,6 +320,7 @@ def interlanguage_mapping(interlang_path, ok_concepts):
                 targets.append(url)
 
             mapping[subj_url] = targets
+    return mapping
 
 
 def main():
