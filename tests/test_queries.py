@@ -23,10 +23,10 @@ def test_lookup():
     eq_(quiz3, quiz1[:2])
 
     verbosity_test = quiz1[0]
-    eq_(verbosity_test['start'], '/c/en/test')
-    eq_(verbosity_test['end'], '/c/en/quiz')
-    eq_(verbosity_test['rel'], '/r/RelatedTo')
-    eq_(verbosity_test['uri'], '/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]')
+    eq_(verbosity_test['start']['@id'], '/c/en/test')
+    eq_(verbosity_test['end']['@id'], '/c/en/quiz')
+    eq_(verbosity_test['rel']['@id'], '/r/RelatedTo')
+    eq_(verbosity_test['@id'], '/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]')
     eq_(verbosity_test['license'], 'cc:by/4.0')
     source = verbosity_test['sources'][0]
     eq_(source['contributor'], '/s/resource/verbosity')
@@ -43,7 +43,6 @@ def test_query_en_quiz():
     testquiz = [
         '/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]',
         '/a/[/r/Synonym/,/c/en/test/n/,/c/en/quiz/]',
-        '/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/en/quiz/]'
     ]
     eq_(q1, testquiz)
     q2 = get_query_ids({'node': '/c/en/quiz'})
@@ -62,7 +61,7 @@ def test_query_en_form():
 
 def test_query_en_es():
     q = get_query_ids({'start': '/c/en/test', 'end': '/c/es'})
-    eq_(q, ['/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/es/prueba/]'])
+    eq_(q, ['/a/[/r/Synonym/,/c/en/test/n/,/c/es/prueba/]'])
 
 
 def test_query_es():
@@ -84,4 +83,4 @@ def test_query_source():
 def test_lookup_external():
     found = list(test_finder.lookup('http://dbpedia.org/resource/Test_(assessment)'))
     eq_(len(found), 1)
-    eq_(found[0]['start'], '/c/en/test/n/wp/assessment')
+    eq_(found[0]['start']['@id'], '/c/en/test/n')

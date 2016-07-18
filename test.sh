@@ -9,4 +9,4 @@ build_test () {
     diff -ur -x '*.msgpack' testdata/reference/assoc testdata/assoc
 }
 
-nosetests --with-doctest conceptnet5 && build_test && nosetests && echo "Success."
+nosetests --with-doctest conceptnet5 && build_test && nosetests && nosetests tests/post-build && echo "Success."
