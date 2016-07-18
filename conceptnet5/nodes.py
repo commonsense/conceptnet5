@@ -160,8 +160,8 @@ LANGUAGES = {
         'mk',   # Macedonian
         'nv',   # Navajo
         'hi',   # Hindi
+        'ur',   # Urdu
         'af',   # Afrikaans
-        'gv',   # Manx
         'sa',   # Sanskrit
         'th',   # Thai
         'fil',  # Filipino
@@ -169,6 +169,12 @@ LANGUAGES = {
         'rup',  # Aromanian
         'uk',   # Ukrainian
         'cy',   # Welsh
+        'be',   # Belarusian
+        'ta',   # Tamil
+        'ku',   # Kurdish
+        'az',   # Azerbaijani
+        'kk',   # Kazakh
+        'sw',   # Swahili
     },
 
     # Languages with no extant native speakers, but at least 25,000 edges
@@ -180,6 +186,7 @@ LANGUAGES = {
         'fro',  # Old French
         'ang',  # Old English
         'non',  # Old Norse
+        'gv',   # Manx
     },
 
     # Artificial languages with at least 25,000 edges
@@ -195,12 +202,8 @@ LANGUAGES = {
         'br',   # Breton
         'lb',   # Luxembourgish
         'fy',   # Western Frisian
-        'ku',   # Kurdish
-        'be',   # Belarusian
-        'kk',   # Kazakh
         'frp',  # Arpitan (Franco-Provençal)
         'mi',   # Maori
-        'sw',   # Swahili
         'yi',   # Yiddish
         'dsb',  # Lower Sorbian
         'vec',  # Venetian
@@ -217,7 +220,6 @@ LANGUAGES = {
         'bn',   # Bengali
         'mt',   # Maltese
         'ady',  # Adyghe
-        'az',   # Azerbaijani
         'qu',   # Quechua
         'scn',  # Sicilian
         'haw',  # Hawaiian
@@ -226,7 +228,6 @@ LANGUAGES = {
         'lo',   # Lao
         'crh',  # Crimean Turkish
         'ses',  # Koyraboro Senni
-        'ta',   # Tamil
         'tg',   # Tajik
         'vep',  # Veps
         'wa',   # Walloon
