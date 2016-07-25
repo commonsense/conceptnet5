@@ -4,7 +4,6 @@ from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity
 )
-from conceptnet5.language.lemmatize import DBLemmatizer, LEMMA_FILENAME
 from conceptnet5.uri import uri_prefix
 import pandas as pd
 
@@ -28,7 +27,6 @@ class VectorSpaceWrapper(object):
     def __init__(self, vector_filename=None,
                  index_filename=None,
                  edge_filename=None,
-                 lemma_filename=None,
                  frame=None):
         if frame is None:
             self.frame = None
@@ -38,12 +36,10 @@ class VectorSpaceWrapper(object):
             self.vector_filename = None
         self.index_filename = index_filename
         self.edge_filename = edge_filename
-        self.lemma_filename = lemma_filename or LEMMA_FILENAME
         self.small_frame = None
         self.k = None
         self.small_k = None
         self.finder = AssertionFinder(self.index_filename, self.edge_filename)
-        self.lemmatizer = DBLemmatizer(self.lemma_filename)
 
     def load(self):
         """
@@ -83,10 +79,7 @@ class VectorSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            lemma = self.lemmatizer.lemmatize_uri(term)
-            expanded.append((lemma, weight / 10))
-            if not list(self.finder.lookup(term, limit=1)):
-                term = lemma
+            expanded.append((term, weight / 10))
             if include_neighbors and term not in self.frame.index:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
                     if field_match(edge['start']['term'], term) and not field_match(edge['end']['term'], term):
