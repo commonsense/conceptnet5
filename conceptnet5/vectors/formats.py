@@ -31,13 +31,13 @@ def convert_glove(glove_filename, output_filename, nrows):
     save_hdf(glove_normal, output_filename)
 
 
-def convert_word2vec(word2vec_filename, output_filename, nrows):
+def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     """
     Convert word2vec data from its gzipped binary format to a Feather
     dataframe.
     """
     w2v_raw = load_word2vec_bin(word2vec_filename, nrows)
-    w2v_std = standardize_row_labels(w2v_raw, forms=True)
+    w2v_std = standardize_row_labels(w2v_raw, forms=True, language=language)
     del w2v_raw
     w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
     del w2v_std
@@ -61,7 +61,7 @@ def _read_until_space(file):
         if newchar == b'' or newchar == b' ':
             break
         chars.append(newchar[0])
-    return bytes(chars).decode('utf-8')
+    return bytes(chars).decode('utf-8', 'replace')
 
 
 def _read_vec(file, ndims):
