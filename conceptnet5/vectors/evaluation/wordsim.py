@@ -34,6 +34,14 @@ def read_ws353_multilingual(language):
             yield term1, term2, gold_score
 
 
+def read_mturk():
+    with open(get_support_data_filename('mturk/MTURK-771.csv')) as file:
+        for line in file:
+            term1, term2, sscore = line.split(',')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score
+
+
 def read_men3000(subset='dev'):
     """
     Parses the MEN test collection. MEN is a collection of 3000 english word
@@ -119,9 +127,10 @@ def evaluate(frame, subset='dev'):
     vectors = VectorSpaceWrapper(frame=frame)
     men_score = spearman_evaluate(vectors, read_men3000(subset))
     rw_score = spearman_evaluate(vectors, read_rw(subset))
+    mturk_score = spearman_evaluate(vectors, read_mturk())
     ws_score = spearman_evaluate(vectors, read_ws353())
     ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
-    results = pd.Series([men_score, rw_score, ws_score, ws_es_score, ws_ro_score],
-                        index=['men3000', 'rw', 'ws353', 'ws353-es', 'ws353-ro'])
+    results = pd.Series([men_score, rw_score, mturk_score, ws_score, ws_es_score, ws_ro_score],
+                        index=['men3000', 'rw', 'mturk-771', 'ws353', 'ws353-es', 'ws353-ro'])
     return results
