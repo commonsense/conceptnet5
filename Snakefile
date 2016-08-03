@@ -437,6 +437,17 @@ rule convert_glove:
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 data/raw/vectors/glove12.840B.300d.txt.gz {output}"
 
+rule convert_lexvec:
+    input:
+        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
+        DATA + "/db/wiktionary.db"
+    output:
+        DATA + "/vectors/lexvec.h5"
+    resources:
+        ram=16
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 data/raw/vectors/lexvec.no-header.vectors.gz {output}"
+
 rule merge_interpolate:
     input:
         DATA + "/vectors/glove12.840B.h5",
