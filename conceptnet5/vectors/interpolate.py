@@ -54,6 +54,26 @@ def estimate_frequency(term, frame1, frame2, extra_labels):
     return freq
 
 
+def merge_intersect(frames, small_k=300):
+    vocab_intersection = frames[0].index
+    big_k = frames[0].shape[1]
+    for frame in frames[1:]:
+        vocab_intersection &= frame.index
+        big_k += frame.shape[1]
+
+    shared_vecs = pd.DataFrame(index=vocab_intersection, columns=range(big_k), dtype='f')
+    offset = 0
+    for frame in frames:
+        k = frame.shape[1]
+        shared_vecs.loc[vocab_intersection, offset:offset + k - 1] = frame.loc[vocab_intersection]
+        offset += k
+
+    print(shared_vecs.shape)
+    projected, projection = dataframe_svd_projection(shared_vecs, small_k)
+    return projected, projection
+
+
+
 def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbose=False):
     """
     Merge together two matrices of term vectors with different vocabularies.
