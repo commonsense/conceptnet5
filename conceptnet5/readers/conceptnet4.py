@@ -246,6 +246,16 @@ def build_data_set(parts_dict):
     return dataset
 
 
+def standardize_username(username):
+    """
+    Convert usernames into a canonical form that can be used in URIs.
+
+    If the username is an e-mail address, just keep the part before the @ sign.
+    """
+    name = username.strip('@').split('@')[0]
+    return standardize_text(name)
+
+
 def build_sources(parts_dict, preposition_fix=False):
     """
     Create the 'source' information for an assertion.
@@ -258,7 +268,7 @@ def build_sources(parts_dict, preposition_fix=False):
     creator_source = {}
     creator_node = join_uri(
         '/s/contributor/omcs',
-        standardize_text(parts_dict["creator"])
+        standardize_username(parts_dict["creator"])
     )
     creator_source['contributor'] = creator_node
 
@@ -278,7 +288,7 @@ def build_sources(parts_dict, preposition_fix=False):
 
         vote_int = vote[1]
         vote_source = {
-            'contributor': join_uri('/s/contributor/omcs', standardize_text(username)),
+            'contributor': join_uri('/s/contributor/omcs', standardize_username(username)),
             'activity': '/s/activity/omcs/vote',
             'weight': float(vote_int)
         }

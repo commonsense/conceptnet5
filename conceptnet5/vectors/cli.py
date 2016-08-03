@@ -5,11 +5,24 @@ from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_interpolate, merge_intersect
 from .evaluation.wordsim import evaluate
 from .transforms import shrink_and_sort
+from .query import VectorSpaceWrapper
 
 
 @click.group()
 def cli():
     pass
+
+@cli.command(name='filter_word_vectors')
+@click.argument('dense_hdf_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('vocab_filename', type=click.Path(readable=True, dir_okay=False))
+def filter_word_vectors(dense_hdf_filename, vocab_filename):
+    vsw = VectorSpaceWrapper(vector_filename=dense_hdf_filename)
+    for line in open(vocab_filename):
+        word = line.strip()
+        term = '/c/en/' + word
+        vec = vsw.get_vector(term)
+        line_parts = [word] + ['%6.6f' % num for num in vec]
+        print(' '.join(line_parts))
 
 
 @cli.command(name='retrofit')

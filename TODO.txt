@@ -16,8 +16,9 @@ Design of ConceptNet 5.5:
 - [x] Break down the and-or trees into more machine-readable structures
 - [x] Use symmetrical relations
 - [ ] Use standardized language codes in Wiktionary forms
-- [ ] Remove "obsolete", "archaic", "dated", "rare", "archaïque" contexts when other contexts exist
+- [x] Remove "obsolete", "archaic", "dated", "rare", "archaïque" contexts
 - [ ] Higher weights on monolingual things, lower weights on uncommon languages
+- [ ] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
 
 ConceptNet 5.6 perhaps:
 
