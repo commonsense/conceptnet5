@@ -3,8 +3,10 @@ import pandas as pd
 import numpy as np
 import wordfreq
 from conceptnet5.uri import split_uri
+from conceptnet5.nodes import CORE_LANGUAGES
 from ..vectors import similar_to_vec, weighted_average
 from .transforms import l2_normalize_rows
+from .formats import save_hdf
 
 
 WORDFREQ_LANGUAGES = set(wordfreq.available_languages())
@@ -54,22 +56,30 @@ def estimate_frequency(term, frame1, frame2, extra_labels):
     return freq
 
 
-def merge_intersect(frames, small_k=300):
-    vocab_intersection = frames[0].index
-    big_k = frames[0].shape[1]
-    for frame in frames[1:]:
-        vocab_intersection &= frame.index
-        big_k += frame.shape[1]
+def lookup_frequency(term):
+    _c, lang, text = split_uri(term)[:3]
+    text = text.replace('_', ' ')
+    if lang in WORDFREQ_LANGUAGES_LARGE:
+        return wordfreq.word_frequency(text, lang, 'large')
+    elif lang in WORDFREQ_LANGUAGES:
+        return wordfreq.word_frequency(text, lang)
+    else:
+        return 0.
 
-    shared_vecs = pd.DataFrame(index=vocab_intersection, columns=range(big_k), dtype='f')
-    offset = 0
-    for frame in frames:
-        k = frame.shape[1]
-        shared_vecs.loc[vocab_intersection, offset:offset + k - 1] = frame.loc[vocab_intersection]
-        offset += k
 
-    print(shared_vecs.shape)
-    projected, projection = dataframe_svd_projection(shared_vecs, small_k)
+
+def merge_intersect(frames, k=300):
+    joined = pd.concat(frames, join='inner', axis=1, ignore_index=True).astype('f')
+    joined.fillna(0)
+    print(joined.shape)
+
+    filtered_labels = pd.Series([label for label in joined.index if label.split('/')[2] in CORE_LANGUAGES])
+    adjusted = l2_normalize_rows(joined.loc[filtered_labels] - joined.mean(0))
+    del joined
+    print(adjusted.shape)
+    save_hdf(adjusted, '/tmp/shared_vecs.h5')
+    print('Running SVD')
+    projected, projection = dataframe_svd_projection(adjusted, k)
     return projected, projection
 
 
