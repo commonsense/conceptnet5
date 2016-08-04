@@ -97,7 +97,7 @@ def run_interpolate_all(input1_filename, input2_filename, output_filename, thres
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 def run_intersect(input_filenames, output_filename):
     frames = [load_hdf(filename) for filename in input_filenames]
-    intersected, projector = merge_intersect(frames, 300)
+    intersected, projector = merge_intersect(frames)
     save_hdf(intersected, output_filename)
     save_hdf(projector, '/tmp/v.h5')
 
