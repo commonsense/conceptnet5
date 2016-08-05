@@ -1,6 +1,7 @@
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import standardized_concept_uri, ALL_LANGUAGES
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, uri_prefix
 import sqlite3

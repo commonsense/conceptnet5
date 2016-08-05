@@ -27,10 +27,9 @@ We extract types and certain relations from the pages that remain using the
 """
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses, uri_prefix, split_uri
-from conceptnet5.nodes import (
-    standardized_concept_uri, topic_to_concept, ALL_LANGUAGES, LCODE_ALIASES
-)
+from conceptnet5.nodes import standardized_concept_uri, topic_to_concept
 from conceptnet5.edges import make_edge
+from conceptnet5.languages import ALL_LANGUAGES, LCODE_ALIASES
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import resource_name, parse_nquads
 import urllib

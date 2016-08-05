@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, print_function
-from conceptnet5.nodes import ALL_LANGUAGES, get_uri_language
+from conceptnet5.languages import ALL_LANGUAGES
+from conceptnet5.nodes import get_uri_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, split_uri, conjunction_uri, is_absolute_url, uri_prefix
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
