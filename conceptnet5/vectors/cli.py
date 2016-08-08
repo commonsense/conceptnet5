@@ -95,11 +95,12 @@ def run_interpolate_all(input1_filename, input2_filename, output_filename, thres
 @cli.command(name='intersect')
 @click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-def run_intersect(input_filenames, output_filename):
+@click.argument('projection_filename', type=click.Path(writable=True, dir_okay=False))
+def run_intersect(input_filenames, output_filename, projection_filename):
     frames = [load_hdf(filename) for filename in input_filenames]
-    intersected, projector = merge_intersect(frames)
+    intersected, projection = merge_intersect(frames)
     save_hdf(intersected, output_filename)
-    save_hdf(projector, '/tmp/v.h5')
+    save_hdf(projection, projection_filename)
 
 
 @cli.command(name='evaluate')

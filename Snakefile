@@ -72,6 +72,7 @@ CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in 
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
 
+
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
 RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
@@ -79,6 +80,7 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
+INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'conceptnet-ppmi', 'w2v-commoncrawl-es']
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -417,25 +419,23 @@ rule reduce_assoc:
 # =========================
 rule convert_word2vec:
     input:
-        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
-        DATA + "/db/wiktionary.db"
+        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
     output:
         DATA + "/vectors/w2v-google-news.h5"
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n 1500000 data/raw/vectors/GoogleNews-vectors-negative300.bin.gz {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n 1500000 {input} {output}"
 
 rule convert_glove:
     input:
-        DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
-        DATA + "/db/wiktionary.db"
+        DATA + "/raw/vectors/glove12.840B.300d.txt.gz"
     output:
-        DATA + "/vectors/glove12.840B.h5"
+        DATA + "/vectors/glove12-840B.h5"
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 data/raw/vectors/glove12.840B.300d.txt.gz {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
 
 rule convert_lexvec:
     input:
@@ -446,7 +446,7 @@ rule convert_lexvec:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 data/raw/vectors/lexvec.no-header.vectors.gz {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
 
 rule merge_interpolate:
     input:
@@ -462,14 +462,35 @@ rule merge_interpolate:
 
 rule retrofit:
     input:
-        DATA + "/vectors/merged.h5",
+        DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
-        expand(DATA + "/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
     resources:
         ram=16
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} data/vectors/retrofit.h5"
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} data/vectors/{wildcards.name}-retrofit.h5"
+
+rule join_retrofit:
+    input:
+        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+    output:
+        DATA + "/vectors/{name}-retrofit.h5"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"
+
+rule merge_intersect:
+    input:
+        expand(DATA + "/vectors/{name}-retrofit.h5", name=INPUT_EMBEDDINGS)
+    output:
+        DATA + "/vectors/intersected.h5",
+        DATA + "/vectors/intersected-projection.h5"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors intersect {input} {output}"
 
 rule shrink_embeddings:
     input:
@@ -479,12 +500,3 @@ rule shrink_embeddings:
     shell:
         "cn5-vectors shrink {input} {output} -n 1000000 -k 300"
 
-rule join_retrofit:
-    input:
-        expand(DATA + "/vectors/retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
-    output:
-        DATA + "/vectors/retrofit.h5"
-    resources:
-        ram=16
-    shell:
-        "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"

@@ -33,7 +33,7 @@ def dataframe_svd_projection(frame, k):
     return uframe, Σ[:k], vframe
 
 
-def estimate_frequency(term, frame1, frame2, extra_labels):
+def estimate_frequency(term, frames, extra_labels=()):
     freq = 0.
     _c, lang, text = split_uri(term)[:3]
 
@@ -41,14 +41,15 @@ def estimate_frequency(term, frame1, frame2, extra_labels):
     if '_' not in text and lang in WORDFREQ_LANGUAGES:
         if lang in WORDFREQ_LANGUAGES_LARGE:
             freq += wordfreq.word_frequency(text, lang, 'large')
-        else:
+        elif lang in WORDFREQ_LANGUAGES:
             freq += wordfreq.word_frequency(text, lang)
 
     # Guess a frequency from the two frames using Zipf's law
-    if term in frame1.index:
-        freq += 1.0 / (1. + frame1.index.get_loc(term))
-    if term in frame2.index:
-        freq += 1.0 / (1. + frame2.index.get_loc(term))
+    for frame in frames:
+        if term in frame.index:
+            freq += 1.0 / (1. + frame.index.get_loc(term))
+        if term in frame2.index:
+            freq += 1.0 / (1. + frame2.index.get_loc(term))
     if term in extra_labels:
         freq *= 2
     return freq
@@ -65,22 +66,14 @@ def lookup_frequency(term):
         return 0.
 
 
-
 def merge_intersect(frames, rows=100000, k=300):
     joined = pd.concat(frames, join='inner', axis=1, ignore_index=True).astype('f')
     joined.fillna(0)
-    print(joined.shape)
 
     filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])
     adjusted = l2_normalize_rows(joined.loc[filtered_labels].ix[::20] - joined.mean(0))
-    print(adjusted.shape)
     save_hdf(adjusted, '/tmp/shared_vecs.h5')
-    print('Running SVD')
     projected, eigenvalues, projection = dataframe_svd_projection(adjusted, k)
-    # projected: 100000 x 300
-    # projection: 1200 x 300
-    # joined: LOTS x 1200
-    # joined ~= projected @ eigenvalues @ projection.T
 
     print('Saving results in /tmp')
     save_hdf(projected, '/tmp/u.h5')
@@ -89,7 +82,6 @@ def merge_intersect(frames, rows=100000, k=300):
     print('Projecting vocabulary into new space')
     reprojected = joined.dot(projection) / (eigenvalues ** .5)
     return reprojected, projection
-
 
 
 def merge_interpolate(frame1, frame2, extra_labels, vocab_threshold=50000, verbose=False):
