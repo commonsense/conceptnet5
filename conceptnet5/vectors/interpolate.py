@@ -28,11 +28,9 @@ def dataframe_svd_projection(frame, k):
     `uframe` is U @ sqrt(Σ), and `vframe` is V @ sqrt(Σ).
     """
     U, Σ, Vt = np.linalg.svd(frame.values, full_matrices=False)
-    projected = U * Σ ** .5
-    projection = Vt.T * Σ ** .5
-    uframe = pd.DataFrame(projected[:, :k], index=frame.index, dtype='f')
-    vframe = pd.DataFrame(projection[:, :k], index=frame.columns, dtype='f')
-    return uframe, vframe
+    uframe = pd.DataFrame(U[:, :k], index=frame.index, dtype='f')
+    vframe = pd.DataFrame(Vt.T[:, :k], index=frame.columns, dtype='f')
+    return uframe, Σ[:k], vframe
 
 
 def estimate_frequency(term, frame1, frame2, extra_labels):
@@ -74,25 +72,22 @@ def merge_intersect(frames, rows=100000, k=300):
     print(joined.shape)
 
     filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])
-    freqs = np.array([lookup_frequency(label) for label in filtered_labels])
-    freqsort = np.argsort(-freqs)
-    refiltered_labels = filtered_labels.ix[freqsort[:rows]]
-    adjusted = l2_normalize_rows(joined.loc[refiltered_labels] - joined.mean(0))
+    adjusted = l2_normalize_rows(joined.loc[filtered_labels].ix[::20] - joined.mean(0))
     print(adjusted.shape)
     save_hdf(adjusted, '/tmp/shared_vecs.h5')
     print('Running SVD')
-    projected, projection = dataframe_svd_projection(adjusted, k)
+    projected, eigenvalues, projection = dataframe_svd_projection(adjusted, k)
     # projected: 100000 x 300
     # projection: 1200 x 300
     # joined: LOTS x 1200
-    # joined ~= projected @ projection.T
+    # joined ~= projected @ eigenvalues @ projection.T
 
     print('Saving results in /tmp')
     save_hdf(projected, '/tmp/u.h5')
     save_hdf(projection, '/tmp/v.h5')
 
     print('Projecting vocabulary into new space')
-    reprojected = joined.dot(projection)
+    reprojected = joined.dot(projection) / (eigenvalues ** .5)
     return reprojected, projection
 
 
