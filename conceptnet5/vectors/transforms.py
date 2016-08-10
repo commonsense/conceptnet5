@@ -51,7 +51,7 @@ def l1_normalize_columns(frame):
     return frame.div(col_norms, axis='columns')
 
 
-def l2_normalize_rows(frame):
+def l2_normalize_rows(frame, offset=0.):
     """
     L_2-normalize the rows of this DataFrame, so their lengths in Euclidean
     distance are all 1. This enables cosine similarities to be computed as
@@ -61,7 +61,7 @@ def l2_normalize_rows(frame):
     Pandas-approved way to represent missing data, so Pandas should be able to
     deal with those.
     """
-    row_norms = np.sqrt(np.sum(np.power(frame, 2), axis='columns'))
+    row_norms = np.sqrt(np.sum(np.power(frame, 2), axis='columns')) + offset
     return frame.div(row_norms, axis='rows')
 
 
