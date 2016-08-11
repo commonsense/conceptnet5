@@ -24,7 +24,7 @@ setup(
     install_requires=[
         'snakemake', 'click', 'requests', 'mmh3', 'ftfy',
         'msgpack-python', 'langcodes', 'wordfreq >= 1.4.1',
-        'xmltodict', 'ordered_set'
+        'xmltodict', 'ordered_set', 'pg8000'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
@@ -34,7 +34,8 @@ setup(
             'cn5-vectors = conceptnet5.vectors.cli:cli',
             'cn5-build-index = conceptnet5.hashtable.cli:run_build',
             'cn5-read = conceptnet5.readers.cli:cli',
-            'cn5-convert = conceptnet5.formats.convert:cli'
+            'cn5-convert = conceptnet5.formats.convert:cli',
+            'cn5-db = conceptnet5.db.cli:cli'
         ]
     },
     extras_require={
