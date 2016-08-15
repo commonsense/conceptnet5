@@ -47,7 +47,7 @@ def merge_intersect(frames, subsample=20, ranked_frames=2, vocab_cutoff=200000, 
         term_scores.loc[frame.index] += 1
         term_scores.loc[frame.index[:vocab_cutoff]] += 1
     new_terms = vocabulary[term_scores >= 3].difference(joined.index)
-    new_vecs = [frame.loc[new_terms] for frame in frames]
+    new_vecs = [frame.reindex(new_terms) for frame in frames]
 
     print('Building input matrix with expanded vocabulary')
     joined2 = pd.concat([
@@ -62,6 +62,6 @@ def merge_intersect(frames, subsample=20, ranked_frames=2, vocab_cutoff=200000, 
     save_hdf(projection, '/tmp/v.h5')
 
     print('Projecting vocabulary into new space')
-    reprojected = l2_normalize_rows(joined2.dot(projection) / (eigenvalues ** .5))
+    reprojected = l2_normalize_rows(joined2.dot(projection) / (eigenvalues ** .5), offset=1e-6)
     reprojected.sort_index(inplace=True)
     return reprojected, projection
