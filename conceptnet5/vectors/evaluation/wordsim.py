@@ -1,5 +1,5 @@
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, standardized_uri
+from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
 import numpy as np
 import pandas as pd
@@ -104,7 +104,10 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
     for term1, term2, gold_score in standard:
         uri1 = standardized_uri(language, term1)
         uri2 = standardized_uri(language, term2)
-        our_score = vectors.get_similarity(uri1, uri2)
+        if isinstance(vectors, VectorSpaceWrapper):
+            our_score = vectors.get_similarity(uri1, uri2)
+        else:
+            our_score = cosine_similarity(get_vector(vectors, uri1), get_vector(vectors, uri2))
         if verbose > 1:
             print('%s\t%s\t%3.3f\t%3.3f' % (term1, term2, gold_score, our_score))
         gold_scores.append(gold_score)
@@ -120,9 +123,11 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
 
 def evaluate(frame, subset='dev'):
     """
-    Evaluate a DataFrame containing term vectors on its ability to predict
-    term relatedness, according to MEN-3000, RW, and WordSim-353. Return
-    a Series containing these three labeled results.
+    Evaluate a DataFrame containing term vectors on its ability to predict term
+    relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Use a
+    VectorSpaceWrapper to fill missing vocabulary from ConceptNet.
+
+    Return a Series containing these labeled results.
     """
     vectors = VectorSpaceWrapper(frame=frame)
     men_score = spearman_evaluate(vectors, read_men3000(subset))
@@ -131,6 +136,24 @@ def evaluate(frame, subset='dev'):
     ws_score = spearman_evaluate(vectors, read_ws353())
     ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
+    results = pd.Series([men_score, rw_score, mturk_score, ws_score, ws_es_score, ws_ro_score],
+                        index=['men3000', 'rw', 'mturk-771', 'ws353', 'ws353-es', 'ws353-ro'])
+    return results
+
+
+def evaluate_raw(frame, subset='dev'):
+    """
+    Evaluate a DataFrame containing term vectors on its ability to predict term
+    relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Return
+    a Series containing these labeled results.
+    """
+    frame = frame.astype(np.float32)
+    men_score = spearman_evaluate(frame, read_men3000(subset))
+    rw_score = spearman_evaluate(frame, read_rw(subset))
+    mturk_score = spearman_evaluate(frame, read_mturk())
+    ws_score = spearman_evaluate(frame, read_ws353())
+    ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'), language='es')
+    ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'), language='ro')
     results = pd.Series([men_score, rw_score, mturk_score, ws_score, ws_es_score, ws_ro_score],
                         index=['men3000', 'rw', 'mturk-771', 'ws353', 'ws353-es', 'ws353-ro'])
     return results
