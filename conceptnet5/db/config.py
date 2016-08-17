@@ -11,18 +11,7 @@ environment variables:
 import os
 
 DB_USERNAME = os.environ.get('CONCEPTNET_DB_USER', os.environ.get('USER', 'www-data'))
-DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD')
-
-if DB_PASSWORD is None:
-    DB_USERPASS = DB_USERNAME
-else:
-    DB_USERPASS = '{}:{}'.format(DB_USERNAME, DB_PASSWORD)
-
-
-DB_CONNECTION = 'postgresql+{engine}://{userpass}@{host}:{port}/{dbname}'.format(
-    engine='pg8000',
-    userpass=DB_USERPASS,
-    host=os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost'),
-    port=os.environ.get('CONCEPTNET_DB_PORT', '5432'),
-    dbname=os.environ.get('CONCEPTNET_DB_NAME', 'conceptnet5')
-)
+DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD', '')
+DB_HOSTNAME = os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost')
+DB_PORT = int(os.environ.get('CONCEPTNET_DB_PORT', '5432'))
+DB_NAME = os.environ.get('CONCEPTNET_DB_NAME', 'conceptnet5')

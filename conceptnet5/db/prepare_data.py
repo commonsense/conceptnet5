@@ -5,7 +5,7 @@ import json
 
 
 def write_row(outfile, items):
-    print('\t'.join(str(x) for x in items), file=outfile)
+    print('\t'.join(sanitize(str(x)) for x in items), file=outfile)
 
 
 def write_ordered_set(filename, oset):
@@ -15,10 +15,15 @@ def write_ordered_set(filename, oset):
 
 
 def sanitize(text):
-    return text.replace('\n', '').replace('\t', '').replace('\\', '')
+    return text.replace('\n', '').replace('\t', '').replace('\\', '\\\\')
 
 
-def assertions_to_sql_csv(msgpack_filename, output_nodes, output_edges, output_sources, output_prefixes):
+def assertions_to_sql_csv(msgpack_filename, output_dir):
+    output_nodes = output_dir + '/nodes.csv'
+    output_edges = output_dir + '/edges.csv'
+    output_sources = output_dir + '/sources.csv'
+    output_prefixes = output_dir + '/prefixes.csv'
+
     node_list = OrderedSet()
     assertion_list = OrderedSet()
     seen_prefixes = set()
@@ -47,9 +52,9 @@ def assertions_to_sql_csv(msgpack_filename, output_nodes, output_edges, output_s
 
         source_json = json.dumps(sources, ensure_ascii=False)
         weight = assertion['weight']
-        surface_text = sanitize(assertion['surfaceText'] or '')
-        surface_start = sanitize(assertion['surfaceStart'] or '')
-        surface_end = sanitize(assertion['surfaceEnd'] or '')
+        surface_text = assertion['surfaceText'] or ''
+        surface_start = assertion['surfaceStart'] or ''
+        surface_end = assertion['surfaceEnd'] or ''
         write_row(
             edge_file,
             [assertion_idx, assertion['uri'],
@@ -59,7 +64,7 @@ def assertions_to_sql_csv(msgpack_filename, output_nodes, output_edges, output_s
         )
         for node in (assertion['start'], assertion['end']):
             write_prefixes(prefix_file, seen_prefixes, node_list, node)
-        for source_idx in source_indices:
+        for source_idx in sorted(set(source_indices)):
             write_row(source_file, [assertion_idx, source_idx])
 
     edge_file.close()
@@ -77,12 +82,16 @@ def write_prefixes(prefix_file, seen_prefixes, node_list, node):
             write_row(prefix_file, [node_idx, prefix_idx])
 
 
-def load_sql_csv(connection, input_nodes, input_edges, input_sources):
+def load_sql_csv(connection, input_dir):
     for (filename, tablename) in [
-        (input_nodes, 'nodes'),
-        (input_edges, 'edges'),
-        (input_sources, 'sources')
+        (input_dir + '/nodes.csv', 'nodes'),
+        (input_dir + '/edges.csv', 'edges'),
+        (input_dir + '/sources.csv', 'edge_sources'),
+        (input_dir + '/prefixes.csv', 'node_prefixes')
     ]:
         print(filename)
         cursor = connection.cursor()
-        cursor.copy_from(filename, tablename)
+        with open(filename, 'rb') as file:
+            cursor.execute("COPY %s FROM STDIN" % tablename, stream=file)
+        cursor.close()
+        connection.commit()
