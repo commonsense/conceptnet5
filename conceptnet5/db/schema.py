@@ -43,6 +43,7 @@ INDICES = [
     "CREATE INDEX edge_end ON edges (end_id)",
     "CREATE INDEX edge_dataset ON edges (dataset_id)",
     "CREATE INDEX edge_license ON edges (license_id)",
+    "CREATE INDEX edge_weight ON edges (weight)",
     "CREATE INDEX es_edge ON edge_sources (edge_id)",
     "CREATE INDEX es_source ON edge_sources (source_id)",
     "CREATE INDEX np_node ON node_prefixes (node_id)",
@@ -87,36 +88,17 @@ VIEWS = [
     """,
     """
     CREATE VIEW edge_view AS
-    SELECT e.id AS id, 1 AS direction,
+    SELECT e.id AS id,
         n0.uri AS rel_uri, n1.uri as start_uri, n2.uri as end_uri,
-        n1.uri AS node_uri, n2.uri AS other_uri,
         nd.uri AS dataset_uri, nlic.uri AS license_uri,
         e.uri, e.weight, e.source_data, e.surface_text, e.start_text, e.end_text
-        FROM nodes n0, nodes n1, nodes n2, nodes np1, nodes np2, nodes nd, nodes nlic,
-            edges e, node_prefixes p1, node_prefixes p2
+        FROM nodes n0, nodes n1, nodes n2, nodes nd,
+            nodes nlic, edges e
         WHERE e.relation_id=n0.id
         AND e.start_id=n1.id
         AND e.end_id=n2.id
         AND e.dataset_id=nd.id
         AND e.license_id=nlic.id
-        AND n1.id=p1.node_id AND p1.prefix_id=np1.id
-        AND n2.id=p2.node_id AND p2.prefix_id=np2.id
-    UNION ALL
-    SELECT e.id AS id, -1 AS direction,
-        n0.uri AS rel_uri, n1.uri as start_uri, n2.uri as end_uri,
-        np1.uri AS start_prefix, np2.uri AS end_prefix,
-        np2.uri AS node_prefix, np1.uri AS other_prefix,
-        nd.uri AS dataset_uri, nlic.uri AS license_uri,
-        e.uri, e.weight, e.source_data, e.surface_text, e.start_text, e.end_text
-        FROM nodes n0, nodes n1, nodes n2, nodes np1, nodes np2, nodes nd, nodes nlic,
-            edges e, node_prefixes p1, node_prefixes p2
-        WHERE e.relation_id=n0.id
-        AND e.start_id=n1.id
-        AND e.end_id=n2.id
-        AND e.dataset_id=nd.id
-        AND e.license_id=nlic.id
-        AND n1.id=p1.node_id AND p1.prefix_id=np1.id
-        AND n2.id=p2.node_id AND p2.prefix_id=np2.id;
     """
 ]
 

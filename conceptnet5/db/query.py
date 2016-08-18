@@ -13,6 +13,7 @@ NODE_PREFIX_QUERY_WITH_FEATURE_LIMIT = """
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
     WHERE p.prefix_id=n.id AND n.uri=%s
+    LIMIT 100
 ),
 -- Another clause in the CTE contains the meat of the query, selecting all the
 -- edges with one of the node IDs we just got as its start or end. The idea of
@@ -66,6 +67,7 @@ NODE_PREFIX_QUERY = """
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
     WHERE p.prefix_id=n.id AND n.uri=%s
+    LIMIT 200
 ),
 matched_edges AS (
     -- This 'location' integer distinguishes whether the start or end matched
@@ -101,4 +103,29 @@ SELECT location, rel_uri, start_uri, end_uri, dataset_uri, license_uri, weight,
 FROM matched_edges
 ORDER BY weight DESC
 LIMIT %s;
+"""
+
+SOURCE_QUERY = """
+WITH node_ids AS (
+    SELECT p.node_id FROM nodes n, node_prefixes p
+    WHERE p.prefix_id=n.id AND n.uri=%s
+    LIMIT 200
+),
+matched_edges AS (
+    SELECT DISTINCT ON (e.id)
+        e.id, e.uri, n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
+        nd.uri AS dataset_uri, nlic.uri AS license_uri,
+        weight, source_data, surface_text, start_text, end_text
+    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic,
+        edges e, edge_sources s
+    WHERE s.source_id IN (SELECT node_id FROM node_ids)
+      AND s.edge_id=e.id
+      AND e.relation_id=n0.id
+      AND e.start_id=n1.id
+      AND e.end_id=n2.id
+      AND e.dataset_id=nd.id
+      AND e.license_id=nlic.id
+    ORDER BY e.id
+)
+SELECT * from matched_edges ORDER BY weight DESC LIMIT %s;
 """
