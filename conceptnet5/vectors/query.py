@@ -108,7 +108,7 @@ class VectorSpaceWrapper(object):
 
     def text_to_vector(self, language, text):
         tokens = wordfreq.tokenize(text, language)
-        weighted_terms = [(standardized_uri(language, token), 1.) for token in tokens]
+        weighted_terms = [(standardized_uri(language, token), 9. - wordfreq.zipf_frequency(token, language)) for token in tokens]
         return self.get_vector(weighted_terms, include_neighbors=False)
 
     def get_vector(self, query, include_neighbors=True):
