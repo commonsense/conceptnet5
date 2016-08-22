@@ -144,7 +144,8 @@ def split_uri(uri):
     >>> split_uri('/')
     []
     """
-    assert uri.startswith('/')
+    if not uri.startswith('/'):
+        return [uri]
     uri2 = uri.lstrip('/')
     if not uri2:
         return []
@@ -312,7 +313,10 @@ def is_concept(uri):
 
 
 def is_absolute_url(uri):
-    return uri.startswith('http')
+    # We have URLs pointing to Creative Commons licenses, starting with 'cc:',
+    # which for Linked Data purposes are absolute URLs because they'll be
+    # resolved into full URLs.
+    return uri.startswith('http') or uri.startswith('cc:')
 
 
 class Licenses:
