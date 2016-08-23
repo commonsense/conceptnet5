@@ -6,13 +6,13 @@
 # feature they express about the node (such as "example UsedFor ..."), and
 # returns only the N top-weighted edges for each feature.
 
-NODE_PREFIX_QUERY_WITH_FEATURE_LIMIT = """
+FEATURE_QUERY = """
 -- This WITH clause is a Common Table Expression, which lets us describe
 -- and name the sub-queries we need to run, so that they can be used in the
 -- queries further down, possibly multiple times.
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=%s
+    WHERE p.prefix_id=n.id AND n.uri=:node
     LIMIT 100
 ),
 -- Another clause in the CTE contains the meat of the query, selecting all the
@@ -21,111 +21,96 @@ WITH node_ids AS (
 matched_edges AS (
     -- This 'location' integer distinguishes whether the start or end matched
     -- the input node.
-    SELECT 1 AS location,
-           n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
-           nd.uri AS dataset_uri, nlic.uri AS license_uri,
-           e.weight, e.source_data, e.surface_text, e.start_text, e.end_text,
+    SELECT 1 AS location, n0.id AS rel_id,
+           e.uri AS uri, e.data AS data, e.weight AS weight,
            -- Attach a rank to each edge, indicating the rank order of its
            -- weight within a relation. Break ties by ID. We'll use this to
            -- prune the results.
            row_number() OVER (PARTITION BY n0.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic, edges e
+    FROM nodes n0, nodes n1, nodes n2, edges e
     WHERE e.relation_id=n0.id
       AND e.start_id=n1.id
       AND e.end_id=n2.id
-      AND e.dataset_id=nd.id
-      AND e.license_id=nlic.id
       AND n1.id IN (SELECT node_id FROM node_ids)
     UNION
 
     -- Here's that same query again, except with n2.id instead of n1.id.
-    SELECT 2 AS location,
-           n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
-           nd.uri AS dataset_uri, nlic.uri AS license_uri,
-           e.weight, e.source_data, e.surface_text, e.start_text, e.end_text,
+    SELECT 2 AS location, n0.id AS rel_id,
+           e.uri AS uri, e.data AS data, e.weight AS weight,
            row_number() OVER (PARTITION BY n0.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic, edges e
+    FROM nodes n0, nodes n1, nodes n2, edges e
     WHERE e.relation_id=n0.id
       AND e.start_id=n1.id
       AND e.end_id=n2.id
-      AND e.dataset_id=nd.id
-      AND e.license_id=nlic.id
       AND n2.id IN (SELECT node_id FROM node_ids)
 )
 -- That's the end of the WITH clause. Finally, we SELECT the results that
 -- rank highly enough within their relation.
-SELECT location, rel_uri, start_uri, end_uri, dataset_uri, license_uri, weight,
-       source_data, surface_text, start_text, end_text
-FROM matched_edges
-WHERE rank <= %s
-ORDER BY location, rel_uri, rank;
+SELECT uri, data FROM matched_edges
+WHERE rank <= :limit
+ORDER BY location, rel_id, rank;
 """
 
-# This query returns a ranked list of edges with a given node, or one of its
-# sub-senses, as the start or end.
-NODE_PREFIX_QUERY = """
-WITH node_ids AS (
-    SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=%s
-    LIMIT 200
-),
-matched_edges AS (
-    -- This 'location' integer distinguishes whether the start or end matched
-    -- the input node.
-    SELECT 1 AS location,
-           n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
-           nd.uri AS dataset_uri, nlic.uri AS license_uri,
-           e.weight, e.source_data, e.surface_text, e.start_text, e.end_text
-    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic, edges e
-    WHERE e.relation_id=n0.id
-      AND e.start_id=n1.id
-      AND e.end_id=n2.id
-      AND e.dataset_id=nd.id
-      AND e.license_id=nlic.id
-      AND n1.id IN (SELECT node_id FROM node_ids)
-    UNION
+PREFIX_CRITERIA = {'node', 'other', 'start', 'end', 'rel', 'source'}
 
-    -- Here's that same query again, except with n2.id instead of n1.id.
-    SELECT 2 AS location,
-           n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
-           nd.uri AS dataset_uri, nlic.uri AS license_uri,
-           e.weight, e.source_data, e.surface_text, e.start_text, e.end_text
-    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic, edges e
-    WHERE e.relation_id=n0.id
-      AND e.start_id=n1.id
-      AND e.end_id=n2.id
-      AND e.dataset_id=nd.id
-      AND e.license_id=nlic.id
-      AND n2.id IN (SELECT node_id FROM node_ids)
-)
-SELECT location, rel_uri, start_uri, end_uri, dataset_uri, license_uri, weight,
-       source_data, surface_text, start_text, end_text
-FROM matched_edges
-ORDER BY weight DESC
-LIMIT %s;
-"""
 
-SOURCE_QUERY = """
-WITH node_ids AS (
-    SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=%s
-    LIMIT 200
-),
-matched_edges AS (
-    SELECT DISTINCT ON (e.id)
-        e.id, e.uri, n0.uri AS rel_uri, n1.uri AS start_uri, n2.uri AS end_uri,
-        nd.uri AS dataset_uri, nlic.uri AS license_uri,
-        weight, source_data, surface_text, start_text, end_text
-    FROM nodes n0, nodes n1, nodes n2, nodes nd, nodes nlic,
-        edges e, edge_sources s
-    WHERE s.source_id IN (SELECT node_id FROM node_ids)
-      AND s.edge_id=e.id
-      AND e.relation_id=n0.id
-      AND e.start_id=n1.id
-      AND e.end_id=n2.id
-      AND e.dataset_id=nd.id
-      AND e.license_id=nlic.id
-    ORDER BY e.id
-)
-SELECT * from matched_edges ORDER BY weight DESC LIMIT %s;
-"""
+def make_list_query(criteria):
+    if not set(criteria) & PREFIX_CRITERIA:
+        raise ValueError("No useful criteria to filter by")
+    parts = ["WITH"]
+    for criterion in set(criteria) & PREFIX_CRITERIA:
+        parts.append(
+            """
+            {c}_ids AS (
+                SELECT p.node_id FROM nodes n, node_prefixes p
+                WHERE p.prefix_id=n.id AND n.uri=:{c}
+                LIMIT 200
+            ),
+            """.format(c=criterion)
+        )
+    piece_directions = [1]
+    if 'node' in criteria:
+        piece_directions = [1, -1]
+    parts.append("matched_edges AS (")
+    for direction in piece_directions:
+        if direction == -1:
+            parts.append("UNION ALL")
+        parts.append("""
+            SELECT e.uri, e.weight, e.data
+            FROM nodes n0, nodes n1, nodes n2, edges e
+        """)
+        if 'source' in criteria:
+            parts.append(", edge_sources s")
+        parts.append("""
+            WHERE e.relation_id=n0.id
+            AND e.start_id=n1.id
+            AND e.end_id=n2.id
+        """)
+        if 'source' in criteria:
+            parts.append("AND s.edge_id=e.id")
+        if 'node' in criteria:
+            if direction == 1:
+                parts.append("AND n1.id IN (SELECT node_id FROM node_ids)")
+            else:
+                parts.append("AND n2.id IN (SELECT node_id FROM node_ids)")
+        if 'other' in criteria:
+            if direction == 1:
+                parts.append("AND n2.id IN (SELECT node_id FROM other_ids)")
+            else:
+                parts.append("AND n1.id IN (SELECT node_id FROM other_ids)")
+        if 'rel' in criteria:
+            parts.append("AND n0.id IN (SELECT node_id FROM rel_ids)")
+        if 'start' in criteria:
+            parts.append("AND n1.id IN (SELECT node_id FROM start_ids)")
+        if 'end' in criteria:
+            parts.append("AND n2.id IN (SELECT node_id FROM end_ids)")
+        if 'source' in criteria:
+            parts.append("AND s.source_id IN (SELECT node_id FROM source_ids)")
+    parts.append("LIMIT :limit * 100")
+    parts.append(")")
+    parts.append("""
+        SELECT uri, data FROM matched_edges
+        ORDER BY weight DESC, uri
+        LIMIT :limit;
+    """)
+    return '\n'.join(parts)

@@ -1,5 +1,5 @@
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
-from conceptnet5.uri import uri_prefix, uri_prefixes
+from conceptnet5.uri import uri_prefixes
 from ordered_set import OrderedSet
 import json
 
@@ -11,7 +11,7 @@ def write_row(outfile, items):
 def write_ordered_set(filename, oset):
     with open(filename, 'w', encoding='utf-8') as outfile:
         for i, item in enumerate(oset):
-            print('%d\t%s' % (i, item), file=outfile)
+            print('%d\t%s' % (i, sanitize(item)), file=outfile)
 
 
 def sanitize(text):
@@ -39,8 +39,6 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
         rel_idx = node_list.add(assertion['rel'])
         start_idx = node_list.add(assertion['start'])
         end_idx = node_list.add(assertion['end'])
-        dataset_idx = node_list.add(assertion['dataset'])
-        license_idx = node_list.add(assertion['license'])
 
         source_indices = []
         sources = assertion['sources']
@@ -50,19 +48,15 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
                 source_indices.append(node_list.add(sourceval))
                 write_prefixes(prefix_file, seen_prefixes, node_list, sourceval)
 
-        source_json = json.dumps(sources, ensure_ascii=False)
+        jsondata = json.dumps(assertion, ensure_ascii=False, sort_keys=True)
         weight = assertion['weight']
-        surface_text = assertion['surfaceText'] or ''
-        surface_start = assertion['surfaceStart'] or ''
-        surface_end = assertion['surfaceEnd'] or ''
         write_row(
             edge_file,
             [assertion_idx, assertion['uri'],
              rel_idx, start_idx, end_idx,
-             dataset_idx, license_idx, weight, source_json,
-             surface_text, surface_start, surface_end]
+             weight, jsondata]
         )
-        for node in (assertion['start'], assertion['end']):
+        for node in (assertion['start'], assertion['end'], assertion['dataset']):
             write_prefixes(prefix_file, seen_prefixes, node_list, node)
         for source_idx in sorted(set(source_indices)):
             write_row(source_file, [assertion_idx, source_idx])

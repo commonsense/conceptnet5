@@ -15,10 +15,12 @@ Design of ConceptNet 5.5:
 - [x] Try new lemmatizer as part of Numberbatch
 - [x] Break down the and-or trees into more machine-readable structures
 - [x] Use symmetrical relations
-- [ ] Use standardized language codes in Wiktionary forms
+- [ ] Use standardized language codes in Wiktionary forms, or maybe remove that database?
 - [x] Remove "obsolete", "archaic", "dated", "rare", "archaïque" contexts
 - [ ] Higher weights on monolingual things, lower weights on uncommon languages
 - [ ] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
+- [ ] Querying an assertion gives an 'edges' list that links to itself -- remove '@id' from the top level?
+- [ ] better API example on front page
 
 ConceptNet 5.6 perhaps:
 
