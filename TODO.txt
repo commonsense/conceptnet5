@@ -20,6 +20,7 @@ Design of ConceptNet 5.5:
 - [ ] Higher weights on monolingual things, lower weights on uncommon languages
 - [ ] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
 - [ ] Querying an assertion gives an 'edges' list that links to itself -- remove '@id' from the top level?
+- [ ] Wiktionary links should be ExternalURLs, not sources
 - [ ] better API example on front page
 
 ConceptNet 5.6 perhaps:

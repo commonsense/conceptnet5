@@ -1,3 +1,6 @@
+from .connection import get_db_connection
+import json
+
 # This query takes in two parameters: a node URI and a number of edges per
 # feature.
 #
@@ -48,15 +51,20 @@ matched_edges AS (
 -- rank highly enough within their relation.
 SELECT uri, data FROM matched_edges
 WHERE rank <= :limit
-ORDER BY location, rel_id, rank;
+ORDER BY location, rel_id, rank
 """
 
-PREFIX_CRITERIA = {'node', 'other', 'start', 'end', 'rel', 'source'}
+PREFIX_CRITERIA = {'node', 'other', 'start', 'end', 'source'}
+LIST_QUERIES = {}
+
+RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
+RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(0.1) WHERE uri LIKE '/c/%' ORDER BY random() LIMIT :limit"
 
 
 def make_list_query(criteria):
-    if not set(criteria) & PREFIX_CRITERIA:
-        raise ValueError("No useful criteria to filter by")
+    crit_tuple = tuple(sorted(criteria))
+    if crit_tuple in LIST_QUERIES:
+        return LIST_QUERIES[crit_tuple]
     parts = ["WITH"]
     for criterion in set(criteria) & PREFIX_CRITERIA:
         parts.append(
@@ -99,18 +107,49 @@ def make_list_query(criteria):
             else:
                 parts.append("AND n1.id IN (SELECT node_id FROM other_ids)")
         if 'rel' in criteria:
-            parts.append("AND n0.id IN (SELECT node_id FROM rel_ids)")
+            parts.append("AND n0.uri = :rel")
         if 'start' in criteria:
             parts.append("AND n1.id IN (SELECT node_id FROM start_ids)")
         if 'end' in criteria:
             parts.append("AND n2.id IN (SELECT node_id FROM end_ids)")
         if 'source' in criteria:
             parts.append("AND s.source_id IN (SELECT node_id FROM source_ids)")
-    parts.append("LIMIT :limit * 100")
+    parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
         SELECT uri, data FROM matched_edges
         ORDER BY weight DESC, uri
-        LIMIT :limit;
+        OFFSET :offset LIMIT :limit
     """)
-    return '\n'.join(parts)
+    query = '\n'.join(parts)
+    LIST_QUERIES[crit_tuple] = query
+    return query
+
+
+class AssertionFinder(object):
+    def __init__(self):
+        self.connection = get_db_connection()
+
+    def lookup(self, uri, limit=1000, offset=0):
+        if uri.startswith('/c/') or uri.startswith('http'):
+            criteria = {'node': uri}
+        elif uri.startswith('/r/'):
+            criteria = {'rel': uri}
+        elif uri.startswith('/s/'):
+            criteria = {'source': uri}
+        else:
+            raise ValueError
+        return self.query(criteria, limit, offset)
+
+    def lookup_random(self):
+        ...
+
+    def query(self, criteria, limit=20, offset=0):
+        params = dict(criteria)
+        params['limit'] = limit
+        params['offset'] = offset
+        query_string = make_list_query(criteria)
+        cursor = self.connection.cursor()
+        cursor.execute(query_string, params)
+        results = [data for uri, data in cursor.fetchall()]
+        return results
