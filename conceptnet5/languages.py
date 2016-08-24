@@ -365,6 +365,8 @@ LANGUAGES = {
         'ch',   # Chamorro
         'akz',  # Alabama
         'ff',   # Fula
+        'xh',   # Xhosa
+        'ii',   # Yi
     },
 
     'more-historical': {
@@ -456,6 +458,4 @@ def get_language_name(code, target_language='en'):
         return LANGUAGE_NAME_OVERRIDES[target_language][code]
     else:
         return langcodes.get(code).language_name(target_language)
-
-
 
