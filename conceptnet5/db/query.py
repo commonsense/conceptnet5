@@ -1,5 +1,6 @@
 from .connection import get_db_connection
-import json
+from conceptnet5.relations import SYMMETRIC_RELATIONS
+import itertools
 
 # This query takes in two parameters: a node URI and a number of edges per
 # feature.
@@ -22,39 +23,41 @@ WITH node_ids AS (
 -- edges with one of the node IDs we just got as its start or end. The idea of
 -- "start or end" is expressed with a UNION of two similar queries.
 matched_edges AS (
-    -- This 'location' integer distinguishes whether the start or end matched
-    -- the input node.
-    SELECT 1 AS location, n0.id AS rel_id,
+    -- This 'direction' integer distinguishes whether the start or end matched
+    -- the input node. For symmetric relations, it's 0, indicating that the
+    -- direction doesn't matter.
+    SELECT CAST(r.directed as int) * 1 AS direction, r.uri AS rel,
            e.uri AS uri, e.data AS data, e.weight AS weight,
            -- Attach a rank to each edge, indicating the rank order of its
            -- weight within a relation. Break ties by ID. We'll use this to
            -- prune the results.
-           row_number() OVER (PARTITION BY n0.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM nodes n0, nodes n1, nodes n2, edges e
-    WHERE e.relation_id=n0.id
+           row_number() OVER (PARTITION BY r.uri ORDER BY e.weight desc, e.id) AS rank
+    FROM relations r, nodes n1, nodes n2, edges e
+    WHERE e.relation_id=r.id
       AND e.start_id=n1.id
       AND e.end_id=n2.id
       AND n1.id IN (SELECT node_id FROM node_ids)
     UNION
 
-    -- Here's that same query again, except with n2.id instead of n1.id.
-    SELECT 2 AS location, n0.id AS rel_id,
+    -- Here's that same query again, except with n2.id instead of n1.id, and
+    -- the sign flipped on 'direction'.
+    SELECT CAST(r.directed as int) * -1 AS direction, r.uri AS rel,
            e.uri AS uri, e.data AS data, e.weight AS weight,
-           row_number() OVER (PARTITION BY n0.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM nodes n0, nodes n1, nodes n2, edges e
-    WHERE e.relation_id=n0.id
+           row_number() OVER (PARTITION BY r.uri ORDER BY e.weight desc, e.id) AS rank
+    FROM relations r, nodes n1, nodes n2, edges e
+    WHERE e.relation_id=r.id
       AND e.start_id=n1.id
       AND e.end_id=n2.id
       AND n2.id IN (SELECT node_id FROM node_ids)
 )
 -- That's the end of the WITH clause. Finally, we SELECT the results that
 -- rank highly enough within their relation.
-SELECT uri, data FROM matched_edges
-WHERE rank <= :limit
-ORDER BY location, rel_id, rank
+SELECT direction, rel, data FROM matched_edges
+WHERE rank <= 21
+ORDER BY direction, rel, rank
 """
 
-PREFIX_CRITERIA = {'node', 'other', 'start', 'end', 'source'}
+NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 
 RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
@@ -66,12 +69,22 @@ def make_list_query(criteria):
     if crit_tuple in LIST_QUERIES:
         return LIST_QUERIES[crit_tuple]
     parts = ["WITH"]
-    for criterion in set(criteria) & PREFIX_CRITERIA:
+    for criterion in set(criteria) & NODE_PREFIX_CRITERIA:
         parts.append(
             """
             {c}_ids AS (
                 SELECT p.node_id FROM nodes n, node_prefixes p
                 WHERE p.prefix_id=n.id AND n.uri=:{c}
+                LIMIT 200
+            ),
+            """.format(c=criterion)
+        )
+    if 'source' in criteria:
+        parts.append(
+            """
+            source_ids AS (
+                SELECT p.source_id FROM sources s, source_prefixes p
+                WHERE p.prefix_id=s.id AND s.uri=:source
                 LIMIT 200
             ),
             """.format(c=criterion)
@@ -85,12 +98,12 @@ def make_list_query(criteria):
             parts.append("UNION ALL")
         parts.append("""
             SELECT e.uri, e.weight, e.data
-            FROM nodes n0, nodes n1, nodes n2, edges e
+            FROM relations r, nodes n1, nodes n2, edges e
         """)
         if 'source' in criteria:
             parts.append(", edge_sources s")
         parts.append("""
-            WHERE e.relation_id=n0.id
+            WHERE e.relation_id=r.id
             AND e.start_id=n1.id
             AND e.end_id=n2.id
         """)
@@ -107,13 +120,13 @@ def make_list_query(criteria):
             else:
                 parts.append("AND n1.id IN (SELECT node_id FROM other_ids)")
         if 'rel' in criteria:
-            parts.append("AND n0.uri = :rel")
+            parts.append("AND r.uri = :rel")
         if 'start' in criteria:
             parts.append("AND n1.id IN (SELECT node_id FROM start_ids)")
         if 'end' in criteria:
             parts.append("AND n2.id IN (SELECT node_id FROM end_ids)")
         if 'source' in criteria:
-            parts.append("AND s.source_id IN (SELECT node_id FROM source_ids)")
+            parts.append("AND s.source_id IN (SELECT source_id FROM source_ids)")
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
@@ -130,7 +143,7 @@ class AssertionFinder(object):
     def __init__(self):
         self.connection = get_db_connection()
 
-    def lookup(self, uri, limit=1000, offset=0):
+    def lookup(self, uri, limit=100, offset=0):
         if uri.startswith('/c/') or uri.startswith('http'):
             criteria = {'node': uri}
         elif uri.startswith('/r/'):
@@ -141,7 +154,17 @@ class AssertionFinder(object):
             raise ValueError
         return self.query(criteria, limit, offset)
 
-    def lookup_random(self):
+    def lookup_grouped_by_feature(self, uri):
+        def extract_feature(row):
+            return tuple(row[:2])
+        cursor = self.connection.cursor()
+        cursor.execute(FEATURE_QUERY, {'node': uri})
+        results = {}
+        for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
+            results[feature] = [data for (_, _, data) in rows]
+        return results
+
+    def random_edges(self, limit=20):
         ...
 
     def query(self, criteria, limit=20, offset=0):

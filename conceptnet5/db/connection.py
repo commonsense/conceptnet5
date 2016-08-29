@@ -12,7 +12,6 @@ def get_db_connection():
     if _CONNECTION is not None:
         return _CONNECTION
     else:
-        pg8000.paramstyle = 'named'
         _CONNECTION = pg8000.connect(
             user=config.DB_USERNAME,
             password=config.DB_PASSWORD,
@@ -20,4 +19,5 @@ def get_db_connection():
             port=config.DB_PORT,
             database=config.DB_NAME
         )
+        pg8000.paramstyle = 'named'
         return _CONNECTION

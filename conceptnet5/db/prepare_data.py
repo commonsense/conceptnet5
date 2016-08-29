@@ -1,5 +1,6 @@
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
 from conceptnet5.uri import uri_prefixes
+from conceptnet5.relations import SYMMETRIC_RELATIONS
 from ordered_set import OrderedSet
 import json
 
@@ -14,6 +15,15 @@ def write_ordered_set(filename, oset):
             print('%d\t%s' % (i, sanitize(item)), file=outfile)
 
 
+def write_relations(filename, oset):
+    with open(filename, 'w', encoding='utf-8') as outfile:
+        for i, rel in enumerate(oset):
+            directed_str = 't'
+            if rel in SYMMETRIC_RELATIONS:
+                directed_str = 'f'
+            print('%d\t%s\t%s' % (i, sanitize(rel), directed_str), file=outfile)
+
+
 def sanitize(text):
     return text.replace('\n', '').replace('\t', '').replace('\\', '\\\\')
 
@@ -21,22 +31,28 @@ def sanitize(text):
 def assertions_to_sql_csv(msgpack_filename, output_dir):
     output_nodes = output_dir + '/nodes.csv'
     output_edges = output_dir + '/edges.csv'
+    output_relations = output_dir + '/relations.csv'
     output_sources = output_dir + '/sources.csv'
-    output_prefixes = output_dir + '/prefixes.csv'
+    output_edge_sources = output_dir + '/edge_sources.csv'
+    output_node_prefixes = output_dir + '/node_prefixes.csv'
+    output_source_prefixes = output_dir + '/source_prefixes.csv'
 
     node_list = OrderedSet()
+    source_list = OrderedSet()
     assertion_list = OrderedSet()
+    relation_list = OrderedSet()
     seen_prefixes = set()
 
     edge_file = open(output_edges, 'w', encoding='utf-8')
-    source_file = open(output_sources, 'w', encoding='utf-8')
-    prefix_file = open(output_prefixes, 'w', encoding='utf-8')
+    edge_source_file = open(output_edge_sources, 'w', encoding='utf-8')
+    node_prefix_file = open(output_node_prefixes, 'w', encoding='utf-8')
+    source_prefix_file = open(output_source_prefixes, 'w', encoding='utf-8')
 
     for assertion in read_msgpack_stream(msgpack_filename):
         if assertion['uri'] in assertion_list:
             continue
         assertion_idx = assertion_list.add(assertion['uri'])
-        rel_idx = node_list.add(assertion['rel'])
+        rel_idx = relation_list.add(assertion['rel'])
         start_idx = node_list.add(assertion['start'])
         end_idx = node_list.add(assertion['end'])
 
@@ -44,9 +60,9 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
         sources = assertion['sources']
         for source in sources:
             for sourceval in sorted(source.values()):
-                source_idx = node_list.add(sourceval)
-                source_indices.append(node_list.add(sourceval))
-                write_prefixes(prefix_file, seen_prefixes, node_list, sourceval)
+                source_idx = source_list.add(sourceval)
+                source_indices.append(source_idx)
+                write_prefixes(source_prefix_file, seen_prefixes, node_list, sourceval)
 
         jsondata = json.dumps(assertion, ensure_ascii=False, sort_keys=True)
         weight = assertion['weight']
@@ -57,14 +73,17 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
              weight, jsondata]
         )
         for node in (assertion['start'], assertion['end'], assertion['dataset']):
-            write_prefixes(prefix_file, seen_prefixes, node_list, node)
+            write_prefixes(node_prefix_file, seen_prefixes, node_list, node)
         for source_idx in sorted(set(source_indices)):
-            write_row(source_file, [assertion_idx, source_idx])
+            write_row(edge_source_file, [assertion_idx, source_idx])
 
     edge_file.close()
-    source_file.close()
-    prefix_file.close()
+    edge_source_file.close()
+    node_prefix_file.close()
+    source_prefix_file.close()
     write_ordered_set(output_nodes, node_list)
+    write_ordered_set(output_sources, source_list)
+    write_relations(output_relations, relation_list)
 
 
 def write_prefixes(prefix_file, seen_prefixes, node_list, node):
@@ -78,10 +97,12 @@ def write_prefixes(prefix_file, seen_prefixes, node_list, node):
 
 def load_sql_csv(connection, input_dir):
     for (filename, tablename) in [
+        (input_dir + '/relations.csv', 'relations'),
         (input_dir + '/nodes.csv', 'nodes'),
         (input_dir + '/edges.csv', 'edges'),
-        (input_dir + '/sources.csv', 'edge_sources'),
-        (input_dir + '/prefixes.csv', 'node_prefixes')
+        (input_dir + '/sources.csv', 'sources'),
+        (input_dir + '/edge_sources.csv', 'edge_sources'),
+        (input_dir + '/node_prefixes.csv', 'node_prefixes')
     ]:
         print(filename)
         cursor = connection.cursor()
