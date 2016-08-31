@@ -90,6 +90,10 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     weight_array = orig_weights.values[:, np.newaxis].astype('f')
     orig_vecs = retroframe.fillna(0).values
 
+    # Subtract the mean so that vectors don't just clump around common
+    # hypernyms
+    orig_vecs -= orig_vecs.mean(0)
+
     # Delete the frame we built, we won't need its indices again until the end
     del retroframe
 
@@ -99,6 +103,7 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
             print('Retrofitting: Iteration %s of %s' % (iteration+1, iterations))
 
         vecs = sparse_csr.dot(vecs)
+        vecs -= vecs.mean(0)
 
         # use sklearn's normalize, because it normalizes in place and
         # leaves zero-rows at 0

@@ -80,7 +80,7 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
-INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'w2v-commoncrawl-es', 'conceptnet-ppmi']
+INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'conceptnet-ppmi']
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -485,18 +485,9 @@ rule merge_intersect:
     input:
         expand(DATA + "/vectors/{name}-retrofit.h5", name=INPUT_EMBEDDINGS)
     output:
-        DATA + "/vectors/intersected.h5",
-        DATA + "/vectors/intersected-projection.h5"
+        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/intersection-projection.h5"
     resources:
         ram=16
     shell:
         "cn5-vectors intersect {input} {output}"
-
-rule shrink_embeddings:
-    input:
-        DATA + "/vectors/retrofit.h5"
-    output:
-        DATA + "/vectors/numberbatch.h5"
-    shell:
-        "cn5-vectors shrink {input} {output} -n 1000000 -k 300"
-
