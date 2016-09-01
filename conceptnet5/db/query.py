@@ -1,5 +1,5 @@
 from .connection import get_db_connection
-from conceptnet5.relations import SYMMETRIC_RELATIONS
+from conceptnet5.edges import transform_for_linked_data
 import itertools
 
 # This query takes in two parameters: a node URI and a number of edges per
@@ -9,6 +9,8 @@ import itertools
 # node (having the given node URI as a prefix). It groups the edges by what
 # feature they express about the node (such as "example UsedFor ..."), and
 # returns only the N top-weighted edges for each feature.
+
+MAX_GROUP_SIZE = 20
 
 FEATURE_QUERY = """
 -- This WITH clause is a Common Table Expression, which lets us describe
@@ -27,7 +29,7 @@ matched_edges AS (
     -- the input node. For symmetric relations, it's 0, indicating that the
     -- direction doesn't matter.
     SELECT CAST(r.directed as int) * 1 AS direction, r.uri AS rel,
-           e.uri AS uri, e.data AS data, e.weight AS weight,
+           n2.uri as other, e.uri AS uri, e.data AS data, e.weight AS weight,
            -- Attach a rank to each edge, indicating the rank order of its
            -- weight within a relation. Break ties by ID. We'll use this to
            -- prune the results.
@@ -42,7 +44,7 @@ matched_edges AS (
     -- Here's that same query again, except with n2.id instead of n1.id, and
     -- the sign flipped on 'direction'.
     SELECT CAST(r.directed as int) * -1 AS direction, r.uri AS rel,
-           e.uri AS uri, e.data AS data, e.weight AS weight,
+           n1.uri as other, e.uri AS uri, e.data AS data, e.weight AS weight,
            row_number() OVER (PARTITION BY r.uri ORDER BY e.weight desc, e.id) AS rank
     FROM relations r, nodes n1, nodes n2, edges e
     WHERE e.relation_id=r.id
@@ -52,7 +54,7 @@ matched_edges AS (
 )
 -- That's the end of the WITH clause. Finally, we SELECT the results that
 -- rank highly enough within their relation.
-SELECT direction, rel, data FROM matched_edges
+SELECT direction, rel, other, data FROM matched_edges
 WHERE rank <= 21
 ORDER BY direction, rel, rank
 """
@@ -61,7 +63,7 @@ NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 
 RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
-RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(0.1) WHERE uri LIKE '/c/%' ORDER BY random() LIMIT :limit"
+RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(0.1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
 
 
 def make_list_query(criteria):
@@ -157,15 +159,24 @@ class AssertionFinder(object):
     def lookup_grouped_by_feature(self, uri):
         def extract_feature(row):
             return tuple(row[:2])
+
+        def feature_data(row):
+            _, _, other, data = row
+            data.update({'other': other})
+            return data
+
         cursor = self.connection.cursor()
         cursor.execute(FEATURE_QUERY, {'node': uri})
         results = {}
         for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
-            results[feature] = [data for (_, _, data) in rows]
+            results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
         return results
 
     def random_edges(self, limit=20):
-        ...
+        cursor = self.connection.cursor()
+        cursor.execute(RANDOM_QUERY, {'limit': limit})
+        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
+        return results
 
     def query(self, criteria, limit=20, offset=0):
         params = dict(criteria)
@@ -174,5 +185,5 @@ class AssertionFinder(object):
         query_string = make_list_query(criteria)
         cursor = self.connection.cursor()
         cursor.execute(query_string, params)
-        results = [data for uri, data in cursor.fetchall()]
+        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
         return results

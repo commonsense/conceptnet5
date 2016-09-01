@@ -1,9 +1,10 @@
-from conceptnet5.query import field_match, AssertionFinder
+from conceptnet5.query import field_match
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity
 )
+from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix
 import pandas as pd
 
@@ -24,22 +25,19 @@ class VectorSpaceWrapper(object):
     look in default locations for them. They can be specified to replace them
     with toy versions for testing.
     """
-    def __init__(self, vector_filename=None,
-                 index_filename=None,
-                 edge_filename=None,
-                 frame=None):
+    def __init__(self, vector_filename=None, frame=None, use_db=True):
         if frame is None:
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch.h5')
         else:
             self.frame = frame
             self.vector_filename = None
-        self.index_filename = index_filename
-        self.edge_filename = edge_filename
         self.small_frame = None
         self.k = None
         self.small_k = None
-        self.finder = AssertionFinder(self.index_filename, self.edge_filename)
+        self.finder = None
+        if use_db:
+            self.finder = AssertionFinder()
 
     def load(self):
         """
@@ -80,7 +78,7 @@ class VectorSpaceWrapper(object):
         expanded = terms[:]
         for term, weight in terms:
             expanded.append((term, weight / 10))
-            if include_neighbors and term not in self.frame.index:
+            if include_neighbors and term not in self.frame.index and self.finder is not None:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
                     if field_match(edge['start']['term'], term) and not field_match(edge['end']['term'], term):
                         neighbor = edge['end']['term']
