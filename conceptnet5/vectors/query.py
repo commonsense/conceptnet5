@@ -1,4 +1,3 @@
-from conceptnet5.query import field_match
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
@@ -14,6 +13,25 @@ SMALL = 1e-6
 
 class MissingVectorSpace(Exception):
     pass
+
+
+def field_match(value, query):
+    """
+    Determines whether a given field of an edge (or, in particular, an
+    assertion) matches the given query.
+    If the query is a URI, it will match prefixes of longer URIs, unless
+    `/.` is added to the end of the query.
+    For example, `/c/en/dog` will match assertions about `/c/en/dog/n/animal`,
+    but `/c/en/dog/.` will only match assertions about `/c/en/dog`.
+    """
+    query = query.rstrip('/')
+    if isinstance(value, list):
+        return any(field_match(subval, query) for subval in value)
+    elif query.endswith('/.'):
+        return value == query[:-2]
+    else:
+        return (value[:len(query)] == query
+                and (len(value) == len(query) or value[len(query)] == '/'))
 
 
 class VectorSpaceWrapper(object):

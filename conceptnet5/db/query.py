@@ -85,11 +85,11 @@ def make_list_query(criteria):
         parts.append(
             """
             source_ids AS (
-                SELECT p.source_id FROM sources s, source_prefixes p
-                WHERE p.prefix_id=s.id AND s.uri=:source
+                SELECT s.id FROM sources s
+                WHERE s.uri=:source
                 LIMIT 200
             ),
-            """.format(c=criterion)
+            """
         )
     piece_directions = [1]
     if 'node' in criteria:
