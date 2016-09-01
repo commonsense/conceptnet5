@@ -5,6 +5,150 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro']
+SAMPLE_SIZES = {
+    'ws353': 353,
+    'ws353-es': 353,
+    'ws353-ro': 353,
+    'men3000': 3000,
+    'mturk': 771,
+    'rw': 2034
+}
+
+# A mapping from short group names to more formal citations
+GROUPS = {
+    'Luminoso': 'Speer and Chin (2016)',
+    'Bar-Ilan': 'Levy et al. (2015)',
+    'Google': 'Mikolov et al. (2013)',
+    'Facebook': 'Joulin et al. (2016)',
+    'Stanford': 'Pennington et al. (2014)',
+    'UFRGS': 'Salle et al. (2016)'
+}
+
+
+def confidence_interval(rho, N):
+    """
+    Give a 95% confidence interval for a Spearman correlation score, given
+    the correlation and the number of cases.
+    """
+    z = np.arctanh(rho)
+    interval = 1.96 / np.sqrt(N - 3)
+    low = z - interval
+    high = z + interval
+    return pd.Series(
+        [rho, np.tanh(low), np.tanh(high)],
+        index=['rho', 'low', 'high']
+    )
+
+
+def empty_comparison_table():
+    return pd.DataFrame(
+        index=EVALS,
+        columns=['rho', 'low', 'high']
+    )
+
+
+def make_comparison_table(scores):
+    table = empty_comparison_table()
+    for evalname, score in scores.items():
+        if evalname in table.index:
+            table.loc[evalname] = confidence_interval(score, SAMPLE_SIZES[evalname])
+    return table
+
+
+COMPARISONS = {}
+
+# Here are all the existing evaluation results we know about, classified by
+# what institution produced the results and which method is implemented.
+
+# Levy et al., 2015
+COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table({
+    'men3000': .745,
+    'mturk': .686,
+    'rw': .462,
+    'simlex': .393,
+    'ws353': .721  # estimate
+})
+COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
+    'men3000': .778,
+    'mturk': .666,
+    'rw': .514,
+    'simlex': .432,
+    'ws353': .733  # estimate
+})
+COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
+    'men3000': .774,
+    'mturk': .693,
+    'rw': .470,
+    'simlex': .438,
+    'ws353': .729  # estimate
+})
+COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
+    'men3000': .729,
+    'mturk': .632,
+    'rw': .403,
+    'simlex': .398,
+    'ws353': .654  # estimate
+})
+COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table({
+    'men3000': .723,
+    'rw': .431,
+    'mturk': .676
+})
+COMPARISONS['Google', 'word2vec CBOW'] = make_comparison_table({
+    'men3000': .757,
+    'rw': .480,
+    'mturk': .663
+})
+
+# Speer and Chin, 2016 - arXiv:1604.01692v1
+COMPARISONS['Luminoso', 'GloVe'] = make_comparison_table({
+    'rw': .528,
+    'men3000': .840,
+    'ws353': .798
+})
+COMPARISONS['Luminoso', 'word2vec SGNS'] = make_comparison_table({
+    'rw': .476,
+    'men3000': .778,
+    'ws353': .731
+})
+COMPARISONS['Luminoso', 'Numberbatch 2016.04'] = make_comparison_table({
+    'rw': .596,
+    'men3000': .859,
+    'ws353': .821
+})
+COMPARISONS['Luminoso', 'PPMI'] = make_comparison_table({
+    'rw': .420,
+    'men3000': .764,
+    'ws353': .651,
+    'scws': .608
+})
+
+# Pennington et al., 2014
+COMPARISONS['Stanford', 'GloVe'] = make_comparison_table({
+    'rw': .477,
+    'men3000': .816,
+    'ws353': .759
+})
+
+# Joulin et al., 2016 - "Bag of Tricks"
+# Rounded-off numbers from the blog post at https://research.facebook.com/blog/fasttext/
+COMPARISONS['Facebook', 'fastText'] = make_comparison_table({
+    'rw': .46,
+    'ws353': .73
+})
+
+# Salle et al., 2016 - LexVec
+# https://github.com/alexandres/lexvec
+COMPARISONS['UFRGS', 'LexVec'] = make_comparison_table({
+    'rw': .489,
+    'simlex': .384,
+    'scws': .652,
+    'ws353': .661,
+    'men3000': .759,
+    'mturk': .655
+})
+
 
 def read_ws353():
     """
@@ -115,10 +259,10 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
     if verbose:
         print("Spearman correlation: %s" % (correlation,))
 
-    return correlation
+    return confidence_interval(correlation, len(gold_scores))
 
 
-def evaluate(frame, subset='dev'):
+def evaluate(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict
     term relatedness, according to MEN-3000, RW, and WordSim-353. Return
@@ -131,6 +275,17 @@ def evaluate(frame, subset='dev'):
     ws_score = spearman_evaluate(vectors, read_ws353())
     ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
-    results = pd.Series([men_score, rw_score, mturk_score, ws_score, ws_es_score, ws_ro_score],
-                        index=['men3000', 'rw', 'mturk-771', 'ws353', 'ws353-es', 'ws353-ro'])
-    return results
+    results = empty_comparison_table()
+    results.loc['men3000'] = men_score
+    results.loc['rw'] = rw_score
+    results.loc['mturk'] = mturk_score
+    results.loc['ws353'] = ws_score
+    results.loc['ws353-es'] = ws_es_score
+    results.loc['ws353-ro'] = ws_ro_score
+
+    comparisons = dict(COMPARISONS)
+    comparisons[name] = results
+    comparison_list = sorted(comparisons)
+    big_frame = pd.concat([comparisons[key] for key in comparison_list], keys=pd.MultiIndex.from_tuples(comparison_list))
+
+    return big_frame.dropna()
