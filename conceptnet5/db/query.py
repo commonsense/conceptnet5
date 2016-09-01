@@ -81,16 +81,6 @@ def make_list_query(criteria):
             ),
             """.format(c=criterion)
         )
-    if 'source' in criteria:
-        parts.append(
-            """
-            source_ids AS (
-                SELECT s.id FROM sources s
-                WHERE s.uri=:source
-                LIMIT 200
-            ),
-            """
-        )
     piece_directions = [1]
     if 'node' in criteria:
         piece_directions = [1, -1]
@@ -103,14 +93,14 @@ def make_list_query(criteria):
             FROM relations r, nodes n1, nodes n2, edges e
         """)
         if 'source' in criteria:
-            parts.append(", edge_sources s")
+            parts.append(", edge_sources es, sources s")
         parts.append("""
             WHERE e.relation_id=r.id
             AND e.start_id=n1.id
             AND e.end_id=n2.id
         """)
         if 'source' in criteria:
-            parts.append("AND s.edge_id=e.id")
+            parts.append("AND s.uri=:source AND es.source_id=s.id AND es.edge_id=e.id")
         if 'node' in criteria:
             if direction == 1:
                 parts.append("AND n1.id IN (SELECT node_id FROM node_ids)")
@@ -127,8 +117,6 @@ def make_list_query(criteria):
             parts.append("AND n1.id IN (SELECT node_id FROM start_ids)")
         if 'end' in criteria:
             parts.append("AND n2.id IN (SELECT node_id FROM end_ids)")
-        if 'source' in criteria:
-            parts.append("AND s.source_id IN (SELECT source_id FROM source_ids)")
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
