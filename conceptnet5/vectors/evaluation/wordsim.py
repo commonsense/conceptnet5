@@ -91,14 +91,10 @@ COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
     'ws353': .654  # estimate
 })
 COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table({
-    'men3000': .723,
-    'rw': .431,
-    'mturk': .676
-})
-COMPARISONS['Google', 'word2vec CBOW'] = make_comparison_table({
-    'men3000': .757,
-    'rw': .480,
-    'mturk': .663
+    'men3000': .732,
+    'rw': .385,
+    'ws353': .624,
+    'scws': .574
 })
 
 # Speer and Chin, 2016 - arXiv:1604.01692v1
