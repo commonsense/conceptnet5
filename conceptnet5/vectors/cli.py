@@ -2,7 +2,7 @@ import click
 from .formats import convert_glove, convert_word2vec, load_hdf, save_hdf
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
-from .interpolate import merge_interpolate
+from .interpolate import merge_intersect
 from .evaluation.wordsim import evaluate
 from .transforms import shrink_and_sort
 from .query import VectorSpaceWrapper
@@ -63,19 +63,15 @@ def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000):
     convert_word2vec(word2vec_filename, output_filename, nrows)
 
 
-@cli.command(name='interpolate')
-@click.argument('input1_filename', type=click.Path(readable=True, dir_okay=False))
-@click.argument('input2_filename', type=click.Path(readable=True, dir_okay=False))
-@click.argument('conceptnet_filename', type=click.Path(readable=True, dir_okay=False))
+@cli.command(name='intersect')
+@click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('--threshold', '-t', default=50000, help="Minimum number of terms to use from each source")
-@click.option('--verbose', '-v', count=True)
-def run_interpolate(input1_filename, input2_filename, conceptnet_filename, output_filename, threshold=50000, verbose=0):
-    frame1 = load_hdf(input1_filename)
-    frame2 = load_hdf(input2_filename)
-    _sparse_csr, conceptnet_labels = build_from_conceptnet_table(conceptnet_filename)
-    interpolated = merge_interpolate(frame1, frame2, conceptnet_labels, vocab_threshold=threshold, verbose=verbose)
-    save_hdf(interpolated, output_filename)
+@click.argument('projection_filename', type=click.Path(writable=True, dir_okay=False))
+def run_intersect(input_filenames, output_filename, projection_filename):
+    frames = [load_hdf(filename) for filename in input_filenames]
+    intersected, projection = merge_intersect(frames)
+    save_hdf(intersected, output_filename)
+    save_hdf(projection, projection_filename)
 
 
 @cli.command(name='evaluate')

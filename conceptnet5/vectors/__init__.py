@@ -50,12 +50,7 @@ def get_vector(frame, label, language=None):
     try:
         return frame.loc[label]
     except KeyError:
-        label = lemmatize_uri(label)
-        try:
-            return frame.loc[label]
-        except KeyError:
-            print("Out of vocabulary: %r" % label)
-            return pd.Series(index=frame.columns)
+        return pd.Series(index=frame.columns)
 
 
 def normalize_vec(vec):

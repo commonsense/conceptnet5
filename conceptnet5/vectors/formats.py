@@ -24,7 +24,7 @@ def convert_glove(glove_filename, output_filename, nrows):
     Convert GloVe data from a gzipped text file to a Feather dataframe.
     """
     glove_raw = load_glove(glove_filename, nrows)
-    glove_std = standardize_row_labels(glove_raw, forms=True)
+    glove_std = standardize_row_labels(glove_raw, forms=False)
     del glove_raw
     glove_normal = l2_normalize_rows(l1_normalize_columns(glove_std))
     del glove_std
@@ -37,7 +37,7 @@ def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     dataframe.
     """
     w2v_raw = load_word2vec_bin(word2vec_filename, nrows)
-    w2v_std = standardize_row_labels(w2v_raw, forms=True, language=language)
+    w2v_std = standardize_row_labels(w2v_raw, forms=False, language=language)
     del w2v_raw
     w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
     del w2v_std

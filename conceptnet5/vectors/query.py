@@ -1,10 +1,12 @@
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
-    similar_to_vec, weighted_average, normalize_vec, cosine_similarity
+    similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
+    standardized_uri
 )
 from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix
+import wordfreq
 import pandas as pd
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
@@ -120,13 +122,18 @@ class VectorSpaceWrapper(object):
             self.expand_terms(terms, limit_per_term, include_neighbors)
         )
 
-    def get_vector(self, query):
+    def text_to_vector(self, language, text):
+        tokens = wordfreq.tokenize(text, language)
+        weighted_terms = [(standardized_uri(language, token), 9. - wordfreq.zipf_frequency(token, language)) for token in tokens]
+        return self.get_vector(weighted_terms, include_neighbors=False)
+
+    def get_vector(self, query, include_neighbors=True):
         """
         Given one of the possible types of queries (see `similar_terms`), make
         a vector to look up from it.
 
-        If there are 5 or fewer terms involved, this will allow expanded_vector
-        to look up neighboring terms in ConceptNet.
+        If there are 5 or fewer terms involved and `include_neighbors=True`, this
+        will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
         if isinstance(query, pd.DataFrame) or isinstance(query, dict):
@@ -137,7 +144,7 @@ class VectorSpaceWrapper(object):
             terms = query
         else:
             raise ValueError("Can't make a query out of type %s" % type(query))
-        include_neighbors = (len(terms) <= 5)
+        include_neighbors = include_neighbors and (len(terms) <= 5)
         vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
         return normalize_vec(vec)
 
