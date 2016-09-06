@@ -9,6 +9,8 @@ DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "data")
 
 # If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
 TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
+if TESTMODE:
+    os.environ['CONCEPTNET_DB_NAME'] = 'conceptnet-test'
 
 # Some build steps are difficult to run, so we've already run them and put
 # the results in S3. Of course, that can't be the complete solution, because
@@ -24,18 +26,6 @@ UPLOAD = False
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
-
-# ConceptNet is being indexed with a hash table that uses linear probing.
-# Because of this, we want to keep the hash table about half full -- that is,
-# keep about twice as much space for entries as actual entries.
-#
-# The `cn5-build-index` command will raise an error if the table is over
-# 80% full, in which case you should increase this number, which will increase
-# the size of the hash table.
-#
-# The index of the hash table will require 2 ^ (HASH_WIDTH + 4) bytes on disk,
-# so a hash width of 28 takes up four gigabytes.
-HASH_WIDTH = 28
 
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
@@ -92,7 +82,7 @@ if TESTMODE:
 rule all:
     input:
         DATA + "/assertions/assertions.csv",
-        DATA + "/index/assertions.index",
+        DATA + "/psql/done",
         DATA + "/stats/languages.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
@@ -100,14 +90,14 @@ rule all:
 
 rule clean:
     shell:
-        "for subdir in assertions collated db edges index tmp vectors stats; "
+        "for subdir in assertions collated db edges psql tmp vectors stats; "
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
 rule test:
     input:
         DATA + "/assertions/assertions.csv",
-        DATA + "/index/assertions.index",
+        DATA + "/psql/done",
         DATA + "/assoc/reduced.csv"
 
 # Downloaders
@@ -301,27 +291,33 @@ rule combine_assertions:
     shell:
         "python3 -m conceptnet5.builders.combine_assertions -o {output} {input}"
 
-# Making an index file
-# ====================
-rule build_assertion_preindex:
+# Putting data in PostgreSQL
+# ==========================
+rule prepare_db:
     input:
         DATA + "/assertions/assertions.msgpack"
     output:
-        DATA + "/index/assertions.preindex.txt"
+        DATA + "/psql/edges.csv",
+        DATA + "/psql/edge_sources.csv",
+        DATA + "/psql/nodes.csv",
+        DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/sources.csv",
+        DATA + "/psql/relations.csv"
     shell:
-        "mkdir -p %(data)s/tmp "
-        "&& python -m conceptnet5.builders.preindex_assertions {input} "
-        "| LANG=C sort -T %(data)s/tmp "
-        "| LANG=C uniq > {output}" % {'data': DATA}
+        "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
 
-
-rule build_index:
+rule load_db:
     input:
-        DATA + "/index/{name}.preindex.txt"
+        DATA + "/psql/edges.csv",
+        DATA + "/psql/edge_sources.csv",
+        DATA + "/psql/nodes.csv",
+        DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/sources.csv",
+        DATA + "/psql/relations.csv"
     output:
-        DATA + "/index/{name}.index"
+        DATA + "/psql/done"
     shell:
-        "cn5-build-index {input} {output} {HASH_WIDTH}"
+        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
 
 # Collecting statistics
 # =====================

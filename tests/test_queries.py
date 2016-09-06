@@ -1,15 +1,12 @@
 from nose.tools import eq_
-from conceptnet5.query import AssertionFinder
+from conceptnet5.db.query import AssertionFinder
 
 test_finder = None
 
 
 def setUp():
     global test_finder
-    test_finder = AssertionFinder(
-        'testdata/index/assertions.index',
-        'testdata/assertions/assertions.msgpack'
-    )
+    test_finder = AssertionFinder('conceptnet-test')
 
 
 def test_lookup():

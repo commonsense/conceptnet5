@@ -33,5 +33,6 @@ testdata/collated
 testdata/db
 testdata/edges
 testdata/external
-testdata/index
 testdata/vectors
+testdata/psql
+testdata/stats

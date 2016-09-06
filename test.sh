@@ -1,6 +1,8 @@
 #!/bin/bash
 
 export CONCEPTNET_BUILD_TEST=1
+dropdb conceptnet-test || true
+createdb conceptnet-test
 build_test () {
     snakemake -q clean &&\
     snakemake -j 4 test &&\
@@ -10,3 +12,4 @@ build_test () {
 }
 
 nosetests --with-doctest conceptnet5 && build_test && nosetests && nosetests tests/post-build && echo "Success."
+dropdb conceptnet-test

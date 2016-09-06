@@ -133,8 +133,8 @@ def make_list_query(criteria):
 
 
 class AssertionFinder(object):
-    def __init__(self):
-        self.connection = get_db_connection()
+    def __init__(self, dbname=None):
+        self.connection = get_db_connection(dbname)
 
     def lookup(self, uri, limit=100, offset=0):
         if uri.startswith('/c/') or uri.startswith('http'):
