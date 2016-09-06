@@ -35,6 +35,9 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     output_sources = output_dir + '/sources.csv'
     output_edge_sources = output_dir + '/edge_sources.csv'
     output_node_prefixes = output_dir + '/node_prefixes.csv'
+
+    # Let's write out source prefixes even though it seems we can do
+    # without them
     output_source_prefixes = output_dir + '/source_prefixes.csv'
 
     node_list = OrderedSet()

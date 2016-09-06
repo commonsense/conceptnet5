@@ -242,7 +242,13 @@ def read_wiktionary(input_file, db_file, output_file):
         title = heading['title']
         dataset = '/d/wiktionary/{}'.format(language)
         url_title = heading['title'].replace(' ', '_')
-        web_source = '/s/resource/{}.wiktionary.org/wiki/{}'.format(language, url_title)
+        web_url = 'http://{}.wiktionary.org/wiki/{}'.format(language, url_title)
+        web_source = '/s/resource/wiktionary/{}'.format(language)
+
+        source = {
+            'contributor': web_source,
+            'process': PARSER_RULE
+        }
 
         # Scan through the 'from' items, such as the start nodes of
         # translations, looking for distinct etymologies. If we get more than
@@ -254,6 +260,15 @@ def read_wiktionary(input_file, db_file, output_file):
             if 'language' in item['from'] and item['from']['text'] == title
             and etym_label(language, item['from']) is not None
         }
+        word_languages = {wlang for (wlang, _) in all_etyms}
+        for wlang in sorted(word_languages):
+            cpage = standardized_concept_uri(wlang, title)
+            ld_edge = make_edge(
+                '/r/ExternalURL', cpage, web_url,
+                dataset=dataset, weight=0.25, sources=[source],
+                license=Licenses.cc_sharealike
+            )
+            out.write(ld_edge)
         etym_to_translation_sense = {}
         language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
         polysemous_languages = {
@@ -276,6 +291,7 @@ def read_wiktionary(input_file, db_file, output_file):
                 language, tfrom, assumed_languages, db,
                 use_etyms=(lang1 in polysemous_languages)
             )
+            cpage = cfrom
             cto = transform_term(
                 language, tto, assumed_languages, db,
                 use_etyms=(lang2 in polysemous_languages)
@@ -304,10 +320,6 @@ def read_wiktionary(input_file, db_file, output_file):
                 else:
                     etym_to_translation_sense[etym_key] = sense
 
-            source = {
-                'contributor': web_source,
-                'process': PARSER_RULE
-            }
             weight = 1.
             if rel == '/r/EtymologicallyRelatedTo':
                 weight = 0.25
@@ -317,4 +329,5 @@ def read_wiktionary(input_file, db_file, output_file):
                              surfaceEnd=tto['text'],
                              license=Licenses.cc_sharealike)
             out.write(edge)
+
     out.close()

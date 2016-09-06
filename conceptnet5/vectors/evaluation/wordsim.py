@@ -1,5 +1,5 @@
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, standardized_uri
+from conceptnet5.vectors import standardized_uri
 from conceptnet5.vectors.query import VectorSpaceWrapper
 import numpy as np
 import pandas as pd

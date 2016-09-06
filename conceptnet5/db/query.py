@@ -1,6 +1,8 @@
 from .connection import get_db_connection
 from conceptnet5.edges import transform_for_linked_data
 import itertools
+import json
+
 
 # This query takes in two parameters: a node URI and a number of edges per
 # feature.
@@ -63,7 +65,8 @@ NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 
 RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
-RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(0.1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
+RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
+DATASET_QUERY = "SELECT uri, data FROM edges WHERE data->'dataset' = :dataset ORDER BY weight DESC OFFSET :offset LIMIT :limit"
 
 
 def make_list_query(criteria):
@@ -140,6 +143,10 @@ class AssertionFinder(object):
             criteria = {'rel': uri}
         elif uri.startswith('/s/'):
             criteria = {'source': uri}
+        elif uri.startswith('/a/'):
+            return self.lookup_assertion(uri)
+        elif uri.startswith('/d/'):
+            return self.sample_dataset(uri, limit, offset)
         else:
             raise ValueError
         return self.query(criteria, limit, offset)
@@ -158,6 +165,19 @@ class AssertionFinder(object):
         results = {}
         for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
             results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
+        return results
+
+    def lookup_assertion(self, uri):
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT data FROM edges WHERE uri=:uri", {'uri': uri})
+        results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
+        return results
+
+    def sample_dataset(self, uri, limit=50, offset=0):
+        cursor = self.connection.cursor()
+        dataset_json = json.dumps(uri)
+        cursor.execute(DATASET_QUERY, {'dataset': dataset_json, 'limit': limit, 'offset': offset})
+        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
         return results
 
     def random_edges(self, limit=20):
