@@ -261,7 +261,7 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
     return confidence_interval(correlation, len(gold_scores))
 
 
-def evaluate(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
+def evaluate(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Use a
@@ -296,7 +296,7 @@ def evaluate(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
     return big_frame.dropna()
 
 
-def evaluate_raw(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
+def evaluate_raw(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Return
