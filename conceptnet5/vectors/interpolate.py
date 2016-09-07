@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 from conceptnet5.uri import split_uri
-from conceptnet5.nodes import CORE_LANGUAGES
+from conceptnet5.languages import CORE_LANGUAGES
 from ..vectors import similar_to_vec, weighted_average
 from .transforms import l2_normalize_rows
 from .formats import save_hdf

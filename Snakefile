@@ -70,7 +70,7 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
-INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'conceptnet-ppmi']
+INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'conceptnet-55-ppmi']
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -443,18 +443,6 @@ rule convert_lexvec:
         ram=16
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
-
-rule merge_interpolate:
-    input:
-        DATA + "/vectors/glove12.840B.h5",
-        DATA + "/vectors/w2v-google-news.h5",
-        DATA + "/assoc/reduced.csv"
-    output:
-        DATA + "/vectors/merged.h5"
-    resources:
-        ram=16
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors interpolate -v -t 50000 {input} {output}"
 
 rule retrofit:
     input:
