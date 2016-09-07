@@ -22,9 +22,9 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'snakemake', 'click', 'requests', 'mmh3', 'ftfy',
-        'msgpack-python', 'langcodes', 'wordfreq >= 1.4.1',
-        'xmltodict', 'ordered_set', 'pg8000'
+        'snakemake', 'click', 'requests', 'ftfy',
+        'msgpack-python', 'langcodes', 'wordfreq >= 1.5',
+        'xmltodict', 'ordered_set', 'pg8000', 'statsmodels'
     ],
     # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
     # not required for all of ConceptNet
