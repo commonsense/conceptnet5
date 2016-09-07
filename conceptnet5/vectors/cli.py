@@ -3,7 +3,7 @@ from .formats import convert_glove, convert_word2vec, load_hdf, save_hdf
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_intersect
-from .evaluation.wordsim import evaluate
+from .evaluation.wordsim import evaluate, evaluate_raw
 from .transforms import shrink_and_sort
 from .query import VectorSpaceWrapper
 
@@ -79,6 +79,13 @@ def run_intersect(input_filenames, output_filename, projection_filename):
 def run_evaluate(filename):
     frame = load_hdf(filename)
     print(evaluate(frame))
+
+
+@cli.command(name='evaluate_raw')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+def run_evaluate(filename):
+    frame = load_hdf(filename)
+    print(evaluate_raw(frame))
 
 
 @cli.command(name='shrink')

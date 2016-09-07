@@ -269,8 +269,12 @@ def evaluate(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
 
     Return a Series containing these labeled results.
     """
+    if subset == 'all':
+        men_subset = 'test'
+    else:
+        men_subset = subset
     vectors = VectorSpaceWrapper(frame=frame)
-    men_score = spearman_evaluate(vectors, read_men3000(subset))
+    men_score = spearman_evaluate(vectors, read_men3000(men_subset))
     rw_score = spearman_evaluate(vectors, read_rw(subset))
     mturk_score = spearman_evaluate(vectors, read_mturk())
     ws_score = spearman_evaluate(vectors, read_ws353())
@@ -292,7 +296,7 @@ def evaluate(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
     return big_frame.dropna()
 
 
-def evaluate_raw(frame, subset='dev'):
+def evaluate_raw(frame, subset='all', name=('Luminoso', 'Numberbatch 2016.09')):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Return
