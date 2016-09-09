@@ -1,8 +1,10 @@
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import standardized_uri, get_vector, similar_to_vec
 from conceptnet5.vectors.query import VectorSpaceWrapper
+from statsmodels.stats.proportion import proportion_confint
 import wordfreq
 import numpy as np
+import pandas as pd
 
 
 def read_google_analogies(filename):
@@ -50,36 +52,82 @@ def analogy_func(frame, a1, b1, a2):
     return get_vector(frame, b1) - get_vector(frame, a1) + get_vector(frame, a2)
 
 
-def pairwise_analogy_func(frame, a1, b1, a2, b2):
-    va1 = get_vector(frame, a1)
-    vb1 = get_vector(frame, b1)
-    va2 = get_vector(frame, a2)
-    vb2 = get_vector(frame, b2)
+def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose):
+    va1 = wrap.get_vector(a1)
+    vb1 = wrap.get_vector(b1)
+    va2 = wrap.get_vector(a2)
+    vb2 = wrap.get_vector(b2)
 
-    # (b2 - a2) * (b1 - a1) = (b1b2 - a1b2 - b1a2 + a1a2)
-    # (b2 - b1) * (a2 - a1) = (a2b2 - a1b2 - b1a2 + a1b1)
-    #
-    # Positive contributors: a1a2, b1b2, a1b1, a2b2
-    # Negative contributors: a1b2, b1a2
-    # Irrelevant: a1b1
-    return va1.dot(va2) + vb1.dot(vb2) + va1.dot(vb1) + va2.dot(vb2) - va1.dot(vb2) - vb1.dot(va2)
+    value = (
+        weight_direct * (vb2 - va2).dot(vb1 - va1)
+        + weight_transpose * (vb2 - vb1).dot(va2 - va1)
+        + vb2.dot(vb1) + va2.dot(va1)
+    )
+    return value
 
 
-def eval_pairwise_analogies(frame, eval_filename):
+def eval_pairwise_analogies(frame, eval_filename, subset='all',
+                            weight_direct=0.6, weight_transpose=0.6):
     total = 0
     correct = 0
-    for prompt, choices, answer in read_turney_analogies(eval_filename):
-        a1, b1 = prompt
-        choice_values = []
-        for choice in choices:
-            a2, b2 = choice
-            choice_values.append(pairwise_analogy_func(frame, a1, b1, a2, b2))
-        our_answer = np.argmax(choice_values)
-        if our_answer == answer:
-            correct += 1
-        total += 1
-    return correct, total, correct / total
+    wrap = VectorSpaceWrapper(frame=frame)
+    for idx, (prompt, choices, answer) in enumerate(read_turney_analogies(eval_filename)):
+        # Enable an artificial training/test split
+        if subset == 'all' or (subset == 'dev') == (idx % 2 == 0):
+            a1, b1 = prompt
+            choice_values = []
+            for choice in choices:
+                a2, b2 = choice
+                choice_values.append(
+                    pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose)
+                )
+            our_answer = np.argmax(choice_values)
+            if our_answer == answer:
+                correct += 1
+            total += 1
+    low, high = proportion_confint(correct, total)
+    return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
 
+
+def tune_pairwise_analogies(frame, eval_filename):
+    """
+    Our pairwise analogy function has three weights that can be tuned
+    (and therefore two free parameters, as the total weight does not matter):
+
+    - The *direct weight*, comparing (b2 - a2) to (b1 - a1)
+    - The *transpose weight*, comparing (b2 - b1) to (a2 - a1)
+    - The *similarity weight*, comparing b2 to b1 and a2 to a1
+
+    This function holds out half of the data and grid-searches for the best
+    combination of parameters, then evaluates on the other half of the data.
+    """
+    # Original search was more coarse-grained
+    # weights = [
+    #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
+    #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
+    # ]
+    weights = [
+        0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0
+    ]
+    best_weights = None
+    best_acc = 0.
+    for weight_direct in weights:
+        for weight_transpose in weights:
+            acc = eval_pairwise_analogies(
+                frame, eval_filename, subset='dev',
+                weight_direct=weight_direct,
+                weight_transpose=weight_transpose
+            ).loc['acc']
+            if acc > best_acc:
+                print(weight_direct, weight_transpose, acc)
+                best_weights = (weight_direct, weight_transpose)
+                best_acc = acc
+    weight_direct, weight_transpose = best_weights
+    return eval_pairwise_analogies(
+        frame, eval_filename, subset='test',
+        weight_direct=weight_direct,
+        weight_transpose=weight_transpose
+    )
 
 
 def eval_analogies(frame):
@@ -87,28 +135,33 @@ def eval_analogies(frame):
     quads = read_google_analogies(filename)
     vocab = [
         standardized_uri('en', word)
-        for word in wordfreq.top_n_list('en', 100000)
+        for word in wordfreq.top_n_list('en', 200000)
     ]
-    tframe = frame.loc[vocab]
+    wrap = VectorSpaceWrapper(frame=frame)
+    vecs = np.vstack([wrap.get_vector(word) for word in vocab])
+    tframe = pd.DataFrame(vecs, index=vocab)
     total = 0
     correct = 0
+    seen_mistakes = set()
     for quad in quads:
-        if all(term in tframe.index for term in quad):
-            prompt = quad[:3]
-            answer = quad[3]
-            vector = analogy_func(frame, *prompt)
-            similar = similar_to_vec(tframe, vector)
-            result = None
-            for match in similar.index:
-                if match not in prompt:
-                    result = match
-                    break
-            if result == answer:
-                correct += 1
-            else:
+        prompt = quad[:3]
+        answer = quad[3]
+        vector = analogy_func(frame, *prompt)
+        similar = similar_to_vec(tframe, vector)
+        result = None
+        for match in similar.index:
+            if match not in prompt:
+                result = match
+                break
+        if result == answer:
+            correct += 1
+        else:
+            if result not in seen_mistakes:
                 print(
-                    "%s : %s :: %s : %s (should be %s)"
-                    % (quad[0], quad[1], quad[2], result.upper(), answer)
+                    "%s : %s :: %s : [%s] (should be %s)"
+                    % (quad[0], quad[1], quad[2], result, answer)
                     )
-            total += 1
-    return correct, total, correct / total
+                seen_mistakes.add(result)
+        total += 1
+    low, high = proportion_confint(correct, total)
+    return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])

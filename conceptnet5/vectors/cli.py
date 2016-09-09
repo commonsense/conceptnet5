@@ -1,5 +1,8 @@
 import click
-from .formats import convert_glove, convert_word2vec, load_hdf, save_hdf
+from .formats import (
+    convert_glove, convert_word2vec, load_hdf, save_hdf,
+    export_conceptnet_to_hyperwords
+)
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
 from .interpolate import merge_intersect
@@ -11,6 +14,7 @@ from .query import VectorSpaceWrapper
 @click.group()
 def cli():
     pass
+
 
 @cli.command(name='filter_word_vectors')
 @click.argument('dense_hdf_filename', type=click.Path(readable=True, dir_okay=False))
@@ -83,9 +87,19 @@ def run_evaluate(filename):
 
 @cli.command(name='evaluate_raw')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-def run_evaluate(filename):
+def run_evaluate_raw(filename):
     frame = load_hdf(filename)
     print(evaluate_raw(frame))
+
+
+@cli.command(name='export')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_matrix', type=click.Path(writable=True, dir_okay=False))
+@click.argument('output_vocab', type=click.Path(writable=True, dir_okay=False))
+@click.option('--nrows', '-n', default=200000)
+def run_export(input_filename, output_matrix, output_vocab, nrows=200000):
+    frame = load_hdf(input_filename)
+    export_conceptnet_to_hyperwords(frame, output_matrix, output_vocab, nrows=nrows)
 
 
 @cli.command(name='shrink')

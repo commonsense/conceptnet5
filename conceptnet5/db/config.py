@@ -14,4 +14,4 @@ DB_USERNAME = os.environ.get('CONCEPTNET_DB_USER', os.environ.get('USER', 'www-d
 DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD', '')
 DB_HOSTNAME = os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost')
 DB_PORT = int(os.environ.get('CONCEPTNET_DB_PORT', '5432'))
-DB_NAME = os.environ.get('CONCEPTNET_DB_NAME', 'conceptnet55')
+DB_NAME = os.environ.get('CONCEPTNET_DB_NAME', 'conceptnet5')

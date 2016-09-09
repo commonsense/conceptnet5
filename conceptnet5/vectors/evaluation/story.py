@@ -1,6 +1,7 @@
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
+from statsmodels.stats.proportion import proportion_confint
 import numpy as np
 import pandas as pd
 
@@ -32,6 +33,12 @@ def evaluate(frame, subset='val'):
 
     Return a Series containing these labeled results.
     """
+    # Make subset names consistent with other datasets
+    if subset == 'dev':
+        subset = 'val'
+    elif subset == 'all':
+        # for the final evaluation, use just the test data
+        subset = 'test'
     filename = get_support_data_filename('story-cloze/cloze_test_spring2016_%s.tsv' % subset)
     vectors = VectorSpaceWrapper(frame=frame)
     total = 0
@@ -48,5 +55,6 @@ def evaluate(frame, subset='val'):
         if right_sim > wrong_sim:
             correct += 1
         total += 1
-        print("%+4.2f %s / %s / %s" % (right_sim - wrong_sim, text, right_answer, wrong_answer))
-    return correct / total
+        # print("%+4.2f %s / %s / %s" % (right_sim - wrong_sim, text, right_answer, wrong_answer))
+    low, high = proportion_confint(correct, total)
+    return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])

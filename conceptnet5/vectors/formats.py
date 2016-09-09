@@ -3,7 +3,9 @@ import numpy as np
 from scipy import sparse
 import gzip
 import struct
+import wordfreq
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
+from ..vectors import standardized_uri, get_vector
 
 
 def load_hdf(filename):
@@ -14,9 +16,28 @@ def save_hdf(table, filename):
     return table.to_hdf(filename, 'mat', encoding='utf-8')
 
 
-def save_npy_and_labels(table, filebase):
-    np.save(filebase + '.npy', table.values)
-    save_index_as_labels(table.index, filebase + '.labels.txt')
+def save_npy_and_labels(table, matrix_filename, vocab_filename):
+    np.save(matrix_filename, table.values)
+    save_index_as_labels(table.index, vocab_filename)
+
+
+def export_conceptnet_to_hyperwords(table, matrix_filename, vocab_filename, nrows):
+    vecs = []
+    labels = []
+    english_labels = [
+        standardized_uri('en', item)
+        for item in wordfreq.top_n_list('en', num * 2, 'large')
+    ]
+    count = 0
+    for label in english_labels:
+        if label in table.index:
+            labels.append(label.split('/')[-1])
+            vecs.append(get_vector(table, label))
+            count += 1
+            if count >= num:
+                break
+    np.save(matrix_filename, np.vstack(vecs))
+    save_index_as_labels(labels, vocab_filename)
 
 
 def convert_glove(glove_filename, output_filename, nrows):

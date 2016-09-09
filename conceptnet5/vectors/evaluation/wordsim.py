@@ -37,14 +37,14 @@ def confidence_interval(rho, N):
     high = z + interval
     return pd.Series(
         [rho, np.tanh(low), np.tanh(high)],
-        index=['rho', 'low', 'high']
+        index=['acc', 'low', 'high']
     )
 
 
 def empty_comparison_table():
     return pd.DataFrame(
         index=EVALS,
-        columns=['rho', 'low', 'high']
+        columns=['acc', 'low', 'high']
     )
 
 
@@ -261,7 +261,7 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
     return confidence_interval(correlation, len(gold_scores))
 
 
-def evaluate(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
+def evaluate(frame, subset='dev'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Use a
@@ -287,16 +287,10 @@ def evaluate(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
-
-    comparisons = dict(COMPARISONS)
-    comparisons[name] = results
-    comparison_list = sorted(comparisons)
-    big_frame = pd.concat([comparisons[key] for key in comparison_list], keys=pd.MultiIndex.from_tuples(comparison_list))
-
-    return big_frame.dropna()
+    return results
 
 
-def evaluate_raw(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
+def evaluate_raw(frame, subset='dev'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Return
@@ -316,7 +310,10 @@ def evaluate_raw(frame, subset='dev', name=('Luminoso', 'Numberbatch 2016.09')):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
+    return results
 
+
+def results_in_context(results, name=('Luminoso', 'Numberbatch 16.09')):
     comparisons = dict(COMPARISONS)
     comparisons[name] = results
     comparison_list = sorted(comparisons)

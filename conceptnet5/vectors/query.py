@@ -56,6 +56,7 @@ class VectorSpaceWrapper(object):
         self.k = None
         self.small_k = None
         self.finder = None
+        self.standardized = None
         if use_db:
             self.finder = AssertionFinder()
 
@@ -68,6 +69,21 @@ class VectorSpaceWrapper(object):
         try:
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
+
+            if self.frame.index[0].startswith('/c/'):
+                self.standardized = True
+            else:
+                # These terms weren't in ConceptNet standard form. Assume
+                # they're in English, and stick the English language tag on
+                # them without any further transformation, so we can be sure
+                # we're evaluating the vectors as provided.
+                self.standardized = False
+                self.finder = None
+                self.frame.index = [
+                    '/c/en/' + label
+                    for label in self.frame.index
+                ]
+
             self.k = self.frame.shape[1]
             self.small_k = self.k // 3
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
@@ -124,7 +140,7 @@ class VectorSpaceWrapper(object):
 
     def text_to_vector(self, language, text):
         tokens = wordfreq.tokenize(text, language)
-        weighted_terms = [(standardized_uri(language, token), 9. - wordfreq.zipf_frequency(token, language)) for token in tokens]
+        weighted_terms = [(standardized_uri(language, token), 1.) for token in tokens]
         return self.get_vector(weighted_terms, include_neighbors=False)
 
     def get_vector(self, query, include_neighbors=True):
