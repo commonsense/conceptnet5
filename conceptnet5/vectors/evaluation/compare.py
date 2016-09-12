@@ -27,7 +27,7 @@ def compare_embeddings(filenames, subset='dev'):
     results = []
     for frame in embeddings:
         wordsim_results = wordsim.evaluate(frame, subset=subset)
-        analogy_results = analogy.eval_pairwise_analogies(
+        analogy_results = analogy.tune_pairwise_analogies(
             frame, ANALOGY_FILENAME, subset=subset
         ).to_frame(name='sat-analogies').T
         story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
@@ -38,3 +38,39 @@ def compare_embeddings(filenames, subset='dev'):
             )
         )
     return pd.concat(results, keys=filenames)
+
+
+def graph_comparison(table_filename):
+    import matplotlib.pyplot as plt
+    result = load_hdf(table_filename)
+    plt.style.use('bmh')
+    plt.rcParams['xtick.labelsize'] = 'x-large'
+    plt.rcParams['ytick.labelsize'] = 'x-large'
+
+    width = 0.15
+    evals = ['men3000', 'rw', 'mturk', 'ws353', 'story-cloze', 'sat-analogies']
+    eval_labels = ['MEN-3000', 'Rare Words', 'MTurk-771', 'WS353', 'Story Cloze', 'SAT analogies']
+    colors = [props['color'] for props in plt.rcParams['axes.prop_cycle']]
+
+    systems = [
+        ('word2vec Google News', 'data/raw/vectors/GoogleNews-vectors-negative300.bin.gz'),
+        ('GloVe 1.2 840B', 'data/raw/vectors/glove12.840B.300d.txt.gz'),
+        ('LexVec', 'data/raw/vectors/lexvec.no-header.vectors.gz'),
+        ('ConceptNet PPMI', 'data/vectors/conceptnet-55-ppmi.h5'),
+        ('ConceptNet Numberbatch 16.09', 'data/vectors/numberbatch.h5')
+    ]
+    ind = np.arange(len(evals))
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for i, (sysname, syspath) in enumerate(systems):
+        eval_table = result.xs(syspath, level=0).loc[evals]
+        errs = [eval_table['high'] - eval_table['acc'], eval_table['acc'] - eval_table['low']]
+        ax.bar(ind + i * width, eval_table['acc'], width, color=colors[i], yerr=errs, ecolor='k')
+
+    ax.set_ylim(0.0, 1.0)
+    ax.legend([name for (name, path) in systems])
+    ax.set_xticks(ind + width * len(systems) / 2)
+    ax.set_xticklabels(eval_labels)
+    ax.xaxis.grid(False)
+    plt.ylabel('Evaluation score', fontsize='x-large')
+    plt.savefig('data/stats/eval-graph.png', dpi=300)

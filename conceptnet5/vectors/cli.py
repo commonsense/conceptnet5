@@ -5,7 +5,7 @@ from .formats import (
 )
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
-from .interpolate import merge_intersect
+from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
 from .transforms import shrink_and_sort
 from .query import VectorSpaceWrapper
