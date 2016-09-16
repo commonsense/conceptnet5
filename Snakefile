@@ -266,28 +266,17 @@ rule assertion_msgpack_to_csv:
     shell:
         "cn5-convert msgpack_to_tab_separated {input} {output}"
 
-rule distribute_edges:
+rule sort_edges:
     input:
         expand(DATA + "/edges/{dataset}.csv", dataset=DATASET_NAMES)
     output:
-        [DATA + "/collated/unsorted/edges_{:02d}.csv".format(num)
-         for num in range(N_PIECES)]
+        DATA + "/collated/sorted/edges.csv"
     shell:
-        "python3 -m conceptnet5.builders.distribute_edges "
-        "-o %s/collated/unsorted/ -n {N_PIECES} {input}" % DATA
-
-rule sort_edges:
-    input:
-        DATA + "/collated/unsorted/{filename}.csv"
-    output:
-        DATA + "/collated/sorted/{filename}.csv"
-    shell:
-        "LC_ALL=C sort {input} | uniq > {output}"
+        "mkdir -p %(data)s/tmp && cat {input} | LC_ALL=C sort -T %(data)s/tmp | LC_ALL=C uniq > {output}" % {'data': DATA}
 
 rule combine_assertions:
     input:
-        [DATA + "/collated/sorted/edges_{:02d}.csv".format(num)
-         for num in range(N_PIECES)]
+        DATA + "/collated/sorted/edges.csv"
     output:
         DATA + "/assertions/assertions.msgpack"
     shell:

@@ -11,13 +11,13 @@ def setUp():
 
 def test_lookup():
     quiz1 = list(test_finder.lookup('/c/en/quiz'))
-    eq_(len(quiz1), 3)
+    eq_(len(quiz1), 2)
 
     quiz2 = list(test_finder.lookup('/c/en/quiz', offset=1))
     eq_(quiz2, quiz1[1:])
 
-    quiz3 = list(test_finder.lookup('/c/en/quiz', limit=2))
-    eq_(quiz3, quiz1[:2])
+    quiz3 = list(test_finder.lookup('/c/en/quiz', limit=1))
+    eq_(quiz3, quiz1[:1])
 
     verbosity_test = quiz1[0]
     eq_(verbosity_test['start']['@id'], '/c/en/test')

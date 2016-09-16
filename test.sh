@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export CONCEPTNET_BUILD_TEST=1
-dropdb conceptnet-test || true
+dropdb conceptnet-test 2>/dev/null || true
 createdb conceptnet-test
 build_test () {
     snakemake -q clean &&\

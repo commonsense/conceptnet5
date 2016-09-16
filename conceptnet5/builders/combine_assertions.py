@@ -86,11 +86,14 @@ def make_assertion(line_group):
     )
 
 
-def combine_assertions(input_filenames, output_file):
+def combine_assertions(input_filename, output_file):
     """
-    Take in a number of tab-separated, sorted "CSV" files, indicated by
-    `input_filenames`, that should be grouped together into assertions.
+    Take in a tab-separated, sorted "CSV" files, indicated by
+    `input_filename`, that should be grouped together into assertions.
     Output a msgpack stream of assertions to `output_file`.
+
+    The input file should be made from multiple sources of assertions by
+    concatenating and sorting them.
 
     The combined assertions will all have the dataset of the first edge that
     produces them, and the license of the strongest license being combined.
@@ -105,17 +108,16 @@ def combine_assertions(input_filenames, output_file):
     out = MsgpackStreamWriter(output_file)
     out_bad = MsgpackStreamWriter(output_file + '.reject')
 
-    for csv_filename in input_filenames:
-        with open(csv_filename, encoding='utf-8') as stream:
-            for key, line_group in itertools.groupby(stream, group_func):
-                assertion = make_assertion(line_group)
-                if assertion is None:
-                    continue
-                if assertion['weight'] > 0:
-                    destination = out
-                else:
-                    destination = out_bad
-                destination.write(assertion)
+    with open(input_filename, encoding='utf-8') as stream:
+        for key, line_group in itertools.groupby(stream, group_func):
+            assertion = make_assertion(line_group)
+            if assertion is None:
+                continue
+            if assertion['weight'] > 0:
+                destination = out
+            else:
+                destination = out_bad
+            destination.write(assertion)
 
     out.close()
     out_bad.close()
@@ -152,9 +154,9 @@ if __name__ == '__main__':
     # for more context.
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('inputs', nargs='*', help='csv files of input')
+    parser.add_argument('input', help='csv file of input')
     parser.add_argument(
         '-o', '--output', help='msgpack file to output to'
     )
     args = parser.parse_args()
-    combine_assertions(args.inputs, args.output)
+    combine_assertions(args.input, args.output)
