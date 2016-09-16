@@ -67,7 +67,7 @@ def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose)
 
 
 def eval_pairwise_analogies(frame, eval_filename, subset='all',
-                            weight_direct=0.6, weight_transpose=0.6):
+                            weight_direct=0.35, weight_transpose=0.65):
     total = 0
     correct = 0
     wrap = VectorSpaceWrapper(frame=frame)
@@ -84,12 +84,13 @@ def eval_pairwise_analogies(frame, eval_filename, subset='all',
             our_answer = np.argmax(choice_values)
             if our_answer == answer:
                 correct += 1
+                print(a1, b1)
             total += 1
     low, high = proportion_confint(correct, total)
     return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
 
 
-def tune_pairwise_analogies(frame, eval_filename, subset='all'):
+def tune_pairwise_analogies(frame, eval_filename, subset):
     """
     Our pairwise analogy function has three weights that can be tuned
     (and therefore two free parameters, as the total weight does not matter):
@@ -107,7 +108,7 @@ def tune_pairwise_analogies(frame, eval_filename, subset='all'):
     #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
     # ]
     weights = [
-        0.3, 0.35, 0.4, 0.42, 0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58,
+        0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
         0.6, 0.65, 0.7, 0.8, 0.9, 1.0
     ]
     best_weights = None
@@ -124,6 +125,7 @@ def tune_pairwise_analogies(frame, eval_filename, subset='all'):
                 best_weights = (weight_direct, weight_transpose)
                 best_acc = acc
     weight_direct, weight_transpose = best_weights
+    print()
     return eval_pairwise_analogies(
         frame, eval_filename, subset=subset,
         weight_direct=weight_direct,

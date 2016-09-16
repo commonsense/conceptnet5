@@ -6,6 +6,8 @@ import struct
 import wordfreq
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 from ..vectors import standardized_uri, get_vector
+from conceptnet5.languages import COMMON_LANGUAGES
+from conceptnet5.nodes import get_uri_language
 
 
 def load_hdf(filename):
@@ -26,7 +28,7 @@ def export_conceptnet_to_hyperwords(table, matrix_filename, vocab_filename, nrow
     labels = []
     english_labels = [
         standardized_uri('en', item)
-        for item in wordfreq.top_n_list('en', num * 2, 'large')
+        for item in wordfreq.top_n_list('en', nrows * 2, 'large')
     ]
     count = 0
     for label in english_labels:
@@ -34,10 +36,49 @@ def export_conceptnet_to_hyperwords(table, matrix_filename, vocab_filename, nrow
             labels.append(label.split('/')[-1])
             vecs.append(get_vector(table, label))
             count += 1
-            if count >= num:
+            if count >= nrows:
                 break
     np.save(matrix_filename, np.vstack(vecs))
     save_index_as_labels(labels, vocab_filename)
+
+
+def export_plain_text(table, uri_file, file_base):
+    from ..vectors.query import VectorSpaceWrapper
+
+    def vec_to_text_line(label, vec):
+        cells = [label] + ['%4.4f' % val for val in vec]
+        return ' '.join(cells)
+
+    uri_main_file = gzip.open(file_base + '_uris_main.txt.gz', 'wt')
+    english_main_file = gzip.open(file_base + '_en_main.txt.gz', 'wt')
+    english_extra_file = gzip.open(file_base + '_en_extra.txt.gz', 'wt')
+    wrap = VectorSpaceWrapper(frame=table)
+
+    for line in open(uri_file, encoding='utf-8'):
+        uri = line.strip()
+        if uri.count('/') == 3 and get_uri_language(uri) in COMMON_LANGUAGES:
+            if uri in table.index:
+                vec = table.loc[uri].values
+                print(vec_to_text_line(uri, vec), file=uri_main_file)
+            else:
+                if not uri.startswith('/c/en') or '_' in uri:
+                    continue
+                vec = wrap.get_vector(uri)
+
+            if vec.dot(vec) == 0:
+                continue
+
+            print(uri)
+            if uri.startswith('/c/en/'):
+                label = uri[6:]
+                if uri in table.index:
+                    print(vec_to_text_line(label, vec), file=english_main_file)
+                else:
+                    print(vec_to_text_line(label, vec), file=english_extra_file)
+
+    uri_main_file.close()
+    english_main_file.close()
+    english_extra_file.close()
 
 
 def convert_glove(glove_filename, output_filename, nrows):

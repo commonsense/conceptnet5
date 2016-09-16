@@ -27,7 +27,7 @@ class SparseMatrixBuilder:
                                  shape=shape, dtype=dtype).tocsr()
 
 
-def build_from_conceptnet_table(filename, orig_index=()):
+def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
     """
     Read a file of tab-separated association data from ConceptNet, such as
     `data/assoc/reduced.csv`. Return a SciPy sparse matrix of the associations,
@@ -70,8 +70,9 @@ def build_from_conceptnet_table(filename, orig_index=()):
                 totals[index2] += 1
 
     # add self-loops on the diagonal with equal weight to the rest of the row
-    for key, value in totals.items():
-        mat[key, key] = value
+    if self_loops:
+        for key, value in totals.items():
+            mat[key, key] = value
 
     shape = (len(labels), len(labels))
     index = pd.Index(labels)

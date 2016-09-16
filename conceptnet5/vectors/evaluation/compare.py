@@ -1,5 +1,5 @@
 from conceptnet5.vectors.evaluation import analogy, story, wordsim
-from conceptnet5.vectors.formats import load_hdf, load_glove, load_word2vec_bin
+from conceptnet5.vectors.formats import load_hdf, save_hdf, load_glove, load_word2vec_bin
 import numpy as np
 import pandas as pd
 
@@ -20,16 +20,21 @@ def load_any_embeddings(filename):
         raise ValueError("Can't recognize file extension of %r" % filename)
 
 
-def compare_embeddings(filenames, subset='dev'):
+def compare_embeddings(filenames, subset='dev', tune_analogies=True):
     embeddings = [
         load_any_embeddings(filename) for filename in filenames
     ]
     results = []
     for frame in embeddings:
         wordsim_results = wordsim.evaluate(frame, subset=subset)
-        analogy_results = analogy.tune_pairwise_analogies(
-            frame, ANALOGY_FILENAME, subset=subset
-        ).to_frame(name='sat-analogies').T
+        if tune_analogies:
+            analogy_results = analogy.tune_pairwise_analogies(
+                frame, ANALOGY_FILENAME, subset=subset
+            ).to_frame(name='sat-analogies').T
+        else:
+            analogy_results = analogy.eval_pairwise_analogies(
+                frame, ANALOGY_FILENAME, subset=subset
+            ).to_frame(name='sat-analogies').T
         story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
         results.append(
             pd.concat(
@@ -37,7 +42,9 @@ def compare_embeddings(filenames, subset='dev'):
                 axis=0
             )
         )
-    return pd.concat(results, keys=filenames)
+    result = pd.concat(results, keys=filenames)
+    save_hdf(result, '/tmp/numberbatch-comparison.h5')
+    return result
 
 
 def graph_comparison(table_filename):
