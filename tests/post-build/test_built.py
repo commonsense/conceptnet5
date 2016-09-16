@@ -4,8 +4,15 @@ This test can only be run when the full ConceptNet data has been built
 """
 
 from conceptnet5.util import get_data_filename
-from conceptnet5.nodes import CORE_LANGUAGES, COMMON_LANGUAGES, ALL_LANGUAGES
-from conceptnet5.query import FINDER
+from conceptnet5.languages import CORE_LANGUAGES, COMMON_LANGUAGES, ALL_LANGUAGES
+from conceptnet5.db.query import AssertionFinder
+
+test_finder = None
+
+
+def setUp():
+    global test_finder
+    test_finder = AssertionFinder('conceptnet-test')
 
 
 def test_languages_exist():
@@ -33,5 +40,5 @@ def test_datasets_exist():
         '/d/wiktionary/en', '/d/wiktionary/fr', '/d/wiktionary/de'
     ]:
         # Test that each dataset has at least 100 assertions
-        q = FINDER.query({'dataset': dataset}, limit=100)
+        q = test_finder.query({'dataset': dataset}, limit=100)
         assert len(q) == 100, dataset

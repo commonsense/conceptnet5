@@ -311,7 +311,6 @@ def interlanguage_mapping(interlang_path, ok_concepts):
                     continue
                 if url.startswith('http://wikidata.dbpedia.org/'):
                     wikidata_id = resource_name(url)
-                    print(wikidata_id, subj_url)
 
                     # Return early when we see a high-numbered Wikidata ID
                     if int(wikidata_id[1:]) >= 1000000:
