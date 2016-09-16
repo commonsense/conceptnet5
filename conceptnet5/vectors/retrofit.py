@@ -78,13 +78,10 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     appropriately.
     """
     # Initialize a DataFrame with rows that we know
-    print("dense_frame:", dense_frame.shape)
-    print("sparse_csr:", sparse_csr.shape)
     retroframe = pd.DataFrame(
         index=row_labels, columns=dense_frame.columns, dtype='f'
     )
     retroframe.update(dense_frame)
-    print("retroframe:", retroframe.shape)
     # weight = 2 for known vectors, 1 for unknown vectors
     orig_weights = 1 - retroframe.iloc[:, 0].isnull()
     weight_array = orig_weights.values[:, np.newaxis].astype('f')
