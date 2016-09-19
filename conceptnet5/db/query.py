@@ -1,65 +1,9 @@
 from .connection import get_db_connection
+from conceptnet5.relations import ALL_RELATIONS, SYMMETRIC_RELATIONS
 from conceptnet5.edges import transform_for_linked_data
-import itertools
+from collections import defaultdict
 import json
 
-
-# This query takes in two parameters: a node URI and a number of edges per
-# feature.
-#
-# It finds edges whose start or end is the given node, or a sub-sense of that
-# node (having the given node URI as a prefix). It groups the edges by what
-# feature they express about the node (such as "example UsedFor ..."), and
-# returns only the N top-weighted edges for each feature.
-
-MAX_GROUP_SIZE = 20
-
-FEATURE_QUERY = """
--- This WITH clause is a Common Table Expression, which lets us describe
--- and name the sub-queries we need to run, so that they can be used in the
--- queries further down, possibly multiple times.
-WITH node_ids AS (
-    SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=:node
-    LIMIT 100
-),
--- Another clause in the CTE contains the meat of the query, selecting all the
--- edges with one of the node IDs we just got as its start or end. The idea of
--- "start or end" is expressed with a UNION of two similar queries.
-matched_edges AS (
-    -- This 'direction' integer distinguishes whether the start or end matched
-    -- the input node. For symmetric relations, it's 0, indicating that the
-    -- direction doesn't matter.
-    SELECT CAST(r.directed as int) * 1 AS direction, r.uri AS rel,
-           n2.uri as other, e.uri AS uri, e.data AS data, e.weight AS weight,
-           -- Attach a rank to each edge, indicating the rank order of its
-           -- weight within a relation. Break ties by ID. We'll use this to
-           -- prune the results.
-           row_number() OVER (PARTITION BY r.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM relations r, nodes n1, nodes n2, edges e
-    WHERE e.relation_id=r.id
-      AND e.start_id=n1.id
-      AND e.end_id=n2.id
-      AND n1.id IN (SELECT node_id FROM node_ids)
-    UNION
-
-    -- Here's that same query again, except with n2.id instead of n1.id, and
-    -- the sign flipped on 'direction'.
-    SELECT CAST(r.directed as int) * -1 AS direction, r.uri AS rel,
-           n1.uri as other, e.uri AS uri, e.data AS data, e.weight AS weight,
-           row_number() OVER (PARTITION BY r.uri ORDER BY e.weight desc, e.id) AS rank
-    FROM relations r, nodes n1, nodes n2, edges e
-    WHERE e.relation_id=r.id
-      AND e.start_id=n1.id
-      AND e.end_id=n2.id
-      AND n2.id IN (SELECT node_id FROM node_ids)
-)
--- That's the end of the WITH clause. Finally, we SELECT the results that
--- rank highly enough within their relation.
-SELECT direction, rel, other, data FROM matched_edges
-WHERE rank <= 21
-ORDER BY direction, rel, rank
-"""
 
 NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
@@ -123,7 +67,7 @@ def make_list_query(criteria):
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
-        SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges
+        SELECT uri, data FROM matched_edges
         ORDER BY weight DESC, uri
         OFFSET :offset LIMIT :limit
     """)
@@ -151,21 +95,30 @@ class AssertionFinder(object):
             raise ValueError
         return self.query(criteria, limit, offset)
 
-    def lookup_grouped_by_feature(self, uri):
-        def extract_feature(row):
-            return tuple(row[:2])
+    def lookup_grouped_by_feature(self, uri, feature_limit=20):
+        results = defaultdict(list)
+        for rel in ALL_RELATIONS:
+            print(rel)
+            entries = self.query({'start': uri, 'rel': rel}, limit=feature_limit + 1)
+            for entry in entries:
+                entry['other'] = entry['end']
+            direction = 1 * (rel not in SYMMETRIC_RELATIONS)
+            if entries:
+                results[direction, rel].extend(entries)
 
-        def feature_data(row):
-            _, _, other, data = row
-            data.update({'other': other})
-            return data
+            entries = self.query({'end': uri, 'rel': rel}, limit=feature_limit + 1)
+            for entry in entries:
+                entry['other'] = entry['start']
+            direction = -1 * (rel not in SYMMETRIC_RELATIONS)
+            if entries:
+                combined = (direction, rel) in results
+                results[direction, rel].extend(entries)
+                if combined:
+                    results[direction, rel].sort(
+                        key=lambda r: r['weight'], reverse=True,
+                    )
 
-        cursor = self.connection.cursor()
-        cursor.execute(FEATURE_QUERY, {'node': uri})
-        results = {}
-        for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
-            results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
-        return results
+        return dict(results)
 
     def lookup_assertion(self, uri):
         cursor = self.connection.cursor()

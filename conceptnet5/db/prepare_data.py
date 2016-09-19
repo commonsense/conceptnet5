@@ -35,10 +35,7 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     output_sources = output_dir + '/sources.csv'
     output_edge_sources = output_dir + '/edge_sources.csv'
     output_node_prefixes = output_dir + '/node_prefixes.csv'
-
-    # Let's write out source prefixes even though it seems we can do
-    # without them
-    output_source_prefixes = output_dir + '/source_prefixes.csv'
+    output_features = output_dir + '/edge_features.csv'
 
     node_list = OrderedSet()
     source_list = OrderedSet()
@@ -49,7 +46,7 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     edge_file = open(output_edges, 'w', encoding='utf-8')
     edge_source_file = open(output_edge_sources, 'w', encoding='utf-8')
     node_prefix_file = open(output_node_prefixes, 'w', encoding='utf-8')
-    source_prefix_file = open(output_source_prefixes, 'w', encoding='utf-8')
+    feature_file = open(output_features, 'w', encoding='utf-8')
 
     for assertion in read_msgpack_stream(msgpack_filename):
         if assertion['uri'] in assertion_list:
@@ -65,7 +62,6 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
             for sourceval in sorted(source.values()):
                 source_idx = source_list.add(sourceval)
                 source_indices.append(source_idx)
-                write_prefixes(source_prefix_file, seen_prefixes, node_list, sourceval)
 
         jsondata = json.dumps(assertion, ensure_ascii=False, sort_keys=True)
         weight = assertion['weight']
@@ -80,10 +76,17 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
         for source_idx in sorted(set(source_indices)):
             write_row(edge_source_file, [assertion_idx, source_idx])
 
+        if assertion['rel'] in SYMMETRIC_RELATIONS:
+            features = [(0, start_idx), (0, end_idx)]
+        else:
+            features = [(1, start_idx), (-1, end_idx)]
+
+        for direction, node_idx in features:
+            write_row(feature_file, [rel_idx, direction, node_idx, assertion_idx])
+
     edge_file.close()
     edge_source_file.close()
     node_prefix_file.close()
-    source_prefix_file.close()
     write_ordered_set(output_nodes, node_list)
     write_ordered_set(output_sources, source_list)
     write_relations(output_relations, relation_list)
@@ -105,7 +108,8 @@ def load_sql_csv(connection, input_dir):
         (input_dir + '/edges.csv', 'edges'),
         (input_dir + '/sources.csv', 'sources'),
         (input_dir + '/edge_sources.csv', 'edge_sources'),
-        (input_dir + '/node_prefixes.csv', 'node_prefixes')
+        (input_dir + '/node_prefixes.csv', 'node_prefixes'),
+        (input_dir + '/edge_features.csv', 'edge_features')
     ]:
         print(filename)
         cursor = connection.cursor()

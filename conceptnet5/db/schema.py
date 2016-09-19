@@ -1,4 +1,5 @@
 TABLES = [
+    "DROP TABLE IF EXISTS edge_features",
     "DROP TABLE IF EXISTS edge_sources",
     "DROP TABLE IF EXISTS node_prefixes",
     "DROP TABLE IF EXISTS edges",
@@ -38,9 +39,11 @@ TABLES = [
         prefix_id      integer NOT NULL REFERENCES nodes (id)
     )
     """,
-    """CREATE TABLE source_prefixes (
-        source_id      integer NOT NULL REFERENCES sources (id),
-        prefix_id      integer NOT NULL REFERENCES sources (id)
+    """CREATE TABLE edge_features (
+        rel_id    integer NOT NULL REFERENCES relations (id),
+        direction integer NOT NULL,
+        node_id   integer NOT NULL REFERENCES nodes (id),
+        edge_id   integer NOT NULL REFERENCES edges (id)
     )
     """
 ]
@@ -59,7 +62,7 @@ INDICES = [
     "CREATE INDEX es_edge ON edge_sources (edge_id)",
     "CREATE INDEX es_source ON edge_sources (source_id)",
     "CREATE INDEX np_prefix ON node_prefixes (prefix_id)",
-    "CREATE INDEX sp_prefix ON source_prefixes (prefix_id)",
+    "CREATE INDEX ef_feature ON edge_features (rel_id, direction, node_id)"
 ]
 
 

@@ -290,6 +290,7 @@ rule prepare_db:
     output:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_sources.csv",
+        DATA + "/psql/edge_features.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/sources.csv",
@@ -301,6 +302,7 @@ rule load_db:
     input:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_sources.csv",
+        DATA + "/psql/edge_features.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/sources.csv",

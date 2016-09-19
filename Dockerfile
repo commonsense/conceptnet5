@@ -6,7 +6,7 @@ ENV PYTHON python3
 ADD conceptnet5 /src/conceptnet/conceptnet5
 ADD tests /src/conceptnet/tests
 ADD setup.py /src/conceptnet/setup.py
-ADD Makefile /src/conceptnet/Makefile
+ADD Snakefile /src/conceptnet/Snakefile
 
 # Set up ConceptNet
 WORKDIR /src/conceptnet
