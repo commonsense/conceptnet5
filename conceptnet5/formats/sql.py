@@ -226,7 +226,7 @@ class EdgeIndexReader(object):
         c = self.dbs[shard].cursor()
         complete_req = ''
         if complete:
-            complete_req = ' AND complete = true'
+            complete_req = ' AND complete = 1'
 
         # If your hair is standing on end when you see "%s" in a SQL
         # expression, I don't blame you. But the only thing being substituted
