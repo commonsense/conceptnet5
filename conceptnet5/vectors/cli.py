@@ -1,9 +1,8 @@
 import click
 from .formats import (
     convert_glove, convert_word2vec, load_hdf, save_hdf,
-    export_conceptnet_to_hyperwords
+    export_conceptnet_to_hyperwords, export_plain_text
 )
-from .sparse_matrix_builder import build_from_conceptnet_table
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
@@ -92,14 +91,23 @@ def run_evaluate_raw(filename):
     print(evaluate_raw(frame))
 
 
-@cli.command(name='export')
+@cli.command(name='export_hyperwords')
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_matrix', type=click.Path(writable=True, dir_okay=False))
 @click.argument('output_vocab', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=200000)
-def run_export(input_filename, output_matrix, output_vocab, nrows=200000):
+def run_export_hyperwords(input_filename, output_matrix, output_vocab, nrows=200000):
     frame = load_hdf(input_filename)
     export_conceptnet_to_hyperwords(frame, output_matrix, output_vocab, nrows=nrows)
+
+
+@cli.command(name='export_text')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('uri_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_dir', type=click.Path(writable=True, dir_okay=True, file_okay=False))
+def run_export(input_filename, uri_filename, output_dir):
+    frame = load_hdf(input_filename)
+    export_plain_text(frame, uri_filename, output_dir)
 
 
 @cli.command(name='shrink')

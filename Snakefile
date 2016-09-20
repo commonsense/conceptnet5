@@ -88,7 +88,8 @@ rule all:
         DATA + "/stats/languages.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/numberbatch.h5"
+        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
 
 rule clean:
     shell:
@@ -324,6 +325,15 @@ rule relation_stats:
         "| LC_ALL=C sort -nbr > {output}"
 
 
+rule all_terms:
+    input:
+        DATA + "/psql/nodes.csv"
+    output:
+        DATA + "/stats/terms.txt"
+    shell:
+        "cut -f 2 {input} > {output}"
+
+
 rule core_concepts_left:
     input:
         expand(DATA + "/edges/{dataset}.csv", dataset=CORE_DATASET_NAMES)
@@ -444,7 +454,7 @@ rule retrofit:
     resources:
         ram=16
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} data/vectors/{wildcards.name}-retrofit.h5"
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
 
 rule join_retrofit:
     input:
@@ -466,3 +476,12 @@ rule merge_intersect:
         ram=16
     shell:
         "cn5-vectors intersect {input} {output}"
+
+rule export_text:
+    input:
+        DATA + "/vectors/numberbatch.h5",
+        DATA + "/stats/terms.txt"
+    output:
+        DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
+    shell:
+        "cn5-vectors export_text {input} %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}

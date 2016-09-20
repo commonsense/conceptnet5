@@ -22,12 +22,10 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'snakemake', 'click', 'requests', 'ftfy',
+        'snakemake', 'click', 'requests', 'ftfy', 'numpy', 'scipy',
         'msgpack-python', 'langcodes', 'wordfreq >= 1.5',
-        'xmltodict', 'ordered_set', 'pg8000', 'statsmodels'
+        'xmltodict', 'ordered_set', 'pg8000'
     ],
-    # assoc-space >= 1.0b1 is required for using assoc-space features, but it's
-    # not required for all of ConceptNet
     license = 'Apache License 2.0',
     entry_points = {
         'console_scripts': [
@@ -39,6 +37,6 @@ setup(
         ]
     },
     extras_require={
-        'vectors': ['tables', 'pandas']
+        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn']
     },
 )
