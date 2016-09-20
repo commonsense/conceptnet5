@@ -3,6 +3,7 @@ from conceptnet5.relations import ALL_RELATIONS, SYMMETRIC_RELATIONS
 from conceptnet5.edges import transform_for_linked_data
 from collections import defaultdict
 import json
+import itertools
 
 
 NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
@@ -17,43 +18,18 @@ DATASET_QUERY = "SELECT uri, data FROM edges WHERE data->'dataset' = :dataset OR
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri='/c/en/example'
-    LIMIT 200
-),
-matched_edges AS (
-    SELECT e.uri, e.weight, e.data, ef.direction, ef.rel_id,
-        row_number() OVER (PARTITION BY (ef.rel_id, ef.direction) ORDER BY e.weight DESC, e.id) AS rank
-    FROM edges e, edge_features ef
-    WHERE ef.node_id in (SELECT node_id FROM node_ids)
-    AND ef.edge_id=e.id
+    WHERE p.prefix_id=n.id AND n.uri=:node
+    LIMIT 10
 )
-SELECT direction, rel_id, data FROM matched_edges
-WHERE rank <= 21
-ORDER BY direction, rel_id, rank;
+SELECT rf.direction, r.uri, e.data
+FROM ranked_features rf, edges e, relations r
+WHERE rf.node_id IN (SELECT node_id FROM node_ids)
+AND rf.edge_id = e.id
+AND rf.rel_id = r.id
+AND rank <= 21
+ORDER BY direction, uri, rank;
 """
-
-NODE_TO_FEATURE_QUERY = """
-WITH node_ids AS (
-    SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri='/c/en/example'
-    LIMIT 200
-)
-SELECT e.uri, e.weight, e.data, ef.direction, ef.rel_id
-FROM edges e, edge_features ef
-WHERE ef.node_id in (SELECT node_id FROM node_ids)
-AND ef.rel_id=37
-AND ef.edge_id=e.id
-ORDER BY e.weight DESC
-LIMIT 20;
-"""
-
-
-
-def make_feature_query(criteria):
-    crit_tuple = tuple(sorted(criteria))
-    if crit_tuple in FEATURE_QUERIES:
-        return FEATURE_QUERIES[crit_tuple]
-    ...
+MAX_GROUP_SIZE = 20
 
 
 def make_list_query(criteria):
@@ -138,30 +114,30 @@ class AssertionFinder(object):
             raise ValueError
         return self.query(criteria, limit, offset)
 
-    def lookup_grouped_by_feature(self, uri, feature_limit=20):
-        results = defaultdict(list)
-        for rel in ALL_RELATIONS:
-            print(rel)
-            entries = self.query({'start': uri, 'rel': rel}, limit=feature_limit + 1)
-            for entry in entries:
-                entry['other'] = entry['end']
-            direction = 1 * (rel not in SYMMETRIC_RELATIONS)
-            if entries:
-                results[direction, rel].extend(entries)
+    def lookup_grouped_by_feature(self, uri):
+        def extract_feature(row):
+            return tuple(row[:2])
 
-            entries = self.query({'end': uri, 'rel': rel}, limit=feature_limit + 1)
-            for entry in entries:
-                entry['other'] = entry['start']
-            direction = -1 * (rel not in SYMMETRIC_RELATIONS)
-            if entries:
-                combined = (direction, rel) in results
-                results[direction, rel].extend(entries)
-                if combined:
-                    results[direction, rel].sort(
-                        key=lambda r: r['weight'], reverse=True,
-                    )
+        def feature_data(row):
+            direction, _, data = row
 
-        return dict(results)
+            # Hacky way to figure out what the 'other' node is, the one that
+            # (in most cases) didn't match the URI. If both start with our
+            # given URI, take the longer one, which is either a more specific
+            # sense or a different, longer word.
+            shorter, longer = sorted([data['start'], data['end']], key=len)
+            if shorter.startswith(uri):
+                data['other'] = longer
+            else:
+                data['other'] = shorter
+            return data
+
+        cursor = self.connection.cursor()
+        cursor.execute(NODE_TO_FEATURE_QUERY, {'node': uri})
+        results = {}
+        for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
+            results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
+        return results
 
     def lookup_assertion(self, uri):
         cursor = self.connection.cursor()
