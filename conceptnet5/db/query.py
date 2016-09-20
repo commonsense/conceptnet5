@@ -7,10 +7,53 @@ import json
 
 NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
+FEATURE_QUERIES = {}
 
 RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
 RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
 DATASET_QUERY = "SELECT uri, data FROM edges WHERE data->'dataset' = :dataset ORDER BY weight DESC OFFSET :offset LIMIT :limit"
+
+
+NODE_TO_FEATURE_QUERY = """
+WITH node_ids AS (
+    SELECT p.node_id FROM nodes n, node_prefixes p
+    WHERE p.prefix_id=n.id AND n.uri='/c/en/example'
+    LIMIT 200
+),
+matched_edges AS (
+    SELECT e.uri, e.weight, e.data, ef.direction, ef.rel_id,
+        row_number() OVER (PARTITION BY (ef.rel_id, ef.direction) ORDER BY e.weight DESC, e.id) AS rank
+    FROM edges e, edge_features ef
+    WHERE ef.node_id in (SELECT node_id FROM node_ids)
+    AND ef.edge_id=e.id
+)
+SELECT direction, rel_id, data FROM matched_edges
+WHERE rank <= 21
+ORDER BY direction, rel_id, rank;
+"""
+
+NODE_TO_FEATURE_QUERY = """
+WITH node_ids AS (
+    SELECT p.node_id FROM nodes n, node_prefixes p
+    WHERE p.prefix_id=n.id AND n.uri='/c/en/example'
+    LIMIT 200
+)
+SELECT e.uri, e.weight, e.data, ef.direction, ef.rel_id
+FROM edges e, edge_features ef
+WHERE ef.node_id in (SELECT node_id FROM node_ids)
+AND ef.rel_id=37
+AND ef.edge_id=e.id
+ORDER BY e.weight DESC
+LIMIT 20;
+"""
+
+
+
+def make_feature_query(criteria):
+    crit_tuple = tuple(sorted(criteria))
+    if crit_tuple in FEATURE_QUERIES:
+        return FEATURE_QUERIES[crit_tuple]
+    ...
 
 
 def make_list_query(criteria):

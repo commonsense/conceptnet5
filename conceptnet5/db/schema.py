@@ -62,7 +62,19 @@ INDICES = [
     "CREATE INDEX es_edge ON edge_sources (edge_id)",
     "CREATE INDEX es_source ON edge_sources (source_id)",
     "CREATE INDEX np_prefix ON node_prefixes (prefix_id)",
-    "CREATE INDEX ef_feature ON edge_features (rel_id, direction, node_id)"
+    "CREATE INDEX ef_feature ON edge_features (rel_id, direction, node_id)",
+    "CREATE INDEX ef_node ON edge_features (node_id)",
+    """
+    CREATE MATERIALIZED VIEW ranked_features AS (
+    SELECT ef.rel_id, ef.direction, ef.node_id, ef.edge_id, e.weight,
+           row_number() OVER (
+               PARTITION BY (ef.node_id, ef.rel_id, ef.direction)
+               ORDER BY e.weight DESC, e.id
+           ) AS rank
+    FROM edge_features ef, edges e WHERE e.id=ef.edge_id
+    ) WITH DATA
+    """,
+    "CREATE INDEX rf_node ON ranked_features (node_id)",
 ]
 
 

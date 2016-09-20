@@ -10,7 +10,7 @@ environment variables:
 """
 import os
 
-DB_USERNAME = os.environ.get('CONCEPTNET_DB_USER', os.environ.get('USER', 'www-data'))
+DB_USERNAME = os.environ.get('CONCEPTNET_DB_USER', os.environ.get('USER', 'postgres'))
 DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD', '')
 DB_HOSTNAME = os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost')
 DB_PORT = int(os.environ.get('CONCEPTNET_DB_PORT', '5432'))
