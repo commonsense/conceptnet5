@@ -68,7 +68,6 @@ def export_plain_text(table, uri_file, file_base):
             if vec.dot(vec) == 0:
                 continue
 
-            print(uri)
             if uri.startswith('/c/en/'):
                 label = uri[6:]
                 if uri in table.index:
@@ -83,7 +82,7 @@ def export_plain_text(table, uri_file, file_base):
 
 def convert_glove(glove_filename, output_filename, nrows):
     """
-    Convert GloVe data from a gzipped text file to a Feather dataframe.
+    Convert GloVe data from a gzipped text file to an HDF5 dataframe.
     """
     glove_raw = load_glove(glove_filename, nrows)
     glove_std = standardize_row_labels(glove_raw, forms=False)
@@ -95,7 +94,7 @@ def convert_glove(glove_filename, output_filename, nrows):
 
 def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     """
-    Convert word2vec data from its gzipped binary format to a Feather
+    Convert word2vec data from its gzipped binary format to an HDF5
     dataframe.
     """
     w2v_raw = load_word2vec_bin(word2vec_filename, nrows)
