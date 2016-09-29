@@ -1,4 +1,6 @@
 import pg8000
+import time
+import sys
 from conceptnet5.db import config
 
 _CONNECTIONS = {}
@@ -13,18 +15,31 @@ def get_db_connection(dbname=None):
     if dbname in _CONNECTIONS:
         return _CONNECTIONS[dbname]
     else:
-        try:
-            _CONNECTIONS[dbname] = pg8000.connect(
-                user=config.DB_USERNAME,
-                password=config.DB_PASSWORD,
-                host=config.DB_HOSTNAME,
-                port=config.DB_PORT,
-                database=dbname
-            )
-            pg8000.paramstyle = 'named'
-            return _CONNECTIONS[dbname]
-        except pg8000.InterfaceError:
-            raise IOError(
-                "Couldn't connect to database %r at %s:%s" %
-                (dbname, config.DB_HOSTNAME, config.DB_PORT)
-            )
+        for attempt in range(10):
+            try:
+                _CONNECTIONS[dbname] = _get_db_connection_inner(dbname)
+                return _CONNECTIONS[dbname]
+            except pg8000.InterfaceError:
+                if attempt == 0:
+                    print(
+                        "Database %r at %s:%s is not available, retrying for 10 seconds"
+                        % (dbname, config.DB_HOSTNAME, config.DB_PORT),
+                        file=sys.stderr
+                    )
+                time.sleep(1)
+        raise IOError(
+            "Couldn't connect to database %r at %s:%s" %
+            (dbname, config.DB_HOSTNAME, config.DB_PORT)
+        )
+
+
+def _get_db_connection_inner(dbname):
+    conn = pg8000.connect(
+        user=config.DB_USERNAME,
+        password=config.DB_PASSWORD,
+        host=config.DB_HOSTNAME,
+        port=config.DB_PORT,
+        database=dbname
+    )
+    pg8000.paramstyle = 'named'
+    return conn
