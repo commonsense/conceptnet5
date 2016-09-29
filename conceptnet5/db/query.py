@@ -1,7 +1,5 @@
 from .connection import get_db_connection
-from conceptnet5.relations import ALL_RELATIONS, SYMMETRIC_RELATIONS
 from conceptnet5.edges import transform_for_linked_data
-from collections import defaultdict
 import json
 import itertools
 
@@ -26,7 +24,7 @@ FROM ranked_features rf, edges e, relations r
 WHERE rf.node_id IN (SELECT node_id FROM node_ids)
 AND rf.edge_id = e.id
 AND rf.rel_id = r.id
-AND rank <= 21
+AND rank <= :limit
 ORDER BY direction, uri, rank;
 """
 MAX_GROUP_SIZE = 20
@@ -114,7 +112,7 @@ class AssertionFinder(object):
             raise ValueError
         return self.query(criteria, limit, offset)
 
-    def lookup_grouped_by_feature(self, uri):
+    def lookup_grouped_by_feature(self, uri, limit=20):
         def extract_feature(row):
             return tuple(row[:2])
 
@@ -133,7 +131,7 @@ class AssertionFinder(object):
             return data
 
         cursor = self.connection.cursor()
-        cursor.execute(NODE_TO_FEATURE_QUERY, {'node': uri})
+        cursor.execute(NODE_TO_FEATURE_QUERY, {'node': uri, 'limit': limit})
         results = {}
         for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
             results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
