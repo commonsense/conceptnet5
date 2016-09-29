@@ -1,21 +1,25 @@
-db:
-  restart: always
-  image: sameersbn/postgresql:9.5-2
-  expose:
-    - "5432"
-  environment:
-    - DEBUG=false
-    - PG_TRUST_LOCALNET=true
-    - DB_NAME=conceptnet5
-  volumes:
-    - /bigdrive/conceptnet5.5/postgresql:/var/lib/postgresql
+version: '2'
+services:
+  db:
+    restart: always
+    image: postgres:9.6.0
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_DB=conceptnet5
+    volumes:
+      - psql:/var/lib/postgresql
 
-conceptnet:
-  build: '.'
-  links:
-    - db
-  environment:
-    - CONCEPTNET_DB_HOSTNAME=db
-    - CONCEPTNET_BUILD_DATA=/conceptnet_data
-  volumes:
-    - /bigdrive/conceptnet5.5/data:/conceptnet_data
+  conceptnet:
+    build: '.'
+    links:
+      - db
+    environment:
+      - CONCEPTNET_DB_HOSTNAME=db
+      - CONCEPTNET_BUILD_DATA=/conceptnet_data
+    volumes:
+      - cn5data:/conceptnet_data
+
+volumes:
+  psql:
+  cn5data:

@@ -1,30 +1,15 @@
 Design of ConceptNet 5.5:
 
-- [x] link the API responses (fix Pygments order)
-- [x] Don't stem things on the way in
-- [x] Figure out how to keep more Verbosity
-- [x] Coarsen Wiktionary using etymologies
-- [x] Handle 'sw-maps' correctly, no proliferation of N-triples, no double-escaping
-- [x] Store the index in a reasonable constant database
-- [x] Use the blacklist when making assertions
-- [x] Build ConceptNet vectors in build process
-- [x] include word2vec and GloVe inputs in raw/
-- [x] Automatically test ConceptNet vectors
-- [x] Build vectors using less than 16 GB RAM
-- [x] fix 'FormOf' links to self
-- [x] Try new lemmatizer as part of Numberbatch
-- [x] Break down the and-or trees into more machine-readable structures
-- [x] Use symmetrical relations
 - [ ] Use standardized language codes in Wiktionary forms, or maybe remove that database?
-- [x] Remove "obsolete", "archaic", "dated", "rare", "archaïque" contexts
-- [ ] Higher weights on monolingual things, lower weights on uncommon languages
-- [ ] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
+- [x] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
 - [ ] Querying an assertion gives an 'edges' list that links to itself -- remove '@id' from the top level?
-- [ ] Wiktionary links should be ExternalURLs, not sources
+- [x] Wiktionary links should be ExternalURLs, not sources
 - [ ] better API example on front page
+- [ ] Remove "archaïque" context
 
 ConceptNet 5.6 perhaps:
 
 - [ ] Nodes should have labels that are stored separately from their edges
 - [ ] Relabel vague nodes like "someone" and "something"
 - [ ] Infer things from verb phrases
+- [ ] Higher weights on monolingual things, lower weights on uncommon languages
