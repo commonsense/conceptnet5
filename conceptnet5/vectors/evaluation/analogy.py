@@ -84,7 +84,6 @@ def eval_pairwise_analogies(frame, eval_filename, subset='all',
             our_answer = np.argmax(choice_values)
             if our_answer == answer:
                 correct += 1
-                print(a1, b1)
             total += 1
     low, high = proportion_confint(correct, total)
     return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
@@ -107,10 +106,18 @@ def tune_pairwise_analogies(frame, eval_filename, subset):
     #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
     #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
     # ]
+
+    # Slightly more detailed search
+    #weights = [
+    #    0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
+    #    0.6, 0.65, 0.7, 0.8, 0.9, 1.0
+    #]
+
+    # This one hits all the right numbers
     weights = [
-        0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
-        0.6, 0.65, 0.7, 0.8, 0.9, 1.0
+        0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.8
     ]
+
     best_weights = None
     best_acc = 0.
     for weight_direct in weights:
