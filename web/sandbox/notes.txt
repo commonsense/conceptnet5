@@ -1,0 +1,3 @@
+“You shall know a word by the company it keeps.” — J. R. Firth
+“You don't understand anything until you learn it more than one way.” — Marvin Minsky
+"If you want to make the Semantic Web a reality, stop making the case for it and spend your time doing something more useful, like actually making machines smarter..." — Manu Sporny, creator of JSON-LD

@@ -1,0 +1,5 @@
+- Language listing
+- Relation listing
+- Serve the frontend and the API at the same time
+- Link to Gitter
+- Link the SVG to appropriate pages

@@ -8,7 +8,7 @@ services:
     environment:
       - POSTGRES_DB=conceptnet5
     volumes:
-      - psql:/var/lib/postgresql
+      - psql:/var/lib/postgresql/data
 
   conceptnet:
     build: '.'

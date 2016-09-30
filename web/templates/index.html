@@ -1,0 +1,241 @@
+{% extends "_base.html" %}
+{% block title %}
+<title>ConceptNet</title>
+<style>
+  .highlight .s { color: #4070a0 } /* Literal.String */
+  .highlight .s2 { color: #4070a0 } /* Literal.String.Double */
+  .highlight .nt { color: #062873; font-weight: bold } /* Name.Tag */
+  .highlight .mf { color: #40a070 } /* Literal.Number.Float */
+  .highlight a { color: #002070; text-decoration: underline; }
+</style>
+{% endblock title %}
+
+{% block content %}
+<div class="main">
+<div class="header">
+<img src="/static/img/conceptnet-logo-5.5.png" width="120" height="120" class="heading-logo">
+<h1>
+  <span class="next-to-logo">ConceptNet</span>
+</h1>
+<h2 class="subtitle">An open, multilingual knowledge graph</h2>
+</div>
+
+
+<div class="content pure-g">
+    <div class="pure-u-1 pure-u-lg-1-2">
+        <div class="doc">
+            <h2>What is ConceptNet?</h2>
+
+            <p><strong>ConceptNet</strong> is a freely-available semantic network,
+            designed to help computers understand the meanings of words that people
+            use.</p>
+
+            <p>ConceptNet originated from the crowdsourcing project Open Mind
+            Common Sense, which was launched in 1999 at the MIT Media Lab.  It has
+            since grown to include knowledge from other crowdsourced resources,
+            expert-created resources, and games with a purpose.</p>
+
+            <div class="svg-illustration">
+                <!-- Created with Inkscape (http://www.inkscape.org/) -->
+                <svg viewbox="0 0 700 800" preserveAspectRatio="xMinYMin meet" version="1.1">
+                  <defs id="defs4">
+                    <marker inkscape:stockid="Arrow1Mstart" orient="auto" refY="0" refX="0" id="Arrow1Mstart" style="overflow:visible">
+                      <path id="path3791" d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" transform="matrix(0.4,0,0,0.4,4,0)" inkscape:connector-curvature="0" />
+                    </marker>
+                    <marker inkscape:stockid="Arrow1Mend" orient="auto" refY="0" refX="0" id="Arrow1Mend" style="overflow:visible">
+                      <path id="path3794" d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" transform="matrix(-0.4,0,0,-0.4,-4,0)" inkscape:connector-curvature="0" />
+                    </marker>
+                    <marker inkscape:stockid="Arrow1Send" orient="auto" refY="0" refX="0" id="Arrow1Send" style="overflow:visible">
+                      <path id="path3800" d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" transform="matrix(-0.2,0,0,-0.2,-1.2,0)" inkscape:connector-curvature="0" />
+                    </marker>
+                  </defs>
+                  <g id="layer1" transform="translate(-44.380753,-313.24292)">
+                    <rect ry="14.14251" y="323.24292" x="333.59503" height="44.603302" width="133.80991" id="rect3759" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text3761" y="351.26331" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="351.26331" x="399.55133" id="tspan3763" sodipodi:role="line">semantic network</tspan></text>
+                    <flowRoot xml:space="preserve" id="flowRoot3765"><flowRegion id="flowRegion3767"><rect id="rect3769" width="40" height="74.285713" x="117.14286" y="153.3802" /></flowRegion><flowPara id="flowPara3771" /></flowRoot> <rect style="fill:#bbeeff;fill-opacity:1;stroke:none" id="rect3773" width="133.80991" height="44.603302" x="333.59503" y="375.24292" ry="14.14251" />
+                    <text xml:space="preserve" x="399.55133" y="403.26331" id="text3775" class="graph-node-label" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan3777" x="399.55133" y="403.26331">knowledge graph</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-mid:none;marker-end:url(#Arrow1Mend)" d="m 184.28572,348.36218 145.71428,0" id="path4411" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 280,348.36218 c 53.19657,0 0,50 50,50" id="path4975" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <text xml:space="preserve" x="227.61501" y="342.64789" id="text5161" class="graph-edge-label" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5163" x="227.61501" y="342.64789">is a</tspan></text>
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect5184" width="133.80991" height="44.603302" x="333.59503" y="445.10004" ry="14.14251" />
+                    <text xml:space="preserve" x="400.26562" y="461.53845" id="text5186" class="graph-node-label" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5188" x="400.26562" y="461.53845">natural language</tspan><tspan sodipodi:role="line" x="400.26562" y="481.53845" id="tspan5190">understanding</tspan></text>
+                    <rect ry="14.14251" y="448.29004" x="588.61511" height="44.603302" width="133.80991" id="rect5192" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text5194" y="466.31042" x="656" class="graph-node-label" xml:space="preserve"><tspan y="466.31042" x="656" sodipodi:role="line" id="tspan5202">artificial</tspan><tspan y="486.31042" x="656" sodipodi:role="line" id="tspan6904">intelligence</tspan></text>
+                    <rect ry="14.14251" y="521.24292" x="333.59503" height="44.603302" width="133.80991" id="rect5204" style="fill:#bbeeff;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text5206" y="547.68127" x="400.26562" class="graph-node-label" xml:space="preserve"><tspan id="tspan5210" y="547.68127" x="400.26562" sodipodi:role="line">word embeddings</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 160,370.21932 c 0,56.84084 10,102.14286 40,102.14286 l 130,0" id="path5218" inkscape:connector-curvature="0" sodipodi:nodetypes="csc" />
+                    <path sodipodi:nodetypes="cc" inkscape:connector-curvature="0" id="path5220" d="m 270,472.36218 c 52.99637,0 2.98175,70.52682 61.33538,70.52682" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+                    <text sodipodi:linespacing="125%" id="text5406" y="466.64789" x="206.76068" class="graph-edge-label" xml:space="preserve"><tspan y="466.64789" x="206.76068" id="tspan5408" sodipodi:role="line">is used for</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 399.03056,520.01179 0,-27.77919" id="path5410" inkscape:connector-curvature="0" />
+                    <text sodipodi:linespacing="125%" id="text5596" y="512.64789" x="405.92859" class="graph-edge-label" xml:space="preserve"><tspan y="512.64789" x="405.92859" id="tspan5598" sodipodi:role="line">part of</tspan></text>
+                    <path inkscape:connector-curvature="0" id="path5600" d="m 470,472.36218 115.71429,0" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-mid:none;marker-end:url(#Arrow1Mend)" sodipodi:nodetypes="cc" />
+                    <text sodipodi:linespacing="125%" id="text5790" y="466.64789" x="504.36121" class="graph-edge-label" xml:space="preserve"><tspan y="466.64789" x="504.36121" id="tspan5792" sodipodi:role="line">part of</tspan></text>
+                    <path sodipodi:nodetypes="czc" inkscape:connector-curvature="0" id="path5794" d="m 140,359.03459 c 0,234.83795 12.33874,306.78258 56.43573,306.78258 44.09699,0 133.56427,0.54501 133.56427,0.54501" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect5796" width="133.80991" height="44.603302" x="333.59503" y="743.24292" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="399.55133" y="771.26331" id="text5798" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5800" x="399.55133" y="771.26331">linked data</tspan></text>
+                    <text xml:space="preserve" class="graph-edge-label" x="210.06516" y="662.64789" id="text5802" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5804" x="210.06516" y="660">made of</tspan></text>
+                    <rect ry="14.14251" y="933.24292" x="333.59503" height="44.603302" width="133.80991" id="rect5806" style="fill:#bbeeff;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text5808" y="961.26331" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="961.26331" x="399.55133" id="tspan5810" sodipodi:role="line">multilingual</tspan></text>
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect5812" width="133.80991" height="44.603302" x="333.59503" y="983.24292" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="399.55133" y="1011.2633" id="text5814" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5816" x="399.55133" y="1011.2633">domain-general</tspan></text>
+                    <rect ry="14.14251" y="883.24292" x="333.59503" height="44.603302" width="133.80991" id="rect5818" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect5824" width="133.80991" height="44.603302" x="588.32941" y="744.29004" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="655.71429" y="762.31042" id="text5826" sodipodi:linespacing="125%"><tspan id="tspan5830" sodipodi:role="line" x="655.71429" y="762.31042">the Semantic</tspan><tspan sodipodi:role="line" x="655.71429" y="782.31042" id="tspan5840">Web</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-mid:none;marker-end:url(#Arrow1Mend)" d="m 470.18101,768.40331 114.63798,0" id="path5832" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <text xml:space="preserve" class="graph-edge-label" x="495.716" y="764.64789" id="text5834" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan5836" x="495.716" y="764.64789">similar to</tspan></text>
+                    <rect ry="14.14251" y="812.29004" x="588.32941" height="44.603302" width="133.80991" id="rect5844" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text5846" y="840.09949" x="655.71429" class="graph-node-label" xml:space="preserve"><tspan id="tspan5850" y="840.09949" x="655.71429" sodipodi:role="line">JSON-LD</tspan></text>
+                    <rect ry="14.14251" y="811.24292" x="332.88074" height="44.603302" width="133.80991" id="rect5854" style="fill:#bbeeff;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text5856" y="837.68127" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="837.68127" x="399.55133" id="tspan5858" sodipodi:role="line">Web API</tspan></text>
+                    <text sodipodi:linespacing="125%" id="text5860" y="499.69287" x="786.25092" class="graph-edge-label" xml:space="preserve" transform="matrix(0.90701698,0.42109405,-0.42109405,0.90701698,0,0)"><tspan y="499.69287" x="786.25092" id="tspan5862" sodipodi:role="line">a kind of</tspan></text>
+                    <path sodipodi:nodetypes="cc" inkscape:connector-curvature="0" id="path5864" d="m 585.20651,832.32105 -114.63798,0" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-mid:none;marker-end:url(#Arrow1Mend)" />
+                    <text sodipodi:linespacing="125%" id="text5866" y="848.64789" x="492.53287" class="graph-edge-label" xml:space="preserve"><tspan y="848.64789" x="492.53287" id="tspan5868" sodipodi:role="line">is used for</tspan></text>
+                    <text sodipodi:linespacing="125%" id="text6056" y="911.26331" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="911.26331" x="399.55133" id="tspan6058" sodipodi:role="line">open content</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 120,359.03459 c 0,245.41227 3.76016,475.18545 50,475.18545 46.23984,0 160,0 160,0" id="path6062" inkscape:connector-curvature="0" sodipodi:nodetypes="czc" />
+                    <path sodipodi:nodetypes="czc" inkscape:connector-curvature="0" id="path6064" d="m 100,359.03459 c 0,331.12655 5.23949,547.50523 69.33647,547.50523 l 160.66353,0" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+                    <text sodipodi:linespacing="125%" id="text6066" y="828.64789" x="219.54034" class="graph-edge-label" xml:space="preserve"><tspan y="828.64789" x="219.54034" id="tspan6068" sodipodi:role="line">has a</tspan></text>
+                    <text xml:space="preserve" class="graph-edge-label" x="196.28038" y="900.64789" id="text6070" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan6072" x="196.28038" y="900.64789">has property</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.42058337;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 270,906.36218 c 52.83851,0 1.82019,100.71432 60,100.71432" id="path6074" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <path sodipodi:nodetypes="cc" inkscape:connector-curvature="0" id="path6076" d="m 297.14286,937.7907 c 0,8.6028 4.77886,18.5715 32.85714,18.5715" style="fill:none;stroke:#000000;stroke-width:1.42058337;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+                    <rect style="fill:#bbeeff;fill-opacity:1;stroke:none" id="rect6112" width="133.80991" height="44.603302" x="589.30933" y="896.95721" ry="14.14251" />
+                    <rect ry="14.14251" y="972.95728" x="589.30933" height="44.603302" width="133.80991" id="rect6114" style="fill:#bbeeff;fill-opacity:1;stroke:none" />
+                    <text xml:space="preserve" class="graph-node-label" x="655.26562" y="924.9776" id="text6116" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan6118" x="655.26562" y="924.9776">multilíngue</tspan></text>
+                    <text sodipodi:linespacing="125%" id="text6120" y="1000.9775" x="655.26562" class="graph-node-label" xml:space="preserve"><tspan y="1000.9775" x="655.26562" id="tspan6122" sodipodi:role="line">多言語</tspan></text>
+                    <path sodipodi:nodetypes="cc" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-mid:none;marker-end:url(#Arrow1Mend)" d="M 470.1728,950.3695 584.8272,918.9774" id="path6124" inkscape:connector-curvature="0" />
+                    <text xml:space="preserve" class="graph-edge-label" x="236.35437" y="1033.5812" id="text6126" sodipodi:linespacing="125%" transform="matrix(0.96540986,-0.26073704,0.26073704,0.96540986,0,0)"><tspan sodipodi:role="line" id="tspan6128" x="236.35437" y="1033.5812">synonym</tspan></text>
+                    <path inkscape:connector-curvature="0" id="path6132" d="m 646.74485,971.7261 0,-27.7792" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-end:url(#Arrow1Mend)" />
+                    <text xml:space="preserve" class="graph-edge-label" x="651.50006" y="962.36218" id="text6134" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan6136" x="651.50006" y="962.36218">synonym</tspan></text>
+                    <text sodipodi:linespacing="125%" id="text6324" y="810.24323" x="746.93829" class="graph-edge-label" xml:space="preserve" transform="matrix(0.96162713,0.27435974,-0.27435974,0.96162713,0,0)"><tspan y="810.24323" x="746.93829" id="tspan6326" sodipodi:role="line">synonym</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-mid:none;marker-end:none" d="m 470.18101,773.1412 114.63798,55.49119" id="path6906" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect7282" width="133.80991" height="44.603302" x="588.61511" y="374.29004" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="656" y="392.31042" id="text7284" sodipodi:linespacing="125%"><tspan id="tspan7288" sodipodi:role="line" x="656" y="392.31042">common sense</tspan><tspan sodipodi:role="line" x="656" y="412.31042" id="tspan7298">knowledge</tspan></text>
+                    <path sodipodi:nodetypes="cc" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-mid:none;marker-end:url(#Arrow1Mend)" d="m 470,398.36218 115,0" id="path7290" inkscape:connector-curvature="0" />
+                    <text xml:space="preserve" class="graph-edge-label" x="516.00806" y="392.64789" id="text7292" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan7294" x="516.00806" y="392.64789">has</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:none;marker-end:url(#Arrow1Mend)" d="m 647.03056,420.2326 0,27.77919" id="path7300" inkscape:connector-curvature="0" />
+                    <text sodipodi:linespacing="125%" id="text7302" y="438.64789" x="653.92859" class="graph-edge-label" xml:space="preserve"><tspan y="438.64789" x="653.92859" id="tspan7304" sodipodi:role="line">part of</tspan></text>
+                    <path inkscape:connector-curvature="0" id="path3128" d="m 470.1728,962.9263 114.6544,31.3921" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Arrow1Mstart);marker-mid:none;marker-end:url(#Arrow1Mend)" sodipodi:nodetypes="cc" />
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect3920" width="388.82486" height="43.189705" x="334.08755" y="1058.3069" ry="13.920777" />
+                    <text xml:space="preserve" class="graph-node-label" x="527.94531" y="1084.0386" id="text3922" sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan3924" x="527.94531" y="1084.0386">let computers understand what people already know</tspan></text>
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 80,359.03459 c 0,571.18245 22.72898,720.63721 81.11168,720.63721 l 168.88832,0" id="path3928" inkscape:connector-curvature="0" sodipodi:nodetypes="czc" />
+                    <text sodipodi:linespacing="125%" id="text3930" y="1072.6479" x="178.23425" class="graph-edge-label" xml:space="preserve"><tspan y="1072.6479" x="178.23425" id="tspan3932" sodipodi:role="line">motivated by goal</tspan></text>
+                    <rect ry="14.14251" y="693.24292" x="333.59503" height="44.603302" width="133.80991" id="rect4142" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text4144" y="711.26331" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="711.26331" x="399.55133" sodipodi:role="line" id="tspan4148">games with a</tspan><tspan y="731.26331" x="399.55133" sodipodi:role="line" id="tspan4152">purpose</tspan></text>
+                    <rect style="fill:#e6e6e6;fill-opacity:1;stroke:none" id="rect4154" width="133.80991" height="44.603302" x="333.59503" y="643.24292" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="399.55133" y="671.26331" id="text4156" sodipodi:linespacing="125%"><tspan sodipodi:role="line" x="399.55133" y="671.26331" id="tspan4164">lexicography</tspan></text>
+                    <rect ry="14.14251" y="593.24292" x="333.59503" height="44.603302" width="133.80991" id="rect4166" style="fill:#e6e6e6;fill-opacity:1;stroke:none" />
+                    <text sodipodi:linespacing="125%" id="text4168" y="611.26331" x="399.55133" class="graph-node-label" xml:space="preserve"><tspan y="611.26331" x="399.55133" sodipodi:role="line" id="tspan4170">crowdsourced</tspan><tspan id="tspan4172" y="631.26331" x="399.55133" sodipodi:role="line">knowledge</tspan></text>
+                    <path sodipodi:nodetypes="cc" inkscape:connector-curvature="0" id="path4178" d="m 270,666.36218 c 52.83851,0 1.82019,100.71432 60,100.71432" style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 297.14286,697.7907 c 0,8.6028 4.77886,18.5715 32.85714,18.5715" id="path4180" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <path style="fill:none;stroke:#000000;stroke-width:1.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" d="m 269.79645,666.12321 c 53.19076,0 1.83232,-50.92192 60.4,-50.92192" id="path4182" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" />
+                    <rect style="fill:#afe9af;fill-opacity:1;stroke:#000000" id="rect2985" width="133.80991" height="44.603302" x="54.880753" y="327.24292" ry="14.14251" />
+                    <text xml:space="preserve" class="graph-node-label" x="120" y="353.47034" id="text2987" sodipodi:linespacing="125%"><tspan sodipodi:role="line" style="font-weight: bold" id="tspan2989" x="120" y="353.47034">ConceptNet</tspan></text>
+                  </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="pure-u-1 pure-u-lg-1-2">
+        <div class="doc">
+            <h2>Examples</h2>
+            <p>To explore what's in ConceptNet, try browsing what it knows about any of these terms:</p>
+
+            <div class="pure-g">
+              <div class="pure-u-1-2">
+                <ul class="term-examples">
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/word">word</a></li>
+                    <li class="term lang-fr"><span class="language">fr</span> <a href="/c/fr/mot">mot</a></li>
+                    <li class="term lang-nl"><span class="language">nl</span> <a href="/c/nl/woord">woord</a></li>
+                    <li class="term lang-es"><span class="language">es</span> <a href="/c/es/palabra">palabra</a></li>
+                    <li class="term lang-pt"><span class="language">pt</span> <a href="/c/pt/palavra">palavra</a></li>
+                    <li class="term lang-ja"><span class="language">ja</span> <a href="/c/ja/単語">単語</a></li>
+                </ul>
+              </div>
+              <div class="pure-u-1-2">
+                <ul class="term-examples">
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/graph">graph</a></li>
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/knowledge">knowledge</a></li>
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/knowledge">learn</a></li>
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/natural_language">natural language</a></li>
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/semantic_network">semantic network</a></li>
+                    <li class="term lang-en"><span class="language">en</span> <a href="/c/en/marvin_minsky">Marvin Minsky</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <h2>Linked Open Data API</h2>
+            <div class="highlight api-example"><pre><span class="p">{</span>
+  <span class="nt">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/a/[/r/UsedFor/,/c/en/example/,/c/en/explain/]">/a/[/r/UsedFor/,/c/en/example/,/c/en/explain/]</a>&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;dataset&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/d/conceptnet/4/en">/d/conceptnet/4/en</a>&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;end&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/c/en/explain">/c/en/explain</a>&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;explain something&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;term&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/c/en/explain">/c/en/explain</a>&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;license&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="http://creativecommons.org/licenses/by/4.0">cc:by/4.0</a>&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;rel&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/r/UsedFor">/r/UsedFor</a>&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;UsedFor&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;sources&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;activity&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/s/activity/omcs/omcs1_possibly_free_text">/s/activity/omcs/omcs1_possibly_free_text</a>&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;contributor&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/s/contributor/omcs/pavlos">/s/contributor/omcs/pavlos</a>&quot;</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;start&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/c/en/example">/c/en/example</a>&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;an example&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;term&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="/c/en/example">/c/en/example</a>&quot;</span>
+  <span class="p">},</span>
+  <span class="nt">&quot;surfaceText&quot;</span><span class="p">:</span> <span class="s2">&quot;You can use [[an example]] to [[explain something]]&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;weight&quot;</span><span class="p">:</span> <span class="mf">1.0,</span>
+  <span class="nt">&quot;@context&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="s2">&quot;<a href="http://api.conceptnet.io/ld/conceptnet5.5/context.ld.json">http://api.conceptnet.io/ld/conceptnet5.5/context.ld.json</a>&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;<a href="http://api.conceptnet.io/ld/conceptnet5.5/pagination.ld.json">http://api.conceptnet.io/ld/conceptnet5.5/pagination.ld.json</a>&quot;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+            <p>ConceptNet is a proud part of the ecosystem of <a
+            href="http://linkeddata.org/">Linked Open Data</a>.
+
+            <p>As a modern Linked Open Data resource, the data in ConceptNet is available
+            in a <a href="http://json-ld.org/">JSON-LD</a> API, a format that aims to make
+            linked data easy to understand and easy to work with. If you don't care what
+            JSON-LD is, it's just a JSON REST API with some extra metadata.</p>
+
+            <p>You can use <a
+            href="/r/ExternalURL">ExternalURL</a> links in ConceptNet to find the same
+            terms in other vocabularies, such as WordNet, DBPedia, and OpenCyc, which can
+            provide you with other forms of information.</p>
+
+            <p>For information on how to use the ConceptNet API, see the
+            <a href="https://github.com/commonsense/conceptnet5/wiki/API">API documentation</a>.
+            Or just <a href="//api.conceptnet.io/c/en/example">start browsing it</a> and
+            you'll probably figure it out.</p>
+
+            <h2>Word embeddings</h2>
+
+            <p>ConceptNet is not just a set of "word embeddings", but it has been used to
+            create word embeddings since before they were called that.</p>
+
+            <p>Word embeddings represent words of natural language as vectors that come out
+            of some machine learning process. Recently, we've been using ConceptNet very
+            effectively as a kind of universal glue for embeddings, helping to align word
+            embeddings from different sources and in different languages to make a whole
+            that is much better than the sum of their parts.</p>
+
+            <p>If you're excited about word embeddings, take a look at
+            <a href="https://github.com/LuminosoInsight/conceptnet-numberbatch">Conceptnet
+            Numberbatch</a>, the best word embeddings you can download as of 2016. These
+            embeddings significantly outperform well-known embeddings, such as the word2vec
+            embeddings (Google News skip-gram embeddings built using word2vec), on all
+            evaluations we have tried. So far, they have continued to outperform newly
+            published systems of word embeddings.</p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

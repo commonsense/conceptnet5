@@ -1,0 +1,46 @@
+{% macro show_term(term, tag='li', link=None) %}
+<{{tag}} class="term lang-{{term.language or 'none'}}">
+    <span class="language">
+    {% if term.site %}
+        {{term.site}}
+    {% else %}
+        {{term.language}}
+    {% endif %}
+    </span>
+    <a href="{{term.term}}">
+        {{term.label}}
+    </a>
+    {% if term.sense_label %}
+    <sup>
+        (<a href="{{term['@id']}}" class="sense">{{term.sense_label}}</a>)
+    </sup>
+    {% endif %}
+    {% if link %}
+        <a href="{{link}}" class="edge-link">
+            ➜
+        </a>
+    {% endif %}
+</{{tag}}>
+{% endmacro %}
+
+{% macro show_edge(edge) %}
+<tr class="edge-main">
+    <td class="edge-start">
+        {{ show_term(edge['start'], 'span') }}
+    </td>
+    <td class="edge-rel">
+        <div class="rel">
+            ―&nbsp;<span class="rel-label">{{edge.rel.label}}</span>&nbsp;⟶
+        </div>
+        <div class="weight">
+            Weight: {{ edge.weight | round(2) }}
+        </div>
+    </td>
+    <td class="edge-end">
+        {{ show_term(edge['end'], 'end') }}
+    </td>
+    <td class="edge-details sources" colspan="3">
+        {{edge.sources | describe_sources}}
+    </td>
+</tr>
+{% endmacro %}

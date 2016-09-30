@@ -1,0 +1,49 @@
+{
+  "@context": [
+    "http://api.conceptnet.io/meta/conceptnet5.5/context.ld.json",
+    "http://api.conceptnet.io/meta/conceptnet5.5/pagination.ld.json"
+  ],
+  "@id": "/c/en/test",
+  "label": {
+    "@value": "Test",
+    "@language": "en"
+  },
+  "features": [
+    {
+      "@id": "/query?rel=/r/RelatedTo&node=/c/en/example",
+      "rel": "/r/RelatedTo",
+      "symmetric": true,
+      "node": "/c/en/example",
+      "edges": [
+        {
+          "@id": "/a/[/r/RelatedTo/,/c/en/test/,/c/en/example/]",
+          "start": "/c/en/test",
+          "rel": "/r/RelatedTo",
+          "end": "/c/en/example",
+          "license": "cc:by/4.0/",
+          "sources": [
+            {
+              "@id": "/and/[/s/activity/omcs/globalmind/,/s/contributor/omcs/dev/]",
+              "contributor": "/s/contributor/omcs/dev",
+              "activity": "/s/activity/omcs/globalmind"
+            }
+          ]
+        },
+        {
+          "@id": "/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]",
+          "start": "/c/en/test",
+          "rel": "/r/RelatedTo",
+          "end": "/c/en/quiz",
+          "license": "cc:by/4.0/"
+        }
+      ],
+      "view": {
+        "@id": "/query?rel=/r/RelatedTo&node=/c/en/example&offset=0",
+        "paginatedProperty": "edges",
+        "firstPage": "/query?rel=/r/RelatedTo&node=/c/en/example&offset=0",
+        "previousPage": "/query?rel=/r/RelatedTo&node=/c/en/example&offset=0",
+        "nextPage": "/query?rel=/r/RelatedTo&node=/c/en/example&offset=20"
+      }
+    }
+  ]
+}

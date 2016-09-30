@@ -91,6 +91,13 @@ rule all:
         DATA + "/vectors/numberbatch.h5",
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
 
+
+rule webdata:
+    input:
+        DATA + "/psql/done",
+        DATA + "/vectors/numberbatch.h5",
+
+
 rule clean:
     shell:
         "for subdir in assertions collated db edges psql tmp vectors stats; "
