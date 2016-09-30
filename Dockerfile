@@ -24,4 +24,4 @@ RUN pip install -e '.[vectors]'
 # a Docker volume
 ENV CONCEPTNET_DATA /conceptnet_data
 
-CMD ["bash", "scripts/build.sh"]
+CMD ["/bin/bash"]

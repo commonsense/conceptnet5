@@ -26,6 +26,7 @@ def error(response, status, details):
     return response
 
 
+
 def make_query_url(url, items):
     str_items = ['{}={}'.format(*item) for item in items]
     if not str_items:

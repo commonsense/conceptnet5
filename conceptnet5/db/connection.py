@@ -1,7 +1,9 @@
 import pg8000
 import time
 import sys
+import os
 from conceptnet5.db import config
+from conceptnet5.util import get_data_filename
 
 _CONNECTIONS = {}
 
@@ -10,6 +12,8 @@ def get_db_connection(dbname=None):
     """
     Get a global connection to the ConceptNet PostgreSQL database.
     """
+    if not os.access(get_data_filename('psql/done'), os.F_OK):
+        raise IOError("The ConceptNet database has not been built.")
     if dbname is None:
         dbname = config.DB_NAME
     if dbname in _CONNECTIONS:

@@ -27,11 +27,14 @@ COPY server/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 ## End of tiangolo/uwsgi-nginx-docker
 
+RUN mkdir -p /data/nginx/cache
+RUN mkdir -p /data/nginx/tmp
+
 # Set up the local code
 ADD conceptnet_web /src/conceptnet-web/conceptnet_web
 ADD templates /src/conceptnet-web/templates
-ADD static /src/conceptnet-web/static
 ADD setup.py /src/conceptnet-web/setup.py
+ADD static /var/www/static
 
 WORKDIR /src/conceptnet-web
 RUN pip install -e '.'

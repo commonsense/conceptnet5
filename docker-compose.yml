@@ -12,14 +12,33 @@ services:
 
   conceptnet:
     build: '.'
+    image: rspeer/conceptnet:5.5b1
+    command: ["bash", "scripts/build.sh"]
     links:
       - db
     environment:
       - CONCEPTNET_DB_HOSTNAME=db
-      - CONCEPTNET_BUILD_DATA=/conceptnet_data
+      - CONCEPTNET_BUILD_DATA=/data/conceptnet
     volumes:
-      - cn5data:/conceptnet_data
+      - cn5data:/data/conceptnet
+
+  conceptnet-web:
+    build: 'web'
+    links:
+      - db
+    depends_on:
+      - conceptnet
+    ports:
+      - "80:80"
+    environment:
+      - CONCEPTNET_DB_HOSTNAME=db
+      - CONCEPTNET_BUILD_DATA=/data/conceptnet
+      - CONCEPTNET_DATA=/data/conceptnet
+    volumes:
+      - cn5data:/data/conceptnet
+      - nginx:/data/nginx
 
 volumes:
   psql:
   cn5data:
+  nginx:

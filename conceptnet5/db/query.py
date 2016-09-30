@@ -95,9 +95,12 @@ def make_list_query(criteria):
 
 class AssertionFinder(object):
     def __init__(self, dbname=None):
-        self.connection = get_db_connection(dbname)
+        self.connection = None
+        self.dbname = dbname
 
     def lookup(self, uri, limit=100, offset=0):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
         if uri.startswith('/c/') or uri.startswith('http'):
             criteria = {'node': uri}
         elif uri.startswith('/r/'):
@@ -113,6 +116,9 @@ class AssertionFinder(object):
         return self.query(criteria, limit, offset)
 
     def lookup_grouped_by_feature(self, uri, limit=20):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
+
         def extract_feature(row):
             return tuple(row[:2])
 
@@ -138,12 +144,16 @@ class AssertionFinder(object):
         return results
 
     def lookup_assertion(self, uri):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute("SELECT data FROM edges WHERE uri=:uri", {'uri': uri})
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
         return results
 
     def sample_dataset(self, uri, limit=50, offset=0):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         dataset_json = json.dumps(uri)
         cursor.execute(DATASET_QUERY, {'dataset': dataset_json, 'limit': limit, 'offset': offset})
@@ -151,12 +161,16 @@ class AssertionFinder(object):
         return results
 
     def random_edges(self, limit=20):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute(RANDOM_QUERY, {'limit': limit})
         results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
         return results
 
     def query(self, criteria, limit=20, offset=0):
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
         params = dict(criteria)
         params['limit'] = limit
         params['offset'] = offset
