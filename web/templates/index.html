@@ -175,6 +175,26 @@
               </div>
             </div>
 
+            <h2>Support and discussion</h2>
+            <p>
+              <a href="https://gitter.im/commonsense/conceptnet5?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge">
+                <img src="https://badges.gitter.im/commonsense/conceptnet5.svg" alt="chat on Gitter">
+              </a>
+            </p>
+            <p>
+              Detailed documentation about ConceptNet appears on its
+              <a href="https://github.com/commonsense/conceptnet5/wiki">GitHub wiki</a>.
+            </p>
+            <p>
+              You can chat with ConceptNet developers and users on
+              <a href="https://gitter.im/commonsense/conceptnet5?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a>,
+              or join the
+              <a href="http://groups.google.com/group/conceptnet-users">conceptnet-users mailing list</a>.
+            </p>
+            <p>
+              Updates to ConceptNet and its supporting technologies appear on
+              the <a href="https://blog.conceptnet.io/">ConceptNet blog</a>.
+            </p>
             <h2>Linked Open Data API</h2>
             <div class="highlight api-example"><pre><span class="p">{</span>
   <span class="nt">&quot;@id&quot;</span><span class="p">:</span> <span class="s2">&quot;<a href="//api.conceptnet.io/a/[/r/UsedFor/,/c/en/example/,/c/en/explain/]">/a/[/r/UsedFor/,/c/en/example/,/c/en/explain/]</a>&quot;</span><span class="p">,</span>
@@ -242,11 +262,86 @@
 
             <p>If you're excited about word embeddings, take a look at
             <a href="https://github.com/LuminosoInsight/conceptnet-numberbatch">Conceptnet
-            Numberbatch</a>, the best word embeddings you can download as of 2016. These
-            embeddings significantly outperform well-known embeddings, such as the word2vec
-            embeddings (Google News skip-gram embeddings built using word2vec), on all
-            evaluations we have tried. So far, they have continued to outperform newly
-            published systems of word embeddings.</p>
+            Numberbatch</a>, the best word embeddings you can download as of 2016.</p>
+        </div>
+    </div>
+    <div class="pure-u-1">
+        <div class="doc">
+            <h2>Sources of knowledge</h2>
+            <p>
+            Previous versions of ConceptNet were a home-grown crowd-sourced project, where
+            we ran a Web site (Open Mind Common Sense) collecting facts from people who
+            came to the site. The Web of Data is much bigger than that now. Our data comes
+            from many different sources, some of which you can contribute to and improve
+            not just the state of computational knowledge, but of <i>human</i> knowledge.
+            </p>
+            <ul>
+            <li>ConceptNet 5, like previous versions, contains the relational knowledge contributed to
+            Open Mind Common Sense and its sister projects in other languages.</li>
+
+            <li>We connect to a subset of <a href="http://dbpedia.org">DBPedia</a>, which extracts
+            knowledge from the infoboxes on Wikipedia articles.</li>
+
+            <li>Much of our knowledge comes from <a href="http://en.wiktionary.org">Wiktionary</a>,
+            the free multilingual dictionary. This gives us information about synonyms, antonyms,
+            translations of concepts into hundreds of languages, and multiple labeled word senses
+            for many words.</li>
+
+            <li>More dictionary-style knowledge comes from
+            <a href="http://compling.hss.ntu.edu.sg/omw/">Open Multilingual WordNet</a>.</li>
+
+            <li><a href="http://umbel.org/">UMBEL</a> connects ConceptNet to the OpenCyc ontology
+            via a Semantic Web representation.</li>
+
+            <li>Some knowledge about people's intuitive word associations comes from "games
+            with a purpose". We have learned facts in English from Verbosity,
+            a word game formerly run by the <a href="http://www.gwap.com">GWAP project</a>,
+            and in Japanese from <a href="http://nadya.jp">nadya.jp</a>.</li>
+            </ul>
+            <p>If you believe a term should be understood by ConceptNet, the
+            most straightforward way to add it to a future build is to add
+            information about that term to <a href="http://en.wiktionary.org">
+            Wiktionary</a>, following their guidelines.</p>
+
+            <h2>Attributing ConceptNet</h2>
+            <p>To give proper attribution to ConceptNet's data, we suggest this
+            text:</p>
+            <blockquote>
+                This work includes data from ConceptNet 5, which was compiled by the
+                Commonsense Computing Initiative. ConceptNet 5 is freely available under
+                the Creative Commons Attribution-ShareAlike license (CC BY SA 4.0) from
+                <a href="http://conceptnet.io">http://conceptnet.io</a>.
+
+                The included data was created by contributors to Commonsense Computing
+                projects, contributors to Wikimedia projects, Games with a Purpose,
+                Princeton University's WordNet, DBPedia, OpenCyc, and Umbel.
+            </blockquote>
+            <p>A paper you can cite about ConceptNet is:</p>
+            <blockquote>
+              Robert Speer and Catherine Havasi.
+              "<a href="http://lrec-conf.org/proceedings/lrec2012/pdf/1072_Paper.pdf">Representing General Relational Knowledge in ConceptNet 5.</a>"
+              <em>LREC</em> 2012.
+            </blockquote>
+
+            <h2 id="development">Development</h2>
+            <img src="/static/img/luminoso-logo.png" class="luminoso-logo" alt="Luminoso logo">
+
+            <p>Development of ConceptNet takes place as an open-source project of
+            <a href="http://www.luminoso.com">Luminoso Technologies, Inc.</a> The code
+            that builds and powers ConceptNet is available
+            <a href="http://github.com/commonsense/conceptnet5">on GitHub</a>.</p>
+
+            <p>ConceptNet originated at the MIT Media Lab, and became part of the Commonsense
+            Computing Initiative, a collaboration between MIT and other labs and companies
+            around the world. This global collaboration helps us collect relational knowledge
+            in many languages. The Commonsense Computing Initiative was founded by
+            <a href="https://www.linkedin.com/in/havasi">Catherine Havasi</a>, now the CEO
+            of Luminoso.</p>
+
+            <p>The development of ConceptNet 5 is led by <a href="http://rspeer.github.io">Rob Speer</a>,
+            a Luminoso co-founder, with contributions from
+            <a href="https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet#credits-and-acknowledgements">several other people</a>.
+            </p>
         </div>
     </div>
 </div>

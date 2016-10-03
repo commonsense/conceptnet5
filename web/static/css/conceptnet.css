@@ -69,6 +69,19 @@ a {
     color: #bdf;
 }
 
+.footer .creative-commons {
+    float: left;
+    margin-right: 1em;
+    margin-bottom: 1em;
+}
+
+.luminoso-logo {
+    max-width: 200px;
+    float: right;
+    position: relative;
+    top: -2em;
+}
+
 /* The grid of edges grouped by feature */
 .rel-grid {
     background: #f4f4f4;
