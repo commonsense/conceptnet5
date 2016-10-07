@@ -1,10 +1,7 @@
 /* Element styles, from purecss.io/css/main.css */
 
 body {
-    font-family: 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK TC',
-                 'Noto Naskh Arabic', 'Noto Sans Devanagari', 'Noto Sans Telugu',
-                 'Noto Sans Armenian', 'Noto Sans Georgian',
-                 'Droid Sans', Helvetica, Arial, sans-serif;
+    font-family: 'Noto Sans', 'Droid Sans', Helvetica, Arial, sans-serif;
     font-size: 20px;
     min-width: 320px;
     color: #555;
@@ -244,6 +241,43 @@ span.language {
     spoken in multiple countries that might not necessarily get
     along, and to work around the fact that like half the flags are
     red, white, and blue. */
+
+.lang-ar, .lang-fa {
+    font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+}
+
+.lang-ur {
+    font-family: 'Noto Nastaliq Urdu', 'Noto Sans', sans-serif;
+}
+
+.lang-te {
+    font-family: 'Noto Sans Telugu', 'Noto Sans', sans-serif;
+}
+
+.lang-he {
+    font-family: 'Noto Sans Hebrew', 'Noto Sans', sans-serif;
+}
+
+.lang-hi {
+    font-family: 'Noto Sans Devanagari', 'Noto Sans', sans-serif;
+}
+
+.lang-ja {
+    font-family: 'Noto Sans CJK JP', 'Noto Sans', sans-serif;
+}
+
+.lang-zh {
+    font-family: 'Noto Sans CJK TC', 'Noto Sans', sans-serif;
+}
+
+.lang-ko {
+    font-family: 'Noto Sans CJK KR', 'Noto Sans', sans-serif;
+}
+
+.lang-th {
+    font-family: 'Noto Sans Thai', 'Noto Sans', sans-serif;
+}
+
 .lang-en span.language, .lang-en span.language a {
     background-color: #22a;
     color: #fff;
@@ -567,6 +601,10 @@ span.language {
 .lang-uk span.language, .lang-uk span.language a {
     background-color: #469;
     color: #fd4;
+}
+.lang-ur span.language, .lang-ur span.language a {
+    background-color: #151;
+    color: #fff;
 }
 .lang-vi span.language, .lang-vi span.language a {
     background-color: #fff;
