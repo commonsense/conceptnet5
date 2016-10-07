@@ -1,7 +1,10 @@
 /* Element styles, from purecss.io/css/main.css */
 
 body {
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK TC',
+                 'Noto Naskh Arabic', 'Noto Sans Devanagari', 'Noto Sans Telugu',
+                 'Noto Sans Armenian', 'Noto Sans Georgian',
+                 'Droid Sans', Helvetica, Arial, sans-serif;
     font-size: 20px;
     min-width: 320px;
     color: #555;
@@ -50,6 +53,7 @@ a {
 .header .subtitle {
     font-weight: normal;
     font-size: 1em;
+    line-height: 90%;
 }
 .heading-logo {
     position: relative;
@@ -180,13 +184,12 @@ a .graph-node-label {
     text-decoration: none;
 }
 .graph-edge-label {
-    font-size: 16px;
-    font-family: FreeSerif, 'Times New Roman', serif;
+    font-size: 15px;
+    font-family: 'Noto Serif', FreeSerif, 'Times New Roman', serif;
     font-style: italic;
 }
 .graph-node-label {
-    font-size: 16px;
-    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
     text-anchor: middle;
 }
 
@@ -210,7 +213,7 @@ a .graph-node-label {
     min-width: 2em;
     min-height: 2em;
     font-weight: bold;
-    padding-top: 0.4em;
+    padding-top: 0.35em;
     padding-left: 0.2em;
     padding-right: 0.2em;
     text-indent: 0;
