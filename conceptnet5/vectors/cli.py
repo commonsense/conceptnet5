@@ -1,6 +1,6 @@
 import click
 from .formats import (
-    convert_glove, convert_word2vec, load_hdf, save_hdf,
+    convert_glove, convert_word2vec, convert_fasttext, load_hdf, save_hdf,
     export_conceptnet_to_hyperwords, export_plain_text
 )
 from .retrofit import sharded_retrofit, join_shards
@@ -56,6 +56,14 @@ def run_join_retrofit(filename, nshards=6):
 @click.option('--nrows', '-n', default=500000)
 def run_convert_glove(glove_filename, output_filename, nrows=500000):
     convert_glove(glove_filename, output_filename, nrows)
+
+
+@cli.command(name='convert_fasttext')
+@click.argument('fasttext_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+@click.option('--nrows', '-n', default=500000)
+def run_convert_fasttext(fasttext_filename, output_filename, nrows=500000):
+    convert_fasttext(fasttext_filename, output_filename, nrows)
 
 
 @cli.command(name='convert_word2vec')

@@ -4,6 +4,7 @@ from scipy import sparse
 import gzip
 import struct
 import wordfreq
+import itertools
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 from ..vectors import standardized_uri, get_vector
 from conceptnet5.languages import COMMON_LANGUAGES
@@ -92,6 +93,18 @@ def convert_glove(glove_filename, output_filename, nrows):
     save_hdf(glove_normal, output_filename)
 
 
+def convert_fasttext(fasttext_filename, output_filename, nrows):
+    """
+    Convert FastText data from a gzipped text file to an HDF5 dataframe.
+    """
+    ft_raw = load_fasttext(fasttext_filename, nrows)
+    ft_std = standardize_row_labels(ft_raw, forms=False)
+    del ft_raw
+    ft_normal = l2_normalize_rows(l1_normalize_columns(ft_std))
+    del ft_std
+    save_hdf(ft_normal, output_filename)
+
+
 def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     """
     Convert word2vec data from its gzipped binary format to an HDF5
@@ -113,6 +126,21 @@ def load_glove(filename, nrows=500000):
             names=['term'] + list(range(300)),
             nrows=nrows
         )
+
+
+def load_fasttext(filename, nrows=1000000):
+    arr = np.zeros((nrows, 300))
+    labels = []
+    with gzip.open(filename, 'rt') as infile:
+        for i, line in enumerate(itertools.islice(infile, 1, None)):
+            if i >= nrows:
+                break
+            items = line.rstrip().split(' ')
+            labels.append(items[0])
+            values = [float(x) for x in items[1:]]
+            arr[i] = values
+
+    return pd.DataFrame(arr, index=labels)
 
 
 def _read_until_space(file):
