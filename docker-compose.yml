@@ -24,6 +24,7 @@ services:
 
   conceptnet-web:
     build: 'web'
+    image: rspeer/conceptnet-web:5.5b1
     links:
       - db
     depends_on:
