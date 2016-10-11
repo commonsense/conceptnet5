@@ -42,6 +42,10 @@ a {
     margin: 0;
     font-size: 2.5em;
 }
+.header h1.error {
+    margin: 0;
+    font-size: 1.5em;
+}
 .header h2 {
     color: #777;
     padding: 0;

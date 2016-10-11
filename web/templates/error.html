@@ -1,17 +1,20 @@
 {% extends "_base.html" %}
 {% from '_macros.html' import show_term, show_edge %}
 {% block title %}
-<title>ConceptNet 5: {{ error.code|error_name }}</title>
+<title>ConceptNet 5: {{ error.status|error_name }}</title>
 {% endblock %}
 {% block content %}
 <div id="main">
     <div class="header">
-        <h1>
+        <h1 class="error">
             {{ error.status|error_name }}
         </h1>
-        <h2 class="term-subtitle">
+        <h2 class="subtitle">
             {{ error.details }}
         </h2>
+    </div>
+    <div class="doc">
+        Sorry about that. You could try going back to the <a href="/">main page</a> of ConceptNet.
     </div>
 </div>
 {% endblock %}

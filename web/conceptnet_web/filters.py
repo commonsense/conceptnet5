@@ -45,12 +45,13 @@ ERROR_NAME_MAP = {
     400: 'Bad request',
     404: 'Not found',
     429: 'Too many requests',
-    500: 'Server error'
+    500: 'Server error',
+    503: 'This ConceptNet interface is unavailable'
 }
 
 
 def error_name(code):
-    return ERROR_NAME_MAP.get(code, 'Unknown error %r' % code)
+    return ERROR_NAME_MAP.get(code, code)
 
 
 def oxford_comma(items):

@@ -12,16 +12,14 @@ import os
 
 
 # Configuration
+app = flask.Flask('conceptnet5_web')
+STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(app.root_path, 'static'))
+TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(app.root_path, 'templates'))
 
-WORKING_DIR = os.getcwd()
-STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
-TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
-
-app = flask.Flask(
-    'conceptnet5_web',
-    template_folder=TEMPLATE_PATH,
-    static_folder=STATIC_PATH
-)
+app.config.update({
+    'template_folder': TEMPLATE_PATH,
+    'static_folder': STATIC_PATH
+})
 for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
@@ -44,6 +42,7 @@ def front_page():
     return flask.render_template('index.html')
 
 
+@app.route('/web/c/<path:uri>')
 @app.route('/c/<path:uri>')
 def browse_concept(uri):
     req_args = flask.request.args
@@ -93,6 +92,7 @@ def browse_concept(uri):
 
 
 # Lookup: match any path starting with /a/, /c/, /d/, /r/, or /s/
+@app.route('/web/<any(a, d, r, s):top>/<path:query>')
 @app.route('/<any(a, d, r, s):top>/<path:query>')
 def browse_node(top, query):
     # TODO: can we make this work with edge_list_query?
@@ -138,6 +138,34 @@ def edge_list_query(criteria, offset=0, limit=50):
         'edge_list.html', results=results, sources=sources,
         pageStart=pageStart, pageEnd=pageEnd
     )
+
+
+@app.errorhandler(IOError)
+def error_data_unavailable(e):
+    return render_error(503, str(e))
+
+
+@app.errorhandler(400)
+def error_bad_request(e):
+    return render_error(
+        400, "Something's wrong with the URL %r." % flask.request.full_path
+    )
+
+
+@app.errorhandler(404)
+def error_page_not_found(e):
+    return render_error(
+        404, "%r isn't a URL that we understand." % flask.request.path
+    )
+
+
+def render_error(status, details):
+    return flask.render_template(
+        'error.html', error={
+            'status': status,
+            'details': details
+        }
+    ), status
 
 
 if __name__ == '__main__':

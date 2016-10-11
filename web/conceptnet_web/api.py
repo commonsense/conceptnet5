@@ -3,7 +3,7 @@ This file sets up Flask to serve the ConceptNet 5 API in JSON-LD format.
 """
 from conceptnet_web.json_rendering import jsonify, highlight_and_link_json
 from conceptnet_web import responses
-from conceptnet_web.responses import VALID_KEYS
+from conceptnet_web.responses import VALID_KEYS, error
 from conceptnet_web.filters import FILTERS
 from conceptnet5.nodes import standardized_concept_uri
 import flask
@@ -104,6 +104,29 @@ def query_top_related(uri):
     filter = req_args.get('filter')
     results = responses.query_related(uri, filter=filter, limit=limit)
     return jsonify(results)
+
+
+@app.errorhandler(IOError)
+def error_data_unavailable(e):
+    return render_error(503, str(e))
+
+
+@app.errorhandler(400)
+def error_bad_request(e):
+    return render_error(
+        400, "Something's wrong with the URL %r." % flask.request.full_path
+    )
+
+
+@app.errorhandler(404)
+def error_page_not_found(e):
+    return render_error(
+        404, "%r isn't a URL that we understand." % flask.request.path
+    )
+
+
+def render_error(status, details):
+    return jsonify(error({}, status=status, details=details))
 
 
 if __name__ == '__main__':
