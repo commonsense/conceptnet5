@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the ConceptNet server using docker-compose
+After=docker.service
+BindsTo=docker.service
+Conflicts=shutdown.target reboot.target halt.target
+
+[Service]
+Restart=always
+
+WorkingDirectory=/home/ubuntu/conceptnet5
+ExecStart=/usr/local/bin/docker-compose up
+ExecStop=/usr/local/bin/docker-compose stop

@@ -84,7 +84,13 @@ if TESTMODE:
 rule all:
     input:
         DATA + "/assertions/assertions.csv",
-        DATA + "/psql/done",
+        DATA + "/psql/edges.csv.gz",
+        DATA + "/psql/edge_sources.csv.gz",
+        DATA + "/psql/edge_features.csv.gz",
+        DATA + "/psql/nodes.csv.gz",
+        DATA + "/psql/node_prefixes.csv.gz",
+        DATA + "/psql/sources.csv.gz",
+        DATA + "/psql/relations.csv.gz",
         DATA + "/stats/languages.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
@@ -306,19 +312,14 @@ rule prepare_db:
     shell:
         "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
 
-rule load_db:
+rule gzip_db:
     input:
-        DATA + "/psql/edges.csv",
-        DATA + "/psql/edge_sources.csv",
-        DATA + "/psql/edge_features.csv",
-        DATA + "/psql/nodes.csv",
-        DATA + "/psql/node_prefixes.csv",
-        DATA + "/psql/sources.csv",
-        DATA + "/psql/relations.csv"
+        DATA + "/psql/{name}.csv"
     output:
-        DATA + "/psql/done"
+        DATA + "/psql/{name}.csv.gz"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "gzip -c {input} > {output}"
+
 
 # Collecting statistics
 # =====================
