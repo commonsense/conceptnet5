@@ -91,7 +91,8 @@ def see_documentation():
     This function redirects to the api documentation
     """
     return jsonify({
-        '@context': responses.CONTEXT
+        '@context': responses.CONTEXT,
+        'rdfs:comment': 'See http://www.conceptnet.io for more information about ConceptNet, and http://api.conceptnet.io/docs for the API documentation.'
     })
 
 
@@ -107,6 +108,7 @@ def query_top_related(uri):
 
 
 @app.errorhandler(IOError)
+@app.errorhandler(MemoryError)
 def error_data_unavailable(e):
     return render_error(503, str(e))
 

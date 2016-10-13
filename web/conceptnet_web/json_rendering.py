@@ -14,7 +14,7 @@ def request_wants_json():
     """
     best = flask.request.accept_mimetypes \
         .best_match(['application/ld+json', 'application/json', 'text/html'])
-    return 'json' in best
+    return (best is not None) and ('json' in best)
 
 
 def regex_replacement_stack(replacements):

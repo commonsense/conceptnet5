@@ -24,6 +24,7 @@ COPY server/nginx.conf /etc/nginx/conf.d/
 COPY server/uwsgi.ini /etc/uwsgi/
 
 COPY server/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN rm /etc/nginx/sites-enabled/default
 
 ## End of tiangolo/uwsgi-nginx-docker
 

@@ -14,7 +14,9 @@ Web interface:
 - [ ] Link to the JSON-LD version of the current page
 - [ ] Add a page listing languages
 - [ ] Add a page per language
-- [ ] Serve some Noto web fonts (not CJK ones though)
+- [x] API root should link to docs
+- [x] Serve some Noto web fonts (not CJK ones though)
+- [x] Handle MemoryErrors
 
 ConceptNet 5.6 perhaps:
 

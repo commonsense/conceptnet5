@@ -141,6 +141,7 @@ def edge_list_query(criteria, offset=0, limit=50):
 
 
 @app.errorhandler(IOError)
+@app.errorhandler(MemoryError)
 def error_data_unavailable(e):
     return render_error(503, str(e))
 

@@ -1,3 +1,13 @@
+/* Web fonts */
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans:400,700');
+@import url(http://fonts.googleapis.com/earlyaccess/notonastaliqurdu.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notonaskharabic.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notosanstelugu.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notosanshebrew.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notosansdevanagari.css);
+@import url(http://fonts.googleapis.com/earlyaccess/notosansthai.css);
+
+
 /* Element styles, from purecss.io/css/main.css */
 
 body {
