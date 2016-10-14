@@ -23,7 +23,7 @@ setup(
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
         'snakemake', 'click', 'requests', 'ftfy', 'numpy', 'scipy',
-        'msgpack-python', 'langcodes', 'wordfreq >= 1.5',
+        'msgpack-python', 'langcodes >= 1.3', 'wordfreq >= 1.5',
         'xmltodict', 'ordered_set', 'pg8000'
     ],
     license = 'Apache License 2.0',
