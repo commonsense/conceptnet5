@@ -53,6 +53,8 @@ def query_node(top, query):
     if grouped:
         limit = min(limit, 100)
         results = responses.lookup_grouped_by_feature(path, feature_limit=limit)
+    elif path.startswith('/a/'):
+        results = responses.lookup_single_assertion(path)
     else:
         results = responses.lookup_paginated(path, offset=offset, limit=limit)
     return jsonify(results)

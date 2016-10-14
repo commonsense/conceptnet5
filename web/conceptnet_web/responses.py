@@ -131,6 +131,18 @@ def lookup_paginated(term, limit=50, offset=0):
         return success(response)
 
 
+def lookup_single_assertion(uri):
+    found = FINDER.lookup(uri, limit=1)
+    response = {
+        '@id': uri
+    }
+    if not found:
+        return error(response, 404, '%r is not an assertion in ConceptNet.' % uri)
+    else:
+        response.update(found[0])
+        return success(response)
+
+
 def query_related(uri, filter=None, limit=20):
     if uri.startswith('/c/'):
         query = uri
