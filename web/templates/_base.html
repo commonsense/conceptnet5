@@ -12,10 +12,15 @@
 </head>
 
 <body>
-
-{% block content %}
-{% endblock %}
-
+<div id="main">
+<div class="header">
+    {% block headleft %}
+    {% endblock %}
+</div>
+<div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
 <div class="footer">
     <div class="creative-commons">
     <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
@@ -26,6 +31,7 @@
     Portions are also available under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
     <br />
     See <a href="https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet">Copying and Sharing ConceptNet</a> for more details.
+</div>
 </div>
 </body>
 </html>

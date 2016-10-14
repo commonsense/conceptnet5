@@ -1,8 +1,8 @@
 Design of ConceptNet 5.5:
 
-- [ ] Download Numberbatch vectors alongside DB
+- [x] Download Numberbatch vectors alongside DB
 - [x] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
-- [ ] Querying an assertion gives an 'edges' list that links to itself -- remove the nested level?
+- [x] Querying an assertion gives an 'edges' list that links to itself -- remove the nested level?
 - [x] Wiktionary links should be ExternalURLs, not sources
 - [ ] Use standardized language codes in Wiktionary forms
 - [ ] Remove "archaïque" context

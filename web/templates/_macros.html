@@ -1,5 +1,5 @@
 {% macro show_term(term, tag='li', link=None) %}
-<{{tag}} class="term lang-{{term.language or 'none'}}">
+<{{tag}} class="term lang-{{term.language or 'none'}}" title="{{term|full_language_name}}">
     <span class="language">
     {% if term.site %}
         {{term.site}}

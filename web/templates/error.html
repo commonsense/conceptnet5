@@ -3,18 +3,16 @@
 {% block title %}
 <title>ConceptNet 5: {{ error.status|error_name }}</title>
 {% endblock %}
+{% block headleft %}
+    <h1 class="error">
+        {{ error.status|error_name }}
+    </h1>
+    <h2 class="subtitle">
+        {{ error.details }}
+    </h2>
+{% endblock headleft %}
 {% block content %}
-<div id="main">
-    <div class="header">
-        <h1 class="error">
-            {{ error.status|error_name }}
-        </h1>
-        <h2 class="subtitle">
-            {{ error.details }}
-        </h2>
-    </div>
     <div class="doc">
         Sorry about that. You could try going back to the <a href="/">main page</a> of ConceptNet.
     </div>
-</div>
-{% endblock %}
+{% endblock content %}

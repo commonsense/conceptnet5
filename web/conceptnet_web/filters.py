@@ -2,6 +2,7 @@ from jinja2.ext import Markup
 from conceptnet5.languages import get_language_name
 from conceptnet5.uri import split_uri, uri_prefix
 from .json_rendering import highlight_and_link_json
+from langcodes import Language
 
 
 def describe_term_language(lang, description_language='en'):
@@ -20,6 +21,19 @@ def describe_term_language(lang, description_language='en'):
         article=article, lang=lang, language_name=language_name
     )
     return Markup(content)
+
+
+def full_language_name(term, description_language='en'):
+    if 'language' not in term:
+        return term.get('site', '')
+    lang = term['language']
+    language_obj = Language.get(lang)
+    full_name = language_obj.language_name(description_language)
+    autonym = language_obj.autonym()
+    if full_name == autonym or autonym == lang:
+        return full_name
+    else:
+        return "{} / {}".format(full_name, autonym)
 
 
 def source_link(url, name):
@@ -148,5 +162,6 @@ FILTERS = {
     'describe_term_language': describe_term_language,
     'describe_sources': describe_sources,
     'describe_sources_brief': describe_sources_brief,
+    'full_language_name': full_language_name,
     'error_name': error_name
 }

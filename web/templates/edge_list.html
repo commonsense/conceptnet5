@@ -3,67 +3,64 @@
 {% block title %}
 <title>ConceptNet 5: Edges found</title>
 {% endblock %}
-{% block content %}
-<div id="main">
-    <div class="header">
-        <h1>
-            {% if results.edges|length == 1 %}
-                Edge details
-            {% elif results.edges|length == 0 %}
-                No edges found
-            {% else %}
-                Edges found
-            {% endif %}
-        </h1>
-        <h2 class="subtitle">
-            Results from <a href="/" class="version">ConceptNet 5.5</a>
-        </h2>
-        <div class="sources">
-            {{ sources | describe_sources_brief }}
-        </div>
-    </div>
-    <div class="content">
-        {% if results.view %}
-        <div class="pagination">
-            {% if results.view.previousPage %}
-            <a class="pure-button" href="{{ results.view.previousPage }}">
-                ← Previous
-            </a>
-            {% endif %}
-            <span class="pagination-counter">
-                Results {{ pageStart }}–{{ pageEnd }}
-            </span>
-            {% if results.view.nextPage %}
-            <a class="pure-button" href="{{ results.view.nextPage }}">
-                Next →
-            </a>
-            {% endif %}
-        </div>
-        {% endif %}
-        <div class="edge-list">
-            <table class="edge-table">
-                {% for edge in results.edges %}
-                {{ show_edge(edge) }}
-                {% endfor %}
-            </table>
-        </div>
-        {% if results.view %}
-        <div class="pagination">
-            {% if results.view.previousPage %}
-            <a class="pure-button" href="{{ results.view.previousPage }}">
-                ← Previous
-            </a>
-            {% endif %}
-            <span class="pagination-counter">
-                Results {{ pageStart }}–{{ pageEnd }}
-            </span>
-            {% if results.view.nextPage %}
-            <a class="pure-button" href="{{ results.view.nextPage }}">
-                Next →
-            </a>
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
+{% block headleft %}
+<h1>
+    {% if results.edges|length == 1 %}
+        Edge details
+    {% elif results.edges|length == 0 %}
+        No edges found
+    {% else %}
+        Edge list
+    {% endif %}
+</h1>
+<h2 class="subtitle">
+    Results from <a href="/" class="version">ConceptNet 5.5</a>
+</h2>
+<div class="sources">
+    {{ sources | describe_sources_brief }}
 </div>
+{% endblock headleft %}
+
+{% block content %}
+    {% if results.view %}
+    <div class="pagination">
+        {% if results.view.previousPage %}
+        <a class="pure-button" href="{{ results.view.previousPage }}">
+            ← Previous
+        </a>
+        {% endif %}
+        <span class="pagination-counter">
+            Results {{ pageStart }}–{{ pageEnd }}
+        </span>
+        {% if results.view.nextPage %}
+        <a class="pure-button" href="{{ results.view.nextPage }}">
+            Next →
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="edge-list">
+        <table class="edge-table">
+            {% for edge in results.edges %}
+            {{ show_edge(edge) }}
+            {% endfor %}
+        </table>
+    </div>
+    {% if results.view %}
+    <div class="pagination">
+        {% if results.view.previousPage %}
+        <a class="pure-button" href="{{ results.view.previousPage }}">
+            ← Previous
+        </a>
+        {% endif %}
+        <span class="pagination-counter">
+            Results {{ pageStart }}–{{ pageEnd }}
+        </span>
+        {% if results.view.nextPage %}
+        <a class="pure-button" href="{{ results.view.nextPage }}">
+            Next →
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 {% endblock %}
