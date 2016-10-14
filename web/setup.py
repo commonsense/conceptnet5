@@ -21,7 +21,7 @@ setup(
     packages=packages,
     include_package_data=True,
     install_requires=[
-        'conceptnet >= 5.5b1', 'limits', 'flask==0.11', 'flask-cors', 'flask-limiter', 'langcodes',
+        'conceptnet >= 5.5b1', 'limits', 'flask==0.11', 'flask-cors', 'flask-limiter', 'langcodes >= 1.3',
         'jinja2-highlight', 'pygments'
     ],
     license = 'Apache License 2.0',
