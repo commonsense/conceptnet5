@@ -52,22 +52,22 @@ def analogy_func(frame, a1, b1, a2):
     return get_vector(frame, b1) - get_vector(frame, a1) + get_vector(frame, a2)
 
 
-def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose):
+def pairwise_analogy_func(wrap, a1, b1, a2, b2, weights=(0.65, 1.35, 1)):
     va1 = wrap.get_vector(a1)
     vb1 = wrap.get_vector(b1)
     va2 = wrap.get_vector(a2)
     vb2 = wrap.get_vector(b2)
 
     value = (
-        weight_direct * (vb2 - va2).dot(vb1 - va1)
-        + weight_transpose * (vb2 - vb1).dot(va2 - va1)
-        + vb2.dot(vb1) + va2.dot(va1)
+        weights[0] * (va1.dot(vb1) + va2.dot(vb2)) +
+        weights[1] * (va1.dot(va2) + vb1.dot(vb2)) -
+        weights[2] * (vb1.dot(va2) + va1.dot(vb2))
     )
     return value
 
 
 def eval_pairwise_analogies(frame, eval_filename, subset='all',
-                            weight_direct=0.35, weight_transpose=0.65):
+                            weights=(0.65, 1.35, 1)):
     total = 0
     correct = 0
     wrap = VectorSpaceWrapper(frame=frame)
@@ -79,7 +79,7 @@ def eval_pairwise_analogies(frame, eval_filename, subset='all',
             for choice in choices:
                 a2, b2 = choice
                 choice_values.append(
-                    pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose)
+                    pairwise_analogy_func(wrap, a1, b1, a2, b2, weights)
                 )
             our_answer = np.argmax(choice_values)
             if our_answer == answer:
@@ -92,51 +92,30 @@ def eval_pairwise_analogies(frame, eval_filename, subset='all',
 def tune_pairwise_analogies(frame, eval_filename, subset):
     """
     Our pairwise analogy function has three weights that can be tuned
-    (and therefore two free parameters, as the total weight does not matter):
-
-    - The *direct weight*, comparing (b2 - a2) to (b1 - a1)
-    - The *transpose weight*, comparing (b2 - b1) to (a2 - a1)
-    - The *similarity weight*, comparing b2 to b1 and a2 to a1
+    (and therefore two free parameters, as the total weight does not matter).
 
     This function holds out half of the data and grid-searches for the best
     combination of parameters, then evaluates on the other half of the data.
     """
-    # Original search was more coarse-grained
-    # weights = [
-    #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
-    #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
-    # ]
-
-    # Slightly more detailed search
-    #weights = [
-    #    0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
-    #    0.6, 0.65, 0.7, 0.8, 0.9, 1.0
-    #]
-
-    # This one hits all the right numbers
-    weights = [
-        0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.8
-    ]
+    weights = [0.5, 0.6, 2/3, 0.7, 0.75, 0.8, 0.9, 1.0,
+               1.1, 1.2, 1.25, 1.3, 4/3, 1.4, 1.5]
 
     best_weights = None
     best_acc = 0.
-    for weight_direct in weights:
-        for weight_transpose in weights:
+    for weight_a in weights:
+        for weight_b in weights:
+            weight_tuple = (weight_a, weight_b, 1.)
             acc = eval_pairwise_analogies(
                 frame, eval_filename, subset='dev',
-                weight_direct=weight_direct,
-                weight_transpose=weight_transpose
+                weights=weight_tuple
             ).loc['acc']
             if acc > best_acc:
-                print(weight_direct, weight_transpose, acc)
-                best_weights = (weight_direct, weight_transpose)
+                print(weight_tuple, acc)
+                best_weights = weight_tuple
                 best_acc = acc
-    weight_direct, weight_transpose = best_weights
     print()
     return eval_pairwise_analogies(
-        frame, eval_filename, subset=subset,
-        weight_direct=weight_direct,
-        weight_transpose=weight_transpose
+        frame, eval_filename, subset=subset, weights=best_weights
     )
 
 
