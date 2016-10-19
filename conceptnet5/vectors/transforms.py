@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-from ..vectors import standardized_uri
+import wordfreq
+from ..vectors import standardized_uri, similar_to_vec
 from conceptnet5.uri import uri_prefix
 from conceptnet5.language.lemmatize import lemmatize_uri
 
@@ -73,3 +74,41 @@ def shrink_and_sort(frame, n, k):
     shrunk = l2_normalize_rows(frame.iloc[:n, :k])
     shrunk.sort_index(inplace=True)
     return shrunk
+
+
+def miniaturize(frame, language, other_vocab=None, k=256):
+    prefix = '/c/%s/' % language
+    plen = len(prefix)
+    wordlist = wordfreq.get_frequency_dict(language, 'large')
+
+    vocab1 = [term for term in frame.index
+              if term.startswith(prefix) and term[plen:] != 'nan'
+              and term[plen:] in wordlist]
+    vocab_set = set(vocab1)
+    if other_vocab is not None:
+        extra_vocab = [term for term in other_vocab if '_' in term and
+                       term in frame.index and term not in vocab_set]
+        extra_vocab = extra_vocab[:20000]
+    else:
+        extra_vocab = []
+
+    vocab = vocab1 + extra_vocab
+    smaller = frame.loc[vocab]
+    smaller.index = [term[plen:] for term in smaller.index]
+    U, _S, _Vt = np.linalg.svd(smaller, full_matrices=False)
+    redecomposed = l2_normalize_rows(pd.DataFrame(U[:, :k], index=vocab, dtype='f'))
+    mini = (redecomposed * 64).astype(np.int8)
+    mini.sort_index(inplace=True)
+    return mini
+
+
+def make_replacements(small_frame, big_frame, limit=100000):
+    intersected = big_frame.loc[small_frame.index].dropna()
+    replacements = {}
+    for term in big_frame.index:
+        if term not in small_frame.index:
+            most_similar = similar_to_vec(intersected, big_frame.loc[term], limit=1)
+            got = list(most_similar.index)
+            if got:
+                replacements[term] = got[0]
+    return replacements
