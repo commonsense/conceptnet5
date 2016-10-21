@@ -94,14 +94,20 @@ rule all:
         DATA + "/stats/languages.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/mini.h5",
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
 
 
 rule webdata:
     input:
-        DATA + "/psql/done",
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/psql/edges.csv.gz",
+        DATA + "/psql/edge_sources.csv.gz",
+        DATA + "/psql/edge_features.csv.gz",
+        DATA + "/psql/nodes.csv.gz",
+        DATA + "/psql/node_prefixes.csv.gz",
+        DATA + "/psql/sources.csv.gz",
+        DATA + "/psql/relations.csv.gz",
+        DATA + "/vectors/mini.h5",
 
 
 rule clean:
@@ -110,11 +116,13 @@ rule clean:
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
+
 rule test:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv"
+
 
 # Downloaders
 # ===========
@@ -319,6 +327,21 @@ rule gzip_db:
         DATA + "/psql/{name}.csv.gz"
     shell:
         "gzip -c {input} > {output}"
+
+
+rule load_db:
+    input:
+        DATA + "/psql/edges.csv",
+        DATA + "/psql/edge_sources.csv",
+        DATA + "/psql/edge_features.csv",
+        DATA + "/psql/nodes.csv",
+        DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/sources.csv",
+        DATA + "/psql/relations.csv"
+    output:
+        DATA + "/psql/done"
+    shell:
+        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
 
 
 # Collecting statistics
