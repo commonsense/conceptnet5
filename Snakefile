@@ -485,6 +485,19 @@ rule merge_intersect:
     shell:
         "cn5-vectors intersect {input} {output}"
 
+
+rule miniaturize:
+    input:
+        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/w2v-google-news.h5"
+    output:
+        DATA + "/vectors/mini.h5"
+    resources:
+        ram=4
+    shell:
+        "cn5-vectors miniaturize {input} {output}"
+
+
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",

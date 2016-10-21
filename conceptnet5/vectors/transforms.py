@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 import wordfreq
 from ..vectors import standardized_uri, similar_to_vec
-from conceptnet5.uri import uri_prefix
+from conceptnet5.uri import uri_prefix, split_uri
 from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.languages import CORE_LANGUAGES
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -76,14 +77,24 @@ def shrink_and_sort(frame, n, k):
     return shrunk
 
 
-def miniaturize(frame, language, other_vocab=None, k=256):
-    prefix = '/c/%s/' % language
-    plen = len(prefix)
-    wordlist = wordfreq.get_frequency_dict(language, 'large')
+def term_freq(term):
+    _c, lang, term = split_uri(term)[:3]
+    if lang == 'en':
+        return wordfreq.word_frequency(term, 'en', 'large')
+    elif lang in CORE_LANGUAGES:
+        return wordfreq.word_frequency(term, lang)
+    else:
+        return 0.
 
-    vocab1 = [term for term in frame.index
-              if term.startswith(prefix) and term[plen:] != 'nan'
-              and term[plen:] in wordlist]
+
+def miniaturize(frame, prefix='/c/', other_vocab=None, k=256):
+    """
+    Produce a small matrix with good coverage of English and reasonable
+    coverage of the other 'core languages' in ConceptNet. A `prefix` can be
+    provided to limit the result to one language.
+    """
+    vocab1 = [term for term in frame.index if '_' not in term
+              and term.startswith(prefix) and term_freq(term) > 0.]
     vocab_set = set(vocab1)
     if other_vocab is not None:
         extra_vocab = [term for term in other_vocab if '_' in term and
@@ -94,7 +105,6 @@ def miniaturize(frame, language, other_vocab=None, k=256):
 
     vocab = vocab1 + extra_vocab
     smaller = frame.loc[vocab]
-    smaller.index = [term[plen:] for term in smaller.index]
     U, _S, _Vt = np.linalg.svd(smaller, full_matrices=False)
     redecomposed = l2_normalize_rows(pd.DataFrame(U[:, :k], index=vocab, dtype='f'))
     mini = (redecomposed * 64).astype(np.int8)

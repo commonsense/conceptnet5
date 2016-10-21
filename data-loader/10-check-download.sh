@@ -23,10 +23,10 @@ panic() {
 mkdir -p $DATA/psql
 mkdir -p $DATA/vectors
 
-# Get semantic vectors (ConceptNet Numberbatch) that would be computationally
-# expensive to compute
-if [ ! -e $DATA/vectors/numberbatch.h5 ]; then
-    curl $PRECOMPUTED_VECTOR_URL/numberbatch.h5 > $DATA/vectors/numberbatch.h5
+# Get semantic vectors (ConceptNet Numberbatch Mini) that would be
+# computationally expensive to compute
+if [ ! -e $DATA/vectors/mini.h5 ]; then
+    curl $PRECOMPUTED_VECTOR_URL/mini.h5 > $DATA/vectors/mini.h5
 fi
 # Get the database input files
 if [ ! -e $DATA/psql/edges.csv.gz ]; then

@@ -6,7 +6,7 @@ from .formats import (
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
-from .transforms import shrink_and_sort
+from .transforms import miniaturize
 from .query import VectorSpaceWrapper
 
 
@@ -118,12 +118,15 @@ def run_export(input_filename, uri_filename, output_dir):
     export_plain_text(frame, uri_filename, output_dir)
 
 
-@cli.command(name='shrink')
+@cli.command(name='miniaturize')
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('extra_vocab_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('-n', default=1000000, help="Number of rows to truncate to")
-@click.option('-k', default=300, help="Number of columns to truncate to")
-def run_shrink(input_filename, output_filename, n, k):
+@click.option('-k', default=256, help="Number of columns to reduce to")
+def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     frame = load_hdf(input_filename)
-    shrunk = shrink_and_sort(frame, n, k)
-    save_hdf(shrunk, output_filename)
+    other_frame = load_hdf(extra_vocab_filename)
+    other_vocab = list(other_frame.index)
+    del other_frame
+    mini = miniaturize(frame, other_vocab=other_vocab, k=k)
+    save_hdf(mini, output_filename)

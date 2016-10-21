@@ -1,5 +1,4 @@
 from conceptnet5.vectors.query import VectorSpaceWrapper
-from conceptnet5.db.query import MAX_GROUP_SIZE
 from conceptnet5.nodes import standardized_concept_uri, ld_node
 
 
@@ -24,7 +23,6 @@ def error(response, status, details):
         'details': details
     }
     return response
-
 
 
 def make_query_url(url, items):

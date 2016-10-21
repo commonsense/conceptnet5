@@ -4,6 +4,7 @@ from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
     standardized_uri
 )
+from conceptnet5.vectors.transforms import l2_normalize_rows
 from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix
 import wordfreq
@@ -48,7 +49,7 @@ class VectorSpaceWrapper(object):
     def __init__(self, vector_filename=None, frame=None, use_db=True):
         if frame is None:
             self.frame = None
-            self.vector_filename = vector_filename or get_data_filename('vectors/numberbatch.h5')
+            self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
             self.frame = frame
             self.vector_filename = None
@@ -85,7 +86,7 @@ class VectorSpaceWrapper(object):
                 ]
 
             self.k = self.frame.shape[1]
-            self.small_k = self.k // 3
+            self.small_k = 100
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
         except OSError:
             raise MissingVectorSpace(
@@ -201,7 +202,8 @@ class VectorSpaceWrapper(object):
                 end_idx = search_frame.index.get_loc(end_key, method='bfill')
                 search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
-        similar_choices = self.frame.loc[similar_sloppy.index]
+        similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index])
+
         similar = similar_to_vec(similar_choices, vec, limit=limit)
         return similar
 
