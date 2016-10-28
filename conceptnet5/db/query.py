@@ -84,7 +84,7 @@ def make_list_query(criteria):
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
-        SELECT uri, data FROM matched_edges
+        SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges
         ORDER BY weight DESC, uri
         OFFSET :offset LIMIT :limit
     """)

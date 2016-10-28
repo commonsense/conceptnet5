@@ -14,8 +14,8 @@ For ConceptNet 5.5.1:
 
 Web interface:
 
-- [ ] Link to an FAQ
-- [ ] Link to the JSON-LD version of the current page
+- [x] Link to an FAQ
+- [x] Link to the JSON-LD version of the current page
 - [ ] Add a page listing languages
 - [ ] Add a page per language
 - [x] API root should link to docs
