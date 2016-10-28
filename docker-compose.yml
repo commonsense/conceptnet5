@@ -17,6 +17,11 @@ services:
         max-size: "10m"
         max-file: "10"
 
+  conceptnet:
+    build: '.'
+    image: rspeer/conceptnet:5.5b1
+    restart: 'no'
+
   conceptnet-web:
     build: 'web'
     image: rspeer/conceptnet-web:5.5b1
