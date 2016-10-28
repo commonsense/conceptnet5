@@ -84,7 +84,10 @@ def query_standardize_uri():
     """
     language = flask.request.args.get('language')
     text = flask.request.args.get('text') or flask.request.args.get('term')
-    return jsonify(standardized_concept_uri(language, text))
+    return jsonify({
+        '@context': responses.CONTEXT,
+        '@id': standardized_concept_uri(language, text)
+    })
 
 
 @app.route('/')
