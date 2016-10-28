@@ -44,6 +44,7 @@ a {
 }
 
 .header {
+     position: relative;
      margin: 0;
      color: #333;
      padding: 2.5em 2em 0;
@@ -60,6 +61,33 @@ a {
     color: #777;
     padding: 0;
     margin-top: 0;
+}
+@media screen and (min-width:84em) {
+    .top-menu-h {
+        position: relative;
+    }
+    .top-menu-h .pure-menu-list {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    .top-menu-v {
+        display: none;
+    }
+}
+@media screen and (max-width:83.999em) {
+    .top-menu-h {
+        display: none;
+    }
+    .top-menu-v {
+        position: relative;
+        font-size: 80%;
+    }
+    .top-menu-v .pure-menu-list {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 }
 .header .subtitle {
     font-weight: normal;
@@ -150,6 +178,9 @@ div.feature-box h2 {
     font-size: 0.8rem;
 }
 .sources {
+    font-size: 0.8rem;
+}
+.api {
     font-size: 0.8rem;
 }
 

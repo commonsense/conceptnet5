@@ -14,8 +14,30 @@
 <body>
 <div id="main">
 <div class="header">
-    {% block headleft %}
-    {% endblock %}
+    <div class="pure-g">
+        <div class="pure-u-2-3">
+            {% block headleft %}
+            {% endblock %}
+        </div>
+        <div class="pure-u-1-3">
+            <div class="pure-menu pure-menu-horizontal top-menu-h">
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="https://github.com/commonsense/conceptnet5/wiki" class="pure-menu-link">Documentation</a></li>
+                    <li class="pure-menu-item"><a href="https://github.com/commonsense/conceptnet5/wiki/FAQ" class="pure-menu-link">FAQ</a></li>
+                    <li class="pure-menu-item"><a href="https://gitter.im/commonsense/conceptnet5" class="pure-menu-link">Chat</a></li>
+                    <li class="pure-menu-item"><a href="http://blog.conceptnet.io" class="pure-menu-link">Blog</a></li>
+                </ul>
+            </div>
+            <div class="pure-menu pure-menu-vertical top-menu-v">
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="https://github.com/commonsense/conceptnet5/wiki" class="pure-menu-link">Documentation</a></li>
+                    <li class="pure-menu-item"><a href="https://github.com/commonsense/conceptnet5/wiki/FAQ" class="pure-menu-link">FAQ</a></li>
+                    <li class="pure-menu-item"><a href="https://gitter.im/commonsense/conceptnet5" class="pure-menu-link">Chat</a></li>
+                    <li class="pure-menu-item"><a href="http://blog.conceptnet.io" class="pure-menu-link">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="content">
     {% block content %}
