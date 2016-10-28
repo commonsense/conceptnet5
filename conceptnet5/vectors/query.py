@@ -205,6 +205,8 @@ class VectorSpaceWrapper(object):
         similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index])
 
         similar = similar_to_vec(similar_choices, vec, limit=limit)
+        if len(similar):
+            similar /= similar[0]
         return similar
 
     def get_similarity(self, query1, query2):
