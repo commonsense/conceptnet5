@@ -2,7 +2,6 @@ from jinja2.ext import Markup
 from conceptnet5.languages import get_language_name
 from conceptnet5.uri import split_uri, uri_prefix
 from .json_rendering import highlight_and_link_json
-from langcodes import Language
 
 
 def describe_term_language(lang, description_language='en'):
@@ -11,7 +10,7 @@ def describe_term_language(lang, description_language='en'):
             "We don't support non-English interface text yet."
         )
 
-    language_name = get_language_name(lang, description_language)
+    language_name = get_language_name(lang)
     if language_name[0] in 'AEIOU' and not language_name.startswith('Uk'):
         article = 'An'
     else:
@@ -24,16 +23,15 @@ def describe_term_language(lang, description_language='en'):
 
 
 def full_language_name(term, description_language='en'):
+    if description_language != 'en':
+        raise NotImplementedError(
+            "We don't support non-English interface text yet."
+        )
+
     if 'language' not in term:
         return term.get('site', '')
     lang = term['language']
-    language_obj = Language.get(lang)
-    full_name = language_obj.language_name(description_language)
-    autonym = language_obj.autonym()
-    if full_name == autonym or autonym == lang:
-        return full_name
-    else:
-        return "{} / {}".format(full_name, autonym)
+    return get_language_name(lang)
 
 
 def source_link(url, name):
