@@ -10,7 +10,7 @@ FEATURE_QUERIES = {}
 
 RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
 RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
-DATASET_QUERY = "SELECT uri, data FROM edges WHERE data->'dataset' = :dataset ORDER BY weight DESC OFFSET :offset LIMIT :limit"
+DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = :dataset ORDER BY weight DESC OFFSET :offset LIMIT :limit"
 
 
 NODE_TO_FEATURE_QUERY = """
