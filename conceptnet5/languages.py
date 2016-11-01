@@ -462,7 +462,7 @@ LANGUAGE_NAMES = {
     'ro': 'Romanian',
     'el': 'Greek',
     'lv': 'Latvian',
-    'ms': 'Malay',
+    'ms': 'Malay / Indonesian',
     'tr': 'Turkish',
     'da': 'Danish',
     'ga': 'Irish',
