@@ -11,10 +11,10 @@
 /* Element styles, from purecss.io/css/main.css */
 
 body {
+    min-width: 320px;
     font-family: 'Noto Sans', 'Droid Sans', Helvetica, Arial, sans-serif;
     font-size: 20px;
-    min-width: 320px;
-    color: #555;
+    color: #333;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -88,6 +88,9 @@ a {
         top: 0;
         right: 0;
     }
+}
+.pure-menu-item {
+    line-height: 75%;
 }
 .header .subtitle {
     font-weight: normal;
@@ -192,6 +195,30 @@ div.feature-box h2 {
     padding-right: 2.5em;
     padding-top: 1em;
     padding-bottom: 1em;
+}
+
+/* Search form */
+.search-form {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+.search-form select {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    height: 3rem;
+}
+.search-form input[type=text] {
+    height: 3rem;
+}
+.search-form button {
+    height: 3rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #fff;
 }
 
 .term-examples {

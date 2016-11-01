@@ -6,6 +6,8 @@ from conceptnet_web.filters import FILTERS
 from conceptnet_web.relations import REL_HEADINGS
 from conceptnet_web.responses import VALID_KEYS
 from conceptnet5.uri import split_uri
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
 import flask
 from flask_limiter import Limiter
 import os
@@ -39,7 +41,19 @@ def get_int(args, key, default, minimum, maximum):
 # @app.route('/<any(a, c, d, r, s):top>/<path:query>')
 @app.route('/')
 def front_page():
-    return flask.render_template('index.html')
+    languages = [(lang, LANGUAGE_NAMES[lang]) for lang in COMMON_LANGUAGES
+                 if lang != 'mul']
+    languages.sort(key=lambda item: item[1])
+    return flask.render_template('index.html', languages=languages)
+
+
+@app.route('/search')
+def search_concept():
+    req_args = flask.request.args
+    lang = req_args.get('language', 'en')
+    text = req_args.get('text', '')
+    uri = standardized_concept_uri(lang, text)
+    return flask.redirect(uri)
 
 
 @app.route('/web/c/<path:uri>')

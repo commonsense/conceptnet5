@@ -20,6 +20,42 @@
 
 {% block content %}
 <div class="pure-g">
+    <div class="pure-u-1-8 pure-u-md-1-4"></div>
+    <div class="pure-u-3-4 pure-u-md-1-2">
+      <form class="pure-form pure-form-stacked search-form" action="/search" method="GET">
+        <fieldset>
+          <div class="pure-g">
+            <div class="pure-u-1 pure-u-md-1-2">
+              <input type="text" name="text" class="pure-u-23-24" placeholder="Search for a word or phrase">
+            </div>
+            <div class="pure-u-2-3 pure-u-md-1-3">
+              <select id="select-language" name="language" class="pure-u-23-24">
+                <optgroup label="Core languages">
+                  <option value="en">English</option>
+                  <option value="zh">Chinese</option>
+                  <option value="nl">Dutch</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="ja">Japanese</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ru">Russian</option>
+                  <option value="es">Spanish</option>
+                </optgroup>
+                <optgroup label="Searchable languages">
+                  {% for code, language in languages %}
+                    <option value="{{code}}">{{language}}</option>
+                  {% endfor %}
+                </optgroup>
+              </select>
+            </div>
+            <div class="pure-u-1-3 pure-u-md-1-6">
+              <button type="submit" class="pure-button pure-button-primary pure-u-23-24">Search</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
     <div class="pure-u-1 pure-u-lg-1-2">
         <div class="doc">
             <h2>What is ConceptNet?</h2>
