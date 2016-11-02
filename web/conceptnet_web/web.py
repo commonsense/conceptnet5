@@ -51,8 +51,8 @@ def front_page():
 def search_concept():
     req_args = flask.request.args
     lang = req_args.get('language', 'en')
-    text = req_args.get('text', '')
-    uri = standardized_concept_uri(lang, text)
+    text = req_args.get('text', '').strip()
+    uri = standardized_concept_uri(lang, text).rstrip('/')
     return flask.redirect(uri)
 
 
