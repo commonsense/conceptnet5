@@ -83,14 +83,22 @@ CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/wellner',
     '/s/contributor/omcs/talshadar',
     '/s/contributor/omcs/mrt',
+    '/s/contributor/omcs/humplik',
+    '/s/contributor/omcs/mickh',
 }
 CONCEPT_BLACKLIST = {
+    # Too vague
     '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/she',
     '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
     '/c/en/they', '/c/en/this', '/c/en/you',
     '/c/en/often', '/c/en/sometimes', '/c/en/usually', '/c/en/if',
     '/c/en/when', '/c/en/whether', '/c/en/nothing', '/c/en/nobody',
     '/c/en/no_one',
+
+    # It's not our job to remove all vulgar terms, especially as they may be
+    # important to understand in context. But here are a few that just pollute
+    # the results for no reason.
+    '/c/en/touch_her_cunt', '/c/en/blow_her_boyfriend'
 }
 ACTIVITY_BLACKLIST = {
     "20 Questions",
