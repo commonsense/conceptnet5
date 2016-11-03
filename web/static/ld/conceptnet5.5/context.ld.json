@@ -75,18 +75,8 @@
     },
     "surfaceText": {
       "@id": "cn:surfaceText",
-      "@type": "rdf:langString",
-      "comment": "The natural language text that corresponds to a node. The @value of this object is the actual text, and the @language is its language code."
-    },
-    "surfaceStart": {
-      "@id": "cn:surfaceStart",
-      "@type": "rdf:langString",
-      "comment": "The natural language text that corresponds to the 'start' value (subject) of this assertion."
-    },
-    "surfaceEnd": {
-      "@id": "cn:surfaceEnd",
-      "@type": "rdf:langString",
-      "comment": "The natural language text that corresponds to the 'end' value (subject) of this assertion."
+      "@type": "xsd:string",
+      "comment": "The natural language text that corresponds to an edge. This may change to an rdf:langString in the future."
     },
     "license": {
       "@id": "dc:license",
