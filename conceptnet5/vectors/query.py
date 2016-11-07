@@ -199,7 +199,10 @@ class VectorSpaceWrapper(object):
                 # key that's not a descendant of the given filter key
                 end_key = filter + '0'
                 start_idx = search_frame.index.get_loc(start_key, method='ffill')
-                end_idx = search_frame.index.get_loc(end_key, method='bfill')
+                try:
+                    end_idx = search_frame.index.get_loc(end_key, method='bfill')
+                except KeyError:
+                    end_idx = len(search_frame.index)
                 search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
         similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index].astype('f'))
