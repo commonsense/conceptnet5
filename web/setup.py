@@ -22,7 +22,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'conceptnet >= 5.5.1', 'limits', 'flask==0.11', 'flask-cors', 'flask-limiter', 'langcodes >= 1.3',
-        'jinja2-highlight', 'pygments'
+        'jinja2-highlight', 'pygments', 'raven[flask]'
     ],
     license = 'Apache License 2.0',
 )

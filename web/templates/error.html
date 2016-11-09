@@ -13,6 +13,13 @@
 {% endblock headleft %}
 {% block content %}
     <div class="doc">
-        Sorry about that. You could try going back to the <a href="/">main page</a> of ConceptNet.
+        <p>Sorry about that.
+        {% if g.sentry_event_id %}
+            The problem has been reported to our bug-tracking system, with
+            error ID {{ g.sentry_event_id }}.
+        {% endif %}
+        </p>
+        <p>You could try going back to the <a href="/">main page</a> of
+        ConceptNet.</p>
     </div>
 {% endblock content %}

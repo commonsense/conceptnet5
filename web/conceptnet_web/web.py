@@ -10,6 +10,8 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
 import flask
 from flask_limiter import Limiter
+from raven.contrib.flask import Sentry
+import logging
 import os
 
 
@@ -26,6 +28,13 @@ for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 application = app  # for uWSGI
+
+# Error logging configuration -- requires SENTRY_DSN to be set to a valid
+# Sentry client key
+if os.environ.get('SENTRY_DSN'):
+    sentry = Sentry(app, logging=True, level=logging.WARNING)
+else:
+    sentry = None
 
 
 def get_int(args, key, default, minimum, maximum):
@@ -172,6 +181,11 @@ def error_page_not_found(e):
     return render_error(
         404, "%r isn't a URL that we understand." % flask.request.path
     )
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_error(500, '%s: %s' % (e.__class__.__name__, e))
 
 
 def render_error(status, details):

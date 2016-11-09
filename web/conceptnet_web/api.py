@@ -9,6 +9,8 @@ from conceptnet5.nodes import standardized_concept_uri
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
+from raven.contrib.flask import Sentry
+import logging
 import os
 # TODO: vector wrapper
 
@@ -31,6 +33,14 @@ app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
 application = app  # for uWSGI
+
+
+# Error logging configuration -- requires SENTRY_DSN to be set to a valid
+# Sentry client key
+if os.environ.get('SENTRY_DSN'):
+    sentry = Sentry(app, logging=True, level=logging.WARNING)
+else:
+    sentry = None
 
 
 def get_int(args, key, default, minimum, maximum):
