@@ -29,13 +29,6 @@ for filter_name, filter_func in FILTERS.items():
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 application = app  # for uWSGI
 
-# Error logging configuration -- requires SENTRY_DSN to be set to a valid
-# Sentry client key
-if os.environ.get('SENTRY_DSN'):
-    sentry = Sentry(app, logging=True, level=logging.WARNING)
-else:
-    sentry = None
-
 
 def get_int(args, key, default, minimum, maximum):
     strvalue = args.get(key, default)
@@ -200,3 +193,12 @@ def render_error(status, details):
 if __name__ == '__main__':
     app.debug = True
     app.run('127.0.0.1', debug=True, port=8084)
+
+
+if not app.debug:
+    # Error logging configuration -- requires SENTRY_DSN to be set to a valid
+    # Sentry client key
+    if os.environ.get('SENTRY_DSN'):
+        sentry = Sentry(app, logging=True, level=logging.WARNING)
+    else:
+        sentry = None
