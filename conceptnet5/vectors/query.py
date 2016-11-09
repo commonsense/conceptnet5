@@ -198,7 +198,10 @@ class VectorSpaceWrapper(object):
                 # '0' is the character after '/', so end_key is the first possible
                 # key that's not a descendant of the given filter key
                 end_key = filter + '0'
-                start_idx = search_frame.index.get_loc(start_key, method='ffill')
+                try:
+                    start_idx = search_frame.index.get_loc(start_key, method='bfill')
+                except KeyError:
+                    start_idx = len(search_frame.index)
                 try:
                     end_idx = search_frame.index.get_loc(end_key, method='bfill')
                 except KeyError:
