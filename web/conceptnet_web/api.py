@@ -86,6 +86,10 @@ def query_standardize_uri():
     """
     language = flask.request.args.get('language')
     text = flask.request.args.get('text') or flask.request.args.get('term')
+    if not language:
+        return render_error(400, "Please specify a 'language' parameter.")
+    if not text:
+        return render_error(400, "Please specify a 'text' parameter.")
     return jsonify({
         '@context': responses.CONTEXT,
         '@id': standardized_concept_uri(language, text)
@@ -131,6 +135,13 @@ def error_bad_request(e):
 def error_page_not_found(e):
     return render_error(
         404, "%r isn't a URL that we understand." % flask.request.path
+    )
+
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_error(
+        500, "Internal server error"
     )
 
 
