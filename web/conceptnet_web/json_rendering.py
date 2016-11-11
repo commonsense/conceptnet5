@@ -58,7 +58,7 @@ def jsonify(obj, status=200):
     if flask.request is None or request_wants_json():
         return flask.Response(
             json.dumps(obj, ensure_ascii=False, sort_keys=True),
-            status_code=status,
+            status=status,
             mimetype='application/json'
         )
     else:
