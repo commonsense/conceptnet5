@@ -1,4 +1,5 @@
 {
+  "rdfs:comment": "Pagination in JSON-LD is not standardized yet. This context implements the proposal at https://www.w3.org/community/hydra/wiki/Pagination#PartialCollectionView.",
   "@context": {
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "comment": "rdfs:comment",

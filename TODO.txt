@@ -1,15 +1,8 @@
-Design of ConceptNet 5.5:
-
-- [x] Download Numberbatch vectors alongside DB
-- [x] Fix dependencies for conceptnet5.vectors: sklearn? pandas?
-- [x] Querying an assertion gives an 'edges' list that links to itself -- remove the nested level?
-- [x] Wiktionary links should be ExternalURLs, not sources
-- [ ] Fix tests
-
-For ConceptNet 5.5.1:
+For ConceptNet 5.5.2:
 
 - [ ] Use standardized language codes in Wiktionary forms
 - [ ] Remove "archaïque" context
+- [ ] Avoid extracting the wrong chunk from Wiktionary's "synonym", "antonym", etc. entries
 - [ ] Higher weights on monolingual things, lower weights on uncommon languages
 
 Web interface:
