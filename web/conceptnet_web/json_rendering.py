@@ -49,7 +49,7 @@ def highlight_and_link_json(content):
     return Markup(urlized_html)
 
 
-def jsonify(obj):
+def jsonify(obj, status=200):
     """
     Our custom method for returning JSON, which either provides the raw JSON
     or fills in an HTML template with pretty, syntax-highlighted, linked JSON,
@@ -58,6 +58,7 @@ def jsonify(obj):
     if flask.request is None or request_wants_json():
         return flask.Response(
             json.dumps(obj, ensure_ascii=False, sort_keys=True),
+            status_code=status,
             mimetype='application/json'
         )
     else:
@@ -67,4 +68,4 @@ def jsonify(obj):
             'json.html',
             json=pretty_json,
             json_raw=ugly_json
-        )
+        ), status

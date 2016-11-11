@@ -146,7 +146,7 @@ def internal_server_error(e):
 
 
 def render_error(status, details):
-    return jsonify(error({}, status=status, details=details))
+    return jsonify(error({}, status=status, details=details), status=status)
 
 
 if __name__ == '__main__':
