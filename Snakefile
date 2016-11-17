@@ -524,8 +524,9 @@ rule miniaturize:
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",
-        DATA + "/stats/terms.txt"
+        DATA + "/stats/terms.txt",
+        DATA + "/psql/done"
     output:
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
     shell:
-        "cn5-vectors export_text {input} %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}
+        "cn5-vectors export_text %(data)s/vectors/numberbatch.h5 %(data)s/stats/terms.txt %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}
