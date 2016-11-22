@@ -98,6 +98,15 @@ rule all:
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
 
 
+rule evaluation:
+    input:
+        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
+        DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
+        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
+        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
+        DATA + "/precomputed/vectors/numberbatch-1609.h5"
+
+
 rule webdata:
     input:
         DATA + "/psql/edges.csv.gz",
@@ -131,6 +140,12 @@ rule download_raw:
         DATA + "/raw/{dirname}/{filename}"
     shell:
         "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+
+rule download_numberbatch:
+    output:
+        DATA + "/precomputed/vectors/numberbatch-1609.h5"
+    shell:
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
 
 
 # Precomputation
