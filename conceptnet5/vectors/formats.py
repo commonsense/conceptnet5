@@ -128,8 +128,8 @@ def load_glove(filename, nrows=500000):
         )
 
 
-def load_fasttext(filename, nrows=1000000):
-    arr = np.zeros((nrows, 300))
+def load_fasttext(filename, nrows=1000000, ncols=300):
+    arr = np.zeros((nrows, ncols))
     labels = []
     with gzip.open(filename, 'rt') as infile:
         for i, line in enumerate(itertools.islice(infile, 1, None)):
