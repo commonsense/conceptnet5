@@ -104,7 +104,7 @@ rule evaluation:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
-        DATA + "/precomputed/vectors/numberbatch-1609.h5"
+        DATA + "/precomputed/vectors/numberbatch.h5"
 
 
 rule webdata:
@@ -143,9 +143,9 @@ rule download_raw:
 
 rule download_numberbatch:
     output:
-        DATA + "/precomputed/vectors/numberbatch-1609.h5"
+        DATA + "/precomputed/vectors/{filename}"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/{filename} > {output}"
 
 
 # Precomputation
