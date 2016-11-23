@@ -3,10 +3,9 @@ from conceptnet5.vectors.formats import load_hdf, save_hdf, load_glove, load_wor
 import numpy as np
 import pandas as pd
 
-
 # The filename of Turney's SAT evaluation data, which cannot be distributed
 # with this code and must be requested from Peter Turney.
-ANALOGY_FILENAME = '/hd/data/analogy/SAT-package-V3.txt'
+ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
 
 def load_any_embeddings(filename):
@@ -38,8 +37,7 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
         story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
         results.append(
             pd.concat(
-                [wordsim_results, analogy_results, story_results],
-                axis=0
+                [wordsim_results, analogy_results, story_results], axis=0
             )
         )
     result = pd.concat(results, keys=filenames)
@@ -62,9 +60,9 @@ def graph_comparison(table_filename):
     systems = [
         ('word2vec Google News', 'data/raw/vectors/GoogleNews-vectors-negative300.bin.gz'),
         ('GloVe 1.2 840B', 'data/raw/vectors/glove12.840B.300d.txt.gz'),
-        ('LexVec', 'data/raw/vectors/lexvec.no-header.vectors.gz'),
-        ('ConceptNet PPMI', 'data/vectors/conceptnet-55-ppmi.h5'),
-        ('ConceptNet Numberbatch 16.09', 'data/vectors/numberbatch.h5')
+        ('LexVec: enWP + NewsCrawl', 'data/raw/vectors/lexvec.no-header.vectors.gz'),
+        ('ConceptNet-PPMI', 'data/precomputed/vectors/conceptnet-55-ppmi.h5'),
+        ('ConceptNet Numberbatch 16.09', 'data/precomputed/vectors/numberbatch.h5')
     ]
     ind = np.arange(len(evals))
 
