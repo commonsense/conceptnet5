@@ -5,14 +5,17 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro']
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'gur222-de', 'gur65-de']
 SAMPLE_SIZES = {
     'ws353': 353,
     'ws353-es': 353,
     'ws353-ro': 353,
     'men3000': 3000,
     'mturk': 771,
-    'rw': 2034
+    'rw': 2034,
+    'gur350-de': 350,
+    'gur222-de': 222,
+    'gur65-de': 65
 }
 
 # A mapping from short group names to more formal citations
@@ -174,6 +177,19 @@ def read_ws353_multilingual(language):
             yield term1, term2, gold_score
 
 
+def read_gurevych(setname):
+    # The 'setname' here is a number indicating the number of word pairs
+    # in the set.
+    filename = 'gurevych/wortpaare{}.gold.pos.txt'.format(setname)
+    with open(get_support_data_filename(filename)) as file:
+        for line in file:
+            if line.startswith('#'):
+                continue
+            term1, term2, sscore, _pos1, _pos2 = line.rstrip().split(':')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score
+
+
 def read_mturk():
     with open(get_support_data_filename('mturk/MTURK-771.csv')) as file:
         for line in file:
@@ -277,6 +293,9 @@ def evaluate(frame, subset='dev'):
     men_score = spearman_evaluate(vectors, read_men3000(men_subset))
     rw_score = spearman_evaluate(vectors, read_rw(subset))
     mturk_score = spearman_evaluate(vectors, read_mturk())
+    gur350_score = spearman_evaluate(vectors, read_gurevych('350'), language='de')
+    gur222_score = spearman_evaluate(vectors, read_gurevych('222'), language='de')
+    gur65_score = spearman_evaluate(vectors, read_gurevych('65'), language='de')
     ws_score = spearman_evaluate(vectors, read_ws353())
     ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
@@ -284,6 +303,9 @@ def evaluate(frame, subset='dev'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['gur350-de'] = gur350_score
+    results.loc['gur222-de'] = gur222_score
+    results.loc['gur65-de'] = gur65_score
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
@@ -300,6 +322,9 @@ def evaluate_raw(frame, subset='dev'):
     men_score = spearman_evaluate(frame, read_men3000(subset))
     rw_score = spearman_evaluate(frame, read_rw(subset))
     mturk_score = spearman_evaluate(frame, read_mturk())
+    gur350_score = spearman_evaluate(frame, read_gurevych('350'), language='de')
+    gur222_score = spearman_evaluate(frame, read_gurevych('222'), language='de')
+    gur65_score = spearman_evaluate(frame, read_gurevych('65'), language='de')
     ws_score = spearman_evaluate(frame, read_ws353())
     ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'), language='ro')
@@ -307,6 +332,9 @@ def evaluate_raw(frame, subset='dev'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['gur350-de'] = gur350_score
+    results.loc['gur222-de'] = gur222_score
+    results.loc['gur65-de'] = gur65_score
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
