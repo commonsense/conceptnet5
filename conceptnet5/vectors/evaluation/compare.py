@@ -45,7 +45,7 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
     return result
 
 
-def graph_comparison(table_filename):
+def graph_comparison(table_filename, png_filename):
     import matplotlib.pyplot as plt
     result = load_hdf(table_filename)
     plt.style.use('bmh')
@@ -78,4 +78,4 @@ def graph_comparison(table_filename):
     ax.set_xticklabels(eval_labels)
     ax.xaxis.grid(False)
     plt.ylabel('Evaluation score', fontsize='x-large')
-    plt.savefig('data/stats/eval-graph.png', dpi=300)
+    plt.savefig(png_filename, dpi=300)

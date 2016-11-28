@@ -6,6 +6,7 @@ from .formats import (
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
+from .evaluation.compare import compare_embeddings, graph_comparison
 from .transforms import miniaturize
 from .query import VectorSpaceWrapper
 
@@ -97,6 +98,31 @@ def run_evaluate(filename):
 def run_evaluate_raw(filename):
     frame = load_hdf(filename)
     print(evaluate_raw(frame))
+
+
+@cli.command(name='compare_embeddings')
+@click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+def run_compare_embeddings(input_filenames, output_filename):
+    """
+    The `input_filenames` are files that can be loaded as matrices of word
+    embeddings. They'll be run through the relatedness and analogy evaluations,
+    and the results will be saved in an HDF5 file, `output_filename`. This
+    file can be used by `comparison_graph`.
+    """
+    results = compare_embeddings(input_filenames, subset='all', tune_analogies=True)
+    print(results)
+    save_hdf(results, output_filename)
+
+
+@cli.command(name='comparison_graph')
+@click.argument('table_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('png_filename', type=click.Path(writable=True, dir_okay=False))
+def run_comparison_graph(table_filename, png_filename):
+    """
+    Convert a table of evaluation results into a PNG graph.
+    """
+    graph_comparison(table_filename, png_filename)
 
 
 @cli.command(name='export_hyperwords')
