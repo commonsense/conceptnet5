@@ -111,7 +111,7 @@ def run_compare_embeddings(input_filenames, output_filename):
     file can be used by `comparison_graph`.
     """
     results = compare_embeddings(input_filenames, subset='all', tune_analogies=True)
-    print(results)
+    print(results['acc'])
     save_hdf(results, output_filename)
 
 
