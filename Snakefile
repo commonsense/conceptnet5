@@ -97,6 +97,9 @@ rule all:
         DATA + "/vectors/mini.h5",
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
 
+rule evaluation:
+    input:
+        DATA + "/stats/eval-graph.png"
 
 rule webdata:
     input:
@@ -109,13 +112,11 @@ rule webdata:
         DATA + "/psql/relations.csv.gz",
         DATA + "/vectors/mini.h5",
 
-
 rule clean:
     shell:
         "for subdir in assertions collated db edges psql tmp vectors stats; "
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
-
 
 rule test:
     input:
@@ -131,6 +132,12 @@ rule download_raw:
         DATA + "/raw/{dirname}/{filename}"
     shell:
         "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+
+rule download_numberbatch:
+    output:
+        DATA + "/precomputed/vectors/{filename}"
+    shell:
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/{wildcards.filename} > {output}"
 
 
 # Precomputation
@@ -304,6 +311,7 @@ rule combine_assertions:
     shell:
         "python3 -m conceptnet5.builders.combine_assertions -o {output} {input}"
 
+
 # Putting data in PostgreSQL
 # ==========================
 rule prepare_db:
@@ -327,7 +335,6 @@ rule gzip_db:
         DATA + "/psql/{name}.csv.gz"
     shell:
         "gzip -c {input} > {output}"
-
 
 rule load_db:
     input:
@@ -355,7 +362,6 @@ rule relation_stats:
         "cut -f 2 {input} | LC_ALL=C sort | LC_ALL=C uniq -c "
         "| LC_ALL=C sort -nbr > {output}"
 
-
 rule all_terms:
     input:
         DATA + "/psql/nodes.csv"
@@ -363,7 +369,6 @@ rule all_terms:
         DATA + "/stats/terms.txt"
     shell:
         "cut -f 2 {input} > {output}"
-
 
 rule core_concepts_left:
     input:
@@ -417,6 +422,7 @@ rule language_stats:
         "cat {input} | grep '^/c/' | LC_ALL=C sort | LC_ALL=C uniq | cut -d '/' -f 3 "
         "| LC_ALL=C sort | LC_ALL=C uniq -c | sort -nbr > {output}"
 
+
 # Building associations
 # =====================
 rule assertions_to_assoc:
@@ -442,6 +448,7 @@ rule reduce_assoc:
         DATA + "/assoc/reduced.csv"
     shell:
         "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
+
 
 # Building the vector space
 # =========================
@@ -508,7 +515,6 @@ rule merge_intersect:
     shell:
         "cn5-vectors intersect {input} {output}"
 
-
 rule miniaturize:
     input:
         DATA + "/vectors/numberbatch.h5",
@@ -520,7 +526,6 @@ rule miniaturize:
     shell:
         "cn5-vectors miniaturize {input} {output}"
 
-
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",
@@ -529,3 +534,27 @@ rule export_text:
         DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
     shell:
         "cn5-vectors export_text {input} %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}
+
+
+# Evaluation
+# ==========
+
+rule compare_embeddings:
+    input:
+        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
+        DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
+        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
+        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
+        DATA + "/precomputed/vectors/numberbatch.h5"
+    output:
+        DATA + "/stats/evaluation.h5"
+    shell:
+        "cn5-vectors compare_embeddings {input} {output}"
+
+rule comparison_graph:
+    input:
+        DATA + "/stats/evaluation.h5"
+    output:
+        DATA + "/stats/eval-graph.png"
+    shell:
+        "cn5-vectors comparison_graph {input} {output}"

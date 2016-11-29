@@ -5,14 +5,16 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro']
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de']
 SAMPLE_SIZES = {
     'ws353': 353,
     'ws353-es': 353,
     'ws353-ro': 353,
     'men3000': 3000,
     'mturk': 771,
-    'rw': 2034
+    'rw': 2034,
+    'gur350-de': 350,
+    'zg222-de': 222,
 }
 
 # A mapping from short group names to more formal citations
@@ -22,7 +24,9 @@ GROUPS = {
     'Google': 'Mikolov et al. (2013)',
     'Facebook': 'Joulin et al. (2016)',
     'Stanford': 'Pennington et al. (2014)',
-    'UFRGS': 'Salle et al. (2016)'
+    'UFRGS': 'Salle et al. (2016)',
+    'Google+HL': 'Soricut and Och (2015)',
+    'Oxford': 'Botha and Blunsom (2014)'
 }
 
 
@@ -131,7 +135,9 @@ COMPARISONS['Stanford', 'GloVe'] = make_comparison_table({
 # Rounded-off numbers from the blog post at https://research.facebook.com/blog/fasttext/
 COMPARISONS['Facebook', 'fastText'] = make_comparison_table({
     'rw': .46,
-    'ws353': .73
+    'ws353': .73,
+    'gur350-de': .69,
+    'zg222-de': .37,
 })
 
 # Salle et al., 2016 - LexVec
@@ -145,6 +151,20 @@ COMPARISONS['UFRGS', 'LexVec'] = make_comparison_table({
     'mturk': .655
 })
 
+COMPARISONS['Google+HL', 'SG+Morph'] = make_comparison_table({
+    'rw': .418,
+    'ws353': .712,
+    'gur350-de': .641,
+    'zg222-de': .215,
+    'ws353-es': .473,
+})
+
+COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
+    'rw': .300,
+    'ws353': .400,
+    'gur350-de': .560,
+    'zg222-de': .250
+})
 
 def read_ws353():
     """
@@ -170,6 +190,19 @@ def read_ws353_multilingual(language):
     with open(get_support_data_filename(filename)) as file:
         for line in file:
             term1, term2, sscore = line.split('\t')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score
+
+
+def read_gurevych(setname):
+    # The 'setname' here is a number indicating the number of word pairs
+    # in the set.
+    filename = 'gurevych/wortpaare{}.gold.pos.txt'.format(setname)
+    with open(get_support_data_filename(filename)) as file:
+        for line in file:
+            if line.startswith('#'):
+                continue
+            term1, term2, sscore, _pos1, _pos2 = line.rstrip().split(':')
             gold_score = float(sscore)
             yield term1, term2, gold_score
 
@@ -277,6 +310,8 @@ def evaluate(frame, subset='dev'):
     men_score = spearman_evaluate(vectors, read_men3000(men_subset))
     rw_score = spearman_evaluate(vectors, read_rw(subset))
     mturk_score = spearman_evaluate(vectors, read_mturk())
+    gur350_score = spearman_evaluate(vectors, read_gurevych('350'), language='de')
+    zg222_score = spearman_evaluate(vectors, read_gurevych('222'), language='de')
     ws_score = spearman_evaluate(vectors, read_ws353())
     ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
@@ -284,6 +319,8 @@ def evaluate(frame, subset='dev'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['gur350-de'] = gur350_score
+    results.loc['zg222-de'] = zg222_score
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
@@ -300,6 +337,8 @@ def evaluate_raw(frame, subset='dev'):
     men_score = spearman_evaluate(frame, read_men3000(subset))
     rw_score = spearman_evaluate(frame, read_rw(subset))
     mturk_score = spearman_evaluate(frame, read_mturk())
+    gur350_score = spearman_evaluate(frame, read_gurevych('350'), language='de')
+    zg222_score = spearman_evaluate(frame, read_gurevych('222'), language='de')
     ws_score = spearman_evaluate(frame, read_ws353())
     ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'), language='es')
     ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'), language='ro')
@@ -307,6 +346,8 @@ def evaluate_raw(frame, subset='dev'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['gur350-de'] = gur350_score
+    results.loc['zg222-de'] = zg222_score
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
