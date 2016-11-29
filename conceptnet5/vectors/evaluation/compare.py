@@ -66,16 +66,17 @@ def graph_comparison(table_filename, png_filename):
     ]
     ind = np.arange(len(evals))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(16, 8))
     for i, (sysname, syspath) in enumerate(systems):
         eval_table = result.xs(syspath, level=0).loc[evals]
         errs = [eval_table['high'] - eval_table['acc'], eval_table['acc'] - eval_table['low']]
         ax.bar(ind + i * width, eval_table['acc'], width, color=colors[i], yerr=errs, ecolor='k')
 
     ax.set_ylim(0.0, 1.0)
-    ax.legend([name for (name, path) in systems])
+    ax.set_yticks(np.arange(0.0, 1.1, 0.1))
+    ax.legend([name for (name, path) in systems], bbox_to_anchor=(1.02, 1), loc=2, borderaxespad=0.)
     ax.set_xticks(ind + width * len(systems) / 2)
     ax.set_xticklabels(eval_labels)
     ax.xaxis.grid(False)
     plt.ylabel('Evaluation score', fontsize='x-large')
-    plt.savefig(png_filename, dpi=300)
+    plt.savefig(png_filename, bbox_inches="tight", dpi=300)
