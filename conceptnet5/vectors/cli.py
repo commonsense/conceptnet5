@@ -102,6 +102,7 @@ def run_evaluate_raw(filename):
 
 @cli.command(name='compare_embeddings')
 @click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument('psql_file_check', type=click.Path())
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 def run_compare_embeddings(input_filenames, output_filename):
     """
@@ -109,6 +110,14 @@ def run_compare_embeddings(input_filenames, output_filename):
     embeddings. They'll be run through the relatedness and analogy evaluations,
     and the results will be saved in an HDF5 file, `output_filename`. This
     file can be used by `comparison_graph`.
+
+    This requires the PostgreSQL database of ConceptNet 5 to be built, because
+    it finds embeddings of uncommon words on the fly by looking up their
+    neighbors in the ConceptNet graph. These embeddings could have been stored
+    in the matrix, but this saves memory and download time.
+
+    The `psql_file_check` argument is ignored; it's just a convenient way
+    to make Snakemake realize that the PostgreSQL database has to be available.
     """
     results = compare_embeddings(input_filenames, subset='all', tune_analogies=True)
     print(results['acc'])
