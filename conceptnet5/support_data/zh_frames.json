@@ -157,19 +157,19 @@
   }, 
   "3392": {
     "text": "{1} 不想要 {2}。", 
-    "relation": "/r/Desires"
+    "relation": "/r/NotDesires"
   }, 
   "3393": {
     "text": "{1} 懼怕 {2}。", 
-    "relation": "/r/Desires"
+    "relation": "/r/NotDesires"
   }, 
   "3394": {
     "text": "{1} 不想得到 {2}。", 
-    "relation": "/r/Desires"
+    "relation": "/r/NotDesires"
   }, 
   "3395": {
     "text": "{1} 痛恨 {2}。", 
-    "relation": "/r/Desires"
+    "relation": "/r/NotDesires"
   }, 
   "3396": {
     "text": "{1} 和 {2} 通常會一起出現。", 
