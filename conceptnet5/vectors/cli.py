@@ -104,7 +104,7 @@ def run_evaluate_raw(filename):
 @click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
 @click.argument('psql_file_check', type=click.Path())
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-def run_compare_embeddings(input_filenames, output_filename):
+def run_compare_embeddings(input_filenames, psql_file_check, output_filename):
     """
     The `input_filenames` are files that can be loaded as matrices of word
     embeddings. They'll be run through the relatedness and analogy evaluations,
