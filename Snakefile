@@ -99,7 +99,7 @@ rule all:
 
 rule evaluation:
     input:
-        DATA + "/stats/eval-graph.png"
+        DATA + "/stats/eval-graph.pdf"
 
 rule webdata:
     input:
@@ -557,6 +557,6 @@ rule comparison_graph:
     input:
         DATA + "/stats/evaluation.h5"
     output:
-        DATA + "/stats/eval-graph.png"
+        DATA + "/stats/eval-graph.pdf"
     shell:
         "cn5-vectors comparison_graph {input} {output}"
