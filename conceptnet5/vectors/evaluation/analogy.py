@@ -108,7 +108,7 @@ def tune_pairwise_analogies(frame, eval_filename, subset):
     # ]
     print('Tuning analogy weights')
     weights = [
-        0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
+        0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
         0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 1.0
     ]
     best_weights = None
@@ -124,6 +124,8 @@ def tune_pairwise_analogies(frame, eval_filename, subset):
                 print(weight_direct, weight_transpose, acc)
                 best_weights = (weight_direct, weight_transpose)
                 best_acc = acc
+            elif acc == best_acc:
+                print(weight_direct, weight_transpose, acc)
     weight_direct, weight_transpose = best_weights
     print()
     return eval_pairwise_analogies(

@@ -546,7 +546,7 @@ rule compare_embeddings:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/precomputed/vectors/numberbatch.h5",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
