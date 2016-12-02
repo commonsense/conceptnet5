@@ -99,7 +99,7 @@ rule all:
 
 rule evaluation:
     input:
-        DATA + "/stats/eval-graph.png"
+        DATA + "/stats/eval-graph.pdf"
 
 rule webdata:
     input:
@@ -546,7 +546,7 @@ rule compare_embeddings:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/precomputed/vectors/numberbatch.h5",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
@@ -557,6 +557,6 @@ rule comparison_graph:
     input:
         DATA + "/stats/evaluation.h5"
     output:
-        DATA + "/stats/eval-graph.png"
+        DATA + "/stats/eval-graph.pdf"
     shell:
         "cn5-vectors comparison_graph {input} {output}"

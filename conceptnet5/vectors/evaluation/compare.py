@@ -45,13 +45,14 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
     return result
 
 
-def graph_comparison(table_filename, png_filename):
+def graph_comparison(table_filename, out_filename):
     import matplotlib.pyplot as plt
     result = load_hdf(table_filename)
     plt.style.use('bmh')
     plt.rcParams['xtick.labelsize'] = 'x-large'
     plt.rcParams['ytick.labelsize'] = 'x-large'
 
+    patterns = [ "/", "\\" , "//" , "\\\\" , " " ]
     width = 0.15
     evals = ['men3000', 'rw', 'mturk', 'ws353', 'story-cloze', 'sat-analogies']
     eval_labels = ['MEN-3000', 'Rare Words', 'MTurk-771', 'WS353', 'Story Cloze', 'SAT analogies']
@@ -62,7 +63,7 @@ def graph_comparison(table_filename, png_filename):
         ('GloVe 1.2 840B', 'data/raw/vectors/glove12.840B.300d.txt.gz'),
         ('LexVec: enWP + NewsCrawl', 'data/raw/vectors/lexvec.no-header.vectors.gz'),
         ('ConceptNet-PPMI', 'data/precomputed/vectors/conceptnet-55-ppmi.h5'),
-        ('ConceptNet Numberbatch 16.09', 'data/precomputed/vectors/numberbatch.h5')
+        ('ConceptNet Numberbatch', 'data/precomputed/vectors/numberbatch.h5')
     ]
     ind = np.arange(len(evals))
 
@@ -70,7 +71,7 @@ def graph_comparison(table_filename, png_filename):
     for i, (sysname, syspath) in enumerate(systems):
         eval_table = result.xs(syspath, level=0).loc[evals]
         errs = [eval_table['high'] - eval_table['acc'], eval_table['acc'] - eval_table['low']]
-        ax.bar(ind + i * width, eval_table['acc'], width, color=colors[i], yerr=errs, ecolor='k')
+        ax.bar(ind + i * width, eval_table['acc'], width, hatch=patterns[i], color=colors[i], yerr=errs, ecolor='k')
 
     ax.set_ylim(0.0, 1.0)
     ax.set_yticks(np.arange(0.0, 1.1, 0.1))
@@ -79,4 +80,4 @@ def graph_comparison(table_filename, png_filename):
     ax.set_xticklabels(eval_labels)
     ax.xaxis.grid(False)
     plt.ylabel('Evaluation score', fontsize='x-large')
-    plt.savefig(png_filename, bbox_inches="tight", dpi=300)
+    plt.savefig(out_filename, bbox_inches="tight", dpi=300)

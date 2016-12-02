@@ -88,9 +88,10 @@ def run_intersect(input_filenames, output_filename, projection_filename):
 
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-def run_evaluate(filename):
+@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+def run_evaluate(filename, subset):
     frame = load_hdf(filename)
-    print(evaluate(frame))
+    print(evaluate(frame, subset=subset))
 
 
 @cli.command(name='evaluate_raw')
@@ -126,12 +127,12 @@ def run_compare_embeddings(input_filenames, psql_file_check, output_filename):
 
 @cli.command(name='comparison_graph')
 @click.argument('table_filename', type=click.Path(readable=True, dir_okay=False))
-@click.argument('png_filename', type=click.Path(writable=True, dir_okay=False))
-def run_comparison_graph(table_filename, png_filename):
+@click.argument('out_filename', type=click.Path(writable=True, dir_okay=False))
+def run_comparison_graph(table_filename, out_filename):
     """
-    Convert a table of evaluation results into a PNG graph.
+    Convert a table of evaluation results into a PNG or PDF graph.
     """
-    graph_comparison(table_filename, png_filename)
+    graph_comparison(table_filename, out_filename)
 
 
 @cli.command(name='export_hyperwords')
