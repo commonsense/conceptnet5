@@ -92,6 +92,7 @@ rule all:
         DATA + "/psql/sources.csv.gz",
         DATA + "/psql/relations.csv.gz",
         DATA + "/stats/languages.txt",
+        DATA + "/stats/language_edges.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/mini.h5",
@@ -412,6 +413,7 @@ rule concepts_right:
     shell:
         "cut -f 4 {input} > {output}"
 
+
 rule language_stats:
     input:
         DATA + "/stats/concepts_left.txt",
@@ -420,6 +422,16 @@ rule language_stats:
         DATA + "/stats/languages.txt"
     shell:
         "cat {input} | grep '^/c/' | LC_ALL=C sort | LC_ALL=C uniq | cut -d '/' -f 3 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c | sort -nbr > {output}"
+
+rule language_edge_stats:
+    input:
+        DATA + "/stats/concepts_left.txt",
+        DATA + "/stats/concepts_right.txt"
+    output:
+        DATA + "/stats/language_edges.txt"
+    shell:
+        "cat {input} | grep '^/c/' | LC_ALL=C sort | cut -d '/' -f 3 "
         "| LC_ALL=C sort | LC_ALL=C uniq -c | sort -nbr > {output}"
 
 
