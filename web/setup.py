@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.5.1'
+version_str = '5.5.2'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
@@ -21,8 +21,9 @@ setup(
     packages=packages,
     include_package_data=True,
     install_requires=[
-        'conceptnet >= 5.5.1', 'limits', 'flask==0.11', 'flask-cors', 'flask-limiter', 'langcodes >= 1.3',
-        'jinja2-highlight', 'pygments', 'raven[flask]'
+        'conceptnet >= %s' % version_str,
+        'limits', 'flask==0.11', 'flask-cors', 'flask-limiter',
+        'langcodes >= 1.3', 'jinja2-highlight', 'pygments', 'raven[flask]'
     ],
     license = 'Apache License 2.0',
 )
