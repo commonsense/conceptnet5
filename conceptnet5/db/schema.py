@@ -1,4 +1,5 @@
 TABLES = [
+    "DROP MATERIALIZED VIEW IF EXISTS ranked_features",
     "DROP TABLE IF EXISTS edge_features",
     "DROP TABLE IF EXISTS edge_sources",
     "DROP TABLE IF EXISTS node_prefixes",
