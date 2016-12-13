@@ -21,6 +21,10 @@ def handle_raw_assertion(line):
     rel = fdata['relation']
 
     surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace('{2}', '[[' + concept2 + ']]')
+    # We mark surface texts with * if {2} comes before {1}.
+    if ftext.find('{2}') < ftext.find('{1}'):
+        surfaceText = '*' + surfaceText
+
     start = standardized_concept_uri('zh_TW', concept1)
     end = standardized_concept_uri('zh_TW', concept2)
     source = {
