@@ -1,9 +1,9 @@
 #!/bin/bash
-# After building ConceptNet, this script uploads the built data in the data/dist/
-# directory to the ConceptNet server.
+# After building ConceptNet, this script uploads the built PostgreSQL data
+# that the data-loader will use.
 if [ $# -eq 0 ]; then
-  echo "Usage: ./upload.sh DATE"
+  echo "Usage: ./upload.sh VERSION"
   exit 1
 fi
 
-rsync -Pavz data/dist/$1/ conceptnet5.media.mit.edu:/data/downloads/$1/
+aws s3 cp --recursive data/psql s3://conceptnet/precomputed-data/2016/psql/$1/ --exclude *.csv --exclude *done
