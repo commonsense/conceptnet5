@@ -1,6 +1,6 @@
 {
   "3353": {
-    "text": "{1} 會讓你想要 {2} 。", 
+    "text": "{1} 會讓你想要 {2} 。",
     "relation": "/r/CausesDesire"
   }, 
   "3354": {
@@ -100,8 +100,8 @@
     "relation": "/r/AtLocation"
   }, 
   "3378": {
-    "text": "{2} 有 {1}。", 
-    "relation": "/r/AtLocation"
+    "text": "{1} 有 {2}。", 
+    "relation": "/r/HasA"
   }, 
   "3379": {
     "text": "{1} 是用來 {2} 的。", 
