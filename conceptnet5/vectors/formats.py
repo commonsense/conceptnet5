@@ -20,6 +20,7 @@ def save_hdf(table, filename):
 
 
 def save_npy_and_labels(table, matrix_filename, vocab_filename):
+    # TODO: find out if we're using this
     np.save(matrix_filename, table.values)
     save_index_as_labels(table.index, vocab_filename)
 
@@ -93,12 +94,12 @@ def convert_glove(glove_filename, output_filename, nrows):
     save_hdf(glove_normal, output_filename)
 
 
-def convert_fasttext(fasttext_filename, output_filename, nrows):
+def convert_fasttext(fasttext_filename, output_filename, nrows, language):
     """
     Convert FastText data from a gzipped text file to an HDF5 dataframe.
     """
     ft_raw = load_fasttext(fasttext_filename, nrows)
-    ft_std = standardize_row_labels(ft_raw, forms=False)
+    ft_std = standardize_row_labels(ft_raw, forms=False, language=language)
     del ft_raw
     ft_normal = l2_normalize_rows(l1_normalize_columns(ft_std))
     del ft_std
@@ -119,6 +120,8 @@ def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
 
 
 def load_glove(filename, nrows=500000):
+    # TODO: just make this a variant of load_fasttext, or make load_fasttext
+    # a variant of this
     with gzip.open(filename, 'rt') as infile:
         return pd.read_table(
             infile, sep=' ', index_col=0, quoting=3,
@@ -128,11 +131,15 @@ def load_glove(filename, nrows=500000):
         )
 
 
-def load_fasttext(filename, nrows=1000000, ncols=300):
-    arr = np.zeros((nrows, ncols))
+def load_fasttext(filename, max_rows=1000000):
+    arr = None
     labels = []
     with gzip.open(filename, 'rt') as infile:
-        for i, line in enumerate(itertools.islice(infile, 1, None)):
+        nrows_str, ncols_str = infile.readline().rstrip().split()
+        nrows = min(int(nrows_str), max_rows)
+        ncols = int(ncols_str)
+        arr = np.zeros((nrows, ncols))
+        for i, line in enumerate(infile):
             if i >= nrows:
                 break
             items = line.rstrip().split(' ')

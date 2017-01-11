@@ -6,22 +6,12 @@ separate and join tokens. The tools apply most to English, but should also
 be able to do their job in any Western language that uses spaces.
 """
 
+# FIXME: this exists only to be imported
 from wordfreq import simple_tokenize
 import sys
 import re
 
 PY2 = (sys.version_info.major < 3)
-
-
-def casefold(text):
-    """
-    Standardize the case of text by converting it to uppercase first, then to
-    lowercase.
-    """
-    if hasattr(str, 'casefold'):
-        return text.casefold()
-    else:
-        return text.upper().lower()
 
 
 def untokenize(tokens):

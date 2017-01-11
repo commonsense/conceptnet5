@@ -34,7 +34,7 @@ BEDUME_FLAGGED_CONCEPTS = [
   'intoxicate', 'eat hamburger', 'wok'
 ]
 BEDUME_FLAGGED_PLACES = [
-  'alaska', 'kansa', 'utah', 'austria', 'delaware', 'pennsylvania', 'italy',
+  'alaska', 'kansa', 'kansas', 'utah', 'austria', 'delaware', 'pennsylvania', 'italy',
   'cuba', 'norway', 'idaho', 'france', 'utha', 'mexico', 'connecticut',
   'massachusetts', 'montana', 'wyoming', 'every state', 'new york', 'maine',
   'suface of moon', 'germany', 'nebraska', 'finland', 'louisiana', 'belgium',
@@ -156,7 +156,7 @@ def can_skip(parts_dict):
         return True
     return False
 
-
+# TODO: this should be combined with 'can_skip'
 def skip_assertion(source_dict, start, end):
     """
     Filter out assertions that we can tell will be unhelpful after we've
@@ -215,6 +215,7 @@ def build_relation(parts_dict):
     return relation
 
 
+# TODO: is this redundant with something in nodes.py?
 def filtered_uri(lang, text):
     if lang == 'en':
         text = filter_stopwords(text)
@@ -304,10 +305,8 @@ def build_sources(parts_dict, preposition_fix=False):
     return sources
 
 
+# TODO: this doesn't need to be a class
 class CN4Builder(object):
-    def __init__(self):
-        self.seen_sources = set()
-
     def handle_assertion(self, parts_dict):
         """
         Process one assertion from ConceptNet 4, which appears in the input
@@ -378,6 +377,7 @@ def handle_file(input_filename, output_file):
     builder.transform_file(input_filename, output_file)
 
 
+# TODO: convert this to click or just remove it if we've already done that
 def main():
     import argparse
     parser = argparse.ArgumentParser()

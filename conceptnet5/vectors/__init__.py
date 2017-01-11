@@ -50,12 +50,13 @@ def get_vector(frame, label, language=None):
     try:
         return frame.loc[label]
     except KeyError:
+        # Return a vector of all NaNs
         return pd.Series(index=frame.columns)
 
 
 def normalize_vec(vec):
     """
-    Normalize a single vector, as a 1-D ndarray or a Series.
+    L2-normalize a single vector, as a 1-D ndarray or a Series.
     """
     if isinstance(vec, pd.Series):
         return normalize(vec.fillna(0).reshape(1, -1))[0]
@@ -75,6 +76,9 @@ def cosine_similarity(vec1, vec2):
 
 
 def similar_to_vec(frame, vec, limit=50):
+    # TODO: document the assumptions here
+    # - frame and vec should be normalized
+    # - frame should not be made of 8-bit ints
     if vec.dot(vec) == 0.:
         return pd.Series(data=[], index=[], dtype='f')
     similarity = frame.dot(vec)

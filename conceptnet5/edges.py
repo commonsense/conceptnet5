@@ -147,6 +147,7 @@ def transform_for_linked_data(edge):
     edge['end'] = ld_node(end_uri, end_label)
     edge['rel'] = ld_node(rel_uri, None)
     if 'other' in edge:
+        # TODO: Find out when we use this, or remove it if we don't use it
         if edge['other'] == start_uri:
             edge['other'] = edge['start']
         elif edge['other'] == end_uri:

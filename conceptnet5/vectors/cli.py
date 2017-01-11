@@ -63,8 +63,9 @@ def run_convert_glove(glove_filename, output_filename, nrows=500000):
 @click.argument('fasttext_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=500000)
-def run_convert_fasttext(fasttext_filename, output_filename, nrows=500000):
-    convert_fasttext(fasttext_filename, output_filename, nrows)
+@click.option('--language', '-l', default='en')
+def run_convert_fasttext(fasttext_filename, output_filename, nrows=500000, language='en'):
+    convert_fasttext(fasttext_filename, output_filename, nrows=nrows, language=language)
 
 
 @cli.command(name='convert_word2vec')

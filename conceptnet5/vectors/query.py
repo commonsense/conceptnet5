@@ -71,6 +71,7 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
+            # FIXME: is self.standardized used for anything?
             if self.frame.index[0].startswith('/c/'):
                 self.standardized = True
             else:
@@ -114,7 +115,10 @@ class VectorSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
+            # TODO: why are we dividing by 10 here?
             expanded.append((term, weight / 10))
+            # TODO: this disagrees with the docstring about whether neighbors
+            # are added to non-OOV terms
             if include_neighbors and term not in self.frame.index and self.finder is not None:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
                     if field_match(edge['start']['term'], term) and not field_match(edge['end']['term'], term):
@@ -123,6 +127,7 @@ class VectorSpaceWrapper(object):
                         neighbor = edge['start']['term']
                     else:
                         continue
+                    # TODO: explain this formula
                     neighbor_weight = weight * min(10, edge['weight']) * 0.001
                     expanded.append((neighbor, neighbor_weight))
 
@@ -133,6 +138,7 @@ class VectorSpaceWrapper(object):
             return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
 
     def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
+        # TODO: docstring
         self.load()
         return weighted_average(
             self.frame,
@@ -140,6 +146,7 @@ class VectorSpaceWrapper(object):
         )
 
     def text_to_vector(self, language, text):
+        # TODO: docstring -- is this only used for Story Cloze Test?
         tokens = wordfreq.tokenize(text, language)
         weighted_terms = [(standardized_uri(language, token), 1.) for token in tokens]
         return self.get_vector(weighted_terms, include_neighbors=False)
@@ -153,6 +160,7 @@ class VectorSpaceWrapper(object):
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
+        # FIXME: is pd.DataFrame supposed to be pd.Series here?
         if isinstance(query, pd.DataFrame) or isinstance(query, dict):
             terms = list(query.items())
         elif isinstance(query, str):
@@ -167,7 +175,7 @@ class VectorSpaceWrapper(object):
 
     def similar_terms(self, query, filter=None, limit=20):
         """
-        Get a DataFrame of terms ranked by their similarity to the query.
+        Get a Series of terms ranked by their similarity to the query.
         The query can be:
 
         - A DataFrame of weighted terms
@@ -177,6 +185,9 @@ class VectorSpaceWrapper(object):
 
         If the query contains 5 or fewer terms, it will be expanded to include
         neighboring terms in ConceptNet.
+
+        TODO: is this sometimes returning a DataFrame? Should it accept a
+        Series as well as a DataFrame?
         """
         self.load()
         vec = self.get_vector(query)
@@ -184,6 +195,8 @@ class VectorSpaceWrapper(object):
         search_frame = self.small_frame
         if filter:
             exact_only = filter.count('/') >= 3
+            # TODO: Is this duplicating something that field_match was supposed
+            # to do?
             if filter.endswith('/.'):
                 filter = filter[:-2]
                 exact_only = True

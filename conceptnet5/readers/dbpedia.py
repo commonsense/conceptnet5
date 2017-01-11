@@ -166,25 +166,47 @@ def map_dbpedia_relation(url):
         return None
 
 
-def get_urls_from_degree_file(in_degree_file):
-    urls = set()
-    for line in open(in_degree_file, encoding='utf-8'):
-        line = line.strip()
-        if line:
-            count_str, url_str = line.split(' ', 1)
-            assert url_str[0] == '<'
-            assert url_str[-1] == '>'
-            url = url_str[1:-1]
-            urls.add(url)
-    return urls
-
-
 def read_concept_file(concept_file):
+    # TODO: docstring
     concepts = set()
     for line in open(concept_file, encoding='utf-8'):
         concept = uri_prefix(line.strip())
         concepts.add(concept)
     return concepts
+
+
+def url_to_label(url):
+    return resource_name(url).replace('_', ' ')
+
+
+def interlanguage_mapping(interlang_path, ok_concepts):
+    quads = parse_nquads(bz2.open(str(interlang_path), 'rt'))
+    mapping = {}
+    for subj, values in itertools.groupby(quads, itemgetter(0)):
+        subj_url = subj['url']
+        subj_concept = translate_dbpedia_url(subj_url)
+        pieces = split_uri(subj_concept)
+        if len(pieces) >= 6:
+            sense = pieces[5]
+            if 'album' in sense or 'film' in sense or 'series' in sense or 'disambiguation' in sense or 'song' in sense or 'album' in sense or 'band' in sense:
+                continue
+        if uri_prefix(subj_concept) in ok_concepts:
+            targets = [subj_url]
+
+            for _subj, _pred, obj, _graph in values:
+                url = obj['url']
+                if 'www.wikidata.org' in url:
+                    continue
+                if url.startswith('http://wikidata.dbpedia.org/'):
+                    wikidata_id = resource_name(url)
+
+                    # Return early when we see a high-numbered Wikidata ID
+                    if int(wikidata_id[1:]) >= 1000000:
+                        return mapping
+                targets.append(url)
+
+            mapping[subj_url] = targets
+    return mapping
 
 
 def process_dbpedia(input_dir, output_file, concept_file):
@@ -287,40 +309,7 @@ def process_dbpedia(input_dir, output_file, concept_file):
     out.close()
 
 
-def url_to_label(url):
-    return resource_name(url).replace('_', ' ')
-
-
-def interlanguage_mapping(interlang_path, ok_concepts):
-    quads = parse_nquads(bz2.open(str(interlang_path), 'rt'))
-    mapping = {}
-    for subj, values in itertools.groupby(quads, itemgetter(0)):
-        subj_url = subj['url']
-        subj_concept = translate_dbpedia_url(subj_url)
-        pieces = split_uri(subj_concept)
-        if len(pieces) >= 6:
-            sense = pieces[5]
-            if 'album' in sense or 'film' in sense or 'series' in sense or 'disambiguation' in sense or 'song' in sense or 'album' in sense or 'band' in sense:
-                continue
-        if uri_prefix(subj_concept) in ok_concepts:
-            targets = [subj_url]
-
-            for _subj, _pred, obj, _graph in values:
-                url = obj['url']
-                if 'www.wikidata.org' in url:
-                    continue
-                if url.startswith('http://wikidata.dbpedia.org/'):
-                    wikidata_id = resource_name(url)
-
-                    # Return early when we see a high-numbered Wikidata ID
-                    if int(wikidata_id[1:]) >= 1000000:
-                        return mapping
-                targets.append(url)
-
-            mapping[subj_url] = targets
-    return mapping
-
-
+# TODO: click
 def main():
     import argparse
     parser = argparse.ArgumentParser()

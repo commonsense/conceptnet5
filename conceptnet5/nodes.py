@@ -104,13 +104,13 @@ def standardized_concept_uri(lang, text, *more):
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
     '/c/en/this_is_test/n/example_phrase'
     """
+    lang = lang.lower()
+    if lang in LCODE_ALIASES:
+        lang = LCODE_ALIASES[lang]
     if lang == 'en':
         token_filter = english_filter
     else:
         token_filter = None
-    lang = lang.lower()
-    if lang in LCODE_ALIASES:
-        lang = LCODE_ALIASES[lang]
     norm_text = standardize_text(text, token_filter)
     more_text = [standardize_text(item, token_filter) for item in more
                  if item is not None]
@@ -156,6 +156,7 @@ def valid_concept_name(text):
 
 
 def uri_to_label(uri):
+    # FIXME: add docstring
     if uri.startswith('/c/'):
         uri = uri_prefix(uri)
     return uri.split('/')[-1].replace('_', ' ')
@@ -173,6 +174,7 @@ def ld_node(uri, label=None):
     }
     if uri.startswith('/c/'):
         pieces = split_uri(uri)
+        # FIXME: use the function we have to extract the language
         ld['language'] = pieces[1]
         if len(pieces) > 3:
             ld['sense_label'] = '/'.join(pieces[3:])

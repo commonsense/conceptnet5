@@ -47,6 +47,8 @@ def msgpack_to_assoc(input_filename, output_filename):
     The result can be used to predict word associations using ConceptNet by using
     dimensionality reduction, as in the `assoc_space` package.
 
+    FIXME: the above is out of date, we use conceptnet5.vectors now
+
     The relation is mostly ignored because we have not yet found a good way to
     take the relation into account in dimensionality reduction.
     """

@@ -33,6 +33,8 @@ def weight_scale(weight):
 
 
 def keep_concept(uri):
+    # FIXME: possibly we should use the 'is_valid_concept' check that we use
+    # elsewhere
     if is_absolute_url(uri):
         return True
     if get_uri_language(uri) not in ALL_LANGUAGES:
@@ -47,6 +49,8 @@ def make_assertion(line_group):
     if not lines:
         return None
 
+    # FIXME: the steps leading up to this produce URIs that can differ based
+    # on word senses. These don't get merged together, but they should.
     uri, rel, start, end, _ = lines[0].split('\t')
 
     # We can't distinguish word senses well enough yet, so only keep them
