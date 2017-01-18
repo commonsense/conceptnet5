@@ -17,7 +17,7 @@ setup(
     version = version_str,
     description = 'A semantic network of general knowledge',
     author = "Rob Speer",
-    author_email = 'conceptnet@media.mit.edu',
+    author_email = 'rspeer@luminoso.com',
     packages=packages,
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
