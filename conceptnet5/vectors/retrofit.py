@@ -76,13 +76,15 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
 
     See cli.py for an example of how to build `row_labels` and `sparse_csr`
     appropriately.
+
+    FIXME: there isn't actually an example there.
     """
     # Initialize a DataFrame with rows that we know
     retroframe = pd.DataFrame(
         index=row_labels, columns=dense_frame.columns, dtype='f'
     )
     retroframe.update(dense_frame)
-    # weight = 2 for known vectors, 1 for unknown vectors
+    # orig_weights = 1 for known vectors, 0 for unknown vectors
     orig_weights = 1 - retroframe.iloc[:, 0].isnull()
     weight_array = orig_weights.values[:, np.newaxis].astype('f')
     orig_vecs = retroframe.fillna(0).values
