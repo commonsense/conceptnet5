@@ -3,18 +3,23 @@ from ordered_set import OrderedSet
 import argparse
 import pathlib
 import random
+import wordfreq
 from conceptnet5.vectors.formats import save_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
 from conceptnet5.vectors.ppmi import counts_to_ppmi
 from conceptnet5.vectors import replace_numbers
 from conceptnet5.nodes import standardized_concept_uri
-from wordfreq import get_frequency_dict
 from scipy import sparse
 from scipy.sparse import linalg
 
 
+def get_vocab(language):
+    words = list(wordfreq.top_n_list(language, 100000))
+    return set(words[100:])
+
+
 def sparse_from_parallel_text(input_path, languages):
-    vocabs = {language: set(get_frequency_dict(language)) for language in languages}
+    vocabs = {language: get_vocab(language) for language in languages}
     labels = OrderedSet()
     pairs = OrderedSet()
     rows = []
