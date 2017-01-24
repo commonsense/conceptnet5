@@ -37,6 +37,20 @@ def field_match(value, query):
                 and (len(value) == len(query) or value[len(query)] == '/'))
 
 
+def index_prefix_range(frame, prefix):
+    assert prefix
+    next_prefix = prefix[:-1] + chr(ord(prefix[-1]) + 1)
+    try:
+        start_idx = frame.index.get_loc(prefix, method='bfill')
+    except KeyError:
+        start_idx = len(frame.index)
+    try:
+        end_idx = frame.index.get_loc(next_prefix, method='bfill')
+    except KeyError:
+        end_idx = len(frame.index)
+    return (start_idx, end_idx)
+
+
 class VectorSpaceWrapper(object):
     """
     An object that wraps the data necessary to look up vectors for terms
@@ -111,7 +125,6 @@ class VectorSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            expanded.append((term, weight))
             # TODO: this disagrees with the docstring about whether neighbors
             # are added to non-OOV terms
             if include_neighbors and term not in self.frame.index and self.finder is not None:
@@ -125,6 +138,23 @@ class VectorSpaceWrapper(object):
                     # TODO: explain this formula
                     neighbor_weight = weight * min(10, edge['weight']) * 0.01
                     expanded.append((neighbor, neighbor_weight))
+
+                prefix_weight = 0.01
+                if not term.startswith('/c/en/'):
+                    # FIXME: better language code handling
+                    englishified = '/c/en/' + term[6:]
+                    expanded.append((englishified, prefix_weight))
+
+                while term:
+                    if term.endswith('/'):
+                        break
+                    start_idx, end_idx = index_prefix_range(self.frame, term)
+                    if end_idx > start_idx:
+                        n_prefixed = end_idx - start_idx
+                        for prefixed_term in self.frame.index[start_idx:end_idx]:
+                            expanded.append((prefixed_term, prefix_weight / n_prefixed))
+                        break
+                    term = term[:-1]
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
@@ -202,18 +232,7 @@ class VectorSpaceWrapper(object):
                 else:
                     search_frame = search_frame.iloc[0:0]
             else:
-                start_key = filter
-                # '0' is the character after '/', so end_key is the first possible
-                # key that's not a descendant of the given filter key
-                end_key = filter + '0'
-                try:
-                    start_idx = search_frame.index.get_loc(start_key, method='bfill')
-                except KeyError:
-                    start_idx = len(search_frame.index)
-                try:
-                    end_idx = search_frame.index.get_loc(end_key, method='bfill')
-                except KeyError:
-                    end_idx = len(search_frame.index)
+                start_idx, end_idx = index_prefix_range(search_frame, filter + '/')
                 search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
         similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index].astype('f'))
