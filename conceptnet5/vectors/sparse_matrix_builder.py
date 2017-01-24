@@ -5,7 +5,7 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.relations import SYMMETRIC_RELATIONS
 from conceptnet5.languages import CORE_LANGUAGES
 from ordered_set import OrderedSet
-from collections import defaultdict
+from collections import defaultdict, Counter
 from ..vectors import replace_numbers
 
 
@@ -21,6 +21,9 @@ class SparseMatrixBuilder:
 
     def __setitem__(self, key, val):
         row, col = key
+        self.add(row, col, val)
+
+    def add(self, row, col, val):
         self.row_index.append(row)
         self.col_index.append(col)
         self.values.append(val)
@@ -28,26 +31,6 @@ class SparseMatrixBuilder:
     def tocsr(self, shape, dtype=float):
         return sparse.coo_matrix((self.values, (self.row_index, self.col_index)),
                                  shape=shape, dtype=dtype).tocsr()
-
-
-def build_from_parallel_text(filename, lang1, lang2):
-    mat = SparseMatrixBuilder()
-    labels = OrderedSet()
-    with open(str(filename), encoding='utf-8') as infile:
-        for line in infile:
-            text1, text2 = line.rstrip('\n').split('\t')
-            terms1 = [replace_numbers(standardized_concept_uri(lang1, word)) for word in text1.split(' ')]
-            terms2 = [replace_numbers(standardized_concept_uri(lang2, word)) for word in text2.split(' ')]
-            terms = terms1 + terms2
-            for t1 in terms:
-                index1 = labels.add(t1)
-                for t2 in terms:
-                    index2 = labels.add(t2)
-                    mat[index1, index2] += 1
-
-    shape = (len(labels), len(labels))
-    index = pd.Index(labels)
-    return mat.tocsr(shape), index
 
 
 def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
