@@ -44,7 +44,8 @@ class VectorSpaceWrapper(object):
 
     The filenames usually don't need to be specified, because the system will
     look in default locations for them. They can be specified to replace them
-    with toy versions for testing.
+    with toy versions for testing, or to evaluate how other embeddings perform
+    while still using ConceptNet for looking up words outside their vocabulary.
     """
     def __init__(self, vector_filename=None, frame=None, use_db=True):
         if frame is None:
@@ -57,7 +58,6 @@ class VectorSpaceWrapper(object):
         self.k = None
         self.small_k = None
         self.finder = None
-        self.standardized = None
         if use_db:
             self.finder = AssertionFinder()
 
@@ -71,15 +71,11 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
-            # FIXME: is self.standardized used for anything?
-            if self.frame.index[0].startswith('/c/'):
-                self.standardized = True
-            else:
+            if not self.frame.index[0].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
                 # they're in English, and stick the English language tag on
                 # them without any further transformation, so we can be sure
                 # we're evaluating the vectors as provided.
-                self.standardized = False
                 self.finder = None
                 self.frame.index = [
                     '/c/en/' + label
@@ -115,8 +111,7 @@ class VectorSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            # TODO: why are we dividing by 10 here?
-            expanded.append((term, weight / 10))
+            expanded.append((term, weight))
             # TODO: this disagrees with the docstring about whether neighbors
             # are added to non-OOV terms
             if include_neighbors and term not in self.frame.index and self.finder is not None:
@@ -128,7 +123,7 @@ class VectorSpaceWrapper(object):
                     else:
                         continue
                     # TODO: explain this formula
-                    neighbor_weight = weight * min(10, edge['weight']) * 0.001
+                    neighbor_weight = weight * min(10, edge['weight']) * 0.01
                     expanded.append((neighbor, neighbor_weight))
 
         total_weight = sum(abs(weight) for term, weight in expanded)
