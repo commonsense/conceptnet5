@@ -70,7 +70,7 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
-INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'ppmi-semeval']
+INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'opensubtitles-ppmi-5']
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -135,11 +135,24 @@ rule download_raw:
     shell:
         "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
 
+rule download_conceptnet_ppmi:
+    output:
+        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
+    shell:
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 > {output}"
+
 rule download_numberbatch:
     output:
-        DATA + "/precomputed/vectors/{filename}"
+        DATA + "/precomputed/vectors/numberbatch.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/{wildcards.filename} > {output}"
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
+
+rule download_opensubtitles_ppmi:
+    output:
+        DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
+    shell:
+        "curl {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
+
 
 
 # Precomputation
@@ -495,6 +508,14 @@ rule convert_lexvec:
         ram=16
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
+
+rule import_opensubtitles_ppmi:
+    input:
+        DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
+    output:
+        DATA + "/vectors/opensubtitles-ppmi-5.h5"
+    shell:
+        "cp {input} {output}"
 
 rule retrofit:
     input:
