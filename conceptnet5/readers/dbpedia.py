@@ -23,7 +23,6 @@ We filter for relevant concepts in the following way:
 
 We extract types and certain relations from the pages that remain using the
 'instance_types' and 'mappingbased_objects' files.
-
 """
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.uri import Licenses, uri_prefix, split_uri
@@ -34,6 +33,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import resource_name, parse_nquads
 import urllib
 import bz2
+import re
 import pathlib
 from operator import itemgetter
 import itertools
@@ -97,8 +97,11 @@ CONCEPT_BLACKLIST = {
 TYPE_BLACKLIST = {
     'Settlement', 'Railway Line', 'Road', 'Sports Event', 'Event',
     'Olympic Event', 'Soccer Tournament', 'Election', 'Diocese',
-    'Year', 'Football League Season', 'Grand Prix'
+    'Year', 'Football League Season', 'Grand Prix', 'NCAA Team Season',
+    'Motorsport Season'
 }
+
+DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
 
 
 def translate_dbpedia_url(url):
@@ -225,13 +228,20 @@ def process_dbpedia(input_dir, output_file, concept_file):
     types_path = input_path / 'instance_types_en.tql.bz2'
     quads = parse_nquads(bz2.open(str(types_path), 'rt'))
     for subj, pred, obj, _graph in quads:
-        subj_url = subj['url']
-        if (
-            'Category:' in subj_url or 'File:' in subj_url or
-            'List_of' in subj_url or '__' in subj_url or
-            'Template:' in subj_url
-        ):
+        blocked_url = False
+        for url in (subj['url'], obj['url']):
+            if (
+                'Category:' in url or 'File:' in url or
+                'List_of' in url or 'Index_of' in url or
+                '__' in url or '_in_' in url or
+                'Template:' in url or DOUBLE_DIGIT_RE.search(url)
+            ):
+                blocked_url = True
+                break
+        if blocked_url:
             continue
+
+        subj_url = subj['url']
         if subj_url in mapped_urls:
             subj_concept = translate_dbpedia_url(subj_url)
             obj_type = un_camel_case(resource_name(obj['url']))
