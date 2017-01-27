@@ -289,6 +289,18 @@ def process_dbpedia(input_dir, output_file, concept_file):
     relations_path = input_path / 'mappingbased_objects_en.tql.bz2'
     quads = parse_nquads(bz2.open(str(relations_path), 'rt'))
     for subj, pred, obj, _graph in quads:
+        blocked_url = False
+        for url in (subj['url'], obj['url']):
+            if (
+                'Category:' in url or 'File:' in url or
+                'List_of' in url or 'Index_of' in url or
+                '__' in url or '_in_' in url or
+                'Template:' in url or DOUBLE_DIGIT_RE.search(url)
+            ):
+                blocked_url = True
+                break
+        if blocked_url:
+            continue
         subj_concept = translate_dbpedia_url(subj['url'])
         obj_concept = translate_dbpedia_url(obj['url'])
         rel_name = resource_name(pred['url'])
@@ -318,7 +330,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('input_dir', help="Directory containing DBPedia files")
     parser.add_argument('output_file', help='msgpack file to output to')
-    parser.add_argument('concept_file', help="Text file of concepts used elsewhere in ConceptNet")
+    parser.add_argument('concept_file', help="Text file of terms to use, in ConceptNet URI form")
     args = parser.parse_args()
     process_dbpedia(args.input_dir, args.output_file, args.concept_file)
 
