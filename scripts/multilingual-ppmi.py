@@ -69,7 +69,7 @@ def sparse_from_parallel_text(input_path, languages):
 def build_ppmi(input_path, output_path):
     spmat, index = sparse_from_parallel_text(
         pathlib.Path(input_path),
-        ['de', 'en', 'es', 'fa', 'it']
+        ['de', 'en', 'es', 'fa', 'fr', 'it', 'pt']
     )
     ppmi = counts_to_ppmi(spmat)
     u, s, vT = linalg.svds(ppmi, 300)

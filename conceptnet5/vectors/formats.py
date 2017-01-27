@@ -4,7 +4,7 @@ from scipy import sparse
 import gzip
 import struct
 import wordfreq
-import itertools
+import pickle
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 from ..vectors import standardized_uri, get_vector
 from conceptnet5.languages import COMMON_LANGUAGES
@@ -119,6 +119,13 @@ def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     save_hdf(w2v_normal, output_filename)
 
 
+def convert_polyglot(polyglot_filename, output_filename, language):
+    pg_raw = load_polyglot(polyglot_filename)
+    pg_std = standardize_row_labels(pg_raw, language, forms=False)
+    del pg_raw
+    save_hdf(pg_std, output_filename)
+
+
 def load_glove(filename, nrows=500000):
     # TODO: just make this a variant of load_fasttext, or make load_fasttext
     # a variant of this
@@ -185,6 +192,12 @@ def load_word2vec_bin(filename, nrows):
             label_list.append(label)
             vec_list.append(vec)
     mat = np.array(vec_list)
+    return pd.DataFrame(mat, index=label_list, dtype='f')
+
+
+def load_polyglot(filename):
+    labels, mat = pickle.load(open(filename, 'rb'), encoding='bytes')
+    label_list = list(labels)
     return pd.DataFrame(mat, index=label_list, dtype='f')
 
 

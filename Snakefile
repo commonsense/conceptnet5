@@ -70,7 +70,9 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
-INPUT_EMBEDDINGS = ['glove12-840B', 'w2v-google-news', 'opensubtitles-ppmi-5']
+INPUT_EMBEDDINGS = [
+    'glove12-840B', 'w2v-google-news', 'polyglot-de'
+]
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -509,6 +511,14 @@ rule convert_lexvec:
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
 
+rule convert_polyglot:
+    input:
+        DATA + "/raw/vectors/polyglot-{language}.pkl"
+    output:
+        DATA + "/vectors/polyglot-{language}.h5"
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_polyglot -l {wildcards.language} {input} {output}"
+
 rule import_opensubtitles_ppmi:
     input:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
@@ -608,3 +618,7 @@ rule comparison_graph:
         DATA + "/stats/eval-graph.pdf"
     shell:
         "cn5-vectors comparison_graph {input} {output}"
+
+
+ruleorder:
+    join_retrofit > convert_polyglot
