@@ -71,7 +71,7 @@ PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_P
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
-    'glove12-840B', 'w2v-google-news', 'polyglot-de'
+    'glove12-840B', 'w2v-google-news', 'polyglot-de', 'polyglot-es'
 ]
 
 # Test mode overrides some of these settings.
