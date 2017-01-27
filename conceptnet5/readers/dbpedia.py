@@ -197,14 +197,7 @@ def interlanguage_mapping(interlang_path, ok_concepts):
                 url = obj['url']
                 if 'www.wikidata.org' in url:
                     continue
-                if url.startswith('http://wikidata.dbpedia.org/'):
-                    wikidata_id = resource_name(url)
-
-                    # Return early when we see a high-numbered Wikidata ID
-                    if int(wikidata_id[1:]) >= 1000000:
-                        return mapping
                 targets.append(url)
-
             mapping[subj_url] = targets
     return mapping
 
