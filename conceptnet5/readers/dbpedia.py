@@ -193,13 +193,23 @@ def interlanguage_mapping(interlang_path, ok_concepts):
             sense = pieces[5]
             if 'album' in sense or 'film' in sense or 'series' in sense or 'disambiguation' in sense or 'song' in sense or 'album' in sense or 'band' in sense:
                 continue
-        if uri_prefix(subj_concept) in ok_concepts:
+        if uri_prefix(subj_concept) in ok_concepts and not DOUBLE_DIGIT_RE.match(subj_concept):
             targets = [subj_url]
 
             for _subj, _pred, obj, _graph in values:
                 url = obj['url']
                 if 'www.wikidata.org' in url:
                     continue
+
+                if url.startswith('http://wikidata.dbpedia.org'):
+                    wikidata_id = resource_name(url)
+
+                    # Return early when we see a high-numbered Wikidata ID
+                    id_number = int(wikidata_id[1:])
+                    if id_number % 1000 == 0:
+                        print(wikidata_id)
+                    if id_number >= 1000000:
+                        return mapping
                 targets.append(url)
             mapping[subj_url] = targets
     return mapping
@@ -227,7 +237,7 @@ def process_dbpedia(input_dir, output_file, concept_file):
                 'Category:' in url or 'File:' in url or
                 'List_of' in url or 'Index_of' in url or
                 '__' in url or '_in_' in url or
-                'Template:' in url or DOUBLE_DIGIT_RE.search(url)
+                'Template:' in url
             ):
                 blocked_url = True
                 break
@@ -240,7 +250,7 @@ def process_dbpedia(input_dir, output_file, concept_file):
             obj_type = un_camel_case(resource_name(obj['url']))
             if obj_type not in TYPE_BLACKLIST:
                 obj_concept = standardized_concept_uri('en', obj_type, 'n')
-                if obj_concept not in CONCEPT_BLACKLIST:
+                if obj_concept not in CONCEPT_BLACKLIST and not DOUBLE_DIGIT_RE.search(obj_concept):
                     edge = make_edge(
                         '/r/IsA', subj_concept, obj_concept,
                         dataset='/d/dbpedia/en',
