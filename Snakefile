@@ -213,13 +213,13 @@ rule read_dbpedia:
         DATA + "/raw/dbpedia/instance_types_en.tql.bz2",
         DATA + "/raw/dbpedia/interlanguage_links_en.tql.bz2",
         DATA + "/raw/dbpedia/mappingbased_objects_en.tql.bz2",
-        DATA + "/stats/core_concepts.txt"
+        DATA + "/stats/frequent_dbpedia_concepts.txt"
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
         "python3 -m conceptnet5.readers.dbpedia %(data)s/raw/dbpedia "
         "{output} "
-        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
+        "%(data)s/stats/frequent_dbpedia_concepts.txt " % {'data': DATA}
 
 rule read_jmdict:
     input:
@@ -412,6 +412,13 @@ rule core_concepts:
     shell:
         "LC_ALL=C sort -u {input} > {output}"
 
+rule frequent_dbpedia_concepts:
+    input:
+        DATA + "/raw/dbpedia/page_links_en.tql.bz2"
+    output:
+        DATA + "/stats/frequent_dbpedia_concepts.txt"
+    shell:
+        "python3 -m conceptnet5.builders.get_frequent_dbpedia_concepts {input} {output}"
 
 rule concepts_left:
     input:
