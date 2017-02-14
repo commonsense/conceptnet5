@@ -11,7 +11,5 @@ ADD 20-load-db.sql /docker-entrypoint-initdb.d/20-load-db.sql
 ADD 30-done.sh /docker-entrypoint-initdb.d/30-done.sh
 ADD sha256sums.txt /data/conceptnet/local/sha256sums.txt
 
-RUN mkdir -p /data/conceptnet
-RUN chown root.postgres /data/conceptnet
-RUN chmod g+w /data/conceptnet
-
+RUN chown -R root.postgres /data/conceptnet
+RUN chmod -R g+w /data/conceptnet
