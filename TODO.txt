@@ -1,4 +1,4 @@
-For ConceptNet 5.5.2:
+For ConceptNet 5.5.x:
 
 - [ ] Use standardized language codes in Wiktionary forms
 - [ ] Remove "archaïque" context

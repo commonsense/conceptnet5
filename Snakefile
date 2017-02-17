@@ -605,11 +605,12 @@ rule compare_embeddings:
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
         DATA + "/precomputed/vectors/numberbatch.h5",
+        DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
     shell:
-        "cn5-vectors compare_embeddings {input} {output}"
+        "cn5-vectors compare_embeddings %(data)s/raw/vectors/GoogleNews-vectors-negative300.bin.gz %(data)s/raw/vectors/glove12.840B.300d.txt.gz %(data)s/raw/vectors/lexvec.no-header.vectors.gz %(data)s/precomputed/vectors/conceptnet-55-ppmi.h5 %(data)s/precomputed/vectors/numberbatch.h5 {output}" % {'data': DATA}
 
 rule comparison_graph:
     input:
