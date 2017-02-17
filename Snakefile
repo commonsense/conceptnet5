@@ -574,6 +574,7 @@ rule compare_embeddings:
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
         DATA + "/precomputed/vectors/numberbatch.h5",
+        DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
