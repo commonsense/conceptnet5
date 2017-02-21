@@ -273,20 +273,23 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def read_semeval(language, subset='test'):
+def read_semeval_monolingual(lang, subset='test'):
     """
-    Parses Semeval2017-Task2 word similarity test collection.
-    Ideas: change the reader to output word, word, and a language perhaps.
-    Instead of doing one result per language I can do just two  evaluations: monolingual and crosslingual
+    Parses Semeval2017-Task2 monolingual word similarity test collection.
     """
-    filename = get_support_data_filename('semeval2017-task2/{}.{}.txt'.format(language, subset))
+    lang1, lang2 = lang, lang
+    filename = get_support_data_filename('semeval2017-task2/{}.{}.txt'.format(lang, subset))
+    with open(filename) as file:
+        for line in file:
+            parts = line.split('\t')
+            yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
-    lang_code = language.split('-')
-    if len(lang_code) > 1:
-        lang1, lang2 = lang_code
-    else:
-        lang1 = lang_code[0]
-        lang2 = lang_code[0]
+
+def read_semeval_crosslingual(lang1, lang2, subset='test'):
+    """
+    Parses Semeval2017-Task2 crosslingual word similarity test collection.
+    """
+    filename = get_support_data_filename('semeval2017-task2/{}-{}.{}.txt'.format(lang1, lang2, subset))
 
     with open(filename) as file:
         for line in file:
@@ -302,7 +305,7 @@ def evaluate_semeval_monolingual(vectors):
     """
     scores = []
     for language in ['en', 'de', 'es', 'it', 'fa']:
-        scores.append(spearman_evaluate(vectors, read_semeval(language=language)))
+        scores.append(spearman_evaluate(vectors, read_semeval_monolingual(lang=language)))
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0, reverse=True)[:4]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
@@ -320,9 +323,9 @@ def evaluate_semeval_crosslingual(vectors):
     """
     scores = []
     for language_pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it', 'it-fa']:
-        scores.append(spearman_evaluate(vectors, read_semeval(language=language_pair)))
+        lang1, lang2 = language_pair.split('-')
+        scores.append(spearman_evaluate(vectors, read_semeval_crosslingual(lang1=lang1, lang2=lang2)))
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0, reverse=True)[:6]
-
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
     high_average = tmean([score['high'] for score in top_scores])
