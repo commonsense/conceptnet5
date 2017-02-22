@@ -1,0 +1,34 @@
+juicio	test	2.82
+coche	automobile	3.75
+informática	matematica	3.08
+voleibol	palla	1.895
+cine	televisione	3.015
+comedia	fantascienza	2.93
+nariz	testa	2.27
+teclado	luce	0.315
+biólogo	microscopio	1.24
+piel	bicicletta	0.15
+bicicleta	pelle	0.15
+automóvil	macchina	3.75
+carne	manzo	3.22
+halcón	aquila	3.585
+microscopio	biologo	1.24
+psicólogo	curandero	2.555
+pelota	pallavolo	1.895
+cuerda	tramonto	0.04
+Nueva York	Washington	3.54
+cabeza	naso	2.27
+puesta de sol	corda	0.04
+ternera	carne	3.22
+edificio	stanza	2.14
+examen	giudizio	2.82
+matemáticas	informatica	3.08
+televisión	cinema	3.015
+Washington	New York	3.54
+árbol	foglia	2.215
+águila	falco	3.585
+rama	albero	2.215
+habitación	edificio	2.14
+ciencia ficción	commedia	2.93
+luz	tastiera	0.315
+curandero	psicologo	2.555

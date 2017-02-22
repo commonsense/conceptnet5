@@ -1,0 +1,36 @@
+meat	گوشت گاو	3.32
+volleyball	توپ	1.79
+computer science	ریاضی	3.135
+science fiction	کمدی	2.81
+string	غروب	0.05
+biologist	میکروسکوپ	1.405
+bike	پوست	0.045
+ball	والیبال	1.79
+mathematics	علوم کامپیوتر	3.135
+psychologist	طبیب	2.84
+cinema	تلویزیون	3.075
+light	کیبورد	0.275
+building	اتاق	2.365
+comedy	علمی تخیلی	2.81
+test	آزمایش	2.87
+Washington	نیویورک	3.58
+skin	دوچرخه	0.045
+trial	تست	2.87
+tree	برگ	2.045
+sunset	ریسمان	0.05
+bank	صندلی	1.045
+microscope	بیولوژیست	1.405
+head	بینی	2.905
+eagle	شاهین	3.585
+New York	واشنگتن	3.58
+nose	سر	2.905
+television	سینما	3.075
+car	اتومبیل	3.87
+leaf	درخت	2.045
+curandero	روانشناس	2.84
+room	ساختمان	2.365
+seat	بانک	1.045
+falcon	عقاب	3.585
+keyboard	چراغ	0.275
+beef	گوشت	3.32
+automobile	ماشین	3.87

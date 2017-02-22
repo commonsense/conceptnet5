@@ -1,0 +1,970 @@
+road	autostrada	3.42
+chemical substance	base	2.96
+Asia	mondo	2.04
+water sport	surf	3.08
+parcel	camion	0.88
+world	Asia	2.04
+worker	ufficio	1.92
+grapefruit	agrume	3.33
+Times	Guardian	3.04
+cloud computing	pioggia	0.0
+sergeant	pistola	1.67
+Clinton	Obama	3.0
+hematology	patologia	2.96
+evolution	Darwin	2.63
+mainboard	scheda madre	4.0
+mother tongue	lingua	3.17
+therapy	comportamentismo	2.08
+rain	cloud computing	0.0
+parliament	congresso	3.33
+cameo	interpretazione	2.54
+national anthem	patriottismo	2.17
+republic	duca	0.92
+gift	scrittore	0.17
+World War II	Beethoven	0.04
+German	latino	2.92
+rear	coda	2.96
+alien	straniero	3.83
+pedestrian crossing	persona	1.38
+asteroid	stella	2.46
+elementary school	penna	1.42
+kindergarten	asilo	3.71
+mind	nevrosi	1.54
+list	array	3.5
+citrus fruit	pompelmo	3.33
+Mona Lisa	capolavoro	2.75
+key	corona	0.29
+breakfast	gelato	1.25
+overcast	previsione	1.79
+vacuum	buco nero	2.38
+rain	grandine	3.08
+sucrose	carboidrato	3.29
+pest	pesticida	2.0
+church	cattedrale	3.38
+novel	scrittore	2.04
+heavy metal	palco	1.38
+dairy	miele	0.7
+Microsoft	Celsius	0.04
+billionaire	senzatetto	1.83
+cable	cappella	0.13
+standard deviation	accumulazione	0.96
+office	lavoratore	1.92
+sonnet	bellezza	1.33
+environment	spada	0.0
+guidebook	manuale	3.54
+path	galleria	2.13
+assignment	appunti	2.04
+ice cream	colazione	1.25
+christian	protestante	3.13
+Ebola	virus Ebola	4.0
+ice	neve	2.88
+corn	granturco	4.0
+cricket	sostenitore	1.29
+typhoon	ciclone	3.79
+plane	Boeing	2.96
+tram	treno	3.25
+table	tramonto	0.0
+mark	circolo	0.5
+cash	denaro	3.54
+sword	trono	1.17
+source	scatola	0.0
+crime	aggressione	2.63
+racket	palla	2.42
+hail	pioggia	3.08
+tail	retro	2.96
+television	attore	1.88
+caterpillar	baco da seta	3.46
+autonomous car	auto senza conducente	4.0
+actor	poliedro	0.0
+justice	tribunale	2.33
+charger	disco	0.88
+constitution	senato	1.5
+compass	elefante	0.09
+heat	riscaldamento globale	2.54
+stock exchange	mercato azionario	3.63
+rose	farfalla	1.33
+Julius Caesar	Cesare	3.96
+performer	canzone	1.67
+island	marina militare	0.75
+brother	sorella	3.0
+combine	canna da zucchero	0.88
+screen	monitor	3.92
+acetylcholine	iride	1.0
+body	intimo	1.63
+defence	forze armate	2.38
+snapdragon	lantana	3.13
+payment	moneta	2.17
+polyhedron	attore	0.0
+telescope	brainstorming	0.0
+artwork	artista	2.29
+Jerusalem	ebreo	2.0
+self-driving car	auto autonoma	4.0
+yo-yo	giocattolo	2.92
+Juventus	Bayern Monaco	3.0
+cotton	poliestere	2.96
+South Pole	danza	0.0
+digit	citoplasma	0.63
+session	paziente	1.08
+planet	stella	2.67
+officer	deputato	2.42
+income	qualità della vita	2.33
+writer	regalo	0.17
+Jupiter	Mercurio	3.21
+NATO	alleanza	2.96
+show	matematico	0.04
+ant	mosca	2.83
+case	elettricità	0.42
+European Union	Mosca	1.83
+fashion	stile	2.96
+card game	frisbee	2.21
+constellation	Orione	3.13
+mohito	mojito	4.0
+democracy	monarchia	2.75
+watercolor painting	pennello	2.42
+truck	pacco	0.88
+man	sospetto	1.46
+Coke	Coca Cola	3.88
+butterfly	rosa	1.33
+silkworm	Via della Seta	0.79
+mask	festa	1.58
+hit	cornice	0.21
+Star Wars	Mozart	0.0
+information	entropia	2.0
+distance education	internet	2.0
+harbor	incarto	0.04
+music	flauto	2.04
+pathology	ematologia	2.96
+touchscreen	Hadoop	0.34
+accumulation	deviazione standard	0.96
+cube	dado	3.04
+avalanche	neve	2.17
+volcano	magma	2.25
+fossil fuel	fossile	2.0
+UNICEF	radice	0.0
+criminal	colpevole	3.38
+conversion	altitudine	0.29
+juice	cucchiaio	0.58
+sphere	palla	3.17
+trout	chitarra	0.0
+island	penisola	3.08
+KFC	McDonald's	3.17
+umbrella	stufa	0.17
+instructor	insegnante	3.71
+journalist	poeta	1.92
+popcorn	cinema	1.79
+archaeology	antropologia	2.75
+El Niño	equatore	1.08
+array	lista	3.5
+gender discrimination	sessismo	3.88
+American	inglese	3.33
+equator	Ecuador	1.42
+frame	colpo	0.21
+swimming pool	legge	0.04
+exam	programma	2.38
+notebook	portatile	4.0
+dignity	insegna	0.38
+player	allenatore	2.58
+campus	università	2.71
+jasmine rice	basmati	3.33
+bat	vampiro	2.46
+honor	stima	2.88
+agriculture	pianta	2.13
+serial killer	assassino	3.38
+blanket	legno	0.54
+Neanderthal	sport	0.0
+chain reaction	termodinamica	2.0
+base	sostanza chimica	2.96
+ministry	sultano	1.21
+peppermint	gomma	1.88
+woodland	Tiger Woods	0.04
+drought	acqua	2.17
+worm	malware	3.13
+lock-up	cella	3.08
+diode	condensatore	2.67
+zinc	oro	3.0
+illustration	vescica	0.0
+spirit	Giochi Olimpici	0.88
+moisture	spagnolo	0.0
+flora	web browser	0.0
+biology	biotopo	2.04
+Harry Potter	mago	3.0
+trainers	medaglia	0.42
+surfing	sport acquatico	3.08
+class	caos	0.25
+tunnel	percorso	2.13
+carbon dioxide	CO2	4.0
+suffix	affisso	3.08
+sound	acustica	2.75
+European Parliament	Nazioni Unite	2.25
+wizard	cavo	0.0
+dance	vestito	1.04
+engagement	anello	1.54
+molecule	matrice	0.04
+sewing machine	bottone	1.79
+Hamadan	Roma	2.79
+sand	piede	0.42
+Siemens	treno elettrico	1.96
+asset	azione	2.5
+IMF	Deutsche Bank	2.88
+river	flusso di cassa	0.17
+provirus	membrana cellulare	1.92
+weather	onda	0.83
+pointer	diapositiva	1.67
+Gospel	Bibbia	3.25
+pesticide	parassita	2.0
+fire	apocalisse	1.42
+priest	profeta	2.29
+radiator	sensore	1.5
+chart	grafico	3.58
+servant	schiavo	3.58
+masterpiece	Gioconda	2.75
+fertilizer	crescita	1.58
+absolute zero	vapore	1.29
+stock	patrimonio	2.5
+theatre	batteria	0.25
+United Nations	Parlamento Europeo	2.25
+broom	polvere	1.79
+Western Union	mondo occidentale	0.71
+gray heron	lago	1.29
+crocodile	lucertola	3.25
+silkworm	bruco	3.46
+biotope	biologia	2.04
+beauty	sonetto	1.33
+seedling	foglia	2.25
+airport	pezzo	0.04
+insignia	dignità	0.38
+internet	formazione a distanza	2.0
+The Last Supper	Leonardo da Vinci	2.38
+skyscraper	palazzo	2.75
+Fox Terrier	Canon	0.0
+symbol	segno	3.42
+historian	storiografo	3.46
+Dylan	Federer	0.5
+theatre	film	1.83
+pineapple	smartphone	0.0
+king	sovrano	3.71
+chair	telescopio	0.29
+fence	salto	1.54
+glacier	riscaldamento globale	1.67
+web browser	flora	0.0
+drug	Pfizer	2.25
+frisbee	gioco di carte	2.21
+wood	coperta	0.54
+Mercury	Giove	3.21
+Britain	HSBC	1.54
+chess	scacco al re	2.04
+University of Cambridge	Università di Oxford	3.13
+peninsula	isola	3.08
+mint	museo	0.5
+visa	globalismo	1.04
+meteorite	Terra	2.21
+outlander	forestiero	3.83
+article	manoscritto	3.33
+vapor	zero assoluto	1.29
+news	editoriale	2.58
+geyser	sorgente	3.21
+cinema	popcorn	1.79
+curtain	tapparella	3.04
+coin	pagamento	2.17
+poem	ritmo	1.46
+protein	maniglia	0.0
+cathedral	chiesa	3.38
+caliber	ombrello	0.04
+university	campus	2.71
+movie	personaggio secondario	1.79
+sign	simbolo	3.42
+WikiLeaks	WiFi	0.25
+judge	magistrato	3.67
+princess	biscotto	0.04
+Paint	Photoshop	3.0
+dermatitis	eczema	4.0
+graph	diagramma	3.58
+Soviet Union	guerra fredda	2.13
+law	piscina	0.04
+sultan	ministero	1.21
+steel	lega	3.21
+JPY	riciclaggio di denaro	1.54
+star	luminosità	1.63
+blanket	burrasca	0.75
+panda	orso polare	3.17
+lobster	squalo balena	2.29
+Hadoop	touchscreen	0.34
+fraud	corruzione	2.92
+Dingle	Dell	0.0
+level	punteggio	2.29
+negotiation	diplomazia	2.58
+snake	lucertola	3.04
+cable	mago	0.0
+gallery	avvocato	0.21
+muslim	vescovo	1.38
+ecosystem	economia	0.67
+governor	imperatore	3.29
+algebra	operazione	1.75
+sea	delta	2.29
+ozone	atmosfera	2.29
+Canon	Fox Terrier	0.0
+actress	attore	3.5
+topic	hashtag	2.42
+envelope	decorazione	0.33
+division	moltiplicazione	2.88
+Promised Land	Baku	0.5
+sequel	macchina fotografica	0.5
+paint	rivoluzione verde	0.09
+tank	vagone	2.13
+clock tower	pietra	1.0
+basketball	spareggio	1.42
+atmosphere	ozono	2.29
+electric train	Siemens	1.96
+pen	scuola elementare	1.42
+lizard	governo	0.0
+polar bear	panda	3.17
+Alexander the Great	conquistatore	2.88
+Plato	Aristotele	3.08
+key	serratura	2.46
+sexism	discriminazione di genere	3.88
+growth hormone	somatotropina	3.79
+Ecuador	equatore	1.42
+telephone	cellulare	3.75
+phonology	schermo	0.29
+runner	atleta	3.33
+heater	ombrello	0.17
+growth	fertilizzante	1.58
+club	marchio	0.5
+water	siccità	2.17
+Photoshop	Paint	3.0
+economy	ecosistema	0.67
+brain	mente	3.54
+pygmy hog	suidi	3.21
+film	film	3.96
+flute	musica	2.04
+corruption	frode	2.92
+window blind	tenda	3.04
+iPhone	Apple	2.58
+currency	scambio	1.88
+star	asteroide	2.46
+gale	coperta	0.75
+happiness	tristezza	2.42
+football	calcio	4.0
+snowboard	sci	3.17
+topology	struttura	2.33
+quality of life	reddito	2.33
+pen	alfabeto	0.63
+woman	jeans	0.41
+chair	sgabello	3.25
+strawberry	ciliegia	3.0
+base	acido	2.75
+lens	Woody Allen	0.25
+vector	matrice	3.0
+exchange	valuta	1.88
+calendar	vacanza	1.63
+murderer	serial killer	3.38
+pollination	stame	2.29
+carbohydrate	saccarosio	3.29
+person	personaggio	2.79
+editorial	notizia	2.58
+Bible	Vangelo	3.25
+preschool	scuola materna	3.71
+mosaic	basilica	1.5
+laptop	computer portatile	4.0
+medal	scarpe da ginnastica	0.42
+screenwriter	televisione	1.67
+peace	soldato	0.88
+wrapper	porto	0.04
+telescope	sedia	0.29
+pole	bandiera	1.63
+gravity	meteora	0.88
+Mathematical Bridge	Si-o-se Pol	3.17
+mind	cervello	3.54
+throne	spada	1.17
+nature	flora	2.79
+Obama	Clinton	3.0
+nihilism	film	0.38
+foot	sabbia	0.42
+fox	cellula del sangue	0.25
+piston	motore	2.25
+bishop	musulmano	1.38
+cash flow	fiume	0.17
+Wall Street	mercato finanziario	3.0
+actor	attrice	3.5
+alloy	acciaio	3.21
+badge	vetro	0.17
+sensor	radiatore	1.5
+ring	fidanzamento	1.54
+dice	cubo	3.04
+fundraising	sviluppo	1.0
+monastery	doccia	0.04
+polyester	cotone	2.96
+spring	geyser	3.21
+city	cittadina	3.58
+battery	teatro	0.25
+blister	illustrazione	0.0
+Shakespeare	Dickens	3.0
+web browser	Mozilla Firefox	3.46
+electricity	cassa	0.42
+xenophobia	razzismo	3.46
+Tiger Woods	bosco	0.04
+style	moda	2.96
+ball	sfera	3.17
+racing	filosofo	0.17
+gunboat	costa	1.04
+wall	castello	2.13
+cardigan	camicia	3.13
+Adidas	Nike	3.21
+England	Regina Vittoria	1.88
+Chelsea	Nietzsche	0.09
+singer	coro	2.67
+bargain	centesimo	1.04
+piano	armonia	1.54
+can	bottiglia	3.33
+Islam	Corano	2.54
+dollar	milionario	1.92
+stamen	impollinazione	2.29
+lake	nuvola	0.75
+box	sorgente	0.0
+leaf	piantina	2.25
+umbrella	calibro	0.04
+compiler	subroutine	2.38
+plant	classe operaia	2.0
+mine	roccia	2.0
+Pfizer	medicinale	2.25
+gun	taccuino	0.0
+monarchy	democrazia	2.75
+cellphone	telefono	3.75
+chips	cursore	0.13
+rhythm	poema	1.46
+motherboard	scheda madre	4.0
+glass	distintivo	0.17
+cytoplasm	dito	0.63
+flora	natura	2.79
+background	sfondo del desktop	3.5
+PlayStation	Wii	3.21
+oasis	libertà	0.63
+strategy	gioco di strategia	2.04
+energy	batteria	2.46
+violin	chitarra	3.08
+GDP	recessione	2.08
+operating system	deep learning	1.0
+director	capo	2.83
+IQ	Mensa	2.0
+handle	proteina	0.0
+affix	suffisso	3.08
+teeth	martello	0.41
+person	attraversamento pedonale	1.38
+stone	torre dell'orologio	1.0
+orchestra	banda	3.29
+Queen Victoria	Inghilterra	1.88
+sodium chloride	sale	3.92
+supporting character	film	1.79
+performance	cameo	2.54
+cadence	ritmo	3.54
+delta	mare	2.29
+century	anno	2.63
+phone	vittima	0.04
+capacitor	diodo	2.67
+spoon	succo	0.58
+root	UNICEF	0.0
+Opel	Mercedes	3.21
+car	camion	3.13
+party	maschera	1.58
+flag	vessillologia	2.21
+alliance	NATO	2.96
+acid	base	2.75
+Oxford University	Università di Cambridge	3.13
+seed	mulino	0.58
+beach	costa	3.33
+rose oil	acqua di rose	3.04
+Aristotle	Platone	3.08
+castle	muro	2.13
+splash	viscosità	1.58
+Spider-Man	strada	0.54
+Moscow	Unione Europea	1.83
+viscosity	spruzzo	1.58
+tax	Brexit	1.25
+comic book	romanzo a fumetti	3.46
+Sun	cavo	0.04
+development	raccolta fondi	1.0
+Boeing	aereo	2.96
+handicraft	tradizione	1.83
+cherry	fragola	3.0
+exit	suffragio	0.17
+somatotropin	ormone della crescita	3.79
+king	nepotismo	1.29
+blizzard	pioggia	2.83
+opera	cinema	2.33
+program	cibo	0.13
+anthropology	New York	0.04
+palace	grattacielo	2.75
+Joule	astronave	0.38
+whale shark	aragosta	2.29
+dance	Polo Sud	0.0
+theorem	teoria	2.38
+attack	crimine	2.63
+slide	puntatore	1.67
+coronation	acqua	0.0
+snow	ghiaccio	2.88
+deep learning	sistema operativo	1.0
+skirt	orologio	0.63
+past	antecedente	2.79
+piece	aeroporto	0.04
+encyclopedia	dizionario	3.0
+fly	formica	2.83
+stock market	borsa	3.63
+Snakes and Ladders	tiro alla fune	2.13
+poster	carta	2.54
+elephant	dinosauro	2.17
+GTA	Grand Theft Auto	4.0
+Faraday constant	zaino	0.0
+roof	finestra	2.25
+matrix	vettore	3.0
+smartphone	ananas	0.0
+hypothesis	teoria	3.54
+dinosaur	elefante	2.17
+post	velocità	0.25
+virus	sangue	1.5
+political party	associazione	2.42
+lawyer	pubblico ministero	3.13
+basmati	riso jasmine	3.33
+sky	sogno	0.83
+mojito	mohito	4.0
+chaos	classe	0.25
+pathogen	germe	3.83
+congress	parlamento	3.33
+demon	angelo	2.63
+Federer	Dylan	0.5
+screen	fonologia	0.29
+notebook	pistola	0.0
+disk	caricabatteria	0.88
+Coca-Cola	coca	3.88
+penny	affare	1.04
+digit	numero	3.67
+scholarship	retta	2.17
+lamp	genio	1.92
+multiplication	divisione	2.88
+life expectancy	misura statistica	2.67
+film	teatro	1.83
+helmet	arma	2.04
+wave	tempo	0.83
+Middle East	Eufrate	1.75
+iris	acetilcolina	1.0
+nozzle	fluido	1.96
+simulation	robotica	1.67
+fluid	ugello	1.96
+precipitation	cambiamento climatico	1.54
+television	sceneggiatore	1.67
+cable	Sole	0.04
+malware	worm	3.13
+forecast	nuvolosità	1.79
+problem	disturbo bipolare	2.38
+sword	ambiente	0.0
+muffin	prezzemolo	0.67
+car	bicicletta	2.58
+guitar	trota	0.0
+eczema	dermatite	4.0
+Beethoven	Seconda Guerra Mondiale	0.04
+champion	vincitore	3.5
+Baku	Terra Promessa	0.5
+chapel	cavo	0.13
+treatment	operazione chirurgica	2.46
+sweater	cotone	1.96
+diplomacy	negoziato	2.58
+Renascence	Rinascimento	4.0
+money	contante	3.54
+Alexander Fleming	penicillina	2.58
+teacher	studente	2.17
+infinity	zero	2.5
+historiographer	storico	3.46
+galaxy	app	0.21
+decoration	busta	0.33
+antecedent	passato	2.79
+rucksack	costante di Faraday	0.0
+plane	elicottero	3.0
+drawing	sommossa	0.04
+manuscript	articolo	3.33
+athlete	corridore	3.33
+button	macchina da cucire	1.79
+Boeing 747-200	coda	1.88
+money laundering	JPY	1.54
+bank loan	debito	3.25
+sociobiology	mutante	1.0
+deputy	dirigente	2.42
+paper money	prete	0.17
+Woody Allen	lente	0.25
+lake	airone cenerino	1.29
+association	partito politico	2.42
+operation	algebra	1.75
+videogame	gioco per PC	3.42
+genie	lampada	1.92
+myth	satira	2.25
+shower	monastero	0.04
+suidae	cinghiale nano	3.21
+artist	opera d'arte	2.29
+emperor	costituzione	1.08
+statistical measure	aspettativa di vita	2.67
+buckler	scudo	3.42
+app	galassia	0.21
+theory	teorema	2.38
+book	incidente	0.0
+Gmail	Yahoo	2.46
+ruler	re	3.71
+lizard	coccodrillo	3.25
+parsley	muffin	0.67
+cursor	patatine fritte	0.13
+semester	quadrimestre	3.58
+priest	banconota	0.17
+duke	repubblica	0.92
+tsunami	mare	2.08
+Ban Ki-moon	Nazioni Unite	2.38
+candy	cannella	1.29
+lawyer	galleria	0.21
+rosewater	olio di rosa	3.04
+bronchitis	acetaminofene	1.5
+coach	giocatore	2.58
+apocalypse	fuoco	1.42
+check	scacchi	2.04
+radar	joystick	0.63
+conqueror	Alessandro Magno	2.88
+equator	El Niño	1.08
+job	strumento	1.54
+Yahoo	Gmail	2.46
+Persian Empire	Ciro	2.04
+working class	fabbrica	2.0
+ISIS	islamofobia	1.88
+harmony	piano	1.54
+Europe	trattato di Maastricht	2.17
+Deutsche Bank	IMF	2.88
+statue	scultura	3.79
+cyclone	tifone	3.79
+statute	era glaciale	0.0
+orchard	struzzo	0.25
+Rome	Hamadan	2.79
+rock	miniera	2.0
+symbol	crittogramma	2.13
+citrus	arancia	3.13
+sea	tsunami	2.08
+stage	heavy metal	1.38
+slave	servo	3.58
+coast	cannoniera	1.04
+armed forces	difesa	2.38
+constitution	imperatore	1.08
+altitude	conversione	0.29
+tennis	statistica	0.5
+wizard	Harry Potter	3.0
+essay	compito a casa	2.54
+gum	menta piperita	1.88
+sunset	tavolo	0.0
+freedom	oasi	0.63
+Mensa	QI	2.0
+system	faglia	0.29
+octopus	Polpo Paul	3.54
+fossil	combustibile fossile	2.0
+philosopher	corsa	0.17
+elephant	bussola	0.09
+sculptor	dimora	0.88
+surgical operation	cura	2.46
+Latin	tedesco	2.92
+acoustics	suono	2.75
+song	esecutore	1.67
+suffrage	uscita	0.17
+theory	ipotesi	3.54
+food	programma	0.13
+squall	vento	2.79
+New York	antropologia	0.04
+esteem	onore	2.88
+blood cell	volpe	0.25
+film	nichilismo	0.38
+pancreatic cancer	chemioterapia	1.75
+Bayern Munich	Juventus	3.0
+LED	tubercolosi	0.0
+graphic novel	fumetto	3.46
+playoff	pallacanestro	1.42
+supporter	cricket	1.29
+zero	infinito	2.5
+brainstorming	telescopio	0.0
+behaviourism	terapia	2.08
+angel	demonio	2.63
+civilization	stile di vita	1.54
+legend	morale	0.92
+vocalist	pentagramma	1.58
+underwear	corpo	1.63
+flag	Union Jack	3.17
+CO2	anidride carbonica	4.0
+snow	valanga	2.17
+story	matita	0.63
+language	lingua madre	3.17
+magistrate	giudice	3.67
+honey	caseificio	0.7
+grassland	prato	3.25
+Oscars	stadio	0.04
+lantana	bocca di leone	3.13
+vampire	pipistrello	2.46
+germ	agente patogeno	3.83
+scientist	Gauss	3.04
+Ronaldo	U2	0.21
+London	prezzo di offerta	0.21
+syllabus	esame	2.38
+culture	società	2.46
+writer	romanzo	2.04
+Si-o-seh pol	ponte matematico	3.17
+dress	danza	1.04
+foreigner	traduttore	1.42
+emperor	governatore	3.29
+black hole	vuoto	2.38
+Go	backgammon	3.33
+Ebola virus	Ebola	4.0
+prophet	prete	2.29
+juice	frappè	3.17
+movie	pellicola	3.96
+JPEG	PDF	2.92
+mill	seme	0.58
+International Mathematical Olympiad	teoria	1.17
+protestant	cristiano	3.13
+tail	Boeing 747-200	1.88
+cloud	finestra	0.58
+anthropology	archeologia	2.75
+translator	straniero	1.42
+Google Drive	driver	0.25
+racism	xenofobia	3.46
+poet	giornalista	1.92
+blood	corpo	2.17
+manuscript	libro	3.13
+crown	chiave	0.29
+holiday	calendario	1.63
+mineral water	giacca	0.0
+highway	strada	3.42
+sandwich	Subway	1.92
+Quran	Islam	2.54
+Penicillin	Alexander Fleming	2.58
+window	nuvola	0.58
+driver	Google Drive	0.25
+competition	rispetto reciproco	1.67
+city center	autobus	0.96
+train	tram	3.25
+sculpture	statua	3.79
+star	pianeta	2.67
+paper	poster	2.54
+tug of war	Scale e Serpenti	2.13
+orange	agrume	3.13
+jacket	acqua minerale	0.0
+MS	sclerosi multipla	3.96
+structure	topologia	2.33
+backgammon	Go	3.33
+Cold War	Unione Sovietica	2.13
+protein molecule	recettore	2.96
+acetaminophen	bronchite	1.5
+Mozilla Firefox	browser	3.46
+tribunal	giustizia	2.33
+Zara	leggings	1.42
+toy	yo-yo	2.92
+Leonardo da Vinci	L'Ultima Cena	2.38
+vexillology	bandiera	2.21
+truck	macchina	3.13
+lifestyle	civiltà	1.54
+gold	zinco	3.0
+score	livello	2.29
+soccer	gioco del calcio	4.0
+AI	batteria	0.21
+Renaissance	Rinascimento	4.0
+nepotism	re	1.29
+matrix	molecola	0.04
+note-taking	compito	2.04
+monkey	campagna	0.0
+Google DeepMind	DeepMind	3.96
+ice age	statuto	0.0
+patriotism	inno nazionale	2.17
+millionaire	dollaro	1.92
+stool	sedia	3.25
+coast	spiaggia	3.33
+salt	cloruro di sodio	3.92
+leggings	Zara	1.42
+stadium	Oscar	0.04
+computer	macchina	3.0
+spacecraft	Joule	0.38
+society	cultura	2.46
+suspect	uomo	1.46
+accident	libro	0.0
+climate change	precipitazione	1.54
+machine	computer	3.0
+global warming	calore	2.54
+Euphrates	medio oriente	1.75
+will	intenzione	3.42
+satire	mito	2.25
+dictionary	enciclopedia	3.0
+helicopter	aereo	3.0
+water	incoronazione	0.0
+chess queen	regina regnante	1.0
+Maastricht Treaty	Europa	2.17
+hashtag	argomento	2.42
+Earth	meteorite	2.21
+Dell	Dingle	0.0
+Wii	PlayStation	3.21
+handbook	guida turistica	3.54
+tuition	borsa di studio	2.17
+alphabet	penna	0.63
+theorem	Bolzano	2.13
+Subway	panino	1.92
+bipolar disorder	problema	2.38
+receptor	molecola proteica	2.96
+strategy game	strategia	2.04
+Celsius	Microsoft	0.04
+distance	prospettiva	2.04
+gymnastics	scherma	2.5
+perspective	distanza	2.04
+term	semestre	3.58
+engine	pistone	2.25
+moral	leggenda	0.92
+Nietzsche	Chelsea	0.09
+McDonald's	KFC	3.17
+Mount Everest	Chomolungma	3.96
+pc game	videogioco	3.42
+HSBC	Gran Bretagna	1.54
+watch	gonna	0.63
+astronomer	galassia	1.38
+recession	PIL	2.08
+sister	fratello	3.0
+English	americano	3.33
+cinnamon	caramella	1.29
+mutant	sociobiologia	1.0
+cryptogram	simbolo	2.13
+cell	gattabuia	3.08
+dream	cielo	0.83
+flag	asta	1.63
+joystick	radar	0.63
+queen regnant	regina degli scacchi	1.0
+Grand Theft Auto	GTA	4.0
+Olympic Games	spirito	0.88
+globalism	visto	1.04
+Mercedes	Opel	3.21
+global warming	ghiacciaio	1.67
+Orion	costellazione	3.13
+episode	capitolo	3.0
+patient	sessione	1.08
+Green Revolution	vernice	0.09
+neuropsychology	parapsicologia	2.88
+mathematician	spettacolo	0.04
+chapter	episodio	3.0
+tradition	artigianato	1.83
+Union Jack	bandiera	3.17
+fencing	ginnastica	2.5
+dune	deserto	2.33
+fault	sistema	0.29
+cinema	opera	2.33
+basilica	mosaico	1.5
+islamophobia	ISIS	1.88
+band	orchestra	3.29
+milkshake	succo	3.17
+ball	racchetta	2.42
+shirt	cardigan	3.13
+jeans	donna	0.41
+United Nations	Ban Ki-moon	2.38
+bus	centro della città	0.96
+museum	zecca	0.5
+rain	tormenta	2.83
+Paul the Octopus	polpo	3.54
+plant	agricoltura	2.13
+biscuit	principessa	0.04
+maize	mais	4.0
+street	Uomo Ragno	0.54
+thermodynamics	reazione a catena	2.0
+campaign	scimmia	0.0
+Silk Road	baco da seta	0.79
+ostrich	frutteto	0.25
+hammer	dente	0.41
+teacher	istruttore	3.71
+soldier	pace	0.88
+navy	isola	0.75
+senate	costituzione	1.5
+Gauss	scienziato	3.04
+shield	brocchiero	3.42
+uniform	uncinetto	1.29
+neurosis	mente	1.54
+bid price	Londra	0.21
+subroutine	compilatore	2.38
+debt	mutuo	3.25
+winner	campione	3.5
+Bolzano	teorema	2.13
+sugarcane	mietitrebbia	0.88
+WiFi	WikiLeaks	0.25
+blood	virus	1.5
+student	insegnante	2.17
+wallpaper	sfondo	3.5
+magma	vulcano	2.25
+battery	IA	0.21
+speed	posto	0.25
+lizard	serpente	3.04
+desert	duna	2.33
+brush	acquerello	2.42
+Hebrew	Gerusalemme	2.0
+Darwin	evoluzione	2.63
+Apple	iPhone	2.58
+cloud	lago	0.75
+riot	disegno	0.04
+multiple sclerosis	sclerosi a placche	3.96
+Western world	Western Union	0.71
+sport	Neanderthal	0.0
+book	manoscritto	3.13
+actor	televisione	1.88
+offender	criminale	3.38
+dust	scopa	1.79
+year	secolo	2.63
+monitor	schermo	3.92
+Guardian	Times	3.04
+town	città	3.58
+meadow	prateria	3.25
+bicycle	macchina	2.58
+U2	Ronaldo	0.21
+homeless	miliardario	1.83
+cell membrane	provirus	1.92
+bottle	lattina	3.33
+battery	energia	2.46
+financial market	Wall Street	3.0
+intention	volontà	3.42
+character	persona	2.79
+Cyrus	Impero Persiano	2.04
+mutual respect	competizione	1.67
+boss	regista	2.83
+Caesar	Giulio Cesare	3.96
+number	cifra	3.67
+camera	seguito	0.5
+tool	lavoro	1.54
+cotton	maglione	1.96
+government	lucertola	0.0
+Brexit	tassa	1.25
+brightness	stella	1.63
+entropy	informazione	2.0
+guitar	violino	3.08
+rhythm	cadenza	3.54
+body	sangue	2.17
+robotics	simulazione	1.67
+Dickens	Shakespeare	3.0
+Chomolungma	monte Everest	3.96
+lock	chiave	2.46
+jumping	recinto	1.54
+Nike	Adidas	3.21
+wind	groppo	2.79
+statistics	tennis	0.5
+gun	sergente	1.67
+Mozart	Guerre stellari	0.0
+PDF	JPEG	2.92
+staff	vocalista	1.58
+victim	telefono	0.04
+DeepMind	Google DeepMind	3.96
+prosecutor	avvocato	3.13
+galaxy	astronomo	1.38
+pencil	storia	0.63
+homework	saggio	2.54
+liberty	libertà	4.0
+parapsychology	neuropsicologia	2.88
+meteor	gravità	0.88
+tuberculosis	led	0.0
+Spanish	umidità	0.0
+window	tetto	2.25
+crochet	uniforme	1.29
+mansion	scultore	0.88
+theory	olimpiadi internazionali di matematica	1.17
+car	cisterna	2.13
+chorus	cantante	2.67
+chemotherapy	cancro al pancreas	1.75
+sadness	felicità	2.42
+weapon	elmetto	2.04
+skiing	snowboard	3.17
+freedom	libertà	4.0

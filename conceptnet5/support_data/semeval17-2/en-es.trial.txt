@@ -1,0 +1,34 @@
+eagle	halcón	3.65
+leaf	árbol	2.11
+tree	rama	2.11
+curandero	psicólogo	2.665
+automobile	coche	3.795
+trial	examen	2.705
+car	automóvil	3.795
+beef	carne	3.35
+Washington	Nueva York	3.645
+bike	piel	0.055
+falcon	águila	3.65
+comedy	ciencia ficción	2.83
+computer science	matemáticas	3.13
+volleyball	pelota	1.585
+mathematics	informática	3.13
+cinema	televisión	3.005
+room	edificio	2.2
+biologist	microscopio	1.145
+string	puesta de sol	0.03
+science fiction	comedia	2.83
+New York	Washington	3.645
+psychologist	curandero	2.665
+microscope	biólogo	1.145
+sunset	cuerda	0.03
+head	nariz	2.475
+building	habitación	2.2
+keyboard	luz	0.275
+nose	cabeza	2.475
+television	cine	3.005
+ball	voleibol	1.585
+skin	bicicleta	0.055
+test	juicio	2.705
+meat	ternera	3.35
+light	teclado	0.275

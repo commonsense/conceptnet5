@@ -1,0 +1,34 @@
+Kino	televisione	3.065
+Zimmer	edificio	2.075
+Mathematik	informatica	2.955
+Blatt	albero	2.175
+Science-Fiction	commedia	3.035
+Informatik	matematica	2.955
+Kopf	naso	2.595
+Gebäude	stanza	2.075
+Leine	tramonto	0.065
+Komödie	fantascienza	3.035
+Auto	macchina	3.765
+Versuch	test	2.565
+Haut	bicicletta	0.105
+Psychologe	curandero	2.8
+Falke	aquila	3.67
+Mikroskop	biologo	1.2
+Ball	pallavolo	1.905
+Nase	testa	2.595
+Adler	falco	3.67
+Tastatur	luce	0.36
+Test	giudizio	2.565
+Fahrrad	pelle	0.105
+Fernseher	cinema	3.065
+Wagen	automobile	3.765
+Rind	carne	3.04
+Licht	tastiera	0.36
+Sonnenuntergang	corda	0.065
+Heiler	psicologo	2.8
+Baum	foglia	2.175
+Washington	New York	3.375
+New York	Washington	3.375
+Fleisch	manzo	3.04
+Volleyball	palla	1.905
+Biologe	microscopio	1.2
