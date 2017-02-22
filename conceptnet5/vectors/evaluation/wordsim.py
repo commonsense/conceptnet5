@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr, tmean
 
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de', 'semeval2017-monolingual',
-         'semeval2017-crosslingual']
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de',
+         'semeval17-2a', 'semeval17-2b']
 SAMPLE_SIZES = {
     'ws353': 353,
     'ws353-es': 353,
@@ -74,6 +74,7 @@ COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table({
     'simlex': .393,
     'ws353': .721  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
     'men3000': .778,
     'mturk': .666,
@@ -81,6 +82,7 @@ COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
     'simlex': .432,
     'ws353': .733  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
     'men3000': .774,
     'mturk': .693,
@@ -88,6 +90,7 @@ COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
     'simlex': .438,
     'ws353': .729  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
     'men3000': .729,
     'mturk': .632,
@@ -95,6 +98,7 @@ COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
     'simlex': .398,
     'ws353': .654  # estimate
 })
+
 COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table({
     'men3000': .732,
     'rw': .385,
@@ -108,16 +112,19 @@ COMPARISONS['Luminoso', 'GloVe'] = make_comparison_table({
     'men3000': .840,
     'ws353': .798
 })
+
 COMPARISONS['Luminoso', 'word2vec SGNS'] = make_comparison_table({
     'rw': .476,
     'men3000': .778,
     'ws353': .731
 })
+
 COMPARISONS['Luminoso', 'Numberbatch 2016.04'] = make_comparison_table({
     'rw': .596,
     'men3000': .859,
     'ws353': .821
 })
+
 COMPARISONS['Luminoso', 'PPMI'] = make_comparison_table({
     'rw': .420,
     'men3000': .764,
@@ -275,10 +282,10 @@ def read_mc():
 
 def read_semeval_monolingual(lang, subset='test'):
     """
-    Parses Semeval2017-Task2 monolingual word similarity test collection.
+    Parses Semeval2017-Task2 monolingual word similarity (subtask 1) test collection.
     """
     lang1, lang2 = lang, lang
-    filename = get_support_data_filename('semeval2017-task2/{}.{}.txt'.format(lang, subset))
+    filename = get_support_data_filename('semeval17-2/{}.{}.txt'.format(lang, subset))
     with open(filename) as file:
         for line in file:
             parts = line.split('\t')
@@ -287,9 +294,9 @@ def read_semeval_monolingual(lang, subset='test'):
 
 def read_semeval_crosslingual(lang1, lang2, subset='test'):
     """
-    Parses Semeval2017-Task2 crosslingual word similarity test collection.
+    Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
     """
-    filename = get_support_data_filename('semeval2017-task2/{}-{}.{}.txt'.format(lang1, lang2, subset))
+    filename = get_support_data_filename('semeval17-2/{}-{}.{}.txt'.format(lang1, lang2, subset))
 
     with open(filename) as file:
         for line in file:
@@ -299,14 +306,14 @@ def read_semeval_crosslingual(lang1, lang2, subset='test'):
 
 def evaluate_semeval_monolingual(vectors):
     """
-    According to Semeval2017-Subtask2 rules, the global score for a system is the average the final individual
-    scores on the four languages on which the system performed best. If less than four scores are supplied, the global
-     score is NaN.
+    According to Semeval2017-Subtask2 rules, the global score for a system is the average the final
+    individual scores on the four languages on which the system performed best. If less than four
+    scores are supplied, the global score is NaN.
     """
     scores = []
-    for language in ['en', 'de', 'es', 'it', 'fa']:
-        scores.append(spearman_evaluate(vectors, read_semeval_monolingual(lang=language)))
-    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0, reverse=True)[:4]
+    for lang in ['en', 'de', 'es', 'it', 'fa']:
+        scores.append(spearman_evaluate(vectors, read_semeval_monolingual(lang)))
+    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-4:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
     high_average = tmean([score['high'] for score in top_scores])
@@ -317,15 +324,16 @@ def evaluate_semeval_monolingual(vectors):
 
 def evaluate_semeval_crosslingual(vectors):
     """
-    According to Semeval2017-Subtask2 rules. the global score is the average of the individual scores on the six
-    cross-lingual datasets on which the system performs best. If less than six scores are supplied, the global score
-    is NaN.
+    According to Semeval2017-Subtask2 rules. the global score is the average of the individual
+    scores on the six cross-lingual datasets on which the system performs best. If less than six
+    scores are supplied, the global score is NaN.
     """
     scores = []
-    for language_pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it', 'it-fa']:
-        lang1, lang2 = language_pair.split('-')
-        scores.append(spearman_evaluate(vectors, read_semeval_crosslingual(lang1=lang1, lang2=lang2)))
-    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0, reverse=True)[:6]
+    for pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it',
+             'it-fa']:
+        lang1, lang2 = pair.split('-')
+        scores.append(spearman_evaluate(vectors, read_semeval_crosslingual(lang1, lang2)))
+    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-6:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
     high_average = tmean([score['high'] for score in top_scores])
@@ -399,8 +407,8 @@ def evaluate(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
-    results.loc['semeval2017-monolingual'] = semeval_monolingual
-    results.loc['semeval2017-crosslingual'] = semeval_crosslingual
+    results.loc['semeval17-2a'] = semeval_monolingual
+    results.loc['semeval17-2b'] = semeval_crosslingual
     return results
 
 
@@ -432,8 +440,8 @@ def evaluate_raw(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
-    results.loc['semeval2017-monolingual'] = semeval_monolingual
-    results.loc['semeval2017-crosslingual'] = semeval_crosslingual
+    results.loc['semeval17-2a'] = semeval_monolingual
+    results.loc['semeval17-2b'] = semeval_crosslingual
     return results
 
 
@@ -441,6 +449,7 @@ def results_in_context(results, name=('Luminoso', 'Numberbatch 16.09')):
     comparisons = dict(COMPARISONS)
     comparisons[name] = results
     comparison_list = sorted(comparisons)
-    big_frame = pd.concat([comparisons[key] for key in comparison_list], keys=pd.MultiIndex.from_tuples(comparison_list))
+    big_frame = pd.concat([comparisons[key] for key in comparison_list],
+                          keys=pd.MultiIndex.from_tuples(comparison_list))
 
     return big_frame.dropna()
