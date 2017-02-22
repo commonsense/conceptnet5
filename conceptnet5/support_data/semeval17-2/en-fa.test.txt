@@ -1,0 +1,952 @@
+Obama	کلینتون	3.21
+dignity	نشان افتخار	0.92
+polyester	پنبه	3.08
+Spider-Man	خیابان	0.34
+Earth	شهاب‌سنگ	2.29
+Euphrates	خاورمیانه	1.75
+orange	مرکبات	3.04
+caterpillar	کرم ابریشم	3.46
+meteor	گرانش	1.13
+basilica	موزائیک	1.42
+character	آدم	2.58
+Alexander the Great	فاتح	2.63
+matrix	ملکول	0.25
+surgical operation	درمان	2.5
+opera	سینما	2.79
+bishop	مسلمان	1.92
+Grand Theft Auto	جی‌تی‌ای	3.83
+growth	کود	1.75
+Soviet Union	جنگ سرد	2.08
+Mercedes	اوپل	3.17
+jasmine rice	باسماتی	3.42
+post	سرعت	0.41
+television	بازیگر	1.92
+culture	جامعه	2.38
+Gmail	یاهو	2.71
+fashion	سبک	3.13
+harbor	لفاف	0.04
+ostrich	باغ سیب	0.21
+apocalypse	آتش	0.92
+civilization	سبک زندگی	1.58
+film	فیلم سینمایی	3.71
+atmosphere	ازن	2.46
+masterpiece	مونالیزا	2.46
+crochet	لباس فرم	0.88
+window	سقف	2.38
+movie	فیلم	3.71
+key	تاج‌	0.33
+chapel	سیم	0.13
+problem	اختلال دوقطبی	2.21
+serial killer	قاتل	3.42
+jacket	آب‌ معدنی	0.0
+MS	اسکلروز چندگانه	3.96
+growth hormone	سوماتوتروپین	3.96
+sequel	دوربین	0.67
+sport	نئاندرتال	0.0
+Yahoo	جیمیل	2.71
+rain	تگرگ	3.13
+Coke	کوکاکولا	3.95
+blizzard	باران	2.75
+director	رئيس	3.63
+sultan	وزارت	1.58
+leggings	زارا	1.92
+cadence	نواخت	3.38
+fertilizer	رشد	1.75
+jeans	زن	0.79
+precipitation	تغییر اقلیم	1.63
+wall	قلعه	2.0
+surfing	ورزش آبی	3.08
+somatotropin	هورمون رشد	3.96
+suidae	گراز کوتوله	3.42
+christian	پروتستان	3.17
+Western world	وسترن یونیون	0.38
+fox	سلول خون	0.33
+Dickens	شکسپیر	3.08
+Aristotle	افلاطون	3.29
+grassland	علف‌زار	3.5
+Bible	انجیل	3.33
+Mozart	جنگ ستارگان	0.0
+comic book	داستان مصور	3.17
+whale shark	شاه‌میگو	2.38
+volcano	ماگما	2.29
+battery	تئاتر	0.04
+murderer	قاتل زنجیره‌ای	3.42
+Times	گاردین	3.08
+criminal	خلافکار	3.71
+anthropology	باستان‌شناسی	2.88
+corruption	کلاه‌برداری	3.13
+evolution	داروین	2.21
+illustration	تاول	0.0
+band	ارکستر	3.54
+actor	چندوجهی	0.0
+splash	گرانروی	2.13
+mineral water	ژاکت	0.0
+Hadoop	صفحه لمسی	0.75
+food	برنامه	0.33
+nihilism	فیلم	0.25
+sweater	پنبه	2.0
+sadness	خوشحالی	2.5
+society	فرهنگ	2.38
+association	حزب سیاسی	2.29
+blood	بدن	1.79
+Renascence	رنسانس	4.0
+Woody Allen	لنز	0.58
+mosaic	قصر سلطنتی	1.42
+bargain	پنی	1.38
+job	ابزار	1.21
+liberty	رهایی	3.92
+mill	دانه	0.79
+cable	خورشید	0.04
+Jupiter	عطارد	3.25
+charger	دیسک	1.29
+Zara	ساق‌پوش	1.92
+London	قیمت پیشنهادی خرید	0.25
+chair	چهارپایه	3.17
+orchard	شترمرغ	0.21
+viscosity	شتک	2.13
+England	ملکه ویکتوریا	1.96
+flora	طبیعت	2.63
+Dingle	دل	0.04
+film	پوچ‌گرایی	0.25
+cloud	پنجره	0.63
+base	ماده شیمیایی	2.96
+Bayern Munich	یوونتوس	3.13
+bottle	قوطی	3.08
+robotics	شبیه‌سازی	1.58
+diode	خازن	3.33
+avalanche	برف	2.21
+acetylcholine	عنبیه	0.79
+chemical substance	باز	2.96
+patient	جلسه	0.46
+city center	اتوبوس	0.71
+maize	ذرت	3.96
+sign	سمبل	3.13
+penny	معامله	1.38
+electric train	زیمنس	1.79
+parcel	کامیون	0.5
+pen	الفبا	0.79
+acetaminophen	برونشیت	1.5
+U2	رونالدو	0.33
+fluid	سرشلنگ	1.67
+fire	آخرالزمان	0.92
+global warming	گرما	2.38
+Dell	دینگل	0.04
+umbrella	کالیبر	0.0
+ministry	سلطان	1.58
+pollination	پرچم	2.5
+case	الکتریسیته	0.38
+JPY	پولشویی	1.5
+chair	تلسکوپ	0.29
+European Union	مسکو	2.21
+cytoplasm	انگشت	0.75
+wrapper	بندرگاه	0.04
+tremor	زمین‌لرزه	3.96
+receptor	ملکول پروتئین	3.21
+helmet	سلاح	2.08
+highway	جاده	3.38
+phonology	صفحه نمایش	0.04
+dance	قطب جنوب	0.0
+zero	بینهایت	2.58
+tree	قایق	0.38
+McDonald's	کی‌اف‌سی	3.17
+iPhone	اپل	2.5
+crown	کلید	0.33
+national anthem	میهن‌دوستی	2.25
+smartphone	سیب	0.25
+museum	ضرابخانه	1.21
+bipolar disorder	مشکل	2.21
+brain	ذهن	3.54
+theatre	باتری	0.04
+instructor	معلم	3.92
+citrus	پرتقال	3.04
+fossil fuel	سنگواره	2.08
+poem	وزن	1.92
+key	قفل	2.46
+blister	تصویرسازی	0.0
+yo-yo	اسباب‌بازی	2.92
+galaxy	منجم	1.71
+cash	پول	3.52
+Neanderthal	ورزش	0.0
+king	فرمانروا	3.71
+fly	مورچه	3.0
+constellation	شکارچی	3.04
+spacecraft	ژول	0.45
+tool	شغل	1.21
+screen	صداشناسی	0.04
+campus	دانشگاه	2.96
+camera	دنباله	0.67
+Spanish	رطوبت	0.0
+magistrate	قاضی	3.58
+anthropology	نیویورک	0.13
+check	شطرنج	1.96
+gift	نویسنده	0.17
+statistics	تنیس	0.45
+fossil	سوخت فسیلی	2.08
+river	جریان نقدی	0.13
+acoustics	صدا	2.33
+operation	جبر	1.83
+base	اسید	2.75
+suffrage	خروج	0.25
+Pfizer	دارو	2.46
+deep learning	سیستم‌عامل	1.79
+sandwich	ساب‌وی	2.04
+orchestra	گروه‌موسیقی	3.54
+university	پردیس دانشگاهی	2.96
+silkworm	کرم پیله ساز	3.46
+Plato	ارسطو	3.29
+caliber	چتر	0.0
+Juventus	بایرن‌مونیخ	3.13
+cricket	حامی	1.54
+cinnamon	آب‌نبات	1.67
+Maastricht Treaty	اروپا	1.96
+theory	قضیه	2.67
+Orion	صورت فلکی	3.04
+sensor	رادیاتور	0.79
+vampire	خفاش	2.33
+theory	المپیاد جهانی ریاضی	1.0
+heater	چتر	0.25
+teeth	چکش	0.17
+gun	دفتریادداشت	0.17
+water	خشکسالی	2.17
+depression	دره	2.38
+club	علامت	0.5
+supporting character	فیلم	1.88
+drought	آب‌	2.17
+butterfly	رز	1.21
+skirt	ساعت	1.38
+wizard	هری پاتر	2.83
+policeman	سیاستمدار	2.04
+Mona Lisa	شاهکار	2.46
+entropy	اطلاعات	1.67
+pancreatic cancer	شیمی‌درمانی	1.83
+coach	بازیکن	2.79
+constitution	امپراتور	1.21
+backgammon	گو	3.25
+pc game	بازی ویدئویی	3.25
+silkworm	راه ابریشم	0.54
+subroutine	کامپایلر	2.75
+monarchy	دموکراسی	2.75
+buckler	محافظ	3.29
+watercolor painting	قلمو	2.08
+billionaire	بی‌خانمان	1.58
+tribunal	عدالت	2.33
+champion	برنده	3.46
+flag	میله	1.42
+sphere	توپ	2.92
+recession	تولید ناخالص داخلی	1.96
+insignia	کرامت	0.92
+worker	دفتر	1.75
+water	تاج‌گذاری	0.09
+philosopher	مسابقه	0.0
+branch	بازو	2.67
+airport	قطعه	0.04
+division	ضرب	2.92
+coast	ناوچه توپدار	1.46
+moisture	اسپانیایی	0.0
+cattle	ماست	1.67
+popcorn	سینما	1.13
+campaign	میمون	0.0
+decoration	پاکت نامه	0.17
+symbol	نوشته رمزی	2.04
+Si-o-seh pol	پل ریاضی	2.92
+background	والپیپر	3.71
+distance education	اینترنت	1.67
+lizard	دولت	0.09
+cash flow	رودخانه	0.13
+dance	لباس	1.08
+spoon	آبمیوه	0.41
+water sport	موج‌سواری	3.08
+woman	شلوار جین	0.79
+list	آرایه	3.96
+Darwin	تکامل	2.21
+Boeing	هواپیما	2.58
+spirit	بازی‌های المپیک	0.45
+Queen Victoria	انگلیس	1.96
+mainboard	مادربورد	4.0
+gum	نعناع فلفلی	1.75
+compiler	رویه	2.75
+Apple	آیفون	2.5
+sodium chloride	نمک	3.88
+typhoon	طوفان موسمی	3.46
+University of Cambridge	دانشگاه آکسفورد	3.29
+juice	قاشق	0.41
+protestant	مسیحی	3.17
+star	سیاره	2.88
+citrus fruit	گریپ‌فروت	3.29
+car	تانک	2.46
+foot	ماسه	0.38
+machine	رایانه	3.04
+Boeing 747-200	دم	1.67
+cell	زندان	3.5
+politician	پليس	2.04
+toy	یویو	2.92
+Mount Everest	کومولانگما	3.96
+throne	شمشیر	1.08
+Rome	همدان	2.71
+wood	پتو	0.38
+ISIS	اسلام‌هراسی	1.96
+plant	کشاورزی	2.33
+novel	نویسنده	2.04
+teacher	دانش‌آموز	2.33
+Moscow	اتحادیه اروپا	2.21
+autonomous car	خودروی خودگردان	4.0
+flute	موسیقی	2.17
+zinc	طلا	2.96
+dictionary	دایرةالمعارف	3.17
+pygmy hog	گراز	3.42
+Jerusalem	عبری	1.67
+web browser	گیا	0.0
+oat	مزرعه	1.67
+asteroid	ستاره	2.75
+International Mathematical Olympiad	نظریه	1.0
+ball	کره	2.92
+delta	دریا	2.46
+neuropsychology	فراروانشناسی	3.13
+stamen	گرده‌افشانی	2.5
+angel	اهریمن	2.63
+Opel	مرسدس	3.17
+lifestyle	تمدن	1.58
+Amazon	جنگل	3.04
+driver	گوگل‌درایو	0.04
+magma	آتش‌فشان	2.29
+watch	دامن	1.38
+affix	پسوند	3.33
+dinosaur	فیل	2.5
+blood	ویروس	1.46
+cathedral	کلیسا	3.46
+CO2	دی‌اکسید کربن	3.83
+sword	تخت‌ پادشاهی	1.08
+economy	اکوسیستم	1.04
+cloud computing	باران	0.17
+tunnel	مسیر	2.33
+congress	پارلمان	3.42
+gunboat	ساحل	1.46
+sculpture	تندیس	3.75
+tuberculosis	ال‌ای‌دی	0.34
+chemotherapy	سرطان لوزالمعده	1.83
+yogurt	گاو	1.67
+island	نیروی دریایی	0.92
+emperor	فرماندار	3.5
+cable	جادوگر	0.0
+happiness	ناراحتی	2.5
+republic	دوک	1.29
+Faraday constant	کوله‌پشتی	0.0
+cryptogram	نماد	2.04
+fault	سامانه	0.5
+Paint	فتوشاپ	3.08
+Nietzsche	چلسی	0.09
+germ	پاتوژن	3.96
+coast	کنار دریا	3.83
+political party	انجمن	2.29
+ant	مگس	3.0
+cinema	اپرا	2.79
+steel	آلیاژ	3.33
+navy	جزیره	0.92
+fencing	ژیمناستیک	2.67
+treatment	عمل جراحی	2.5
+gallery	وکیل	0.21
+shower	صومعه	0.04
+Ban Ki-moon	سازمان ملل متحد	2.33
+mutual respect	رقابت	1.38
+telescope	صندلی	0.29
+operating system	یادگیری عمیق	1.79
+beach	ساحل	3.83
+news	سرمقاله	2.17
+The Last Supper	لئوناردو‌دا‌وینچی	2.21
+calendar	تعطیلات	2.21
+nepotism	پادشاه	1.5
+Joule	فضاپیما	0.45
+translator	خارجی	1.67
+handle	پروتئین	0.09
+sergeant	تفنگ	1.58
+plane	هلی‌کوپتر	3.17
+energy	باتری	2.67
+chart	گراف	3.63
+AI	باتری	0.42
+strategy game	استراتژی	1.92
+global warming	یخچال طبیعی	1.71
+income	کیفیت زندگی	2.08
+hashtag	موضوع	2.29
+tennis	آمار	0.45
+ice cream	صبحانه	1.29
+alien	بیگانه	3.63
+fraud	فساد	3.13
+earthquake	زلزله	3.96
+rosewater	روغن گل‌سرخ	3.25
+suffix	وند	3.33
+runner	ورزشکار	3.21
+monastery	دوش	0.04
+cell membrane	پروویروس	1.42
+internet	یادگیری از راه دور	1.67
+handicraft	سنت	1.54
+pathology	خون‌شناسی	3.0
+guidebook	راهنما	3.54
+computer	دستگاه	3.04
+hardware	جعبه رایانه	2.08
+coin	پرداخت	1.96
+source	جعبه	0.29
+bronchitis	استامینوفن	1.5
+sugarcane	کمباین	1.04
+slave	خدمتکار	3.46
+pedestrian crossing	شخص	1.71
+screen	مانیتور	3.88
+Cold War	شوروی	2.08
+cube	تاس	2.79
+prophet	کشیش	2.67
+money	پول نقد	3.52
+biology	بیوتوپ	1.67
+cotton	ژاکت	2.0
+card game	فریزبی	2.5
+candy	دارچین	1.67
+seed	کارخانه	0.79
+Alexander Fleming	پنی‌سیلین	2.25
+overcast	پيش‌‌بینی	1.63
+blanket	چوب	0.38
+actor	هنرپیشه‌	3.71
+quality of life	درآمد	2.08
+paper	پوستر	2.71
+dust	جارو	2.0
+frame	اصابت	0.25
+Silk Road	کرم ابریشم	0.54
+Deutsche Bank	صندوق بین‌المللی پول	2.71
+muslim	اسقف	1.92
+provirus	غشای سلول	1.42
+blood cell	روباه	0.33
+rain	کولاک	2.75
+hammer	دندان	0.17
+Asia	جهان	2.25
+hematology	آسیب‌شناسی	3.0
+truck	بسته	0.5
+table	غروب	0.0
+number	رقم	3.54
+poet	روزنامه‌نگار	2.75
+money laundering	ین	1.5
+drug	فایزر	2.46
+iris	استیل کولین	0.79
+currency	بورس	1.92
+pineapple	گوشی هوشمند	0.25
+breakfast	بستنی	1.29
+truck	ماشین	3.08
+cherry	توت‌فرنگی	2.92
+Subway	ساندویچ	2.04
+scholarship	شهریه	2.67
+blanket	طوفان	0.88
+molecule	ماتریس	0.25
+paper money	کشیش	0.04
+freedom	واحه	0.29
+sister	برادر	2.83
+cellphone	تلفن	3.66
+IQ	منسا	1.96
+map	مربع	0.83
+cable	نمازخانه	0.13
+globalism	روادید	1.5
+clock tower	سنگ	0.58
+century	سال	2.88
+neurosis	ذهن	1.92
+hit	قاب	0.25
+badge	شیشه	0.09
+geyser	چشمه	3.38
+lizard	تمساح	2.96
+guitar	قزل‌آلا	0.0
+body	لباس زیر	1.54
+speed	پست	0.41
+skiing	اسنوبرد	3.21
+town	شهر	3.54
+mask	مهمانی	0.88
+malware	کرم	3.38
+car	کامیون	3.08
+envelope	دکوراسیون	0.17
+engine	پیستون	2.25
+Hebrew	بیت‌المقدس	1.67
+climate change	بارش	1.63
+peppermint	آدامس	1.75
+Ronaldo	یوتو	0.33
+stock exchange	بازار بورس	3.08
+Mensa	آی‌کیو	1.96
+therapy	رفتارگرایی	2.29
+writer	رمان	2.04
+Adidas	نایک	3.25
+United Nations	پارلمان اروپا	2.63
+teacher	آموزگار	3.92
+offender	مجرم	3.71
+parsley	مافین	1.42
+story	مداد	1.08
+exam	سرفصل دروس	2.08
+body	خون	1.79
+jumping	حصار	1.25
+LED	سل	0.34
+lobster	کوسه نهنگ	2.38
+nozzle	مایع	1.67
+car	دوچرخه	2.88
+Guardian	تایمز	3.08
+party	نقاب	0.88
+Chomolungma	کوه اورست	3.96
+assignment	یادداشت‌برداری	1.96
+article	نسخه خطی	3.29
+forest	آمازون	3.04
+graphic novel	کتاب کامیک	3.17
+emperor	قانون اساسی	1.21
+brother	خواهر	2.83
+snapdragon	شاه‌پسند	3.04
+glass	نشان	0.09
+behaviourism	درمان	2.29
+vocalist	کارمند	1.63
+Caesar	قیصر	3.96
+bicycle	ماشین	2.88
+ice age	قانون	0.0
+sociobiology	جهش‌یافته	0.96
+island	شبه‌جزیره	3.21
+prosecutor	وکیل	3.29
+motherboard	برداصلی	4.0
+tram	قطار	3.5
+archaeology	انسان‌شناسی	2.88
+Sun	کابل	0.04
+demon	فرشته	2.63
+combine	نیشکر	1.04
+will	قصد	3.46
+GDP	بحران اقتصادی	1.96
+program	غذا	0.33
+king	خویشاوندسالاری	1.5
+wizard	کابل	0.0
+Harry Potter	جادوگر	2.83
+infinity	صفر	2.58
+visa	جهانی‌گرایی	1.5
+manuscript	مقاله	3.29
+man	مظنون	1.08
+Ebola	ویروس ابولا	4.0
+valley	فرورفتگی	2.38
+lock	کلید	2.46
+stone	چوب	2.42
+Google Drive	راننده	0.04
+weapon	کلاه‌ ایمنی	2.08
+player	مربی	2.79
+preschool	کودکستان	3.71
+suspect	مرد	1.08
+thermodynamics	واکنش زنجیره‌ای	1.71
+accident	کتاب	0.0
+harmony	پیانو	1.42
+guitar	ویولن	3.17
+trainers	مدال	0.88
+black hole	خلاء	2.33
+class	آشفتگی	0.29
+writer	هدیه	0.17
+foreigner	مترجم	1.67
+castle	ديوار	2.0
+Oxford University	دانشگاه کمبریج	3.29
+mint	موزه	1.21
+bid price	لندن	0.25
+stock	دارایی	2.54
+parapsychology	نوروسایکولوژی	3.13
+can	بطری	3.08
+sea	دلتا	2.46
+Brexit	مالیات	0.96
+leaf	جوانه	2.38
+vector	ماتریس	2.88
+bank loan	قرض	3.33
+sculptor	عمارت	1.13
+ecosystem	اقتصاد	1.04
+staff	سراینده	1.63
+Beethoven	جنگ جهانی دوم	0.04
+theorem	بولتسانو	2.13
+cloud	دریاچه	1.08
+snow	یخ	2.88
+wallpaper	دیواربرگ	3.71
+show	ریاضی‌دان	0.04
+performance	تک‌جلوه	2.21
+priest	اسکناس	0.04
+chaos	کلاس	0.29
+corn	جواری	3.96
+Coca-Cola	کوکا	3.95
+Shakespeare	دیکنز	3.08
+pest	آفت‌کش	2.08
+juice	میلک‌شیک	3.04
+compass	فیل	0.09
+root	یونیسف	0.04
+winner	قهرمان	3.46
+chess	کیش	1.96
+window blind	پرده	3.21
+broom	خاک	2.0
+pen	مدرسه ابتدایی	1.46
+capacitor	دیود	3.33
+chapter	بخش	3.13
+Nike	آدیداس	3.25
+mohito	موخیتو	4.0
+Hamadan	رم	2.71
+servant	غلام	3.46
+Latin	آلمانی	3.0
+lizard	مار	3.06
+laptop	رایانه کیفی	3.83
+athlete	دونده	3.21
+United Nations	بان‌کی‌مون	2.33
+brightness	ستاره	1.63
+conqueror	اسکندرکبیر	2.63
+racism	بیگانه‌هراسی	3.0
+statue	مجسمه	3.75
+wind	بوران	3.13
+development	جذب سرمایه	1.54
+IMF	دویچه بانک	2.71
+priest	پیامبر	2.67
+chain reaction	ترمودینامیک	1.71
+meadow	چمن‌زار	3.5
+Persian Empire	کورش	2.0
+phone	قربانی	0.04
+altitude	تبدیل	0.13
+peace	سرباز	1.46
+city	شهرک	3.54
+square	نقشه	0.83
+fence	پرش	1.25
+underwear	بدن	1.54
+conversion	ارتفاع	0.13
+chips	مکان‌نما	0.13
+sucrose	کربوهیدرات	3.54
+judge	دادرس	3.58
+semester	ترم‌تحصیلی	3.75
+singer	گروه کر	2.71
+mind	اختلال اعصاب	1.92
+alloy	فولاد	3.33
+star	روشنایی	1.63
+South Pole	رقص	0.0
+Go	تخته نرد	3.25
+senate	قانون اساسی	1.92
+handbook	کتاب راهنما	3.54
+Quran	اسلام	2.42
+PlayStation	وی	3.25
+telephone	تلفن همراه	3.66
+pathogen	بیمارگر	3.96
+ball	راکت	2.42
+nature	گیاه	2.63
+mind	مفز	3.54
+sound	صوت‌شناسی	2.33
+piece	فرودگاه	0.04
+actress	بازیگر	3.71
+theorem	نظریه	2.67
+meteorite	زمین	2.29
+cyclone	گردباد	3.46
+case	سخت‌افزار	2.08
+dress	رقص	1.08
+Renaissance	عصر نوزایی	4.0
+historiographer	مورخ	3.79
+stationery	لژیون دونور	0.0
+pointer	اسلاید	1.17
+radar	جوی‌استیک	0.46
+matrix	بردار	2.88
+democracy	سلطنت	2.75
+palace	آسمان‌خراش	2.5
+historian	تاریخ‌نگار	3.79
+biscuit	شاهزاده	0.04
+digit	سيتوپلاسم	0.75
+snake	مارمولک	3.06
+shirt	ژاکت	3.17
+holiday	تقویم	2.21
+dune	بیابان	2.38
+sword	محیط	0.0
+galaxy	اپ	0.21
+shield	سپر	3.29
+basketball	بازی حذفی	2.0
+GTA	اتومبیل‌دزدی بزرگ	3.83
+rain	رایانش ابری	0.17
+paint	انقلاب سبز	0.13
+Mercury	مشتری	3.25
+American	انگلیسی	3.25
+Mathematical Bridge	سی‌وسه‌پل	2.92
+Oscars	استادیوم	0.17
+stadium	اسکار	0.17
+student	معلم	2.33
+polar bear	پاندا	3.27
+session	بیمار	0.46
+dice	مکعب	2.79
+sand	پا	0.38
+New York	انسان‌شناسی	0.13
+Leonardo da Vinci	شام آخر	2.21
+app	کهکشان	0.21
+strategy	بازی استراتژیکی	1.92
+Western Union	جهان غرب	0.38
+mutant	زیست‌جامعه‌شناسی	0.96
+lantana	میمونی	3.04
+monkey	کمپین	0.0
+brainstorming	تلسکوپ	0.0
+star	سیارک	2.75
+tuition	بورس تحصیلی	2.67
+environment	شمشیر	0.0
+array	لیست	3.96
+diplomacy	مذاکره	2.83
+carbohydrate	ساکارز	3.54
+fundraising	توسعه	1.54
+encyclopedia	واژه‌نامه	3.17
+mansion	مجسمه ساز	1.13
+Google DeepMind	ديپ‌مایند	3.96
+cotton	پلی‌ستر	3.08
+information	آنتروپی	1.67
+alphabet	خودکار	0.79
+PDF	جی‌پگ	3.0
+dermatitis	اگزما	4.0
+elephant	دایناسور	2.5
+radiator	حسگر	0.79
+UNICEF	ریشه	0.04
+Tiger Woods	بیشه‌زار	0.21
+acid	باز	2.75
+polyhedron	بازیگر	0.0
+world	آسیا	2.25
+worm	بدافزار	3.38
+intention	خواست	3.46
+World War II	بتهوون	0.04
+wood	سنگ	2.42
+elephant	قطب‌نما	0.09
+drawing	شورش	0.08
+forecast	ابری	1.63
+syllabus	امتحان	2.08
+biotope	بیولوژی	1.67
+defence	نیروهای مسلح	2.13
+Baku	سرزمین موعود	0.71
+sunset	میز	0.0
+heat	گرمایش جهانی	2.38
+Clinton	اوباما	3.21
+note-taking	تکلیف	1.96
+cinema	ذرت‌ بو داده	1.13
+honor	عزت	3.38
+debt	وام	3.33
+violin	گیتار	3.17
+Star Wars	موتزارت	0.0
+statistical measure	امید به زندگی	2.83
+duke	جمهوری	1.29
+multiple sclerosis	ام‌اس	3.96
+heavy metal	صحنه	1.13
+dream	آسمان	0.54
+distance	پرسپکتیو	1.96
+pencil	داستان	1.08
+movie	نقش مکمل	1.88
+planet	ستاره	2.88
+Chelsea	نیچه	0.09
+homework	انشا	2.46
+topic	برچسب	2.29
+curtain	کرکره	3.21
+agriculture	گیاه	2.33
+button	چرخ‌خیاطی	1.54
+exchange	پول	1.92
+battery	انرژی	2.67
+music	فلوت	2.17
+grapefruit	مرکبات	3.29
+multiplication	تقسیم	2.92
+tsunami	دریا	2.08
+notebook	لپ‌تاپ	3.83
+graph	چارت	3.63
+life expectancy	شاخص آماری	2.83
+oasis	آزادی	0.29
+field	جو	1.67
+Bolzano	قضیه	2.13
+disk	شارژر	1.29
+film	تئاتر	2.67
+book	کتاب خطی	3.25
+payment	سکه	1.96
+gender discrimination	تبعیض جنسیتی	3.96
+Ebola virus	ابولا	4.0
+umbrella	بخاری	0.25
+basmati	برنج ژاسمین	3.42
+astronomer	کهکشان	1.71
+virus	خون‌	1.46
+window	ابر	0.63
+rhythm	شعر	1.92
+coronation	آب	0.09
+seedling	برگ	2.38
+soldier	صلح	1.46
+negotiation	دیپلماسی	2.83
+journalist	شاعر	2.75
+brush	آبرنگ	2.08
+Julius Caesar	سزار	3.96
+lake	حواصیل خاکستری	1.33
+potato	برنج	2.67
+protein	دستگیره	0.09
+digit	عدد	3.54
+plane	بوئینگ	2.58
+Middle East	فرات	1.75
+competition	احترام متقابل	1.38
+strawberry	گیلاس	2.92
+snowboard	اسکی	3.21
+Gospel	کتاب مقدس	3.33
+constitution	مجلس سنا	1.92
+rhythm	آهنگ	3.38
+mojito	موهیتو	4.0
+Penicillin	الکساندرفلمینگ	2.25
+actor	تلویزیون	1.92
+notebook	تفنگ	0.17
+language	زبان مادری	3.21
+legend	پند	0.79
+gray heron	دریاچه	1.33
+gun	گروهبان	1.58
+flag	پرچم انگلستان	3.13
+JPEG	پی‌دی‌اف	3.0
+flora	مرورگر وب	0.0
+Green Revolution	رنگ	0.13
+justice	محکمه	2.33
+English	آمریکایی	3.25
+kindergarten	پيش‌دبستان	3.71
+squall	باد	3.13
+theatre	فیلم	2.67
+tradition	صنایع دستی	1.54
+moral	افسانه	0.79
+government	مارمولک	0.09
+cardigan	لباس	3.17
+glacier	گرمایش جهانی	1.71
+lawyer	نمایشگاه	0.21
+peninsula	جزیره	3.21
+ruler	پادشاه	3.71
+exit	رای	0.25
+pole	پرچم	1.42
+freedom	آزادی	3.92
+governor	امپراطور	3.5
+uniform	قلاب‌دوزی	0.88
+patriotism	سرود ملی	2.25
+armed forces	دفاع	2.13
+xenophobia	نژادپرستی	3.0
+tax	برگزیت	0.96
+editorial	اخبار	2.17
+snow	بهمن	2.21
+lawyer	دادستان	3.29
+electricity	جعبه	0.38
+octopus	پاولِ هشت‌پا	3.46
+roof	پنجره	2.38
+artwork	هنرمند	2.13
+self-driving car	خودروی روباتیک	4.0
+manuscript	کتاب	3.25
+homeless	میلیاردر	1.58
+playoff	بسکتبال	2.0
+theory	فرضیه	3.42
+ring	عقد	1.29
+mathematician	نمایش	0.04
+hypothesis	نظریه	3.42
+engagement	انگشتر	1.29
+bat	خون‌آشام	2.33
+supporter	کریکت	1.54
+dollar	میلیونر	2.0
+skyscraper	کاخ	2.5
+Cyrus	امپراتوری ایران	2.0
+Union Jack	پرچم	3.13
+swimming pool	قانون	0.08
+working class	کارخانه	1.71
+Promised Land	باکو	0.71
+cameo	اجرا	2.21
+piano	هارمونی	1.42
+Legion of Honour	لوازم تحریر	0.0
+lake	ابر	1.08
+Photoshop	پینت	3.08
+milkshake	آبمیوه	3.04
+office	کارمند	1.75
+stone	برج‌ساعت	0.58
+television	نمایشنامه‌نویس	1.63
+person	شخصیت	2.58
+lock-up	سلول	3.5
+paddy	سیب‌زمینی	2.67
+monitor	نمایشگر	3.88
+protein molecule	گیرنده	3.21
+panda	خرس قطبی	3.27
+web browser	موزیلا فایرفاکس	3.42
+screenwriter	تلویزیون	1.63
+vexillology	پرچم	2.29
+church	کلیسای جامع	3.46
+frisbee	ورق‌بازی	2.5
+flag	پرچم‌شناسی	2.29
+parliament	کنگره	3.42
+videogame	بازی کامپيوتری	3.25
+Siemens	قطار برقی	1.79
+trout	گیتار	0.0
+carbon dioxide	گازکربنیک	3.83
+Wii	پلی‌استیشن	3.25
+piston	موتور	2.25
+tug of war	مار و پله	2.46
+millionaire	دلار	2.0
+symbol	نشانه	3.13
+esteem	افتخار	3.38
+poster	کاغذ	2.71
+mine	سنگ	1.88
+mark	باشگاه	0.5
+sky	خواب	0.54
+DeepMind	گوگل ديپ‌مایند	3.96
+term	نیم‌سال تحصیلی	3.75
+style	مد	3.13
+sexism	جنسیت‌زدگی	3.96
+gale	پتو	0.88
+scientist	گاوس	2.83
+road	بزرگراه	3.38
+gravity	شهاب	1.13
+sea	سونامی	2.08
+helicopter	هواپیما	3.17
+sonnet	زیبایی	1.5
+cursor	چیپس	0.13
+artist	اثر هنری	2.13
+mother tongue	زبان	3.21
+chorus	خواننده	2.71
+person	گذرگاه عابران پیاده	1.71
+essay	تکلیف	2.46
+princess	بیسکویت	0.04
+bus	مرکز شهر	0.71
+touchscreen	هدوپ	0.75
+boss	مدیر	3.63
+lens	وودی آلن	0.58
+ozone	جو	2.46
+elementary school	مداد	1.46
+stage	هوی متال	1.13
+box	منبع	0.29
+ice	برف	2.88
+episode	فصل	3.13
+outlander	خارجی	3.63
+stock market	بورس اوراق بهادار	3.08
+pesticide	آفت	2.08
+asset	موجودی کالا	2.54
+sewing machine	دکمه	1.54
+Paul the Octopus	هشت‌پا	3.46
+desert	تپه ماسه‌ای	2.38
+stool	صندلی	3.17
+Islam	قرآن	2.42
+Britain	اچ‌اس‌بی‌سی	1.5
+perspective	فاصله	1.96
+medal	کفش ورزشی	0.88
+beauty	غزل	1.5
+tank	خودرو	2.46
+rose	پروانه	1.21
+rucksack	ثابت فارادی	0.0
+plant	طبقه کارگر	1.71
+German	لاتین	3.0
+telescope	طوفان فکری	0.0
+spring	آب‌فشان	3.38
+train	تراموا	3.5
+rose oil	گلاب	3.25
+rock	معدن	1.88
+Celsius	مایکروسافت	0.08
+islamophobia	داعش	1.96
+muffin	جعفری	1.42
+HSBC	بریتانیا	1.5
+arm	شاخه	2.67
+Microsoft	سلسیوس	0.08
+gold	روی	2.96
+victim	تلفن	0.04
+Snakes and Ladders	طناب‌کشی	2.46
+racing	فیلسوف	0.0
+Olympic Games	روح	0.45
+hail	باران	3.13
+woodland	تایگر وودز	0.21
+KFC	مک‌دونالد	3.17
+path	تونل	2.33
+statute	عصر یخبندان	0.0
+system	گسل	0.5
+racket	توپ	2.42
+law	استخر	0.08
+Mozilla Firefox	مرورگر وب	3.42
+year	قرن	2.88
+simulation	رباتیک	1.58
+vacuum	سیاهچاله	2.33
+salt	سدیم کلرید	3.88
+algebra	عمل	1.83
+gymnastics	شمشیربازی	2.67
+book	تصادف	0.0
+riot	نقاشی	0.08
+crocodile	مارمولک	2.96
+slide	اشاره‌گر	1.17
+Europe	پیمان ماستریخت	1.96
+street	مرد عنکبوتی	0.34
+boat	درخت	0.38
+tail	بوئینگ ۷۴۷-۲۰۰	1.67
+eczema	درماتیت	4.0
+joystick	رادار	0.46
+Gauss	دانشمند	2.83
+European Parliament	سازمان ملل متحد	2.63
+battery	هوش مصنوعی	0.42

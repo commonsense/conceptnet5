@@ -3,9 +3,10 @@ from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine
 from conceptnet5.vectors.query import VectorSpaceWrapper
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, tmean
 
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de']
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de',
+         'semeval17-2a', 'semeval17-2b']
 SAMPLE_SIZES = {
     'ws353': 353,
     'ws353-es': 353,
@@ -73,6 +74,7 @@ COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table({
     'simlex': .393,
     'ws353': .721  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
     'men3000': .778,
     'mturk': .666,
@@ -80,6 +82,7 @@ COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
     'simlex': .432,
     'ws353': .733  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
     'men3000': .774,
     'mturk': .693,
@@ -87,6 +90,7 @@ COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
     'simlex': .438,
     'ws353': .729  # estimate
 })
+
 COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
     'men3000': .729,
     'mturk': .632,
@@ -94,6 +98,7 @@ COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
     'simlex': .398,
     'ws353': .654  # estimate
 })
+
 COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table({
     'men3000': .732,
     'rw': .385,
@@ -107,16 +112,19 @@ COMPARISONS['Luminoso', 'GloVe'] = make_comparison_table({
     'men3000': .840,
     'ws353': .798
 })
+
 COMPARISONS['Luminoso', 'word2vec SGNS'] = make_comparison_table({
     'rw': .476,
     'men3000': .778,
     'ws353': .731
 })
+
 COMPARISONS['Luminoso', 'Numberbatch 2016.04'] = make_comparison_table({
     'rw': .596,
     'men3000': .859,
     'ws353': .821
 })
+
 COMPARISONS['Luminoso', 'PPMI'] = make_comparison_table({
     'rw': .420,
     'men3000': .764,
@@ -174,16 +182,18 @@ def read_ws353():
     of a pair of words was determined by the average scores of either 13
     or 16 native english speakers.
     """
+    lang1, lang2 = 'en', 'en'
     with open(get_support_data_filename('wordsim-353/combined.csv')) as file:
         for line in file:
             if line.startswith('Word 1'):  # Skip the header
                 continue
             term1, term2, sscore = line.split(',')
             gold_score = float(sscore)
-            yield term1, term2, gold_score
+            yield term1, term2, gold_score, lang1, lang2
 
 
 def read_ws353_multilingual(language):
+    lang1, lang2 = language, language
     if language == 'es':
         language = 'es.fixed'
     filename = 'wordsim-353/{}.tab'.format(language)
@@ -191,12 +201,13 @@ def read_ws353_multilingual(language):
         for line in file:
             term1, term2, sscore = line.split('\t')
             gold_score = float(sscore)
-            yield term1, term2, gold_score
+            yield term1, term2, gold_score, lang1, lang2
 
 
 def read_gurevych(setname):
     # The 'setname' here is a number indicating the number of word pairs
     # in the set.
+    lang1, lang2 = 'de', 'de'
     filename = 'gurevych/wortpaare{}.gold.pos.txt'.format(setname)
     with open(get_support_data_filename(filename)) as file:
         for line in file:
@@ -204,15 +215,16 @@ def read_gurevych(setname):
                 continue
             term1, term2, sscore, _pos1, _pos2 = line.rstrip().split(':')
             gold_score = float(sscore)
-            yield term1, term2, gold_score
+            yield term1, term2, gold_score, lang1, lang2
 
 
 def read_mturk():
+    lang1, lang2 = 'en', 'en'
     with open(get_support_data_filename('mturk/MTURK-771.csv')) as file:
         for line in file:
             term1, term2, sscore = line.split(',')
             gold_score = float(sscore)
-            yield term1, term2, gold_score
+            yield term1, term2, gold_score, lang1, lang2
 
 
 def read_men3000(subset='dev'):
@@ -222,6 +234,7 @@ def read_men3000(subset='dev'):
     a pair of words was determined by the number of times the pair was selected
     as more related compared to another randomly chosen pair.
     """
+    lang1, lang2 = 'en', 'en'
     filename = get_support_data_filename('mensim/MEN_dataset_lemma_form.{}'.format(subset))
     with open(filename) as file:
         for line in file:
@@ -229,29 +242,31 @@ def read_men3000(subset='dev'):
             term1 = parts[0].split('-')[0]  # remove part of speech
             term2 = parts[1].split('-')[0]
             gold_score = float(parts[2])
-            yield term1, term2, gold_score
+            yield term1, term2, gold_score, lang1, lang2
 
 
 def read_rg65():
     """
     Parses the Rubenstein and Goodenough word similarity test collection.
     """
+    lang1, lang2 = 'en', 'en'
     filename = get_support_data_filename('rg65/EN-RG-65.txt')
     with open(filename) as file:
         for line in file:
             parts = line.split()
-            yield parts[0], parts[1], float(parts[2])
+            yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
 def read_rw(subset='dev'):
     """
     Parses the rare word similarity test collection.
     """
+    lang1, lang2 = 'en', 'en'
     filename = get_support_data_filename('rw/rw-{}.csv'.format(subset))
     with open(filename) as file:
         for line in file:
             parts = line.split()
-            yield parts[0], parts[1], float(parts[2])
+            yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
 def read_mc():
@@ -265,7 +280,70 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def spearman_evaluate(vectors, standard, language='en', verbose=0):
+def read_semeval_monolingual(lang, subset='test'):
+    """
+    Parses Semeval2017-Task2 monolingual word similarity (subtask 1) test collection.
+    """
+    lang1, lang2 = lang, lang
+    filename = get_support_data_filename('semeval17-2/{}.{}.txt'.format(lang, subset))
+    with open(filename) as file:
+        for line in file:
+            parts = line.split('\t')
+            yield parts[0], parts[1], float(parts[2]), lang1, lang2
+
+
+def read_semeval_crosslingual(lang1, lang2, subset='test'):
+    """
+    Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
+    """
+    filename = get_support_data_filename('semeval17-2/{}-{}.{}.txt'.format(lang1, lang2, subset))
+
+    with open(filename) as file:
+        for line in file:
+            parts = line.split('\t')
+            yield parts[0], parts[1], float(parts[2]), lang1, lang2
+
+
+def evaluate_semeval_monolingual(vectors):
+    """
+    According to Semeval2017-Subtask2 rules, the global score for a system is the average the final
+    individual scores on the four languages on which the system performed best. If less than four
+    scores are supplied, the global score is NaN.
+    """
+    scores = []
+    for lang in ['en', 'de', 'es', 'it', 'fa']:
+        scores.append(spearman_evaluate(vectors, read_semeval_monolingual(lang)))
+    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-4:]
+    acc_average = tmean([score['acc'] for score in top_scores])
+    low_average = tmean([score['low'] for score in top_scores])
+    high_average = tmean([score['high'] for score in top_scores])
+    return pd.Series(
+        [acc_average, low_average, high_average],
+        index=['acc', 'low', 'high']
+    )
+
+def evaluate_semeval_crosslingual(vectors):
+    """
+    According to Semeval2017-Subtask2 rules. the global score is the average of the individual
+    scores on the six cross-lingual datasets on which the system performs best. If less than six
+    scores are supplied, the global score is NaN.
+    """
+    scores = []
+    for pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it',
+             'it-fa']:
+        lang1, lang2 = pair.split('-')
+        scores.append(spearman_evaluate(vectors, read_semeval_crosslingual(lang1, lang2)))
+    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-6:]
+    acc_average = tmean([score['acc'] for score in top_scores])
+    low_average = tmean([score['low'] for score in top_scores])
+    high_average = tmean([score['high'] for score in top_scores])
+    return pd.Series(
+        [acc_average, low_average, high_average],
+        index=['acc', 'low', 'high']
+    )
+
+
+def spearman_evaluate(vectors, standard, verbose=0):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word
@@ -274,9 +352,9 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
     gold_scores = []
     our_scores = []
 
-    for term1, term2, gold_score in standard:
-        uri1 = standardized_uri(language, term1)
-        uri2 = standardized_uri(language, term2)
+    for term1, term2, gold_score, lang1, lang2 in standard:
+        uri1 = standardized_uri(lang1, term1)
+        uri2 = standardized_uri(lang2, term2)
         if isinstance(vectors, VectorSpaceWrapper):
             our_score = vectors.get_similarity(uri1, uri2)
         else:
@@ -297,7 +375,7 @@ def spearman_evaluate(vectors, standard, language='en', verbose=0):
 def evaluate(frame, subset='dev'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
-    relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Use a
+    relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Use a
     VectorSpaceWrapper to fill missing vocabulary from ConceptNet.
 
     Return a Series containing these labeled results.
@@ -306,15 +384,20 @@ def evaluate(frame, subset='dev'):
         men_subset = 'test'
     else:
         men_subset = subset
+
     vectors = VectorSpaceWrapper(frame=frame)
+
     men_score = spearman_evaluate(vectors, read_men3000(men_subset))
     rw_score = spearman_evaluate(vectors, read_rw(subset))
     mturk_score = spearman_evaluate(vectors, read_mturk())
-    gur350_score = spearman_evaluate(vectors, read_gurevych('350'), language='de')
-    zg222_score = spearman_evaluate(vectors, read_gurevych('222'), language='de')
+    gur350_score = spearman_evaluate(vectors, read_gurevych('350'))
+    zg222_score = spearman_evaluate(vectors, read_gurevych('222'))
     ws_score = spearman_evaluate(vectors, read_ws353())
-    ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'), language='es')
-    ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'), language='ro')
+    ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'))
+    ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'))
+    semeval_monolingual = evaluate_semeval_monolingual(vectors)
+    semeval_crosslingual = evaluate_semeval_crosslingual(vectors)
+
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
@@ -324,24 +407,30 @@ def evaluate(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
+    results.loc['semeval17-2a'] = semeval_monolingual
+    results.loc['semeval17-2b'] = semeval_crosslingual
     return results
 
 
 def evaluate_raw(frame, subset='dev'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
-    relatedness, according to MEN-3000, RW, MTurk-771, and WordSim-353. Return
+    relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Return
     a Series containing these labeled results.
     """
     frame = frame.astype(np.float32)
+
     men_score = spearman_evaluate(frame, read_men3000(subset))
     rw_score = spearman_evaluate(frame, read_rw(subset))
     mturk_score = spearman_evaluate(frame, read_mturk())
-    gur350_score = spearman_evaluate(frame, read_gurevych('350'), language='de')
-    zg222_score = spearman_evaluate(frame, read_gurevych('222'), language='de')
+    gur350_score = spearman_evaluate(frame, read_gurevych('350'))
+    zg222_score = spearman_evaluate(frame, read_gurevych('222'))
     ws_score = spearman_evaluate(frame, read_ws353())
-    ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'), language='es')
-    ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'), language='ro')
+    ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'))
+    ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'))
+    semeval_monolingual = evaluate_semeval_monolingual(frame)
+    semeval_crosslingual = evaluate_semeval_crosslingual(frame)
+
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
@@ -351,6 +440,8 @@ def evaluate_raw(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
+    results.loc['semeval17-2a'] = semeval_monolingual
+    results.loc['semeval17-2b'] = semeval_crosslingual
     return results
 
 
@@ -358,6 +449,7 @@ def results_in_context(results, name=('Luminoso', 'Numberbatch 16.09')):
     comparisons = dict(COMPARISONS)
     comparisons[name] = results
     comparison_list = sorted(comparisons)
-    big_frame = pd.concat([comparisons[key] for key in comparison_list], keys=pd.MultiIndex.from_tuples(comparison_list))
+    big_frame = pd.concat([comparisons[key] for key in comparison_list],
+                          keys=pd.MultiIndex.from_tuples(comparison_list))
 
     return big_frame.dropna()

@@ -1,0 +1,18 @@
+puesta de sol	cuerda	0.01
+banco	asiento	3.77
+habitación	edificio	2.29
+informática	matemáticas	3.16
+Nueva York	Washington	3.67
+automóvil	coche	3.77
+curandero	psicólogo	2.7
+teclado	luz	0.31
+nariz	cabeza	2.23
+ternera	carne	3.34
+biólogo	microscopio	1.21
+voleibol	pelota	1.7
+televisión	cine	3.03
+águila	halcón	3.58
+bicicleta	piel	0.09
+ciencia ficción	comedia	2.88
+árbol	rama	2.21
+juicio	examen	2.89

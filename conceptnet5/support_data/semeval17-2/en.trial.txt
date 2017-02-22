@@ -1,0 +1,18 @@
+sunset	string	0.05
+bank	seat	1.02
+room	building	2.11
+computer science	mathematics	3.1
+New York	Washington	3.62
+automobile	car	3.82
+curandero	psychologist	2.63
+keyboard	light	0.24
+nose	head	2.72
+beef	meat	3.36
+biologist	microscope	1.08
+volleyball	ball	1.47
+television	cinema	2.98
+eagle	falcon	3.72
+bike	skin	0.02
+science fiction	comedy	2.78
+tree	leaf	2.01
+trial	test	2.52

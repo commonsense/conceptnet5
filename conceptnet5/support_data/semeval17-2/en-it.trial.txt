@@ -1,0 +1,36 @@
+television	cinema	2.99
+keyboard	luce	0.28
+bank	seduta	0.995
+leaf	albero	2.115
+comedy	fantascienza	2.88
+tree	foglia	2.115
+cinema	televisione	2.99
+falcon	aquila	3.655
+volleyball	palla	1.78
+beef	carne	3.23
+automobile	macchina	3.775
+car	automobile	3.775
+test	giudizio	2.635
+trial	test	2.635
+nose	testa	2.515
+skin	bicicletta	0.115
+mathematics	informatica	3.05
+meat	manzo	3.23
+computer science	matematica	3.05
+biologist	microscopio	1.175
+room	edificio	2.05
+psychologist	curandero	2.52
+sunset	corda	0.06
+seat	banca	0.995
+eagle	falco	3.655
+microscope	biologo	1.175
+ball	pallavolo	1.78
+bike	pelle	0.115
+head	naso	2.515
+string	tramonto	0.06
+building	stanza	2.05
+light	tastiera	0.28
+Washington	New York	3.515
+New York	Washington	3.515
+science fiction	commedia	2.88
+curandero	psicologo	2.52
