@@ -1,0 +1,36 @@
+albero	برگ	2.15
+microscopio	بیولوژیست	1.5
+falco	عقاب	3.52
+manzo	گوشت	3.19
+seduta	بانک	1.02
+testa	بینی	2.7
+banca	صندلی	1.02
+fantascienza	کمدی	2.91
+cinema	تلویزیون	3.085
+palla	والیبال	2.1
+psicologo	طبیب	2.73
+televisione	سینما	3.085
+macchina	اتومبیل	3.825
+carne	گوشت گاو	3.19
+pelle	دوچرخه	0.14
+test	آزمایش	2.985
+Washington	نیویورک	3.475
+corda	غروب	0.06
+pallavolo	توپ	2.1
+informatica	ریاضی	3.085
+tramonto	ریسمان	0.06
+naso	سر	2.7
+biologo	میکروسکوپ	1.5
+New York	واشنگتن	3.475
+bicicletta	پوست	0.14
+foglia	درخت	2.15
+giudizio	تست	2.985
+commedia	علمی تخیلی	2.91
+stanza	ساختمان	2.305
+curandero	روانشناس	2.73
+edificio	اتاق	2.305
+luce	کیبورد	0.315
+aquila	شاهین	3.52
+matematica	علوم کامپیوتر	3.085
+tastiera	چراغ	0.315
+automobile	ماشین	3.825

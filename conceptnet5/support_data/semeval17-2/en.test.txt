@@ -1,0 +1,500 @@
+Joule	spacecraft	0.58
+Promised Land	Baku	0.42
+car	bicycle	2.83
+polyhedron	actor	0.0
+multiple sclerosis	MS	3.92
+fault	system	0.58
+weapon	helmet	1.83
+screenwriter	television	1.67
+United Nations	Ban Ki-moon	2.5
+Si-o-seh pol	Mathematical Bridge	3.0
+basilica	mosaic	1.5
+watercolor painting	brush	2.0
+democracy	monarchy	2.67
+Gauss	scientist	3.0
+tuberculosis	LED	0.0
+self-driving car	autonomous car	4.0
+apocalypse	fire	1.25
+speed	post	0.25
+PlayStation	Wii	3.25
+laptop	notebook	4.0
+Harry Potter	wizard	3.0
+snowboard	skiing	3.17
+pointer	slide	1.33
+sensor	radiator	1.25
+hit	frame	0.42
+theory	hypothesis	3.83
+Wall Street	financial market	2.92
+Darwin	evolution	2.58
+actor	actress	3.42
+film	theatre	2.25
+national anthem	patriotism	2.42
+screen	monitor	3.92
+dairy	honey	0.83
+Mount Everest	Chomolungma	3.92
+tug of war	Snakes and Ladders	2.33
+pesticide	pest	1.83
+policeman	politician	2.17
+neuropsychology	parapsychology	3.17
+battery	energy	2.83
+Legion of Honour	stationery	0.0
+Spider-Man	street	0.5
+peninsula	island	3.0
+equator	Ecuador	1.17
+chart	graph	3.83
+simulation	robotics	1.42
+Nike	Adidas	3.17
+society	culture	2.67
+strategy game	strategy	2.0
+church	cathedral	3.58
+translator	foreigner	1.42
+biotope	biology	1.92
+magma	volcano	2.25
+brainstorming	telescope	0.0
+level	score	2.67
+penny	bargain	1.42
+political party	association	2.08
+tsunami	sea	2.0
+ostrich	orchard	0.42
+cinnamon	candy	1.75
+broom	dust	1.83
+galaxy	astronomer	1.42
+juice	milkshake	3.17
+window blind	curtain	3.25
+criminal	offender	3.5
+pancreatic cancer	chemotherapy	1.83
+past	antecedent	2.75
+United Nations	European Parliament	2.75
+song	performer	1.83
+gun	notebook	0.0
+acetylcholine	iris	0.58
+alphabet	pen	0.58
+chorus	singer	2.67
+wood	blanket	0.5
+soldier	peace	1.25
+English	American	3.33
+lizard	crocodile	3.25
+money	cash	3.42
+Paul the Octopus	octopus	3.5
+calendar	holiday	2.08
+base	chemical substance	3.0
+government	lizard	0.0
+JPY	money laundering	1.58
+DeepMind	Google DeepMind	3.92
+chess	check	1.67
+sonnet	beauty	1.33
+worker	office	1.75
+currency	exchange	1.67
+polyester	cotton	3.08
+tribunal	justice	2.5
+tail	rear	3.25
+accident	book	0.0
+squall	wind	2.75
+piano	harmony	1.58
+sultan	ministry	1.5
+desert	dune	2.42
+multiplication	division	2.67
+virus	blood	1.58
+ice age	statute	0.0
+sword	environment	0.0
+elementary school	pen	1.5
+cricket	supporter	1.67
+sculpture	statue	3.83
+web browser	Mozilla Firefox	3.58
+Fox Terrier	Canon	0.0
+HSBC	Britain	1.67
+Bible	Gospel	3.08
+dress	dance	1.0
+array	list	3.92
+cell	lock-up	3.5
+essay	homework	2.5
+computer	machine	3.33
+panda	polar bear	3.25
+neurosis	mind	1.75
+campaign	monkey	0.0
+Faraday constant	rucksack	0.0
+palace	skyscraper	2.33
+helicopter	plane	3.0
+University of Cambridge	Oxford University	3.25
+flag	pole	1.42
+window	roof	2.33
+card game	frisbee	2.5
+malware	worm	3.42
+planet	star	2.58
+runner	athlete	3.42
+caliber	umbrella	0.0
+WiFi	WikiLeaks	0.5
+drought	water	2.0
+airport	piece	0.08
+orchestra	band	3.42
+mojito	mohito	4.0
+syllabus	exam	2.42
+theorem	theory	2.42
+yo-yo	toy	3.0
+blizzard	rain	2.58
+historian	historiographer	3.58
+Siemens	electric train	1.75
+century	year	2.83
+alloy	steel	3.5
+magistrate	judge	3.58
+chaos	class	0.17
+distance education	internet	1.75
+sand	foot	0.42
+IMF	Deutsche Bank	2.83
+Guardian	Times	3.17
+silkworm	Silk Road	0.58
+freedom	oasis	0.58
+cytoplasm	digit	0.67
+protestant	christian	3.5
+Leonardo da Vinci	The Last Supper	2.33
+map	square	1.0
+parliament	congress	3.5
+fundraising	development	1.17
+pathology	hematology	3.08
+valley	depression	2.0
+telescope	chair	0.25
+heavy metal	stage	1.42
+globalism	visa	1.5
+bat	vampire	2.33
+deputy	officer	2.83
+electricity	case	0.42
+alien	outlander	3.67
+button	sewing machine	1.42
+wizard	cable	0.0
+philosopher	racing	0.0
+popcorn	cinema	1.5
+agriculture	plant	2.25
+poet	journalist	2.33
+weather	wave	0.83
+civilization	lifestyle	1.5
+snow	ice	2.75
+World War II	Beethoven	0.08
+motherboard	mainboard	4.0
+club	mark	0.33
+Alexander the Great	conqueror	2.92
+app	galaxy	0.42
+cloud computing	rain	0.0
+television	actor	1.58
+delta	sea	2.42
+yarn	thread	3.92
+pedestrian crossing	person	1.42
+protein	handle	0.0
+U2	Ronaldo	0.42
+Apple	iPhone	2.58
+peppermint	gum	1.83
+poster	paper	2.83
+UNICEF	root	0.0
+xenophobia	racism	3.42
+Woody Allen	lens	0.33
+lamp	genie	2.08
+navy	island	0.92
+wall	castle	2.0
+dinosaur	elephant	2.33
+clock tower	stone	0.67
+Middle East	Euphrates	1.5
+meadow	grassland	3.58
+guitar	violin	3.17
+diplomacy	negotiation	2.67
+gravity	meteor	0.75
+IQ	Mensa	1.83
+Union Jack	flag	3.17
+earthquake	tremor	3.92
+asset	stock	2.75
+Hebrew	Jerusalem	1.75
+overcast	forecast	1.92
+dictionary	encyclopedia	2.83
+mint	museum	1.0
+chair	stool	3.08
+Spanish	moisture	0.0
+can	bottle	3.5
+fly	ant	2.92
+myth	satire	1.92
+city center	bus	0.75
+tail	Boeing 747-200	1.92
+artwork	artist	2.33
+NATO	alliance	3.0
+king	ruler	3.67
+rhythm	cadence	3.58
+Alexander Fleming	Penicillin	2.5
+flute	music	2.08
+gray heron	lake	1.33
+viscosity	splash	1.92
+hardware	case	1.67
+ring	engagement	1.25
+Latin	German	2.92
+working class	plant	1.75
+Shakespeare	Dickens	3.0
+paper money	priest	0.0
+tool	job	1.08
+pygmy hog	suidae	3.42
+suffrage	exit	0.08
+star	brightness	1.58
+trout	guitar	0.0
+dollar	millionaire	1.75
+digit	number	3.92
+gale	blanket	0.42
+Obama	Clinton	3.08
+supporting character	movie	1.67
+Juventus	Bayern Munich	3.0
+climate change	precipitation	1.58
+AI	battery	0.42
+masterpiece	Mona Lisa	2.67
+crime	attack	2.75
+coronation	water	0.0
+vocalist	staff	1.75
+playoff	basketball	1.67
+armed forces	defence	2.33
+lake	cloud	0.83
+monastery	shower	0.08
+mother tongue	language	3.17
+harbor	wrapper	0.08
+demon	angel	2.67
+cryptogram	symbol	2.33
+campus	university	2.92
+freedom	liberty	4.0
+typhoon	cyclone	3.83
+handbook	guidebook	3.92
+Ebola	Ebola virus	4.0
+princess	biscuit	0.08
+train	tram	3.5
+ecosystem	economy	0.92
+queen regnant	chess queen	0.92
+gold	zinc	3.0
+cursor	chips	0.25
+Amazon	forest	3.08
+tennis	statistics	0.58
+Bolzano	theorem	2.25
+altitude	conversion	0.08
+boat	tree	0.25
+throne	sword	1.0
+cotton	sweater	1.83
+cherry	strawberry	3.0
+Islam	Quran	2.5
+Neanderthal	sport	0.0
+nepotism	king	1.42
+character	person	2.67
+tank	car	2.33
+Mercury	Jupiter	3.17
+bronchitis	acetaminophen	1.67
+blood	body	2.0
+islamophobia	ISIS	1.92
+crochet	uniform	1.17
+Hadoop	touchscreen	0.67
+fossil fuel	fossil	2.08
+mutant	sociobiology	0.75
+sister	brother	2.67
+pencil	story	1.08
+eczema	dermatitis	4.0
+emperor	governor	3.67
+crown	key	0.25
+algebra	operation	1.67
+piston	engine	2.33
+scholarship	tuition	2.42
+book	manuscript	3.17
+lantana	snapdragon	3.0
+black hole	vacuum	2.33
+Persian Empire	Cyrus	1.83
+editorial	news	2.42
+decoration	envelope	0.08
+whale shark	lobster	2.25
+corn	maize	4.0
+bipolar disorder	problem	2.25
+acid	base	2.67
+absolute zero	vapor	1.42
+Green Revolution	paint	0.0
+operating system	deep learning	1.5
+International Mathematical Olympiad	theory	1.0
+El Niño	equator	0.83
+badge	glass	0.0
+mansion	sculptor	1.0
+atmosphere	ozone	2.58
+shield	buckler	3.67
+coin	payment	1.75
+oat	field	1.17
+monk	cross	0.33
+gunboat	coast	1.42
+rock	mine	1.75
+legend	moral	1.0
+champion	winner	3.75
+dice	cube	3.0
+topology	structure	1.83
+chapel	cable	0.25
+cash flow	river	0.0
+serial killer	murderer	3.5
+matrix	molecule	0.0
+fashion	style	3.17
+vexillology	flag	2.33
+Maastricht Treaty	Europe	2.17
+geyser	spring	3.25
+sucrose	carbohydrate	3.58
+beach	coast	3.83
+stock market	stock exchange	3.25
+tradition	handicraft	1.58
+novel	writer	1.92
+sandwich	Subway	1.75
+acoustics	sound	2.67
+fencing	gymnastics	2.33
+writer	gift	0.0
+woodland	Tiger Woods	0.08
+cloud	window	0.67
+JPEG	PDF	3.08
+director	boss	3.33
+tax	Brexit	1.17
+pollination	stamen	2.42
+videogame	pc game	3.33
+treatment	surgical operation	2.33
+paddy	potato	2.67
+note-taking	assignment	1.83
+fox	blood cell	0.33
+sodium chloride	salt	3.92
+income	quality of life	2.17
+will	intention	3.5
+compass	elephant	0.17
+sequel	camera	1.0
+movie	film	3.92
+sergeant	gun	1.75
+mill	seed	0.75
+ice cream	breakfast	1.17
+key	lock	2.33
+cellphone	telephone	3.92
+kindergarten	preschool	3.75
+Western world	Western Union	0.42
+seedling	leaf	2.25
+rain	hail	3.08
+happiness	sadness	2.33
+silkworm	caterpillar	3.33
+surfing	water sport	3.0
+car	truck	3.17
+food	program	0.25
+graphic novel	comic book	3.42
+snake	lizard	3.08
+pineapple	smartphone	0.0
+wallpaper	background	3.42
+Celsius	Microsoft	0.08
+combine	sugarcane	0.75
+jeans	woman	0.75
+matrix	vector	2.83
+carbon dioxide	CO2	4.0
+coach	player	2.5
+stone	wood	2.33
+charger	disk	1.08
+manuscript	article	3.5
+Gmail	Yahoo	2.42
+capacitor	diode	3.17
+corruption	fraud	3.17
+Coca-Cola	Coke	3.92
+Plato	Aristotle	3.17
+Cold War	Soviet Union	2.58
+nozzle	fluid	2.0
+phonology	screen	0.0
+Zara	leggings	1.67
+football	soccer	4.0
+germ	pathogen	3.92
+republic	duke	1.17
+ball	sphere	3.0
+Mozart	Star Wars	0.0
+mask	party	1.33
+Grand Theft Auto	GTA	4.0
+highway	road	3.42
+chain reaction	thermodynamics	2.0
+illustration	blister	0.0
+anthropology	archaeology	2.92
+Dell	Dingle	0.0
+juice	spoon	0.25
+Pfizer	drug	2.5
+truck	parcel	0.67
+receptor	protein molecule	2.75
+Google Drive	driver	0.0
+billionaire	homeless	1.67
+episode	chapter	2.83
+infinity	zero	2.33
+servant	slave	3.42
+suffix	affix	3.33
+global warming	heat	2.42
+growth hormone	somatotropin	3.92
+sky	dream	0.83
+bid price	London	0.42
+fertilizer	growth	1.67
+hashtag	topic	2.5
+Orion	constellation	3.17
+Nietzsche	Chelsea	0.17
+mutual respect	competition	1.5
+branch	arm	3.0
+victim	phone	0.08
+standard deviation	accumulation	0.5
+avalanche	snow	2.08
+teacher	student	2.0
+cattle	yogurt	1.5
+sexism	gender discrimination	3.92
+South Pole	dance	0.0
+prosecutor	lawyer	3.33
+racket	ball	2.5
+bank loan	debt	3.25
+perspective	distance	1.58
+Federer	Dylan	0.5
+lawyer	gallery	0.33
+life expectancy	statistical measure	2.67
+cell membrane	provirus	1.83
+European Union	Moscow	2.0
+world	Asia	2.17
+Paint	Photoshop	3.17
+senate	constitution	1.83
+parsley	muffin	1.0
+mind	brain	3.83
+Mercedes	Opel	3.17
+hammer	teeth	0.0
+Renaissance	Renascence	4.0
+skirt	watch	1.0
+opera	cinema	2.75
+teacher	instructor	3.83
+Sun	cable	0.08
+recession	GDP	2.0
+Caesar	Julius Caesar	3.92
+patient	session	0.67
+behaviourism	therapy	2.17
+emperor	constitution	1.25
+mathematician	show	0.08
+entropy	information	1.75
+rosewater	rose oil	3.17
+citrus fruit	grapefruit	3.5
+Queen Victoria	England	1.75
+Olympic Games	spirit	0.83
+bishop	muslim	1.67
+man	suspect	1.0
+meteorite	Earth	1.83
+symbol	sign	3.42
+anthropology	New York	0.08
+sunset	table	0.0
+town	city	3.75
+jacket	mineral water	0.0
+nature	flora	3.0
+subroutine	compiler	2.67
+Hamadan	Rome	2.58
+umbrella	heater	0.17
+honor	esteem	3.25
+insignia	dignity	0.58
+KFC	McDonald's	3.17
+joystick	radar	0.67
+basmati	jasmine rice	3.58
+medal	trainers	0.42
+law	swimming pool	0.08
+source	box	0.0
+theatre	battery	0.0
+flora	web browser	0.0
+shirt	cardigan	3.25
+poem	rhythm	1.42
+prophet	priest	2.58
+Oscars	stadium	0.08
+backgammon	Go	3.25
+butterfly	rose	1.25
+fence	jumping	1.58
+nihilism	film	0.17
+asteroid	star	2.25
+riot	drawing	0.08
+underwear	body	1.25
+Boeing	plane	2.83
+cameo	performance	2.42
+semester	term	3.83
+orange	citrus	3.0
+glacier	global warming	1.58
+tunnel	path	2.0

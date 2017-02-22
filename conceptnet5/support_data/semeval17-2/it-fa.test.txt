@@ -1,0 +1,916 @@
+Obama	کلینتون	3.13
+episodio	فصل	3.29
+penicillina	الکساندرفلمینگ	2.33
+profeta	کشیش	2.38
+matita	داستان	0.63
+trattato di Maastricht	اروپا	1.96
+competizione	احترام متقابل	1.54
+avvocato	نمایشگاه	0.08
+burrasca	پتو	1.21
+era glaciale	قانون	0.0
+basilica	موزائیک	1.42
+insegnante	آموزگار	3.79
+elettricità	جعبه	0.38
+Grand Theft Auto	جی‌تی‌ای	3.83
+ghiaccio	برف	3.0
+Mercedes	اوپل	3.21
+vincitore	قهرمان	3.21
+ipotesi	نظریه	3.13
+Gmail	یاهو	2.75
+Vangelo	کتاب مقدس	3.5
+stufa	چتر	0.25
+carta	پوستر	2.42
+prete	اسکناس	0.21
+diapositiva	اشاره‌گر	1.5
+telescopio	طوفان فکری	0.0
+storico	تاریخ‌نگار	3.67
+duna	بیابان	2.29
+spada	محیط	0.0
+motore	پیستون	2.17
+sfera	توپ	3.08
+vento	بوران	3.17
+avena	مزرعه	2.33
+galleria	مسیر	2.46
+demonio	فرشته	2.58
+Aristotele	افلاطون	3.21
+serial killer	قاتل	3.29
+bocca di leone	شاه‌پسند	3.17
+campione	برنده	3.21
+sale	سدیم کلرید	3.88
+canzone	مجری	1.08
+pentagramma	سراینده	1.46
+parapsicologia	نوروسایکولوژی	2.83
+pezzo	فرودگاه	0.0
+saccarosio	کربوهیدرات	3.25
+statistica	تنیس	0.38
+Yahoo	جیمیل	2.75
+lingua madre	زبان	3.21
+tristezza	خوشحالی	2.58
+combustibile fossile	سنگواره	2.0
+Seconda Guerra Mondiale	بتهوون	0.0
+jeans	زن	0.45
+morale	افسانه	0.7
+Europa	پیمان ماستریخت	1.96
+Gran Bretagna	اچ‌اس‌بی‌سی	1.38
+deputato	افسر	1.54
+penna	مدرسه ابتدایی	1.38
+Dickens	شکسپیر	3.08
+sfondo	والپیپر	3.79
+conquistatore	اسکندرکبیر	2.58
+cardigan	لباس	3.04
+telescopio	صندلی	0.33
+mosaico	قصر سلطنتی	1.42
+tradizione	صنایع دستی	1.79
+Times	گاردین	2.96
+archeologia	انسان‌شناسی	2.71
+chitarra	قزل‌آلا	0.0
+Nazioni Unite	بان‌کی‌مون	2.21
+monte Everest	کومولانگما	4.0
+palazzo	آسمان‌خراش	2.92
+Hadoop	صفحه لمسی	0.41
+leggenda	پند	0.7
+attraversamento pedonale	شخص	1.67
+pistone	موتور	2.17
+cellulare	تلفن	3.49
+pubblico ministero	وکیل	3.08
+Bayern Monaco	یوونتوس	3.13
+velocità	پست	0.41
+Woody Allen	لنز	0.5
+cambiamento climatico	بارش	1.58
+sessismo	جنسیت‌زدگی	3.92
+cancro al pancreas	شیمی‌درمانی	1.75
+strumento	شغل	1.67
+stadio	اسکار	0.13
+ombrello	بخاری	0.25
+libro	تصادف	0.0
+stame	گرده‌افشانی	2.38
+Terra	شهاب‌سنگ	2.67
+Zara	ساق‌پوش	1.67
+nuvolosità	پيش‌‌بینی	1.5
+rivoluzione verde	رنگ	0.21
+disegno	شورش	0.04
+politico	پليس	1.46
+piantina	برگ	2.38
+auto senza conducente	خودروی روباتیک	4.0
+Dingle	دل	0.04
+Cesare	قیصر	4.0
+neve	یخ	3.0
+Coca Cola	کوکا	3.9
+galassia	منجم	1.67
+computer portatile	لپ‌تاپ	3.83
+base	ماده شیمیایی	2.92
+principessa	بیسکویت	0.0
+eczema	درماتیت	4.0
+Boeing	هواپیما	2.71
+Alessandro Magno	فاتح	2.58
+biotopo	بیولوژی	1.79
+molecola proteica	گیرنده	3.42
+bellezza	غزل	1.5
+gattabuia	سلول	3.08
+busta	دکوراسیون	0.41
+macchina	رایانه	2.71
+Oscar	استادیوم	0.13
+legno	پتو	0.41
+succo	میلک‌شیک	3.04
+esecutore	آهنگ	1.08
+scheda madre	برداصلی	4.0
+dizionario	دایرةالمعارف	3.33
+calore	گرمایش جهانی	2.5
+Eufrate	خاورمیانه	2.0
+scacco al re	شطرنج	2.33
+illustrazione	تاول	0.0
+crescita	کود	1.67
+JPY	پولشویی	1.46
+segno	سمبل	3.13
+ozono	جو	2.17
+negoziato	دیپلماسی	2.75
+batteria	هوش مصنوعی	0.21
+pistola	دفتریادداشت	0.17
+L'Ultima Cena	لئوناردو‌دا‌وینچی	2.25
+razzismo	بیگانه‌هراسی	3.04
+lavoratore	دفتر	1.92
+inglese	آمریکایی	3.25
+lucertola	دولت	0.09
+sostenitore	کریکت	1.17
+cannella	آب‌نبات	1.21
+reazione a catena	ترمودینامیک	1.71
+iPhone	اپل	2.5
+scatola	منبع	0.29
+chitarra	ویولن	3.08
+mutante	زیست‌جامعه‌شناسی	1.21
+smartphone	سیب	0.25
+recinto	پرش	1.21
+stima	افتخار	3.0
+sovrano	پادشاه	3.75
+assassino	قاتل زنجیره‌ای	3.29
+cultura	جامعه	2.17
+manoscritto	کتاب	3.21
+yo-yo	اسباب‌بازی	2.83
+polvere	جارو	1.96
+lantana	میمونی	3.17
+acetilcolina	عنبیه	1.21
+informazione	آنتروپی	1.92
+formazione a distanza	اینترنت	1.92
+muro	قلعه	2.13
+Impero Persiano	کورش	2.21
+lente	وودی آلن	0.5
+opera	سینما	2.38
+sostanza chimica	باز	2.92
+tramonto	میز	0.0
+poliedro	بازیگر	0.0
+vapore	صفر مطلق	0.67
+campus	دانشگاه	2.75
+grafico	چارت	3.38
+entropia	اطلاعات	1.92
+calibro	چتر	0.04
+martello	دندان	0.58
+asta	پرچم	1.63
+flora	طبیعت	2.42
+Orione	صورت فلکی	3.0
+piede	ماسه	0.38
+valanga	برف	2.29
+governo	مارمولک	0.09
+sistema	گسل	0.21
+base	اسید	2.83
+riscaldamento globale	گرما	2.5
+globalismo	روادید	1.04
+Pfizer	دارو	2.21
+colpevole	مجرم	3.58
+gomma	نعناع فلفلی	1.79
+patatine fritte	مکان‌نما	0.0
+germe	پاتوژن	3.88
+fragola	گیلاس	2.92
+orchestra	گروه‌موسیقی	3.42
+forestiero	بیگانه	3.79
+simbolo	نشانه	3.13
+chiave	تاج‌	0.38
+dermatite	اگزما	4.0
+manuale	کتاب راهنما	3.16
+orso polare	پاندا	3.19
+democrazia	سلطنت	2.83
+senato	قانون اساسی	1.58
+Juventus	بایرن‌مونیخ	3.13
+penisola	جزیره	3.29
+Hamadan	رم	2.92
+miniera	سنگ	2.13
+apocalisse	آتش	1.08
+cittadina	شهر	3.38
+aereo	بوئینگ	2.71
+scultore	عمارت	1.0
+coda	بوئینگ ۷۴۷-۲۰۰	1.63
+cavo	جادوگر	0.0
+regalo	نویسنده	0.33
+prospettiva	فاصله	2.42
+gioco di strategia	استراتژی	1.96
+operazione	جبر	1.92
+compito a casa	انشا	2.5
+volontà	قصد	3.38
+secolo	سال	2.67
+lucertola	تمساح	2.96
+cricket	حامی	1.17
+ufficio	کارمند	1.92
+attore	هنرپیشه‌	3.79
+recessione	تولید ناخالص داخلی	2.04
+numero	رقم	3.29
+subroutine	کامپایلر	2.46
+cursore	چیپس	0.0
+vernice	انقلاب سبز	0.21
+pietra	برج‌ساعت	0.92
+pacco	کامیون	0.71
+puntatore	اسلاید	1.5
+ministero	سلطان	1.29
+palla	کره	3.08
+Corano	اسلام	2.46
+simbolo	نوشته رمزی	1.83
+persona	گذرگاه عابران پیاده	1.67
+corpo	لباس زیر	1.92
+ormone della crescita	سوماتوتروپین	3.83
+matrice	بردار	3.04
+servo	غلام	3.63
+suono	صوت‌شناسی	2.42
+diagramma	گراف	3.38
+decorazione	پاکت نامه	0.41
+traduttore	خارجی	1.67
+agrume	پرتقال	3.17
+Ciro	امپراتوری ایران	2.21
+maglione	پنبه	2.13
+canna da zucchero	کمباین	1.17
+mais	جواری	3.96
+matematico	نمایش	0.0
+statuto	عصر یخبندان	0.0
+banda	ارکستر	3.42
+prato	چمن‌زار	3.17
+chiave	قفل	2.58
+sedia	تلسکوپ	0.33
+cornice	اصابت	0.04
+protestante	مسیحی	2.79
+agrume	گریپ‌فروت	3.13
+Darwin	تکامل	2.25
+macchina	دوچرخه	2.63
+vettore	ماتریس	3.04
+groppo	باد	3.17
+sport	نئاندرتال	0.0
+impollinazione	پرچم	2.38
+patrimonio	موجودی کالا	2.29
+scrittore	هدیه	0.33
+penna	الفبا	0.83
+corruzione	کلاه‌برداری	2.88
+sociobiologia	جهش‌یافته	1.21
+monarchia	دموکراسی	2.83
+scimmia	کمپین	0.0
+piscina	قانون	0.04
+posto	سرعت	0.41
+ritmo	آهنگ	3.33
+mente	مفز	3.25
+anello	عقد	1.58
+depressione	دره	2.96
+oasi	آزادی	0.34
+latino	آلمانی	3.0
+Boeing 747-200	دم	1.63
+pellicola	فیلم سینمایی	3.75
+polpo	پاولِ هشت‌پا	3.5
+riciclaggio di denaro	ین	1.46
+leggings	زارا	1.67
+sclerosi a placche	اسکلروز چندگانه	4.0
+scambio	پول	2.13
+ISIS	اسلام‌هراسی	1.92
+misura statistica	امید به زندگی	2.83
+aspettativa di vita	شاخص آماری	2.83
+stella	روشنایی	1.67
+repubblica	دوک	1.04
+macchina fotografica	دنباله	0.17
+Mozart	جنگ ستارگان	0.0
+cloruro di sodio	نمک	3.88
+allenatore	بازیکن	2.88
+dimora	مجسمه ساز	1.0
+libertà	رهایی	3.92
+baco da seta	راه ابریشم	0.75
+conversione	ارتفاع	0.34
+nevrosi	ذهن	1.71
+cinghiale nano	گراز	3.21
+isola	نیروی دریایی	0.75
+difesa	نیروهای مسلح	2.17
+guerra fredda	شوروی	1.63
+tassa	برگزیت	1.04
+fertilizzante	رشد	1.67
+vessillologia	پرچم	2.17
+rispetto reciproco	رقابت	1.54
+umidità	اسپانیایی	0.0
+coda	پشت	2.33
+magma	آتش‌فشان	2.29
+mare	سونامی	2.17
+cotone	پلی‌ستر	2.96
+citoplasma	انگشت	0.7
+serratura	کلید	2.58
+regina regnante	وزیر شطرنج	1.58
+maniglia	پروتئین	0.09
+cappella	سیم	0.0
+scarpe da ginnastica	مدال	0.88
+ematologia	آسیب‌شناسی	2.88
+cloud computing	باران	0.17
+proteina	دستگیره	0.09
+studente	معلم	2.5
+miliardario	بی‌خانمان	1.75
+circolo	علامت	0.67
+bandiera	میله	1.63
+cucchiaio	آبمیوه	0.75
+ritmo	شعر	1.96
+giocatore	مربی	2.88
+valuta	بورس	2.13
+film	پوچ‌گرایی	0.45
+governatore	امپراطور	3.13
+Londra	قیمت پیشنهادی خرید	0.04
+libertà	واحه	0.34
+schiavo	خدمتکار	3.63
+Nietzsche	چلسی	0.0
+personaggio	آدم	2.71
+centesimo	معامله	1.0
+cinema	اپرا	2.38
+artista	اثر هنری	2.08
+treno	تراموا	3.25
+agricoltura	گیاه	2.21
+classe operaia	کارخانه	1.96
+Ban Ki-moon	سازمان ملل متحد	2.21
+scudo	سپر	3.04
+stile	مد	2.92
+incoronazione	آب	0.09
+Joule	فضاپیما	0.25
+acido	باز	2.83
+spiaggia	ساحل	3.33
+pennello	آبرنگ	2.5
+menta piperita	آدامس	1.79
+filo	نخ	2.79
+schermo	صداشناسی	0.33
+vagone	تانک	2.25
+film	فیلم	3.75
+moda	سبک	2.92
+uomo	مظنون	1.54
+hashtag	موضوع	2.21
+tennis	آمار	0.38
+lucertola	مار	3.02
+Go	تخته نرد	3.33
+grandine	باران	3.13
+mietitrebbia	نیشکر	1.17
+film	نقش مکمل	2.0
+internet	یادگیری از راه دور	1.92
+corona	کلید	0.38
+cella	زندان	3.08
+computer	دستگاه	2.71
+dente	چکش	0.58
+hardware	جعبه رایانه	2.63
+nuvola	پنجره	0.54
+imperatore	قانون اساسی	1.04
+ecosistema	اقتصاد	0.79
+imperatore	فرماندار	3.13
+poliestere	پنبه	2.96
+acqua di rose	روغن گل‌سرخ	3.13
+divisione	ضرب	3.13
+acciaio	آلیاژ	3.04
+cervello	ذهن	3.25
+ebreo	بیت‌المقدس	1.92
+costa	کنار دریا	3.33
+scienziato	گاوس	2.88
+angelo	اهریمن	2.58
+El Niño	خط‌استوا	1.63
+onore	عزت	3.0
+riso jasmine	باسماتی	3.17
+prateria	علف‌زار	3.17
+Alexander Fleming	پنی‌سیلین	2.33
+milionario	دلار	2.17
+tormenta	باران	3.0
+tiro alla fune	مار و پله	2.25
+panino	ساب‌وی	2.21
+macchina	کامیون	3.04
+bandiera	پرچم‌شناسی	2.17
+costante di Faraday	کوله‌پشتی	0.0
+Deutsche Bank	صندوق بین‌المللی پول	2.75
+provirus	غشای سلول	1.5
+americano	انگلیسی	3.25
+armonia	پیانو	1.38
+Celsius	مایکروسافت	0.04
+programma	غذا	0.21
+vetro	نشان	0.25
+partito politico	انجمن	2.63
+cannoniera	ساحل	1.08
+ombrello	کالیبر	0.04
+virus Ebola	ابولا	4.0
+civiltà	سبک زندگی	1.63
+led	سل	0.34
+fiume	جریان نقدی	0.29
+biscotto	شاهزاده	0.0
+donna	شلوار جین	0.45
+esame	سرفصل دروس	2.04
+Giochi Olimpici	روح	0.5
+sport acquatico	موج‌سواری	3.17
+incarto	بندرگاه	0.0
+affisso	پسوند	3.08
+agente patogeno	بیمارگر	3.88
+Via della Seta	کرم ابریشم	0.75
+telefono	قربانی	0.0
+vampiro	خفاش	2.46
+struzzo	باغ سیب	0.04
+sceneggiatore	تلویزیون	1.63
+capolavoro	مونالیزا	2.54
+nichilismo	فیلم	0.45
+crimine	حمله	2.08
+heavy metal	صحنه	1.08
+dirigente	جانشین	1.54
+lista	آرایه	3.54
+palla	راکت	2.33
+geyser	چشمه	3.33
+pioggia	رایانش ابری	0.17
+buco nero	خلاء	2.38
+bussola	فیل	0.0
+Polpo Paul	هشت‌پا	3.5
+monastero	دوش	0.0
+Giove	عطارد	3.29
+cristiano	پروتستان	2.79
+malware	کرم	3.08
+tenda	کرکره	3.0
+autobus	مرکز شهر	0.92
+persona	شخصیت	2.71
+articolo	نسخه خطی	3.13
+campagna	میمون	0.0
+acetaminofene	برونشیت	1.33
+Ronaldo	یوتو	0.13
+Mensa	آی‌کیو	2.13
+corpo	خون	1.96
+libro	کتاب خطی	3.21
+autostrada	جاده	3.38
+Università di Oxford	دانشگاه کمبریج	3.17
+Adidas	نایک	3.29
+aggressione	جرم	2.08
+roccia	معدن	2.13
+straniero	خارجی	3.79
+racchetta	توپ	2.33
+danza	قطب جنوب	0.0
+precipitazione	تغییر اقلیم	1.58
+simulazione	رباتیک	1.83
+ciliegia	توت‌فرنگی	2.92
+portatile	رایانه کیفی	3.83
+Guardian	تایمز	2.96
+guida turistica	راهنما	3.16
+uscita	رای	0.33
+Chomolungma	کوه اورست	4.0
+costa	ناوچه توپدار	1.08
+semestre	ترم‌تحصیلی	3.5
+pioggia	تگرگ	3.13
+Bibbia	انجیل	3.5
+cantante	گروه کر	2.71
+coro	خواننده	2.71
+flauto	موسیقی	2.13
+luminosità	ستاره	1.67
+televisione	بازیگر	2.21
+arma	کلاه‌ ایمنی	2.29
+airone cenerino	دریاچه	1.29
+poema	وزن	1.96
+Polo Sud	رقص	0.0
+acqua	خشکسالی	2.33
+finestra	ابر	0.54
+Inghilterra	ملکه ویکتوریا	2.08
+programma	امتحان	2.04
+cibo	برنامه	0.21
+re	فرمانروا	3.75
+cassa	الکتریسیته	0.38
+U2	رونالدو	0.13
+sabbia	پا	0.38
+tram	قطار	3.25
+gravità	شهاب	1.25
+uniforme	قلاب‌دوزی	1.0
+radar	جوی‌استیک	0.41
+camion	بسته	0.71
+seguito	دوربین	0.17
+serpente	مارمولک	3.02
+Harry Potter	جادوگر	2.83
+camicia	ژاکت	3.04
+cielo	خواب	0.54
+farfalla	رز	1.29
+matrice	ملکول	0.29
+Unione Sovietica	جنگ سرد	1.63
+Ebola	ویروس ابولا	4.0
+problema	اختلال دوقطبی	2.33
+qualità della vita	درآمد	2.25
+Google Drive	راننده	0.29
+sogno	آسمان	0.54
+ponte matematico	سی‌وسه‌پل	3.08
+strada	بزرگراه	3.38
+aragosta	کوسه نهنگ	2.42
+pagamento	سکه	2.38
+zaino	ثابت فارادی	0.0
+trono	شمشیر	1.25
+coperta	طوفان	1.21
+astronomo	کهکشان	1.67
+equatore	اکوادور	1.96
+delta	دریا	2.33
+teoria	فرضیه	3.13
+salto	حصار	1.21
+natura	گیاه	2.42
+antropologia	نیویورک	0.09
+dito	سيتوپلاسم	0.7
+deserto	تپه ماسه‌ای	2.29
+fuoco	آخرالزمان	1.08
+musica	فلوت	2.13
+classe	آشفتگی	0.38
+colpo	قاب	0.04
+Beethoven	جنگ جهانی دوم	0.0
+stella	سیارک	2.96
+mago	کابل	0.0
+baco da seta	کرم پیله ساز	3.58
+costellazione	شکارچی	3.0
+teorema	بولتسانو	2.0
+poliziotto	سیاستمدار	1.46
+personaggio secondario	فیلم	2.0
+sangue	ویروس	1.38
+mondo occidentale	وسترن یونیون	0.67
+disturbo bipolare	مشکل	2.33
+taccuino	تفنگ	0.17
+scultura	تندیس	3.71
+pipistrello	خون‌آشام	2.46
+islamofobia	داعش	1.92
+ambiente	شمشیر	0.0
+Roma	همدان	2.92
+tavolo	غروب	0.0
+Shakespeare	دیکنز	3.08
+zero	بینهایت	2.75
+avvocato	دادستان	3.08
+fumetto	داستان مصور	3.21
+attore	تلویزیون	2.21
+duca	جمهوری	1.04
+somatotropina	هورمون رشد	3.83
+zero assoluto	بخار	0.67
+percorso	تونل	2.46
+Nike	آدیداس	3.29
+mohito	موخیتو	4.0
+Bolzano	قضیه	2.0
+schermo	مانیتور	3.88
+ananas	گوشی هوشمند	0.25
+asilo	کودکستان	3.67
+spettacolo	ریاضی‌دان	0.0
+campo	جو	2.33
+contante	پول	3.65
+Terra Promessa	باکو	0.79
+chemioterapia	سرطان لوزالمعده	1.75
+scuola elementare	مداد	1.38
+patologia	خون‌شناسی	2.88
+trota	گیتار	0.0
+ugello	مایع	1.63
+Rinascimento	رنسانس	4.0
+valle	فرورفتگی	2.96
+IMF	دویچه بانک	2.75
+felicità	ناراحتی	2.58
+operazione chirurgica	درمان	2.63
+xenofobia	نژادپرستی	3.04
+fabbrica	طبقه کارگر	1.96
+interpretazione	تک‌جلوه	2.33
+IA	باتری	0.21
+Mosca	اتحادیه اروپا	2.04
+telefono	تلفن همراه	3.49
+Scale e Serpenti	طناب‌کشی	2.25
+Rinascimento	عصر نوزایی	4.0
+Opel	مرسدس	3.21
+anno	قرن	2.67
+scrittore	رمان	2.17
+comportamentismo	درمان	2.21
+carboidrato	ساکارز	3.25
+teatro	باتری	0.29
+castello	ديوار	2.13
+notizia	سرمقاله	2.33
+medicinale	فایزر	2.21
+forze armate	دفاع	2.17
+dinosauro	فیل	2.33
+evoluzione	داروین	2.25
+pianeta	ستاره	2.96
+atleta	دونده	3.13
+PlayStation	وی	3.21
+giacca	آب‌ معدنی	0.0
+cavo	خورشید	0.0
+Parlamento Europeo	سازمان ملل متحد	2.13
+vocalista	کارمند	1.46
+Guerre stellari	موتزارت	0.0
+stella	سیاره	2.96
+romanzo a fumetti	کتاب کامیک	3.21
+sangue	بدن	1.96
+acustica	صدا	2.42
+sommossa	نقاشی	0.04
+fonologia	صفحه نمایش	0.33
+meteorite	زمین	2.67
+teoria	قضیه	2.63
+case	سخت‌افزار	2.63
+Sole	کابل	0.0
+backgammon	گو	3.33
+driver	گوگل‌درایو	0.29
+cura	عمل جراحی	2.63
+Regina Vittoria	انگلیس	2.08
+sfondo del desktop	دیواربرگ	3.79
+crittogramma	نماد	1.83
+azione	دارایی	2.29
+fluido	سرشلنگ	1.63
+croce	راهب	1.88
+università	پردیس دانشگاهی	2.75
+senzatetto	میلیاردر	1.75
+retta	بورس تحصیلی	2.42
+zinco	طلا	2.96
+meteora	گرانش	1.25
+borsa di studio	شهریه	2.42
+seme	کارخانه	0.63
+GTA	اتومبیل‌دزدی بزرگ	3.83
+teoria	المپیاد جهانی ریاضی	1.17
+anidride carbonica	گازکربنیک	3.83
+sgabello	صندلی	3.33
+equatore	ال‌نینو	1.63
+mosca	مورچه	2.92
+lingua	زبان مادری	3.21
+Apple	آیفون	2.5
+basmati	برنج ژاسمین	3.17
+pompelmo	مرکبات	3.13
+mutuo	قرض	3.33
+coccodrillo	مارمولک	2.96
+tapparella	پرده	3.0
+distintivo	شیشه	0.25
+New York	انسان‌شناسی	0.09
+Leonardo da Vinci	شام آخر	2.25
+app	کهکشان	0.0
+corridore	ورزشکار	3.13
+romanzo	نویسنده	2.17
+Western Union	جهان غرب	0.67
+magistrato	قاضی	3.67
+visto	جهانی‌گرایی	1.04
+membrana cellulare	پروویروس	1.5
+brainstorming	تلسکوپ	0.0
+spirito	بازی‌های المپیک	0.5
+retro	دم	2.33
+volpe	سلول خون	0.25
+array	لیست	3.54
+cotone	ژاکت	2.13
+pesticida	آفت	2.25
+appunti	تکلیف	2.17
+acqua	تاج‌گذاری	0.09
+aeroporto	قطعه	0.0
+spagnolo	رطوبت	0.0
+compito	یادداشت‌برداری	2.17
+Google DeepMind	ديپ‌مایند	4.0
+parassita	آفت‌کش	2.25
+PDF	جی‌پگ	2.83
+attore	چندوجهی	0.0
+UNICEF	ریشه	0.04
+Tiger Woods	بیشه‌زار	0.17
+vestito	رقص	1.13
+olio di rosa	گلاب	3.13
+colazione	بستنی	1.38
+worm	بدافزار	3.08
+giocattolo	یویو	2.83
+danza	لباس	1.13
+monaco	سلیب	1.88
+lago	حواصیل خاکستری	1.29
+rosa	پروانه	1.29
+argomento	برچسب	2.21
+legge	استخر	0.04
+elefante	قطب‌نما	0.0
+Paint	فتوشاپ	2.92
+caos	کلاس	0.38
+enciclopedia	واژه‌نامه	3.33
+Baku	سرزمین موعود	0.79
+livello	امتیاز	1.63
+dollaro	میلیونر	2.17
+robotica	شبیه‌سازی	1.83
+Giulio Cesare	سزار	4.0
+caricabatteria	دیسک	1.08
+mare	دلتا	2.33
+scopa	خاک	1.96
+fratello	خواهر	3.17
+Gioconda	شاهکار	2.54
+patriottismo	سرود ملی	2.0
+marchio	باشگاه	0.67
+sergente	تفنگ	1.5
+caramella	دارچین	1.21
+disco	شارژر	1.08
+diplomazia	مذاکره	2.75
+infinito	صفر	2.75
+Chelsea	نیچه	0.0
+siccità	آب‌	2.33
+galleria	وکیل	0.08
+quadrimestre	نیم‌سال تحصیلی	3.5
+nuvola	دریاچه	1.0
+Brexit	مالیات	1.04
+ghiacciaio	گرمایش جهانی	1.79
+bottiglia	قوطی	2.92
+strada	مرد عنکبوتی	0.38
+bruco	کرم ابریشم	3.58
+tsunami	دریا	2.17
+cisterna	خودرو	2.25
+tetto	پنجره	2.29
+cavo	نمازخانه	0.0
+cifra	عدد	3.29
+cadenza	نواخت	3.33
+nepotismo	پادشاه	1.38
+opera d'arte	هنرمند	2.08
+neve	بهمن	2.29
+punteggio	مرحله	1.63
+sclerosi multipla	ام‌اس	4.0
+moneta	پرداخت	2.38
+frutteto	شترمرغ	0.04
+terapia	رفتارگرایی	2.21
+compilatore	رویه	2.46
+mente	اختلال اعصاب	1.71
+giudice	دادرس	3.67
+elicottero	هواپیما	3.17
+scherma	ژیمناستیک	2.83
+virus	خون‌	1.38
+congresso	پارلمان	3.25
+pistola	گروهبان	1.5
+sospetto	مرد	1.54
+sonetto	زیبایی	1.5
+batteria	انرژی	2.29
+storia	مداد	0.63
+bicicletta	ماشین	2.63
+medio oriente	فرات	2.0
+neuropsicologia	فراروانشناسی	2.83
+filato	رشته	2.79
+bandiera	پرچم انگلستان	3.13
+lattina	بطری	2.92
+QI	منسا	2.13
+Unione Europea	مسکو	2.04
+associazione	حزب سیاسی	2.63
+uncinetto	لباس فرم	1.0
+acqua minerale	ژاکت	0.0
+energia	باتری	2.29
+snowboard	اسکی	3.21
+macchina da cucire	دکمه	1.92
+attrice	بازیگر	3.79
+mojito	موهیتو	4.0
+camion	ماشین	3.04
+pioggia	کولاک	3.0
+discriminazione di genere	تبعیض جنسیتی	3.92
+gioco per PC	بازی ویدئویی	3.33
+suidi	گراز کوتوله	3.21
+flora	مرورگر وب	0.0
+società	فرهنگ	2.17
+bottone	چرخ‌خیاطی	1.92
+moltiplicazione	تقسیم	3.13
+gelato	صبحانه	1.38
+finestra	سقف	2.29
+galassia	اپ	0.0
+tedesco	لاتین	3.0
+Platone	ارسطو	3.21
+scheda madre	مادربورد	4.0
+Islam	قرآن	2.46
+frappè	آبمیوه	3.04
+fidanzamento	انگشتر	1.58
+sedia	چهارپایه	3.33
+dado	مکعب	2.83
+antropologia	باستان‌شناسی	2.71
+insegnante	دانش‌آموز	2.5
+affare	پنی	1.0
+marina militare	جزیره	0.75
+prezzo di offerta	لندن	0.04
+bosco	تایگر وودز	0.17
+riscaldamento globale	یخچال طبیعی	1.79
+formica	مگس	2.92
+vuoto	سیاهچاله	2.38
+aereo	هلی‌کوپتر	3.17
+cellula del sangue	روباه	0.25
+cattedrale	کلیسا	3.25
+asteroide	ستاره	2.96
+mondo	آسیا	2.13
+città	شهرک	3.38
+sorella	برادر	3.17
+faglia	سامانه	0.21
+stile di vita	تمدن	1.63
+iride	استیل کولین	1.21
+Ecuador	استوا	1.96
+PIL	بحران اقتصادی	2.04
+KFC	مک‌دونالد	3.17
+Dell	دینگل	0.04
+strategia	بازی استراتژیکی	1.96
+distanza	پرسپکتیو	2.42
+sci	اسنوبرد	3.21
+foglia	جوانه	2.38
+regina degli scacchi	ملکه سلطنتی	1.58
+reddito	کیفیت زندگی	2.25
+succo	قاشق	0.75
+videogioco	بازی کامپيوتری	3.33
+centro della città	اتوبوس	0.92
+Union Jack	پرچم	3.13
+palco	هوی متال	1.08
+prete	پیامبر	2.38
+arancia	مرکبات	3.17
+piano	هارمونی	1.38
+Università di Cambridge	دانشگاه آکسفورد	3.17
+Gauss	دانشمند	2.88
+olimpiadi internazionali di matematica	نظریه	1.17
+surf	ورزش آبی	3.17
+Mercurio	مشتری	3.29
+Photoshop	پینت	2.92
+sorgente	جعبه	0.29
+torre dell'orologio	سنگ	0.92
+web browser	گیا	0.0
+batteria	تئاتر	0.29
+JPEG	پی‌دی‌اف	2.83
+tribunale	عدالت	2.17
+monitor	نمایشگر	3.88
+re	خویشاوندسالاری	1.38
+panda	خرس قطبی	3.19
+mago	هری پاتر	2.83
+cameo	اجرا	2.33
+flusso di cassa	رودخانه	0.29
+lago	ابر	1.0
+coperta	چوب	0.41
+fossile	سوخت فسیلی	2.0
+economia	اکوسیستم	0.79
+banconota	کشیش	0.21
+frisbee	ورق‌بازی	2.21
+sorgente	آب‌فشان	3.33
+McDonald's	کی‌اف‌سی	3.17
+Siemens	قطار برقی	2.0
+ginnastica	شمشیربازی	2.83
+capitolo	بخش	3.29
+Wii	پلی‌استیشن	3.21
+saggio	تکلیف	2.5
+suffragio	خروج	0.33
+biologia	بیوتوپ	1.79
+poster	کاغذ	2.42
+statua	مجسمه	3.71
+DeepMind	گوگل ديپ‌مایند	4.0
+artigianato	سنت	1.79
+lavoro	ابزار	1.67
+termodinamica	واکنش زنجیره‌ای	1.71
+giustizia	محکمه	2.17
+vittima	تلفن	0.0
+filosofo	مسابقه	0.17
+violino	گیتار	3.08
+squalo balena	شاه‌میگو	2.42
+Si-o-se Pol	پل ریاضی	3.08
+editoriale	اخبار	2.33
+frode	فساد	2.88
+vulcano	ماگما	2.29
+straniero	مترجم	1.67
+intimo	بدن	1.92
+teorema	نظریه	2.63
+grattacielo	کاخ	2.92
+denaro	پول نقد	3.65
+tifone	طوفان موسمی	3.42
+altitudine	تبدیل	0.34
+touchscreen	هدوپ	0.41
+Subway	ساندویچ	2.21
+coca	کوکاکولا	3.9
+vescica	تصویرسازی	0.0
+sultano	وزارت	1.29
+radice	یونیسف	0.04
+treno elettrico	زیمنس	2.0
+recettore	ملکول پروتئین	3.42
+suffisso	وند	3.08
+parlamento	کنگره	3.25
+atmosfera	ازن	2.17
+Nazioni Unite	پارلمان اروپا	2.13
+gioco di carte	فریزبی	2.21
+ciclone	گردباد	3.42
+lega	فولاد	3.04
+spada	تخت‌ پادشاهی	1.25
+inno nazionale	میهن‌دوستی	2.0
+Gerusalemme	عبری	1.92
+debito	وام	3.33
+astronave	ژول	0.25
+Clinton	اوباما	3.13
+acquerello	قلمو	2.5
+alfabeto	خودکار	0.83
+browser	موزیلا فایرفاکس	3.29
+costituzione	امپراتور	1.04
+storiografo	مورخ	3.67
+elefante	دایناسور	2.33
+auto autonoma	خودروی خودگردان	4.0
+isola	شبه‌جزیره	3.29
+medaglia	کفش ورزشی	0.88
+HSBC	بریتانیا	1.38
+mulino	دانه	0.63
+criminale	خلافکار	3.58
+Microsoft	سلسیوس	0.04
+brocchiero	محافظ	3.04
+scuola materna	پيش‌دبستان	3.67
+costituzione	مجلس سنا	1.58
+elmetto	سلاح	2.29
+libertà	آزادی	3.92
+Uomo Ragno	خیابان	0.38
+pianta	کشاورزی	2.21
+manoscritto	مقاله	3.13
+doccia	صومعه	0.0
+joystick	رادار	0.41
+televisione	نمایشنامه‌نویس	1.63
+porto	لفاف	0.0
+incidente	کتاب	0.0
+scacchi	کیش	2.33
+granturco	ذرت	3.96
+intenzione	خواست	3.38
+bronchite	استامینوفن	1.33
+Mozilla Firefox	مرورگر وب	3.29
+tubercolosi	ال‌ای‌دی	0.34
+corsa	فیلسوف	0.17
+CO2	دی‌اکسید کربن	3.83
+algebra	عمل	1.92
+chiesa	کلیسای جامع	3.25
+previsione	ابری	1.5
+Asia	جهان	2.13
+molecola	ماتریس	0.29
+istruttore	معلم	3.79
+Neanderthal	ورزش	0.0
+cubo	تاس	2.83
+oro	روی	2.96

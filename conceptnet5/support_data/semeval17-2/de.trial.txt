@@ -1,0 +1,18 @@
+Sonnenuntergang	Leine	0.06
+Bank	Sitz	3.31
+Zimmer	Gebäude	2.16
+Informatik	Mathematik	2.91
+New York	Washington	3.34
+Auto	Wagen	3.8
+Heiler	Psychologe	3.19
+Tastatur	Licht	0.4
+Nase	Kopf	2.88
+Rind	Fleisch	2.98
+Biologe	Mikroskop	1.13
+Volleyball	Ball	1.72
+Fernseher	Kino	3.13
+Adler	Falke	3.75
+Fahrrad	Haut	0.0
+Science-Fiction	Komödie	3.09
+Baum	Blatt	2.13
+Versuch	Test	2.38

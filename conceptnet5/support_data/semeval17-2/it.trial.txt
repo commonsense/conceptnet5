@@ -1,0 +1,18 @@
+tramonto	corda	0.07
+banca	seduta	0.97
+stanza	edificio	1.99
+informatica	matematica	3.0
+New York	Washington	3.41
+automobile	macchina	3.73
+curandero	psicologo	2.41
+tastiera	luce	0.32
+naso	testa	2.31
+manzo	carne	3.1
+biologo	microscopio	1.27
+pallavolo	palla	2.09
+televisione	cinema	3.0
+aquila	falco	3.59
+bicicletta	pelle	0.21
+fantascienza	commedia	2.98
+albero	foglia	2.22
+giudizio	test	2.75

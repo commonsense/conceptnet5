@@ -1,0 +1,36 @@
+Informatik	matemáticas	3.035
+Kino	televisión	3.08
+Volleyball	pelota	1.71
+Licht	teclado	0.355
+Versuch	examen	2.635
+Zimmer	edificio	2.225
+Ball	voleibol	1.71
+Auto	coche	3.785
+Test	juicio	2.635
+Tastatur	luz	0.355
+Washington	Nueva York	3.505
+Kopf	nariz	2.555
+Bank	asiento	3.54
+Komödie	ciencia ficción	2.985
+Nase	cabeza	2.555
+Psychologe	curandero	2.945
+Science-Fiction	comedia	2.985
+Sitz	banco	3.54
+Falke	águila	3.665
+Sonnenuntergang	cuerda	0.035
+Fleisch	ternera	3.16
+Heiler	psicólogo	2.945
+Gebäude	habitación	2.225
+Fahrrad	piel	0.045
+Wagen	automóvil	3.785
+Adler	halcón	3.665
+Leine	puesta de sol	0.035
+Rind	carne	3.16
+Fernseher	cine	3.08
+Baum	rama	2.17
+Mikroskop	biólogo	1.17
+Mathematik	informática	3.035
+Haut	bicicleta	0.045
+New York	Washington	3.505
+Blatt	árbol	2.17
+Biologe	microscopio	1.17

@@ -1,0 +1,956 @@
+Wille	intención	3.04
+Tunnel	camino	1.29
+statistisches Mass	esperanza de vida	1.63
+Nihilismus	película	0.04
+Paul die Krake	pulpo	3.13
+BIP	recesión	1.21
+Zink	oro	2.88
+Eis	nieve	3.08
+Times	Guardian	3.17
+Knopf	máquina de coser	1.38
+Clinton	Obama	3.04
+Fernunterricht	Internet	1.29
+Wirtschaftskrise	PIB	1.21
+Lampe	genio	1.0
+Suffix	afijo	3.21
+Biologie	biotopo	1.54
+Wassersport	surf	3.08
+Steuerknüppel	radar	0.8
+Matrix	vector	2.83
+Flasche	lata	2.79
+Provirus	membrana plasmática	1.33
+Zahn	martillo	0.0
+Sessel	taburete	3.08
+Lawine	nieve	2.29
+Flaggenkunde	bandera	2.21
+Rahmen	golpe	0.0
+Polyeder	actor	0.21
+Serienmörder	asesino	3.58
+Helligkeit	estrella	0.96
+Universität	campus	2.67
+Base	ácido	2.92
+Affix	sufijo	3.21
+Raumschiff	Julio	0.21
+Galaxie	astrónomo	1.42
+Pistole	cuaderno	0.09
+Papiergeld	sacerdote	0.0
+Arbeit	herramienta	0.92
+Diener	esclavo	3.21
+Einkommen	calidad de vida	1.75
+Medaille	zapatillas	0.21
+Paracetamol	bronquitis	0.88
+Microsoft	Celsius	0.0
+Schlüssel	corona	0.25
+Gouverneur	emperador	2.79
+Schüler	profesor	2.54
+Delta	mar	1.88
+Aristoteles	Platón	3.17
+Renner	atleta	3.13
+Insel	península	2.96
+Verfassung	senado	1.08
+Simulation	robótica	1.5
+Amerikanisch	inglés	3.25
+Gold	zinc	2.88
+fossiler Brennstoff	fósil	1.83
+Energie	batería	2.25
+Nietzsche	Chelsea	0.0
+Buch	accidente	0.04
+Verhandlung	diplomacia	2.67
+Diplomatie	negociación	2.67
+Ban Ki-moon	Naciones Unidas	2.17
+Zivilisation	estilo de vida	1.54
+Staubblatt	polinización	2.21
+Elektrolokomotive	Siemens	1.42
+Kloster	ducha	0.04
+Wolke	ventana	0.5
+Umschlag	decoración	0.29
+Mozilla Firefox	navegador web	3.25
+Matrix	molécula	0.41
+Musik	flauta	1.88
+Kanonboot	costa	0.92
+Flagge	vexilología	2.21
+Ball	esfera	2.58
+Tal	depresión	2.75
+Flughafen	pieza	0.04
+Zauberer	Harry Potter	3.13
+Islamophobie	EI	1.58
+Trainer	jugador	2.54
+Schulden	préstamo bancario	2.42
+Jasminreis	basmati	3.33
+Wachstumshormon	somatotropina	3.79
+Problem	trastorno bipolar	1.71
+politische Partei	asociación	2.46
+Radiator	sensor	0.83
+Erdbeere	cereza	3.13
+Nähmaschine	botón	1.38
+schwarzes Loch	vacío	1.13
+Chef	director	3.04
+Schmetterling	rosa	1.04
+CO2	dióxido de carbono	4.0
+Strasse	Spider-Man	0.09
+Autobahn	carretera	3.38
+Mönch	cruz	1.5
+Kohlendioxid	CO2	4.0
+Halbinsel	isla	2.96
+Vereinte Nationen	Ban Ki-moon	2.17
+Charakter	persona	2.79
+Theater	batería	0.0
+Jupiter	Mercurio	3.29
+Faraday-Konstante	mochila	0.0
+Roman	escritor	1.92
+System	falla	0.45
+Lehrer	estudiante	2.54
+Soldat	paz	0.71
+Mineralwasser	chaqueta	0.0
+Unteroffizier	pistola	1.0
+Springen	valla	1.0
+Bayern München	Juventus	3.04
+Viereck	mapa	0.88
+Eiscreme	desayuno	0.88
+Wurm	malware	2.88
+Flugzeug	helicóptero	3.08
+Coke	Coca Cola	3.79
+Bruder	hermana	3.25
+Nachrichten	editorial	2.58
+Spritzer	viscosidad	1.0
+Mosaik	basílica	1.42
+Windhose	tifón	3.38
+Deutsche Bank	FMI	2.42
+Fussball	fútbol	3.83
+Übersetzer	extranjero	1.17
+Bühne	heavy metal	0.96
+Basmatireis	arroz jazmín	3.33
+Teleskop	silla	0.13
+Statistik	tenis	0.67
+Mann	sospechoso	1.0
+König	nepotismo	0.71
+Wiedergeburt	Renaissance	3.79
+Manuskript	artículo	3.29
+Bildhauer	mansión	0.83
+KFC	McDonald's	3.04
+Mensa	CI	1.92
+Schloss	muro	1.79
+Statue	glaciación	0.0
+Nahrung	programa	0.42
+Kubik	dados	2.21
+Keim	patógeno	3.71
+Surfen	deporte acuático	3.08
+Ebola Virus	Ébola	3.88
+Krönung	agua	0.17
+Abzeichen	vaso	0.17
+Ausbilder	profesor	3.88
+Pfarrer	billete	0.0
+Renaissance	Renacimiento	3.79
+Hautausschlag	dermatitis	3.46
+Erdbeben	temblor	3.46
+Maske	fiesta	0.83
+Echte Schweine	jabalí enano	3.25
+Computer	máquina	2.58
+Allianz	OTAN	3.13
+Phonologie	pantalla	0.0
+Gauss	científico	2.71
+Sitzung	paciente	1.29
+Azetylcholin	iris	0.29
+Olympische Spiele	espíritu	0.38
+Ast	brazo	1.08
+Maschine	ordenador	2.58
+Korruption	fraude	3.08
+Geisir	manantial	2.83
+Zellmembran	provirus	1.33
+Unterprogramm	compilador	1.71
+gelobtes Land	Baku	0.38
+Latein	alemán	2.71
+Zug	tranvía	3.17
+Friedensrichter	juez	3.42
+Süssigkeiten	canela	1.29
+Snowboard	esquí	3.0
+Orion	constelación	2.75
+Himmel	sueño	0.29
+Islam	Corán	2.33
+Comicroman	tebeo	3.54
+Jacke	agua mineral	0.0
+Salz	cloruro de sodio	3.96
+Woody Allen	objetivo	0.38
+Meer	delta	1.88
+Visa	globalismo	1.0
+Harry Potter	mago	3.13
+Grossstadt	pueblo	3.04
+Umwelt	espada	0.0
+Besen	polvo	1.54
+Koran	Islam	2.33
+Traum	cielo	0.29
+Molekül	matriz	0.41
+Moskau	Unión Europea	1.71
+Sternbild	Orión	2.75
+Politiker	policía	2.38
+Person	personaje	2.79
+Verdächtiger	hombre	1.0
+Kathedrale	iglesia	3.21
+Stück	aeropuerto	0.04
+Wüste	duna	1.92
+Spanisch	humedad	0.0
+Fluss	flujo de caja	0.25
+Landwirtschaft	planta	1.75
+Sklave	criado	3.21
+Fenster	nube	0.5
+Wetterprognose	nubosidad	1.46
+Eidechse	gobierno	0.0
+Aufgabe	apuntes	1.92
+Atmosphäre	ozono	2.13
+Mobiltelefon	teléfono	3.5
+IMF	Deutsche Bank	2.42
+Holz	manta	0.25
+Feuer	apocalipsis	0.88
+Schnee	hielo	3.08
+Dach	ventana	1.75
+Mojito	mojito	4.0
+chemische Substanz	base	2.08
+Mühle	semilla	1.33
+Gemütsart	Juegos Olímpicos	0.38
+Herrscher	rey	3.42
+Saft	cuchara	0.58
+University of Cambridge	Universidad de Oxford	3.13
+Shakespeare	Dickens	2.88
+Leitartikel	noticia	2.58
+Pfennig	ganga	0.83
+Sonnett	belleza	1.25
+Bleistift	historia	0.09
+Obdachloser	multimillonario	2.08
+Quelle	géiser	2.83
+Stichkampf	baloncesto	1.38
+Wall Street	mercado financiero	2.63
+Christ	protestante	3.29
+Somatropin	hormona del crecimiento	3.79
+Sonne	cable	0.0
+Laptop	ordenador portátil	4.0
+Schauspielerin	actor	3.63
+Prinzessin	galleta	0.0
+New York	antropología	0.29
+Thermodynamik	reacción en cadena	1.46
+Fossil	combustible fósil	1.83
+Demokratie	monarquía	2.67
+Spieler	entrenador	2.54
+Bestäubung	estambre	2.21
+Joghurt	ganado	0.58
+Person	paso de cebra	1.0
+Pistole	sargento	1.0
+Sämling	hoja	1.42
+Bildschirm	fonología	0.0
+Regenschirm	radiador	0.21
+Auto	camión	3.13
+Vetternwirtschaft	rey	0.71
+33-Bogen-Brücke	Mathematical Bridge	3.13
+Sphäre	balón	2.58
+Tisch	puesta de sol	0.0
+Arbeiterklasse	planta	1.58
+Senat	constitución	1.08
+Glass	emblema	0.17
+Statue	escultura	3.67
+Array	lista	3.13
+Unterrichtsgebühr	beca	2.38
+Turnschuhe	medalla	0.21
+Ansehen	honor	2.83
+Fuss	arena	0.58
+Dollar	millonario	1.71
+Packet	camión	0.75
+Strand	costa	2.96
+Juventus	Bayern Munich	3.04
+Alexander Fleming	penicilina	2.08
+Hautentzündung	eczema	3.46
+Düne	desierto	1.92
+Vieh	yogurt	0.58
+Vorhang	persiana	3.25
+Kino	ópera	2.75
+Gesetz	piscina	0.0
+Google Drive	conductor	0.0
+Tuberkulose	LED	0.13
+Kabel	mago	0.0
+Jerusalem	hebreo	1.58
+Ameise	mosca	3.0
+Geldwäsche	JPY	1.0
+Struktur	topología	1.79
+Jahrhundert	año	2.71
+Strasse	autovía	3.38
+Regen	granizo	2.83
+Chelsea	Nietzsche	0.0
+Aufstand	dibujo	0.0
+Mode	estilo	2.54
+Stil	moda	2.54
+Helikopter	avión	3.08
+Auto	bicicleta	2.67
+Stipendium	matrícula	2.38
+Bargeld	dinero	3.54
+Neurose	mente	1.5
+Level	puntuación	2.46
+Motor	pistón	2.13
+Muttersprache	idioma	3.33
+Imperator	gobernador	2.79
+Ausgang	sufragio	0.21
+Welt	Asia	2.0
+Helm	arma	1.79
+Kirsche	fresa	3.13
+Blut	virus	1.08
+Cyrus	Imperio persa	2.21
+Magma	volcán	2.29
+Mozart	Guerra de las Galaxias	0.09
+Europäische Union	Moscú	1.71
+Parlament	congreso	3.54
+Sänger	personal	1.0
+Ausserirdischer	forastero	2.42
+Monitor	pantalla	3.96
+Markierung	club	0.63
+Bronchitis	acetaminofeno	0.88
+Brainstorming	telescopio	0.0
+Feld	avena	1.71
+Obstgarten	avestruz	0.63
+Boeing	avión	3.38
+London	precio de licitación	0.29
+Künstler	obra de arte	2.08
+Kondensator	diodo	2.33
+Chomolungma	Monte Everest	3.96
+Schwester	hermano	3.25
+Patriotismus	himno nacional	2.04
+Tanz	vestido	0.92
+Körper	ropa interior	0.79
+Schläger	pelota	2.0
+Niederschlag	cambio climático	1.21
+Gitarre	trucha	0.0
+Rock	reloj	0.21
+Jahr	siglo	2.71
+Ecuador	ecuador	1.29
+Auto	tanque	2.5
+Büchse	botella	2.79
+Episode	capítulo	3.58
+Lastwagen	paquete	0.75
+Abwehr	fuerzas armadas	2.04
+Wolke	lago	0.67
+Stahl	aleación	3.04
+Hintergrund	fondo de pantalla	2.96
+Kabel	capilla	0.0
+Ozon	atmósfera	2.13
+Topologie	estructura	1.79
+Heavy Metal	escenario	0.96
+Dell	Dingle	0.04
+Photoshop	Paint	3.33
+Webbrowser	Mozilla Firefox	3.25
+Schneesturm	lluvia	2.79
+England	Reina Victoria	1.71
+Pullover	algodón	1.75
+AI	batería	0.04
+Hagel	lluvia	2.83
+iPhone	Apple	2.54
+Sonnenuntergang	mesa	0.0
+Verlobung	anillo	1.83
+Sand	pie	0.58
+Planet	estrella	2.96
+Nationalhymne	patriotismo	2.04
+Baum	barco	0.17
+Arbeiter	oficina	1.25
+Forelle	guitarra	0.0
+Milchshake	zumo	2.92
+Gedicht	ritmo	1.71
+Elephant	brújula	0.0
+Muffin	perejil	0.67
+Entwicklung	recaudación de fondos	0.71
+Münzamt	museo	1.33
+Actant	poliedro	0.21
+HSBC	Gran Bretaña	0.92
+Schreibwaren	Legión de Honor	0.04
+Gewinner	campeón	3.29
+Meteor	gravedad	0.8
+Karte	plaza	0.88
+Tanz	Polo Sur	0.0
+Stadium	Oscars	0.13
+Handy	piña	0.0
+Schlüssel	cerradura	1.88
+Zitrusfrucht	pomelo	3.08
+Anthropologie	arqueología	2.54
+Equator	Ecuador	1.29
+Verstand	neurosis	1.5
+Fremdenfeindlichkeit	racismo	3.92
+Teleskop	tormenta de ideas	0.0
+Fahrrad	coche	2.67
+Klimawandel	precipitación	1.21
+Blatt	plántula	1.42
+Geschlechtsdiskriminierung	sexismo	3.96
+persisches Reich	Ciro	2.21
+Wirtschaft	ecosistema	0.54
+Strickgarn	hilo	3.25
+Obama	Clinton	3.04
+Westliche Welt	Western Union	0.34
+Sturm	manta	0.25
+Astronom	galaxia	1.42
+Rassismus	xenofobia	3.92
+Rosenöl	agua de rosas	2.71
+Häkeln	uniforme	0.38
+Hemd	rebeca	2.63
+Leonardo da Vinci	La Última Cena	2.29
+Zelle	cárcel	2.42
+Wand	castillo	1.79
+Mona Lisa	obra maestra	2.5
+Opfer	teléfono	0.29
+Löwenmäuler	lantana	3.17
+Neuropsychologie	parapsicología	2.5
+Opel	Mercedes	3.17
+Unterrichtsstoff	examen	2.0
+Vampir	murciélago	2.42
+Fahrer	Google Drive	0.0
+Football	balompié	3.83
+Tsunami	mar	1.44
+Zitrusfrucht	naranja	3.08
+Cricket	seguidor	0.79
+Geldkurs	Londres	0.29
+Harmonie	piano	1.29
+Jalousie	cortina	3.25
+Welle	clima	0.71
+Betriebssystem	aprendizaje profundo	1.0
+Notebook	portátil	4.0
+Applikation	galaxia	0.0
+Richter	magistrado	3.42
+Amazonas	bosque	2.46
+JPEG	PDF	2.67
+Internet	educación a distancia	1.29
+Mutant	sociobiología	0.54
+Quelle	caja	0.0
+Adidas	Nike	3.08
+Europäisches Parlament	Naciones Unidas	2.17
+Algebra	operación	1.96
+Wasser	sequía	1.67
+Erfolg	marco	0.0
+Aktie	activo	1.67
+Asteroid	estrella	3.0
+Asien	mundo	2.0
+Ziffer	citoplasma	0.46
+Ausländer	traductor	1.17
+Das Abendmahl	Leonardo da Vinci	2.29
+selbstfahrendes Auto	vehículo autónomo	3.96
+Erderwärmung	glaciar	1.46
+Hocker	silla	3.08
+Eidechse	cocodrilo	3.13
+Film	actor secundario	1.58
+Hamedan	Roma	2.5
+Kartoffel	arrozal	1.08
+Rezeptor	molécula proteica	3.0
+Kolben	motor	2.13
+Chor	cantante	2.63
+Geldfluss	río	0.25
+Elephant	dinosaurio	2.17
+Decke	vendaval	0.25
+Schriftsteller	novela	1.92
+Gefängnis	celda	2.42
+Therapie	conductismo	1.75
+Bildschirm	monitor	3.96
+Schwimmbad	ley	0.0
+Tennis	estadística	0.67
+Flöte	música	1.88
+Stift	alfabeto	0.63
+Celsius	Microsoft	0.0
+Rucksack	constante de Faraday	0.0
+Gehölz	Tiger Woods	0.04
+PlayStation	Wii	3.21
+Film	nihilismo	0.04
+PC Spiel	videojuego	3.42
+Protestant	cristiano	3.29
+Programm	comida	0.42
+IQ	Mensa	1.92
+Theorem	Bolzano	1.5
+Nahost	Éufrates	1.33
+Erschütterung	terremoto	3.46
+Kalender	vacaciones	1.71
+Zara	mallas	1.21
+Basilika	mosaico	1.42
+Artikel	manuscrito	3.29
+Fussgängerstreifen	persona	1.0
+Maus	patatas fritas	0.21
+Wald	Amazonas	2.46
+Palast	rascacielos	2.46
+Erreger	germen	3.71
+Film	teatro	1.88
+Globalisierung	visa	1.0
+Diode	condensador	2.33
+Wettbewerb	respeto mutuo	0.63
+Akustik	sonido	2.21
+Löffel	zumo	0.58
+Auftritt	actuación	3.29
+Lehrer	instructor	3.88
+Teilung	multiplicación	2.96
+Börse	mercado de valores	3.92
+Fabrik	clase obrera	1.58
+Hag	salto	1.0
+Foxterrier	Canon	0.0
+Neanderthaler	deporte	0.0
+Coca-Cola	bebida de cola	3.79
+Büro	trabajador	1.25
+Dinosaurier	elefante	2.17
+El Niño	ecuador	1.17
+Krone	llave	0.25
+Holz	piedra	2.42
+Hülle	puerto	0.0
+Pandabär	oso polar	3.17
+Schönheit	soneto	1.25
+Notizbuch	arma	0.09
+Elektrizität	funda	0.38
+Dickflüssigkeit	salpicadura	1.0
+Mochito	mojito	4.0
+Regierung	lagartija	0.0
+Anthropologie	Nueva York	0.29
+Papier	póster	2.5
+Band	orquesta	3.17
+Klavier	armonía	1.29
+Regenschirm	calibre	0.0
+Philosoph	carreras	0.25
+Blutkörperchen	zorro	0.04
+Star Wars	Mozart	0.09
+Vertrag von Maastricht	Europa	1.67
+Unterwäsche	cuerpo	0.79
+LED	tuberculosis	0.13
+Saccharose	carbohidrato	2.96
+Dürre	agua	1.67
+Athlet	corredor	3.13
+Batterie	teatro	0.0
+Joule	astronave	0.21
+Fechten	gimnasia	2.25
+grüne Revolution	pintura	0.04
+Betrug	corrupción	3.08
+Strauss	huerto	0.63
+Republik	duque	0.46
+Chips	cursor	0.21
+Gymnastik	esgrima	2.25
+Entropie	información	2.42
+Lebensstil	civilización	1.54
+Finanzmittelbeschaffung	desarrollo	0.71
+Regen	tormenta de nieve	2.79
+Gitarre	violín	3.13
+Staub	escoba	1.54
+Dichter	periodista	2.21
+Präsentationsfolie	puntero	1.08
+Anwalt	fiscal	3.29
+Europa	Tratado de Maastricht	1.67
+Zauberer	cable	0.0
+Medikament	Pfizer	2.21
+Villa	escultor	0.83
+GTA	Grand Theft Auto	4.0
+Robotik	simulación	1.5
+Subway	bocadillo	1.5
+Pflanze	agricultura	1.75
+Tauziehen	Serpientes y Escaleras	1.79
+Anwalt	galería	0.13
+Moral	leyenda	1.13
+Frieden	soldado	0.71
+Fuchs	glóbulo	0.04
+Staatsanwalt	abogado	3.29
+Windbö	viento	3.08
+Vacuum	agujero negro	1.13
+Parapsychologie	neuropsicología	2.5
+Wissenschaftler	Gauss	2.71
+Aquarell	brocha	2.08
+Euphrates	Oriente Medio	1.33
+Kalter Krieg	Unión Soviética	1.79
+bedeckt	pronóstico	1.46
+MS	esclerosis múltiple	4.0
+Frisbee	juego de cartas	1.79
+Kapitel	episodio	3.58
+Deep Learning	sistema operativo	1.0
+Königin Victoria	Inglaterra	1.71
+Eroberer	Alejandro Magno	2.92
+JPY	blanqueo de dinero	1.0
+Britannien	HSBC	0.92
+Soziobiologie	mutante	0.54
+Information	entropía	2.42
+Hadoop	pantalla táctil	0.67
+Touchscreen	Hadoop	0.67
+Motherboard	placa base	3.92
+Uhrturm	piedra	0.5
+Krake	pulpo Paul	3.13
+Aufsatz	deberes	2.17
+Ehrenlegion	papelería	0.04
+Stern	brillo	0.96
+Klimaerwärmung	calor	2.21
+Siemens	tren eléctrico	1.42
+Schloss	llave	1.88
+Freude	tristeza	2.58
+Spider-Man	calle	0.09
+Ehre	estima	2.83
+Farbe	revolución verde	0.04
+Kreuz	monje	1.5
+Marine	isla	1.0
+Lied	artista	1.04
+Butterbrot	Subway	1.5
+Telefon	móvil	3.5
+Schadprogramm	gusano	2.88
+Natur	flora	3.08
+Attacke	crimen	2.25
+Umtausch	moneda	1.33
+Geige	guitarra	3.13
+See	garza real	1.29
+Gesellschaft	cultura	2.42
+Klasse	caos	0.04
+Kettenreaktion	termodinámica	1.46
+Geld	efectivo	3.54
+Sexismus	discriminación de género	3.96
+Archeologie	antropología	2.54
+Wetter	ola	0.71
+Sensor	radiador	0.83
+Düse	fluido	1.04
+Operation	álgebra	1.96
+Währung	intercambio	1.33
+Schachtel	fuente	0.0
+Zeichnung	revuelta	0.0
+Webbrauser	flora	0.0
+Basis	sustancia química	2.08
+Heizer	paraguas	0.21
+Strategie	juego de estrategia	2.04
+Brexit	impuesto	0.88
+Kohlenhydrat	sacarosa	2.96
+Cytoplasma	dedo	0.46
+Unendlichkeit	cero	2.33
+Weltuntergang	fuego	0.88
+Faden	hilado	3.25
+Graureiher	lago	1.29
+Schauspieler	televisión	1.79
+Theorie	teorema	2.71
+Finanzmarkt	Wall Street	2.63
+Cäsar	Julio César	3.79
+Arm	rama	1.08
+Liste	matriz	3.13
+Union Jack	bandera	2.58
+Batterie	energía	2.25
+Wurzel	UNICEF	0.04
+Wörterbuch	enciclopedia	3.33
+Telefon	víctima	0.29
+Kultur	sociedad	2.42
+Plato	Aristóteles	3.17
+Kompass	elefante	0.0
+Sänger	coro	2.63
+Milchprodukt	miel	0.71
+Kugelschreiber	escuela primaria	0.63
+Comic	novela gráfica	3.54
+Dusche	monasterio	0.04
+Kirche	catedral	3.21
+Schauspieler	actriz	3.63
+Fledermaus	vampiro	2.42
+Kaugummi	menta	1.5
+chirurgischer Eingriff	tratamiento	2.63
+Leggings	Zara	1.21
+Pfarrer	profeta	1.88
+Legende	moraleja	1.13
+Vermögen	existencias	1.67
+Flugzeug	Boeing	3.38
+Hammer	dientes	0.0
+Hebräisch	Jerusalén	1.58
+Rosenwasser	esencia de rosas	2.71
+Verstand	cerebro	3.58
+Club	marca	0.63
+Milliardär	vagabundo	2.08
+Prüfung	temario	2.0
+Schuld	sistema	0.45
+Rangabzeichen	dignidad	1.0
+Würfel	cubo	2.21
+Dekoration	sobre	0.29
+Keks	princesa	0.0
+Ananas	smartphone	0.0
+Stein	madera	2.42
+Innenstadt	autobús	0.75
+Protein	pomo	0.0
+Mörder	asesino en serie	3.58
+Monarchie	democracia	2.67
+Vector	matriz	2.83
+Vulkan	magma	2.29
+Stein	torre del reloj	0.5
+Nebenfigur	película	1.58
+Fernsehen	actor	1.79
+Zeiger	diapositiva	1.08
+Gehirn	mente	3.58
+Journalist	poeta	2.21
+Kino	palomitas	1.33
+Baumwolle	poliéster	3.04
+Werkzeug	trabajo	0.92
+Cloudcomputing	lluvia	0.0
+Bischof	musulmán	0.88
+Würde	insignia	1.0
+Personal	vocalista	1.0
+Getreide	mijo	2.96
+Tabelle	gráfico	3.29
+Wasser	coronación	0.17
+Verfassung	emperador	0.63
+Rom	Hamedan	2.5
+Merkur	Júpiter	3.29
+Kompilierer	subrutina	1.71
+Theorie	Olimpiada Internacional de Matemáticas	0.75
+Polyester	algodón	3.04
+Engel	demonio	2.63
+Videospiel	juego de ordenador	3.42
+Vorschule	jardín de infancia	3.5
+Alexander der Grosse	conquistador	2.92
+WikiLeaks	Wifi	0.25
+Fliege	hormiga	3.0
+Seidenstrasse	gusano de seda	0.71
+Englisch	americano	3.25
+Gehäuse	electricidad	0.38
+Ronaldo	U2	0.17
+gegenseitiger Respekt	competición	0.63
+Sultan	ministerio	0.58
+Bezahlung	moneda	1.75
+Traurigkeit	felicidad	2.58
+Geschichtsschreiber	historiador	3.79
+Säure	base	2.92
+Regisseur	jefe	3.04
+Raupe	gusano de seda	3.5
+Go	backgammon	2.58
+Stadt	ciudad	3.04
+Herzog	república	0.46
+Hafer	campo	1.71
+Pfefferminze	chicle	1.5
+Eisbär	oso panda	3.17
+Lebenserwartung	medida estadística	1.63
+Südpol	baile	0.0
+Geschenk	escritor	0.17
+Null	infinito	2.33
+Julius Cäsar	César	3.79
+Hypothese	teoría	3.42
+Frau	vaqueros	0.54
+Perspektive	distancia	1.67
+Kamera	secuela	0.45
+Popcorn	cine	1.33
+Zwergwildschwein	suidae	3.25
+Anziehungskraft	meteorito	0.8
+Primarschule	bolígrafo	0.63
+Chaos	clase	0.04
+Meisterwerk	Mona Lisa	2.5
+bipolare Störung	problema	1.71
+Stern	asteroide	3.0
+Regen	computación en la nube	0.0
+Fortsetzung	cámara	0.45
+Hafen	envoltorio	0.0
+Gletscher	calentamiento global	1.46
+Thron	espada	1.75
+Rhythmus	poema	1.71
+Schwert	trono	1.75
+Jeans	mujer	0.54
+Orchester	banda	3.17
+bewaffnete Streitkräfte	defensa	2.04
+Penicillin	Alexander Fleming	2.08
+Wandelröschen	boca de dragón	3.17
+Vereinte Nationen	Parlamento Europeo	2.17
+Ebola	virus del Ébola	3.88
+Aufführung	matemático	0.0
+Reisfeld	patata	1.08
+Iris	acetilcolina	0.29
+Feuchtigkeit	español	0.0
+Mathematiker-Brücke	Si-o-seh pol	3.13
+Pinsel	acuarela	2.08
+Geschichte	lápiz	0.09
+Multiplikation	división	2.96
+Weide	pradera	3.25
+Oper	cine	2.75
+Flagge	Union Jack	2.58
+Protein-Molekül	receptor	3.0
+Radar	joystick	0.8
+Seidenraupe	Ruta de la Seda	0.71
+Enzyklopädie	diccionario	3.33
+Behandlung	operación quirúrgica	2.63
+Mine	roca	1.5
+Flora	navegador web	0.0
+Ton	acústica	2.21
+Jo-Jo	juguete	2.71
+Sport	neandertal	0.0
+Basketball	desempate	1.38
+Fernseher	guionista	1.04
+Kindergarten	preescolar	3.5
+Umformung	altitud	0.17
+Ecosystem	economía	0.54
+Panzer	coche	2.5
+Cardigan	camisa	2.63
+Scheibe	cargador	0.13
+Absicht	voluntad	3.04
+Lastwagen	coche	3.13
+Unterstützer	críquet	0.79
+Google DeepMind	DeepMind	3.79
+Uniform	ganchillo	0.38
+Stein	mina	1.5
+Illustration	ampolla	0.0
+Boot	árbol	0.17
+Depression	valle	2.75
+Theorem	teoría	2.71
+Gmail	Yahoo	2.75
+Stimmrecht	salida	0.21
+Grand Theft Auto	GTA	4.0
+Flora	naturaleza	3.08
+Manuskript	libro	3.0
+Behaviorismus	terapia	1.75
+Pest	pesticida	0.79
+Skifahren	snowboard	3.0
+Oxford University	Universidad de Cambridge	3.13
+Hitze	calentamiento global	2.21
+Paint	Photoshop	3.33
+Wallpaper	fondo	2.96
+Wii	PlayStation	3.21
+Krokodil	lagarto	3.13
+Aufführung	cameo	3.29
+Kaliber	paraguas	0.0
+Darsteller	canción	1.04
+Petersilie	magdalena	0.67
+Kaiser	constitución	0.63
+Kunstwerk	artista	2.08
+Drehbuchautor	televisión	1.04
+Patient	sesión	1.29
+Pampelmuse	cítrico	3.08
+Küste	playa	2.96
+Schlange	lagartija	2.67
+Geist	lámpara	1.0
+McDonald's	KFC	3.04
+Mount Everest	Chomolungma	3.96
+Ball	raqueta	2.0
+Freiheit	oasis	0.25
+Geschwindigkeit	correo	0.17
+Ziffer	número	3.92
+Tradition	artesanía	1.63
+Ring	compromiso	1.83
+Eiszeit	estatuto	0.0
+Diagramm	gráfica	3.29
+NATO	alianza	3.13
+Film	película	3.71
+Äquator	El Niño	1.17
+Stern	planeta	2.96
+Mercedes	Opel	3.17
+Schnee	avalancha	2.29
+Oscars	estadio	0.13
+Aktienmarkt	bolsa	3.92
+Dämon	ángel	2.63
+Sitz	telescopio	0.13
+Kabel	Sol	0.0
+Buch	manuscrito	3.0
+Orange	cítrico	3.08
+Skulptur	estatua	3.67
+Meteorit	Tierra	1.79
+Hummer	tiburón ballena	2.29
+Soviet Union	Guerra Fría	1.79
+Western Union	mundo occidental	0.34
+Taifun	ciclón	3.38
+Backgammon	Go	2.58
+Kumulation	desviación estándar	0.96
+Baku	Tierra Prometida	0.38
+Pfad	túnel	1.29
+Mainboard	placa madre	3.92
+Virus	sangre	1.08
+Tiger Woods	bosque	0.04
+Seidenraupe	oruga	3.5
+See	nube	0.67
+Verbrechen	ataque	2.25
+Oase	libertad	0.25
+Honig	lechería	0.71
+Mais	maíz	2.96
+Kapelle	cable	0.0
+Muslime	obispo	0.88
+Frühstück	helado	0.88
+Küste	cañonero	0.92
+Congress	parlamento	3.54
+Waffe	casco	1.79
+Nummer	dígito	3.92
+Dingle	Dell	0.04
+Höhe	conversión	0.17
+Polizist	político	2.38
+Theorie	hipótesis	3.42
+Pfizer	medicamento	2.21
+Notizen	tarea	1.92
+Fenster	techo	1.75
+Dampf	cero absoluto	0.88
+Korn	molino	1.33
+Mathematiker	espectáculo	0.0
+Bauchspeicheldrüsenkrebs	quimioterapia	1.71
+Walhai	langosta	2.29
+Entfernung	perspectiva	1.67
+Leiterspiel	juego de la soga	1.79
+Meister	ganador	3.29
+Outlander	extraterrestre	2.42
+Theater	película	1.88
+Galerie	abogado	0.13
+Fest	máscara	0.83
+Wolkenkratzer	palacio	2.46
+Rennen	filósofo	0.25
+Decke	madera	0.25
+Affe	campaña	0.0
+Campus	universidad	2.67
+Unfall	libro	0.04
+Bolzano	teorema	1.5
+Saft	batido	2.92
+WiFi	WikiLeaks	0.25
+Flüssigkeit	boquilla	1.04
+Pathologie	hematología	2.67
+Prophet	sacerdote	1.88
+Yahoo	Gmail	2.75
+Sprache	lengua materna	3.33
+Handwerk	tradición	1.63
+Ampulle	ilustración	0.0
+Kinofilm	largometraje	3.71
+Poster	papel	2.5
+Lebensqualitàt	renta	1.75
+Hausaufgaben	redacción	2.17
+Baumwolle	jersey	1.75
+Galaxie	aplicación	0.0
+absoluter Nullpunkt	vapor	0.88
+Wachstum	fertilizante	1.46
+Apple	iPhone	2.54
+Ministerium	sultán	0.58
+Ferien	calendario	1.71
+Graslandschaft	prado	3.25
+König	gobernante	3.42
+Zimt	caramelo	1.29
+Rose	mariposa	1.04
+Legierung	acero	3.04
+Strategiespiel	estrategia	2.04
+ISIS	islamofobia	1.58
+U2	Ronaldo	0.17
+Millionär	dólar	1.71
+UNICEF	raíz	0.04
+Guardian	Times	3.17
+Beethoven	Segunda Guerra Mundial	0.17
+Bankkredit	deuda	2.42
+Schnäppchen	centavo	0.83
+Pestizid	peste	0.79
+Batterie	IA	0.04
+Münze	pago	1.75
+Erde	meteorito	1.79
+Dünger	crecimiento	1.46
+Ladegerät	disco	0.13
+Canon	Fox Terrier	0.0
+Hämatologie	patología	2.67
+Kampagne	mono	0.0
+Kartenspiel	frisbee	1.79
+Post	velocidad	0.17
+Steuer	Brexit	0.88
+Dickens	Shakespeare	2.88
+Multiple Sklerose	EM	4.0
+Bus	centro	0.75
+Linse	Woody Allen	0.38
+Schwert	medio ambiente	0.0
+Alphabet	bolígrafo	0.63
+Tram	tren	3.17
+Wind	borrasca	3.08
+Zweiter Weltkrieg	Beethoven	0.17
+Museum	ceca	1.33
+Nike	Adidas	3.08
+Deutsch	latín	2.71
+Insel	marina	1.0
+Eidechse	serpiente	2.67
+PDF	JPEG	2.67
+Biotop	biología	1.54
+Blut	cuerpo	1.46
+DeepMind	Google DeepMind	3.79
+Punktezahl	nivel	2.46
+Meer	maremoto	1.44
+Normalabweichung	acumulación	0.96
+Beamte	diputado	2.5
+Spielzeug	yoyó	2.71
+Autor	regalo	0.17
+internationale Mathematik Olympiade	teoría	0.75
+Natriumchlorid	sal	3.96
+Uhr	falda	0.21
+Vereinigung	partido político	2.46
+Historiker	historiógrafo	3.79
+Roboterauto	coche autónomo	3.96
+Körper	sangre	1.46
+Griff	proteína	0.0
+Chemotherapie	cáncer de páncreas	1.71
+Abgeordneter	oficial	2.5
+Kleid	baile	0.92

@@ -1,0 +1,500 @@
+Joule	Raumschiff	0.25
+gelobtes Land	Baku	0.33
+Auto	Fahrrad	2.67
+Polyeder	Actant	0.42
+Multiple Sklerose	MS	4.0
+Schuld	System	0.08
+Waffe	Helm	1.92
+Drehbuchautor	Fernseher	0.83
+Vereinte Nationen	Ban Ki-moon	2.08
+33-Bogen-Brücke	Mathematiker-Brücke	3.0
+Basilika	Mosaik	1.25
+Aquarell	Pinsel	1.75
+Demokratie	Monarchie	2.92
+Gauss	Wissenschaftler	2.58
+Tuberkulose	LED	0.25
+selbstfahrendes Auto	Roboterauto	4.0
+Weltuntergang	Feuer	0.67
+Geschwindigkeit	Post	0.25
+PlayStation	Wii	3.25
+Laptop	Notebook	4.0
+Harry Potter	Zauberer	3.0
+Snowboard	Skifahren	2.83
+Zeiger	Präsentationsfolie	1.0
+Sensor	Radiator	0.83
+Erfolg	Rahmen	0.0
+Theorie	Hypothese	3.5
+Wall Street	Finanzmarkt	2.17
+Darwin	Evolution	1.92
+Schauspieler	Schauspielerin	3.75
+Film	Theater	2.08
+Nationalhymne	Patriotismus	2.17
+Bildschirm	Monitor	4.0
+Milchprodukt	Honig	0.92
+Mount Everest	Chomolungma	4.0
+Tauziehen	Leiterspiel	2.0
+Pestizid	Pest	0.42
+Polizist	Politiker	2.25
+Neuropsychologie	Parapsychologie	2.75
+Batterie	Energie	2.08
+Ehrenlegion	Schreibwaren	0.08
+Spider-Man	Strasse	0.0
+Halbinsel	Insel	3.0
+Equator	Ecuador	1.0
+Tabelle	Diagramm	3.08
+Simulation	Robotik	1.75
+Nike	Adidas	3.0
+Gesellschaft	Kultur	2.17
+Strategiespiel	Strategie	2.08
+Kirche	Kathedrale	3.17
+Übersetzer	Ausländer	0.75
+Biotop	Biologie	1.17
+Magma	Vulkan	2.17
+Brainstorming	Teleskop	0.0
+Level	Punktezahl	2.33
+Pfennig	Schnäppchen	0.83
+politische Partei	Vereinigung	2.67
+Tsunami	Meer	1.17
+Strauss	Obstgarten	0.5
+Zimt	Süssigkeiten	1.0
+Besen	Staub	1.5
+Galaxie	Astronom	1.33
+Saft	Milchshake	2.83
+Jalousie	Vorhang	3.33
+Verbrecher	Angreifer	2.33
+Bauchspeicheldrüsenkrebs	Chemotherapie	1.67
+Vergangenheit	Vorläufer	1.08
+Vereinte Nationen	Europäisches Parlament	1.92
+Lied	Darsteller	0.67
+Pistole	Notizbuch	0.17
+Azetylcholin	Iris	0.0
+Alphabet	Stift	0.58
+Chor	Sänger	2.58
+Holz	Decke	0.42
+Soldat	Frieden	0.75
+Englisch	Amerikanisch	3.33
+Eidechse	Krokodil	3.0
+Geld	Bargeld	3.67
+Paul die Krake	Krake	3.25
+Kalender	Ferien	1.5
+Basis	chemische Substanz	1.83
+Regierung	Eidechse	0.0
+JPY	Geldwäsche	0.83
+DeepMind	Google DeepMind	3.75
+Schachspiel	Schach	4.0
+Sonnett	Schönheit	0.83
+Arbeiter	Büro	1.0
+Währung	Umtausch	1.33
+Polyester	Baumwolle	3.0
+Strafgericht	Gerechtigkeit	1.42
+Schwanz	Rückseite	1.08
+Unfall	Buch	0.08
+Windbö	Wind	3.33
+Klavier	Harmonie	1.25
+Sultan	Ministerium	0.5
+Wüste	Düne	1.67
+Multiplikation	Teilung	3.0
+Virus	Blut	1.0
+Eiszeit	Statue	0.0
+Schwert	Umwelt	0.0
+Primarschule	Kugelschreiber	0.5
+Cricket	Unterstützer	0.42
+Skulptur	Statue	3.92
+Webbrowser	Mozilla Firefox	3.17
+Foxterrier	Canon	0.0
+HSBC	Britannien	0.75
+Bibel	Gospel	1.83
+Kleid	Tanz	0.92
+Array	Liste	3.42
+Zelle	Gefängnis	2.25
+Aufsatz	Hausaufgaben	2.17
+Computer	Maschine	2.25
+Pandabär	Eisbär	3.17
+Neurose	Verstand	1.33
+Kampagne	Affe	0.0
+Faraday-Konstante	Rucksack	0.0
+Palast	Wolkenkratzer	2.42
+Helikopter	Flugzeug	3.0
+University of Cambridge	Oxford University	3.08
+Flagge	Fahnenstange	2.08
+Fenster	Dach	1.67
+Kartenspiel	Frisbee	2.17
+Schadprogramm	Wurm	2.58
+Planet	Stern	3.0
+Renner	Athlet	3.08
+Kaliber	Regenschirm	0.0
+WiFi	WikiLeaks	0.33
+Dürre	Wasser	1.92
+Flughafen	Stück	0.0
+Orchester	Band	3.17
+Mojito	Mochito	4.0
+Unterrichtsstoff	Prüfung	2.25
+Theorem	Theorie	3.0
+Jo-Jo	Spielzeug	2.75
+Schneesturm	Regen	2.83
+Historiker	Geschichtsschreiber	3.92
+Siemens	Elektrolokomotive	1.08
+Jahrhundert	Jahr	2.58
+Legierung	Stahl	3.0
+Friedensrichter	Richter	3.17
+Chaos	Klasse	0.0
+Fernunterricht	Internet	1.17
+Sand	Fuss	0.5
+IMF	Deutsche Bank	2.17
+Guardian	Times	3.17
+Seidenraupe	Seidenstrasse	0.42
+Freiheit	Oase	0.25
+Cytoplasma	Ziffer	0.0
+Protestant	Christ	3.33
+Leonardo da Vinci	Das Abendmahl	2.17
+Karte	Viereck	0.75
+Parlament	Congress	3.33
+Finanzmittelbeschaffung	Entwicklung	0.33
+Pathologie	Hämatologie	2.83
+Tal	Depression	2.5
+Teleskop	Sitz	0.17
+Heavy Metal	Bühne	0.75
+Globalisierung	Visa	0.83
+Fledermaus	Vampir	2.17
+Abgeordneter	Beamte	2.58
+Elektrizität	Gehäuse	0.67
+Ausserirdischer	Outlander	2.92
+Knopf	Nähmaschine	1.42
+Zauberer	Kabel	0.0
+Philosoph	Rennen	0.0
+Popcorn	Kino	1.42
+Landwirtschaft	Pflanze	1.58
+Dichter	Journalist	2.42
+Wetter	Welle	0.75
+Zivilisation	Lebensstil	1.75
+Schnee	Eis	2.92
+Zweiter Weltkrieg	Beethoven	0.33
+Motherboard	Mainboard	3.83
+Club	Markierung	0.25
+Alexander der Grosse	Eroberer	2.75
+Applikation	Galaxie	0.0
+Cloudcomputing	Regen	0.0
+Fernsehen	Schauspieler	2.0
+Delta	Meer	1.58
+Strickgarn	Faden	3.42
+Fussgängerstreifen	Person	0.83
+Protein	Griff	0.0
+U2	Ronaldo	0.33
+Apple	iPhone	2.58
+Pfefferminze	Kaugummi	1.42
+Poster	Papier	2.5
+UNICEF	Wurzel	0.08
+Fremdenfeindlichkeit	Rassismus	4.0
+Woody Allen	Linse	0.42
+Lampe	Geist	0.83
+Marine	Insel	0.83
+Wand	Schloss	1.33
+Dinosaurier	Elephant	2.33
+Uhrturm	Stein	0.33
+Nahost	Euphrates	0.92
+Weide	Graslandschaft	3.25
+Gitarre	Geige	3.08
+Diplomatie	Verhandlung	2.67
+Anziehungskraft	Meteor	0.67
+IQ	Mensa	1.83
+Union Jack	Flagge	2.5
+Erdbeben	Erschütterung	3.5
+Vermögen	Aktie	1.33
+Hebräisch	Jerusalem	1.42
+bedeckt	Wetterprognose	1.42
+Wörterbuch	Enzyklopädie	3.5
+Münzamt	Museum	1.17
+Sessel	Hocker	3.08
+Spanisch	Feuchtigkeit	0.0
+Büchse	Flasche	2.58
+Fliege	Ameise	3.0
+Mythos	Satire	0.5
+Innenstadt	Bus	0.75
+Schwanz	Boeing 747-200	0.17
+Kunstwerk	Künstler	2.0
+NATO	Allianz	3.17
+König	Herrscher	3.58
+Rhythmus	Kadenz	1.92
+Alexander Fleming	Penicillin	1.58
+Flöte	Musik	2.0
+Graureiher	See	1.25
+Dickflüssigkeit	Spritzer	0.83
+Hardware	Gehäuse	2.67
+Ring	Verlobung	2.0
+Latein	Deutsch	2.92
+Arbeiterklasse	Fabrik	1.25
+Shakespeare	Dickens	2.92
+Papiergeld	Pfarrer	0.0
+Werkzeug	Arbeit	0.83
+Zwergwildschwein	Echte Schweine	3.17
+Stimmrecht	Ausgang	0.42
+Stern	Helligkeit	0.75
+Forelle	Gitarre	0.0
+Dollar	Millionär	1.5
+Ziffer	Nummer	4.0
+Sturm	Decke	0.42
+Obama	Clinton	3.0
+Nebenfigur	Film	1.67
+Juventus	Bayern München	3.0
+Klimawandel	Niederschlag	1.08
+AI	Batterie	0.0
+Meisterwerk	Mona Lisa	2.17
+Verbrechen	Attacke	1.75
+Krönung	Wasser	0.33
+Sänger	Personal	1.08
+Stichkampf	Basketball	1.33
+bewaffnete Streitkräfte	Abwehr	1.58
+See	Wolke	0.75
+Kloster	Dusche	0.0
+Muttersprache	Sprache	3.33
+Hafen	Hülle	0.0
+Dämon	Engel	2.75
+Kryptogramm	Symbol	2.08
+Campus	Universität	2.75
+Freiheit	Bewegungsfreiheit	2.92
+Taifun	Windhose	3.17
+Anleitung	Reiseführer	2.08
+Ebola	Ebola Virus	3.83
+Prinzessin	Keks	0.0
+Zug	Tram	2.92
+Ecosystem	Wirtschaft	0.5
+herrschende Königin	Schachdame	0.58
+Gold	Zink	2.83
+Maus	Chips	0.42
+Amazonas	Wald	2.33
+Tennis	Statistik	0.5
+Bolzano	Theorem	1.5
+Höhe	Umformung	0.0
+Boot	Baum	0.17
+Thron	Schwert	2.0
+Baumwolle	Pullover	1.75
+Kirsche	Erdbeere	3.08
+Islam	Koran	2.0
+Neanderthaler	Sport	0.0
+Vetternwirtschaft	König	0.33
+Charakter	Person	3.0
+Panzer	Auto	2.67
+Merkur	Jupiter	3.25
+Bronchitis	Paracetamol	0.67
+Blut	Körper	1.42
+Islamophobie	ISIS	1.5
+Häkeln	Uniform	0.33
+Hadoop	Touchscreen	0.67
+fossiler Brennstoff	Fossil	1.83
+Mutant	Soziobiologie	0.5
+Schwester	Bruder	3.08
+Bleistift	Geschichte	0.0
+Hautausschlag	Hautentzündung	3.25
+Imperator	Gouverneur	2.67
+Krone	Schlüssel	0.42
+Algebra	Operation	2.0
+Kolben	Motor	2.08
+Stipendium	Unterrichtsgebühr	2.58
+Buch	Manuskript	2.83
+Wandelröschen	Löwenmäuler	3.17
+schwarzes Loch	Vacuum	1.0
+persisches Reich	Cyrus	2.08
+Leitartikel	Nachrichten	2.42
+Dekoration	Umschlag	0.42
+Walhai	Hummer	2.42
+Getreide	Mais	2.75
+bipolare Störung	Problem	1.75
+Säure	Base	3.0
+absoluter Nullpunkt	Dampf	0.67
+grüne Revolution	Farbe	0.08
+Betriebssystem	Deep Learning	1.0
+internationale Mathematik Olympiade	Theorie	0.83
+El Niño	Äquator	1.25
+Abzeichen	Glass	0.33
+Villa	Bildhauer	0.5
+Atmosphäre	Ozon	1.83
+Schild	Beschützer	1.5
+Münze	Bezahlung	1.58
+Hafer	Feld	1.83
+Mönch	Kreuz	1.58
+Kanonboot	Küste	0.58
+Stein	Mine	1.17
+Legende	Moral	0.67
+Meister	Gewinner	2.92
+Würfel	Kubik	2.42
+Topologie	Struktur	1.67
+Kapelle	Kabel	0.0
+Geldfluss	Fluss	0.5
+Serienmörder	Mörder	3.5
+Matrix	Molekül	0.58
+Mode	Stil	2.25
+Flaggenkunde	Flagge	2.08
+Vertrag von Maastricht	Europa	1.58
+Geisir	Quelle	3.0
+Saccharose	Kohlenhydrat	2.92
+Strand	Küste	2.67
+Aktienmarkt	Börse	3.92
+Tradition	Handwerk	1.33
+Roman	Schriftsteller	2.0
+Butterbrot	Subway	1.42
+Akustik	Ton	2.42
+Fechten	Gymnastik	2.0
+Autor	Geschenk	0.0
+Gehölz	Tiger Woods	0.0
+Wolke	Fenster	0.5
+JPEG	PDF	2.5
+Regisseur	Chef	3.0
+Steuer	Brexit	0.75
+Bestäubung	Staubblatt	2.25
+Videospiel	PC Spiel	3.25
+Behandlung	chirurgischer Eingriff	2.92
+Reisfeld	Kartoffel	1.0
+Notizen	Aufgabe	1.83
+Fuchs	Blutkörperchen	0.0
+Natriumchlorid	Salz	4.0
+Einkommen	Lebensqualitàt	1.58
+Wille	Absicht	3.0
+Kompass	Elephant	0.0
+Fortsetzung	Kamera	0.33
+Kinofilm	Film	3.58
+Unteroffizier	Pistole	0.75
+Mühle	Korn	1.58
+Eiscreme	Frühstück	0.58
+Schlüssel	Schloss	1.67
+Mobiltelefon	Telefon	3.5
+Kindergarten	Vorschule	3.5
+Westliche Welt	Western Union	0.5
+Sämling	Blatt	1.17
+Regen	Hagel	2.67
+Freude	Traurigkeit	2.58
+Seidenraupe	Raupe	3.5
+Surfen	Wassersport	3.0
+Auto	Lastwagen	3.17
+Nahrung	Programm	0.33
+Comicroman	Comic	3.83
+Schlange	Eidechse	2.75
+Ananas	Handy	0.0
+Wallpaper	Hintergrund	3.25
+Celsius	Microsoft	0.0
+verbinden	Zuckerrohr	0.17
+Jeans	Frau	0.33
+Matrix	Vector	2.75
+Kohlendioxid	CO2	4.0
+Trainer	Spieler	2.42
+Stein	Holz	2.33
+Ladegerät	Scheibe	0.0
+Manuskript	Artikel	3.17
+Gmail	Yahoo	2.83
+Kondensator	Diode	2.17
+Korruption	Betrug	3.08
+Coca-Cola	Coke	3.75
+Plato	Aristoteles	3.17
+Kalter Krieg	Soviet Union	1.5
+Düse	Flüssigkeit	1.08
+Phonologie	Bildschirm	0.0
+Zara	Leggings	1.17
+Football	Fussball	3.67
+Keim	Erreger	3.67
+Republik	Herzog	0.42
+Ball	Sphäre	2.67
+Mozart	Star Wars	0.17
+Maske	Fest	0.5
+Grand Theft Auto	GTA	4.0
+Autobahn	Strasse	3.17
+Kettenreaktion	Thermodynamik	1.25
+Illustration	Ampulle	0.0
+Anthropologie	Archeologie	2.92
+Dell	Dingle	0.08
+Saft	Löffel	0.33
+Pfizer	Medikament	2.0
+Lastwagen	Packet	0.58
+Rezeptor	Protein-Molekül	3.33
+Google Drive	Fahrer	0.0
+Milliardär	Obdachloser	2.5
+Episode	Kapitel	3.5
+Unendlichkeit	Null	2.25
+Diener	Sklave	3.17
+Suffix	Affix	3.08
+Klimaerwärmung	Hitze	2.08
+Wachstumshormon	Somatropin	3.75
+Himmel	Traum	0.33
+Geldkurs	London	0.42
+Dünger	Wachstum	1.5
+Gartenhag	Thema	0.0
+Orion	Sternbild	2.5
+Nietzsche	Chelsea	0.0
+gegenseitiger Respekt	Wettbewerb	0.58
+Ast	Arm	1.0
+Opfer	Telefon	0.08
+Normalabweichung	Kumulation	0.92
+Lawine	Schnee	2.17
+Lehrer	Schüler	2.58
+Vieh	Joghurt	0.58
+Sexismus	Geschlechtsdiskriminierung	4.0
+Südpol	Tanz	0.0
+Staatsanwalt	Anwalt	3.33
+Schläger	Ball	2.08
+Bankkredit	Schulden	2.33
+Perspektive	Entfernung	1.67
+Federer	Dylan	1.75
+Anwalt	Galerie	0.17
+Lebenserwartung	statistisches Mass	1.5
+Zellmembran	Provirus	1.08
+Europäische Union	Moskau	1.42
+Welt	Asien	1.5
+Paint	Photoshop	3.33
+Senat	Verfassung	0.75
+Petersilie	Muffin	0.75
+Verstand	Gehirn	3.58
+Mercedes	Opel	3.0
+Hammer	Zahn	0.0
+Renaissance	Wiedergeburt	3.67
+Rock	Uhr	0.33
+Oper	Kino	2.75
+Lehrer	Ausbilder	3.92
+Sonne	Kabel	0.0
+Wirtschaftskrise	BIP	1.08
+Cäsar	Julius Cäsar	3.83
+Patient	Sitzung	1.17
+Behaviorismus	Therapie	1.33
+Kaiser	Verfassung	0.67
+Mathematiker	Aufführung	0.0
+Entropie	Information	2.25
+Rosenwasser	Rosenöl	2.42
+Zitrusfrucht	Pampelmuse	2.92
+Königin Victoria	England	1.58
+Olympische Spiele	Gemütsart	0.0
+Bischof	Muslime	0.58
+Mann	Verdächtiger	0.67
+Meteorit	Erde	1.83
+Symbol	Zeichen	3.75
+Anthropologie	New York	0.25
+Sonnenuntergang	Tisch	0.0
+Stadt	Grossstadt	3.25
+Jacke	Mineralwasser	0.0
+Natur	Flora	2.75
+Unterprogramm	Kompilierer	1.42
+Hamedan	Rom	2.83
+Regenschirm	Heizer	0.25
+Ehre	Ansehen	3.33
+Rangabzeichen	Würde	0.83
+KFC	McDonald's	2.92
+Steuerknüppel	Radar	0.92
+Basmatireis	Jasminreis	3.42
+Medaille	Turnschuhe	0.33
+Gesetz	Schwimmbad	0.0
+Quelle	Schachtel	0.0
+Theater	Batterie	0.0
+Flora	Webbrauser	0.0
+Hemd	Cardigan	2.33
+Gedicht	Rhythmus	1.75
+Prophet	Pfarrer	1.5
+Oscars	Stadium	0.25
+Backgammon	Go	2.5
+Schmetterling	Rose	1.08
+Hag	Springen	0.83
+Nihilismus	Film	0.08
+Asteroid	Stern	3.33
+Aufstand	Zeichnung	0.0
+Unterwäsche	Körper	0.75
+Boeing	Flugzeug	3.42
+Auftritt	Aufführung	3.5
+Semester	Amtszeit	2.0
+Orange	Zitrusfrucht	3.17
+Gletscher	Erderwärmung	1.25
+Tunnel	Pfad	0.92
