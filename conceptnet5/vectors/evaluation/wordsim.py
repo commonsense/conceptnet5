@@ -2,10 +2,9 @@ from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from scipy.stats import spearmanr, pearsonr, tmean, hmean
+from itertools import combinations
 import numpy as np
 import pandas as pd
-
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de']
 
 SAMPLE_SIZES = {
     'ws353': 353,
@@ -48,7 +47,6 @@ def confidence_interval(rho, N):
 
 def empty_comparison_table():
     return pd.DataFrame(
-        index=EVALS,
         columns=['acc', 'low', 'high']
     )
 
@@ -65,6 +63,9 @@ COMPARISONS = {}
 
 # Here are all the existing evaluation results we know about, classified by
 # what institution produced the results and which method is implemented.
+
+# TODO: Update COMPARISONS and fill in the Semeval results once the group affiliations become
+# available
 
 # Levy et al., 2015
 COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table({
@@ -281,7 +282,7 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def read_semeval_monoling(lang, subset='test'):
+def read_semeval_monolingual(lang, subset='test'):
     """
     Parses Semeval2017-Task2 monolingual word similarity (subtask 1) test collection.
     """
@@ -293,7 +294,7 @@ def read_semeval_monoling(lang, subset='test'):
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
-def read_semeval_crossling(lang1, lang2, subset='test'):
+def read_semeval_crosslingual(lang1, lang2, subset='test'):
     """
     Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
     """
@@ -329,8 +330,8 @@ def evaluate_semeval_monolingual(vectors, lang):
     """
     Get a semeval score for a single monolingual test set.
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monoling(lang))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monoling(lang))
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monolingual(lang))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monolingual(lang))
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
@@ -339,8 +340,8 @@ def evaluate_semeval_crosslingual(vectors, lang1, lang2):
     """
     Get a semeval score for a single crosslingual test set
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crossling(lang1, lang2))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crossling(lang1, lang2))
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crosslingual(lang1, lang2))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crosslingual(lang1, lang2))
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
@@ -454,41 +455,19 @@ def evaluate(frame, subset='dev', semeval_scope='per_language'):
     results.loc['ws353-ro'] = ws_ro_score
 
     if semeval_scope == 'global':
-        semeval_monolingual = evaluate_semeval_monolingual_global(vectors)
-        semeval_crosslingual = evaluate_semeval_crosslingual_global(vectors)
-        results.loc['semeval17-2a'] = semeval_monolingual
-        results.loc['semeval17-2b'] = semeval_crosslingual
+        results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors)
+        results.loc['semeval17-2b'] = evaluate_semeval_crosslingual_global(vectors)
+
     else:
-        semeval_en = evaluate_semeval_monolingual(vectors, 'en')
-        semeval_de = evaluate_semeval_monolingual(vectors, 'de')
-        semeval_es = evaluate_semeval_monolingual(vectors, 'es')
-        semeval_it = evaluate_semeval_monolingual(vectors, 'it')
-        semeval_fa = evaluate_semeval_monolingual(vectors, 'fa')
-        semeval_en_de = evaluate_semeval_crosslingual(vectors, 'en', 'de')
-        semeval_en_es = evaluate_semeval_crosslingual(vectors, 'en', 'es')
-        semeval_en_it = evaluate_semeval_crosslingual(vectors, 'en', 'it')
-        semeval_en_fa = evaluate_semeval_crosslingual(vectors, 'en', 'fa')
-        semeval_de_es = evaluate_semeval_crosslingual(vectors, 'de', 'es')
-        semeval_de_it = evaluate_semeval_crosslingual(vectors, 'de', 'it')
-        semeval_de_fa = evaluate_semeval_crosslingual(vectors, 'de', 'fa')
-        semeval_es_it = evaluate_semeval_crosslingual(vectors, 'es', 'it')
-        semeval_es_fa = evaluate_semeval_crosslingual(vectors, 'es', 'fa')
-        semeval_it_fa = evaluate_semeval_crosslingual(vectors, 'it', 'fa')
-        results.loc['semeval17-2a-en'] = semeval_en
-        results.loc['semeval17-2a-de'] = semeval_de
-        results.loc['semeval17-2a-es'] = semeval_es
-        results.loc['semeval17-2a-it'] = semeval_it
-        results.loc['semeval17-2a-fa'] = semeval_fa
-        results.loc['semeval17-2b-en-de'] = semeval_en_de
-        results.loc['semeval17-2b-en-es'] = semeval_en_es
-        results.loc['semeval17-2b-en-it'] = semeval_en_it
-        results.loc['semeval17-2b-en-fa'] = semeval_en_fa
-        results.loc['semeval17-2b-de-es'] = semeval_de_es
-        results.loc['semeval17-2b-de-it'] = semeval_de_it
-        results.loc['semeval17-2b-de-fa'] = semeval_de_fa
-        results.loc['semeval17-2a-es-it'] = semeval_es_it
-        results.loc['semeval17-2a-es-fa'] = semeval_es_fa
-        results.loc['semeval17-2a-it-fa'] = semeval_it_fa
+        languages = ['en', 'de', 'es', 'it', 'fa']
+
+        for lang in languages:
+            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(vectors, lang)
+
+        for lang1, lang2 in combinations(languages, 2):
+            results.loc['semeval-2b-{}-{}'.format(lang1, lang2)] = evaluate_semeval_crosslingual(
+                vectors, lang1, lang2)
+
     return results
 
 
@@ -520,41 +499,18 @@ def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
     results.loc['ws353-ro'] = ws_ro_score
 
     if semeval_scope == 'global':
-        semeval_monolingual = evaluate_semeval_monolingual_global(frame)
-        semeval_crosslingual = evaluate_semeval_crosslingual_global(frame)
-        results.loc['semeval17-2a'] = semeval_monolingual
-        results.loc['semeval17-2b'] = semeval_crosslingual
+        results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(frame)
+        results.loc['semeval17-2b'] = evaluate_semeval_crosslingual_global(frame)
+
     else:
-        semeval_en = evaluate_semeval_monolingual(frame, 'en')
-        semeval_de = evaluate_semeval_monolingual(frame, 'de')
-        semeval_es = evaluate_semeval_monolingual(frame, 'es')
-        semeval_it = evaluate_semeval_monolingual(frame, 'it')
-        semeval_fa = evaluate_semeval_monolingual(frame, 'fa')
-        semeval_en_de = evaluate_semeval_crosslingual(frame, 'en', 'de')
-        semeval_en_es = evaluate_semeval_crosslingual(frame, 'en', 'es')
-        semeval_en_it = evaluate_semeval_crosslingual(frame, 'en', 'it')
-        semeval_en_fa = evaluate_semeval_crosslingual(frame, 'en', 'fa')
-        semeval_de_es = evaluate_semeval_crosslingual(frame, 'de', 'es')
-        semeval_de_it = evaluate_semeval_crosslingual(frame, 'de', 'it')
-        semeval_de_fa = evaluate_semeval_crosslingual(frame, 'de', 'fa')
-        semeval_es_it = evaluate_semeval_crosslingual(frame, 'es', 'it')
-        semeval_es_fa = evaluate_semeval_crosslingual(frame, 'es', 'fa')
-        semeval_it_fa = evaluate_semeval_crosslingual(frame, 'it', 'fa')
-        results.loc['semeval17-2a-en'] = semeval_en
-        results.loc['semeval17-2a-de'] = semeval_de
-        results.loc['semeval17-2a-es'] = semeval_es
-        results.loc['semeval17-2a-it'] = semeval_it
-        results.loc['semeval17-2a-fa'] = semeval_fa
-        results.loc['semeval17-2b-en-de'] = semeval_en_de
-        results.loc['semeval17-2b-en-es'] = semeval_en_es
-        results.loc['semeval17-2b-en-it'] = semeval_en_it
-        results.loc['semeval17-2b-en-fa'] = semeval_en_fa
-        results.loc['semeval17-2b-de-es'] = semeval_de_es
-        results.loc['semeval17-2b-de-it'] = semeval_de_it
-        results.loc['semeval17-2b-de-fa'] = semeval_de_fa
-        results.loc['semeval17-2a-es-it'] = semeval_es_it
-        results.loc['semeval17-2a-es-fa'] = semeval_es_fa
-        results.loc['semeval17-2a-it-fa'] = semeval_it_fa
+        languages = ['en', 'de', 'es', 'it', 'fa']
+
+        for lang in languages:
+            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(frame, lang)
+
+        for lang1, lang2 in combinations(languages, 2):
+            results.loc['semeval-2b-{}-{}'.format(lang1, lang2)] = evaluate_semeval_crosslingual(
+                frame, lang1, lang2)
     return results
 
 
