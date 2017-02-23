@@ -1,12 +1,12 @@
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
+from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
+from scipy.stats import spearmanr, pearsonr, tmean, hmean
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr, tmean
 
-EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de',
-         'semeval17-2a', 'semeval17-2b']
+EVALS = ['men3000', 'rw', 'mturk', 'ws353', 'ws353-es', 'ws353-ro', 'gur350-de', 'zg222-de']
+
 SAMPLE_SIZES = {
     'ws353': 353,
     'ws353-es': 353,
@@ -174,6 +174,7 @@ COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
     'zg222-de': .250
 })
 
+
 def read_ws353():
     """
     Parses the word-similarity 353 test collection (ws353). ws353 is a
@@ -280,7 +281,7 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def read_semeval_monolingual(lang, subset='test'):
+def read_semeval_monoling(lang, subset='test'):
     """
     Parses Semeval2017-Task2 monolingual word similarity (subtask 1) test collection.
     """
@@ -292,7 +293,7 @@ def read_semeval_monolingual(lang, subset='test'):
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
-def read_semeval_crosslingual(lang1, lang2, subset='test'):
+def read_semeval_crossling(lang1, lang2, subset='test'):
     """
     Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
     """
@@ -304,7 +305,47 @@ def read_semeval_crosslingual(lang1, lang2, subset='test'):
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
-def evaluate_semeval_monolingual(vectors):
+def compute_semeval_score(pearson_score, spearman_score):
+    """
+    Take a harmonic mean of a Pearson correlation coefficient and a Spearman correlation
+    coefficient.
+    """
+    if any(np.isnan(x) for x in [spearman_score['acc'], pearson_score['acc']]):
+        acc_harmonic_mean = float('NaN')
+        low_harmonic_mean = float('NaN')
+        high_harmonic_mean = float('NaN')
+    else:
+        acc_harmonic_mean = hmean([spearman_score['acc'], pearson_score['acc']])
+        low_harmonic_mean = hmean([spearman_score['low'], pearson_score['low']])
+        high_harmonic_mean = hmean([spearman_score['high'], pearson_score['high']])
+
+    return pd.Series(
+        [acc_harmonic_mean, low_harmonic_mean, high_harmonic_mean],
+        index=['acc', 'low', 'high']
+    )
+
+
+def evaluate_semeval_monolingual(vectors, lang):
+    """
+    Get a semeval score for a single monolingual test set.
+    """
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monoling(lang))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monoling(lang))
+    score = compute_semeval_score(spearman_score, pearson_score)
+    return score
+
+
+def evaluate_semeval_crosslingual(vectors, lang1, lang2):
+    """
+    Get a semeval score for a single crosslingual test set
+    """
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crossling(lang1, lang2))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crossling(lang1, lang2))
+    score = compute_semeval_score(spearman_score, pearson_score)
+    return score
+
+
+def evaluate_semeval_monolingual_global(vectors):
     """
     According to Semeval2017-Subtask2 rules, the global score for a system is the average the final
     individual scores on the four languages on which the system performed best. If less than four
@@ -312,7 +353,9 @@ def evaluate_semeval_monolingual(vectors):
     """
     scores = []
     for lang in ['en', 'de', 'es', 'it', 'fa']:
-        scores.append(spearman_evaluate(vectors, read_semeval_monolingual(lang)))
+        score = evaluate_semeval_monolingual(vectors, lang)
+        scores.append(score)
+
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-4:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
@@ -322,17 +365,21 @@ def evaluate_semeval_monolingual(vectors):
         index=['acc', 'low', 'high']
     )
 
-def evaluate_semeval_crosslingual(vectors):
+
+def evaluate_semeval_crosslingual_global(vectors):
     """
     According to Semeval2017-Subtask2 rules. the global score is the average of the individual
     scores on the six cross-lingual datasets on which the system performs best. If less than six
     scores are supplied, the global score is NaN.
     """
+
     scores = []
     for pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it',
-             'it-fa']:
+                 'it-fa']:
         lang1, lang2 = pair.split('-')
-        scores.append(spearman_evaluate(vectors, read_semeval_crosslingual(lang1, lang2)))
+        score = evaluate_semeval_crosslingual(vectors, lang1, lang2)
+        scores.append(score)
+
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-6:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
@@ -343,7 +390,7 @@ def evaluate_semeval_crosslingual(vectors):
     )
 
 
-def spearman_evaluate(vectors, standard, verbose=0):
+def measure_correlation(correlation_function, vectors, standard, verbose=0):
     """
     Tests assoc_space's ability to recognize word correlation. This function
     computes the spearman correlation between assoc_space's reported word
@@ -364,15 +411,15 @@ def spearman_evaluate(vectors, standard, verbose=0):
         gold_scores.append(gold_score)
         our_scores.append(our_score)
 
-    correlation = spearmanr(np.array(gold_scores), np.array(our_scores))[0]
+    correlation = correlation_function(np.array(gold_scores), np.array(our_scores))[0]
 
     if verbose:
-        print("Spearman correlation: %s" % (correlation,))
+        print("Correlation: %s" % (correlation,))
 
     return confidence_interval(correlation, len(gold_scores))
 
 
-def evaluate(frame, subset='dev'):
+def evaluate(frame, subset='dev', semeval_scope='per_language'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Use a
@@ -387,16 +434,14 @@ def evaluate(frame, subset='dev'):
 
     vectors = VectorSpaceWrapper(frame=frame)
 
-    men_score = spearman_evaluate(vectors, read_men3000(men_subset))
-    rw_score = spearman_evaluate(vectors, read_rw(subset))
-    mturk_score = spearman_evaluate(vectors, read_mturk())
-    gur350_score = spearman_evaluate(vectors, read_gurevych('350'))
-    zg222_score = spearman_evaluate(vectors, read_gurevych('222'))
-    ws_score = spearman_evaluate(vectors, read_ws353())
-    ws_es_score = spearman_evaluate(vectors, read_ws353_multilingual('es'))
-    ws_ro_score = spearman_evaluate(vectors, read_ws353_multilingual('ro'))
-    semeval_monolingual = evaluate_semeval_monolingual(vectors)
-    semeval_crosslingual = evaluate_semeval_crosslingual(vectors)
+    men_score = measure_correlation(spearmanr, vectors, read_men3000(men_subset))
+    rw_score = measure_correlation(spearmanr, vectors, read_rw(subset))
+    mturk_score = measure_correlation(spearmanr, vectors, read_mturk())
+    gur350_score = measure_correlation(spearmanr, vectors, read_gurevych('350'))
+    zg222_score = measure_correlation(spearmanr, vectors, read_gurevych('222'))
+    ws_score = measure_correlation(spearmanr, vectors, read_ws353())
+    ws_es_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('es'))
+    ws_ro_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('ro'))
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -407,12 +452,47 @@ def evaluate(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
-    results.loc['semeval17-2a'] = semeval_monolingual
-    results.loc['semeval17-2b'] = semeval_crosslingual
+
+    if semeval_scope == 'global':
+        semeval_monolingual = evaluate_semeval_monolingual_global(vectors)
+        semeval_crosslingual = evaluate_semeval_crosslingual_global(vectors)
+        results.loc['semeval17-2a'] = semeval_monolingual
+        results.loc['semeval17-2b'] = semeval_crosslingual
+    else:
+        semeval_en = evaluate_semeval_monolingual(vectors, 'en')
+        semeval_de = evaluate_semeval_monolingual(vectors, 'de')
+        semeval_es = evaluate_semeval_monolingual(vectors, 'es')
+        semeval_it = evaluate_semeval_monolingual(vectors, 'it')
+        semeval_fa = evaluate_semeval_monolingual(vectors, 'fa')
+        semeval_en_de = evaluate_semeval_crosslingual(vectors, 'en', 'de')
+        semeval_en_es = evaluate_semeval_crosslingual(vectors, 'en', 'es')
+        semeval_en_it = evaluate_semeval_crosslingual(vectors, 'en', 'it')
+        semeval_en_fa = evaluate_semeval_crosslingual(vectors, 'en', 'fa')
+        semeval_de_es = evaluate_semeval_crosslingual(vectors, 'de', 'es')
+        semeval_de_it = evaluate_semeval_crosslingual(vectors, 'de', 'it')
+        semeval_de_fa = evaluate_semeval_crosslingual(vectors, 'de', 'fa')
+        semeval_es_it = evaluate_semeval_crosslingual(vectors, 'es', 'it')
+        semeval_es_fa = evaluate_semeval_crosslingual(vectors, 'es', 'fa')
+        semeval_it_fa = evaluate_semeval_crosslingual(vectors, 'it', 'fa')
+        results.loc['semeval17-2a-en'] = semeval_en
+        results.loc['semeval17-2a-de'] = semeval_de
+        results.loc['semeval17-2a-es'] = semeval_es
+        results.loc['semeval17-2a-it'] = semeval_it
+        results.loc['semeval17-2a-fa'] = semeval_fa
+        results.loc['semeval17-2b-en-de'] = semeval_en_de
+        results.loc['semeval17-2b-en-es'] = semeval_en_es
+        results.loc['semeval17-2b-en-it'] = semeval_en_it
+        results.loc['semeval17-2b-en-fa'] = semeval_en_fa
+        results.loc['semeval17-2b-de-es'] = semeval_de_es
+        results.loc['semeval17-2b-de-it'] = semeval_de_it
+        results.loc['semeval17-2b-de-fa'] = semeval_de_fa
+        results.loc['semeval17-2a-es-it'] = semeval_es_it
+        results.loc['semeval17-2a-es-fa'] = semeval_es_fa
+        results.loc['semeval17-2a-it-fa'] = semeval_it_fa
     return results
 
 
-def evaluate_raw(frame, subset='dev'):
+def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Return
@@ -420,16 +500,14 @@ def evaluate_raw(frame, subset='dev'):
     """
     frame = frame.astype(np.float32)
 
-    men_score = spearman_evaluate(frame, read_men3000(subset))
-    rw_score = spearman_evaluate(frame, read_rw(subset))
-    mturk_score = spearman_evaluate(frame, read_mturk())
-    gur350_score = spearman_evaluate(frame, read_gurevych('350'))
-    zg222_score = spearman_evaluate(frame, read_gurevych('222'))
-    ws_score = spearman_evaluate(frame, read_ws353())
-    ws_es_score = spearman_evaluate(frame, read_ws353_multilingual('es'))
-    ws_ro_score = spearman_evaluate(frame, read_ws353_multilingual('ro'))
-    semeval_monolingual = evaluate_semeval_monolingual(frame)
-    semeval_crosslingual = evaluate_semeval_crosslingual(frame)
+    men_score = measure_correlation(spearmanr, frame, read_men3000(subset))
+    rw_score = measure_correlation(spearmanr, frame, read_rw(subset))
+    mturk_score = measure_correlation(spearmanr, frame, read_mturk())
+    gur350_score = measure_correlation(spearmanr, frame, read_gurevych('350'))
+    zg222_score = measure_correlation(spearmanr, frame, read_gurevych('222'))
+    ws_score = measure_correlation(spearmanr, frame, read_ws353())
+    ws_es_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('es'))
+    ws_ro_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('ro'))
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -440,8 +518,43 @@ def evaluate_raw(frame, subset='dev'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
-    results.loc['semeval17-2a'] = semeval_monolingual
-    results.loc['semeval17-2b'] = semeval_crosslingual
+
+    if semeval_scope == 'global':
+        semeval_monolingual = evaluate_semeval_monolingual_global(frame)
+        semeval_crosslingual = evaluate_semeval_crosslingual_global(frame)
+        results.loc['semeval17-2a'] = semeval_monolingual
+        results.loc['semeval17-2b'] = semeval_crosslingual
+    else:
+        semeval_en = evaluate_semeval_monolingual(frame, 'en')
+        semeval_de = evaluate_semeval_monolingual(frame, 'de')
+        semeval_es = evaluate_semeval_monolingual(frame, 'es')
+        semeval_it = evaluate_semeval_monolingual(frame, 'it')
+        semeval_fa = evaluate_semeval_monolingual(frame, 'fa')
+        semeval_en_de = evaluate_semeval_crosslingual(frame, 'en', 'de')
+        semeval_en_es = evaluate_semeval_crosslingual(frame, 'en', 'es')
+        semeval_en_it = evaluate_semeval_crosslingual(frame, 'en', 'it')
+        semeval_en_fa = evaluate_semeval_crosslingual(frame, 'en', 'fa')
+        semeval_de_es = evaluate_semeval_crosslingual(frame, 'de', 'es')
+        semeval_de_it = evaluate_semeval_crosslingual(frame, 'de', 'it')
+        semeval_de_fa = evaluate_semeval_crosslingual(frame, 'de', 'fa')
+        semeval_es_it = evaluate_semeval_crosslingual(frame, 'es', 'it')
+        semeval_es_fa = evaluate_semeval_crosslingual(frame, 'es', 'fa')
+        semeval_it_fa = evaluate_semeval_crosslingual(frame, 'it', 'fa')
+        results.loc['semeval17-2a-en'] = semeval_en
+        results.loc['semeval17-2a-de'] = semeval_de
+        results.loc['semeval17-2a-es'] = semeval_es
+        results.loc['semeval17-2a-it'] = semeval_it
+        results.loc['semeval17-2a-fa'] = semeval_fa
+        results.loc['semeval17-2b-en-de'] = semeval_en_de
+        results.loc['semeval17-2b-en-es'] = semeval_en_es
+        results.loc['semeval17-2b-en-it'] = semeval_en_it
+        results.loc['semeval17-2b-en-fa'] = semeval_en_fa
+        results.loc['semeval17-2b-de-es'] = semeval_de_es
+        results.loc['semeval17-2b-de-it'] = semeval_de_it
+        results.loc['semeval17-2b-de-fa'] = semeval_de_fa
+        results.loc['semeval17-2a-es-it'] = semeval_es_it
+        results.loc['semeval17-2a-es-fa'] = semeval_es_fa
+        results.loc['semeval17-2a-it-fa'] = semeval_it_fa
     return results
 
 
