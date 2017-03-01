@@ -502,9 +502,9 @@ rule convert_glove:
 
 rule convert_fasttext:
     input:
-        DATA + "/raw/vectors/fasttext-wiki.en.vec.gz"
+        DATA + "/raw/vectors/fasttext-wiki.{lang}.vec.gz"
     output:
-        DATA + "/vectors/fasttext-wiki-en.h5"
+        DATA + "/vectors/fasttext-wiki-{lang}.h5"
     resources:
         ram=16
     shell:
