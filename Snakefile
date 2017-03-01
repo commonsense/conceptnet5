@@ -500,6 +500,16 @@ rule convert_glove:
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
 
+rule convert_fasttext:
+    input:
+        DATA + "/raw/vectors/fasttext-wiki.en.vec.gz"
+    output:
+        DATA + "/vectors/fasttext-wiki-en.h5"
+    resources:
+        ram=16
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 {input} {output}"
+
 rule convert_lexvec:
     input:
         DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
