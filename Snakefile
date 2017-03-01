@@ -135,7 +135,7 @@ rule download_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "curl -f {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
 
 rule download_conceptnet_ppmi:
     output:
@@ -153,8 +153,7 @@ rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
-
+        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
 
 
 # Precomputation
@@ -180,7 +179,7 @@ rule precompute_wiktionary:
         DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
-            shell("curl {PRECOMPUTED_DATA_URL}/wiktionary/"
+            shell("curl -f {PRECOMPUTED_DATA_URL}/wiktionary/"
                   "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
                   "> {output}")
         else:
