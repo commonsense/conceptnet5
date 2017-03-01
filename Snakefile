@@ -133,13 +133,13 @@ rule download_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "curl {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "curl -f {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
 
 rule download_numberbatch:
     output:
         DATA + "/precomputed/vectors/{filename}"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/{wildcards.filename} > {output}"
+        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/16.09/{wildcards.filename} > {output}"
 
 
 # Precomputation
@@ -165,7 +165,7 @@ rule precompute_wiktionary:
         DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
-            shell("curl {PRECOMPUTED_DATA_URL}/wiktionary/"
+            shell("curl -f {PRECOMPUTED_DATA_URL}/wiktionary/"
                   "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
                   "> {output}")
         else:
