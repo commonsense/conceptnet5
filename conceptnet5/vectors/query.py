@@ -66,7 +66,7 @@ class VectorSpaceWrapper(object):
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
-            self.frame = frame
+            self.frame = frame.sort_index()
             self.vector_filename = None
         self.small_frame = None
         self.k = None
