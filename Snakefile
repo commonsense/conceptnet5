@@ -501,13 +501,13 @@ rule convert_glove:
 
 rule convert_fasttext:
     input:
-        DATA + "/raw/vectors/fasttext-wiki.{lang}.vec.gz"
+        DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz"
     output:
         DATA + "/vectors/fasttext-wiki-{lang}.h5"
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:
