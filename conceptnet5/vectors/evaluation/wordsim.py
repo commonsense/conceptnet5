@@ -1,5 +1,5 @@
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
+from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from scipy.stats import spearmanr, pearsonr, tmean, hmean
 from itertools import combinations
@@ -520,7 +520,7 @@ def compute_semeval_score(pearson_score, spearman_score):
     Take a harmonic mean of a Pearson correlation coefficient and a Spearman correlation
     coefficient.
     """
-    if any(np.isnan(x) for x in [spearman_score['acc'], pearson_score['acc']]):
+    if any(np.isnan(x) or x <=0 for x in [spearman_score['low'], pearson_score['low']]):
         acc_harmonic_mean = float('NaN')
         low_harmonic_mean = float('NaN')
         high_harmonic_mean = float('NaN')
@@ -610,12 +610,16 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
     our_scores = []
 
     for term1, term2, gold_score, lang1, lang2 in standard:
-        uri1 = standardized_uri(lang1, term1)
-        uri2 = standardized_uri(lang2, term2)
+
         if isinstance(vectors, VectorSpaceWrapper):
+            uri1 = standardized_uri(lang1, term1)
+            uri2 = standardized_uri(lang2, term2)
             our_score = vectors.get_similarity(uri1, uri2)
+
         else:
-            our_score = cosine_similarity(get_vector(vectors, uri1), get_vector(vectors, uri2))
+            our_score = cosine_similarity(get_vector(vectors, term1, lang1),
+                                          get_vector(vectors, term2, lang2))
+
         if verbose > 1:
             print('%s\t%s\t%3.3f\t%3.3f' % (term1, term2, gold_score, our_score))
         gold_scores.append(gold_score)
