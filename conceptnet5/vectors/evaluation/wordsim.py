@@ -1,5 +1,5 @@
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
+from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from scipy.stats import spearmanr, pearsonr, tmean, hmean
 from itertools import combinations
