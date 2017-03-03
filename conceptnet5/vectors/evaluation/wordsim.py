@@ -199,7 +199,7 @@ COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
 })
 
 # Comparisons from SemEval results
-COMPARISONS['Luminoso', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Luminoso'] = make_comparison_table({
     'semeval-2a-en': .789,
     'semeval-2a-de': .700,
     'semeval-2a-es': .743,
@@ -218,7 +218,7 @@ COMPARISONS['Luminoso', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-it-fa': .604,
 })
 
-COMPARISONS['Nasari', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Nasari'] = make_comparison_table({
     # This is the baseline system, by Uniroma
     'semeval-2a-en': .682,
     'semeval-2a-de': .514,
@@ -238,11 +238,11 @@ COMPARISONS['Nasari', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-it-fa': .486,
 })
 
-COMPARISONS['QLUT', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'QLUT'] = make_comparison_table({
     'semeval-2a-en': .778,
 })
 
-COMPARISONS['HCCL', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'HCCL'] = make_comparison_table({
     'semeval-2a-en': .687,
     'semeval-2a-de': .594,
     'semeval-2a-es': .701,
@@ -261,17 +261,17 @@ COMPARISONS['HCCL', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-it-fa': .000,
 })
 
-COMPARISONS['Mahtab', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Mahtab'] = make_comparison_table({
     'semeval-2a-fa': .715,
 })
 
-COMPARISONS['hhu', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'hhu'] = make_comparison_table({
     'semeval-2a-en': .704,
     'semeval-2a-fa': .604,
     'semeval-2b-en-fa': .513,
 })
 
-COMPARISONS['OoO', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'OoO'] = make_comparison_table({
     'semeval-2b-en-de': .570,
     'semeval-2b-en-es': .584,
     'semeval-2b-en-it': .584,
@@ -280,7 +280,7 @@ COMPARISONS['OoO', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-es-it': .570,
 })
 
-COMPARISONS['SEW', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'SEW'] = make_comparison_table({
     'semeval-2a-en': .464,
     'semeval-2a-de': .449,
     'semeval-2a-es': .616,
@@ -299,7 +299,7 @@ COMPARISONS['SEW', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-it-fa': .489,
 })
 
-COMPARISONS['RUFINO', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'RUFINO'] = make_comparison_table({
     'semeval-2a-en': .656,
     'semeval-2a-de': .539,
     'semeval-2a-es': .549,
@@ -318,45 +318,66 @@ COMPARISONS['RUFINO', 'SemEval2017'] = make_comparison_table({
     'semeval-2b-it-fa': .249,
 })
 
-COMPARISONS['Citius', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Citius'] = make_comparison_table({
     'semeval-2a-en': .651,
     'semeval-2a-es': .523,
     'semeval-2b-en-es': .577,
 })
 
-COMPARISONS['Citius', 'SemEval2017'] = make_comparison_table({
-    'semeval-2a-en': .651,
-    'semeval-2a-es': .523,
-    'semeval-2b-en-es': .577,
-})
-
-COMPARISONS['l2f', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'l2f'] = make_comparison_table({
     'semeval-2a-en': .649,
 })
 
-COMPARISONS['gpv8', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'gpv8'] = make_comparison_table({
     'semeval-2a-en': .555,
     'semeval-2a-de': .347,
     'semeval-2a-it': .499,
 })
 
-COMPARISONS['MERALI', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'MERALI'] = make_comparison_table({
     'semeval-2a-en': .594,
 })
 
-COMPARISONS['Amateur', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Amateur'] = make_comparison_table({
     'semeval-2a-en': .589,
 })
 
-COMPARISONS['Wild Devs', 'SemEval2017'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Wild Devs'] = make_comparison_table({
     'semeval-2a-en': .468,
 })
 
-COMPARISONS['Wild Devs', 'SemEval2017'] = make_comparison_table({
+# Hypothetical SemEval runs of existing systems
+COMPARISONS['SemEval2017', 'fastText'] = make_comparison_table({
     'semeval-2a-en': .468,
+    'semeval-2a-de': .507,
+    'semeval-2a-es': .417,
+    'semeval-2a-it': .344,
+    'semeval-2a-fa': .334,
 })
 
+# Hypothetical SemEval runs of existing systems
+COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table({
+    'semeval-2a-en': .747,
+    'semeval-2a-de': .599,
+    'semeval-2a-es': .611,
+    'semeval-2a-it': .606,
+    'semeval-2a-fa': .363,
 
+    'semeval-2b-en-de': .696,
+    'semeval-2b-en-es': .675,
+    'semeval-2b-en-it': .677,
+    'semeval-2b-en-fa': .502,
+    'semeval-2b-de-es': .620,
+    'semeval-2b-de-it': .612,
+    'semeval-2b-de-fa': .501,
+    'semeval-2b-es-it': .613,
+    'semeval-2b-es-fa': .482,
+    'semeval-2b-it-fa': .474,
+})
+
+COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
+    'semeval-2a-en': .575,
+})
 
 def read_ws353():
     """
