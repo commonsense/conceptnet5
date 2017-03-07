@@ -373,11 +373,9 @@ def evaluate_semeval_crosslingual_global(vectors):
     scores on the six cross-lingual datasets on which the system performs best. If less than six
     scores are supplied, the global score is NaN.
     """
-
     scores = []
-    for pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it',
-                 'it-fa']:
-        lang1, lang2 = pair.split('-')
+    languages = ['en', 'de', 'es', 'it', 'fa']
+    for lang1, lang2 in combinations(languages, 2):
         score = evaluate_semeval_crosslingual(vectors, lang1, lang2)
         scores.append(score)
 

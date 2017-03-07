@@ -99,9 +99,9 @@ def weighted_average(frame, weight_series):
         weight_series = pd.Series(weight_dict)
     vec = np.zeros(frame.shape[1], dtype='f')
 
-    for label in weight_series.index:
+    for i, label in enumerate(weight_series.index):
         if label in frame.index:
-            val = weight_series.loc[label]
+            val = weight_series[i]
             vec += val * frame.loc[label].values
 
     return pd.Series(data=vec, index=frame.columns, dtype='f')
