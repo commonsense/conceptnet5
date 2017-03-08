@@ -308,21 +308,23 @@ def read_semeval_crosslingual(lang1, lang2, subset='test'):
 
 def compute_semeval_score(pearson_score, spearman_score):
     """
-    Take a harmonic mean of a Pearson correlation coefficient and a Spearman correlation
-    coefficient.
+    Return NaN if a dataset can't be evaluated on a given frame. Return 0 if at least one similarity
+    measure was 0 or negative. Otherwise, take a harmonic mean of a Pearson correlation coefficient
+    and a Spearman correlation coefficient.
     """
-    if any(np.isnan(x) or x <=0 for x in [spearman_score['low'], pearson_score['low']]):
-        acc_harmonic_mean = float('NaN')
-        low_harmonic_mean = float('NaN')
-        high_harmonic_mean = float('NaN')
-    else:
-        acc_harmonic_mean = hmean([spearman_score['acc'], pearson_score['acc']])
-        low_harmonic_mean = hmean([spearman_score['low'], pearson_score['low']])
-        high_harmonic_mean = hmean([spearman_score['high'], pearson_score['high']])
+    intervals = ['acc', 'low', 'high']
+    scores = []
+    for interval in intervals:
+        if any(np.isnan(x) for x in [spearman_score[interval], pearson_score[interval]]):
+            scores.append(float('NaN'))
+        elif any(x <= 0 for x in [spearman_score[interval], pearson_score[interval]]):
+            scores.append(0)
+        else:
+            scores.append(hmean([spearman_score[interval], pearson_score[interval]]))
 
     return pd.Series(
-        [acc_harmonic_mean, low_harmonic_mean, high_harmonic_mean],
-        index=['acc', 'low', 'high']
+        scores,
+        index=intervals
     )
 
 
