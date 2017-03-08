@@ -56,12 +56,15 @@ def merge_intersect(frames, subsample=20, ranked_frames=2, vocab_cutoff=200000, 
     ])
 
     projected, eigenvalues, projection = dataframe_svd_projection(adjusted, k)
+    del adjusted
 
     print('Saving results in /tmp')
     save_hdf(projected, '/tmp/u.h5')
     save_hdf(projection, '/tmp/v.h5')
 
     print('Projecting vocabulary into new space')
-    reprojected = l2_normalize_rows(joined2.dot(projection) / (eigenvalues ** .5), offset=1e-6)
+    product = joined2.dot(projection) / (eigenvalues ** .5)
+    del joined2
+    reprojected = l2_normalize_rows(product, offset=1e-6)
     reprojected.sort_index(inplace=True)
     return reprojected, projection
