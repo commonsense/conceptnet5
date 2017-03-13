@@ -199,6 +199,6 @@ if not app.debug:
     # Error logging configuration -- requires SENTRY_DSN to be set to a valid
     # Sentry client key
     if os.environ.get('SENTRY_DSN'):
-        sentry = Sentry(app, logging=True, level=logging.WARNING)
+        sentry = Sentry(app, logging=True, level=logging.ERROR)
     else:
         sentry = None
