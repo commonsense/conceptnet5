@@ -12,9 +12,13 @@ def request_wants_json():
     Determine from the request headers whether this is a Web browser that wants
     pretty rendering, or an API user that wants actual JSON-LD.
     """
+    if flask.request.args.get('format') == 'json':
+        return True
+    elif flask.request.args.get('format') == 'html':
+        return False
     best = flask.request.accept_mimetypes \
         .best_match(['application/ld+json', 'application/json', 'text/html'])
-    return (best is not None) and ('json' in best)
+    return (best is None) or ('json' in best)
 
 
 def regex_replacement_stack(replacements):

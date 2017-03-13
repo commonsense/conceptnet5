@@ -1,4 +1,15 @@
 <!doctype html>
+<!--
+    This is an HTML rendering of the ConceptNet API response.
+
+    We're showing you HTML so you get convenient syntax highlighting and links,
+    because we think you're seeing this in a Web browser, based on your
+    'Accept: text/html' header.
+
+    If you're using a client that isn't a Web browser, you probably wanted pure
+    JSON. In that case, set the header 'Accept: */*' or 'Accept:
+    application/json' on your request, or add the '?format=json' parameter.
+-->
 <html>
 <head>
   <title>ConceptNet 5 API</title>
@@ -15,6 +26,8 @@
 <body>
 {% block content %}
 {{ json | highlight_json }}
+<div class="raw-json-link">
+</div>
 {% endblock %}
 <script type="application/ld+json">
 {{ json_raw|safe }}
