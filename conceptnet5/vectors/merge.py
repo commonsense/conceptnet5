@@ -28,7 +28,7 @@ def dataframe_svd_projection(frame, k):
     return uframe, Σ[:k], vframe
 
 
-def merge_intersect(frames, subsample=20, ranked_frames=3, vocab_cutoff=200000, k=300):
+def merge_intersect(frames, subsample=20, ranked_frames=2, vocab_cutoff=200000, k=300):
     joined = pd.concat(frames, join='inner', axis=1, ignore_index=True).astype('f')
     joined.fillna(0.)
     filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])

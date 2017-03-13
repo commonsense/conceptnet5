@@ -1,10 +1,11 @@
 from scipy import sparse
 import pandas as pd
 from conceptnet5.uri import uri_prefixes, uri_prefix
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.relations import SYMMETRIC_RELATIONS
 from conceptnet5.languages import CORE_LANGUAGES
 from ordered_set import OrderedSet
-from collections import defaultdict
+from collections import defaultdict, Counter
 from ..vectors import replace_numbers
 
 
@@ -20,6 +21,9 @@ class SparseMatrixBuilder:
 
     def __setitem__(self, key, val):
         row, col = key
+        self.add(row, col, val)
+
+    def add(self, row, col, val):
         self.row_index.append(row)
         self.col_index.append(col)
         self.values.append(val)
