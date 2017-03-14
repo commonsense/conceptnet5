@@ -6,4 +6,4 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-aws s3 cp --recursive data/psql s3://conceptnet/precomputed-data/2016/psql/$1/ --exclude *.csv --exclude *done
+aws s3 cp --recursive data/psql s3://conceptnet/precomputed-data/2016/psql/$1/ --exclude *.csv --exclude *done --acl public-read
