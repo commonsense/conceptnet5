@@ -25,19 +25,15 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
     ]
     results = []
     for frame in embeddings:
-        wordsim_results = wordsim.evaluate(frame, subset=subset)
-        if tune_analogies:
-            analogy_results = analogy.tune_pairwise_analogies(
-                frame, ANALOGY_FILENAME, subset=subset
-            ).to_frame(name='sat-analogies').T
-        else:
-            analogy_results = analogy.eval_pairwise_analogies(
-                frame, ANALOGY_FILENAME, subset=subset
-            ).to_frame(name='sat-analogies').T
-        story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
+        tune_analogies = False
+        # wordsim_results = wordsim.evaluate(frame, subset=subset)
+
+        analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME, subset='test')
+
+        # story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
         results.append(
             pd.concat(
-                [wordsim_results, analogy_results, story_results], axis=0
+                [analogy_results], axis=0
             )
         )
     result = pd.concat(results, keys=filenames)
