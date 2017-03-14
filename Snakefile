@@ -98,7 +98,6 @@ rule all:
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/mini.h5",
-        DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz",
         "data-loader/sha256sums.txt"
 
 rule evaluation:
