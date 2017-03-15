@@ -1,0 +1,19 @@
+Question 5(b) ATTRIBUTE: Object Attribute:Condition
+
+Consider the following word pairs:
+
+brittle:broken
+malleable:molded
+edible:eaten
+
+What relation best describes these X:Y word pairs?
+
+someone/something who is X is unlikely to Y
+an X is unlikely to Y
+X and Y are contrary / opposite to each other
+something that is X may be Y
+
+Correct Answer:
+
+something that is X may be Y
+

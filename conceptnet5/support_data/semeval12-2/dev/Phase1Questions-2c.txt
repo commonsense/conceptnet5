@@ -1,0 +1,19 @@
+Question 2(c) PART-WHOLE: Mass:Potion
+
+Consider the following word pairs:
+
+water:drop
+mile:yard
+time:moment
+
+What relation best describes these X:Y word pairs?
+
+an X is an increase/decease in Y
+an Y receives an X
+an X is is a defect in Y
+X may be divided into Y
+
+Correct Answer:
+
+X may be divided into Y
+

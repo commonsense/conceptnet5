@@ -1,0 +1,19 @@
+Question 8(f) CAUSE-PURPOSE: Instrument:Goal
+
+Consider the following word pairs:
+
+anesthetic:numbness
+ballast:stability
+camouflage:concealment
+
+What relation best describes these X:Y word pairs?
+
+an X cannot have attribute Y; Y is antithetical to being X
+a Y receives an item/knowledge/service from X
+X is intended to produce Y
+X may be divided into Y
+
+Correct Answer:
+
+X is intended to produce Y
+

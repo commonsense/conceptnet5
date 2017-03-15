@@ -1,0 +1,19 @@
+Question 10(c) REFERENCE: Representation
+
+Consider the following word pairs:
+
+person:portrait
+backdrop:vista
+diary:person
+
+What relation best describes these X:Y word pairs?
+
+a Y represents/is representative of X
+Being X is incompatible with being Y
+an X causes Y
+an X and Y are a similar type of action/thing/attribute
+
+Correct Answer:
+
+a Y represents/is representative of X
+

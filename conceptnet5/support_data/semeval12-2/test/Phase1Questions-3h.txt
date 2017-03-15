@@ -1,0 +1,19 @@
+Question 3(h) SIMILAR: Change
+
+Consider the following word pairs:
+
+crescendo:sound
+brighten:color
+discount:price
+
+What relation best describes these X:Y word pairs?
+
+something that is X cannot be Y
+Y describes a condition or state that is usually absent from X
+X conceals a person/place/thing's Y
+an X is an increase/decease in Y
+
+Correct Answer:
+
+an X is an increase/decease in Y
+

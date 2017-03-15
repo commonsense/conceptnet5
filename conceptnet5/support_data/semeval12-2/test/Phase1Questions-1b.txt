@@ -1,0 +1,19 @@
+Question 1(b) CLASS-INCLUSION: Functional
+
+Consider the following word pairs:
+
+ornament:brooch
+weapon:knife
+vehicle:car
+
+What relation best describes these X:Y word pairs?
+
+the result of action X does not produce an object with Y
+Y is an instrumental item in the activities that occur at place/location/area Y
+Y functions as an X
+X possesses/owns/has Y
+
+Correct Answer:
+
+Y functions as an X
+

@@ -1,0 +1,19 @@
+Question 9(b) SPACE-TIME: Location:Process/Product
+
+Consider the following word pairs:
+
+bakery:bread
+quarry:rock
+laboratory:science
+
+What relation best describes these X:Y word pairs?
+
+an X and Y are two kinds in a category of actions/things/attributes
+an X is a place/location/area where Y is made/done/produced
+an Y receives an X
+an X exists in the state of Y
+
+Correct Answer:
+
+an X is a place/location/area where Y is made/done/produced
+

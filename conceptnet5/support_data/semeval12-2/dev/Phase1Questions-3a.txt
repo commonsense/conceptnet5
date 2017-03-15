@@ -1,0 +1,19 @@
+Question 3(a) SIMILAR: Synonymity
+
+Consider the following word pairs:
+
+car:auto
+buy:purchase
+rapid:quick
+
+What relation best describes these X:Y word pairs?
+
+Y is an instrument through with X receives some object/service/role
+an X and Y are a similar type of action/thing/attribute
+someone perform the action X on Y
+someone/something who is X is unlikely to Y
+
+Correct Answer:
+
+an X and Y are a similar type of action/thing/attribute
+

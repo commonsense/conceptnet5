@@ -1,0 +1,19 @@
+Question 7(f) CASE RELATIONS: Object:Recipient
+
+Consider the following word pairs:
+
+inheritance:heir
+speech:audience
+honor:laureate
+
+What relation best describes these X:Y word pairs?
+
+an X exists in the state of Y
+an X indicates/signifies Y
+Y is an instrumental item in the activities that occur at place/location/area Y
+an Y receives an X
+
+Correct Answer:
+
+an Y receives an X
+

@@ -1,0 +1,19 @@
+Question 2(f) PART-WHOLE: Item:Topological Part
+
+Consider the following word pairs:
+
+room:corner
+mountain:foot
+table:top
+
+What relation best describes these X:Y word pairs?
+
+X causes/compels a person to Y
+Y is one of the areas/locations of X
+an Y receives an X
+an X is a plan for Y
+
+Correct Answer:
+
+Y is one of the areas/locations of X
+

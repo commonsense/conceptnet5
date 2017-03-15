@@ -1,0 +1,19 @@
+Question 3(e) SIMILAR: Conversion
+
+Consider the following word pairs:
+
+apprentice:master
+colt:horse
+grape:wine
+
+What relation best describes these X:Y word pairs?
+
+X will become / be converted into Y
+something/someone that is X will typically Y
+a Y is one item in a collection/group of X
+an X is a place/location/area where Y takes place
+
+Correct Answer:
+
+X will become / be converted into Y
+

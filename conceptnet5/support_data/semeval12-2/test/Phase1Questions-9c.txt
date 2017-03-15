@@ -1,0 +1,19 @@
+Question 9(c) SPACE-TIME: Location:Action/Activity
+
+Consider the following word pairs:
+
+school:learning
+gym:exercise
+highway:driving
+
+What relation best describes these X:Y word pairs?
+
+X is the opposite direction from Y
+Y describes a condition or state that is usually absent from X
+Something cannot be/have/do X and Y at the same time
+an X is a place/location/area where Y takes place
+
+Correct Answer:
+
+an X is a place/location/area where Y takes place
+

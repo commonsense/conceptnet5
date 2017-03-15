@@ -1,0 +1,19 @@
+Question 7(d) CASE RELATIONS: Action:Object
+
+Consider the following word pairs:
+
+plow:earth
+sing:dirge
+pardon:sin
+
+What relation best describes these X:Y word pairs?
+
+an X is a place/location/area where Y is made/done/produced
+someone perform the action X on Y
+X and Y share a contiguous border
+X and Y both have a similar attribute or feature
+
+Correct Answer:
+
+someone perform the action X on Y
+

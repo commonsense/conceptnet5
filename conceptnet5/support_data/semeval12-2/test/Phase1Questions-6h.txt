@@ -1,0 +1,21 @@
+Question 6(h) NON-ATTRIBUTE: Action:Object Nonattribute
+
+Consider the following word pairs:
+
+embellish:austere
+obliterate:extant
+cook:raw
+mend:broken
+contaminate:pure
+
+What relation best describes these X:Y word pairs?
+
+an Y follows X in sequence
+someone will X an object that is Y
+the result of action X does not produce an object with Y
+an X causes Y
+
+Correct Answer:
+
+the result of action X does not produce an object with Y
+

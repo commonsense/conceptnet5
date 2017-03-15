@@ -1,0 +1,19 @@
+Question 2(a) PART-WHOLE: Object:Component
+
+Consider the following word pairs:
+
+car:engine
+face:nose
+novel:epilogue
+
+What relation best describes these X:Y word pairs?
+
+a Y is one item in a collection/group of X
+X is an expression that indicates Y
+a Y is a part of an X
+a Y is used on an X
+
+Correct Answer:
+
+a Y is a part of an X
+

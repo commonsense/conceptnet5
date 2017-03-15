@@ -1,0 +1,19 @@
+Question 2(e) PART-WHOLE: Activity:Stage
+
+Consider the following word pairs:
+
+shopping:buying
+planting:gardening
+kickoff:football
+
+What relation best describes these X:Y word pairs?
+
+someone/something will X in order to Y
+Y describes a condition or state that is usually absent from X
+X and Y share a contiguous border
+X is one step/action/part of the actions in Y
+
+Correct Answer:
+
+X is one step/action/part of the actions in Y
+

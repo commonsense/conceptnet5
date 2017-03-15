@@ -1,0 +1,19 @@
+Question 10(f) REFERENCE: Concealment
+
+Consider the following word pairs:
+
+alias:name
+camouflage:location
+disguise:identity
+
+What relation best describes these X:Y word pairs?
+
+X conceals a person/place/thing's Y
+Y functions as an X
+a Y is used on an X
+an X is attached to a Y
+
+Correct Answer:
+
+X conceals a person/place/thing's Y
+

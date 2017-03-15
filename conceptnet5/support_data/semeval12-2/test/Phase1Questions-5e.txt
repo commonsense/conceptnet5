@@ -1,0 +1,19 @@
+Question 5(e) ATTRIBUTE: Object:Typical Action (noun.verb)
+
+Consider the following word pairs:
+
+glass:break
+soldier:fight
+juggernaut:crush
+
+What relation best describes these X:Y word pairs?
+
+X and Y share a contiguous border
+X is a time when Y occurs
+an X will typically Y
+Y is one of the areas/locations of X
+
+Correct Answer:
+
+an X will typically Y
+

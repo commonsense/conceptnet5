@@ -1,0 +1,19 @@
+Question 5(g) ATTRIBUTE: Action:Action Attribute
+
+Consider the following word pairs:
+
+creep:slow
+exercise:vigorous
+longing:passionate
+
+What relation best describes these X:Y word pairs?
+
+an X once had/owned/possessed Y, but no longer
+the result of action X does not produce an object with Y
+X is a Y kind of action
+someone/something will X in order to Y
+
+Correct Answer:
+
+X is a Y kind of action
+

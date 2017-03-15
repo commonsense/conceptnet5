@@ -1,0 +1,19 @@
+Question 5(h) ATTRIBUTE: Action:Object Attribute
+
+Consider the following word pairs:
+
+sterilize:infectious
+capture:elusive
+drink:potable
+
+What relation best describes these X:Y word pairs?
+
+Y functions as an X
+X is made from a collection of Y
+an X is a plan for Y
+someone will X an object that is Y
+
+Correct Answer:
+
+someone will X an object that is Y
+

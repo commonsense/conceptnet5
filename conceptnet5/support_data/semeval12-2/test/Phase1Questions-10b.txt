@@ -1,0 +1,19 @@
+Question 10(b) REFERENCE: Expression
+
+Consider the following word pairs:
+
+smile:friendliness
+lamentation:grief
+hug:affection
+
+What relation best describes these X:Y word pairs?
+
+X is an expression that indicates Y
+an X is a place/location/area where Y is made/done/produced
+an X is a place/location/area where Y is found
+a Y is one item in a collection/group of X
+
+Correct Answer:
+
+X is an expression that indicates Y
+

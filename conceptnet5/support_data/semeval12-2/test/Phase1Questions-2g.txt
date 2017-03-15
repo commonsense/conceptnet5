@@ -1,0 +1,19 @@
+Question 2(g) PART-WHOLE: Object:Stuff
+
+Consider the following word pairs:
+
+glacier:ice
+salt:sodium
+lens:glass
+
+What relation best describes these X:Y word pairs?
+
+X is made of / is comprised of Y
+a Y represents/is representative of X
+to X is to have a Y receive some object/service/idea
+X enables the use of Y
+
+Correct Answer:
+
+X is made of / is comprised of Y
+
