@@ -18,7 +18,7 @@ def read_google_analogies(filename):
         [standardized_uri('en', term) for term in line.rstrip().split(' ')]
         for line in open(filename, encoding='utf-8')
         if not line.startswith(':')
-    ]
+        ]
     return quads
 
 
@@ -40,7 +40,8 @@ def read_turney_analogies(filename):
 
                     # Line 0 is a header we can discard.
                     raw_pairs = [qline.split(' ')[:2] for qline in question_lines[1:]]
-                    concept_pairs = [tuple(standardized_uri('en', term) for term in pair) for pair in raw_pairs]
+                    concept_pairs = [tuple(standardized_uri('en', term) for term in pair) for pair
+                                     in raw_pairs]
 
                     # The first of the pairs we got is the prompt pair. The others are
                     # answers (a) through (e).
@@ -80,7 +81,7 @@ def read_questions_semeval2012(subset, subclass):
             if i == 0:
                 continue
             pairs = line.split('\t')
-            pairs = [pair.split(':') for pair in pairs[:-1]] # Skip relation label
+            pairs = [pair.split(':') for pair in pairs[:-1]]  # Skip relation label
             pairs = [tuple(standardized_uri('en', term) for term in pair) for pair in pairs]
             questions.append(pairs)
         return questions
@@ -127,8 +128,8 @@ def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose)
     return value
 
 
-def eval_pairwise_analogies(vectors, eval_filename, subset='all',
-                            weight_direct=0.35, weight_transpose=0.65):
+def eval_pairwise_analogies(vectors, eval_filename,
+                            weight_direct, weight_transpose, subset='all'):
     total = 0
     correct = 0
     # wrap = VectorSpaceWrapper(vectors=vectors)
@@ -174,7 +175,7 @@ def tune_pairwise_analogies(func, *args):
     best_acc = 0.
     for weight_direct in weights:
         for weight_transpose in weights:
-            scores = func(*args, 'dev', weight_direct, weight_transpose)
+            scores = func(*args, weight_direct, weight_transpose, subset='dev')
             if isinstance(scores, list):
                 acc = scores[0].loc['acc']
             else:
@@ -196,7 +197,7 @@ def eval_google_analogies(frame):
     vocab = [
         standardized_uri('en', word)
         for word in wordfreq.top_n_list('en', 200000)
-    ]
+        ]
     wrap = VectorSpaceWrapper(frame=frame)
     vecs = np.vstack([wrap.get_vector(word) for word in vocab])
     tframe = pd.DataFrame(vecs, index=vocab)
@@ -220,17 +221,18 @@ def eval_google_analogies(frame):
                 print(
                     "%s : %s :: %s : [%s] (should be %s)"
                     % (quad[0], quad[1], quad[2], result, answer)
-                    )
+                )
                 seen_mistakes.add(result)
         total += 1
     low, high = proportion_confint(correct, total)
     return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
 
 
-def eval_semeval2012_analogies(vectors, subset, subclass, weight_direct=0.25, weight_transpose=1.0):
+def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset, subclass):
     """
     For a test file:
-        * Compute a Spearman correlation coefficient between the ranks produced by vectors and gold ranks.
+        * Compute a Spearman correlation coefficient between the ranks produced by vectors and
+           gold ranks.
         * Compute an accuracy score of answering MaxDiff questions.
     """
     train_pairs = read_train_pairs_semeval2012(subset, subclass)
@@ -286,13 +288,15 @@ def eval_semeval2012_analogies(vectors, subset, subclass, weight_direct=0.25, we
     return [maxdiff_results, spearman_results]
 
 
-def eval_semeval2012_global(vectors, subset, weight_direct, weight_transpose):
+def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
     spearman_scores = []
     maxdiff_scores = []
     for subclass in product(range(1, 11), 'a b c d e f g h i j'):
         subclass = ''.join([str(element) for element in subclass])
         try:
-            maxdiff, spearman = eval_semeval2012_analogies(vectors, subset, subclass, weight_direct, weight_transpose)
+            maxdiff, spearman = eval_semeval2012_analogies(vectors, weight_direct,
+                                                           weight_transpose,
+                                                           subset, subclass)
             spearman_scores.append(spearman)
             maxdiff_scores.append(maxdiff)
         except FileNotFoundError:
@@ -310,7 +314,7 @@ def eval_semeval2012_global(vectors, subset, weight_direct, weight_transpose):
             pd.Series(spearman_output, index=['acc', 'low', 'high'])]
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeval_scope='global'):
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global'):
     """
     Run SAT and Semeval12-2 evaluations.
     """
@@ -323,12 +327,19 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeva
     else:
         sat_weights = (0.35, 0.65)
         semeval_weights = (0.2, 1.0)
-    
-    sat_results = eval_pairwise_analogies(vectors, analogy_filename, subset, sat_weights[0], sat_weights[1])
+
+    sat_results = eval_pairwise_analogies(vectors,
+                                          analogy_filename,
+                                          sat_weights[0],
+                                          sat_weights[1],
+                                          subset)
     results.loc['sat-analogies'] = sat_results
 
     if semeval_scope == 'global':
-        maxdiff_score, spearman_score = eval_semeval2012_global(vectors, subset, semeval_weights[0], semeval_weights[1])
+        maxdiff_score, spearman_score = eval_semeval2012_global(vectors,
+                                                                semeval_weights[0],
+                                                                semeval_weights[1],
+                                                                subset)
         results.loc['semeval12-spearman'] = spearman_score
         results.loc['semeval12-maxdiff'] = maxdiff_score
 
@@ -337,8 +348,11 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeva
             subclass = ''.join([str(element) for element in subclass])
             subclass = ''.join(subclass)
             try:
-                maxdiff_score, spearman_score = eval_semeval2012_analogies(vectors, subset,
-                                                                           subclass, semeval_weights[0],semeval_weights[1])
+                maxdiff_score, spearman_score = eval_semeval2012_analogies(vectors,
+                                                                           semeval_weights[0],
+                                                                           semeval_weights[1],
+                                                                           subset,
+                                                                           subclass)
                 results.loc['semeval12-{}-spearman'.format(subclass)] = spearman_score
                 results.loc['semeval12-{}-maxdiff'.format(subclass)] = maxdiff_score
             except FileNotFoundError:
