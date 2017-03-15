@@ -289,6 +289,9 @@ def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset,
 
 
 def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
+    """
+    Return the average Spearman score and MaxDiff accuracy score for the entire test set.
+    """
     spearman_scores = []
     maxdiff_scores = []
     for subclass in product(range(1, 11), 'a b c d e f g h i j'):
@@ -314,7 +317,7 @@ def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
             pd.Series(spearman_output, index=['acc', 'low', 'high'])]
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global'):
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeval_scope='global'):
     """
     Run SAT and Semeval12-2 evaluations.
     """
