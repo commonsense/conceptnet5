@@ -6,6 +6,8 @@ services:
     image: rspeer/conceptnet-data:5.5.3
     expose:
       - "5432"
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=conceptnet5
     volumes:
@@ -29,6 +31,7 @@ services:
       - db
     ports:
       - "80:80"
+      - "1337:1337"
     environment:
       - CONCEPTNET_DB_HOSTNAME=db
       - CONCEPTNET_BUILD_DATA=/data/conceptnet

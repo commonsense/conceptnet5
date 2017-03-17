@@ -11,7 +11,7 @@ RUN apt-get update \
 # forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log
-EXPOSE 80 443
+EXPOSE 80 443 1337
 
 # Set up uwsgi
 RUN pip install uwsgi
