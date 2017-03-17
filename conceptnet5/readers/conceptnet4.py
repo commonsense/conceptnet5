@@ -103,6 +103,7 @@ CONCEPT_BLACKLIST = {
 ACTIVITY_BLACKLIST = {
     "20 Questions",
     "picture description",
+    "response to picture",
     "response to diagram",
     "commons2_reject",
     "globalmind",    # avoid double-counting with the GlobalMind reader
