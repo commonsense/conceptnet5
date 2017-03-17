@@ -16,7 +16,7 @@ def get_db_connection(dbname=None, building=False):
     `building` specifies whether it's okay for the DB to not exist
     (set it to True at build time).
     """
-    if not building and not os.access(get_data_filename('psql/done'), os.F_OK):
+    if not building and not os.access(get_data_filename('psql/done'), os.F_OK) and not config.DB_REMOTE:
         raise IOError("The ConceptNet database has not been built.")
     if dbname is None:
         dbname = config.DB_NAME

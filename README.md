@@ -71,3 +71,16 @@ word embeddings:
 To start over when something goes wrong or when the code has changed:
 
     snakemake clean
+
+
+## Accessing ConceptNet5 python api over docker
+
+To access ConceptNet5 python api while using docker, set the following environment variables:
+
+    CONCEPTNET_DB_USER=postgres
+    CONCEPTNET_DB_HOSTNAME=[Your docker-machine IP]
+    CONCEPTNET_IS_REMOTE=true
+
+Warning: this method bypasses a safeguard which ensures the db is fully built before
+connecting to the db.  It is up to you to ensure that the database has fully and
+correctly been built before using this.
