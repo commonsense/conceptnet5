@@ -9,6 +9,7 @@ from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix
 import wordfreq
 import pandas as pd
+import numpy as np
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
@@ -186,7 +187,9 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         # FIXME: is pd.DataFrame supposed to be pd.Series here?
-        if isinstance(query, pd.DataFrame) or isinstance(query, dict):
+        if isinstance(query, np.ndarray):
+            return query
+        elif isinstance(query, pd.DataFrame) or isinstance(query, dict):
             terms = list(query.items())
         elif isinstance(query, str):
             terms = [(query, 1.)]
@@ -207,6 +210,7 @@ class VectorSpaceWrapper(object):
         - A dictionary from terms to weights
         - A list of (term, weight) tuples
         - A single term
+        - An existing vector
 
         If the query contains 5 or fewer terms, it will be expanded to include
         neighboring terms in ConceptNet.
