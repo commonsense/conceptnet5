@@ -36,6 +36,6 @@ setup(
         ]
     },
     extras_require={
-        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn']
+        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn', 'mecab-python3', 'jieba']
     },
 )
