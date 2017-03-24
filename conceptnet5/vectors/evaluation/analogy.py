@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import wordfreq
-from itertools import product
-from scipy.stats import spearmanr
+from collections import Counter
+from itertools import groupby, product
+from scipy.stats import spearmanr, hmean
 from statsmodels.stats.proportion import proportion_confint
 
 from conceptnet5.util import get_support_data_filename
@@ -72,19 +73,32 @@ def read_train_pairs_semeval2012(subset, subclass):
 
 def read_questions_semeval2012(subset, subclass):
     """
-    Semeval2012 questions have the following format:
-    pair1, pair2, pair3, pair4, least_prototypical_pair, most_prototypical_pair, relation_name
+    A line represents one turker's answer to a given question. An answer has the
+    following format:
+    pair1, pair2, pair3, pair4, least_prototypical_pair, most_prototypical_pair, relation_name,
     """
     filename = 'semeval12-2/{}/Phase2Answers-{}.txt'.format(subset, subclass)
     with open(get_support_data_filename(filename)) as file:
-        questions = []
+        answers = []
         for i, line in enumerate(file):
             if i == 0:
                 continue
             pairs = line.split('\t')
-            pairs = [pair.split(':') for pair in pairs[:-1]]  # Skip relation label
-            pairs = [tuple(standardized_uri('en', term) for term in pair) for pair in pairs]
-            questions.append(pairs)
+            answers.append(pairs)
+
+        questions = []
+        for key, group in groupby(answers, key=lambda x: x[:4]):
+            most_list = []
+            least_list = []
+            for elem in group:
+                least_list.append(elem[4])
+                most_list.append(elem[5])
+            least = Counter(least_list).most_common(1)[0][0]
+            most = Counter(most_list).most_common(1)[0][0]
+            question = key + [least, most]
+            question = [pair.split(':') for pair in question]
+            question = [tuple(standardized_uri('en', term) for term in pair) for pair in question]
+            questions.append(question)
         return questions
 
 
@@ -133,7 +147,6 @@ def eval_pairwise_analogies(vectors, eval_filename,
                             weight_direct, weight_transpose, subset='all'):
     total = 0
     correct = 0
-    # wrap = VectorSpaceWrapper(vectors=vectors)
     for idx, (prompt, choices, answer) in enumerate(read_turney_analogies(eval_filename)):
         # Enable an artificial training/test split
         if subset == 'all' or (subset == 'dev') == (idx % 2 == 0):
@@ -168,17 +181,19 @@ def tune_pairwise_analogies(func, *args):
     #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
     # ]
     print('Tuning analogy weights')
-    weights = [
-        0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
-        0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 1.0
-    ]
+    # weights = [
+    #     0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
+    #     0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 1.0
+    # ]
+    weights = [0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
+               2.0, 2.5, 3.0]
     best_weights = None
     best_acc = 0.
     for weight_direct in weights:
         for weight_transpose in weights:
             scores = func(*args, weight_direct, weight_transpose, subset='dev')
             if isinstance(scores, list):
-                acc = scores[0].loc['acc']
+                acc = hmean([scores[0].loc['acc'], scores[1].loc['acc']])
             else:
                 acc = scores.loc['acc']
             if acc > best_acc:

@@ -26,7 +26,7 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
     results = []
     for frame in embeddings:
         wordsim_results = wordsim.evaluate(frame, subset=subset)
-        analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME)
+        analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME, tune_analogies=True)
         story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
 
         results.append(
