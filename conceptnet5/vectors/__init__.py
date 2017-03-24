@@ -1,4 +1,4 @@
-from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.nodes import standardized_concept_uri, uri_to_label
 from conceptnet5.language.lemmatize import lemmatize_uri
 from sklearn.preprocessing import normalize
 import re
@@ -45,13 +45,21 @@ def get_vector(frame, label, language=None):
     and normalize it to ConceptNet form. Either way, it can also take in
     a label that is already in ConceptNet form.
     """
-    if language is not None and not label.startswith('/'):
-        label = standardized_uri(language, label)
-    try:
-        return frame.loc[label]
-    except KeyError:
-        # Return a vector of all NaNs
-        return pd.Series(index=frame.columns)
+    if frame.index[0].startswith('/'): # This frame has URIs in its index
+        if not label.startswith('/'):
+            label = standardized_uri(language, label)
+        try:
+            return frame.loc[label]
+        except KeyError:
+            return pd.Series(index=frame.columns)
+    else:
+        if label.startswith('/'):
+            label = uri_to_label(label)
+        try:
+            return frame.loc[replace_numbers(label)]
+        except KeyError:
+            # Return a vector of all NaNs
+            return pd.Series(index=frame.columns)
 
 
 def normalize_vec(vec):
@@ -91,9 +99,9 @@ def weighted_average(frame, weight_series):
         weight_series = pd.Series(weight_dict)
     vec = np.zeros(frame.shape[1], dtype='f')
 
-    for label in weight_series.index:
+    for i, label in enumerate(weight_series.index):
         if label in frame.index:
-            val = weight_series.loc[label]
+            val = weight_series[i]
             vec += val * frame.loc[label].values
 
     return pd.Series(data=vec, index=frame.columns, dtype='f')
