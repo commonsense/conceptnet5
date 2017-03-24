@@ -8,6 +8,7 @@ from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
 from .evaluation.compare import compare_embeddings, graph_comparison
 from .transforms import miniaturize
+from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
 
 
@@ -104,6 +105,15 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     intersected, projection = merge_intersect(frames)
     save_hdf(intersected, output_filename)
     save_hdf(projection, projection_filename)
+
+
+@cli.command(name='debias')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+def run_debias(input_filename, output_filename):
+    frame = load_hdf(input_filename)
+    debiased = de_bias_frame(frame)
+    save_hdf(debiased, output_filename)
 
 
 @cli.command(name='evaluate')

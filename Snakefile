@@ -550,12 +550,22 @@ rule merge_intersect:
     input:
         expand(DATA + "/vectors/{name}-retrofit.h5", name=INPUT_EMBEDDINGS)
     output:
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
         ram=16
     shell:
         "cn5-vectors intersect {input} {output}"
+
+rule debias:
+    input:
+        DATA + "/vectors/numberbatch-biased.h5"
+    output:
+        DATA + "/vectors/numberbatch.h5"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors debias {input} {output}"
 
 rule miniaturize:
     input:
