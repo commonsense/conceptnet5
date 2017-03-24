@@ -95,6 +95,17 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     save_hdf(projection, projection_filename)
 
 
+@cli.command(name='intersect')
+@click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+@click.argument('projection_filename', type=click.Path(writable=True, dir_okay=False))
+def run_intersect(input_filenames, output_filename, projection_filename):
+    frames = [load_hdf(filename) for filename in input_filenames]
+    intersected, projection = merge_intersect(frames)
+    save_hdf(intersected, output_filename)
+    save_hdf(projection, projection_filename)
+
+
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
