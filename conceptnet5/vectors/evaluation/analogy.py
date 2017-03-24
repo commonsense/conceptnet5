@@ -1,13 +1,14 @@
-from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import standardized_uri, get_vector, similar_to_vec
-from conceptnet5.vectors.query import VectorSpaceWrapper
-from statsmodels.stats.proportion import proportion_confint
-from itertools import product
-from scipy.stats import spearmanr
-from conceptnet5.vectors.evaluation.wordsim import empty_comparison_table, confidence_interval
-import wordfreq
 import numpy as np
 import pandas as pd
+import wordfreq
+from itertools import product
+from scipy.stats import spearmanr
+from statsmodels.stats.proportion import proportion_confint
+
+from conceptnet5.util import get_support_data_filename
+from conceptnet5.vectors import get_vector, similar_to_vec, standardized_uri
+from conceptnet5.vectors.evaluation.wordsim import confidence_interval, empty_comparison_table
+from conceptnet5.vectors.query import VectorSpaceWrapper
 
 
 def read_google_analogies(filename):
@@ -281,7 +282,7 @@ def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset,
     spearman_results = confidence_interval(spearman, total)
 
     # Compute an accuracy score on MaxDiff questions
-    maxdiff = round((correct_least + correct_most) / (total + total), 3)
+    maxdiff = round((correct_least + correct_most) / (2 * total), 3)
     low_maxdiff, high_maxdiff = proportion_confint((correct_least + correct_most), (2 * total))
     maxdiff_results = pd.Series([maxdiff, low_maxdiff, high_maxdiff], index=['acc', 'low', 'high'])
 
@@ -317,9 +318,24 @@ def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
             pd.Series(spearman_output, index=['acc', 'low', 'high'])]
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeval_scope='global'):
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global'):
     """
     Run SAT and Semeval12-2 evaluations.
+
+    Required parameters:
+      frame
+          a DataFrame containing term vectors
+      analogy_filename
+          the filename of Turney's SAT evaluation data
+
+    Optional parameters:
+      subset (string, default 'test')
+          a subset of a data to evaluate on, either 'test' or 'dev'
+      tune_analogies (boolean, default False)
+          tune the weights in eval_pairwise_analogies()
+      semeval_scope (string, default 'global')
+          'global' to get the average of the results across all subclasses of semeval12-2,
+          or another string to get the results broken down by a subclass (1a, 1b, etc.)
     """
     vectors = VectorSpaceWrapper(frame=frame)
     results = empty_comparison_table()
@@ -329,7 +345,7 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, semeva
         semeval_weights = tune_pairwise_analogies(eval_semeval2012_global, vectors)
     else:
         sat_weights = (0.35, 0.65)
-        semeval_weights = (0.2, 1.0)
+        semeval_weights = (0.05, 1.5)
 
     sat_results = eval_pairwise_analogies(vectors,
                                           analogy_filename,
