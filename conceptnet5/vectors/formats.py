@@ -154,7 +154,7 @@ def load_fasttext(filename, max_rows=1000000):
             values = [float(x) for x in items[1:]]
             arr[i] = values
 
-    return pd.DataFrame(arr, index=labels)
+    return pd.DataFrame(arr, index=labels, dtype='f')
 
 
 def _read_until_space(file):

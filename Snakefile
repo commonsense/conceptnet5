@@ -152,7 +152,7 @@ rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
+        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
 
 
 # Precomputation
@@ -497,6 +497,16 @@ rule convert_glove:
         ram=16
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
+
+rule convert_fasttext:
+    input:
+        DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz"
+    output:
+        DATA + "/vectors/fasttext-wiki-{lang}.h5"
+    resources:
+        ram=16
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:

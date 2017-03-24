@@ -15,6 +15,29 @@ SAMPLE_SIZES = {
     'rw': 2034,
     'gur350-de': 350,
     'zg222-de': 222,
+    'simlex': 999,
+    'scws': 2003,
+    'pku500-zh': 500,
+    'tmu-rw-ja': 4431,
+
+    'semeval-2a-en': 500,
+    'semeval-2a-de': 500,
+    'semeval-2a-es': 500,
+    'semeval-2a-it': 500,
+    'semeval-2a-fa': 500,
+    'semeval17-2a': 2000,
+
+    'semeval-2b-de-es': 956,
+    'semeval-2b-de-fa': 888,
+    'semeval-2b-de-it': 912,
+    'semeval-2b-en-de': 914,
+    'semeval-2b-en-es': 978,
+    'semeval-2b-en-fa': 952,
+    'semeval-2b-en-it': 970,
+    'semeval-2b-es-fa': 914,
+    'semeval-2b-es-it': 967,
+    'semeval-2b-it-fa': 916,
+    'semeval17-2b': 5697,
 }
 
 # A mapping from short group names to more formal citations
@@ -52,10 +75,10 @@ def empty_comparison_table():
 
 
 def make_comparison_table(scores):
-    table = empty_comparison_table()
+    evals = sorted(scores)
+    table = pd.DataFrame(index=evals, columns=['acc', 'low', 'high'])
     for evalname, score in scores.items():
-        if evalname in table.index:
-            table.loc[evalname] = confidence_interval(score, SAMPLE_SIZES[evalname])
+        table.loc[evalname] = confidence_interval(score, SAMPLE_SIZES[evalname])
     return table
 
 
@@ -175,6 +198,186 @@ COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
     'zg222-de': .250
 })
 
+# Comparisons from SemEval results
+COMPARISONS['SemEval2017', 'Luminoso'] = make_comparison_table({
+    'semeval-2a-en': .789,
+    'semeval-2a-de': .700,
+    'semeval-2a-es': .743,
+    'semeval-2a-it': .741,
+    'semeval-2a-fa': .503,
+
+    'semeval-2b-en-de': .763,
+    'semeval-2b-en-es': .761,
+    'semeval-2b-en-it': .776,
+    'semeval-2b-en-fa': .598,
+    'semeval-2b-de-es': .728,
+    'semeval-2b-de-it': .741,
+    'semeval-2b-de-fa': .598,
+    'semeval-2b-es-it': .753,
+    'semeval-2b-es-fa': .627,
+    'semeval-2b-it-fa': .604,
+})
+
+COMPARISONS['SemEval2017', 'Nasari'] = make_comparison_table({
+    # This is the baseline system, by Uniroma
+    'semeval-2a-en': .682,
+    'semeval-2a-de': .514,
+    'semeval-2a-es': .600,
+    'semeval-2a-it': .596,
+    'semeval-2a-fa': .405,
+
+    'semeval-2b-en-de': .598,
+    'semeval-2b-en-es': .633,
+    'semeval-2b-en-it': .648,
+    'semeval-2b-en-fa': .505,
+    'semeval-2b-de-es': .549,
+    'semeval-2b-de-it': .561,
+    'semeval-2b-de-fa': .458,
+    'semeval-2b-es-it': .595,
+    'semeval-2b-es-fa': .479,
+    'semeval-2b-it-fa': .486,
+})
+
+COMPARISONS['SemEval2017', 'QLUT'] = make_comparison_table({
+    'semeval-2a-en': .778,
+})
+
+COMPARISONS['SemEval2017', 'HCCL'] = make_comparison_table({
+    'semeval-2a-en': .687,
+    'semeval-2a-de': .594,
+    'semeval-2a-es': .701,
+    'semeval-2a-it': .651,
+    'semeval-2a-fa': .436,
+
+    'semeval-2b-en-de': .307,
+    'semeval-2b-en-es': .087,
+    'semeval-2b-en-it': .055,
+    'semeval-2b-en-fa': .012,
+    'semeval-2b-de-es': .045,
+    'semeval-2b-de-it': .037,
+    'semeval-2b-de-fa': .023,
+    'semeval-2b-es-it': .064,
+    'semeval-2b-es-fa': .048,
+    'semeval-2b-it-fa': .000,
+})
+
+COMPARISONS['SemEval2017', 'Mahtab'] = make_comparison_table({
+    'semeval-2a-fa': .715,
+})
+
+COMPARISONS['SemEval2017', 'hhu'] = make_comparison_table({
+    'semeval-2a-en': .704,
+    'semeval-2a-fa': .604,
+    'semeval-2b-en-fa': .513,
+})
+
+COMPARISONS['SemEval2017', 'OoO'] = make_comparison_table({
+    'semeval-2b-en-de': .570,
+    'semeval-2b-en-es': .584,
+    'semeval-2b-en-it': .584,
+    'semeval-2b-de-es': .549,
+    'semeval-2b-de-it': .548,
+    'semeval-2b-es-it': .570,
+})
+
+COMPARISONS['SemEval2017', 'SEW'] = make_comparison_table({
+    'semeval-2a-en': .464,
+    'semeval-2a-de': .449,
+    'semeval-2a-es': .616,
+    'semeval-2a-it': .569,
+    'semeval-2a-fa': .393,
+
+    'semeval-2b-en-de': .464,
+    'semeval-2b-en-es': .505,
+    'semeval-2b-en-it': .526,
+    'semeval-2b-en-fa': .420,
+    'semeval-2b-de-es': .530,
+    'semeval-2b-de-it': .520,
+    'semeval-2b-de-fa': .428,
+    'semeval-2b-es-it': .595,
+    'semeval-2b-es-fa': .515,
+    'semeval-2b-it-fa': .489,
+})
+
+COMPARISONS['SemEval2017', 'RUFINO'] = make_comparison_table({
+    'semeval-2a-en': .656,
+    'semeval-2a-de': .539,
+    'semeval-2a-es': .549,
+    'semeval-2a-it': .476,
+    'semeval-2a-fa': .360,
+
+    'semeval-2b-en-de': .330,
+    'semeval-2b-en-es': .340,
+    'semeval-2b-en-it': .342,
+    'semeval-2b-en-fa': .373,
+    'semeval-2b-de-es': .318,
+    'semeval-2b-de-it': .327,
+    'semeval-2b-de-fa': .267,
+    'semeval-2b-es-it': .356,
+    'semeval-2b-es-fa': .300,
+    'semeval-2b-it-fa': .249,
+})
+
+COMPARISONS['SemEval2017', 'Citius'] = make_comparison_table({
+    'semeval-2a-en': .651,
+    'semeval-2a-es': .523,
+    'semeval-2b-en-es': .577,
+})
+
+COMPARISONS['SemEval2017', 'l2f'] = make_comparison_table({
+    'semeval-2a-en': .649,
+})
+
+COMPARISONS['SemEval2017', 'gpv8'] = make_comparison_table({
+    'semeval-2a-en': .555,
+    'semeval-2a-de': .347,
+    'semeval-2a-it': .499,
+})
+
+COMPARISONS['SemEval2017', 'MERALI'] = make_comparison_table({
+    'semeval-2a-en': .594,
+})
+
+COMPARISONS['SemEval2017', 'Amateur'] = make_comparison_table({
+    'semeval-2a-en': .589,
+})
+
+COMPARISONS['SemEval2017', 'Wild Devs'] = make_comparison_table({
+    'semeval-2a-en': .468,
+})
+
+# Hypothetical SemEval runs of existing systems
+COMPARISONS['SemEval2017', 'fastText'] = make_comparison_table({
+    'semeval-2a-en': .468,
+    'semeval-2a-de': .507,
+    'semeval-2a-es': .417,
+    'semeval-2a-it': .344,
+    'semeval-2a-fa': .334,
+})
+
+# Hypothetical SemEval runs of existing systems
+COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table({
+    'semeval-2a-en': .747,
+    'semeval-2a-de': .599,
+    'semeval-2a-es': .611,
+    'semeval-2a-it': .606,
+    'semeval-2a-fa': .363,
+
+    'semeval-2b-en-de': .696,
+    'semeval-2b-en-es': .675,
+    'semeval-2b-en-it': .677,
+    'semeval-2b-en-fa': .502,
+    'semeval-2b-de-es': .620,
+    'semeval-2b-de-it': .612,
+    'semeval-2b-de-fa': .501,
+    'semeval-2b-es-it': .613,
+    'semeval-2b-es-fa': .482,
+    'semeval-2b-it-fa': .474,
+})
+
+COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
+    'semeval-2a-en': .575,
+})
 
 def read_ws353():
     """
@@ -229,6 +432,18 @@ def read_mturk():
             yield term1, term2, gold_score, lang1, lang2
 
 
+def read_pku500():
+    lang1, lang2 = 'zh', 'zh'
+    filename = 'pku-500/pku-500.csv'
+    with open(get_support_data_filename(filename)) as file:
+        for line in file:
+            if line.startswith('#'):
+                continue
+            term1, term2, sscore = line.split('\t')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score, lang1, lang2
+
+
 def read_men3000(subset='dev'):
     """
     Parses the MEN test collection. MEN is a collection of 3000 english word
@@ -269,6 +484,21 @@ def read_rw(subset='dev'):
         for line in file:
             parts = line.split()
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
+
+
+def read_tmu():
+    """
+    Read the Japanese rare-words dataset from Tokyo Metropolitan University.
+    """
+    lang1, lang2 = 'ja', 'ja'
+    for pos in ('noun', 'verb', 'adj', 'adv'):
+        filename = get_support_data_filename('tmu-rw/score_{}.csv'.format(pos))
+        with open(filename, encoding='utf-8') as file:
+            for line in file:
+                if line.startswith('word1'):
+                    continue
+                parts = line.split(',')
+                yield parts[0].strip(), parts[1].strip(), float(parts[2]), lang1, lang2
 
 
 def read_mc():
@@ -447,6 +677,8 @@ def evaluate(frame, subset='dev', semeval_scope='per_language'):
     ws_score = measure_correlation(spearmanr, vectors, read_ws353())
     ws_es_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('es'))
     ws_ro_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('ro'))
+    pku500_score = measure_correlation(spearmanr, vectors, read_pku500())
+    tmu_score = measure_correlation(spearmanr, vectors, read_tmu())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -457,6 +689,8 @@ def evaluate(frame, subset='dev', semeval_scope='per_language'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
+    results.loc['pku500-zh'] = pku500_score
+    results.loc['tmu-rw-ja'] = tmu_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors)
@@ -491,6 +725,8 @@ def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
     ws_score = measure_correlation(spearmanr, frame, read_ws353())
     ws_es_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('es'))
     ws_ro_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('ro'))
+    pku500_score = measure_correlation(spearmanr, frame, read_pku500())
+    tmu_score = measure_correlation(spearmanr, frame, read_tmu())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -501,6 +737,8 @@ def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
     results.loc['ws353'] = ws_score
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
+    results.loc['pku500-zh'] = pku500_score
+    results.loc['tmu-rw-ja'] = tmu_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(frame)
@@ -518,7 +756,16 @@ def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
     return results
 
 
-def results_in_context(results, name=('Luminoso', 'Numberbatch 16.09')):
+def comparison_table():
+    comparisons = dict(COMPARISONS)
+    comparison_list = sorted(comparisons)
+    big_frame = pd.concat([comparisons[key] for key in comparison_list],
+                          keys=pd.MultiIndex.from_tuples(comparison_list))
+
+    return big_frame.dropna()
+
+
+def results_in_context(results, name=('Luminoso', 'Numberbatch 17.02')):
     comparisons = dict(COMPARISONS)
     comparisons[name] = results
     comparison_list = sorted(comparisons)
