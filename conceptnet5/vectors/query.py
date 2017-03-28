@@ -74,7 +74,7 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
-            if not self.frame.index[0].startswith('/c/'):
+            if not self.frame.index[1].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
                 # they're in English, and stick the English language tag on
                 # them without any further transformation, so we can be sure

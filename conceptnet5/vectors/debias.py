@@ -3,7 +3,6 @@ from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity,
 from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
 import pandas as pd
-import cvxpy
 
 # A list of English words referring to nationalities, nations, ethnicities, and
 # religions. Our goal is to prevent ConceptNet from learning insults and
@@ -382,51 +381,6 @@ def get_vocabulary_vectors(frame, vocab):
         if uri in frame.index:
             vecs.append(frame.loc[uri].values)
     return np.vstack(vecs)
-
-
-def fancy_debias(frame, weight=1):
-    print("Getting vocab")
-    B = get_vocabulary_vectors(
-        frame,
-        SEX_PREJUDICES + CULTURE_PREJUDICES
-    )
-
-    avg_vecs = [
-        get_vocabulary_vectors(frame, vocab).mean(axis=0)
-        for vocab in [
-            MALE_WORDS, FEMALE_WORDS, AGE_WORDS, ORIENTATION_WORDS, PEOPLE_BY_CULTURE
-        ]
-    ]
-    P = np.vstack(avg_vecs)
-    # P = get_vocabulary_vectors(
-    #     frame,
-    #     MALE_WORDS + FEMALE_WORDS + AGE_WORDS + ORIENTATION_WORDS + PEOPLE_BY_CULTURE
-    # )
-
-    #print("calculating SVD operation")
-    #U, S, Vt = np.linalg.svd(frame.values, full_matrices=False)
-    #right_op = Vt.T * S
-    #del U, S, Vt
-
-    print("Setting up objective")
-    k = frame.shape[1]
-    X = cvxpy.Semidef(k)
-    ident = np.eye(k)
-
-    #objective = cvxpy.Minimize(
-    #    cvxpy.norm(right_op.T * (X - ident) * right_op, 'fro') +
-    #    weight * cvxpy.norm(P * X * B.T, 'fro')
-    #)
-    objective = cvxpy.Minimize(
-        cvxpy.norm(X - ident, 'fro') + 100 * cvxpy.norm(P * X * B.T, 'fro')
-    )
-    prob = cvxpy.Problem(objective)
-
-    print("Solving")
-    print(prob)
-    prob.solve(solver='SCS', verbose=True)
-    transform = X.value
-    return frame.dot(transform)
 
 
 def de_bias_category(frame, category_examples, bias_examples, strength=20.):
