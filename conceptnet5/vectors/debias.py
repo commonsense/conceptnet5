@@ -3,7 +3,7 @@ from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity,
 from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
 import pandas as pd
-
+import cvxpy
 
 # A list of English words referring to nationalities, nations, ethnicities, and
 # religions. Our goal is to prevent ConceptNet from learning insults and
@@ -20,21 +20,6 @@ PEOPLE_BY_CULTURE = [
     'middle east', 'middle eastern',
     'arabia', 'arabian', 'arab'
     'latin america', 'latin american', 'latino', 'latina', 'hispanic',
-
-    # Religions and beliefs
-    'christianity', 'christian',
-    'islam', 'muslim',
-    'humanism', 'humanist', 'secular',
-    'agnosticism', 'agnostic',
-    'atheism', 'atheist',
-    'buddhism', 'buddhist',
-    'sikhism', 'sikh',
-    'judaism', 'jewish',
-    "bahà'i",
-    'jainism', 'jain',
-    'shinto',
-    'zoroastrianism', 'zoroastrian',
-    'paganism', 'pagan',
 
     # Colors used as races
     'white', 'black', 'brown',
@@ -270,12 +255,29 @@ PEOPLE_BY_CULTURE = [
     'zimbabwe', 'zimbabwean'
 ]
 
+PEOPLE_BY_BELIEF = [
+    'christianity', 'christian',
+    'islam', 'muslim',
+    'humanism', 'humanist', 'secular',
+    'agnosticism', 'agnostic',
+    'atheism', 'atheist',
+    'buddhism', 'buddhist',
+    'sikhism', 'sikh',
+    'judaism', 'jewish',
+    "bahà'i",
+    'jainism', 'jain',
+    'shinto',
+    'zoroastrianism', 'zoroastrian',
+    'paganism', 'pagan',
+]
+
+
 # A list of things we don't want our semantic space to learn about various
 # cultures of people. This list doesn't have to be exhaustive; we're modifying
 # the whole vector space, so nearby terms will also be affected.
 CULTURE_PREJUDICES = [
     'illegal', 'terror', 'evil', 'threat',
-    'dumbass', 'shithead', 'wanker',
+    'dumbass', 'shithead', 'wanker', 'dickhead',
     'illiterate', 'ignorant', 'inferior',
     'sexy', 'suave',
     'wealthy', 'poor',
@@ -294,9 +296,7 @@ CULTURE_PREJUDICES = [
 #
 # We handle this and related problems by making an axis of words that refer to
 # gender or sexual orientation, and exclude them from making associations with
-# porn and sexually-degrading words. It appears we don't have to handle the
-# word 'teen' separately; it's fixed as a side effect when we de-porn the more
-# specifically gendered words.
+# porn and sexually-degrading words.
 
 FEMALE_WORDS = [
     'woman', 'feminine', 'female',
@@ -312,20 +312,40 @@ ORIENTATION_WORDS = [
     'gay', 'lesbian', 'bisexual', 'trans', 'transgender'
 ]
 
-SEX_PREJUDICES = [
-    'slut', 'whore', 'shrew', 'bitch', 'faggot',
-    'sexy', 'fuck', 'fucked', 'fucker', 'nude', 'porn'
+AGE_WORDS = [
+    'young', 'teen', 'old'
 ]
 
+SEX_PREJUDICES = [
+    'slut', 'whore', 'shrew', 'bitch', 'faggot',
+    'sexy', 'fuck', 'fucked', 'fucker', 'nude', 'porn',
+    'cocksucker'
+]
 
-def read_sentiment(filename):
-    sentiments = {}
-    for line in open(filename, encoding='utf-8'):
-        line = line.strip()
-        if line and not line.startswith('#'):
-            word, sentiment_str = line.split(',')
-            sentiments[word] = float(sentiment_str)
-    return sentiments
+GENDERED_WORDS = FEMALE_WORDS + MALE_WORDS
+
+GENDER_NEUTRAL_WORDS = [
+    'surgeon', 'nurse',
+    'doctor', 'midwife',
+    'paramedic', 'registered nurse',
+    'hummer', 'minivan',
+    'karate', 'gymnastics',
+    'alcoholism', 'eating disorder',
+    'athlete', 'gymnast',
+    'neurologist', 'therapist',
+    'architect', 'interior designer',
+    'chauffeur', 'nanny',
+    'curator', 'librarian',
+    'drug trafficking', 'prostitution',
+    'musician', 'dancer',
+    'beer', 'cocktail',
+    'headmaster', 'guidance counselor',
+    'workout', 'pilates',
+    'home depot', 'jcpenney',
+    'carpentry', 'sewing',
+    'accountant', 'paralegal'
+    'programmer', 'homemaker'
+]
 
 
 def get_weighted_vector(frame, weighted_terms):
@@ -355,17 +375,82 @@ def reject_subspace(frame, axes):
     return l2_normalize_rows(current_array, offset=1e-9)
 
 
+def get_vocabulary_vectors(frame, vocab):
+    vecs = []
+    for term in vocab:
+        uri = standardized_uri('en', term)
+        if uri in frame.index:
+            vecs.append(frame.loc[uri].values)
+    return np.vstack(vecs)
+
+
+def fancy_debias(frame, weight=1):
+    print("Getting vocab")
+    B = get_vocabulary_vectors(
+        frame,
+        SEX_PREJUDICES + CULTURE_PREJUDICES
+    )
+
+    avg_vecs = [
+        get_vocabulary_vectors(frame, vocab).mean(axis=0)
+        for vocab in [
+            MALE_WORDS, FEMALE_WORDS, AGE_WORDS, ORIENTATION_WORDS, PEOPLE_BY_CULTURE
+        ]
+    ]
+    P = np.vstack(avg_vecs)
+    # P = get_vocabulary_vectors(
+    #     frame,
+    #     MALE_WORDS + FEMALE_WORDS + AGE_WORDS + ORIENTATION_WORDS + PEOPLE_BY_CULTURE
+    # )
+
+    #print("calculating SVD operation")
+    #U, S, Vt = np.linalg.svd(frame.values, full_matrices=False)
+    #right_op = Vt.T * S
+    #del U, S, Vt
+
+    print("Setting up objective")
+    k = frame.shape[1]
+    X = cvxpy.Semidef(k)
+    ident = np.eye(k)
+
+    #objective = cvxpy.Minimize(
+    #    cvxpy.norm(right_op.T * (X - ident) * right_op, 'fro') +
+    #    weight * cvxpy.norm(P * X * B.T, 'fro')
+    #)
+    objective = cvxpy.Minimize(
+        cvxpy.norm(X - ident, 'fro') + 100 * cvxpy.norm(P * X * B.T, 'fro')
+    )
+    prob = cvxpy.Problem(objective)
+
+    print("Solving")
+    print(prob)
+    prob.solve(solver='SCS', verbose=True)
+    transform = X.value
+    return frame.dot(transform)
+
+
 def de_bias_category(frame, category_examples, bias_examples, strength=20.):
     category_axis = get_category_axis(frame, category_examples)
-
     applicability = frame.dot(category_axis)
     applicability = np.power(np.maximum(applicability, 0.), 1 / strength)
+    print(np.max(applicability))
 
     vocab = [
         standardized_uri('en', term) for term in bias_examples
     ]
     components_to_reject = frame.loc[vocab].values
     modified_component = reject_subspace(frame, components_to_reject).mul(applicability, axis=0)
+    original_component = frame.mul(1 - applicability, axis=0)
+    return l2_normalize_rows(original_component + modified_component)
+
+
+def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples, strength=40.):
+    category_axis = get_category_axis(frame, pos_examples) - get_category_axis(frame, neg_examples)
+    bias_axis = get_category_axis(frame, right_examples) - get_category_axis(frame, left_examples)
+    applicability = frame.dot(category_axis)
+    print(np.max(applicability))
+    applicability = np.maximum(0., applicability) ** (1 / strength)
+    modified_component = reject_subspace(frame, [bias_axis]).mul(applicability, axis=0)
     original_component = frame.mul(1 - applicability, axis=0)
     return l2_normalize_rows(original_component + modified_component)
 
@@ -380,6 +465,8 @@ def de_bias_frame(frame):
     anyone's race, color, religion, national origin, sex, gender presentation,
     or sexual orientation.
     """
-    newframe = de_bias_category(frame, PEOPLE_BY_CULTURE, CULTURE_PREJUDICES)
-    newframe = de_bias_category(newframe, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS, SEX_PREJUDICES)
+    newframe = de_bias_category(frame, PEOPLE_BY_CULTURE, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    newframe = de_bias_category(newframe, PEOPLE_BY_BELIEF, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    newframe = de_bias_category(newframe, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    newframe = de_bias_binary(newframe, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)
     return newframe
