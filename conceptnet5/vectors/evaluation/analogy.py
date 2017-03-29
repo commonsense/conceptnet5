@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import wordfreq
-from collections import Counter
+from collections import defaultdict
 from itertools import groupby, product
 from scipy.stats import spearmanr, hmean
 from statsmodels.stats.proportion import proportion_confint
@@ -66,16 +66,20 @@ def read_train_pairs_semeval2012(subset, subclass):
         for i, line in enumerate(file):
             if i in [4, 5, 6]:
                 pair = line.strip().split(':')
-                pair = tuple(standardized_uri('en', term) for term in pair)
+                pair = tuple(pair)
                 train_pairs.append(pair)
     return train_pairs
 
 
-def read_questions_semeval2012(subset, subclass):
+def read_turk_answers_semeval2012(subset, subclass, test_questions):
     """
     A line represents one turker's answer to a given question. An answer has the
     following format:
-    pair1, pair2, pair3, pair4, least_prototypical_pair, most_prototypical_pair, relation_name,
+    pair1, pair2, pair3, pair4, least_prototypical_pair, most_prototypical_pair, relation_name
+
+    This function returns two dictionaries:
+      * pairqnum2least -
+      * pairqnum2most
     """
     filename = 'semeval12-2/{}/Phase2Answers-{}.txt'.format(subset, subclass)
     with open(get_support_data_filename(filename)) as file:
@@ -83,26 +87,35 @@ def read_questions_semeval2012(subset, subclass):
         for i, line in enumerate(file):
             if i == 0:
                 continue
-            pairs = line.split('\t')
+            pairs = tuple(line.split('\t'))
             answers.append(pairs)
 
-        questions = []
-        for key, group in groupby(answers, key=lambda x: x[:4]):
-            most_list = []
-            least_list = []
-            for elem in group:
-                least_list.append(elem[4])
-                most_list.append(elem[5])
-            least = Counter(least_list).most_common(1)[0][0]
-            most = Counter(most_list).most_common(1)[0][0]
-            question = key + [least, most]
-            question = [pair.split(':') for pair in question]
-            question = [tuple(standardized_uri('en', term) for term in pair) for pair in question]
-            questions.append(question)
-        return questions
+        pairqnum2least = defaultdict(int)
+        pairqnum2most = defaultdict(int)
+
+        for question, answers in groupby(answers, key=lambda x: x[:4]):
+            question_num = test_questions.index(question)
+            for answer in answers:
+                pairqnum2least[(question_num, answer[4])] += 1
+                pairqnum2most[(question_num, answer[5])] += 1
+        return pairqnum2least, pairqnum2most
 
 
-def read_turk_ranks(subset, subclass):
+def read_test_questions_semeval2012(subset, subclass):
+    """
+    Read test questions for a specific subclass. A test question has the following format:
+    pair1,pair2,pair3,pair4
+    """
+    filename = 'semeval12-2/{}/Phase2Questions-{}.txt'.format(subset, subclass)
+    with open(get_support_data_filename(filename)) as file:
+        test_questions = []
+        for line in file:
+            pairs = tuple(line.strip().split(','))
+            test_questions.append(pairs)
+        return test_questions
+
+
+def read_turk_ranks_semeval2012(subset, subclass):
     """
     Read gold rankings of prototypicality, as computed using turkers answers to MaxDiff
     questions.
@@ -119,8 +132,6 @@ def read_turk_ranks(subset, subclass):
                 continue
             gold_score, pair = line.split()
             gold_score = float(gold_score)
-            pair = pair.strip().replace('"', '').split(':')
-            pair = tuple(standardized_uri('en', term) for term in pair)
             gold_ranks.append((pair, gold_score))
         return sorted(gold_ranks)
 
@@ -175,17 +186,8 @@ def tune_pairwise_analogies(func, *args):
     - The *similarity weight*, comparing b2 to b1 and a2 to a1
 
     """
-    # Original search was more coarse-grained
-    # weights = [
-    #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
-    #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
-    # ]
     print('Tuning analogy weights')
-    # weights = [
-    #     0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55,
-    #     0.6, 0.65, 0.7, 0.75, 0.8, 0.9, 1.0
-    # ]
-    weights = [0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
+    weights = [0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
                2.0, 2.5, 3.0]
     best_weights = None
     best_acc = 0.
@@ -246,14 +248,15 @@ def eval_google_analogies(frame):
 
 def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset, subclass):
     """
-    For a test file:
+    For a set of test pairs:
         * Compute a Spearman correlation coefficient between the ranks produced by vectors and
            gold ranks.
         * Compute an accuracy score of answering MaxDiff questions.
     """
     train_pairs = read_train_pairs_semeval2012(subset, subclass)
-    questions = read_questions_semeval2012(subset, subclass)
-    turk_rank = read_turk_ranks(subset, subclass)
+    test_questions = read_test_questions_semeval2012(subset, subclass)
+    pairqnum2least, pairqnum2most = read_turk_answers_semeval2012(subset, subclass, test_questions)
+    turk_rank = read_turk_ranks_semeval2012(subset, subclass)
     pairs_to_rank = [pair for pair, score in turk_rank]
 
     # Assign a score to each pair, according to pairwise_analogy_func
@@ -261,8 +264,13 @@ def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset,
     for pair in pairs_to_rank:
         rank_pair_scores = []
         for train_pair in train_pairs:
-            score = pairwise_analogy_func(vectors, train_pair[0], pair[0],
-                                          train_pair[1], pair[1], weight_direct, weight_transpose)
+            pair_to_rank = pair.strip().replace('"', '').split(':')
+            score = pairwise_analogy_func(vectors, standardized_uri('en', train_pair[0]),
+                                          standardized_uri('en', train_pair[1]),
+                                          standardized_uri('en', pair_to_rank[0]),
+                                          standardized_uri('en', pair_to_rank[1]),
+                                          weight_direct,
+                                          weight_transpose)
             rank_pair_scores.append(score)
         our_pair_scores[pair] = np.mean(rank_pair_scores)
 
@@ -271,33 +279,44 @@ def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset,
     correct_least = 0
     total = 0
 
-    for i, question in enumerate(questions):
-        question_pairs = question[:4]
-        least = question[4]
-        most = question[5]
+    for i, question in enumerate(test_questions):
         question_pairs_scores = []
 
-        for question_pair in question_pairs:
+        for question_pair in question:
             score = our_pair_scores[question_pair]
             question_pairs_scores.append(score)
 
-        our_answer_most = question_pairs[np.argmax(question_pairs_scores)]
-        our_answer_least = question_pairs[np.argmin(question_pairs_scores)]
+        our_answer_most = question[np.argmax(question_pairs_scores)]
+        our_answer_least = question[np.argmin(question_pairs_scores)]
 
-        if most == our_answer_most:
-            correct_most += 1
-        if least == our_answer_least:
+        votes_guess_least = pairqnum2least[(i, our_answer_least)]
+        votes_guess_most = pairqnum2most[(i, our_answer_most)]
+
+        max_votes_least = 0
+        max_votes_most = 0
+        for question_pair in question:
+            num_votes_least = pairqnum2least[(i, question_pair)]
+            num_votes_most = pairqnum2most[(i, question_pair)]
+            if num_votes_least > max_votes_least:
+                max_votes_least = num_votes_least
+            if num_votes_most > max_votes_most:
+                max_votes_most = num_votes_most
+
+        # a guess is correct if it got the same number of votes as the most frequent turkers' answer
+        if votes_guess_least == max_votes_least:
             correct_least += 1
+        if votes_guess_most == max_votes_most:
+            correct_most += 1
         total += 1
 
     # Compute Spearman correlation of our ranks and MT ranks
     our_semeval_scores = [score for pair, score in sorted(our_pair_scores.items())]
     turk_semeval_scores = [score for pair, score in turk_rank]
-    spearman = round(spearmanr(our_semeval_scores, turk_semeval_scores)[0], 3)
+    spearman = spearmanr(our_semeval_scores, turk_semeval_scores)[0]
     spearman_results = confidence_interval(spearman, total)
 
     # Compute an accuracy score on MaxDiff questions
-    maxdiff = round((correct_least + correct_most) / (2 * total), 3)
+    maxdiff = (correct_least + correct_most) / (2 * total)
     low_maxdiff, high_maxdiff = proportion_confint((correct_least + correct_most), (2 * total))
     maxdiff_results = pd.Series([maxdiff, low_maxdiff, high_maxdiff], index=['acc', 'low', 'high'])
 
@@ -352,6 +371,7 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
           'global' to get the average of the results across all subclasses of semeval12-2,
           or another string to get the results broken down by a subclass (1a, 1b, etc.)
     """
+
     vectors = VectorSpaceWrapper(frame=frame)
     results = empty_comparison_table()
 
@@ -360,7 +380,7 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
         semeval_weights = tune_pairwise_analogies(eval_semeval2012_global, vectors)
     else:
         sat_weights = (0.35, 0.65)
-        semeval_weights = (0.05, 1.5)
+        semeval_weights = (0.3, 0.35)
 
     sat_results = eval_pairwise_analogies(vectors,
                                           analogy_filename,
@@ -380,7 +400,6 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
     else:
         for subclass in product(range(1, 11), 'a b c d e f g h i j'):
             subclass = ''.join([str(element) for element in subclass])
-            subclass = ''.join(subclass)
             try:
                 maxdiff_score, spearman_score = eval_semeval2012_analogies(vectors,
                                                                            semeval_weights[0],
