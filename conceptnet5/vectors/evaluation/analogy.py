@@ -154,8 +154,7 @@ def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose)
     return value
 
 
-def eval_pairwise_analogies(vectors, eval_filename,
-                            weight_direct, weight_transpose, subset='all'):
+def eval_pairwise_analogies(vectors, eval_filename, weight_direct, weight_transpose, subset='all'):
     total = 0
     correct = 0
     for idx, (prompt, choices, answer) in enumerate(read_turney_analogies(eval_filename)):
@@ -176,15 +175,17 @@ def eval_pairwise_analogies(vectors, eval_filename,
     return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
 
 
-def tune_pairwise_analogies(func, *args):
+def optimize_weights(func, *args):
     """
-    Our pairwise analogy function has three weights that can be tuned
-    (and therefore two free parameters, as the total weight does not matter):
+    Both eval_pairwise_analogies() and eval_semeval2012_analogies() have three weights that can be
+    tuned(and therefore two free parameters, as the total weight does not matter):
 
     - The *direct weight*, comparing (b2 - a2) to (b1 - a1)
     - The *transpose weight*, comparing (b2 - b1) to (a2 - a1)
     - The *similarity weight*, comparing b2 to b1 and a2 to a1
 
+    This function takes a function for which to optimize the weights as an argument and returns
+    the optimal weights, weight_direct and weight_transpose.
     """
     print('Tuning analogy weights')
     weights = [0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
@@ -195,6 +196,8 @@ def tune_pairwise_analogies(func, *args):
         for weight_transpose in weights:
             scores = func(*args, weight_direct, weight_transpose, subset='dev')
             if isinstance(scores, list):
+                # If a function to optimize returns two results, like eval_semeval2012_analogies(),
+                #  take their harmonic mean to compute the weights optimal for both results
                 acc = hmean([scores[0].loc['acc'], scores[1].loc['acc']])
             else:
                 acc = scores.loc['acc']
@@ -376,8 +379,8 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
     results = empty_comparison_table()
 
     if tune_analogies:
-        sat_weights = tune_pairwise_analogies(eval_pairwise_analogies, vectors, analogy_filename)
-        semeval_weights = tune_pairwise_analogies(eval_semeval2012_global, vectors)
+        sat_weights = optimize_weights(eval_pairwise_analogies, vectors, analogy_filename)
+        semeval_weights = optimize_weights(eval_semeval2012_global, vectors)
     else:
         sat_weights = (0.35, 0.65)
         semeval_weights = (0.3, 0.35)
