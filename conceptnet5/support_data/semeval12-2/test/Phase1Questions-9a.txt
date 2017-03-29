@@ -1,0 +1,19 @@
+Question 9(a) SPACE-TIME: Item:Location
+
+Consider the following word pairs:
+
+arsenal:weapon
+seminary:theologian
+bookshelf:books
+
+What relation best describes these X:Y word pairs?
+
+X and Y are contrary / opposite to each other
+an X is a place/location/area where Y is found
+a person who is X often is in a state of Y
+Y is an instrument through with X receives some object/service/role
+
+Correct Answer:
+
+an X is a place/location/area where Y is found
+

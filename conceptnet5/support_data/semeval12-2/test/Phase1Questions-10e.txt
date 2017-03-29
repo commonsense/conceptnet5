@@ -1,0 +1,19 @@
+Question 10(e) REFERENCE: Knowledge
+
+Consider the following word pairs:
+
+psychology:minds
+astronomy:stars
+ballistics:projectiles
+
+What relation best describes these X:Y word pairs?
+
+an X cannot have attribute Y; Y is antithetical to being X
+X is the opposite direction from Y
+X is the name for knowledge of Y
+X is intended to produce Y
+
+Correct Answer:
+
+X is the name for knowledge of Y
+

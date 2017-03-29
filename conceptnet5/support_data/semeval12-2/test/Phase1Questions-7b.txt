@@ -1,0 +1,19 @@
+Question 7(b) CASE RELATIONS: Agent:Recipient
+
+Consider the following word pairs:
+
+doctor:patient
+mentor:protege
+judge:litigant
+
+What relation best describes these X:Y word pairs?
+
+Y is a kind/type/instance of X
+X enables the use of Y
+a Y receives an item/knowledge/service from X
+Y is a specific X
+
+Correct Answer:
+
+a Y receives an item/knowledge/service from X
+

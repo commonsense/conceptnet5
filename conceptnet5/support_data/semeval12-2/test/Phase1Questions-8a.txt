@@ -1,0 +1,19 @@
+Question 8(a) CAUSE-PURPOSE: Cause:Effect
+
+Consider the following word pairs:
+
+enigma:puzzlement
+joke:laughter
+practice:improvement
+
+What relation best describes these X:Y word pairs?
+
+an X causes Y
+the result of action X does not produce an object with Y
+X and Y are at opposite ends of the same scale, but X is more extreme than Y
+an X will typically Y
+
+Correct Answer:
+
+an X causes Y
+

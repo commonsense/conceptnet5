@@ -1,0 +1,19 @@
+Question 1(a) CLASS-INCLUSION: Taxonomic
+
+Consider the following word pairs:
+
+flower:tulip
+emotion:rage
+poem:sonnet
+
+What relation best describes these X:Y word pairs?
+
+to X is to have a Y receive some object/service/idea
+Y is an unacceptable form of X
+a Y is a part of an X
+Y is a kind/type/instance of X
+
+Correct Answer:
+
+Y is a kind/type/instance of X
+

@@ -1,0 +1,19 @@
+Question 5(a) ATTRIBUTE: ItemAttribute(noun:adjective)
+
+Consider the following word pairs:
+
+beggar:poor
+glass:fragile
+hero:brave
+
+What relation best describes these X:Y word pairs?
+
+X cannot be done in a Y manner
+an X has the attribute Y
+Y is a kind/type/instance of X
+X is similar to the opposite of Y, but X is not truly the opposite of Y
+
+Correct Answer:
+
+an X has the attribute Y
+

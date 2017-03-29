@@ -1,0 +1,19 @@
+Question 5(f) ATTRIBUTE: Agent/ObjectAttribute:Typical Action
+
+Consider the following word pairs:
+
+viable:live
+salient:notice
+brittle:break
+
+What relation best describes these X:Y word pairs?
+
+X is one step/action/part of the actions in Y
+Being X is incompatible with being Y
+something/someone that is X will typically Y
+Something cannot be/have/do X and Y at the same time
+
+Correct Answer:
+
+something/someone that is X will typically Y
+

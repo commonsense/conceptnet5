@@ -420,7 +420,7 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
     return confidence_interval(correlation, len(gold_scores))
 
 
-def evaluate(frame, subset='dev', semeval_scope='per_language'):
+def evaluate(frame, subset='dev', semeval_scope='global'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Use a

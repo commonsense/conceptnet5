@@ -1,0 +1,19 @@
+Question 3(d) SIMILAR: Dimensional Naughty
+
+Consider the following word pairs:
+
+copy:plagiarize
+listen:eavesdrop
+gaze:leer
+
+What relation best describes these X:Y word pairs?
+
+Y is the goal of X
+Y is an unacceptable form of X
+X is similar to the opposite of Y, but X is not truly the opposite of Y
+X and Y share a contiguous border
+
+Correct Answer:
+
+Y is an unacceptable form of X
+

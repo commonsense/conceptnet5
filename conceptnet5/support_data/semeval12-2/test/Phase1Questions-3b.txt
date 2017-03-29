@@ -1,0 +1,19 @@
+Question 3(b) SIMILAR: Dimensional Similarity
+
+Consider the following word pairs:
+
+enthusiasm:fervor
+simmer:boil
+stream:river
+
+What relation best describes these X:Y word pairs?
+
+an X and Y are two kinds in a category of actions/things/attributes
+X is intended to produce Y
+an X indicates/signifies Y
+an X has the attribute Y
+
+Correct Answer:
+
+an X and Y are two kinds in a category of actions/things/attributes
+

@@ -1,0 +1,19 @@
+Question 7(g) CASE RELATIONS: Object:Instrument
+
+Consider the following word pairs:
+
+patient:stethoscope
+violin:bow
+pipe:wrench
+
+What relation best describes these X:Y word pairs?
+
+an X is an increase/decease in Y
+a Y is a part of an X
+Y are items in a collection/group of X
+a Y is used on an X
+
+Correct Answer:
+
+a Y is used on an X
+

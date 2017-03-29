@@ -1,0 +1,19 @@
+Question 6(e) NON-ATTRIBUTE: Objects:Atypical Action (noun:verb)
+
+Consider the following word pairs:
+
+recluse:socialize
+ascetic:indulge
+patron:disparage
+
+What relation best describes these X:Y word pairs?
+
+an X is unlikely to Y
+an X once had/owned/possessed Y, but no longer
+an X exists in the state of Y
+Y are items in a collection/group of X
+
+Correct Answer:
+
+an X is unlikely to Y
+

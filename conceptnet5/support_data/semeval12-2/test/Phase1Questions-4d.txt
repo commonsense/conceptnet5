@@ -1,0 +1,21 @@
+Question 4(d) CONTRAST: Directional
+
+Consider the following word pairs:
+
+front:back
+left:right
+east:west
+before:after
+inside:outside
+
+What relation best describes these X:Y word pairs?
+
+X causes/compels a person to Y
+X is one step/action/part of the actions in Y
+X possesses/owns/has Y
+X is the opposite direction from Y
+
+Correct Answer:
+
+X is the opposite direction from Y
+

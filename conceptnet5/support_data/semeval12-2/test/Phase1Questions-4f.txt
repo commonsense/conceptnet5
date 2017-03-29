@@ -1,0 +1,20 @@
+Question 4(f) CONTRAST: Asymmetric Contrary
+
+Consider the following word pairs:
+
+hot:cool
+destitute:rich
+tiny:large
+dry:moist
+
+What relation best describes these X:Y word pairs?
+
+Y is a kind/type/instance of X
+X is the name for knowledge of Y
+X and Y are at opposite ends of the same scale, but X is more extreme than Y
+an X makes Y / an X uses Y to make an item
+
+Correct Answer:
+
+X and Y are at opposite ends of the same scale
+

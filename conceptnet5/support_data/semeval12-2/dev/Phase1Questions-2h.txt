@@ -1,0 +1,19 @@
+Question 2(h) PART-WHOLE: Creature:Possession
+
+Consider the following word pairs:
+
+millionaire:money
+author:copyright
+robin:nest
+
+What relation best describes these X:Y word pairs?
+
+X causes/compels a person to Y
+X is intended to produce Y
+an X cannot have attribute Y; Y is antithetical to being X
+X possesses/owns/has Y
+
+Correct Answer:
+
+X possesses/owns/has Y
+

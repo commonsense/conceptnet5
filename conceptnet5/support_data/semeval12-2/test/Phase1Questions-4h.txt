@@ -1,0 +1,19 @@
+Question 4(h) CONTRAST: Defective
+
+Consider the following word pairs:
+
+fallacy:logic
+astigmatism:sight
+limp:walk
+
+What relation best describes these X:Y word pairs?
+
+an X uses Y to perform their role
+an X is is a defect in Y
+Y is the goal of X
+Y is an excessive form of X
+
+Correct Answer:
+
+an X is is a defect in Y
+
