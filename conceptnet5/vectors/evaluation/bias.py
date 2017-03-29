@@ -1,5 +1,6 @@
 from conceptnet5.vectors.debias import (
-    FEMALE_WORDS, MALE_WORDS, get_category_axis, get_vocabulary_vectors
+    FEMALE_WORDS, MALE_WORDS, PEOPLE_BY_ETHNICITY, PEOPLE_BY_BELIEF,
+    get_category_axis, get_vocabulary_vectors
 )
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.vectors import standardized_uri
@@ -55,10 +56,28 @@ GENDER_BIAS_PAIRS = [
     ('cheerful', 'jovial')
 ]
 
-STEREOTYPE_TARGETS = (
-    ['american', 'asian', 'black', 'british', 'chinese', 'jewish', 'mexican', 'muslim', 'nigerian', 'white'],
-    ['overweight', 'slut', 'criminal', 'wanker', 'inferior', 'greedy', 'illegal', 'terror', 'scam', 'elegant']
-)
+# This intentionally is a slightly different list than the one in debias.py.
+# We need to test associations with more terms than the ones we specifically
+# corrected.
+STEREOTYPE_TERMS = [
+    'cheap', 'criminal', 'dumb', 'elegant', 'evil', 'greedy', 'hooligan',
+    'illegal', 'inferior', 'lazy', 'overweight', 'scammer', 'slob', 'slut',
+    'terrorist', 'wanker'
+]
+
+
+def correlation_bias(grid):
+    bias_numbers = []
+    for i in range(grid.shape[1]):
+        col_bias = np.max(grid[:, i]) - np.mean(grid[:, i])
+        bias_numbers.append(col_bias)
+
+    mean = np.mean(bias_numbers)
+    sem = scipy.stats.sem(bias_numbers)
+    return pd.Series(
+        [mean, mean - sem * 2, mean + sem * 2],
+        index=['bias', 'low', 'high']
+    )
 
 
 def measure_bias(frame):
@@ -77,23 +96,22 @@ def measure_bias(frame):
     mean = np.mean(gender_bias_numbers)
     sem = scipy.stats.sem(gender_bias_numbers)
     gender_bias = pd.Series(
-        [mean, mean + sem * 2, mean - sem * 2],
-        index=['bias', 'low', 'high']
-    )
-
-    stereotype_vecs_1 = get_vocabulary_vectors(frame, STEREOTYPE_TARGETS[0])
-    stereotype_vecs_2 = get_vocabulary_vectors(frame, STEREOTYPE_TARGETS[1])
-    stereotype_corr = stereotype_vecs_1.dot(stereotype_vecs_2.T)
-    ethnic_bias_numbers = []
-    for i in range(len(stereotype_vecs_1)):
-        bias = stereotype_corr[i, i] - np.mean(stereotype_corr[i])
-        ethnic_bias_numbers.append(bias)
-
-    mean = np.mean(ethnic_bias_numbers)
-    sem = scipy.stats.sem(ethnic_bias_numbers)
-    ethnic_bias = pd.Series(
         [mean, mean - sem * 2, mean + sem * 2],
         index=['bias', 'low', 'high']
     )
 
-    return pd.concat([gender_bias, ethnic_bias], axis=0, keys=['gender', 'ethnicity'])
+    stereotype_vecs_1 = get_vocabulary_vectors(frame, PEOPLE_BY_ETHNICITY)
+    stereotype_vecs_2 = get_vocabulary_vectors(frame, STEREOTYPE_TERMS)
+    stereotype_corr = stereotype_vecs_1.dot(stereotype_vecs_2.T)
+    ethnic_bias = correlation_bias(stereotype_corr)
+
+    stereotype_vecs_1 = get_vocabulary_vectors(frame, PEOPLE_BY_BELIEF)
+    stereotype_vecs_2 = get_vocabulary_vectors(frame, STEREOTYPE_TERMS)
+    stereotype_corr = stereotype_vecs_1.dot(stereotype_vecs_2.T)
+    belief_bias = correlation_bias(stereotype_corr)
+
+    return pd.DataFrame({
+        'gender': gender_bias,
+        'ethnicity': ethnic_bias,
+        'beliefs': belief_bias
+    }).T

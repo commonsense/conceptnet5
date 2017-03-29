@@ -3,12 +3,14 @@ from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity,
 from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
 import pandas as pd
+from sklearn import svm
+
 
 # A list of English words referring to nationalities, nations, ethnicities, and
 # religions. Our goal is to prevent ConceptNet from learning insults and
 # stereotypes about these classes of people.
 
-PEOPLE_BY_CULTURE = [
+PEOPLE_BY_ETHNICITY = [
     # Regions of the world
     'africa', 'african', 'sub-saharan',
     'america', 'american',
@@ -383,6 +385,30 @@ def get_vocabulary_vectors(frame, vocab):
     return np.vstack(vecs)
 
 
+def one_class_svm(frame, vocab):
+    vecs = get_vocabulary_vectors(frame, vocab)
+    vecs = np.vstack([vecs, vecs[0] * 0])
+    values = np.ones(vecs.shape[0])
+    values[-1] = -1
+
+    svc = svm.LinearSVC(verbose=True, random_state=0, max_iter=10000)
+    svc.fit(vecs, values)
+    return svc
+
+
+def two_class_svm(frame, pos_vocab, neg_vocab):
+    pos_vecs = get_vocabulary_vectors(frame, pos_vocab)
+    pos_values = np.ones(len(pos_vocab))
+    neg_vecs = get_vocabulary_vectors(frame, neg_vocab)
+    neg_values = -np.ones(len(neg_vocab))
+    vecs = np.vstack([pos_vecs, neg_vecs])
+    values = np.concat([pos_values, neg_values])
+
+    svc = svm.LinearSVC(verbose=True, random_state=0, max_iter=10000)
+    svc.fit(vecs, values)
+    return svc
+
+
 def de_bias_category(frame, category_examples, bias_examples, strength=20.):
     category_axis = get_category_axis(frame, category_examples)
     applicability = frame.dot(category_axis)
@@ -419,7 +445,7 @@ def de_bias_frame(frame):
     anyone's race, color, religion, national origin, sex, gender presentation,
     or sexual orientation.
     """
-    newframe = de_bias_category(frame, PEOPLE_BY_CULTURE, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    newframe = de_bias_category(frame, PEOPLE_BY_ETHNICITY, CULTURE_PREJUDICES + SEX_PREJUDICES)
     newframe = de_bias_category(newframe, PEOPLE_BY_BELIEF, CULTURE_PREJUDICES + SEX_PREJUDICES)
     newframe = de_bias_category(newframe, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS, CULTURE_PREJUDICES + SEX_PREJUDICES)
     newframe = de_bias_binary(newframe, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)
