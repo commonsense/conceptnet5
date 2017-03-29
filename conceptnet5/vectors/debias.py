@@ -385,35 +385,25 @@ def get_vocabulary_vectors(frame, vocab):
     return np.vstack(vecs)
 
 
-def one_class_svm(frame, vocab):
-    vecs = get_vocabulary_vectors(frame, vocab)
-    vecs = np.vstack([vecs, vecs[0] * 0])
-    values = np.ones(vecs.shape[0])
-    values[-1] = -1
-
-    svc = svm.LinearSVC(verbose=True, random_state=0, max_iter=10000)
-    svc.fit(vecs, values)
-    return svc
-
-
 def two_class_svm(frame, pos_vocab, neg_vocab):
     pos_vecs = get_vocabulary_vectors(frame, pos_vocab)
-    pos_values = np.ones(len(pos_vocab))
+    pos_values = np.ones(pos_vecs.shape[0])
     neg_vecs = get_vocabulary_vectors(frame, neg_vocab)
-    neg_values = -np.ones(len(neg_vocab))
+    neg_values = -np.ones(neg_vecs.shape[0])
     vecs = np.vstack([pos_vecs, neg_vecs])
-    values = np.concat([pos_values, neg_values])
+    values = np.concatenate([pos_values, neg_values])
 
-    svc = svm.LinearSVC(verbose=True, random_state=0, max_iter=10000)
+    svc = svm.SVC(
+        verbose=False, random_state=0, max_iter=10000, class_weight='balanced',
+        probability=True, kernel='linear'
+    )
     svc.fit(vecs, values)
     return svc
 
 
-def de_bias_category(frame, category_examples, bias_examples, strength=20.):
-    category_axis = get_category_axis(frame, category_examples)
-    applicability = frame.dot(category_axis)
-    applicability = np.power(np.maximum(applicability, 0.), 1 / strength)
-    print(np.max(applicability))
+def de_bias_category(frame, category_examples, bias_examples):
+    category_predictor = two_class_svm(frame, category_examples, bias_examples)
+    applicability = category_predictor.predict_proba(frame)[:, 1]
 
     vocab = [
         standardized_uri('en', term) for term in bias_examples
@@ -424,12 +414,10 @@ def de_bias_category(frame, category_examples, bias_examples, strength=20.):
     return l2_normalize_rows(original_component + modified_component)
 
 
-def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples, strength=40.):
-    category_axis = get_category_axis(frame, pos_examples) - get_category_axis(frame, neg_examples)
+def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples):
+    category_predictor = two_class_svm(frame, pos_examples, neg_examples)
+    applicability = category_predictor.predict_proba(frame)[:, 1]
     bias_axis = get_category_axis(frame, right_examples) - get_category_axis(frame, left_examples)
-    applicability = frame.dot(category_axis)
-    print(np.max(applicability))
-    applicability = np.maximum(0., applicability) ** (1 / strength)
     modified_component = reject_subspace(frame, [bias_axis]).mul(applicability, axis=0)
     original_component = frame.mul(1 - applicability, axis=0)
     return l2_normalize_rows(original_component + modified_component)
