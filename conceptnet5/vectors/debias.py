@@ -100,7 +100,7 @@ PEOPLE_BY_ETHNICITY = [
     'finland', 'finnish',
     'france', 'french',
     'gabon', 'gabonese',
-    'georgia', 'georgian',
+    'georgia',
     'germany', 'german',
     'ghana', 'ghanaian',
     'gibraltar',
@@ -257,19 +257,23 @@ PEOPLE_BY_ETHNICITY = [
 ]
 
 PEOPLE_BY_BELIEF = [
-    'christianity', 'christian',
-    'islam', 'muslim',
-    'humanism', 'humanist', 'secular',
     'agnosticism', 'agnostic',
     'atheism', 'atheist',
     'buddhism', 'buddhist',
-    'sikhism', 'sikh',
-    'judaism', 'jewish',
     "bahà'i",
+    'catholicism', 'catholic',
+    'christianity', 'christian',
+    'humanism', 'humanist', 'secular',
+    'islam', 'muslim',
     'jainism', 'jain',
-    'shinto',
-    'zoroastrianism', 'zoroastrian',
+    'judaism', 'jewish',
+    'mormonism', 'mormon',
+    'orthodox',
     'paganism', 'pagan',
+    'protestantism', 'protestant',
+    'shinto',
+    'sikhism', 'sikh',
+    'zoroastrianism', 'zoroastrian',
 ]
 
 
@@ -277,7 +281,7 @@ PEOPLE_BY_BELIEF = [
 # cultures of people. This list doesn't have to be exhaustive; we're modifying
 # the whole vector space, so nearby terms will also be affected.
 CULTURE_PREJUDICES = [
-    'illegal', 'terror', 'evil', 'threat',
+    'illegal', 'terrorist', 'evil', 'threat',
     'dumbass', 'shithead', 'wanker', 'dickhead',
     'illiterate', 'ignorant', 'inferior',
     'sexy', 'suave',
@@ -377,12 +381,8 @@ def reject_subspace(frame, axes):
 
 
 def get_vocabulary_vectors(frame, vocab):
-    vecs = []
-    for term in vocab:
-        uri = standardized_uri('en', term)
-        if uri in frame.index:
-            vecs.append(frame.loc[uri].values)
-    return np.vstack(vecs)
+    uris = [standardized_uri('en', term) for term in vocab]
+    return frame.loc[uris].dropna()
 
 
 def two_class_svm(frame, pos_vocab, neg_vocab):
@@ -390,7 +390,7 @@ def two_class_svm(frame, pos_vocab, neg_vocab):
     pos_values = np.ones(pos_vecs.shape[0])
     neg_vecs = get_vocabulary_vectors(frame, neg_vocab)
     neg_values = -np.ones(neg_vecs.shape[0])
-    vecs = np.vstack([pos_vecs, neg_vecs])
+    vecs = np.vstack([pos_vecs.values, neg_vecs.values])
     values = np.concatenate([pos_values, neg_values])
 
     svc = svm.SVC(

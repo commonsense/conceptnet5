@@ -67,9 +67,17 @@ def l2_normalize_rows(frame, offset=0.):
     return frame.div(row_norms, axis='rows')
 
 
+def subtract_mean_vector(frame):
+    """
+    Re-center the vectors in a DataFrame by subtracting the mean vector from
+    each row.
+    """
+    return frame.sub(frame.mean(axis='rows'), axis='columns')
+
+
 def shrink_and_sort(frame, n, k):
     """
-    Truncate a matrix to NxK, re-normalize it, and arrange the rows in
+    Truncate a DataFrame to NxK, re-normalize it, and arrange the rows in
     lexicographic order for querying.
     """
     shrunk = l2_normalize_rows(frame.iloc[:n, :k])
