@@ -53,7 +53,9 @@ class VectorSpaceWrapper(object):
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
-            self.frame = frame.sort_index()
+            self.frame = frame
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
             self.vector_filename = None
         self.index_cache = {}
         self.small_frame = None
