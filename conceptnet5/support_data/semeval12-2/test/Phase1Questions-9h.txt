@@ -1,0 +1,19 @@
+Question 9(h) SPACE-TIME: Sequence
+
+Consider the following word pairs:
+
+prologue:narrative
+inception:development
+coda:symphony
+
+What relation best describes these X:Y word pairs?
+
+Y is typically found at an event such as X
+an X has the attribute Y
+something that is X may be Y
+an Y follows X in sequence
+
+Correct Answer:
+
+an Y follows X in sequence
+

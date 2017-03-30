@@ -1,0 +1,20 @@
+Question 9(e) SPACE-TIME: Contiguity
+
+Consider the following word pairs:
+
+coast:ocean
+sidewalk:road
+horizon:sky
+fence:property
+
+What relation best describes these X:Y word pairs?
+
+Something cannot be/have/do X and Y at the same time
+X and Y share a contiguous border
+X is similar to the opposite of Y, but X is not truly the opposite of Y
+an X is a plan for Y
+
+Correct Answer:
+
+X and Y share a contiguous border
+

@@ -1,0 +1,19 @@
+Question 6(d) NON-ATTRIBUTE: Attribute:Nonstate (adjective:noun)
+
+Consider the following word pairs:
+
+dull:cunning
+immortal:death
+celibate:promiscuity
+
+What relation best describes these X:Y word pairs?
+
+X is the reverse act of Y / X may be undone by Y
+someone/something who is X cannot be Y or be in the state of Y
+Y is an instrument through with X receives some object/service/role
+an X uses Y to perform their role
+
+Correct Answer:
+
+someone/something who is X cannot be Y or be in the state of Y
+

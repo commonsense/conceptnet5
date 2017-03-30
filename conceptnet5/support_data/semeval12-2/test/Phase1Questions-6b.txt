@@ -1,0 +1,19 @@
+Question 6(b) NON-ATTRIBUTE: ObjectAttribute:Noncondition (adjective:adjective)
+
+Consider the following word pairs:
+
+brittle:molded
+inconsolable:comforted
+exemplary:criticized
+
+What relation best describes these X:Y word pairs?
+
+an X is is a defect in Y
+Y is typically found at an event such as X
+something that is X cannot be Y
+X causes/compels a person to Y
+
+Correct Answer:
+
+something that is X cannot be Y
+

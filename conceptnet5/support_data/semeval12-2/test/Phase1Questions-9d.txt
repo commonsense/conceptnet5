@@ -1,0 +1,19 @@
+Question 9(d) SPACE-TIME: Location:Instrument/Associated Item
+
+Consider the following word pairs:
+
+school:textbook
+farm:tractor
+beach:swimsuit
+
+What relation best describes these X:Y word pairs?
+
+a Y is one item in a collection/group of X
+X is the name for knowledge of Y
+Y is an instrumental item in the activities that occur at place/location/area Y
+an X has the attribute Y
+
+Correct Answer:
+
+Y is an instrumental item in the activities that occur at place/location/area Y
+

@@ -1,0 +1,19 @@
+Question 8(d) CAUSE-PURPOSE: Action/Activity:Goal
+
+Consider the following word pairs:
+
+eat:satiation
+flee:escape
+fertilize:grow
+
+What relation best describes these X:Y word pairs?
+
+someone/something will X in order to Y
+a Y is used on an X
+an X is a place/location/area where Y is made/done/produced
+Y is an unacceptable form of X
+
+Correct Answer:
+
+someone/something will X in order to Y
+

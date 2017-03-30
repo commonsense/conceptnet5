@@ -1,0 +1,19 @@
+Question 5(i) ATTRIBUTE: Action:Resultant Attribute (verb:noun/adjective)
+
+Consider the following word pairs:
+
+rain:wet
+riddle:holes
+homogenize:uniform
+
+What relation best describes these X:Y word pairs?
+
+the action X results Y or things that are Y
+a Y represents/is representative of X
+X and Y are contrary / opposite to each other
+a Y is one item in a collection/group of X
+
+Correct Answer:
+
+the action X results Y or things that are Y
+

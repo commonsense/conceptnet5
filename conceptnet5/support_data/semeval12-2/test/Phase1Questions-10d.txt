@@ -1,0 +1,19 @@
+Question 10(d) REFERENCE: Plan
+
+Consider the following word pairs:
+
+recipe:cake
+syllabus:course
+blueprint:building
+
+What relation best describes these X:Y word pairs?
+
+an X will typically Y
+the action X results Y or things that are Y
+an X makes Y / an X uses Y to make an item
+an X is a plan for Y
+
+Correct Answer:
+
+an X is a plan for Y
+

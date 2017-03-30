@@ -1,0 +1,19 @@
+Question 8(g) CAUSE-PURPOSE: Instrument:Intended Action
+
+Consider the following word pairs:
+
+gun:shoot
+pestle:mash
+abacus:calculate
+
+What relation best describes these X:Y word pairs?
+
+an X is an increase/decease in Y
+an X is unlikely to Y
+an X is a plan for Y
+Y is the intended action to be taken using X
+
+Correct Answer:
+
+Y is the intended action to be taken using X
+

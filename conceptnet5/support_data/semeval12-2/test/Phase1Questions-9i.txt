@@ -1,0 +1,19 @@
+Question 9(i) SPACE-TIME: Attachment
+
+Consider the following word pairs:
+
+belt:waist
+rivet:girder
+bowler:head
+
+What relation best describes these X:Y word pairs?
+
+something/someone that is X will typically Y
+X may be divided into Y
+an X is attached to a Y
+someone will X an object that is Y
+
+Correct Answer:
+
+an X is attached to a Y
+

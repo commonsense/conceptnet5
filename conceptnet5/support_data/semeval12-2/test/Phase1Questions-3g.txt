@@ -1,0 +1,19 @@
+Question 3(g) SIMILAR: Coordinates
+
+Consider the following word pairs:
+
+ram:ewe
+son:daughter
+trackpad:mouse
+
+What relation best describes these X:Y word pairs?
+
+X enables the use of Y
+X and Y are two distinct objects in the same category
+X is the name for knowledge of Y
+Y is the goal of X
+
+Correct Answer:
+
+X and Y are two distinct objects in the same category
+

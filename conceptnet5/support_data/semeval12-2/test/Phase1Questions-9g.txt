@@ -1,0 +1,19 @@
+Question 9(g) SPACE-TIME: Time Associated Item
+
+Consider the following word pairs:
+
+retirement:pension
+infancy:cradle
+adolescence:textbooks
+
+What relation best describes these X:Y word pairs?
+
+something that is X may be Y
+Y is an item associated with time X
+Y describes a condition or state that is usually absent from X
+an X is unlikely to Y
+
+Correct Answer:
+
+Y is an item associated with time X
+

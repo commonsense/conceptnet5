@@ -1,0 +1,19 @@
+Question 8(c) CAUSE-PURPOSE: EnablingAgent:Object
+
+Consider the following word pairs:
+
+match:candle
+gasoline:car
+mnemonic:memory
+
+What relation best describes these X:Y word pairs?
+
+X enables the use of Y
+an X is a plan for Y
+Y functions as an X
+X is a time when Y occurs
+
+Correct Answer:
+
+X enables the use of Y
+

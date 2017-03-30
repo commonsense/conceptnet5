@@ -1,0 +1,19 @@
+Question 6(f) NON-ATTRIBUTE: Agent/Object Attribute: Atypical Action (adjective:verb)
+
+Consider the following word pairs:
+
+reticent:talk
+obtrusive:ignore
+garbled:comprehend
+
+What relation best describes these X:Y word pairs?
+
+Y is a kind/type/instance of X
+an X causes Y
+someone/something who is X is unlikely to Y
+someone perform the action X on Y
+
+Correct Answer:
+
+someone/something who is X is unlikely to Y
+

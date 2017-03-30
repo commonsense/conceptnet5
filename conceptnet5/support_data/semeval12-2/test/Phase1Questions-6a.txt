@@ -1,0 +1,19 @@
+Question 6(a) NON-ATTRIBUTE: Item:Nonattribute (noun:adjective)
+
+Consider the following word pairs:
+
+harmony:discordant
+bulwark: flimsy
+sound:inaudible
+
+What relation best describes these X:Y word pairs?
+
+an X cannot have attribute Y; Y is antithetical to being X
+a Y is used on an X
+an Y receives an X
+Y is typically found at an event such as X
+
+Correct Answer:
+
+an X cannot have attribute Y; Y is antithetical to being X
+
