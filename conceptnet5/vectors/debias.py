@@ -284,6 +284,7 @@ CULTURE_PREJUDICES = [
     'illegal', 'terrorist', 'evil', 'threat',
     'dumbass', 'shithead', 'wanker', 'dickhead',
     'illiterate', 'ignorant', 'inferior',
+    'good',
     'sexy', 'suave',
     'wealthy', 'poor',
     'racist', 'slavery',
@@ -291,11 +292,7 @@ CULTURE_PREJUDICES = [
     'fraudster', 'rapist', 'robber', 'dodgy', 'perpetrator',
 ]
 
-# Because it combines information from different sources, Numberbatch seems to
-# automatically counteract the worst gender biases of word2vec, particularly
-# those that assign genders to professions.
-#
-# However, Numberbatch acquires a "porn bias" from the Common Crawl via GloVe.
+# Numberbatch acquires a "porn bias" from the Common Crawl via GloVe.
 # Because so much of the Web is about porn, words such as 'teen', 'girl', and
 # 'girlfriend' acquire word associations from porn.
 #
@@ -329,26 +326,35 @@ SEX_PREJUDICES = [
 
 GENDERED_WORDS = FEMALE_WORDS + MALE_WORDS
 
+# Words identified as gender stereotypes by 10 Turkers, in Bolukbasi et al.,
+# "Quantifying and Reducing Stereotypes in Word Embeddings".
+# https://arxiv.org/pdf/1606.06121.pdf
 GENDER_NEUTRAL_WORDS = [
     'surgeon', 'nurse',
     'doctor', 'midwife',
     'paramedic', 'registered nurse',
     'hummer', 'minivan',
     'karate', 'gymnastics',
+    'woodworking', 'quilting',
     'alcoholism', 'eating disorder',
     'athlete', 'gymnast',
     'neurologist', 'therapist',
+    'hockey', 'figure skating',
     'architect', 'interior designer',
     'chauffeur', 'nanny',
     'curator', 'librarian',
+    'pilot', 'flight attendant',
     'drug trafficking', 'prostitution',
     'musician', 'dancer',
     'beer', 'cocktail',
+    'weightlifting', 'gymnastics',
     'headmaster', 'guidance counselor',
     'workout', 'pilates',
     'home depot', 'jcpenney',
     'carpentry', 'sewing',
     'accountant', 'paralegal'
+    'addiction', 'eating disorder',
+    'professor emeritus', 'associate professor',
     'programmer', 'homemaker'
 ]
 
