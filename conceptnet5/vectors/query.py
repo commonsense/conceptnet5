@@ -263,6 +263,10 @@ class VectorSpaceWrapper(object):
         return index
 
     def index_prefix_range(self, prefix):
+        """
+        Returns a range of indices in frame's index that will be used in expand_terms(). This range
+        contains all terms which share a specified prefix with a given term.
+        """
         assert prefix
         next_prefix = prefix[:-1] + chr(ord(prefix[-1]) + 1)
         start_idx = self.get_index(prefix)
