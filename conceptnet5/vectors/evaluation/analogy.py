@@ -187,6 +187,11 @@ def optimize_weights(func, *args):
     This function takes a function for which to optimize the weights as an argument and returns
     the optimal weights, weight_direct and weight_transpose.
     """
+    # Original search was more coarse-grained
+    # weights = [
+    #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
+    #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
+    # ]
     print('Tuning analogy weights')
     weights = [0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
                2.0, 2.5, 3.0]
