@@ -1,0 +1,19 @@
+Question 2(i) PART-WHOLE: Item:Distinctive Nonpart
+
+Consider the following word pairs:
+
+tundra:tree
+horse:wings
+perfection:fault
+
+What relation best describes these X:Y word pairs?
+
+Y is a kind/type/instance of X
+a Y is one item in a collection/group of X
+a Y is used on an X
+X is devoid of / cannot have Y
+
+Correct Answer:
+
+X is devoid of / cannot have Y
+

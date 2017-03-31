@@ -1,0 +1,20 @@
+Question 7(h) CASE RELATIONS: Recipient:Instrument
+
+Consider the following word pairs:
+
+heir:testament
+king:crown
+graduate:diploma
+police:badge
+
+What relation best describes these X:Y word pairs?
+
+an X is a place/location/area where Y takes place
+X will become / be converted into Y
+Y is a kind/type/instance of X
+Y is an instrument through with X receives some object/service/role
+
+Correct Answer:
+
+Y is an instrument through with X receives some object/service/role
+

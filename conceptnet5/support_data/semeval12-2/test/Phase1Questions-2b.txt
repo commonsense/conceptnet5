@@ -1,0 +1,19 @@
+Question 2(b) PART-WHOLE: Collection:Member
+
+Consider the following word pairs:
+
+forrest:tree
+anthology:poem
+fleet:ship
+
+What relation best describes these X:Y word pairs?
+
+X is made from a collection of Y
+someone perform the action X on Y
+an X is unlikely to Y
+X and Y are at opposite ends of the same scale, but X is more extreme than Y
+
+Correct Answer:
+
+X is made from a collection of Y
+

@@ -1,0 +1,19 @@
+Question 8(e) CAUSE-PURPOSE: Agent:Goal
+
+Consider the following word pairs:
+
+pilgrim:shrine
+assassin:death
+climber:peak
+
+What relation best describes these X:Y word pairs?
+
+Y is a specific X
+Y is the goal of X
+someone/something who is X is unlikely to Y
+Y is one of the areas/locations of X
+
+Correct Answer:
+
+Y is the goal of X
+

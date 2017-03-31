@@ -1,0 +1,20 @@
+Question 6(c) NON-ATTRIBUTE: Object:Nonstate (noun:noun)
+
+Consider the following word pairs:
+
+laureate:dishonor
+famine:plenitude
+war:tranquility
+desert:lushness
+
+What relation best describes these X:Y word pairs?
+
+X is an expression that indicates Y
+Y describes a condition or state that is usually absent from X
+an X makes Y / an X uses Y to make an item
+an X uses Y to perform their role
+
+Correct Answer:
+
+Y describes a condition or state that is usually absent from X
+

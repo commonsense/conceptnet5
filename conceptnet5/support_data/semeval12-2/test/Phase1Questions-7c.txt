@@ -1,0 +1,19 @@
+Question 7(c) CASE RELATIONS: Agent:Instrument
+
+Consider the following word pairs:
+
+farmer:tractor
+conductor:baton
+arsonist:match
+
+What relation best describes these X:Y word pairs?
+
+an X is a place/location/area where Y is found
+X is the name for knowledge of Y
+an X uses Y to perform their role
+Y is typically found at an event such as X
+
+Correct Answer:
+
+an X uses Y to perform their role
+

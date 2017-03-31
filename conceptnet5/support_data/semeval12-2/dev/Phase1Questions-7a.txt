@@ -1,0 +1,19 @@
+Question 7(a) CASE RELATIONS: Agent:Object
+
+Consider the following word pairs:
+
+tailor:suit
+oracle:prophesy
+baker:flour
+
+What relation best describes these X:Y word pairs?
+
+something that is X cannot be Y
+an X makes Y / an X uses Y to make an item
+X is intended to produce Y
+X enables the use of Y
+
+Correct Answer:
+
+an X makes Y / an X uses Y to make an item
+

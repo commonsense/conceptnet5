@@ -1,0 +1,19 @@
+Question 10(a) REFERENCE: Sign:Significant
+
+Consider the following word pairs:
+
+siren:danger
+scepter:authority
+signature:approval
+
+What relation best describes these X:Y word pairs?
+
+an X is a place/location/area where Y takes place
+an X indicates/signifies Y
+an X will typically Y
+someone/something who is X cannot be Y or be in the state of Y
+
+Correct Answer:
+
+an X indicates/signifies Y
+

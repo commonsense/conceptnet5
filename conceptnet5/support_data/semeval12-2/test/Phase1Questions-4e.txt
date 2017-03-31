@@ -1,0 +1,19 @@
+Question 4(e) CONTRAST: Incompatible
+
+Consider the following word pairs:
+
+happy:morbid
+vigilant:careless
+slow:stationary
+
+What relation best describes these X:Y word pairs?
+
+Being X is incompatible with being Y
+someone will X an object that is Y
+Y describes a condition or state that is usually absent from X
+Y describes a condition or state that is usually absent from X
+
+Correct Answer:
+
+Being X is incompatible with being Y
+

@@ -1,0 +1,19 @@
+Question 2(j) PART-WHOLE: Item:Ex-part/Ex-possession
+
+Consider the following word pairs:
+
+apostate:belief
+wood:splinter
+prisoner:freedom
+
+What relation best describes these X:Y word pairs?
+
+an X once had/owned/possessed Y, but no longer
+a Y receives an item/knowledge/service from X
+an X has the attribute Y
+an X uses Y to perform their role
+
+Correct Answer:
+
+an X once had/owned/possessed Y
+

@@ -1,0 +1,19 @@
+Question 2(d) PART-WHOLE: Event:Feature
+
+Consider the following word pairs:
+
+rodeo:cowboy
+banquet:food
+wedding:bride
+
+What relation best describes these X:Y word pairs?
+
+an X and Y are a similar type of action/thing/attribute
+X prevents Y
+X is intended to produce Y
+Y is typically found at an event such as X
+
+Correct Answer:
+
+Y is typically found at an event such as X
+

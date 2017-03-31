@@ -1,0 +1,19 @@
+Question 8(b) CAUSE-PURPOSE: Cause:Compensatory Action
+
+Consider the following word pairs:
+
+hunger:eat
+fatigue:sleep
+lateness:hurry
+
+What relation best describes these X:Y word pairs?
+
+X is a Y kind of action
+X and Y are two distinct objects in the same category
+X causes/compels a person to Y
+an X has the attribute Y
+
+Correct Answer:
+
+X causes/compels a person to Y
+

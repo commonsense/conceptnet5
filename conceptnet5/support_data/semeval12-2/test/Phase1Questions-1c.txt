@@ -1,0 +1,19 @@
+Question 1(c) CLASS-INCLUSION: Singular Collective
+
+Consider the following word pairs:
+
+cutlery:spoon
+clothing:shirt
+vermin:rat
+
+What relation best describes these X:Y word pairs?
+
+a Y receives an item/knowledge/service from X
+a Y is one item in a collection/group of X
+Y is an unacceptable form of X
+X is a Y kind of action
+
+Correct Answer:
+
+a Y is one item in a collection/group of X
+

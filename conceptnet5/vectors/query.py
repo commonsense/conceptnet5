@@ -54,9 +54,11 @@ class VectorSpaceWrapper(object):
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
-            self.frame = frame.sort_index()
+            self.frame = frame
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
             self.vector_filename = None
-        self.index_cache = {}
+        self._index_cache = {}
         self.small_frame = None
         self.k = None
         self.small_k = None
@@ -241,30 +243,34 @@ class VectorSpaceWrapper(object):
 
     def get_index(self, prefix):
         """
-        Get an index of a prefix. Using index_cache to store previously retrieved indices
+        Get an index of a prefix. Using _index_cache to store previously retrieved indices
         instead of retrieving them from the index every time cuts the computation time by 78%.
         This is particularly useful for Semeval data, where the same words are reused across
         different test sets.
 
-        If index_cache reaches 50,000 entries, drop it to prevent it from becoming too large.
+        If _index_cache reaches 50,000 entries, drop it to prevent it from becoming too large.
         """
         try:
-            index = self.index_cache[prefix]
+            index = self._index_cache[prefix]
         except KeyError:
             try:
                 index = self.frame.index.get_loc(prefix, method='bfill')
-                self.index_cache[prefix] = index
+                self._index_cache[prefix] = index
             except KeyError:
                 index = len(self.frame.index)
-                self.index_cache[prefix] = index
+                self._index_cache[prefix] = index
 
         # Drop cache if it contains more than 50000 entries
-        if len(self.index_cache) > 50000:
-            self.index_cache = {}
+        if len(self._index_cache) > 50000:
+            self._index_cache.clear()
 
         return index
 
     def index_prefix_range(self, prefix):
+        """
+        Returns a range of indices in frame's index that will be used in expand_terms(). This range
+        contains all terms which share a specified prefix with a given term.
+        """
         assert prefix
         next_prefix = prefix[:-1] + chr(ord(prefix[-1]) + 1)
         start_idx = self.get_index(prefix)

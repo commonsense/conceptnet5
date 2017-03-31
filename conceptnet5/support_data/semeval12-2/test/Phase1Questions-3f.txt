@@ -1,0 +1,19 @@
+Question 3(f) SIMILAR: Attribute Similarity
+
+Consider the following word pairs:
+
+rake:fork
+valley:gutter
+painting:movie
+
+What relation best describes these X:Y word pairs?
+
+X and Y are contrary / opposite to each other
+something/someone that is X will typically Y
+an X makes Y / an X uses Y to make an item
+X and Y both have a similar attribute or feature
+
+Correct Answer:
+
+X and Y both have a similar attribute or feature
+

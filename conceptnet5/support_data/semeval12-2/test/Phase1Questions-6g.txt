@@ -1,0 +1,20 @@
+Question 6(g) NON-ATTRIBUTE: Action:Action Nonattribute
+
+Consider the following word pairs:
+
+creep:fast
+fade:abruptly
+scream:quietly
+destroy:gently
+
+What relation best describes these X:Y word pairs?
+
+X enables the use of Y
+an X is is a defect in Y
+X cannot be done in a Y manner
+Y functions as an X
+
+Correct Answer:
+
+X cannot be done in a Y manner
+

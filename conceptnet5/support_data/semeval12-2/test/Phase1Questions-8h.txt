@@ -1,0 +1,19 @@
+Question 8(h) CAUSE-PURPOSE: Prevention
+
+Consider the following word pairs:
+
+pesticide:vermin
+antidote:poison
+lubricate:friction
+
+What relation best describes these X:Y word pairs?
+
+X prevents Y
+an X and Y are two kinds in a category of actions/things/attributes
+X is one step/action/part of the actions in Y
+someone/something who is X cannot be Y or be in the state of Y
+
+Correct Answer:
+
+X prevents Y
+

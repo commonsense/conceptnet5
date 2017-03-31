@@ -1,0 +1,19 @@
+Question 4(c) CONTRAST: Reverse
+
+Consider the following word pairs:
+
+attack:defend
+buy:sell
+love:hate
+
+What relation best describes these X:Y word pairs?
+
+X is the reverse act of Y / X may be undone by Y
+X is an expression that indicates Y
+a Y represents/is representative of X
+Y describes a condition or state that is usually absent from X
+
+Correct Answer:
+
+X is the reverse act of Y / X may be undone by Y
+
