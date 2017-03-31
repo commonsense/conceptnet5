@@ -308,21 +308,23 @@ def read_semeval_crosslingual(lang1, lang2, subset='test'):
 
 def compute_semeval_score(pearson_score, spearman_score):
     """
-    Take a harmonic mean of a Pearson correlation coefficient and a Spearman correlation
-    coefficient.
+    Return NaN if a dataset can't be evaluated on a given frame. Return 0 if at least one similarity
+    measure was 0 or negative. Otherwise, take a harmonic mean of a Pearson correlation coefficient
+    and a Spearman correlation coefficient.
     """
-    if any(np.isnan(x) for x in [spearman_score['acc'], pearson_score['acc']]):
-        acc_harmonic_mean = float('NaN')
-        low_harmonic_mean = float('NaN')
-        high_harmonic_mean = float('NaN')
-    else:
-        acc_harmonic_mean = hmean([spearman_score['acc'], pearson_score['acc']])
-        low_harmonic_mean = hmean([spearman_score['low'], pearson_score['low']])
-        high_harmonic_mean = hmean([spearman_score['high'], pearson_score['high']])
+    intervals = ['acc', 'low', 'high']
+    scores = []
+    for interval in intervals:
+        if any(np.isnan(x) for x in [spearman_score[interval], pearson_score[interval]]):
+            scores.append(float('NaN'))
+        elif any(x <= 0 for x in [spearman_score[interval], pearson_score[interval]]):
+            scores.append(0)
+        else:
+            scores.append(hmean([spearman_score[interval], pearson_score[interval]]))
 
     return pd.Series(
-        [acc_harmonic_mean, low_harmonic_mean, high_harmonic_mean],
-        index=['acc', 'low', 'high']
+        scores,
+        index=intervals
     )
 
 
@@ -373,11 +375,9 @@ def evaluate_semeval_crosslingual_global(vectors):
     scores on the six cross-lingual datasets on which the system performs best. If less than six
     scores are supplied, the global score is NaN.
     """
-
     scores = []
-    for pair in ['en-de', 'en-es', 'en-fa', 'en-it', 'de-es', 'de-fa', 'de-it', 'es-fa', 'es-it',
-                 'it-fa']:
-        lang1, lang2 = pair.split('-')
+    languages = ['en', 'de', 'es', 'it', 'fa']
+    for lang1, lang2 in combinations(languages, 2):
         score = evaluate_semeval_crosslingual(vectors, lang1, lang2)
         scores.append(score)
 
@@ -401,12 +401,16 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
     our_scores = []
 
     for term1, term2, gold_score, lang1, lang2 in standard:
-        uri1 = standardized_uri(lang1, term1)
-        uri2 = standardized_uri(lang2, term2)
+
         if isinstance(vectors, VectorSpaceWrapper):
+            uri1 = standardized_uri(lang1, term1)
+            uri2 = standardized_uri(lang2, term2)
             our_score = vectors.get_similarity(uri1, uri2)
+
         else:
-            our_score = cosine_similarity(get_vector(vectors, uri1), get_vector(vectors, uri2))
+            our_score = cosine_similarity(get_vector(vectors, term1, lang1),
+                                          get_vector(vectors, term2, lang2))
+
         if verbose > 1:
             print('%s\t%s\t%3.3f\t%3.3f' % (term1, term2, gold_score, our_score))
         gold_scores.append(gold_score)
