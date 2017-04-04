@@ -119,10 +119,10 @@ def read_turk_ranks_semeval2012(subset, subclass):
     """
     Read gold rankings of prototypicality, as computed using turkers answers to MaxDiff
     questions.
-    
+
     A score is defined as the difference between the number of times the turkers judged
     a pair the most prototypical and the number of times they judged it as the least
-    prototypical. 
+    prototypical.
     """
     filename = 'semeval12-2/{}/GoldRatings-{}.txt'.format(subset, subclass)
     with open(get_support_data_filename(filename)) as file:
@@ -177,24 +177,23 @@ def eval_pairwise_analogies(vectors, eval_filename, weight_direct, weight_transp
 
 def optimize_weights(func, *args):
     """
-    Both eval_pairwise_analogies() and eval_semeval2012_analogies() have three weights that can be
-    tuned(and therefore two free parameters, as the total weight does not matter):
+    Both eval_pairwise_analogies() and eval_semeval2012_analogies() have three
+    weights that can be tuned (and therefore two free parameters, as the total
+    weight does not matter):
 
     - The *direct weight*, comparing (b2 - a2) to (b1 - a1)
     - The *transpose weight*, comparing (b2 - b1) to (a2 - a1)
     - The *similarity weight*, comparing b2 to b1 and a2 to a1
 
-    This function takes a function for which to optimize the weights as an argument and returns
-    the optimal weights, weight_direct and weight_transpose.
+    This function takes a function for which to optimize the weights as an
+    argument and returns the optimal weights, `weight_direct` and
+    `weight_transpose`.
     """
-    # Original search was more coarse-grained
-    # weights = [
-    #     0.25, 0.3, 0.4, 0.5, 0.6, 0.8,
-    #     1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0
-    # ]
     print('Tuning analogy weights')
-    weights = [0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8, 0.9, 1.0, 1.5,
-               2.0, 2.5, 3.0]
+    weights = [
+        0., 0.05, 0.1, 0.15, 0.2, 0.3, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8,
+        0.9, 1.0, 1.5, 2.0, 2.5, 3.0
+    ]
     best_weights = None
     best_acc = 0.
     for weight_direct in weights:
