@@ -6,10 +6,14 @@ from .formats import (
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
+from .evaluation.analogy import evaluate as evaluate_analogies
 from .evaluation.compare import compare_embeddings, graph_comparison
 from .transforms import miniaturize
 from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
+
+
+ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
 
 @click.group()
@@ -119,16 +123,34 @@ def run_debias(input_filename, output_filename):
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
-def run_evaluate(filename, subset):
+@click.option('--semeval-by-language/--semeval-global', '-l', default=False)
+def run_evaluate(filename, subset, semeval_by_language):
     frame = load_hdf(filename)
-    print(evaluate(frame, subset=subset))
+    if semeval_by_language:
+        scope = 'per-language'
+    else:
+        scope = 'global'
+    print(evaluate(frame, subset=subset, semeval_scope=scope))
 
 
 @cli.command(name='evaluate_raw')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-def run_evaluate_raw(filename):
+@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option('--semeval-by-language/--semeval-global', '-l', default=False)
+def run_evaluate_raw(filename, subset, semeval_by_language):
     frame = load_hdf(filename)
-    print(evaluate_raw(frame))
+    if semeval_by_language:
+        scope = 'per-language'
+    else:
+        scope = 'global'
+    print(evaluate_raw(frame, subset=subset, semeval_scope=scope))
+
+
+@cli.command(name='evaluate_analogies')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+def run_evaluate_analogies(filename):
+    frame = load_hdf(filename)
+    print(evaluate_analogies(frame, analogy_filename=ANALOGY_FILENAME))
 
 
 @cli.command(name='compare_embeddings')

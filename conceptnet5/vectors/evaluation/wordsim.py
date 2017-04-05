@@ -709,7 +709,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     return results
 
 
-def evaluate_raw(frame, subset='dev', semeval_scope='per_language'):
+def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     """
     Evaluate a DataFrame containing term vectors on its ability to predict term
     relatedness, according to MEN-3000, RW, MTurk-771, WordSim-353, and Semeval2017-Task2. Return

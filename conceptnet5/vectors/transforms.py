@@ -15,6 +15,11 @@ def standardize_row_labels(frame, language='en', forms=True):
     standardized URI get combined, with earlier rows given more weight.
     """
     # Re-label the DataFrame with standardized, non-unique row labels
+    if all('/' in label for label in frame.index[10:20]):
+        tuples = [label.partition('/') for label in frame.index]
+        frame.index = [uri_prefix(standardized_uri(language, text))
+                       for language, _slash, text in tuples]
+
     frame.index = [uri_prefix(standardized_uri(language, label)) for label in frame.index]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
