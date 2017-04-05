@@ -136,11 +136,52 @@ def read_turk_ranks_semeval2012(subset, subclass):
         return sorted(gold_ranks)
 
 
-def analogy_func(frame, a1, b1, a2):
-    return get_vector(frame, b1) - get_vector(frame, a1) + get_vector(frame, a2)
+def analogy_func(wrap, a1, b1, a2, weight_direct=2/3, weight_transpose=1/3):
+    """
+    Find the vector representing the best b2 to complete the analogy
+    a1 : b1 :: a2 : b2, according to `pairwise_analogy_func`.
+
+    This is the partial derivative of `pairwise_analogy_func` with respect
+    to b2.
+    """
+    va1 = wrap.get_vector(a1)
+    vb1 = wrap.get_vector(b1)
+    va2 = wrap.get_vector(a2)
+
+    return (
+        (vb1 - va1) * weight_direct +
+        (va2 - va1) * weight_transpose +
+        vb1
+    )
+
+
+def best_analogy_3cosmul(wrap, subframe, a1, b1, a2):
+    """
+    Find the best b2 to complete the analogy a1 : b1 :: a2 : b2, according
+    to the 3CosMul metric.
+    """
+    va1 = wrap.get_vector(a1)
+    vb1 = wrap.get_vector(b1)
+    va2 = wrap.get_vector(a2)
+
+    sa1 = subframe.dot(va1)
+    sb1 = subframe.dot(vb1)
+    sa2 = subframe.dot(va2)
+
+    eps = 1e-6
+    mul3cos = (sb1 + 1 + eps) * (sa2 + 1 + eps) / (sa1 + 1 + eps)
+
+    best = mul3cos.dropna().nlargest(4)
+    prompt = (a1, b1, a2)
+    for term in best.index:
+        if term not in prompt:
+            return term
 
 
 def pairwise_analogy_func(wrap, a1, b1, a2, b2, weight_direct, weight_transpose):
+    """
+    Rate the quality of the analogy a1 : b1 :: a2 : b2.
+    """
     va1 = wrap.get_vector(a1)
     vb1 = wrap.get_vector(b1)
     va2 = wrap.get_vector(a2)
@@ -216,15 +257,44 @@ def optimize_weights(func, *args):
     return weight_direct, weight_transpose
 
 
-def eval_google_analogies(frame):
-    filename = get_support_data_filename('google-analogies/questions-words.txt')
+def eval_google_analogies(vectors, subset='semantic', vocab_size=200000, verbose=False):
+    """
+    Evaluate the Google Research analogies, released by Mikolov et al. along
+    with word2vec.
+
+    These analogies come in two flavors: semantic and syntactic. Numberbatch
+    is intended to be a semantic space, so we focus on semantic analogies.
+
+    The syntactic analogies are about whether you can inflect or conjugate a
+    particular word. The semantic analogies are about whether you can sort
+    words by their gender, and about geographic trivia.
+
+    I (Rob) think this data set is not very representative, but evaluating
+    against it is all the rage.
+
+    These analogies are not multiple-choice; instead, you're supposed to pick
+    the best match out of your vector space's entire vocabulary, excluding the
+    three words used in the prompt. The vocabulary size can matter a lot: Set
+    it too high and you'll get low-frequency words that the data set wasn't
+    looking for as answers. Set it too low and the correct answers won't be
+    in the vocabulary.
+
+    Set vocab_size='cheat' to see the results for an unrealistically optimal
+    vocabulary (the vocabulary of the set of answer words).
+    """
+    filename = get_support_data_filename('google-analogies/{}-words.txt'.format(subset))
     quads = read_google_analogies(filename)
-    vocab = [
-        standardized_uri('en', word)
-        for word in wordfreq.top_n_list('en', 200000)
+    if vocab_size == 'cheat':
+        vocab = [
+            standardized_uri('en', word)
+            for word in sorted(set([quad[3] for quad in quads]))
         ]
-    wrap = VectorSpaceWrapper(frame=frame)
-    vecs = np.vstack([wrap.get_vector(word) for word in vocab])
+    else:
+        vocab = [
+            standardized_uri('en', word)
+            for word in wordfreq.top_n_list('en', vocab_size)
+        ]
+    vecs = np.vstack([vectors.get_vector(word) for word in vocab])
     tframe = pd.DataFrame(vecs, index=vocab)
     total = 0
     correct = 0
@@ -232,17 +302,13 @@ def eval_google_analogies(frame):
     for quad in quads:
         prompt = quad[:3]
         answer = quad[3]
-        vector = analogy_func(frame, *prompt)
-        similar = similar_to_vec(tframe, vector)
-        result = None
-        for match in similar.index:
-            if match not in prompt:
-                result = match
-                break
+        result = best_analogy_3cosmul(
+            vectors, tframe, *prompt
+        )
         if result == answer:
             correct += 1
         else:
-            if result not in seen_mistakes:
+            if verbose and result not in seen_mistakes:
                 print(
                     "%s : %s :: %s : [%s] (should be %s)"
                     % (quad[0], quad[1], quad[2], result, answer)
@@ -250,7 +316,10 @@ def eval_google_analogies(frame):
                 seen_mistakes.add(result)
         total += 1
     low, high = proportion_confint(correct, total)
-    return pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
+    result = pd.Series([correct / total, low, high], index=['acc', 'low', 'high'])
+    if verbose:
+        print(result)
+    return result
 
 
 def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset, subclass):
@@ -395,6 +464,11 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
                                           sat_weights[1],
                                           subset)
     results.loc['sat-analogies'] = sat_results
+
+    for gsubset in ['semantic', 'syntactic']:
+        for vocab_size in [200000, 'cheat']:
+            google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=vocab_size)
+            results.loc['google-%s-%s' % (gsubset, vocab_size)] = google_results
 
     if semeval_scope == 'global':
         maxdiff_score, spearman_score = eval_semeval2012_global(vectors,
