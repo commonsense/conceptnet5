@@ -1,9 +1,7 @@
 # coding: utf-8
 import pandas as pd
 import numpy as np
-from conceptnet5.uri import split_uri
 from conceptnet5.languages import CORE_LANGUAGES
-from ..vectors import similar_to_vec, weighted_average
 from .transforms import l2_normalize_rows
 from .formats import save_hdf
 
@@ -34,8 +32,10 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])
     adjusted = l2_normalize_rows(joined.loc[filtered_labels].ix[::subsample] - joined.mean(0))
 
-    # Search the frames for significant terms that we've missed. Significant
-    # terms need to appear in the first `vocab_cutoff` rows of one of the frames.
+    # Search the frames for significant terms that we've missed.
+    # Significant terms are those that appear in 3 different vocabularies,
+    # or in 2 different vocabularies and in the first `vocab_cutoff` rows of
+    # one of them.
 
     print('Finding expanded vocabulary')
     vocabulary = frames[0].index
