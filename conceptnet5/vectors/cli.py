@@ -7,6 +7,7 @@ from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation.wordsim import evaluate, evaluate_raw
 from .evaluation.analogy import evaluate as evaluate_analogies
+from .evaluation.bias import measure_bias
 from .evaluation.compare import compare_embeddings, graph_comparison
 from .transforms import miniaturize
 from .debias import de_bias_frame
@@ -151,6 +152,13 @@ def run_evaluate_raw(filename, subset, semeval_by_language):
 def run_evaluate_analogies(filename):
     frame = load_hdf(filename)
     print(evaluate_analogies(frame, analogy_filename=ANALOGY_FILENAME))
+
+
+@cli.command(name='evaluate_bias')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+def run_evaluate_bias(filename):
+    frame = load_hdf(filename)
+    print(measure_bias(frame))
 
 
 @cli.command(name='compare_embeddings')
