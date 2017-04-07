@@ -98,16 +98,23 @@ def run_intersect(input_filenames, output_filename, projection_filename):
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
-def run_evaluate(filename, subset):
+@click.option('--semeval-by-language/--semeval-global', '-l', default=False)
+def run_evaluate(filename, subset, semeval_by_language):
     frame = load_hdf(filename)
-    print(evaluate(frame, subset=subset))
+    if semeval_by_language:
+        scope = 'per-language'
+    else:
+        scope = 'global'
+    print(evaluate(frame, subset=subset, semeval_scope=scope))
 
 
 @cli.command(name='evaluate_raw')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate_raw(filename):
     frame = load_hdf(filename)
-    print(evaluate_raw(frame))
+    print(evaluate_raw(frame, subset=subset, semeval_scope=scope))
 
 
 @cli.command(name='compare_embeddings')
