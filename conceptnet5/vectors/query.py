@@ -101,6 +101,10 @@ class VectorSpaceWrapper(object):
         self._build_trie()
 
     def _build_trie(self):
+        """
+        Build a trie (a prefix tree) that allows finding terms by their
+        prefixes.
+        """
         self._trie = marisa_trie.Trie(list(self.frame.index))
 
     @staticmethod
@@ -166,7 +170,15 @@ class VectorSpaceWrapper(object):
             return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
 
     def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
-        # TODO: docstring
+        """
+        Given a list of weighted terms as (term, weight) tuples, make a vector
+        representing information from:
+
+        - The vectors for these terms
+        - The vectors for their neighbors in ConceptNet
+        - The vectors for terms that share a sufficiently-long prefix with
+          any terms in this list that are out-of-vocabulary
+        """
         self.load()
         return weighted_average(
             self.frame,
@@ -252,12 +264,30 @@ class VectorSpaceWrapper(object):
         return cosine_similarity(vec1, vec2)
 
     def terms_with_prefix(self, prefix):
+        """
+        Get a list of terms whose URI begins with the given prefix. The list
+        will be in an arbitrary order.
+        """
         return self._trie.keys(prefix)
 
     def index_prefix_range(self, prefix):
+        """
+        Get the range of indices on the DataFrame we're wrapping that begin
+        with a given prefix.
+
+        The range is a pair of index numbers. Following the convention of
+        Python ranges, the starting index is inclusive, while the end index
+        is exclusive.
+
+        Returns the empty range (0, 0) if no terms begin with this prefix.
+        """
+        # Use the trie to find all terms with the given prefix. Then sort them,
+        # because the range will span from our first prefix in sorted
+        # order to just after our last.
         terms = sorted(self.terms_with_prefix(prefix))
         if not terms:
             return (0, 0)
+
         start_loc = self.frame.index.get_loc(terms[0])
         end_loc = self.frame.index.get_loc(terms[-1]) + 1
         return start_loc, end_loc
