@@ -9,7 +9,7 @@ from .evaluation.wordsim import evaluate, evaluate_raw
 from .evaluation.analogy import evaluate as evaluate_analogies
 from .evaluation.bias import measure_bias
 from .evaluation.compare import compare_embeddings, graph_comparison
-from .transforms import miniaturize
+from .miniaturize import miniaturize
 from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
 
@@ -214,7 +214,7 @@ def run_export(input_filename, uri_filename, output_dir):
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('extra_vocab_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('-k', default=256, help="Number of columns to reduce to")
+@click.option('-k', default=300, help="Number of columns to reduce to")
 def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     frame = load_hdf(input_filename)
     other_frame = load_hdf(extra_vocab_filename)

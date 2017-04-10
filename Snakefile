@@ -588,7 +588,7 @@ rule debias:
 
 rule miniaturize:
     input:
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/w2v-google-news.h5"
     output:
         DATA + "/vectors/mini.h5"
