@@ -6,7 +6,7 @@ ENV PYTHON python3
 
 # Install system dependencies (the overall form of this command is recommended by https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/)
 RUN apt-get update \
-  && apt-get install -y build-essential python3-pip libatlas-dev liblapack-dev libhdf5-dev \
+  && apt-get install -y build-essential python3-pip libatlas-dev liblapack-dev libhdf5-dev libmecab-dev mecab-ipadic-utf8 \
   && rm -rf /var/lib/apt/lists/*
 
 ADD conceptnet5 /src/conceptnet/conceptnet5
