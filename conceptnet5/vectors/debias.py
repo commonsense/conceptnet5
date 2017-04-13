@@ -410,7 +410,6 @@ def two_class_svm(frame, pos_vocab, neg_vocab):
 def de_bias_category(frame, category_examples, bias_examples):
     category_predictor = two_class_svm(frame, category_examples, bias_examples)
     applicability = category_predictor.predict_proba(frame)[:, 1]
-
     vocab = [
         standardized_uri('en', term) for term in bias_examples
     ]

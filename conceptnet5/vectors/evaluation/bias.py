@@ -181,9 +181,9 @@ def measure_bias(frame):
     stereotype_vecs_2 = get_vocabulary_vectors(frame, ETHNIC_STEREOTYPE_TERMS)
     coarse_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
 
-    stereotype_vecs_1 = get_vocabulary_vectors(frame, COARSE_ETHNICITY_TERMS)
-    stereotype_vecs_2 = get_vocabulary_vectors(frame, CULTURE_PREJUDICES)
-    trained_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
+    #stereotype_vecs_1 = get_vocabulary_vectors(frame, COARSE_ETHNICITY_TERMS)
+    #stereotype_vecs_2 = get_vocabulary_vectors(frame, CULTURE_PREJUDICES)
+    #trained_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
 
     stereotype_vecs_1 = get_vocabulary_vectors(frame, PEOPLE_BY_BELIEF)
     stereotype_vecs_2 = get_vocabulary_vectors(frame, BELIEF_STEREOTYPE_TERMS)
@@ -193,6 +193,5 @@ def measure_bias(frame):
         'gender': gender_bias,
         'ethnicity-fine': fine_ethnic_bias,
         'ethnicity-coarse': coarse_ethnic_bias,
-        'ethnicity-trained': trained_ethnic_bias,
         'beliefs': belief_bias
     }).T
