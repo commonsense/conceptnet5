@@ -26,11 +26,19 @@ def term_freq(term):
         return 0.
 
 
-def miniaturize(frame, prefix='/c/', other_vocab=None, k=300):
+def miniaturize(frame, other_vocab=None, k=300, debias=True):
     """
     Produce a small matrix with good coverage of English and reasonable
-    coverage of the other 'core languages' in ConceptNet. A `prefix` can be
-    provided to limit the result to one language.
+    coverage of the other 'core languages' in ConceptNet. Three things that
+    make the matrix smaller are:
+
+    - Vocabulary pruning
+    - Dimensionality reduction (if k < 300)
+    - Quantization to 8-bit ints
+
+    With `debias=True` (the default), this will run the de-biasing process
+    after dimensionality reduction and before quantization. This is more
+    effective than running it entirely before or after miniaturization.
     """
     # In practice, wordfreq doesn't even have single words with frequencies
     # below 1e-8, so this could just as well say 'term_freq(term) > 0'.
@@ -39,7 +47,7 @@ def miniaturize(frame, prefix='/c/', other_vocab=None, k=300):
     # Non-English languages use terms with frequency 1e-6 or greater, because
     # only that much of the list has been loaded.
     vocab1 = [term for term in frame.index if '_' not in term
-              and term.startswith(prefix) and term_freq(term) >= 1e-8]
+              and term_freq(term) >= 1e-8]
     vocab_set = set(vocab1)
     if other_vocab is not None:
         extra_vocab = [term for term in other_vocab if '_' in term and
