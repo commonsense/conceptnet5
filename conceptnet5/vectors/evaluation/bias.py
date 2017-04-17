@@ -67,8 +67,6 @@ GENDER_BIAS_PAIRS = [
     ('beauty', 'grandeur'),
     ('cheerful', 'jovial')
 ]
-GENDER_BIAS_PAIRS_TEST = [
-]
 
 # We check the long list of words for ethnicities and nationalities from
 # debias.py against ethnic stereotypes. However, that long list includes
@@ -109,6 +107,13 @@ BELIEF_STEREOTYPE_TERMS = [
     'terror', 'violent'
 ]
 
+
+ETHNIC_NAME_SETS = [
+    ['Amanda', 'Megan', 'Molly', 'Amy', 'Claire', 'Adam', 'Paul', 'Jake', 'Connor', 'Cody'],
+    ['Latisha', 'Shaniqua', 'Jerome', 'Lavon', 'Imani', 'Shanice', 'Aaliyah', 'DeShawn', 'Marquis', 'Darnell'],
+    ['Hakim', 'Sharif', 'Yousef', 'Wahib', 'Muhsin', 'Salim', 'Karim', 'Habib', 'Ashraf', 'Akbar'],
+    ['Juan', 'José', 'Miguel', 'Juana', 'Ana', 'Luisa'],
+]
 
 def correlation_bias(frame1, frame2, verbose=False):
     """
@@ -181,6 +186,14 @@ def measure_bias(frame):
     stereotype_vecs_2 = get_vocabulary_vectors(frame, ETHNIC_STEREOTYPE_TERMS)
     coarse_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
 
+    stereotype_vecs_1 = pd.DataFrame(
+        np.vstack([
+            get_category_axis(frame, names) for names in ETHNIC_NAME_SETS
+        ])
+    )
+    stereotype_vecs_2 = get_vocabulary_vectors(frame, ETHNIC_STEREOTYPE_TERMS)
+    name_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
+
     #stereotype_vecs_1 = get_vocabulary_vectors(frame, COARSE_ETHNICITY_TERMS)
     #stereotype_vecs_2 = get_vocabulary_vectors(frame, CULTURE_PREJUDICES)
     #trained_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
@@ -193,5 +206,6 @@ def measure_bias(frame):
         'gender': gender_bias,
         'ethnicity-fine': fine_ethnic_bias,
         'ethnicity-coarse': coarse_ethnic_bias,
+        'ethnicity-names': name_ethnic_bias,
         'beliefs': belief_bias
     }).T

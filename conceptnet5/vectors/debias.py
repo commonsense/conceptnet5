@@ -360,6 +360,12 @@ GENDER_NEUTRAL_WORDS = [
 
 
 def get_weighted_vector(frame, weighted_terms):
+    """
+    Given a list of (term, weight) pairs, get a unit vector corresponding
+    to the weighted average of those term vectors.
+
+    A simplified version of VectorSpaceWrapper.get_vector().
+    """
     total = frame.iloc[0] * 0.
     for term, weight in weighted_terms:
         if term in frame.index:
@@ -369,6 +375,10 @@ def get_weighted_vector(frame, weighted_terms):
 
 
 def get_category_axis(frame, category_examples):
+    """
+    Get a vector representing the average of several example terms, where
+    the terms are specified as plain English text.
+    """
     return get_weighted_vector(
         frame,
         [(standardized_uri('en', term), 1.)
@@ -376,22 +386,37 @@ def get_category_axis(frame, category_examples):
     )
 
 
-def reject_subspace(frame, axes):
+def reject_subspace(frame, vecs):
+    """
+    Return a modification of the vector space `frame` where none of
+    its rows have any correlation with any rows of `vecs`, by subtracting
+    the outer product of `frame` with each normalized row of `vecs`.
+    """
     current_array = frame.copy()
-    for axis in axes:
-        axis = normalize_vec(axis)
-        projection = current_array.dot(axis)
-        current_array -= np.outer(projection, axis)
+    for vec in vecs:
+        vec = normalize_vec(vec)
+        projection = current_array.dot(vec)
+        current_array -= np.outer(projection, vec)
 
     return l2_normalize_rows(current_array, offset=1e-9)
 
 
 def get_vocabulary_vectors(frame, vocab):
+    """
+    Given a vocabulary (as a list of English terms), get a sub-frame of the
+    given DataFrame containing just the known vectors for that vocabulary.
+    """
     uris = [standardized_uri('en', term) for term in vocab]
     return frame.loc[uris].dropna()
 
 
 def two_class_svm(frame, pos_vocab, neg_vocab):
+    """
+    Given a DataFrame of word vectors, and lists of words that should be
+    positive or negative examples of a given category, get a linear
+    decision boundary between them (and a function that estimates the
+    probability of the membership of a word in that category) using an SVM.
+    """
     pos_vecs = get_vocabulary_vectors(frame, pos_vocab)
     pos_values = np.ones(pos_vecs.shape[0])
     neg_vecs = get_vocabulary_vectors(frame, neg_vocab)
@@ -407,24 +432,104 @@ def two_class_svm(frame, pos_vocab, neg_vocab):
     return svc
 
 
-def de_bias_category(frame, category_examples, bias_examples):
-    category_predictor = two_class_svm(frame, category_examples, bias_examples)
+def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples):
+    """
+    De-bias a distinction that is presumed - for the purposes of de-biasing -
+    to form two ends of a scale. The prototypical example is male vs. female,
+    where words that are not inherently defined by gender end up being "more
+    male" or "more female" due to stereotypes and biases in the data.
+
+    The goal is not to remove the distinction from every word in the system's
+    vocabulary, only those where making the distinction is inappropriate. A
+    gender distinction between "she" and "he" is appropriate. A gender
+    distinction between "doctor" and "nurse" is inappropriate.
+
+    This function takes in four lists of vocabulary:
+
+    - "Positive examples": examples of words that *should* be de-biased,
+      such as "doctor" and "nurse" in the case of gender.
+
+    - "Negative examples": examples of words that *should not* be de-biased,
+      such as "she" and "he".
+
+    - "Left examples": words that define one end of the distinction to be
+      de-biased, such as "man".
+
+    - "Right examples": words that define the other end of the distinction,
+      such as "woman".
+
+    The left and right examples are probably also good negative examples:
+    they appropriately represent the distinction to be made, so they should
+    not be de-biased.
+    """
+    # Make the SVM that distinguishes positive examples (words that should
+    # be de-biased) from negative examples.
+    category_predictor = two_class_svm(frame, pos_examples, neg_examples)
+
+    # The SVM can predict the probability, for each vector in the frame, that
+    # it's in each class. The positive class is column 1 of this prediction.
+    # This gives us a vector of how much each word in the vocabulary should be
+    # de-biased.
     applicability = category_predictor.predict_proba(frame)[:, 1]
+
+    # The bias axis is the vector difference between the average right example
+    # and the average left example.
+    bias_axis = get_category_axis(frame, right_examples) - get_category_axis(frame, left_examples)
+
+    # Make a modified version of the space that projects the bias axis to 0.
+    # Then weight each row of that space by "applicability", the probability
+    # that each row should be de-biased.
+    modified_component = reject_subspace(frame, [bias_axis]).mul(applicability, axis=0)
+
+    # Make another component representing the vectors that should not be
+    # de-biased: the original space times (1 - applicability).
+    original_component = frame.mul(1 - applicability, axis=0)
+
+    # The sum of these two components is the de-biased space, where de-biasing
+    # applies to each row proportional to its applicability.
+    return l2_normalize_rows(original_component + modified_component)
+
+
+def de_bias_category(frame, category_examples, bias_examples):
+    """
+    Remove correlations between a class of words that should have biases
+    removed (category_examples) and a set of words reflecting those biases
+    (bias_examples). For example, the `category_examples` may be ethnicities,
+    and `bias_examples` may be stereotypes about them.
+
+    The check for whether a word should be de-biased works like
+    `de_bias_binary`, where the category words are positive examples and the
+    bias words are negative examples (because the words that define the bias
+    presumably should not be de-biased).
+
+    The words that should be de-biased will have their correlations with
+    each of the bias words removed.
+    """
+    # Make an SVM that distinguishes words that are in the category to be
+    # de-biased from words that are not.
+    category_predictor = two_class_svm(frame, category_examples, bias_examples)
+
+    # Predict the probability of each word in the vocabulary being in the
+    # category.
+    applicability = category_predictor.predict_proba(frame)[:, 1]
+
+    # Make a matrix of vectors representing the correlations to remove.
     vocab = [
         standardized_uri('en', term) for term in bias_examples
     ]
     components_to_reject = frame.loc[vocab].values
+
+    # Make a modified version of the space that projects the bias vectors to 0.
+    # Then weight each row of that space by "applicability", the probability
+    # that each row should be de-biased.
     modified_component = reject_subspace(frame, components_to_reject).mul(applicability, axis=0)
-    original_component = frame.mul(1 - applicability, axis=0)
-    return l2_normalize_rows(original_component + modified_component)
 
-
-def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples):
-    category_predictor = two_class_svm(frame, pos_examples, neg_examples)
-    applicability = category_predictor.predict_proba(frame)[:, 1]
-    bias_axis = get_category_axis(frame, right_examples) - get_category_axis(frame, left_examples)
-    modified_component = reject_subspace(frame, [bias_axis]).mul(applicability, axis=0)
+    # Make another component representing the vectors that should not be
+    # de-biased: the original space times (1 - applicability).
     original_component = frame.mul(1 - applicability, axis=0)
+
+    # The sum of these two components is the de-biased space, where de-biasing
+    # applies to each row proportional to its applicability.
     return l2_normalize_rows(original_component + modified_component)
 
 
