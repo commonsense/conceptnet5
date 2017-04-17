@@ -44,12 +44,13 @@ def export_conceptnet_to_hyperwords(table, matrix_filename, vocab_filename, nrow
     save_index_as_labels(labels, vocab_filename)
 
 
-def export_plain_text(table, uri_file, file_base):
-    from ..vectors.query import VectorSpaceWrapper
+def vec_to_text_line(label, vec):
+    cells = [label] + ['%4.4f' % val for val in vec]
+    return ' '.join(cells)
 
-    def vec_to_text_line(label, vec):
-        cells = [label] + ['%4.4f' % val for val in vec]
-        return ' '.join(cells)
+
+def export_multiple_text(table, uri_file, file_base):
+    from ..vectors.query import VectorSpaceWrapper
 
     uri_main_file = gzip.open(file_base + '_uris_main.txt.gz', 'wt')
     english_main_file = gzip.open(file_base + '_en_main.txt.gz', 'wt')
@@ -80,6 +81,29 @@ def export_plain_text(table, uri_file, file_base):
     uri_main_file.close()
     english_main_file.close()
     english_extra_file.close()
+
+
+def export_text(frame, filename, filter_language=None):
+    vectors = frame.values
+    index = frame.index
+    if filter_language is not None:
+        start_idx = index.get_loc('/c/%s/#' % filter_language, method='bfill')
+        try:
+            end_idx = index.get_loc('/c/%s0' % filter_language, method='bfill')
+        except KeyError:
+            end_idx = frame.shape[0]
+        frame = frame.iloc[start_idx:end_idx]
+        index = frame.index
+
+    with gzip.open(filename, 'wt') as out:
+        dims = "%s %s" % frame.shape
+        print(dims, file=out)
+        for i in range(frame.shape[0]):
+            label = index[i]
+            if filter_language is not None:
+                label = label.split('/', 3)[-1]
+            vec = vectors[i]
+            print(vec_to_text_line(label, vec), file=out)
 
 
 def convert_glove(glove_filename, output_filename, nrows):
