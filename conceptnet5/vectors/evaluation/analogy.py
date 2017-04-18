@@ -428,7 +428,7 @@ def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
             pd.Series(spearman_output, index=['acc', 'low', 'high'])]
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global'):
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global', google_vocab_size=200000):
     """
     Run SAT and Semeval12-2 evaluations.
 
@@ -466,15 +466,20 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
     results.loc['sat-analogies'] = sat_results
 
     for gsubset in ['semantic', 'syntactic']:
-        for vocab_size in [200000, 'cheat']:
-            google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=vocab_size)
-            results.loc['google-%s-%s' % (gsubset, vocab_size)] = google_results
+        google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=google_vocab_size)
+        results.loc['google-%s' % gsubset] = google_results
 
+    # There's no meaningful "all" subset for semeval12, because the dev and
+    # test data are stored entirely separately. Just use "test".
+    if subset == 'dev':
+        semeval12_subset = 'dev'
+    else:
+        semeval12_subset = 'test'
     if semeval_scope == 'global':
         maxdiff_score, spearman_score = eval_semeval2012_global(vectors,
                                                                 semeval_weights[0],
                                                                 semeval_weights[1],
-                                                                subset)
+                                                                semeval12_subset)
         results.loc['semeval12-spearman'] = spearman_score
         results.loc['semeval12-maxdiff'] = maxdiff_score
 
@@ -485,7 +490,7 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
                 maxdiff_score, spearman_score = eval_semeval2012_analogies(vectors,
                                                                            semeval_weights[0],
                                                                            semeval_weights[1],
-                                                                           subset,
+                                                                           semeval12_subset,
                                                                            subclass)
                 results.loc['semeval12-{}-spearman'.format(subclass)] = spearman_score
                 results.loc['semeval12-{}-maxdiff'.format(subclass)] = maxdiff_score

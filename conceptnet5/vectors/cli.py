@@ -5,10 +5,10 @@ from .formats import (
 )
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
-from .evaluation.wordsim import evaluate, evaluate_raw
-from .evaluation.analogy import evaluate as evaluate_analogies
+from .evaluation import wordsim, analogy, bias
 from .evaluation.compare import compare_embeddings, graph_comparison
-from .transforms import miniaturize
+from .miniaturize import miniaturize
+from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
 
 
@@ -99,6 +99,15 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     save_hdf(projection, projection_filename)
 
 
+@cli.command(name='debias')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+def run_debias(input_filename, output_filename):
+    frame = load_hdf(input_filename)
+    debiased = de_bias_frame(frame)
+    save_hdf(debiased, output_filename)
+
+
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
@@ -109,7 +118,22 @@ def run_evaluate(filename, subset, semeval_by_language):
         scope = 'per-language'
     else:
         scope = 'global'
-    print(evaluate(frame, subset=subset, semeval_scope=scope))
+    print(wordsim.evaluate(frame, subset=subset, semeval_scope=scope))
+    print(analogy.evaluate(frame, subset=subset, analogy_filename=ANALOGY_FILENAME))
+    print(bias.measure_bias(frame))
+
+
+@cli.command(name='evaluate_wordsim')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option('--semeval-by-language/--semeval-global', '-l', default=False)
+def run_evaluate_wordsim(filename, subset, semeval_by_language):
+    frame = load_hdf(filename)
+    if semeval_by_language:
+        scope = 'per-language'
+    else:
+        scope = 'global'
+    print(wordsim.evaluate(frame, subset=subset, semeval_scope=scope))
 
 
 @cli.command(name='evaluate_raw')
@@ -122,14 +146,22 @@ def run_evaluate_raw(filename, subset, semeval_by_language):
         scope = 'per-language'
     else:
         scope = 'global'
-    print(evaluate_raw(frame, subset=subset, semeval_scope=scope))
+    print(wordsim.evaluate_raw(frame, subset=subset, semeval_scope=scope))
 
 
 @cli.command(name='evaluate_analogies')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-def run_evaluate_analogies(filename):
+@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+def run_evaluate_analogies(filename, subset):
     frame = load_hdf(filename)
-    print(evaluate_analogies(frame, analogy_filename=ANALOGY_FILENAME))
+    print(analogy.evaluate(frame, analogy_filename=ANALOGY_FILENAME))
+
+
+@cli.command(name='evaluate_bias')
+@click.argument('filename', type=click.Path(readable=True, dir_okay=False))
+def run_evaluate_bias(filename):
+    frame = load_hdf(filename)
+    print(bias.measure_bias(frame))
 
 
 @cli.command(name='compare_embeddings')
@@ -185,7 +217,7 @@ def run_export(input_filename, uri_filename, output_dir):
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('extra_vocab_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('-k', default=256, help="Number of columns to reduce to")
+@click.option('-k', default=300, help="Number of columns to reduce to")
 def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     frame = load_hdf(input_filename)
     other_frame = load_hdf(extra_vocab_filename)

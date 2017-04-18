@@ -71,7 +71,7 @@ PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_P
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
-    'glove12-840B', 'w2v-google-news'
+    'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
 
 # Test mode overrides some of these settings.
@@ -510,14 +510,23 @@ rule convert_fasttext:
 
 rule convert_lexvec:
     input:
-        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
-        DATA + "/db/wiktionary.db"
+        DATA + "/raw/vectors/lexvec.commoncrawl.300d.W+C.pos.vectors.gz",
     output:
-        DATA + "/vectors/lexvec.h5"
+        DATA + "/vectors/lexvec-commoncrawl.h5"
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2000000 {input} {output}"
+
+rule convert_opensubtitles_ft:
+    input:
+        DATA + "/raw/vectors/ft-opensubtitles.vec.gz",
+    output:
+        DATA + "/vectors/fasttext-opensubtitles.h5"
+    resources:
+        ram=16
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2000000 {input} {output}"
 
 rule convert_polyglot:
     input:
@@ -560,16 +569,26 @@ rule merge_intersect:
     input:
         expand(DATA + "/vectors/{name}-retrofit.h5", name=INPUT_EMBEDDINGS)
     output:
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
         ram=16
     shell:
         "cn5-vectors intersect {input} {output}"
 
+rule debias:
+    input:
+        DATA + "/vectors/numberbatch-biased.h5"
+    output:
+        DATA + "/vectors/numberbatch.h5"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors debias {input} {output}"
+
 rule miniaturize:
     input:
-        DATA + "/vectors/numberbatch.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/w2v-google-news.h5"
     output:
         DATA + "/vectors/mini.h5"
