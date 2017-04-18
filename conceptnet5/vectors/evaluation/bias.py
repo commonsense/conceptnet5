@@ -107,13 +107,49 @@ BELIEF_STEREOTYPE_TERMS = [
     'terror', 'violent'
 ]
 
-
 ETHNIC_NAME_SETS = [
-    ['Amanda', 'Megan', 'Molly', 'Amy', 'Claire', 'Adam', 'Paul', 'Jake', 'Connor', 'Cody'],
-    ['Latisha', 'Shaniqua', 'Jerome', 'Lavon', 'Imani', 'Shanice', 'Aaliyah', 'DeShawn', 'Marquis', 'Darnell'],
-    ['Hakim', 'Sharif', 'Yousef', 'Wahib', 'Muhsin', 'Salim', 'Karim', 'Habib', 'Ashraf', 'Akbar'],
-    ['Juan', 'José', 'Miguel', 'Juana', 'Ana', 'Luisa'],
+    # "White" names from Caliskan et al., trimmed to 15 male and 15 female names
+    # http://science.sciencemag.org/content/sci/suppl/2017/04/12/356.6334.183.DC1/Caliskan-SM.pdf
+    [
+        'Adam', 'Harry', 'Josh', 'Roger', 'Alan',
+        'Frank', 'Justin', 'Ryan', 'Andrew', 'Jack',
+        'Matthew', 'Stephen', 'Brad', 'Greg', 'Paul',
+        'Amanda', 'Courtney', 'Heather', 'Melanie', 'Katie',
+        'Betsy', 'Kristin', 'Nancy', 'Stephanie', 'Ellen',
+        'Lauren', 'Colleen', 'Emily', 'Megan', 'Rachel'
+    ],
+    # "Black" names from Caliskan et al., plus two more to balance it at
+    # 15 male and 15 female names
+    [
+        'Alonzo', 'Jamel', 'Theo', 'Alphonse', 'Jerome',
+        'Leroy', 'Torrance', 'Darnell', 'Lamar', 'Lionel',
+        'Tyree', 'Deion', 'Lamont', 'Malik', 'Terrence',
+        'Nishelle', 'Shereen', 'Ebony', 'Latisha', 'Shaniqua',
+        'Jasmine', 'Tanisha', 'Tia', 'Lakisha', 'Latoya',
+        'Yolanda', 'Malika', 'Yvette', 'Aaliyah', 'Shanice'
+    ],
+    # Common Hispanic names from various sources, preferring those that are
+    # in the Numberbatch vocabulary
+    [
+        'Juan', 'José', 'Miguel', 'Luís', 'Jorge',
+        'Santiago', 'Matías', 'Sebastián', 'Mateo', 'Nicolás',
+        'Alejandro', 'Samuel', 'Diego', 'Daniel', 'Tomás',
+        'Juana', 'Ana', 'Luisa', 'María', 'Elena',
+        'Sofía', 'Isabella', 'Valentina', 'Camila', 'Valeria',
+        'Luciana', 'Ximena', 'Mariana', 'Victoria', 'Martina',
+    ],
+    # Common Muslim names from various sources, preferring those that are
+    # in the Numberbatch vocabulary
+    [
+        'Mohammed', 'Omar', 'Ahmed', 'Ali', 'Youssef',
+        'Abdullah', 'Yasin', 'Hamza', 'Ayaan', 'Syed',
+        'Rishaan', 'Samar', 'Ahmad', 'Zikri', 'Rayyan',
+        'Mariam', 'Jana', 'Malak', 'Salma', 'Nour',
+        'Lian', 'Fatima', 'Ayesha', 'Zahra', 'Sana',
+        'Zara', 'Alya', 'Shaista', 'Zoya', 'Maryam'
+    ]
 ]
+
 
 def correlation_bias(frame1, frame2, verbose=False):
     """
@@ -193,10 +229,6 @@ def measure_bias(frame):
     )
     stereotype_vecs_2 = get_vocabulary_vectors(frame, ETHNIC_STEREOTYPE_TERMS)
     name_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
-
-    #stereotype_vecs_1 = get_vocabulary_vectors(frame, COARSE_ETHNICITY_TERMS)
-    #stereotype_vecs_2 = get_vocabulary_vectors(frame, CULTURE_PREJUDICES)
-    #trained_ethnic_bias = correlation_bias(stereotype_vecs_1, stereotype_vecs_2)
 
     stereotype_vecs_1 = get_vocabulary_vectors(frame, PEOPLE_BY_BELIEF)
     stereotype_vecs_2 = get_vocabulary_vectors(frame, BELIEF_STEREOTYPE_TERMS)
