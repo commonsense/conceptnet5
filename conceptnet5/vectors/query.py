@@ -55,8 +55,6 @@ class VectorSpaceWrapper(object):
             self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
             self.frame = frame
-            if not self.frame.index.is_monotonic_increasing:
-                self.frame = self.frame.sort_index()
             self.vector_filename = None
         self._index_cache = {}
         self.small_frame = None
@@ -75,6 +73,9 @@ class VectorSpaceWrapper(object):
         try:
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
+
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
 
             if not self.frame.index[0].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
@@ -106,18 +107,19 @@ class VectorSpaceWrapper(object):
     def expand_terms(self, terms, limit_per_term=10, include_neighbors=True):
         """
         Given a list of weighted terms as (term, weight) tuples, add terms that
-        are one step away in ConceptNet at a lower weight.
+        are one step away in ConceptNet at a lower weight, terms in English that share the
+        surface form with these terms, and the terms which share prefix with these terms,
+        if the terms are OOV.
 
         This helps increase the recall power of the vector space, because it
         means you can find terms that are too infrequent to have their own
-        vector by looking up their neighbors. This forms a reasonable
-        approximation of the vector an infrequent term would have anyway.
+        vector by looking up their neighbors, etc.
+
+        This forms a reasonable approximation of the vector an infrequent term would have anyway.
         """
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            # TODO: this disagrees with the docstring about whether neighbors
-            # are added to non-OOV terms
             if include_neighbors and term not in self.frame.index and self.finder is not None:
                 for edge in self.finder.lookup(term, limit=limit_per_term):
                     if field_match(edge['start']['term'], term) and not field_match(
@@ -156,7 +158,10 @@ class VectorSpaceWrapper(object):
             return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
 
     def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
-        # TODO: docstring
+        """
+        Given the terms, return their vector. In case of OOV words, the vector is created using
+        expanded terms and their weights.
+        """
         self.load()
         return weighted_average(
             self.frame,
@@ -164,7 +169,9 @@ class VectorSpaceWrapper(object):
         )
 
     def text_to_vector(self, language, text):
-        # TODO: docstring -- is this only used for Story Cloze Test?
+        """
+        Used in Story Cloze Test to to create a vector for text.
+        """
         tokens = wordfreq.tokenize(text, language)
         weighted_terms = [(standardized_uri(language, token), 1.) for token in tokens]
         return self.get_vector(weighted_terms, include_neighbors=False)

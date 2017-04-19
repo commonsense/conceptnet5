@@ -20,7 +20,7 @@ def save_hdf(table, filename):
 
 
 def save_npy_and_labels(table, matrix_filename, vocab_filename):
-    # TODO: find out if we're using this
+    """This function is not currently used"""
     np.save(matrix_filename, table.values)
     save_index_as_labels(table.index, vocab_filename)
 
