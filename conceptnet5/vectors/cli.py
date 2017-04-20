@@ -6,7 +6,9 @@ from .formats import (
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
 from .evaluation import wordsim, analogy, bias
-from .evaluation.compare import compare_embeddings, graph_comparison
+from .evaluation.compare import (
+    compare_embeddings, graph_comparison, graph_bias_comparison
+)
 from .miniaturize import miniaturize
 from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
@@ -186,12 +188,14 @@ def run_compare_embeddings(input_filenames, output_filename):
 
 @cli.command(name='comparison_graph')
 @click.argument('table_filename', type=click.Path(readable=True, dir_okay=False))
-@click.argument('out_filename', type=click.Path(writable=True, dir_okay=False))
-def run_comparison_graph(table_filename, out_filename):
+@click.argument('eval_graph_filename', type=click.Path(writable=True, dir_okay=False))
+@click.argument('bias_graph_filename', type=click.Path(writable=True, dir_okay=False))
+def run_comparison_graph(table_filename, eval_graph_filename, bias_graph_filename):
     """
     Convert a table of evaluation results into a PNG or PDF graph.
     """
-    graph_comparison(table_filename, out_filename)
+    graph_comparison(table_filename, eval_graph_filename)
+    graph_bias_comparison(table_filename, bias_graph_filename)
 
 
 @cli.command(name='export_hyperwords')

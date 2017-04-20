@@ -600,12 +600,19 @@ rule miniaturize:
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",
-        DATA + "/stats/terms.txt",
-        DATA + "/psql/done"
     output:
-        DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
+        DATA + "/vectors/plain/numberbatch.txt.gz"
     shell:
-        "cn5-vectors export_text %(data)s/vectors/numberbatch.h5 %(data)s/stats/terms.txt %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}
+        "cn5-vectors export_text {input} {output}"
+
+
+rule export_english_text:
+    input:
+        DATA + "/vectors/numberbatch.h5",
+    output:
+        DATA + "/vectors/plain/numberbatch-en.txt.gz"
+    shell:
+        "cn5-vectors export_text -l en {input} {output}"
 
 
 rule sha256sums:
@@ -629,21 +636,25 @@ rule compare_embeddings:
     input:
         DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
-        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
-        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
-        DATA + "/precomputed/vectors/numberbatch.h5",
+        DATA + "/vectors/glove12-840B.h5",
+        DATA + "/raw/vectors/fasttext-wiki-en.vec.gz",
+        DATA + "/vectors/numberbatch-biased.h5",
+        DATA + "/vectors/numberbatch.h5",
         DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
-    shell:
-        "cn5-vectors compare_embeddings %(data)s/raw/vectors/GoogleNews-vectors-negative300.bin.gz %(data)s/raw/vectors/glove12.840B.300d.txt.gz %(data)s/raw/vectors/lexvec.no-header.vectors.gz %(data)s/precomputed/vectors/conceptnet-55-ppmi.h5 %(data)s/precomputed/vectors/numberbatch.h5 {output}" % {'data': DATA}
+    run:
+        input_embeddings = input[:-2]
+        input_embeddings_str = ' '.join(input_embeddings)
+        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings)
 
 rule comparison_graph:
     input:
         DATA + "/stats/evaluation.h5"
     output:
-        DATA + "/stats/eval-graph.pdf"
+        DATA + "/stats/eval-graph.png",
+        DATA + "/stats/bias-graph.png"
     shell:
         "cn5-vectors comparison_graph {input} {output}"
 

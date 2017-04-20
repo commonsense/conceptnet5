@@ -1,8 +1,6 @@
-from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity, normalize_vec
+from conceptnet5.vectors import standardized_uri, normalize_vec
 from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
-import pandas as pd
 from sklearn import svm
 
 
