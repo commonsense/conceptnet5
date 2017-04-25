@@ -118,6 +118,27 @@ def convert_polyglot(polyglot_filename, output_filename, language):
     save_hdf(pg_std, output_filename)
 
 
+def load_glove(filename, max_rows=1000000):
+    """
+    Load a DataFrame from the GloVe text format, which is the same as the
+    fastText format except it doesn't tell you up front how many rows and
+    columns there are.
+    """
+    labels = []
+    rows = []
+    with gzip.open(filename, 'rt') as infile:
+        for i, line in enumerate(infile):
+            if i >= max_rows:
+                break
+            items = line.rstrip().split(' ')
+            labels.append(items[0])
+            values = np.array([float(x) for x in items[1:]], 'f')
+            rows.append(values)
+
+    arr = np.vstack(rows)
+    return pd.DataFrame(arr, index=labels, dtype='f')
+
+
 def load_fasttext(filename, max_rows=1000000):
     """
     Load a DataFrame from the fastText text format.
