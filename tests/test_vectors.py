@@ -146,20 +146,20 @@ def test_shrink_and_sort(frame=None):
     vectors = load_any_embeddings(frame)
 
     n, k = 10, 20
-    shrinked = shrink_and_sort(vectors, n, k)
+    shrank = shrink_and_sort(vectors, n, k)
 
     # Check the size of the frame
-    ok_(shrinked.shape == (n, k))
+    ok_(shrank.shape == (n, k))
 
     # Check if the frame is l2 normalized
-    lengths = np.sqrt(np.sum(np.power(shrinked, 2), axis='columns'))
+    lengths = np.sqrt(np.sum(np.power(shrank, 2), axis='columns'))
     ok_(all(isclose(length, 1.0) for length in lengths))
 
     # Check if the index is sorted
-    ok_(shrinked.index.is_monotonic_increasing)
+    ok_(shrank.index.is_monotonic_increasing)
 
 
-def test_miniturize(frame=None):
+def test_miniaturize(frame=None):
     if not frame:
         frame = DATA + '/vectors/numberbatch.h5'
     frame = load_any_embeddings(frame)
@@ -180,7 +180,7 @@ def test_miniturize(frame=None):
 
 
 @click.command()
-@click.argument('frame')
+@click.option('--frame', default=None)
 def test(frame):
     test_terms_in_frame(frame)
     test_vector_space_wrapper(frame)
@@ -189,7 +189,7 @@ def test(frame):
     test_l1_normalize_columns(frame)
     test_l2_normalize_rows(frame)
     test_shrink_and_sort(frame)
-    test_miniturize(frame)
+    test_miniaturize(frame)
 
 
 if __name__ == '__main__':
