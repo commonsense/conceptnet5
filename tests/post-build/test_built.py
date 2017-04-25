@@ -2,6 +2,7 @@
 This test can only be run when the full ConceptNet data has been built
 (not just the test data). It confirms that
 """
+#TODO: Finish an incomplete docstring.
 
 from conceptnet5.util import get_data_filename
 from conceptnet5.languages import CORE_LANGUAGES, COMMON_LANGUAGES, ALL_LANGUAGES
