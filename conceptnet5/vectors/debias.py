@@ -350,7 +350,7 @@ GENDER_NEUTRAL_WORDS = [
     'workout', 'pilates',
     'home depot', 'jcpenney',
     'carpentry', 'sewing',
-    'accountant', 'paralegal'
+    'accountant', 'paralegal',
     'addiction', 'eating disorder',
     'professor emeritus', 'associate professor',
     'programmer', 'homemaker'
@@ -392,9 +392,10 @@ def reject_subspace(frame, vecs):
     """
     current_array = frame.copy()
     for vec in vecs:
-        vec = normalize_vec(vec)
-        projection = current_array.dot(vec)
-        current_array -= np.outer(projection, vec)
+        if not np.isnan(vec).any():
+            vec = normalize_vec(vec)
+            projection = current_array.dot(vec)
+            current_array -= np.outer(projection, vec)
 
     return l2_normalize_rows(current_array, offset=1e-9)
 
