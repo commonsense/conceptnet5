@@ -7,11 +7,6 @@ HTTP = HTTPRemoteProvider()
 # CONCEPTNET_BUILD_DATA environment variable. This will happen during testing.
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "data")
 
-# If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
-TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
-if TESTMODE:
-    os.environ['CONCEPTNET_DB_NAME'] = 'conceptnet-test'
-
 # Some build steps are difficult to run, so we've already run them and put
 # the results in S3. Of course, that can't be the complete solution, because
 # we have to have run those build steps first. So when USE_PRECOMPUTED is
@@ -73,6 +68,19 @@ PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 INPUT_EMBEDDINGS = [
     'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
+SOURCE_EMBEDDING_ROWS = 1500000
+
+# If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
+TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
+if TESTMODE:
+    # Use a throwaway database to store the ConceptNet data when testing
+    os.environ['CONCEPTNET_DB_NAME'] = 'conceptnet-test'
+
+    # Retrofit a tiny version of GloVe when testing
+    INPUT_EMBEDDINGS = ['glove12-840B']
+    SOURCE_EMBEDDING_ROWS = 5000
+
+
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -125,7 +133,8 @@ rule test:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/psql/done",
-        DATA + "/assoc/reduced.csv"
+        DATA + "/assoc/reduced.csv",
+        DATA + "/vectors/plain/numberbatch-en.txt.gz"
 
 
 # Downloaders
@@ -486,7 +495,7 @@ rule convert_word2vec:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_glove:
     input:
@@ -496,7 +505,7 @@ rule convert_glove:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_fasttext:
     input:
@@ -506,7 +515,7 @@ rule convert_fasttext:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 -l {wildcards.lang} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:
