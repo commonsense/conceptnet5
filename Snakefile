@@ -7,11 +7,6 @@ HTTP = HTTPRemoteProvider()
 # CONCEPTNET_BUILD_DATA environment variable. This will happen during testing.
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "data")
 
-# If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
-TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
-if TESTMODE:
-    os.environ['CONCEPTNET_DB_NAME'] = 'conceptnet-test'
-
 # Some build steps are difficult to run, so we've already run them and put
 # the results in S3. Of course, that can't be the complete solution, because
 # we have to have run those build steps first. So when USE_PRECOMPUTED is
@@ -73,6 +68,19 @@ PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 INPUT_EMBEDDINGS = [
     'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
+SOURCE_EMBEDDING_ROWS = 1500000
+
+# If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
+TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
+if TESTMODE:
+    # Use a throwaway database to store the ConceptNet data when testing
+    os.environ['CONCEPTNET_DB_NAME'] = 'conceptnet-test'
+
+    # Retrofit a tiny version of GloVe when testing
+    INPUT_EMBEDDINGS = ['glove12-840B']
+    SOURCE_EMBEDDING_ROWS = 5000
+
+
 
 # Test mode overrides some of these settings.
 if TESTMODE:
@@ -125,7 +133,8 @@ rule test:
     input:
         DATA + "/assertions/assertions.csv",
         DATA + "/psql/done",
-        DATA + "/assoc/reduced.csv"
+        DATA + "/assoc/reduced.csv",
+        DATA + "/vectors/plain/numberbatch-en.txt.gz"
 
 
 # Downloaders
@@ -486,7 +495,7 @@ rule convert_word2vec:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_glove:
     input:
@@ -496,7 +505,7 @@ rule convert_glove:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n 1500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_fasttext:
     input:
@@ -506,7 +515,7 @@ rule convert_fasttext:
     resources:
         ram=16
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 1500000 -l {wildcards.lang} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:
@@ -600,12 +609,19 @@ rule miniaturize:
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",
-        DATA + "/stats/terms.txt",
-        DATA + "/psql/done"
     output:
-        DATA + "/vectors/plain/conceptnet-numberbatch_uris_main.txt.gz"
+        DATA + "/vectors/plain/numberbatch.txt.gz"
     shell:
-        "cn5-vectors export_text %(data)s/vectors/numberbatch.h5 %(data)s/stats/terms.txt %(data)s/vectors/plain/conceptnet-numberbatch" % {'data': DATA}
+        "cn5-vectors export_text {input} {output}"
+
+
+rule export_english_text:
+    input:
+        DATA + "/vectors/numberbatch.h5",
+    output:
+        DATA + "/vectors/plain/numberbatch-en.txt.gz"
+    shell:
+        "cn5-vectors export_text -l en {input} {output}"
 
 
 rule sha256sums:
@@ -629,21 +645,25 @@ rule compare_embeddings:
     input:
         DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
-        DATA + "/raw/vectors/lexvec.no-header.vectors.gz",
-        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5",
-        DATA + "/precomputed/vectors/numberbatch.h5",
+        DATA + "/vectors/glove12-840B.h5",
+        DATA + "/raw/vectors/fasttext-wiki-en.vec.gz",
+        DATA + "/vectors/numberbatch-biased.h5",
+        DATA + "/vectors/numberbatch.h5",
         DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"
     output:
         DATA + "/stats/evaluation.h5"
-    shell:
-        "cn5-vectors compare_embeddings %(data)s/raw/vectors/GoogleNews-vectors-negative300.bin.gz %(data)s/raw/vectors/glove12.840B.300d.txt.gz %(data)s/raw/vectors/lexvec.no-header.vectors.gz %(data)s/precomputed/vectors/conceptnet-55-ppmi.h5 %(data)s/precomputed/vectors/numberbatch.h5 {output}" % {'data': DATA}
+    run:
+        input_embeddings = input[:-2]
+        input_embeddings_str = ' '.join(input_embeddings)
+        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
 
 rule comparison_graph:
     input:
         DATA + "/stats/evaluation.h5"
     output:
-        DATA + "/stats/eval-graph.pdf"
+        DATA + "/stats/eval-graph.png",
+        DATA + "/stats/bias-graph.png"
     shell:
         "cn5-vectors comparison_graph {input} {output}"
 

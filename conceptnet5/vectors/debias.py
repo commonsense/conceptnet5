@@ -1,8 +1,6 @@
-from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity, normalize_vec
+from conceptnet5.vectors import standardized_uri, normalize_vec
 from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
-import pandas as pd
 from sklearn import svm
 
 
@@ -352,7 +350,7 @@ GENDER_NEUTRAL_WORDS = [
     'workout', 'pilates',
     'home depot', 'jcpenney',
     'carpentry', 'sewing',
-    'accountant', 'paralegal'
+    'accountant', 'paralegal',
     'addiction', 'eating disorder',
     'professor emeritus', 'associate professor',
     'programmer', 'homemaker'
@@ -394,9 +392,10 @@ def reject_subspace(frame, vecs):
     """
     current_array = frame.copy()
     for vec in vecs:
-        vec = normalize_vec(vec)
-        projection = current_array.dot(vec)
-        current_array -= np.outer(projection, vec)
+        if not np.isnan(vec).any():
+            vec = normalize_vec(vec)
+            projection = current_array.dot(vec)
+            current_array -= np.outer(projection, vec)
 
     return l2_normalize_rows(current_array, offset=1e-9)
 
