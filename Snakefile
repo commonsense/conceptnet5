@@ -656,7 +656,7 @@ rule compare_embeddings:
     run:
         input_embeddings = input[:-2]
         input_embeddings_str = ' '.join(input_embeddings)
-        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings)
+        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
 
 rule comparison_graph:
     input:
