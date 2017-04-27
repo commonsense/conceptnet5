@@ -45,7 +45,7 @@ def get_vector(frame, label, language=None):
     and normalize it to ConceptNet form. Either way, it can also take in
     a label that is already in ConceptNet form.
     """
-    if frame.index[0].startswith('/'): # This frame has URIs in its index
+    if frame.index[1].startswith('/c/'):  # This frame has URIs in its index
         if not label.startswith('/'):
             label = standardized_uri(language, label)
         try:

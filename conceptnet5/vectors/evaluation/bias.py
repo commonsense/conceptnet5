@@ -195,10 +195,6 @@ def measure_bias(frame):
     - Coarse-grained ethnicity
     - Religious beliefs
     """
-    # Assume English for DataFrames that don't have language tags.
-    if '/c/' not in frame.index[0]:
-        frame.index = ['/c/en/%s' % label for label in frame.index]
-
     gender_binary_axis = normalize_vec(get_category_axis(frame, FEMALE_WORDS) - get_category_axis(frame, MALE_WORDS))
     gender_bias_numbers = []
     for female_biased_word, male_biased_word in GENDER_BIAS_PAIRS:
