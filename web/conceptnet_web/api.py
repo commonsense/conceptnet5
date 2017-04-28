@@ -27,6 +27,9 @@ app = flask.Flask(
     static_folder=STATIC_PATH
 )
 app.config['JSON_AS_ASCII'] = False
+app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
+
+
 for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
