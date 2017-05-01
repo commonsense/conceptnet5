@@ -182,7 +182,7 @@ def run_compare_embeddings(input_filenames, output_filename):
     in the matrix, but this saves memory and download time.
     """
     results = compare_embeddings(input_filenames, subset='all', tune_analogies=True)
-    print(results['acc'])
+    print(results)
     save_hdf(results, output_filename)
 
 
