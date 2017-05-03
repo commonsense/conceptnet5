@@ -19,6 +19,7 @@ import os
 app = flask.Flask('conceptnet5_web')
 STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(app.root_path, 'static'))
 TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(app.root_path, 'templates'))
+app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
 
 app.config.update({
     'template_folder': TEMPLATE_PATH,

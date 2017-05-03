@@ -1,85 +1,74 @@
 import pandas as pd
 import numpy as np
-from scipy import sparse
 import gzip
 import struct
-import wordfreq
 import pickle
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
-from ..vectors import standardized_uri, get_vector
-from conceptnet5.languages import COMMON_LANGUAGES
-from conceptnet5.nodes import get_uri_language
 
 
 def load_hdf(filename):
+    """
+    Load a semantic vector space from an HDF5 file.
+
+    HDF5 is a complex format that can contain many instances of different kinds
+    of data. The convention we use is that the file contains one labeled
+    matrix, named "mat".
+    """
     return pd.read_hdf(filename, 'mat', encoding='utf-8')
 
 
 def save_hdf(table, filename):
+    """
+    Save a semantic vector space into an HDF5 file, following the convention
+    of storing it as a labeled matrix named 'mat'.
+    """
     return table.to_hdf(filename, 'mat', encoding='utf-8')
 
 
-def save_npy_and_labels(table, matrix_filename, vocab_filename):
-    # TODO: find out if we're using this
+def save_labels_and_npy(table, vocab_filename, matrix_filename):
+    """
+    Save a semantic vector space in two files: a NumPy .npy file of the matrix,
+    and a text file with one label per line. We use this for exporting the
+    Luminoso background space.
+    """
     np.save(matrix_filename, table.values)
     save_index_as_labels(table.index, vocab_filename)
 
 
-def export_conceptnet_to_hyperwords(table, matrix_filename, vocab_filename, nrows):
-    vecs = []
-    labels = []
-    english_labels = [
-        standardized_uri('en', item)
-        for item in wordfreq.top_n_list('en', nrows * 2, 'large')
-    ]
-    count = 0
-    for label in english_labels:
-        if label in table.index:
-            labels.append(label.split('/')[-1])
-            vecs.append(get_vector(table, label))
-            count += 1
-            if count >= nrows:
-                break
-    np.save(matrix_filename, np.vstack(vecs))
-    save_index_as_labels(labels, vocab_filename)
+def vec_to_text_line(label, vec):
+    """
+    Output a labeled vector as a line in a fastText-style text format.
+    """
+    cells = [label] + ['%4.4f' % val for val in vec]
+    return ' '.join(cells)
 
 
-def export_plain_text(table, uri_file, file_base):
-    from ..vectors.query import VectorSpaceWrapper
+def export_text(frame, filename, filter_language=None):
+    """
+    Save a semantic vector space as a fastText-style text file.
 
-    def vec_to_text_line(label, vec):
-        cells = [label] + ['%4.4f' % val for val in vec]
-        return ' '.join(cells)
+    If `filter_language` is set, it will output only vectors in that language.
+    """
+    vectors = frame.values
+    index = frame.index
+    if filter_language is not None:
+        start_idx = index.get_loc('/c/%s/#' % filter_language, method='bfill')
+        try:
+            end_idx = index.get_loc('/c/%s0' % filter_language, method='bfill')
+        except KeyError:
+            end_idx = frame.shape[0]
+        frame = frame.iloc[start_idx:end_idx]
+        index = frame.index
 
-    uri_main_file = gzip.open(file_base + '_uris_main.txt.gz', 'wt')
-    english_main_file = gzip.open(file_base + '_en_main.txt.gz', 'wt')
-    english_extra_file = gzip.open(file_base + '_en_extra.txt.gz', 'wt')
-    wrap = VectorSpaceWrapper(frame=table)
-
-    for line in open(uri_file, encoding='utf-8'):
-        uri = line.strip()
-        if uri.count('/') == 3 and get_uri_language(uri) in COMMON_LANGUAGES:
-            if uri in table.index:
-                vec = table.loc[uri].values
-                print(vec_to_text_line(uri, vec), file=uri_main_file)
-            else:
-                if not uri.startswith('/c/en') or '_' in uri:
-                    continue
-                vec = wrap.get_vector(uri)
-
-            if vec.dot(vec) == 0:
-                continue
-
-            if uri.startswith('/c/en/'):
-                label = uri[6:]
-                if uri in table.index:
-                    print(vec_to_text_line(label, vec), file=english_main_file)
-                else:
-                    print(vec_to_text_line(label, vec), file=english_extra_file)
-
-    uri_main_file.close()
-    english_main_file.close()
-    english_extra_file.close()
+    with gzip.open(filename, 'wt') as out:
+        dims = "%s %s" % frame.shape
+        print(dims, file=out)
+        for i in range(frame.shape[0]):
+            label = index[i]
+            if filter_language is not None:
+                label = label.split('/', 3)[-1]
+            vec = vectors[i]
+            print(vec_to_text_line(label, vec), file=out)
 
 
 def convert_glove(glove_filename, output_filename, nrows):
@@ -120,25 +109,40 @@ def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
 
 
 def convert_polyglot(polyglot_filename, output_filename, language):
+    """
+    Convert Polyglot data from its pickled format to an HDF5 dataframe.
+    """
     pg_raw = load_polyglot(polyglot_filename)
     pg_std = standardize_row_labels(pg_raw, language, forms=False)
     del pg_raw
     save_hdf(pg_std, output_filename)
 
 
-def load_glove(filename, nrows=500000):
-    # TODO: just make this a variant of load_fasttext, or make load_fasttext
-    # a variant of this
+def load_glove(filename, max_rows=1000000):
+    """
+    Load a DataFrame from the GloVe text format, which is the same as the
+    fastText format except it doesn't tell you up front how many rows and
+    columns there are.
+    """
+    labels = []
+    rows = []
     with gzip.open(filename, 'rt') as infile:
-        return pd.read_table(
-            infile, sep=' ', index_col=0, quoting=3,
-            keep_default_na=False, na_values=[],
-            names=['term'] + list(range(300)),
-            nrows=nrows
-        )
+        for i, line in enumerate(infile):
+            if i >= max_rows:
+                break
+            items = line.rstrip().split(' ')
+            labels.append(items[0])
+            values = np.array([float(x) for x in items[1:]], 'f')
+            rows.append(values)
+
+    arr = np.vstack(rows)
+    return pd.DataFrame(arr, index=labels, dtype='f')
 
 
 def load_fasttext(filename, max_rows=1000000):
+    """
+    Load a DataFrame from the fastText text format.
+    """
     arr = None
     labels = []
     with gzip.open(filename, 'rt') as infile:
@@ -175,6 +179,11 @@ def _read_vec(file, ndims):
 
 
 def load_word2vec_bin(filename, nrows):
+    """
+    Load a DataFrame from word2vec's binary format. (word2vec's text format
+    should be the same as fastText's, but it's less efficient to load the
+    word2vec data that way.)
+    """
     label_list = []
     vec_list = []
     with gzip.open(filename, 'rb') as infile:
@@ -196,34 +205,37 @@ def load_word2vec_bin(filename, nrows):
 
 
 def load_polyglot(filename):
+    """
+    Load a pickled matrix from the Polyglot format.
+    """
     labels, mat = pickle.load(open(filename, 'rb'), encoding='bytes')
     label_list = list(labels)
     return pd.DataFrame(mat, index=label_list, dtype='f')
 
 
-def save_csr(matrix, filename):
-    np.savez(filename, data=matrix.data, indices=matrix.indices,
-             indptr=matrix.indptr, shape=matrix.shape)
-
-
 def load_labels_and_npy(label_file, npy_file):
+    """
+    Load a semantic vector space from two files: a NumPy .npy file of the matrix,
+    and a text file with one label per line.
+    """
     labels = [line.rstrip('\n') for line in open(label_file, encoding='utf-8')]
     npy = np.load(npy_file)
     return pd.DataFrame(npy, index=labels, dtype='f')
 
 
 def load_labels_as_index(label_filename):
+    """
+    Load a set of labels (with no attached vectors) from a text file, and
+    represent them in a pandas Index.
+    """
     labels = [line.rstrip('\n') for line in open(label_filename, encoding='utf-8')]
     return pd.Index(labels)
 
 
 def save_index_as_labels(index, label_filename):
+    """
+    Save a pandas Index as a text file of labels.
+    """
     with open(label_filename, 'w', encoding='utf-8') as out:
         for label in index:
             print(label, file=out)
-
-
-def load_csr(filename):
-    with np.load(filename) as npz:
-        mat = sparse.csr_matrix((npz['data'], npz['indices'], npz['indptr']), shape=npz['shape'])
-    return mat

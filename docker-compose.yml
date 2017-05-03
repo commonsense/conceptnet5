@@ -33,6 +33,7 @@ services:
       - CONCEPTNET_DB_HOSTNAME=db
       - CONCEPTNET_BUILD_DATA=/data/conceptnet
       - CONCEPTNET_DATA=/data/conceptnet
+      - CONCEPTNET_RATE_LIMITING=0
     volumes:
       - cn5data:/data/conceptnet
       - nginx:/data/nginx
