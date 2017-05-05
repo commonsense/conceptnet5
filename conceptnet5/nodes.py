@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with functions that normalize
