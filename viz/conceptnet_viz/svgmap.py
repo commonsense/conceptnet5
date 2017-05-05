@@ -1,11 +1,12 @@
 import svgwrite
+import networkx as nx
+from networkx.exception import NetworkXError
+from networkx.algorithms.mst import minimum_spanning_tree
 from scipy.spatial import Delaunay
 from scipy.spatial.distance import euclidean
-from scipy.sparse import csr_matrix
-from scipy.sparse.csgraph import minimum_spanning_tree
-from conceptnet5.vectors.formats import load_hdf
 
-import numpy as np
+
+from conceptnet5.vectors.formats import load_hdf
 
 
 def get_concept_degrees(filename):
@@ -36,19 +37,24 @@ def spanning_tree(frame):
     neighbor_indices, neighbor_indptr = triangulation.vertex_neighbor_vertices
     print(neighbor_indices[:10])
     print(neighbor_indptr[:10])
-    rows = np.zeros(neighbor_indptr.shape, dtype='i')
-    cols = np.zeros(neighbor_indptr.shape, dtype='i')
-    distances = np.zeros(neighbor_indptr.shape, dtype='f')
+    graph = nx.Graph()
     for i in range(len(coords)):
         for j in range(neighbor_indices[i], neighbor_indices[i+1]):
             neighbor = neighbor_indptr[j]
-            rows[j] = i
-            cols[j] = neighbor
-            distances[j] = euclidean(coords[i], coords[neighbor])
+            distance = euclidean(coords[i], coords[neighbor])
+            graph.add_edge(i, neighbor, weight=distance)
 
-    dist_matrix = csr_matrix((distances, (rows, cols)))
-    print(dist_matrix.shape)
-    return minimum_spanning_tree(dist_matrix)
+    print("Getting spanning tree")
+    spantree = minimum_spanning_tree(graph)
+
+    for i in range(len(coords)):
+        for j in range(neighbor_indices[i], neighbor_indices[i+1]):
+            neighbor = neighbor_indptr[j]
+            distance = euclidean(coords[i], coords[neighbor])
+            if distance < 0.1:
+                spantree.add_edge(i, neighbor, weight=distance)
+
+    return spantree
 
 
 def draw_tsne(tsne_filename, degree_filename, out_filename, xmin=0, ymin=0, xmax=5000, ymax=5000):
@@ -58,6 +64,7 @@ def draw_tsne(tsne_filename, degree_filename, out_filename, xmin=0, ymin=0, xmax
     concept_degrees = get_concept_degrees(degree_filename)
     draw = svgwrite.Drawing(size=(xmax - xmin, ymax - ymin))
 
+    print('Drawing')
     for i, uri in enumerate(tsne_frame.index):
         deg = concept_degrees.get(uri, 0)
         x = tsne_frame.iloc[i, 0]
@@ -77,22 +84,25 @@ def draw_tsne(tsne_filename, degree_filename, out_filename, xmin=0, ymin=0, xmax
             )
             draw.add(circle)
 
-            neighbors = spantree.indptr[spantree.indices[i]:spantree.indices[i + 1]]
-            for neighbor_idx in neighbors:
-                if neighbor_idx > i:
-                    nx = tsne_frame.iloc[neighbor_idx, 0]
-                    ny = tsne_frame.iloc[neighbor_idx, 1]
-                    pnx = tsne_to_svg_coordinate(nx) - xmin
-                    pny = tsne_to_svg_coordinate(ny) - ymin
-                    ndeg = concept_degrees.get(tsne_frame.index[neighbor_idx], 0)
-                    weight = (deg * ndeg) ** .125 / 10
-                    line = draw.line(
-                        (px, py),
-                        (pnx, pny),
-                        opacity=0.75,
-                        style="stroke: #016; stroke-width: %4.4f" % weight
-                    )
-                    draw.add(line)
+            try:
+                neighbors = spantree.neighbors(i)
+                for neighbor_idx in neighbors:
+                    if neighbor_idx > i:
+                        nx = tsne_frame.iloc[neighbor_idx, 0]
+                        ny = tsne_frame.iloc[neighbor_idx, 1]
+                        pnx = tsne_to_svg_coordinate(nx) - xmin
+                        pny = tsne_to_svg_coordinate(ny) - ymin
+                        ndeg = concept_degrees.get(tsne_frame.index[neighbor_idx], 0)
+                        weight = (deg * ndeg) ** .125 / 10
+                        line = draw.line(
+                            (px, py),
+                            (pnx, pny),
+                            opacity=0.75,
+                            style="stroke: #016; stroke-width: %4.4f" % weight
+                        )
+                        draw.add(line)
+            except NetworkXError:
+                pass
 
     for i, uri in enumerate(tsne_frame.index):
         deg = concept_degrees.get(uri, 0)
