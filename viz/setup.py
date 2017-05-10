@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages, Command
-from setuptools.command.install import install
-from setuptools.command.develop import develop
+from setuptools import setup, find_packages
 import sys
 
 packages = find_packages()
@@ -13,19 +11,17 @@ if sys.version_info.major < 3:
 
 
 setup(
-    name = 'conceptnet-viz',
-    version = version_str,
-    description = 'Produces an explorable SVG visualization of ConceptNet',
-    author = "Rob Speer",
-    author_email = 'rob@luminoso.com',
+    name='conceptnet-viz',
+    version=version_str,
+    description='Produces an explorable SVG visualization of ConceptNet',
+    author="Rob Speer",
+    author_email='rob@luminoso.com',
     packages=packages,
     include_package_data=True,
     install_requires=[
         'conceptnet >= 5.5.4',
-        'freetype-py',
-        'Python-fontconfig',
+        'cairocffi',
         'svgwrite',
-        'colormath'
     ],
-    license = 'Apache License 2.0',
+    license='Apache License 2.0',
 )
