@@ -1,13 +1,22 @@
 import svgwrite
-import networkx as nx
-import numpy as np
-from networkx.exception import NetworkXError
-from networkx.algorithms.mst import minimum_spanning_tree
-from scipy.spatial import Delaunay
-from scipy.spatial.distance import euclidean
-
+import pathlib
+import pycairo
 
 from conceptnet5.vectors.formats import load_hdf
+
+
+LANGUAGE_COLORS = {
+    'en': '#048',
+    'fr': '#76e',
+    'de': '#222',
+    'es': '#db0',
+    'it': '#8c8',
+    'ru': '#840',
+    'pt': '#080',
+    'ja': '#f66',
+    'zh': '#a10',
+    'nl': '#e70'
+}
 
 
 def get_concept_degrees(filename):
@@ -24,116 +33,93 @@ def get_concept_degrees(filename):
     return concept_degrees
 
 
+def language_and_word(uri):
+    _, _c, lang, word = uri.split('/', 3)
+    word = word.replace('_', ' ')
+    return lang, word
+
+
 def delangtag(uri):
     return uri.split('/')[3].replace('_', ' ')
 
 
-def tsne_to_svg_coordinate(coord):
-    return coord * 100 + 2500
+def map_to_svg_coordinate(coord):
+    return coord * 320 + 8192
 
 
-def spanning_tree(frame):
-    coords = frame.values[:, :2]
-    triangulation = Delaunay(coords)
-    neighbor_indices, neighbor_indptr = triangulation.vertex_neighbor_vertices
-    print(neighbor_indices[:10])
-    print(neighbor_indptr[:10])
-    graph = nx.Graph()
-    for i in range(len(coords)):
-        for j in range(neighbor_indices[i], neighbor_indices[i+1]):
-            neighbor = neighbor_indptr[j]
-            distance = euclidean(coords[i], coords[neighbor])
-            graph.add_edge(i, neighbor, weight=distance)
-
-    print("Getting spanning tree")
-    spantree = minimum_spanning_tree(graph)
-    newgraph = nx.Graph(graph)
-
-    for i in graph.nodes():
-        neighbors = [j for j in graph.neighbors(i) if not spantree.has_edge(i, j)]
-        if neighbors:
-            neighbors = np.array(neighbors)
-            distances = np.array(
-                [euclidean(coords[i], coords[j]) for j in neighbors]
-            )
-            distance_sort = np.argsort(distances)
-            worst_neighbors = neighbors[distance_sort[-2:]]
-            for worst in worst_neighbors:
-                if newgraph.has_edge(i, worst):
-                    newgraph.remove_edge(i, worst)
-
-    return newgraph
+def map_to_tile_coordinates(coord, z, threshold):
+    x, y = map_to_svg_coordinate(coord)
+    tile_size = 16384 >> z
+    tile_x = int(x // tile_size)
+    tile_y = int(y // tile_size)
+    offset_x = x % tile_size
+    offset_y = y % tile_size
+    prop_x = offset_x / tile_size
+    prop_y = offset_y / tile_size
+    yield (tile_x, tile_y, offset_x, offset_y)
+    if prop_x > threshold:
+        yield (tile_x + 1, tile_y, offset_x - tile_size, offset_y)
+    if prop_y > threshold:
+        yield (tile_x, tile_y + 1, offset_x, offset_y - tile_size)
+    if prop_x > threshold and prop_y > threshold:
+        yield (tile_x + 1, tile_y + 1, offset_x - tile_size, offset_y - tile_size)
 
 
-def draw_tsne(tsne_filename, degree_filename, out_filename, xmin=0, ymin=0, xmax=5000, ymax=5000):
+def draw_tsne(tsne_filename, degree_filename, svg_out_path, depth=8):
     tsne_frame = load_hdf(tsne_filename)
-    # spantree = spanning_tree(tsne_frame)
-    spantree = None
-
+    svg_out_path = pathlib.Path(svg_out_path)
     concept_degrees = get_concept_degrees(degree_filename)
-    draw = svgwrite.Drawing(size=(xmax - xmin, ymax - ymin))
 
-    print('Drawing')
+    tiles = {}
+    for tile_z in range(depth):
+        for tile_x in range(1 << tile_z + 1):
+            for tile_y in range(1 << tile_z + 1):
+                tiles[tile_z, tile_x, tile_y] = svgwrite.Drawing(size=(16384 >> tile_z, 16384 >> tile_z))
+
+    print('Drawing nodes')
     for i, uri in enumerate(tsne_frame.index):
         deg = concept_degrees.get(uri, 0)
-        x = tsne_frame.iloc[i, 0]
-        y = tsne_frame.iloc[i, 1]
+        coord = tsne_frame.iloc[i, :2]
+        for z in range(depth):
+            if deg >= (512 >> z):
+                for tile_x, tile_y, offset_x, offset_y in map_to_tile_coordinates(coord, z, .95):
+                    tile = tiles[z, tile_x, tile_y]
+                    pt_size = deg ** .25 * 8 / (z + 1)
+                    lang, label = language_and_word(uri)
+                    color = LANGUAGE_COLORS[lang]
+                    circle = tile.circle(
+                        center=(offset_x, offset_y), r=pt_size, opacity=0.5,
+                        style="fill: %s;" % color
+                    )
+                    tile.add(circle)
 
-        fill_color = "#57e"
-
-        px = tsne_to_svg_coordinate(x)
-        py = tsne_to_svg_coordinate(y)
-        if xmin <= px <= xmax and ymin <= py <= ymax:
-            px -= xmin
-            py -= ymin
-            pt_size = deg ** .25 / 2
-            circle = draw.circle(
-                center=(px, py), r=pt_size, opacity=0.75,
-                style="fill: %s;" % fill_color
-            )
-            draw.add(circle)
-
-            if spantree is not None:
-                try:
-                    neighbors = spantree.neighbors(i)
-                    for neighbor_idx in neighbors:
-                        if neighbor_idx > i:
-                            nx = tsne_frame.iloc[neighbor_idx, 0]
-                            ny = tsne_frame.iloc[neighbor_idx, 1]
-                            pnx = tsne_to_svg_coordinate(nx) - xmin
-                            pny = tsne_to_svg_coordinate(ny) - ymin
-                            ndeg = concept_degrees.get(tsne_frame.index[neighbor_idx], 0)
-                            weight = (deg * ndeg) ** .125 / 10
-                            line = draw.line(
-                                (px, py),
-                                (pnx, pny),
-                                opacity=0.75,
-                                style="stroke: #348; stroke-width: %4.4f" % weight
-                            )
-                            draw.add(line)
-                except NetworkXError:
-                    pass
-
+    print('Drawing labels')
     for i, uri in enumerate(tsne_frame.index):
         deg = concept_degrees.get(uri, 0)
-        x = tsne_frame.iloc[i, 0]
-        y = tsne_frame.iloc[i, 1]
-        px = tsne_to_svg_coordinate(x)
-        py = tsne_to_svg_coordinate(y)
-        if xmin <= px <= xmax and ymin <= py <= ymax:
-            px -= xmin
-            py -= ymin
-            text_size = deg ** .5 / 4
-            if deg >= 100:
-                label = delangtag(uri)
-                print(label)
-                style = "font-family: 'Noto Sans'; font-size: %4.4fpx; fill: black;" % text_size
-                text = draw.text(label, (px, py), style=style)
-                draw.add(text)
+        coord = tsne_frame.iloc[i, :2]
+        for z in range(depth):
+            if deg >= (4096 >> z):
+                for tile_x, tile_y, offset_x, offset_y in map_to_tile_coordinates(coord, z, .6):
+                    tile = tiles[z, tile_x, tile_y]
+                    text_size = deg ** .5 * 8 / (z + 1)
+                    tile_size = 16384 >> z
+                    text_size = min(tile_size / 16, text_size)
 
-    draw.saveas(out_filename)
+                    lang, label = language_and_word(uri)
+                    if z == 3:
+                        print(lang, label)
+                    color = LANGUAGE_COLORS[lang]
+                    style = "font-family: 'Noto Sans'; font-size: %4.4fpx; fill: %s;" % (text_size, color)
+                    pt_size = deg ** .25 * 8 / (z + 1)
+                    text = tile.text(label, (offset_x + pt_size, offset_y + pt_size + text_size / 2), style=style)
+                    tile.add(text)
+
+    for key, val in tiles.items():
+        tile_z, tile_x, tile_y = key
+        out_path = svg_out_path / str(tile_z) / str(tile_x) / ("%s.svg" % tile_y)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        val.saveas(str(out_path))
 
 
 if __name__ == '__main__':
-    draw_tsne('viz/tsne-joined.h5', 'data/stats/concept_counts.txt', 'viz/svg/conceptnet-mid.svg',
-              xmin=2000, xmax=3000, ymin=2000, ymax=3000)
+    draw_tsne('viz/tsne-multi.h5', 'data/stats/concept_counts.txt', 'viz/svg')
