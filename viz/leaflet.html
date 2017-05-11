@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CRS.Simple example - Leaflet</title>
+	<title>Map of ConceptNet</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,7 +72,38 @@
     };
     map.on('zoomend', updateZoom);
     map.on('load', updateZoom);
-    // map.on('load', doHash);
+
+    tiles.createTile = function(coords, done) {
+        var tile = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        tile.setAttribute('class', 'leaflet-tile');
+        var size = this.getTileSize();
+        var error;
+
+        tile.width = size.x;
+        tile.height = size.y;
+
+        var r = new XMLHttpRequest();
+        r.open("GET", this.getTileUrl(coords), true);
+        r.onreadystatechange = function () {
+            if (r.readyState != 4 || r.status != 200) {
+                return;
+            }
+            var e = r.responseXML.documentElement;
+            var children = e.childNodes;
+            for (var i=0; i < children.length; i++) {
+                if (children[i].tagName != 'defs') {
+                    tile.appendChild(children[i]);
+                }
+            }
+            tile.setAttribute('viewBox', e.getAttribute('viewBox'));
+            tile.setAttribute('width', e.getAttribute('width'));
+            tile.setAttribute('height', e.getAttribute('height'));
+            done(error, tile);
+        }.bind(this);
+        r.send();
+
+        return tile;
+    }
 
 </script>
 </body>

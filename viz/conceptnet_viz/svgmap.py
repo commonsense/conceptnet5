@@ -88,7 +88,9 @@ def draw_tsne(tsne_filename, degree_filename, svg_out_path, png_out_path, render
     for tile_z in range(depth):
         for tile_x in range(1 << tile_z + 1):
             for tile_y in range(1 << tile_z + 1):
-                tiles[tile_z, tile_x, tile_y] = svgwrite.Drawing(size=(16384 >> tile_z, 16384 >> tile_z))
+                size = 16384 >> tile_z
+                viewBox = "0 0 %s %s" % (size, size)
+                tiles[tile_z, tile_x, tile_y] = svgwrite.Drawing(size=(256, 256), viewBox=viewBox)
 
     occlusion = np.zeros((depth, 4096, 4096), np.bool)
 
