@@ -31,13 +31,48 @@
 <script>
 
 	var map = L.map('map', {
-		crs: L.CRS.Simple
+		crs: L.CRS.Simple,
 	});
-    var hash = new L.Hash(map);
 	var url_base = "./svg/";
-    var tiles = L.tileLayer(url_base + "{z}/{x}/{y}.svg", {maxZoom: 6});
+    var tiles = L.tileLayer(
+        url_base + "{z}/{x}/{y}.svg",
+        {
+            minZoom: 0,
+            maxZoom: 10,
+            maxNativeZoom: 7,
+            pane: "markerPane",
+            detectRetina: true
+        }
+        );
+    var rasterLayer = L.imageOverlay("raster.png", [[0, 0], [-256, 256]], {
+        opacity: 0.25
+    })
+    rasterLayer.addTo(map);
     tiles.addTo(map);
-    map.setView(L.latLng(-128, 200), 2);
+    map.setView(L.latLng(-128, 128), 3);
+    var hash = new L.Hash(map);
+
+    var updateZoom = function() {
+        if (map.getZoom() >= 4 && map.hasLayer(rasterLayer)) {
+            map.removeLayer(rasterLayer);
+        }
+        if (map.getZoom() <= 3 && !map.hasLayer(rasterLayer)) {
+            map.addLayer(rasterLayer);
+        }
+        var z = map.getZoom();
+        if (z >= 3) {
+            rasterLayer.setOpacity(0.25);
+        }
+        else if (z == 2) {
+            rasterLayer.setOpacity(0.33);
+        }
+        else {
+            rasterLayer.setOpacity(0.5);
+        }
+    };
+    map.on('zoomend', updateZoom);
+    map.on('load', updateZoom);
+    // map.on('load', doHash);
 
 </script>
 </body>
