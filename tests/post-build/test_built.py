@@ -42,3 +42,28 @@ def test_datasets_exist():
         # Test that each dataset has at least 100 assertions
         q = test_finder.query({'dataset': dataset}, limit=100)
         assert len(q) == 100, dataset
+
+# Queries that all include the result "/r/Synonym/,/c/es/prueba/n/,/c/en/test/n/"
+TEST_QUERIES = [
+    {'node': '/c/en/test', 'other': '/c/es'},
+    {'node': '/c/es', 'other': '/c/en/test'},
+    {'start': '/c/es', 'end': '/c/en'},
+    {'node': '/c/es/prueba/n'},
+    {'node': '/c/es/prueba/n', 'source': '/s/resource/wordnet/rdf/3.1'},
+    {'node': '/c/en/test', 'rel': '/r/Synonym', 'other': '/c/es/prueba'},
+]
+TEST_URI = "/a/[/r/Synonym/,/c/es/prueba/n/,/c/en/test/n/]"
+
+
+def check_query(query):
+    q = test_finder.query(query)
+    q_uris = [match['@id'] for match in q]
+    q_uris_set = set(q_uris)
+    assert len(q_uris) == len(q_uris_set)
+    assert TEST_URI in q_uris_set, q_uris_set
+
+
+def test_queries():
+    # Test that each of the above queries finds the expected assertion
+    for query in TEST_QUERIES:
+        yield check_query, query
