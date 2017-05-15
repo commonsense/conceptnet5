@@ -1,5 +1,6 @@
 var map = L.map('map', {
     crs: L.CRS.Simple,
+    renderer: L.svg()
 });
 
 var url_base = "./json/";
@@ -9,25 +10,28 @@ var tiles = L.tileLayer(
     {
         minZoom: 0,
         maxZoom: 10,
-        maxNativeZoom: 7,
-        pane: "markerPane",
+        maxNativeZoom: 9,
+        pane: "overlayPane",
         detectRetina: true
     }
 );
-var rs = 102.5;
+var rs = 128;
 var rasterLayer = L.imageOverlay("raster.png", [[rs, -rs], [-rs, rs]], {
     opacity: 0.25
 });
 
 var updateZoom = function() {
-    if (map.getZoom() >= 4 && map.hasLayer(rasterLayer)) {
+    if (map.getZoom() >= 5 && map.hasLayer(rasterLayer)) {
         map.removeLayer(rasterLayer);
     }
-    if (map.getZoom() <= 3 && !map.hasLayer(rasterLayer)) {
+    if (map.getZoom() <= 4 && !map.hasLayer(rasterLayer)) {
         map.addLayer(rasterLayer);
     }
     var z = map.getZoom();
-    if (z >= 3) {
+    if (z >= 4) {
+        rasterLayer.setOpacity(0.15);
+    }
+    else if (z == 3) {
         rasterLayer.setOpacity(0.25);
     }
     else if (z == 2) {
@@ -48,24 +52,29 @@ var svgElement = (name) => {
 tiles.populateTile = (tile, coords, tileSize, data) => {
     tile.setAttribute('viewBox', '0 0 512 512');
     for (const node of data) {
-        var circle = svgElement('circle');
-        var size = node.textSize;
-        circle.setAttribute('cx', node.x);
-        circle.setAttribute('cy', node.y);
-        circle.setAttribute('r', size / 8 + 0.2);
-        circle.setAttribute('class', "node lang-" + node.lang);
-        tile.appendChild(circle);
+        if (node.textSize >= 4) {
+            var circle = svgElement('circle');
+            var size = node.textSize;
+            circle.setAttribute('cx', node.x);
+            circle.setAttribute('cy', node.y);
+            circle.setAttribute('r', size / 8 + 0.2);
+            circle.setAttribute('class', "node lang-" + node.lang);
+            tile.appendChild(circle);
+        }
     }
     for (const node of data) {
         if (node.showLabel && node.textSize >= 8) {
             var size = node.textSize;
+            var anchor = svgElement('a');
+            anchor.setAttribute('href', `http://conceptnet.io${node.uri}`);
             var label = svgElement('text');
-            label.setAttribute('class', "label lang-" + node.lang);
-            label.setAttribute('style', `font-size: ${node.textSize}; stroke-width: ${node.textSize / 8 + 2}`);
+            label.setAttribute('class', "label leaflet-interactive lang-" + node.lang);
+            label.setAttribute('style', `font-size: ${node.textSize}px; stroke-width: ${node.textSize / 8 + 2}px`);
             label.innerHTML = node.label;
             label.setAttribute('x', node.x + node.textSize / 4 + 0.2);
             label.setAttribute('y', node.y + node.textSize * 5 / 8 + 0.2);
-            tile.appendChild(label);
+            anchor.appendChild(label);
+            tile.appendChild(anchor);
         }
     }
     tile.style.width = tileSize * 2;

@@ -41,7 +41,7 @@ def raster_coordinate(coord):
 
 def map_to_tile_coordinate(coord, z):
     x, y = global_coordinate(coord)
-    tile_size = 256 >> z
+    tile_size = 2 ** (8 - z)
     tile_x = int(math.floor(x / tile_size))
     tile_y = int(math.floor(y / tile_size))
     offset_x = x - (tile_x * tile_size)
@@ -51,7 +51,7 @@ def map_to_tile_coordinate(coord, z):
     return (tile_x, tile_y, local_x, local_y)
 
 
-def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, render_png=False, depth=8):
+def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, render_png=False, depth=10):
     tsne_frame = load_hdf(tsne_filename)
     json_out_path = pathlib.Path(json_out_path)
     concept_degrees = get_concept_degrees(degree_filename)
@@ -71,23 +71,23 @@ def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, rende
         deg = min(10000, concept_degrees.get(uri, 0))
         coord = tsne_frame.iloc[i, :2]
         lang, label = language_and_word(uri)
-        nodes.append((deg, coord, lang, label))
+        nodes.append((deg, coord, lang, label, uri))
 
     print('Creating nodes')
     nodes.sort(key=itemgetter(0), reverse=True)
 
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 4096, 4096)
     ctx = cairo.Context(surface)
-    ctx.scale(1/4, 1/4)
     ctx.set_source_rgba(1, 1, 1, 1)
     ctx.paint()
 
-    for deg, coord, lang, label in nodes:
+    for deg, coord, lang, label, uri in nodes:
         for z in range(depth):
-            tile_size = 256 >> z
+            tile_size = 2 ** (8 - z)
             if deg >= tile_size:  # no reason these should be comparable, just a convenient cutoff
                 tile_x, tile_y, local_x, local_y = map_to_tile_coordinate(coord, z)
                 text_size = deg ** .5 * (2 ** (z / 2 - 3))
+                text_size = min(24, text_size)
                 raster_text_size = text_size * tile_size / 16
 
                 use_label = False
@@ -111,6 +111,7 @@ def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, rende
                     'deg': deg,
                     'lang': lang,
                     'label': label,
+                    'uri': uri,
                     'showLabel': use_label,
                     'textSize': round(text_size, 2)
                 })
@@ -119,7 +120,7 @@ def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, rende
             ctx.new_path()
             ctx.set_source_rgba(.75, .75, .8, 1)
             cx, cy = raster_coordinate(coord)
-            ctx.arc(cx, cy, min(deg, 1000) ** .25 * 4, 0, TAU)
+            ctx.arc(cx, cy, min(deg, 1000) ** .25, 0, TAU)
             ctx.fill()
 
     if render_png:
