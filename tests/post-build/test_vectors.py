@@ -89,7 +89,7 @@ def test_l1_normalize_columns(frame=None):
     vectors = l1_normalize_columns(vectors)
     sums = np.sum(np.abs(vectors))
     for s in sums:
-        assert_almost_equal(s, 1.0, 1e-04)
+        assert_almost_equal(s, 1.0, places=4)
 
 
 def test_l2_normalize_rows(frame=None):
@@ -100,7 +100,8 @@ def test_l2_normalize_rows(frame=None):
     vectors = l2_normalize_rows(vectors)
 
     lengths = np.sqrt(np.sum(np.power(vectors, 2), axis='columns'))
-    ok_(all(isclose(length, 1.0, rel_tol=1e-04) for length in lengths))
+    for length in lengths:
+        assert_almost_equal(length, 1.0, places=4)
 
     # Check if a data frame of all zeroes will be normalized to NaN
     frame = pd.DataFrame(np.zeros(shape=(1, 10)))
@@ -122,7 +123,8 @@ def test_shrink_and_sort(frame=None):
 
     # Check if the frame is l2 normalized
     lengths = np.sqrt(np.sum(np.power(shrank, 2), axis='columns'))
-    ok_(all(isclose(length, 1.0, rel_tol=1e-04) for length in lengths))
+    for length in lengths:
+        assert_almost_equal(length, 1.0, places=4)
 
     # Check if the index is sorted
     ok_(shrank.index.is_monotonic_increasing)
