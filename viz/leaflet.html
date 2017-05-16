@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CRS.Simple example - Leaflet</title>
+	<title>Map of ConceptNet</title>
 
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg==" crossorigin=""></script>
+    <script src="https://unpkg.com/babel-standalone@6.24.0/babel.min.js"></script>
     <script src="http://www.mapbox.com/mapbox.js/assets/leaflet-hash.js"></script>
 
 	<style>
@@ -22,58 +23,34 @@
         .leaflet-container {
             background: white;
         }
+        .node {
+            opacity: .5;
+        }
+        .label {
+            font-family: "Noto Sans", sans-serif;
+            stroke: white;
+            paint-order: stroke;
+            pointer-events: auto;
+        }
+        .label:hover {
+            stroke: #cfc;
+        }
+
+        .lang-en { fill: #05a; }
+        .lang-fr { fill: #76e; }
+        .lang-de { fill: #222; }
+        .lang-es { fill: #da0; }
+        .lang-it { fill: #8d8; }
+        .lang-ru { fill: #a50; }
+        .lang-pt { fill: #080; }
+        .lang-ja { fill: #f55; }
+        .lang-zh { fill: #e00; }
+        .lang-nl { fill: #e70; }
+
 	</style>
 </head>
 <body>
-
 <div id="map"></div>
-
-<script>
-
-	var map = L.map('map', {
-		crs: L.CRS.Simple,
-	});
-	var url_base = "./svg/";
-    var tiles = L.tileLayer(
-        url_base + "{z}/{x}/{y}.svg",
-        {
-            minZoom: 0,
-            maxZoom: 10,
-            maxNativeZoom: 9,
-            pane: "markerPane",
-            detectRetina: true
-        }
-        );
-    var rasterLayer = L.imageOverlay("raster.png", [[0, 0], [-256, 256]], {
-        opacity: 0.25
-    })
-    rasterLayer.addTo(map);
-    tiles.addTo(map);
-    map.setView(L.latLng(-128, 128), 3);
-    var hash = new L.Hash(map);
-
-    var updateZoom = function() {
-        if (map.getZoom() >= 4 && map.hasLayer(rasterLayer)) {
-            map.removeLayer(rasterLayer);
-        }
-        if (map.getZoom() <= 3 && !map.hasLayer(rasterLayer)) {
-            map.addLayer(rasterLayer);
-        }
-        var z = map.getZoom();
-        if (z >= 3) {
-            rasterLayer.setOpacity(0.25);
-        }
-        else if (z == 2) {
-            rasterLayer.setOpacity(0.33);
-        }
-        else {
-            rasterLayer.setOpacity(0.5);
-        }
-    };
-    map.on('zoomend', updateZoom);
-    map.on('load', updateZoom);
-    // map.on('load', doHash);
-
-</script>
+<script type="text/babel" src="tilemap.js"></script>
 </body>
 </html>
