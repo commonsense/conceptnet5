@@ -11,13 +11,13 @@ from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.vectors.transforms import standardize_row_labels, l1_normalize_columns, \
     l2_normalize_rows, shrink_and_sort
 
-DATA = os.environ.get("CONCEPTNET_BUILD_DATA")
+DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "testdata")
 
 
 def test_get_vector(frame=None):
     """
-     Check if vectors.get_vector() returns the same vector given labels that are shaped in a
-     different way.
+    Check if vectors.get_vector() returns the same vector given labels that are shaped in a
+    different way.
     """
     if frame:
         vectors = load_any_embeddings(frame)
@@ -60,12 +60,9 @@ def test_standardize_row_labels(frame=None):
         frame = DATA + '/raw/vectors/glove12.840B.300d.txt.gz'
     vectors = load_any_embeddings(frame)
 
-    word1 = 'island'
-    word2 = 'Island'
-    word3 = 'archipelagos'
-    vec1 = vectors.loc[word1]
-    vec2 = vectors.loc[word2]
-    vec3 = vectors.loc[word3]
+    vec1 = vectors.loc['island']
+    vec2 = vectors.loc['Island']
+    vec3 = vectors.loc['things']
     standardized_vectors = standardize_row_labels(vectors)
 
     # Check if all labels are concepts
@@ -74,14 +71,14 @@ def test_standardize_row_labels(frame=None):
     # Check if all terms standardized to the same concept are merged
     ok_(standardized_vectors.index.is_unique)
     ok_('/c/en/Island' not in standardized_vectors.index)
+    ok_('/c/en/island' in standardized_vectors.index)
+    ok_('/c/en/thing' in standardized_vectors.index)
     ok_(not standardized_vectors.loc['/c/en/island'].equals(vec1))
     ok_(not standardized_vectors.loc['/c/en/island'].equals(vec2))
-
-    # Check if lemmatization changes the value of a concept
-    ok_(not standardized_vectors.loc['/c/en/archipelagos'].equals(vec3))
+    ok_(not standardized_vectors.loc['/c/en/things'].equals(vec3))
 
     # Check if numbers are substituted with '#'
-    ok_('/c/en/utc_##' in standardized_vectors.index)
+    ok_('/c/en/##' in standardized_vectors.index)
 
 
 def test_l1_normalize_columns(frame=None):
