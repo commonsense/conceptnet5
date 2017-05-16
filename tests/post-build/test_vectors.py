@@ -1,10 +1,9 @@
 import os
-from math import isclose
 
 import click
 import numpy as np
 import pandas as pd
-from nose.tools import ok_
+from nose.tools import ok_, eq_, assert_almost_equal
 
 from conceptnet5.vectors import get_vector
 from conceptnet5.vectors.evaluation.compare import load_any_embeddings
@@ -92,7 +91,8 @@ def test_l1_normalize_columns(frame=None):
 
     vectors = l1_normalize_columns(vectors)
     sums = np.sum(np.abs(vectors))
-    ok_(all(isclose(s, 1.0, rel_tol=1e-04) for s in sums))
+    for s in sums:
+        assert_almost_equal(s, 1.0, 1e-04)
 
 
 def test_l2_normalize_rows(frame=None):
