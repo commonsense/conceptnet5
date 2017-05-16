@@ -12,4 +12,3 @@ build_test () {
 }
 
 nosetests --with-doctest conceptnet5 && build_test && nosetests && nosetests tests/post-build && echo "Success."
-dropdb conceptnet-test
