@@ -1,4 +1,4 @@
-FROM python:3.5
+FROM python:3.6
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Configure the environment where ConceptNet will be built

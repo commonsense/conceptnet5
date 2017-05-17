@@ -1,4 +1,4 @@
-FROM rspeer/conceptnet:5.5.4
+FROM rspeer/conceptnet:5.5.5
 MAINTAINER Rob Speer <rob@luminoso.com>
 
 # Install system dependencies (the overall form of this command is recommended by https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/)

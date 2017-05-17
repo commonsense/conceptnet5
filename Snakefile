@@ -110,7 +110,7 @@ rule all:
 
 rule evaluation:
     input:
-        DATA + "/stats/eval-graph.pdf"
+        DATA + "/stats/eval-graph.png"
 
 rule webdata:
     input:

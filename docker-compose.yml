@@ -3,7 +3,7 @@ services:
   db:
     restart: always
     build: 'data-loader'
-    image: rspeer/conceptnet-data:5.5.4
+    image: rspeer/conceptnet-data:5.5.5
     expose:
       - "5432"
     environment:
@@ -19,12 +19,12 @@ services:
 
   conceptnet:
     build: '.'
-    image: rspeer/conceptnet:5.5.4
+    image: rspeer/conceptnet:5.5.5
     restart: 'no'
 
   conceptnet-web:
     build: 'web'
-    image: rspeer/conceptnet-web:5.5.4
+    image: rspeer/conceptnet-web:5.5.5
     links:
       - db
     ports:
