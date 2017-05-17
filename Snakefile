@@ -662,8 +662,7 @@ rule comparison_graph:
     input:
         DATA + "/stats/evaluation.h5"
     output:
-        DATA + "/stats/eval-graph.png",
-        DATA + "/stats/bias-graph.png"
+        DATA + "/stats/eval-graph.png"
     shell:
         "cn5-vectors comparison_graph {input} {output}"
 

@@ -21,7 +21,7 @@ def load_any_embeddings(filename):
         raise ValueError("Can't recognize file extension of %r" % filename)
 
 
-def compare_embeddings(filenames, subset='dev', tune_analogies=True):
+def compare_embeddings(filenames, subset='dev', tune_analogies=False):
     results = []
     for filename in filenames:
         print(filename)
@@ -29,11 +29,10 @@ def compare_embeddings(filenames, subset='dev', tune_analogies=True):
         wordsim_results = wordsim.evaluate(frame, subset=subset, semeval_scope='per-language')
         analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME, tune_analogies=tune_analogies)
         story_results = story.evaluate(frame, subset=subset).to_frame('story-cloze').T
-        bias_results = bias.measure_bias(frame)
 
         results.append(
             pd.concat(
-                [wordsim_results, analogy_results, story_results, bias_results], axis=0
+                [wordsim_results, analogy_results, story_results], axis=0
             )
         )
     result = pd.concat(results, keys=filenames)

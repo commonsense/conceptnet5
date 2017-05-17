@@ -189,13 +189,11 @@ def run_compare_embeddings(input_filenames, output_filename):
 @cli.command(name='comparison_graph')
 @click.argument('table_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('eval_graph_filename', type=click.Path(writable=True, dir_okay=False))
-@click.argument('bias_graph_filename', type=click.Path(writable=True, dir_okay=False))
-def run_comparison_graph(table_filename, eval_graph_filename, bias_graph_filename):
+def run_comparison_graph(table_filename, eval_graph_filename):
     """
     Convert a table of evaluation results into a PNG or PDF graph.
     """
     graph_comparison(table_filename, eval_graph_filename)
-    graph_bias_comparison(table_filename, bias_graph_filename)
 
 
 @cli.command(name='export_text')
