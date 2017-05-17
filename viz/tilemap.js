@@ -1,8 +1,3 @@
-var map = L.map('map', {
-    crs: L.CRS.Simple,
-    renderer: L.svg()
-});
-
 var url_base = "./json/";
 
 var tiles = L.tileLayer(
@@ -20,36 +15,11 @@ var rasterLayer = L.imageOverlay("raster.png", [[rs, -rs], [-rs, rs]], {
     opacity: 0.25
 });
 
-var updateZoom = function() {
-    if (map.getZoom() >= 5 && map.hasLayer(rasterLayer)) {
-        map.removeLayer(rasterLayer);
-    }
-    if (map.getZoom() <= 4 && !map.hasLayer(rasterLayer)) {
-        map.addLayer(rasterLayer);
-    }
-    var z = map.getZoom();
-    if (z >= 4) {
-        rasterLayer.setOpacity(0.15);
-    }
-    else if (z == 3) {
-        rasterLayer.setOpacity(0.25);
-    }
-    else if (z == 2) {
-        rasterLayer.setOpacity(0.33);
-    }
-    else {
-        rasterLayer.setOpacity(0.5);
-    }
-};
-map.on('zoomend', updateZoom);
-map.on('load', updateZoom);
-
-
 var svgElement = (name) => {
     return document.createElementNS("http://www.w3.org/2000/svg", name);
 };
 
-tiles.populateTile = (tile, coords, tileSize, data) => {
+var populateTile = (tile, coords, tileSize, data) => {
     tile.setAttribute('viewBox', '0 0 512 512');
     for (const node of data) {
         if (node.textSize >= 4) {
@@ -91,7 +61,7 @@ tiles.createTile = function(coords, done) {
     fetch(url).then(response => {
         if (response.ok) {
             response.json().then(data => {
-                this.populateTile(tile, coords, size.x, data);
+                populateTile(tile, coords, size.x, data);
                 done(error, tile);
             });
         }
@@ -99,7 +69,76 @@ tiles.createTile = function(coords, done) {
     return tile;
 };
 
-rasterLayer.addTo(map);
-tiles.addTo(map);
-map.setView(L.latLng(0, 0), 3);
-var hash = new L.Hash(map);
+
+var standaloneView = (element, coords) => {
+    tiles._tileZoom = 7;
+    var deltaNW = L.point([-2, -2]);
+    var deltaSW = L.point([-2, +2]);
+    var deltaNE = L.point([+2, -2]);
+    var deltaSE = L.point([+2, +2]);
+
+    var tileNW = tiles.createTile(coords.add(deltaNW), noop);
+    var tileSW = tiles.createTile(coords.add(deltaSW), noop);
+    var tileNE = tiles.createTile(coords.add(deltaNE), noop);
+    var tileSE = tiles.createTile(coords.add(deltaSE), noop);
+
+    tileNW.style.position = 'absolute';
+    tileNW.style.top = '0px';
+    tileNW.style.left = '0px';
+
+    tileSW.style.position = 'absolute';
+    tileSW.style.top = '256px';
+    tileSW.style.left = '0px';
+
+    tileNE.style.position = 'absolute';
+    tileNE.style.top = '0px';
+    tileNE.style.left = '256px';
+
+    tileSE.style.position = 'absolute';
+    tileSE.style.top = '256px';
+    tileSE.style.left = '256px';
+
+    element.appendChild(tileNW);
+    element.appendChild(tileNE);
+    element.appendChild(tileSW);
+    element.appendChild(tileSE);
+    return element;
+};
+
+var showMap = () => {
+    var map = L.map('map', {
+        crs: L.CRS.Simple,
+        renderer: L.svg()
+    });
+
+    var updateZoom = function() {
+        if (map.getZoom() >= 5 && map.hasLayer(rasterLayer)) {
+            map.removeLayer(rasterLayer);
+        }
+        if (map.getZoom() <= 4 && !map.hasLayer(rasterLayer)) {
+            map.addLayer(rasterLayer);
+        }
+        var z = map.getZoom();
+        if (z >= 4) {
+            rasterLayer.setOpacity(0.15);
+        }
+        else if (z == 3) {
+            rasterLayer.setOpacity(0.25);
+        }
+        else if (z == 2) {
+            rasterLayer.setOpacity(0.33);
+        }
+        else {
+            rasterLayer.setOpacity(0.5);
+        }
+    };
+    map.on('zoomend', updateZoom);
+    map.on('load', updateZoom);
+
+    rasterLayer.addTo(map);
+    tiles.addTo(map);
+    map.setView(L.latLng(0, 0), 3);
+    var hash = new L.Hash(map);
+};
+
+window.showMap = showMap;
