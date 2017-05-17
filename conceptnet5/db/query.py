@@ -34,27 +34,18 @@ def make_list_query(criteria):
     crit_tuple = tuple(sorted(criteria))
     if crit_tuple in LIST_QUERIES:
         return LIST_QUERIES[crit_tuple]
-    parts = ["WITH"]
-    for criterion in set(criteria) & NODE_PREFIX_CRITERIA:
-        parts.append(
-            """
-            {c}_ids AS (
-                SELECT p.node_id FROM nodes n, node_prefixes p
-                WHERE p.prefix_id=n.id AND n.uri=:{c}
-                LIMIT 200
-            ),
-            """.format(c=criterion)
-        )
-    piece_directions = [1]
+    parts = ["WITH matched_edges AS ("]
     if 'node' in criteria:
         piece_directions = [1, -1]
-    parts.append("matched_edges AS (")
+    else:
+        piece_directions = [1]
     for direction in piece_directions:
         if direction == -1:
             parts.append("UNION ALL")
         parts.append("""
             SELECT e.uri, e.weight, e.data
-            FROM relations r, nodes n1, nodes n2, edges e
+            FROM relations r, edges e, nodes n1, nodes n2,
+                 node_prefixes p1, node_prefixes p2, nodes np1, nodes np2
         """)
         if 'source' in criteria:
             parts.append(", edge_sources es, sources s")
@@ -62,25 +53,29 @@ def make_list_query(criteria):
             WHERE e.relation_id=r.id
             AND e.start_id=n1.id
             AND e.end_id=n2.id
+            AND p1.prefix_id=np1.id
+            AND p1.node_id=n1.id
+            AND p2.prefix_id=np2.id
+            AND p2.node_id=n2.id
         """)
         if 'source' in criteria:
             parts.append("AND s.uri=:source AND es.source_id=s.id AND es.edge_id=e.id")
         if 'node' in criteria:
             if direction == 1:
-                parts.append("AND n1.id IN (SELECT node_id FROM node_ids)")
+                parts.append("AND np1.uri = :node")
             else:
-                parts.append("AND n2.id IN (SELECT node_id FROM node_ids)")
+                parts.append("AND np2.uri = :node")
         if 'other' in criteria:
             if direction == 1:
-                parts.append("AND n2.id IN (SELECT node_id FROM other_ids)")
+                parts.append("AND np2.uri = :other")
             else:
-                parts.append("AND n1.id IN (SELECT node_id FROM other_ids)")
+                parts.append("AND np1.uri = :other")
         if 'rel' in criteria:
             parts.append("AND r.uri = :rel")
         if 'start' in criteria:
-            parts.append("AND n1.id IN (SELECT node_id FROM start_ids)")
+            parts.append("AND np1.uri = :start")
         if 'end' in criteria:
-            parts.append("AND n2.id IN (SELECT node_id FROM end_ids)")
+            parts.append("AND np2.uri = :end")
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
