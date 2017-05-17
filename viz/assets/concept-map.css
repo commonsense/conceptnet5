@@ -1,0 +1,34 @@
+html, body, #map {
+    width: 100%;
+    height: 100%;
+}
+body {
+    padding: 0;
+    margin: 0;
+}
+.leaflet-container {
+    background: white;
+}
+.node {
+    opacity: .5;
+}
+.label {
+    font-family: "Noto Sans", sans-serif;
+    stroke: white;
+    paint-order: stroke;
+    pointer-events: auto;
+}
+.label:hover {
+    stroke: #cfc;
+}
+
+.lang-en { fill: #05a; }
+.lang-fr { fill: #76e; }
+.lang-de { fill: #222; }
+.lang-es { fill: #da0; }
+.lang-it { fill: #8d8; }
+.lang-ru { fill: #a50; }
+.lang-pt { fill: #080; }
+.lang-ja { fill: #f55; }
+.lang-zh { fill: #e00; }
+.lang-nl { fill: #e70; }
