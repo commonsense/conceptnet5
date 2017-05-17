@@ -63,7 +63,7 @@ tiles.createTile = function(coords, done) {
     fetch(url).then(function(response) {
         if (response.ok) {
             response.json().then(function(data) {
-                populateTile(tile, coords, size.x, data);
+                populateTile(tile, size.x, data);
                 done(error, tile);
             });
         }
@@ -71,61 +71,6 @@ tiles.createTile = function(coords, done) {
     return tile;
 };
 
-
-createSimpleTile = function(coords) {
-    var tile = svgElement('svg');
-    tile.setAttribute('class', 'leaflet-tile');
-    var size = 256;
-    var error;
-
-    var url = this.getTileUrl(coords);
-    fetch(url).then(function(response) {
-        if (response.ok) {
-            response.json().then(function(data) {
-                populateTile(tile, size, data);
-            });
-        }
-    });
-    return tile;
-};
-
-var standaloneView = function(elementName, zoom, x, y) {
-    var element = document.getElementById(elementName);
-    var coords = L.point([x, y]);
-    tiles._tileZoom = zoom;
-
-    var deltaNW = L.point([0, 0]);
-    var deltaSW = L.point([0, 1]);
-    var deltaNE = L.point([1, 0]);
-    var deltaSE = L.point([1, 1]);
-
-    var tileNW = tiles.createTile(coords.add(deltaNW), noop);
-    var tileSW = tiles.createTile(coords.add(deltaSW), noop);
-    var tileNE = tiles.createTile(coords.add(deltaNE), noop);
-    var tileSE = tiles.createTile(coords.add(deltaSE), noop);
-
-    var myTiles = [tileNW, tileNE, tileSW, tileSE];
-    for (var i=0; i < myTiles.length; i++) {
-        var tile = myTiles[i];
-        tile.style.position = 'absolute';
-        tile.setAttribute('class', "leaflet-tile leaflet-tile-loaded");
-        element.appendChild(tile);
-    }
-
-    tileNW.style.top = '0px';
-    tileNW.style.left = '0px';
-
-    tileSW.style.top = '256px';
-    tileSW.style.left = '0px';
-
-    tileNE.style.top = '0px';
-    tileNE.style.left = '256px';
-
-    tileSE.style.top = '256px';
-    tileSE.style.left = '256px';
-
-    return element;
-};
 
 var showMap = function() {
     var map = L.map('map', {
