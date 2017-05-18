@@ -8,22 +8,35 @@ from conceptnet5.language.lemmatize import lemmatize_uri
 
 def standardize_row_labels(frame, language='en', forms=True):
     """
-    Convert a frame whose row labels are bare English terms to one whose row
-    labels are standardized ConceptNet URIs (with some extra word2vec-style
-    normalization of digits). Rows whose labels get the same
-    standardized URI get combined, with earlier rows given more weight.
+    Convert a frame whose row labels are bare English terms (e.g. of the
+    form 'en/term') to one whose row labels are standardized ConceptNet URIs
+    (e.g. of the form '/c/en/term'; and with some extra word2vec-style
+    normalization of digits). Rows whose labels get the same standardized
+    URI get combined, with earlier rows given more weight.
+    Args:
+        frame (DataFrame): Term vectors DataFrame with indexed with terms.
+        language (str, default='en): Use this language for labels that aren't
+            already standardized.
+        forms (bool, default=True): Combine terms with the same lemma.
     """
     # Re-label the DataFrame with standardized, non-unique row labels
-    if all('/' in label for label in frame.index[10:20]):
+    # (this used to be a bug, see previous and new behavior comment below)
+    #if all('/' in label for label in frame.index[10:20]):
+    if all(label.count('/') == 1 for label in frame.index[10:20]):
+
+        # previously partitioned label='/c/en/term' into tuple=('', '/', 'c/en/term')
+        # into new label='/c//en_term', now partitions label='en/term' into tuple=('en',
+        # '/', 'term') into new label=/c/en/term
         tuples = [label.partition('/') for label in frame.index]
         frame.index = [uri_prefix(standardized_uri(language, text))
                        for language, _slash, text in tuples]
 
+    # `language` argument is only used here for labels that aren't already standardized
     frame.index = [uri_prefix(standardized_uri(language, label)) for label in frame.index]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
     nrows = frame.shape[0]
-    weights = 1.0 / np.arange(1, nrows + 1)
+    weights = 1.0 / np.arange(1, nrows + 1)  # "with earlier rows given more weight"
     label_weights = pd.Series(weights, index=frame.index)
 
     # groupby(level=0).sum() means to add rows that have the same label
@@ -42,7 +55,7 @@ def standardize_row_labels(frame, language='en', forms=True):
 
     # Rearrange the items in descending order of weight, similar to the order
     # we get them in from word2vec and GloVe
-    combined_weights.sort(ascending=False)
+    combined_weights.sort_values(inplace=True, ascending=False)
     result = scaled.loc[combined_weights.index]
     return result
 

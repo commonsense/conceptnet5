@@ -239,7 +239,7 @@ def optimize_weights(func, *args):
     best_acc = 0.
     for weight_direct in weights:
         for weight_transpose in weights:
-            scores = func(*args, weight_direct, weight_transpose, subset='dev')
+            scores = func(*args, weight_direct=weight_direct, weight_transpose=weight_transpose, subset='dev')
             if isinstance(scores, list):
                 # If a function to optimize returns two results, like eval_semeval2012_analogies(),
                 #  take their harmonic mean to compute the weights optimal for both results
