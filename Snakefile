@@ -606,6 +606,19 @@ rule miniaturize:
     shell:
         "cn5-vectors miniaturize {input} {output}"
 
+
+rule tsne:
+    input:
+        DATA + "/vectors/mini.h5",
+        DATA + "/stats/concept_counts.txt"
+    output:
+        DATA + "/vectors/mini.tsne.h5"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors tsne {input} {output}"
+
+
 rule export_text:
     input:
         DATA + "/vectors/numberbatch.h5",

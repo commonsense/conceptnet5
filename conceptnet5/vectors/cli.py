@@ -12,6 +12,7 @@ from .evaluation.compare import (
 from .miniaturize import miniaturize
 from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
+from .visualize import compute_tsne
 
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
@@ -219,3 +220,11 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     del other_frame
     mini = miniaturize(frame, other_vocab=other_vocab, k=k)
     save_hdf(mini, output_filename)
+
+
+@cli.command(name='tsne')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('degree_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+def run_tsne(input_filename, degree_filename, output_filename):
+    compute_tsne(input_filename, degree_filename, output_filename)
