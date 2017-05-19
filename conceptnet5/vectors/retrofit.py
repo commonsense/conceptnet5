@@ -92,7 +92,10 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     # improving multilingual alignment.
     rows_by_language = defaultdict(list)
     for i, label in enumerate(row_labels):
-        lang = label.split('/')[2]
+        try:
+            lang = label.split('/')[2]
+        except IndexError:
+            continue
         rows_by_language[lang].append(i)
     all_languages = sorted(rows_by_language)
     row_groups = [rows_by_language[lang] for lang in all_languages]
