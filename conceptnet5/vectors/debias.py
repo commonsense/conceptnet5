@@ -486,7 +486,7 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    return l2_normalize_rows(original_component + modified_component)
+    return l2_normalize_rows(original_component + modified_component, offset=1e-9)
 
 
 def de_bias_category(frame, category_examples, bias_examples):
@@ -529,7 +529,7 @@ def de_bias_category(frame, category_examples, bias_examples):
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    return l2_normalize_rows(original_component + modified_component)
+    return l2_normalize_rows(original_component + modified_component, offset=1e-9)
 
 
 def de_bias_frame(frame):
