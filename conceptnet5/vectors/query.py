@@ -49,6 +49,8 @@ class VectorSpaceWrapper(object):
     - our strategy, outlined in expand_terms() OR
     - fastText strategy of combining subword vectors, if fasttext_bin is specified.
 
+    Loading a fastText model will currently only work for a bin in the original fastText format.
+
     The filenames usually don't need to be specified, because the system will
     look in default locations for them. They can be specified to replace them
     with toy versions for testing, or to evaluate how other embeddings perform
@@ -198,7 +200,7 @@ class VectorSpaceWrapper(object):
 
     def get_fasttext_vector(self, query):
         """Look up a vector for a query in the fastText model."""
-        label = query.split('/')[-1]
+        label = uri_prefix(query).split('/')[-1]
         vec = self.fasttext_model[label]
         return pd.Series(data=vec, dtype='f')
 
