@@ -3,7 +3,8 @@ import pandas as pd
 import numpy as np
 import marisa_trie
 import struct
-import fasttext
+
+from gensim.models.wrappers import FastText
 
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
@@ -48,8 +49,6 @@ class VectorSpaceWrapper(object):
     OOV terms are looked up using:
     - our strategy, outlined in expand_terms() OR
     - fastText strategy of combining subword vectors, if fasttext_bin is specified.
-
-    Loading a fastText model will currently only work for a bin in the original fastText format.
 
     The filenames usually don't need to be specified, because the system will
     look in default locations for them. They can be specified to replace them
@@ -103,13 +102,13 @@ class VectorSpaceWrapper(object):
             self.small_k = 100
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
 
-            if self.fasttext_bin:
-                self.fasttext_model = fasttext.load_model(self.fasttext_bin)
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
                 "download it?" % self.vector_filename
             )
+        if self.fasttext_bin:
+            self.fasttext_model = FastText.load_fasttext_format(self.fasttext_bin)
         self._build_trie()
 
     def _build_trie(self):
@@ -201,7 +200,10 @@ class VectorSpaceWrapper(object):
     def get_fasttext_vector(self, query):
         """Look up a vector for a query in the fastText model."""
         label = uri_prefix(query).split('/')[-1]
-        vec = self.fasttext_model[label]
+        try:
+            vec = self.fasttext_model[label]
+        except KeyError:
+            vec = np.zeros(self.frame.shape[1], dtype='f')
         return pd.Series(data=vec, dtype='f')
 
     def text_to_vector(self, language, text):
