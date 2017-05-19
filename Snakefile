@@ -372,7 +372,7 @@ rule load_db:
     output:
         DATA + "/psql/done"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "touch {output} && cn5-db load_data %(data)s/psql" % {'data': DATA}
 
 
 # Collecting statistics
