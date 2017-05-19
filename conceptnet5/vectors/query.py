@@ -4,6 +4,8 @@ import numpy as np
 import marisa_trie
 import struct
 
+from gensim.models.wrappers import FastText
+
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
@@ -43,8 +45,10 @@ def field_match(value, query):
 
 class VectorSpaceWrapper(object):
     """
-    An object that wraps the data necessary to look up vectors for terms
-    (in the vector space named Conceptnet Numberbatch) and find related terms.
+    An object that wraps the data necessary to look up vectors for terms even if they are OOV.
+    OOV terms are looked up using:
+    - our strategy, outlined in expand_terms() OR
+    - fastText strategy of combining subword vectors, if fasttext_bin is specified.
 
     The filenames usually don't need to be specified, because the system will
     look in default locations for them. They can be specified to replace them
@@ -52,7 +56,7 @@ class VectorSpaceWrapper(object):
     while still using ConceptNet for looking up words outside their vocabulary.
     """
 
-    def __init__(self, vector_filename=None, frame=None, use_db=True):
+    def __init__(self, vector_filename=None, frame=None, use_db=True, fasttext_bin=None):
         if frame is None:
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
@@ -64,6 +68,8 @@ class VectorSpaceWrapper(object):
         self.small_k = None
         self.finder = None
         self.trie = None
+        self.fasttext_bin = fasttext_bin
+        self.fasttext_model = None
         if use_db:
             self.finder = AssertionFinder()
 
@@ -77,9 +83,6 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
-            if not self.frame.index.is_monotonic_increasing:
-                self.frame = self.frame.sort_index()
-
             if not self.frame.index[1].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
                 # they're in English, and stick the English language tag on
@@ -91,14 +94,21 @@ class VectorSpaceWrapper(object):
                     for label in self.frame.index
                     ]
 
+            # Sort the index
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
+
             self.k = self.frame.shape[1]
             self.small_k = 100
             self.small_frame = self.frame.iloc[:, :self.small_k].copy()
+
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
                 "download it?" % self.vector_filename
             )
+        if self.fasttext_bin:
+            self.fasttext_model = FastText.load_fasttext_format(self.fasttext_bin)
         self._build_trie()
 
     def _build_trie(self):
@@ -187,6 +197,15 @@ class VectorSpaceWrapper(object):
             self.expand_terms(terms, limit_per_term, include_neighbors)
         )
 
+    def get_fasttext_vector(self, query):
+        """Look up a vector for a query in the fastText model."""
+        label = uri_prefix(query).split('/')[-1]
+        try:
+            vec = self.fasttext_model[label]
+        except KeyError:
+            vec = np.zeros(self.frame.shape[1], dtype='f')
+        return pd.Series(data=vec, dtype='f')
+
     def text_to_vector(self, language, text):
         """Used in Story Cloze Test to create a vector for text """
         tokens = wordfreq.tokenize(text, language)
@@ -202,20 +221,25 @@ class VectorSpaceWrapper(object):
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
-        # FIXME: is pd.DataFrame supposed to be pd.Series here?
-        if isinstance(query, np.ndarray):
-            return query
-        elif isinstance(query, pd.DataFrame) or isinstance(query, dict):
-            terms = list(query.items())
-        elif isinstance(query, str):
-            terms = [(query, 1.)]
-        elif isinstance(query, list):
-            terms = query
+        if self.fasttext_model is not None:
+            vector = self.get_fasttext_vector(query)
+            return vector
         else:
-            raise ValueError("Can't make a query out of type %s" % type(query))
-        include_neighbors = include_neighbors and (len(terms) <= 5)
-        vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
-        return normalize_vec(vec)
+            # FIXME: is pd.DataFrame supposed to be pd.Series here?
+            if isinstance(query, np.ndarray):
+                return query
+            elif isinstance(query, pd.DataFrame) or isinstance(query, dict):
+                terms = list(query.items())
+            elif isinstance(query, str):
+                terms = [(query, 1.)]
+            elif isinstance(query, list):
+                terms = query
+            else:
+                raise ValueError("Can't make a query out of type %s" % type(query))
+
+            include_neighbors = include_neighbors and (len(terms) <= 5)
+            vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
+            return normalize_vec(vec)
 
     def similar_terms(self, query, filter=None, limit=20):
         """

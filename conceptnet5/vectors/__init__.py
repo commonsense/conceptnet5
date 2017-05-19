@@ -1,10 +1,10 @@
-from conceptnet5.nodes import standardized_concept_uri, uri_to_label
-from conceptnet5.language.lemmatize import lemmatize_uri
-from sklearn.preprocessing import normalize
 import re
-import pandas as pd
-import numpy as np
 
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import normalize
+
+from conceptnet5.nodes import standardized_concept_uri, uri_to_label
 
 DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
 DIGIT_RE = re.compile(r'[0-9]')
@@ -67,7 +67,7 @@ def normalize_vec(vec):
     L2-normalize a single vector, as a 1-D ndarray or a Series.
     """
     if isinstance(vec, pd.Series):
-        return normalize(vec.fillna(0).reshape(1, -1))[0]
+        return normalize(vec.fillna(0).values.reshape(1, -1))[0]
     elif isinstance(vec, np.ndarray):
         return normalize(vec.reshape(1, -1))[0]
     else:
