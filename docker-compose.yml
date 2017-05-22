@@ -3,13 +3,13 @@ services:
   db:
     restart: always
     build: 'data-loader'
-    image: rspeer/conceptnet-data:5.5.4
+    image: rspeer/conceptnet-data:5.5.5
     expose:
       - "5432"
     environment:
       - POSTGRES_DB=conceptnet5
     volumes:
-      - cn5data:/data/conceptnet
+      - data:/data/conceptnet
       - psql:/var/lib/postgresql/data
     logging:
       driver: json-file
@@ -17,14 +17,9 @@ services:
         max-size: "10m"
         max-file: "10"
 
-  conceptnet:
+  api:
     build: '.'
-    image: rspeer/conceptnet:5.5.4
-    restart: 'no'
-
-  conceptnet-web:
-    build: 'web'
-    image: rspeer/conceptnet-web:5.5.4
+    image: rspeer/conceptnet:5.5.5
     links:
       - db
     ports:
@@ -35,8 +30,8 @@ services:
       - CONCEPTNET_DATA=/data/conceptnet
       - CONCEPTNET_RATE_LIMITING=0
     volumes:
-      - cn5data:/data/conceptnet
-      - nginx:/data/nginx
+      - data:/data/conceptnet
+      - cache:/data/nginx
     logging:
       driver: json-file
       options:
@@ -45,5 +40,5 @@ services:
 
 volumes:
   psql:
-  cn5data:
-  nginx:
+  data:
+  cache:

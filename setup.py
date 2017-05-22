@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.5.4'
+version_str = '5.5.5'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
@@ -36,7 +36,7 @@ setup(
         ]
     },
     extras_require={
-        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn', 'mecab-python3', 'jieba', 'marisa_trie'],
+        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn', 'mecab-python3', 'jieba', 'marisa_trie', 'matplotlib >= 2'],
         'viz': ['cairocffi', 'barnes-hut-tsne'],
     },
 )

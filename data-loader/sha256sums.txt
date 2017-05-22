@@ -1,7 +1,7 @@
-e61512152cc234c4d247194c40c7c3209c4e506415f05d440005630ebccf56e6  /data/conceptnet/psql/edge_features.csv.gz
-6a626faadd57fe3dbefde05223a053fff764582d753e3bdfddc310ec9809786d  /data/conceptnet/psql/edges.csv.gz
-da5c48d87ec238b5945ec9d1c5643baf693e7b0b73333b0e571b2738c65eae2a  /data/conceptnet/psql/edge_sources.csv.gz
-e20891ed0e4cb22a240c25e18513ca93db4751f5d3ff7b5980594c268777c2dd  /data/conceptnet/psql/node_prefixes.csv.gz
-b29b69bcb97181a5a7a4df45c131c89dea92bf91942297139677db63880944dc  /data/conceptnet/psql/nodes.csv.gz
-64db26d85e3b42bb8fb4ee6244465929884e57123a0f1a7958d9e9fe31a72ae0  /data/conceptnet/psql/relations.csv.gz
-9413909ff254ab4679494282ee03ec2d657ee4f50b47cce8a2c1baab5586b899  /data/conceptnet/psql/sources.csv.gz
+f6c1e36dcedc6263bd9889ba493f29ba766ff3a3e882ad0504286a0969688efd  /data/conceptnet/psql/edge_features.csv.gz
+4375bab68daecba9560383ef932e32c390a0f4bb032473aac7dd111c8872b09a  /data/conceptnet/psql/edges.csv.gz
+4668d24673acec15fae2ab8a82b70e7737118f69251355e22ea2f5732103a9de  /data/conceptnet/psql/edge_sources.csv.gz
+17461b07bd4d008eea0419a38e73fa32c6797787366d32dce872218c8a1c1f89  /data/conceptnet/psql/node_prefixes.csv.gz
+8c381fefbc4194d2068fed4039275265419ee3f421376f8c28c937af510c2516  /data/conceptnet/psql/nodes.csv.gz
+c0b66df2c8f7986f31a986178d9eb3e10573caa47ebcfc3f237c9804c79632cc  /data/conceptnet/psql/relations.csv.gz
+f3c4c941066d5d19b2d9371cd9fd7cad556cd6e84f7ef2c541661f0ccb45be2b  /data/conceptnet/psql/sources.csv.gz
