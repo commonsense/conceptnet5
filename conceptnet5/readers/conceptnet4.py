@@ -19,19 +19,21 @@ from conceptnet5.uri import join_uri, Licenses
 # filter them out without losing his informative statements.
 
 BEDUME_FLAGGED_CONCEPTS = [
-  'cute', 'lose', 'sew', 'brat', 'work', 'sex', 'shop', 'drive to work',
-  'type', 'in jail', 'jog in park', 'wash his car', 'poor', 'pull weed',
-  'dance', 'sleep', 'pout', 'rake leave', 'wash her car', 'chop wood',
-  'write book', 'shout', 'take out garbage', 'it', 'cry', 'run', 'cook',
-  'late', 'happy', 'eat', 'afraid', 'vote', 'thief', 'shovel snow',
-  'drink', 'drunk', 'watch tv', 'nut', 'early', 'well', 'ill', 'jog',
-  'dead', 'naked', 'play card', 'sick', 'paint', 'read', 'hunter',
-  'play monopoly', 'build new house', 'ride horse', 'play in football game',
-  'make love', 'knit', 'go to take vacation', 'fish', 'go to dentist',
-  'go to store', 'go to airport', 'go to go to store', 'kid', 'computer',
-  'stew', 'take walk', 'tire', 'new computer', 'horn', 'serve mealfish',
-  'potatoe shed', 'hunt', 'crazy', 'buy new car', 'laugh', 'intoxicated',
-  'intoxicate', 'eat hamburger', 'wok'
+  'cute', 'lost', 'sewing', 'brat', 'working', 'have sex', 'shopping',
+  'driving to work', 'typing', 'in jail', 'jogging in park', 'washing his car',
+  'washing her car', 'poor', 'pulling weeds', 'dancing', 'sleeping', 'pouting',
+  'raking leaves', 'washing her car', 'chopping wood', 'writing book',
+  'shouting', 'taking out garbage', 'crying', 'it', 'running', 'cooking',
+  'late', 'happy', 'eating', 'afraid', 'voting', 'it', 'thief',
+  'shoveling snow', 'drinking', 'drunk', 'watching tv', 'nut', 'early', 'well',
+  'ill', 'jogging', 'dead', 'naked', 'playing cards', 'sick', 'painting',
+  'reading', 'hunter', 'playing monopoly', 'building new house', 'riding horse',
+  'playing in football game', 'making love', 'knitting',
+  'going to take vacation', 'fishing', 'going to dentist', 'going to store',
+  'going to airport', 'going to go to store', 'kid', 'computer', 'stew',
+  'taking walk', 'tired', 'new computer', 'horn', 'serving mealfish',
+  'potatoe shed', 'hunting', 'crazy', 'buying new car', 'laughing',
+  'intoxicated', 'eating hamburger', 'wok'
 ]
 BEDUME_FLAGGED_PLACES = [
   'alaska', 'kansa', 'kansas', 'utah', 'austria', 'delaware', 'pennsylvania', 'italy',
