@@ -8,17 +8,19 @@ from conceptnet5.language.lemmatize import lemmatize_uri
 
 def standardize_row_labels(frame, language='en', forms=True):
     """
-    Convert a frame whose row labels are bare English terms to one whose row
-    labels are standardized ConceptNet URIs (with some extra word2vec-style
-    normalization of digits). Rows whose labels get the same
-    standardized URI get combined, with earlier rows given more weight.
+    Convert a frame whose row labels are bare English terms (e.g. of the
+    form 'en/term') to one whose row labels are standardized ConceptNet URIs
+    (e.g. of the form '/c/en/term'; and with some extra word2vec-style
+    normalization of digits). Rows whose labels get the same standardized
+    URI get combined, with earlier rows given more weight.
     """
-    # Re-label the DataFrame with standardized, non-unique row labels
-    if all('/' in label for label in frame.index[10:20]):
+    # Check for en/term format we use to train fastText on OpenSubtitles data
+    if all(label.count('/') == 1 for label in frame.index[10:20]):
         tuples = [label.partition('/') for label in frame.index]
         frame.index = [uri_prefix(standardized_uri(language, text))
                        for language, _slash, text in tuples]
 
+    # Re-label the DataFrame with standardized, non-unique row labels
     frame.index = [uri_prefix(standardized_uri(language, label)) for label in frame.index]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
@@ -42,7 +44,7 @@ def standardize_row_labels(frame, language='en', forms=True):
 
     # Rearrange the items in descending order of weight, similar to the order
     # we get them in from word2vec and GloVe
-    combined_weights.sort(ascending=False)
+    combined_weights.sort_values(inplace=True, ascending=False)
     result = scaled.loc[combined_weights.index]
     return result
 
