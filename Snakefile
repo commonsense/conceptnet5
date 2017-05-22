@@ -101,6 +101,7 @@ rule all:
         DATA + "/psql/node_prefixes.csv.gz",
         DATA + "/psql/sources.csv.gz",
         DATA + "/psql/relations.csv.gz",
+        DATA + "/psql/done",
         DATA + "/stats/languages.txt",
         DATA + "/stats/language_edges.txt",
         DATA + "/stats/relations.txt",
