@@ -58,7 +58,7 @@ def graph_comparison(table_filename, out_filename):
         ('GloVe renormalized', 'data/vectors/glove12-840B.h5'),
         ('fastText enWP (without OOV)', 'data/raw/vectors/fasttext-wiki-en.vec.gz'),
         # ('ConceptNet Numberbatch biased', 'data/vectors/numberbatch-biased.h5'),
-        ('ConceptNet Numberbatch 17.04', 'data/vectors/numberbatch.h5')
+        ('ConceptNet Numberbatch', 'data/vectors/numberbatch.h5')
     ]
     width = 0.84 / len(systems)
     ind = np.arange(len(evals))
