@@ -421,13 +421,23 @@ rule core_concepts:
         "LC_ALL=C sort -u {input} > {output}"
 
 
+rule concept_counts:
+    input:
+        DATA + "/stats/concepts_left.txt",
+        DATA + "/stats/concepts_right.txt"
+    output:
+        DATA + "/stats/concept_counts.txt"
+    shell:
+        "LC_ALL=C sort {input} | LC_ALL=C uniq -c | LC_ALL=C sort -nbr > {output}"
+
+
 rule concepts_left:
     input:
         DATA + "/assertions/assertions.csv"
     output:
         DATA + "/stats/concepts_left.txt"
     shell:
-        "cut -f 3 {input} > {output}"
+        "cut -f 3 {input} | cut -d '/' -f 1,2,3,4 > {output}"
 
 rule concepts_right:
     input:
@@ -435,7 +445,7 @@ rule concepts_right:
     output:
         DATA + "/stats/concepts_right.txt"
     shell:
-        "cut -f 4 {input} > {output}"
+        "cut -f 4 {input} | cut -d '/' -f 1,2,3,4 > {output}"
 
 
 rule language_stats:
@@ -618,6 +628,18 @@ rule tsne:
         ram=16
     shell:
         "cn5-vectors tsne {input} {output}"
+
+
+rule render_tsne:
+    input:
+        DATA + "/vectors/mini.tsne.h5",
+        DATA + "/stats/concept_counts.txt"
+    output:
+        DATA + "/viz/raster.png"
+    resources:
+        ram=16
+    shell:
+        "cn5-vectors render_tsne {input} %(data)s/viz/json_tiles {output}" % {'data': DATA}
 
 
 rule export_text:
