@@ -122,7 +122,7 @@ def handle_file(filename, output_file):
     out = MsgpackStreamWriter(output_file)
     data = file.read()
     file.close()
-    xml = xmltodict.parse(data)
+    xml = xmltodict.parse(data, disable_entities=False)
 
     # The dictionary contains a list of <entry> tags.
     root_node = xml['JMdict']
