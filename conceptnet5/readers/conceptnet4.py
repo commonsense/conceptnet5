@@ -144,6 +144,10 @@ def can_skip(parts_dict):
         return True
     if not parts_dict["startText"] or not parts_dict["endText"]:
         return True
+    if len(parts_dict["startText"]) == 0 or len(parts_dict["endText"]) == 0:
+        return True
+    if lang == 'pt' and (len(parts_dict["startText"]) <= 2 or len(parts_dict["endText"]) <= 2):
+        return True
     if 'rubycommons' in parts_dict["activity"]:
         return True
     if 'Verbosity' in parts_dict["activity"]:
