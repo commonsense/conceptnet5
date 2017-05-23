@@ -38,3 +38,5 @@ for name in $NAMES; do
     gunzip -c $DATA/psql/$name.csv.gz > $DATA/psql/$name.csv
     chown postgres.postgres $DATA/psql/$name.csv
 done
+
+touch "$DATA/psql/done"
