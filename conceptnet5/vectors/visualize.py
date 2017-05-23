@@ -9,6 +9,7 @@ from operator import itemgetter
 from conceptnet5.vectors.formats import load_hdf, save_hdf
 
 TAU = 2 * math.pi
+TILE_LANGUAGES = ['mul', 'en', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ja', 'nl']
 
 
 def get_concept_degrees(filename):
@@ -134,9 +135,12 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
         bound = 1 << tile_z
         for tile_x in range(-bound, bound):
             for tile_y in range(-bound, bound):
-                tiles[tile_z, tile_x, tile_y] = []
+                for lang in TILE_LANGUAGES:
+                    tiles[lang, tile_z, tile_x, tile_y] = []
 
-    occlusion = np.zeros((depth, 4096, 4096), np.bool)
+    occlusion = {}
+    for lang in TILE_LANGUAGES:
+        occlusion[lang] = np.zeros((depth, 4096, 4096), np.bool)
 
     nodes = []
     for i, uri in enumerate(tsne_frame.index):
@@ -159,33 +163,34 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
                 tile_x, tile_y, local_x, local_y = map_to_tile_coordinate(coord, z)
                 text_size = deg ** .5 * (2 ** (z / 2 - 3))
                 text_size = min(24, text_size)
-                raster_text_size = text_size * tile_size / 16
+                for tile_lang in [lang, 'mul']:
+                    raster_text_size = text_size * tile_size / 16
 
-                use_label = False
-                if text_size > 2:
-                    cx, cy = raster_coordinate(coord)
-                    occlude_top = int(max(0, cy))
-                    occlude_left = int(max(0, cx))
-                    occlude_bottom = int(math.ceil(occlude_top + raster_text_size * 1.25))
-                    occlude_right = int(math.ceil(occlude_left + raster_text_size * len(label)))
-                    region = occlusion[z, occlude_top:occlude_bottom, occlude_left:occlude_right]
-                    if not region.any():
-                        region[:, :] = True
-                        use_label = True
-                        if z == 3:
-                            print(occlude_top, occlude_left, occlude_bottom, occlude_right, lang, label)
+                    use_label = False
+                    if text_size > 2:
+                        cx, cy = raster_coordinate(coord)
+                        occlude_top = int(max(0, cy))
+                        occlude_left = int(max(0, cx))
+                        occlude_bottom = int(math.ceil(occlude_top + raster_text_size * 1.25))
+                        occlude_right = int(math.ceil(occlude_left + raster_text_size * len(label)))
+                        region = occlusion[lang][z, occlude_top:occlude_bottom, occlude_left:occlude_right]
+                        if not region.any():
+                            region[:, :] = True
+                            use_label = True
+                            if z == 3:
+                                print(occlude_top, occlude_left, occlude_bottom, occlude_right, lang, label)
 
-                tile = tiles[z, tile_x, tile_y]
-                tile.append({
-                    'x': round(local_x, 2),
-                    'y': round(local_y, 2),
-                    'deg': deg,
-                    'lang': lang,
-                    'label': label,
-                    'uri': uri,
-                    'showLabel': use_label,
-                    'textSize': round(text_size, 2)
-                })
+                    tile = tiles[tile_lang, z, tile_x, tile_y]
+                    tile.append({
+                        'x': round(local_x, 2),
+                        'y': round(local_y, 2),
+                        'deg': deg,
+                        'lang': lang,
+                        'label': label,
+                        'uri': uri,
+                        'showLabel': use_label,
+                        'textSize': round(text_size, 2)
+                    })
 
         if render_png:
             ctx.new_path()
@@ -199,8 +204,8 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
 
     print('Writing JSON')
     for key, val in tiles.items():
-        tile_z, tile_x, tile_y = key
-        out_path = json_out_path / str(tile_z) / str(tile_x) / ("%s.json" % tile_y)
+        language, tile_z, tile_x, tile_y = key
+        out_path = json_out_path / language / str(tile_z) / str(tile_x) / ("%s.json" % tile_y)
         os.makedirs(str(out_path.parent), exist_ok=True)
         with open(str(out_path), 'w', encoding='utf-8') as out:
             json.dump(val, out, ensure_ascii=False)
