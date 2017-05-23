@@ -127,7 +127,7 @@ rule webdata:
 
 rule clean:
     shell:
-        "for subdir in assertions collated db edges psql tmp vectors stats; "
+        "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
