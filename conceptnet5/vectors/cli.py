@@ -235,4 +235,4 @@ def run_tsne(input_filename, degree_filename, output_filename):
 @click.argument('png_out_filename', type=click.Path(writable=True, dir_okay=False))
 def run_render_tsne(input_filename, degree_filename, json_out_dir, png_out_filename):
     render_tsne(input_filename, degree_filename, json_out_dir, png_out_filename,
-                render_png=True, depth=10)
+                render_png=True, depth=8)

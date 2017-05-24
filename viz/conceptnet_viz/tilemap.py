@@ -32,7 +32,7 @@ def language_and_word(uri):
 
 
 def global_coordinate(coord):
-    return coord * 4
+    return coord * 5
 
 
 def raster_coordinate(coord):
@@ -136,4 +136,4 @@ def draw_tsne(tsne_filename, degree_filename, json_out_path, png_out_path, rende
 
 
 if __name__ == '__main__':
-    draw_tsne('data/viz/tsne-multi.h5', 'data/stats/concept_counts.txt', 'viz/json', 'viz/raster.png')
+    draw_tsne('data/viz/tsne-multi.h5', 'data/stats/concept_counts.txt', 'viz/json', 'viz/raster.png', depth=5)

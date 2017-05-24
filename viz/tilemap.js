@@ -1,11 +1,11 @@
-var url_base = "./json/";
+var url_base = "./json/mul/";
 
 var tiles = L.tileLayer(
     url_base + "{z}/{x}/{y}.json",
     {
-        minZoom: 0,
-        maxZoom: 10,
-        maxNativeZoom: 9,
+        minZoom: 1,
+        maxZoom: 8,
+        maxNativeZoom: 7,
         pane: "overlayPane",
         detectRetina: true
     }
@@ -49,8 +49,8 @@ var populateTile = function(tile, tileSize, data) {
             tile.appendChild(anchor);
         }
     }
-    tile.style.width = tileSize * 2;
-    tile.style.height = tileSize * 2;
+    tile.style.width = tileSize * 2 + "px";
+    tile.style.height = tileSize * 2 + "px";
 };
 
 tiles.createTile = function(coords, done) {
@@ -60,6 +60,10 @@ tiles.createTile = function(coords, done) {
     var error;
 
     var url = this.getTileUrl(coords);
+    if (Math.max(Math.abs(coords.x), Math.abs(coords.y)) >= Math.pow(2, coords.z)) {
+        done(error, tile);
+        return tile;
+    }
     fetch(url).then(function(response) {
         if (response.ok) {
             response.json().then(function(data) {
@@ -104,6 +108,6 @@ var showMap = function() {
 
     rasterLayer.addTo(map);
     tiles.addTo(map);
-    map.setView(L.latLng(0, 0), 3);
+    map.setView(L.latLng(0, 0), 3, {animation: false});
     var hash = new L.Hash(map);
 };

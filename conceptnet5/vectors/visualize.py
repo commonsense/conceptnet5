@@ -10,6 +10,18 @@ from conceptnet5.vectors.formats import load_hdf, save_hdf
 
 TAU = 2 * math.pi
 TILE_LANGUAGES = ['mul', 'en', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ja', 'nl']
+DEGREE_SCALE = {
+    'mul': 1,
+    'en': 1,
+    'fr': 1,
+    'es': 5,
+    'de': 5,
+    'ja': 8,
+    'pt': 10,
+    'it': 10,
+    'nl': 12,
+    'ru': 20,
+}
 
 
 def get_concept_degrees(filename):
@@ -69,7 +81,7 @@ def global_coordinate(coord):
     go from about -100 to 100, and are definitely enclosed in the box whose
     coordinates go from -128 to 128).
     """
-    return coord * 4
+    return coord * 5
 
 
 def raster_coordinate(coord):
@@ -144,9 +156,9 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
 
     nodes = []
     for i, uri in enumerate(tsne_frame.index):
-        deg = min(10000, concept_degrees.get(uri, 0))
         coord = tsne_frame.iloc[i, :2]
         lang, label = _language_and_text(uri)
+        deg = min(10000, concept_degrees.get(uri, 0)) * DEGREE_SCALE[lang]
         nodes.append((deg, coord, lang, label, uri))
 
     nodes.sort(key=itemgetter(0), reverse=True)
@@ -173,7 +185,7 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
                         occlude_left = int(max(0, cx))
                         occlude_bottom = int(math.ceil(occlude_top + raster_text_size * 1.25))
                         occlude_right = int(math.ceil(occlude_left + raster_text_size * len(label)))
-                        region = occlusion[lang][z, occlude_top:occlude_bottom, occlude_left:occlude_right]
+                        region = occlusion[tile_lang][z, occlude_top:occlude_bottom, occlude_left:occlude_right]
                         if not region.any():
                             region[:, :] = True
                             use_label = True
