@@ -33,7 +33,7 @@ def standardized_uri(language, term):
     ConceptNet URI in the given language, and then have its sequences of digits
     replaced.
     """
-    if not (term.startswith('/') and term.count('/') >= 2):
+    if not (term.startswith('/c/') and term.count('/') >= 2):
         term = standardized_concept_uri(language, term)
     return replace_numbers(term)
 
