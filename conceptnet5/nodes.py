@@ -4,12 +4,14 @@ puts the tools in conceptnet5.uri together with functions that normalize
 terms and languages into a standard form.
 """
 
-from conceptnet5.language.english import english_filter
-from conceptnet5.language.token_utils import simple_tokenize
-from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri
-from urllib.parse import urlparse
-from .languages import LCODE_ALIASES
 import re
+from urllib.parse import urlparse
+
+from wordfreq import simple_tokenize
+
+from conceptnet5.language.english import english_filter
+from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri
+from .languages import LCODE_ALIASES
 
 
 def standardize_text(text, token_filter=None):

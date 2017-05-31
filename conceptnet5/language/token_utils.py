@@ -1,15 +1,13 @@
 # coding: utf-8
-from __future__ import unicode_literals
 """
 This file contains some generally useful operations you would perform to
 separate and join tokens. The tools apply most to English, but should also
 be able to do their job in any Western language that uses spaces.
 """
+from __future__ import unicode_literals
 
-# FIXME: this exists only to be imported
-from wordfreq import simple_tokenize
-import sys
 import re
+import sys
 
 PY2 = (sys.version_info.major < 3)
 
