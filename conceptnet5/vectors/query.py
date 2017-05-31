@@ -202,11 +202,12 @@ class VectorSpaceWrapper(object):
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
-        # FIXME: is pd.DataFrame supposed to be pd.Series here?
         if isinstance(query, np.ndarray):
             return query
-        elif isinstance(query, pd.DataFrame) or isinstance(query, dict):
+        elif isinstance(query, pd.Series) or isinstance(query, dict):
             terms = list(query.items())
+        elif isinstance(query, pd.DataFrame):
+            terms = list(query.to_records())
         elif isinstance(query, str):
             terms = [(query, 1.)]
         elif isinstance(query, list):
@@ -222,7 +223,8 @@ class VectorSpaceWrapper(object):
         Get a Series of terms ranked by their similarity to the query.
         The query can be:
 
-        - A DataFrame of weighted terms
+        - A pandas Series of weighted terms
+        - A pandas DataFrame of weighted terms
         - A dictionary from terms to weights
         - A list of (term, weight) tuples
         - A single term
@@ -230,9 +232,6 @@ class VectorSpaceWrapper(object):
 
         If the query contains 5 or fewer terms, it will be expanded to include
         neighboring terms in ConceptNet.
-
-        TODO: is this sometimes returning a DataFrame? Should it accept a
-        Series as well as a DataFrame?
         """
         self.load()
         vec = self.get_vector(query)
