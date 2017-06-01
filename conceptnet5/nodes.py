@@ -10,7 +10,8 @@ from urllib.parse import urlparse
 from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
-from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri
+from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
+    get_language
 from .languages import LCODE_ALIASES
 
 
@@ -158,7 +159,11 @@ def valid_concept_name(text):
 
 
 def uri_to_label(uri):
-    # FIXME: add docstring
+    """
+    Convert a ConceptNet uri into a label to be used in nodes. This
+    function replaces an underscore with a space, so while '/c/en/example' will be converted into
+    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+    """
     if uri.startswith('/c/'):
         uri = uri_prefix(uri)
     return uri.split('/')[-1].replace('_', ' ')
@@ -176,8 +181,7 @@ def ld_node(uri, label=None):
     }
     if uri.startswith('/c/'):
         pieces = split_uri(uri)
-        # FIXME: use the function we have to extract the language
-        ld['language'] = pieces[1]
+        ld['language'] = get_language(uri)
         if len(pieces) > 3:
             ld['sense_label'] = '/'.join(pieces[3:])
         ld['term'] = uri_prefix(uri)
