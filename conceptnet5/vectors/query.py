@@ -239,8 +239,6 @@ class VectorSpaceWrapper(object):
         search_frame = self.small_frame
         if filter:
             exact_only = filter.count('/') >= 3
-            # TODO: Is this duplicating something that field_match was supposed
-            # to do?
             if filter.endswith('/.'):
                 filter = filter[:-2]
                 exact_only = True
