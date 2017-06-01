@@ -1,18 +1,17 @@
-import wordfreq
-import pandas as pd
-import numpy as np
 import marisa_trie
-import struct
+import numpy as np
+import pandas as pd
+import wordfreq
 
+from conceptnet5.db.query import AssertionFinder
+from conceptnet5.uri import uri_prefix, get_language, split_uri
 from conceptnet5.util import get_data_filename
-from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
     standardized_uri
 )
+from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
-from conceptnet5.db.query import AssertionFinder
-from conceptnet5.uri import uri_prefix, get_language, split_uri
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
