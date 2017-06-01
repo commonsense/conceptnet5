@@ -1,6 +1,6 @@
 from scipy import sparse
 import pandas as pd
-from conceptnet5.uri import uri_prefixes, uri_prefix
+from conceptnet5.uri import uri_prefixes, uri_prefix, get_language
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.relations import SYMMETRIC_RELATIONS
 from conceptnet5.languages import CORE_LANGUAGES
@@ -83,10 +83,6 @@ def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
     shape = (len(labels), len(labels))
     index = pd.Index(labels)
     return mat.tocsr(shape), index
-
-
-def get_language(uri):
-    return uri.split('/')[2]
 
 
 def build_features_from_conceptnet_table(filename):

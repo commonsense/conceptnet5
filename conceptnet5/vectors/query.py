@@ -12,7 +12,7 @@ from conceptnet5.vectors import (
 )
 from conceptnet5.vectors.transforms import l2_normalize_rows
 from conceptnet5.db.query import AssertionFinder
-from conceptnet5.uri import uri_prefix
+from conceptnet5.uri import uri_prefix, get_language, split_uri
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
@@ -146,9 +146,8 @@ class VectorSpaceWrapper(object):
                     expanded.append((neighbor, neighbor_weight))
 
                 prefix_weight = 0.01
-                if not term.startswith('/c/en/'):
-                    # FIXME: better language code handling
-                    englishified = '/c/en/' + term[6:]
+                if get_language(term) != 'en':
+                    englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
                 while term:
