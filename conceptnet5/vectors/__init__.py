@@ -4,12 +4,11 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import normalize
 
-from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.nodes import standardized_concept_uri, uri_to_label
 
 DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
 DIGIT_RE = re.compile(r'[0-9]')
-CONCEPT_RE = re.compile(r'/c/({})/.+'.format('|'.join(ALL_LANGUAGES)))
+CONCEPT_RE = re.compile(r'/c/[a-z]{2,3}/.+')
 
 
 def replace_numbers(s):
