@@ -1,7 +1,11 @@
-var url_base = "./json/mul/";
+var renderedLanguage = "mul";
+if (window.location.search) {
+    renderedLanguage = window.location.search.substring(1);
+}
+var url_base = "/vizdata/json_tiles/" + renderedLanguage + "/";
 
 var tiles = L.tileLayer(
-    url_base + "{z}/{x}/{y}.json",
+    url_base + "{z}/{x}/{y}.json?cb=2",
     {
         minZoom: 1,
         maxZoom: 8,
@@ -11,7 +15,7 @@ var tiles = L.tileLayer(
     }
 );
 var rs = 128;
-var rasterLayer = L.imageOverlay("assets/raster.png", [[rs, -rs], [-rs, rs]], {
+var rasterLayer = L.imageOverlay("/vizdata/raster.png", [[rs, -rs], [-rs, rs]], {
     opacity: 0.25
 });
 
@@ -23,28 +27,28 @@ var populateTile = function(tile, tileSize, data) {
     tile.setAttribute('viewBox', '0 0 512 512');
     for (var i=0; i < data.length; i++) {
         var node = data[i];
-        if (node.textSize >= 4) {
+        if (node.s >= 4) {
             var circle = svgElement('circle');
-            var size = node.textSize;
+            var size = node.s;
             circle.setAttribute('cx', node.x);
             circle.setAttribute('cy', node.y);
-            circle.setAttribute('r', size / 8 + 0.2);
+            circle.setAttribute('r', size / 16);
             circle.setAttribute('class', "node lang-" + node.lang);
             tile.appendChild(circle);
         }
     }
     for (var i=0; i < data.length; i++) {
         var node = data[i];
-        if (node.showLabel && node.textSize >= 8) {
-            var size = node.textSize;
+        if (node.label) {
+            var size = node.s;
             var anchor = svgElement('a');
             anchor.setAttribute('href', `http://conceptnet.io${node.uri}`);
             var label = svgElement('text');
             label.setAttribute('class', "label leaflet-interactive lang-" + node.lang);
-            label.setAttribute('style', `font-size: ${node.textSize}px; stroke-width: ${node.textSize / 8 + 2}px`);
+            label.setAttribute('style', `font-size: ${size}px; stroke-width: ${size / 4 + 2}px`);
             label.innerHTML = node.label;
-            label.setAttribute('x', node.x + node.textSize / 4 + 0.2);
-            label.setAttribute('y', node.y + node.textSize * 5 / 8 + 0.2);
+            label.setAttribute('x', node.x + size / 4 + 0.2);
+            label.setAttribute('y', node.y + size * 5 / 8 + 0.2);
             anchor.appendChild(label);
             tile.appendChild(anchor);
         }
@@ -60,7 +64,7 @@ tiles.createTile = function(coords, done) {
     var error;
 
     var url = this.getTileUrl(coords);
-    if (Math.max(Math.abs(coords.x), Math.abs(coords.y)) >= Math.pow(2, coords.z)) {
+    if (Math.max(coords.x, coords.y, ~coords.x, ~coords.y) >= Math.pow(2, coords.z)) {
         done(error, tile);
         return tile;
     }
@@ -83,12 +87,6 @@ var showMap = function() {
     });
 
     var updateZoom = function() {
-        if (map.getZoom() >= 5 && map.hasLayer(rasterLayer)) {
-            map.removeLayer(rasterLayer);
-        }
-        if (map.getZoom() <= 4 && !map.hasLayer(rasterLayer)) {
-            map.addLayer(rasterLayer);
-        }
         var z = map.getZoom();
         if (z >= 4) {
             rasterLayer.setOpacity(0.15);

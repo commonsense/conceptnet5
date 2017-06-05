@@ -14,13 +14,13 @@ DEGREE_SCALE = {
     'mul': 1,
     'en': 1,
     'fr': 1,
-    'es': 5,
-    'de': 5,
+    'es': 3,
+    'de': 3,
     'ja': 8,
-    'pt': 10,
-    'it': 10,
-    'nl': 12,
-    'ru': 20,
+    'pt': 7,
+    'it': 8,
+    'nl': 10,
+    'ru': 15,
 }
 
 
@@ -81,7 +81,7 @@ def global_coordinate(coord):
     go from about -100 to 100, and are definitely enclosed in the box whose
     coordinates go from -128 to 128).
     """
-    return coord * 5
+    return coord * 4
 
 
 def raster_coordinate(coord):
@@ -173,7 +173,8 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
             tile_size = 2 ** (8 - z)
             if deg >= tile_size:  # no reason these should be comparable, just a convenient cutoff
                 tile_x, tile_y, local_x, local_y = map_to_tile_coordinate(coord, z)
-                text_size = deg ** .5 * (2 ** (z / 2 - 3))
+                # These numbers just come from a lot of experimentation
+                text_size = deg ** .5 * 0.75 * (2 ** (z / 2 - 3)) + 6
                 text_size = min(24, text_size)
                 for tile_lang in [lang, 'mul']:
                     raster_text_size = text_size * tile_size / 16
@@ -193,16 +194,17 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
                                 print(occlude_top, occlude_left, occlude_bottom, occlude_right, lang, label)
 
                     tile = tiles[tile_lang, z, tile_x, tile_y]
-                    tile.append({
+                    point_data = {
                         'x': round(local_x, 2),
                         'y': round(local_y, 2),
-                        'deg': deg,
                         'lang': lang,
                         'label': label,
                         'uri': uri,
-                        'showLabel': use_label,
-                        'textSize': round(text_size, 2)
-                    })
+                        's': round(text_size, 2)
+                    }
+                    if not use_label:
+                        del point_data['label']
+                    tile.append(point_data)
 
         if render_png:
             ctx.new_path()

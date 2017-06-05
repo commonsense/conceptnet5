@@ -1,1 +1,0 @@
-git+https://github.com/alexisbcook/tsne.git#egg=tsne.bh-sne==0.1.7+5.g3aeafd5
