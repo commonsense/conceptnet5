@@ -5,7 +5,7 @@ if (window.location.search) {
 var url_base = "/vizdata/json_tiles/" + renderedLanguage + "/";
 
 var tiles = L.tileLayer(
-    url_base + "{z}/{x}/{y}.json?cb=2",
+    url_base + "{z}/{x}/{y}.json?cb=3",
     {
         minZoom: 1,
         maxZoom: 8,
@@ -32,7 +32,7 @@ var populateTile = function(tile, tileSize, data) {
             var size = node.s;
             circle.setAttribute('cx', node.x);
             circle.setAttribute('cy', node.y);
-            circle.setAttribute('r', size / 16);
+            circle.setAttribute('r', size / 12 + 0.1);
             circle.setAttribute('class', "node lang-" + node.lang);
             tile.appendChild(circle);
         }

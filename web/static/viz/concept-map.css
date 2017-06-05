@@ -10,25 +10,37 @@ body {
     background: white;
 }
 .node {
-    opacity: .5;
+    z-index: 1;
 }
 .label {
     font-family: "Noto Sans", sans-serif;
     stroke: white;
     paint-order: stroke;
     pointer-events: auto;
+    z-index: 2;
 }
 .label:hover {
     stroke: #cfc;
 }
 
 .lang-en { fill: #05a; }
+.node.lang-en { fill: #8ad; }
 .lang-fr { fill: #76e; }
+.node.lang-fr { fill: #bbf; }
 .lang-de { fill: #222; }
+.node.lang-de { fill: #999; }
+
 .lang-es { fill: #da0; }
+.node.lang-es { fill: #ed8; }
 .lang-it { fill: #4d4; }
+.node.lang-it { fill: #aea; }
 .lang-ru { fill: #a50; }
+.node.lang-ru { fill: #da8; }
 .lang-pt { fill: #080; }
+.node.lang-pt { fill: #8c8;}
 .lang-ja { fill: #f55; }
+.node.lang-ja { fill: #faa; }
 .lang-zh { fill: #e00; }
+.node.lang-zh { fill: #f88; }
 .lang-nl { fill: #e70; }
+.node.lang-nl { fill: #fb8; }
