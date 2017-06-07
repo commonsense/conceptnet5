@@ -9,15 +9,11 @@ body {
 .leaflet-container {
     background: white;
 }
-.node {
-    z-index: 1;
-}
 .label {
     font-family: "Noto Sans", sans-serif;
     stroke: white;
     paint-order: stroke;
     pointer-events: auto;
-    z-index: 2;
 }
 .label:hover {
     stroke: #cfc;
@@ -38,9 +34,9 @@ body {
 .node.lang-ru { fill: #da8; }
 .lang-pt { fill: #080; }
 .node.lang-pt { fill: #8c8;}
-.lang-ja { fill: #f55; }
-.node.lang-ja { fill: #faa; }
-.lang-zh { fill: #e00; }
-.node.lang-zh { fill: #f88; }
+.lang-ja { fill: #f77; }
+.node.lang-ja { fill: #fbb; }
+.lang-zh { fill: #900; }
+.node.lang-zh { fill: #c88; }
 .lang-nl { fill: #e70; }
 .node.lang-nl { fill: #fb8; }
