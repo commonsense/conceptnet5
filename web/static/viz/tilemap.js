@@ -2,10 +2,10 @@ var renderedLanguage = "mul";
 if (window.location.search) {
     renderedLanguage = window.location.search.substring(1);
 }
-var url_base = "/vizdata/json_tiles/" + renderedLanguage + "/";
+var url_base = "/vizdata/json_tiles/" + renderedLanguage;
 
 var tiles = L.tileLayer(
-    url_base + "{z}/{x}/{y}.json?cb=3",
+    url_base + "{z}/{x}/{y}.json?cb=6",
     {
         minZoom: 1,
         maxZoom: 8,
@@ -19,20 +19,42 @@ var rasterLayer = L.imageOverlay("/vizdata/raster.png", [[rs, -rs], [-rs, rs]], 
     opacity: 0.25
 });
 
+var map = L.map('map', {
+    crs: L.CRS.Simple,
+    renderer: L.svg()
+});
+
 var svgElement = function(name) {
     return document.createElementNS("http://www.w3.org/2000/svg", name);
 };
 
-var populateTile = function(tile, tileSize, data) {
+var popupOptions = {
+};
+
+var makePopupHandler = function(latLng, label, uri) {
+    var content = L.Util.template('<a href="{uri}">{label}</a>', {
+        uri: uri,
+        label: label
+    });
+    var popupHandler = function(event) {
+        var popup = L.popup(popupOptions, tiles)
+            .setLatLng(latLng)
+            .setContent(content)
+            .openOn(map);
+    }
+}
+
+var populateTile = function(tile, tileSize, data, zoom) {
     tile.setAttribute('viewBox', '0 0 512 512');
     for (var i=0; i < data.length; i++) {
         var node = data[i];
         if (node.s >= 4) {
             var circle = svgElement('circle');
             var size = node.s;
+            var nodeSize = size * (1.25 ** (zoom - 2)) / 12 + 0.1;
             circle.setAttribute('cx', node.x);
             circle.setAttribute('cy', node.y);
-            circle.setAttribute('r', size / 12 + 0.1);
+            circle.setAttribute('r', nodeSize);
             circle.setAttribute('class', "node lang-" + node.lang);
             tile.appendChild(circle);
         }
@@ -41,14 +63,15 @@ var populateTile = function(tile, tileSize, data) {
         var node = data[i];
         if (node.label) {
             var size = node.s;
+            var nodeSize = size * (1.25 ** (zoom - 2)) / 12 + 0.1;
             var anchor = svgElement('a');
             anchor.setAttribute('href', `http://conceptnet.io${node.uri}`);
             var label = svgElement('text');
             label.setAttribute('class', "label leaflet-interactive lang-" + node.lang);
             label.setAttribute('style', `font-size: ${size}px; stroke-width: ${size / 4 + 2}px`);
             label.innerHTML = node.label;
-            label.setAttribute('x', node.x + size / 4 + 0.2);
-            label.setAttribute('y', node.y + size * 5 / 8 + 0.2);
+            label.setAttribute('x', node.x + size / 4 + nodeSize);
+            label.setAttribute('y', node.y + size * 5 / 8 + nodeSize);
             anchor.appendChild(label);
             tile.appendChild(anchor);
         }
@@ -60,6 +83,7 @@ var populateTile = function(tile, tileSize, data) {
 tiles.createTile = function(coords, done) {
     var tile = svgElement('svg');
     tile.setAttribute('class', 'leaflet-tile');
+    tile.style["z-index"] = 10000 - coords.x;
     var size = this.getTileSize();
     var error;
 
@@ -71,7 +95,7 @@ tiles.createTile = function(coords, done) {
     fetch(url).then(function(response) {
         if (response.ok) {
             response.json().then(function(data) {
-                populateTile(tile, size.x, data);
+                populateTile(tile, size.x, data, coords.z);
                 done(error, tile);
             });
         }
@@ -81,11 +105,6 @@ tiles.createTile = function(coords, done) {
 
 
 var showMap = function() {
-    var map = L.map('map', {
-        crs: L.CRS.Simple,
-        renderer: L.svg()
-    });
-
     var updateZoom = function() {
         var z = map.getZoom();
         if (z >= 4) {
@@ -104,8 +123,9 @@ var showMap = function() {
     map.on('zoomend', updateZoom);
     map.on('load', updateZoom);
 
-    rasterLayer.addTo(map);
-    tiles.addTo(map);
     map.setView(L.latLng(0, 0), 3, {animation: false});
     var hash = new L.Hash(map);
+
+    rasterLayer.addTo(map);
+    tiles.addTo(map);
 };
