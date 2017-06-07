@@ -621,10 +621,10 @@ rule miniaturize:
 
 rule tsne:
     input:
-        DATA + "/vectors/mini.h5",
+        DATA + "/vectors/numberbatch.h5",
         DATA + "/stats/concept_counts.txt"
     output:
-        DATA + "/vectors/mini.tsne.h5"
+        DATA + "/vectors/numberbatch.tsne.h5"
     resources:
         ram=16
     shell:
@@ -633,7 +633,7 @@ rule tsne:
 
 rule render_tsne:
     input:
-        DATA + "/vectors/mini.tsne.h5",
+        DATA + "/vectors/numberbatch.tsne.h5",
         DATA + "/stats/concept_counts.txt"
     output:
         DATA + "/viz/raster.png"
