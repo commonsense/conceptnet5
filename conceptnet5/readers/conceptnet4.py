@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
 """
+from wordfreq import simple_tokenize
 
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
@@ -11,7 +12,6 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
-from conceptnet5.language.token_utils import simple_tokenize
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some

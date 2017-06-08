@@ -319,6 +319,10 @@ def is_absolute_url(uri):
     return uri.startswith('http') or uri.startswith('cc:')
 
 
+def get_language(uri):
+    return uri.split('/')[2]
+
+
 class Licenses:
     cc_attribution = 'cc:by/4.0'
     cc_sharealike = 'cc:by-sa/4.0'

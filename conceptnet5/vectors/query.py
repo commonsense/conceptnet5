@@ -1,18 +1,17 @@
-import wordfreq
-import pandas as pd
-import numpy as np
 import marisa_trie
-import struct
+import numpy as np
+import pandas as pd
+import wordfreq
 
+from conceptnet5.db.query import AssertionFinder
+from conceptnet5.uri import uri_prefix, get_language, split_uri
 from conceptnet5.util import get_data_filename
-from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
     standardized_uri
 )
+from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
-from conceptnet5.db.query import AssertionFinder
-from conceptnet5.uri import uri_prefix
 
 # Magnitudes smaller than this tell us that we didn't find anything meaningful
 SMALL = 1e-6
@@ -146,9 +145,8 @@ class VectorSpaceWrapper(object):
                     expanded.append((neighbor, neighbor_weight))
 
                 prefix_weight = 0.01
-                if not term.startswith('/c/en/'):
-                    # FIXME: better language code handling
-                    englishified = '/c/en/' + term[6:]
+                if get_language(term) != 'en':
+                    englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
                 while term:
@@ -202,11 +200,12 @@ class VectorSpaceWrapper(object):
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
-        # FIXME: is pd.DataFrame supposed to be pd.Series here?
         if isinstance(query, np.ndarray):
             return query
-        elif isinstance(query, pd.DataFrame) or isinstance(query, dict):
+        elif isinstance(query, pd.Series) or isinstance(query, dict):
             terms = list(query.items())
+        elif isinstance(query, pd.DataFrame):
+            terms = list(query.to_records())
         elif isinstance(query, str):
             terms = [(query, 1.)]
         elif isinstance(query, list):
@@ -222,7 +221,8 @@ class VectorSpaceWrapper(object):
         Get a Series of terms ranked by their similarity to the query.
         The query can be:
 
-        - A DataFrame of weighted terms
+        - A pandas Series of weighted terms
+        - A pandas DataFrame of weighted terms
         - A dictionary from terms to weights
         - A list of (term, weight) tuples
         - A single term
@@ -230,9 +230,6 @@ class VectorSpaceWrapper(object):
 
         If the query contains 5 or fewer terms, it will be expanded to include
         neighboring terms in ConceptNet.
-
-        TODO: is this sometimes returning a DataFrame? Should it accept a
-        Series as well as a DataFrame?
         """
         self.load()
         vec = self.get_vector(query)
@@ -240,8 +237,6 @@ class VectorSpaceWrapper(object):
         search_frame = self.small_frame
         if filter:
             exact_only = filter.count('/') >= 3
-            # TODO: Is this duplicating something that field_match was supposed
-            # to do?
             if filter.endswith('/.'):
                 filter = filter[:-2]
                 exact_only = True

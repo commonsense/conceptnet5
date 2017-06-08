@@ -67,7 +67,7 @@ def normalize_vec(vec):
     L2-normalize a single vector, as a 1-D ndarray or a Series.
     """
     if isinstance(vec, pd.Series):
-        return normalize(vec.fillna(0).reshape(1, -1))[0]
+        return normalize(vec.fillna(0).values.reshape(1, -1))[0]
     elif isinstance(vec, np.ndarray):
         return normalize(vec.reshape(1, -1))[0]
     else:
