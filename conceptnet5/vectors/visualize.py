@@ -228,5 +228,6 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
         language, tile_z, tile_x, tile_y = key
         out_path = json_out_path / language / str(tile_z) / str(tile_x) / ("%s.json" % tile_y)
         os.makedirs(str(out_path.parent), exist_ok=True)
+        val = val[:1000]
         with open(str(out_path), 'w', encoding='utf-8') as out:
             json.dump(val, out, ensure_ascii=False)
