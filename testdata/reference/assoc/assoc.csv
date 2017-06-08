@@ -36,8 +36,12 @@
 /c/en/balalaika	/c/en/make_music	2.82842712474619	/d/conceptnet/4/en	/r/UsedFor
 /c/en/balalaika	/c/en/making_music	1.0	/d/conceptnet/4/en	/r/UsedFor
 /c/en/bar	/c/en/test	0.32200000000000006	/d/verbosity	/r/RelatedTo
+/c/en/carrots/n	/c/en/carrot	1.0	/d/wiktionary/en	/r/FormOf
+/c/en/carrots/n	/c/en/carrots	1.0	/d/wiktionary/en	/r/SenseOf
 /c/en/checking/n	/c/en/checking	1.0	/d/opencyc	/r/SenseOf
 /c/en/checking/n	/c/en/evaluating/n	1.0	/d/opencyc	/r/IsA
+/c/en/eating/v	/c/en/eat	1.0	/d/wiktionary/en	/r/FormOf
+/c/en/eating/v	/c/en/eating	1.0	/d/wiktionary/en	/r/SenseOf
 /c/en/education_in_united_states	/c/en/certainly_thing	1.0	/d/conceptnet/4/en	/r/HasProperty
 /c/en/education_in_united_states	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/en/education_in_united_states	/c/en/test/n	0.5	/d/dbpedia/en	/r/RelatedTo
@@ -50,6 +54,10 @@
 /c/en/example_concept/n	/c/en/example_concept	1.0	/d/dbpedia/en	/r/SenseOf
 /c/en/experiment	/c/en/test	1.206	/d/verbosity	/r/RelatedTo
 /c/en/hard_questions	/c/en/test	1.0	/d/conceptnet/4/en	/r/AtLocation
+/c/en/is/v	/c/en/be	1.0	/d/wiktionary/en	/r/FormOf
+/c/en/is/v	/c/en/is	1.0	/d/wiktionary/en	/r/SenseOf
+/c/en/people/n	/c/en/people	1.0	/d/wiktionary/en	/r/SenseOf
+/c/en/people/n	/c/en/person	1.0	/d/wiktionary/en	/r/FormOf
 /c/en/question	/c/en/test	0.8140000000000001	/d/verbosity	/r/RelatedTo
 /c/en/run/n	/c/en/run	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/en/run/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
@@ -209,6 +217,8 @@
 /c/es/prueba/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
 /c/es/prueba/n	/c/es/prueba	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/es/sistema_educativo_de_estados_unidos	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
+/c/es/tengo/v	/c/es/tener	1.0	/d/wiktionary/en	/r/FormOf
+/c/es/tengo/v	/c/es/tengo	1.0	/d/wiktionary/en	/r/SenseOf
 /c/es/test/n	/c/en/test	1.0	/d/wiktionary/en	/r/RelatedTo
 /c/es/test/n	/c/es/prueba	1.0	/d/wiktionary/en	/r/Synonym
 /c/es/test/n	/c/es/test	1.0	/d/wiktionary/en	/r/SenseOf

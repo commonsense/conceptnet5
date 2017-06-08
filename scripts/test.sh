@@ -1,6 +1,7 @@
 #!/bin/bash
 
 export CONCEPTNET_BUILD_TEST=1
+export CONCEPTNET_BUILD_DATA=testdata
 dropdb conceptnet-test 2>/dev/null || true
 createdb conceptnet-test
 build_test () {
@@ -11,4 +12,4 @@ build_test () {
     diff -ur -x '*.msgpack' testdata/reference/assoc testdata/assoc
 }
 
-nosetests --with-doctest conceptnet5 && build_test && nosetests && nosetests tests/post-build && echo "Success."
+nosetests --with-doctest conceptnet5 && build_test && nosetests && nosetests tests/small-build && echo "Success."

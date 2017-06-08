@@ -68,7 +68,7 @@ def test_query_es():
     q2 = get_query_ids({'start': '/c/es', 'end': '/c/es', 'rel': '/r/Synonym'})
     eq_(q2, ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]'])
 
-    q3 = get_query_ids({'node': '/c/es', 'other': '/c/es'})
+    q3 = get_query_ids({'node': '/c/es', 'other': '/c/es', 'rel': '/r/Synonym'})
     eq_(q3, ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]'])
 
 

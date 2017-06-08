@@ -205,15 +205,19 @@ def lemmatize(language, word, pos=None):
     word and the word form that was found. The word form will be the empty
     string if the word was unchanged.
 
-    >>> lemmatize('en', 'eating')
+    The following examples are deliberately not quite doctests, because they
+    can only pass if Wiktionary data has been built. The actual tests
+    appear in tests/post-build.
+
+    >> lemmatize('en', 'eating')
     ('eat', 'pres+ptcp')
-    >>> lemmatize('en', 'carrots')
+    >> lemmatize('en', 'carrots')
     ('carrot', 'p')
-    >>> lemmatize('en', 'is')
+    >> lemmatize('en', 'is')
     ('be', '3+s+pres')
-    >>> lemmatize('en', 'good')
+    >> lemmatize('en', 'good')
     ('good', '')
-    >>> lemmatize('es', 'tengo', 'v')
+    >> lemmatize('es', 'tengo', 'v')
     ('tener', '1+s+pres+ind')
     """
     return LEMMATIZER.lookup(language, word, pos)
