@@ -1,7 +1,7 @@
 import click
 from .formats import (
     convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
-    load_hdf, save_hdf, export_text
+    load_hdf, save_hdf, export_text, attach_labels
 )
 from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
@@ -201,9 +201,10 @@ def run_comparison_graph(table_filename, eval_graph_filename):
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--language', '-l', default=None)
-def run_export(input_filename, output_filename, language):
+@click.option('--labeled/--unlabeled', default=True)
+def run_export(input_filename, output_filename, language, labeled):
     frame = load_hdf(input_filename)
-    export_text(frame, output_filename, language)
+    export_text(frame, output_filename, language, labeled)
 
 
 @cli.command(name='miniaturize')
@@ -236,3 +237,12 @@ def run_tsne(input_filename, degree_filename, output_filename):
 def run_render_tsne(input_filename, degree_filename, json_out_dir, png_out_filename):
     render_tsne(input_filename, degree_filename, json_out_dir, png_out_filename,
                 render_png=True, depth=8)
+
+
+@cli.command(name='attach_labels')
+@click.argument('text_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('hdf5_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
+def run_attach_labels(text_filename, hdf5_filename, output_filename):
+    attach_labels(text_filename, hdf5_filename, output_filename)
+

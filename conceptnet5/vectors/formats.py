@@ -35,15 +35,17 @@ def save_labels_and_npy(table, vocab_filename, matrix_filename):
     save_index_as_labels(table.index, vocab_filename)
 
 
-def vec_to_text_line(label, vec):
+def vec_to_text_line(label, vec, labeled=True):
     """
     Output a labeled vector as a line in a fastText-style text format.
     """
-    cells = [label] + ['%4.4f' % val for val in vec]
+    cells = ['%4.4f' % val for val in vec]
+    if labeled:
+        cells = [label] + cells
     return ' '.join(cells)
 
 
-def export_text(frame, filename, filter_language=None):
+def export_text(frame, filename, filter_language=None, labeled=True):
     """
     Save a semantic vector space as a fastText-style text file.
 
@@ -68,7 +70,18 @@ def export_text(frame, filename, filter_language=None):
             if filter_language is not None:
                 label = label.split('/', 3)[-1]
             vec = vectors[i]
-            print(vec_to_text_line(label, vec), file=out)
+            print(vec_to_text_line(label, vec, labeled), file=out)
+
+
+def attach_labels(text_filename, hdf5_filename, output_filename):
+    """
+    This is used in putting together the output of LargeVis. TODO: explain
+    more.
+    """
+    frame = load_hdf(hdf5_filename)
+    coords = load_unlabeled_coords(text_filename)
+    newframe = pd.DataFrame(coords, index=frame.index)
+    save_hdf(newframe, output_filename)
 
 
 def convert_glove(glove_filename, output_filename, nrows):
@@ -159,6 +172,23 @@ def load_fasttext(filename, max_rows=1000000):
             arr[i] = values
 
     return pd.DataFrame(arr, index=labels, dtype='f')
+
+
+def load_unlabeled_coords(filename):
+    arr = None
+    with open(filename, 'r') as infile:
+        nrows_str, ncols_str = infile.readline().rstrip().split()
+        nrows = int(nrows_str)
+        ncols = int(ncols_str)
+        arr = np.zeros((nrows, ncols))
+        for i, line in enumerate(infile):
+            if i >= nrows:
+                break
+            items = line.rstrip().split(' ')
+            values = [float(x) for x in items]
+            arr[i] = values
+
+    return arr
 
 
 def _read_until_space(file):

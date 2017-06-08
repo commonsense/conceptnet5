@@ -7,6 +7,7 @@ import pandas as pd
 from operator import itemgetter
 
 from conceptnet5.vectors.formats import load_hdf, save_hdf
+from conceptnet5.nodes import get_uri_language
 
 TAU = 2 * math.pi
 TILE_LANGUAGES = ['mul', 'en', 'fr', 'de', 'es', 'pt', 'it', 'ru', 'ja', 'nl']
@@ -16,11 +17,12 @@ DEGREE_SCALE = {
     'fr': 1,
     'es': 5,
     'de': 3,
-    'ja': 10,
+    'ja': 8,
     'pt': 8,
     'it': 8,
     'nl': 12,
     'ru': 16,
+    'zh': 1,
 }
 
 
@@ -39,6 +41,11 @@ def get_concept_degrees(filename):
                 if count == 1:
                     break
                 concept_degrees[uri] = count
+
+    # Hack to suppress a term that's overrepresented and confusing
+    # (its vector makes it mostly mean an article of clothing, but it appears
+    # as the dialectal context of many Wiktionary words)
+    concept_degrees['/c/en/jersey'] /= 10
     return concept_degrees
 
 
@@ -51,15 +58,13 @@ def compute_tsne(input_filename, degree_filename, output_filename):
     concept_degrees = get_concept_degrees(degree_filename)
     frame = load_hdf(input_filename)
 
-    # Exclude Chinese because, so far, its vectors aren't alignable with
-    # other languages
     vocab = [
         term for term in frame.index
         if concept_degrees.get(term, 0) >= 10
-        and not term.startswith('/c/zh/')
+        and get_uri_language(term) in TILE_LANGUAGES
     ]
     v_frame = frame.loc[vocab].astype(np.float64)
-    tsne_coords = bh_sne(v_frame.values, perplexity=50.)
+    tsne_coords = bh_sne(v_frame.values, perplexity=30.)
     tsne_frame = pd.DataFrame(tsne_coords, index=v_frame.index)
     save_hdf(tsne_frame, output_filename)
 
@@ -126,7 +131,7 @@ def map_to_tile_coordinate(coord, z):
 
 
 def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
-                render_png=True, depth=10):
+                render_png=True, depth=8):
     """
     Produces the data that a Web frontend will used to show a t-SNE
     visualization of ConceptNet:
@@ -197,6 +202,8 @@ def render_tsne(tsne_filename, degree_filename, json_out_path, png_out_path,
                     point_data = {
                         'x': round(local_x, 2),
                         'y': round(local_y, 2),
+                        'gx': round(coord[0], 2),
+                        'gy': round(coord[1], 2),
                         'lang': lang,
                         'label': label,
                         'uri': uri,

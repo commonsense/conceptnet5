@@ -29,24 +29,12 @@ var svgElement = function(name) {
 };
 
 var popupOptions = {
+    autoPan: false
 };
-
-var makePopupHandler = function(latLng, label, uri) {
-    var content = L.Util.template('<a href="{uri}">{label}</a>', {
-        uri: uri,
-        label: label
-    });
-    var popupHandler = function(event) {
-        var popup = L.popup(popupOptions, tiles)
-            .setLatLng(latLng)
-            .setContent(content)
-            .openOn(map);
-    }
-}
 
 var populateTile = function(tile, tileSize, data, zoom) {
     tile.setAttribute('viewBox', '0 0 512 512');
-    for (var i=0; i < data.length; i++) {
+    for (var i=0; i < Math.min(data.length, 200); i++) {
         var node = data[i];
         if (node.s >= 4) {
             var circle = svgElement('circle');
@@ -59,21 +47,19 @@ var populateTile = function(tile, tileSize, data, zoom) {
             tile.appendChild(circle);
         }
     }
-    for (var i=0; i < data.length; i++) {
+    for (var i=0; i < Math.min(data.length, 100); i++) {
         var node = data[i];
         if (node.label) {
             var size = node.s;
             var nodeSize = size * (1.25 ** (zoom - 2)) / 12 + 0.1;
-            var anchor = svgElement('a');
-            anchor.setAttribute('href', `http://conceptnet.io${node.uri}`);
+            var url = `http://conceptnet.io${node.uri}`;
             var label = svgElement('text');
             label.setAttribute('class', "label leaflet-interactive lang-" + node.lang);
             label.setAttribute('style', `font-size: ${size}px; stroke-width: ${size / 4 + 2}px`);
             label.innerHTML = node.label;
             label.setAttribute('x', node.x + size / 4 + nodeSize);
             label.setAttribute('y', node.y + size * 5 / 8 + nodeSize);
-            anchor.appendChild(label);
-            tile.appendChild(anchor);
+            tile.appendChild(label);
         }
     }
     tile.style.width = tileSize * 2 + "px";
@@ -85,6 +71,9 @@ tiles.createTile = function(coords, done) {
     tile.setAttribute('class', 'leaflet-tile');
     tile.style["z-index"] = 10000 - coords.x;
     var size = this.getTileSize();
+    tile.setAttribute('data-lat', -coords.y * size.y);
+    tile.setAttribute('data-lon', coords.x * size.x);
+
     var error;
 
     var url = this.getTileUrl(coords);
@@ -123,7 +112,7 @@ var showMap = function() {
     map.on('zoomend', updateZoom);
     map.on('load', updateZoom);
 
-    map.setView(L.latLng(0, 0), 3, {animation: false});
+    // map.setView(L.latLng(0, 0), 3, {animation: false});
     var hash = new L.Hash(map);
 
     rasterLayer.addTo(map);
