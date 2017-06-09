@@ -188,7 +188,7 @@ class VectorSpaceWrapper(object):
     def text_to_vector(self, language, text):
         """Used in Story Cloze Test to create a vector for text """
         tokens = wordfreq.tokenize(text, language)
-        weighted_terms = [(standardized_uri(language, token), 1.) for token in tokens]
+        weighted_terms = [(uri_prefix(standardized_uri(language, token)), 1.) for token in tokens]
         return self.get_vector(weighted_terms, include_neighbors=False)
 
     def get_vector(self, query, include_neighbors=True):
