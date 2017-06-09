@@ -80,10 +80,6 @@ if TESTMODE:
     INPUT_EMBEDDINGS = ['glove12-840B']
     SOURCE_EMBEDDING_ROWS = 5000
 
-
-
-# Test mode overrides some of these settings.
-if TESTMODE:
     DATA = "testdata"
     USE_PRECOMPUTED = True
     HASH_WIDTH = 12
@@ -136,7 +132,8 @@ rule test:
         DATA + "/assertions/assertions.csv",
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/plain/numberbatch-en.txt.gz"
+        DATA + "/vectors/plain/numberbatch-en.txt.gz",
+        DATA + "/stats/languages.txt"
 
 
 # Downloaders
