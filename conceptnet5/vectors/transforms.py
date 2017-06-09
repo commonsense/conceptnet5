@@ -1,9 +1,13 @@
 import pandas as pd
 import numpy as np
+from annoy import AnnoyIndex
+import msgpack
 
 from ..vectors import standardized_uri, similar_to_vec
-from conceptnet5.uri import uri_prefix
+from conceptnet5.uri import uri_prefix, get_language
 from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.db.query import AssertionFinder
+from conceptnet5.vectors.formats import save_hdf
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -91,13 +95,73 @@ def shrink_and_sort(frame, n, k):
     return shrunk
 
 
-def make_replacements(small_frame, big_frame, limit=100000):
+def build_annoy_tree(frame, tree_depth):
+    """
+    Build a tree to hold a frame's vectors for efficient lookup.
+    """
+    # TODO don't hard code the size of a vector
+    index = AnnoyIndex(300, metric='euclidean')
+    index_map = {}
+    for i, item in enumerate(frame.index):
+        index.add_item(i, frame.loc[item])
+        index_map[i] = item
+    index.build(tree_depth)
+    return index, index_map
+
+
+def make_replacements(small_frame, big_frame):
+    """
+    Create a replacements dictionary to map terms only present in a big frame to the closest term
+    in a small_frame
+    """
     intersected = big_frame.loc[small_frame.index].dropna()
+    index, index_map = build_annoy_tree(intersected, 100)
     replacements = {}
     for term in big_frame.index:
         if term not in small_frame.index:
-            most_similar = similar_to_vec(intersected, big_frame.loc[term], limit=1)
-            got = list(most_similar.index)
-            if got:
-                replacements[term] = got[0]
+            most_similar = index.get_nns_by_vector(big_frame.loc[term], 2)[1]
+            replacements[term] = index_map[most_similar]
     return replacements
+
+
+def choose_small_vocabulary(big_frame, lang):
+    """
+    Choose the vocabulary of the small frame, by eliminating the terms which:
+     - are in a languages other than a lang specified with a lang parameter.
+     - contain more than one word
+     - are not in ConceptNet
+    """
+    small_vocabulary = []
+    finder = AssertionFinder()
+
+    for term in big_frame.index:
+        # Check if a term is in the language of choice
+        if get_language(term) == lang:
+
+            # Make sure the term is not a phrase
+            if term.count('_') < 1:
+
+                # Check if a term comes from ConceptNet, not Glove or Word2Vec
+                results = finder.lookup(term)
+                if results:
+                    small_vocabulary.append(term)
+    return small_vocabulary
+
+
+def make_small_frame(big_frame, language):
+    """
+    Create a small frame using the output of choose_small_vocabulary()
+    """
+    small_vocab = choose_small_vocabulary(big_frame, language)
+    return big_frame.ix[small_vocab]
+
+
+def save_replacements(output_filepath, replacements):
+    # Save the replacement dictionary as a mgspack file
+    with open(output_filepath, 'wb') as output_file:
+        msgpack.dump(replacements, output_file)
+
+
+def save_small_frame(output_filepath, small_frame):
+    # Save the small frame as hdfs
+    save_hdf(small_frame, output_filepath)
