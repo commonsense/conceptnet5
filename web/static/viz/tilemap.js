@@ -2,10 +2,10 @@ var renderedLanguage = "mul";
 if (window.location.search) {
     renderedLanguage = window.location.search.substring(1);
 }
-var url_base = "/vizdata/json_tiles/" + renderedLanguage;
+var url_base = "/vizdata/json_tiles/" + renderedLanguage + "/";
 
 var tiles = L.tileLayer(
-    url_base + "{z}/{x}/{y}.json?cb=6",
+    url_base + "{z}/{x}/{y}.json?cache=1",
     {
         minZoom: 1,
         maxZoom: 8,
@@ -34,7 +34,7 @@ var popupOptions = {
 
 var populateTile = function(tile, tileSize, data, zoom) {
     tile.setAttribute('viewBox', '0 0 512 512');
-    for (var i=0; i < Math.min(data.length, 200); i++) {
+    for (var i=0; i < data.length; i++) {
         var node = data[i];
         if (node.s >= 4) {
             var circle = svgElement('circle');
@@ -47,7 +47,7 @@ var populateTile = function(tile, tileSize, data, zoom) {
             tile.appendChild(circle);
         }
     }
-    for (var i=0; i < Math.min(data.length, 100); i++) {
+    for (var i=0; i < Math.min(data.length, 500); i++) {
         var node = data[i];
         if (node.label) {
             var size = node.s;
@@ -112,7 +112,9 @@ var showMap = function() {
     map.on('zoomend', updateZoom);
     map.on('load', updateZoom);
 
-    // map.setView(L.latLng(0, 0), 3, {animation: false});
+    if (!window.location.hash) {
+        map.setView(L.latLng(0, 0), 3, {animation: false});
+    }
     var hash = new L.Hash(map);
 
     rasterLayer.addTo(map);
