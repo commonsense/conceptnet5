@@ -7,7 +7,6 @@ from ..vectors import standardized_uri, similar_to_vec
 from conceptnet5.uri import uri_prefix, get_language
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.db.query import AssertionFinder
-from conceptnet5.vectors.formats import save_hdf
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -99,8 +98,7 @@ def build_annoy_tree(frame, tree_depth):
     """
     Build a tree to hold a frame's vectors for efficient lookup.
     """
-    # TODO don't hard code the size of a vector
-    index = AnnoyIndex(300, metric='euclidean')
+    index = AnnoyIndex(frame.shape[1], metric='euclidean')
     index_map = {}
     for i, item in enumerate(frame.index):
         index.add_item(i, frame.loc[item])
@@ -109,18 +107,28 @@ def build_annoy_tree(frame, tree_depth):
     return index, index_map
 
 
-def make_replacements(small_frame, big_frame):
+def make_replacements(small_frame, big_frame, tree_depth):
     """
     Create a replacements dictionary to map terms only present in a big frame to the closest term
     in a small_frame
     """
     intersected = big_frame.loc[small_frame.index].dropna()
-    index, index_map = build_annoy_tree(intersected, 100)
+    index, index_map = build_annoy_tree(intersected, tree_depth)
     replacements = {}
+    average_similarity = []
     for term in big_frame.index:
         if term not in small_frame.index:
-            most_similar = index.get_nns_by_vector(big_frame.loc[term], 2)[1]
-            replacements[term] = index_map[most_similar]
+            indices, scores = index.get_nns_by_vector(big_frame.loc[term], 2,
+                                                   include_distances=True)
+            i = 0
+            if index_map[indices[-1]] != term:
+                i = -1
+            else:
+                i = -2
+
+            replacements[term] = index_map[indices[i]]
+            average_similarity.append(scores[i])
+    print(np.mean(average_similarity))
     return replacements
 
 
@@ -148,6 +156,15 @@ def choose_small_vocabulary(big_frame, lang):
     return small_vocabulary
 
 
+def make_big_frame(frame, lang):
+    vocabulary = []
+    for term in frame.index:
+        if get_language(term) == lang:
+            vocabulary.append(term)
+    big_frame = frame.ix[vocabulary]
+    return big_frame
+
+
 def make_small_frame(big_frame, language):
     """
     Create a small frame using the output of choose_small_vocabulary()
@@ -164,4 +181,4 @@ def save_replacements(output_filepath, replacements):
 
 def save_small_frame(output_filepath, small_frame):
     # Save the small frame as hdfs
-    save_hdf(small_frame, output_filepath)
+    small_frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
