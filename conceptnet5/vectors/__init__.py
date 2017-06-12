@@ -1,13 +1,14 @@
-from conceptnet5.nodes import standardized_concept_uri, uri_to_label
-from conceptnet5.language.lemmatize import lemmatize_uri
-from sklearn.preprocessing import normalize
 import re
-import pandas as pd
-import numpy as np
 
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import normalize
+
+from conceptnet5.nodes import standardized_concept_uri, uri_to_label
 
 DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
 DIGIT_RE = re.compile(r'[0-9]')
+CONCEPT_RE = re.compile(r'/c/[a-z]{2,3}/.+')
 
 
 def replace_numbers(s):
@@ -33,7 +34,7 @@ def standardized_uri(language, term):
     ConceptNet URI in the given language, and then have its sequences of digits
     replaced.
     """
-    if not (term.startswith('/') and term.count('/') >= 2):
+    if not CONCEPT_RE.match(term):
         term = standardized_concept_uri(language, term)
     return replace_numbers(term)
 
