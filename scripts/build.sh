@@ -1,3 +1,3 @@
 #!/bin/bash -x
 pip install -e '.[vectors]'
-snakemake --resources 'ram=16' -j
+snakemake --resources 'ram=24' -j
