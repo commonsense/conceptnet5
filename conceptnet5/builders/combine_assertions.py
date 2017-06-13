@@ -127,18 +127,6 @@ def combine_assertions(input_filename, output_file):
     out_bad.close()
 
 
-def output_assertion(out, **kwargs):
-    """
-    Output an assertion to the given output stream. All keyword arguments
-    become arguments to `make_edge`. (An assertion is a kind of edge.)
-    """
-    # Build the assertion object.
-    assertion = make_edge(**kwargs)
-
-    # Output the result in a Msgpack stream.
-    out.write(assertion)
-
-
 class AssertionCombiner(object):
     """
     A class that wraps the combine_assertions function, so it can be tested in
