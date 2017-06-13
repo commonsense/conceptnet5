@@ -1,0 +1,42 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="et"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀">naine | sümbol</annotation>
+		<annotation cp="♀" type="tts">naise sümbol</annotation>
+		<annotation cp="♂">mees | sümbol</annotation>
+		<annotation cp="♂" type="tts">mehe sümbol</annotation>
+		<annotation cp="⚕">Asklepios | meditsiin</annotation>
+		<annotation cp="⚕" type="tts">meditsiinisümbol</annotation>
+		<annotation cp="🕺">tants | mees</annotation>
+		<annotation cp="🕺" type="tts">mees tantsimas</annotation>
+		<annotation cp="🖤">must | süda | kuri</annotation>
+		<annotation cp="🖤" type="tts">must süda</annotation>
+		<annotation cp="🤙">helista | käsi</annotation>
+		<annotation cp="🤙" type="tts">helista mulle</annotation>
+		<annotation cp="🤚">käsi | tõstetud</annotation>
+		<annotation cp="🤚" type="tts">tõstetud käsi</annotation>
+		<annotation cp="🤛">rusikas | vasakule</annotation>
+		<annotation cp="🤛" type="tts">vasakule suunatud rusikas</annotation>
+		<annotation cp="🤜">rusikas | paremale</annotation>
+		<annotation cp="🤜" type="tts">paremale suunatud rusikas</annotation>
+		<annotation cp="🤝">käepigistus | kohtumine | tervitus | käsi</annotation>
+		<annotation cp="🤝" type="tts">käepigistus</annotation>
+		<annotation cp="🤞">sõrmed | risti | käsi | õnn</annotation>
+		<annotation cp="🤞" type="tts">sõrmed risti</annotation>
+		<annotation cp="🤠">kauboi | müts | nägu</annotation>
+		<annotation cp="🤠" type="tts">kauboimütsiga nägu</annotation>
+		<annotation cp="🤡">kloun | nägu</annotation>
+		<annotation cp="🤡" type="tts">klouninägu</annotation>
+		<annotation cp="🤢">iiveldus | nägu | okse</annotation>
+		<annotation cp="🤢" type="tts">iiveldav nägu</annotation>
+		<annotation cp="🤣">naer | kõver</annotation>
+		<annotation cp="🤣" type="tts">naerust kõveras</annotation>
+		<annotation cp="🤤">ila | nägu</annotation>
+		<annotation cp="🤤" type="tts">ilastav nägu</annotation>
+		<annotation cp="🤥">vale | nägu</annotation>
+		<annotation cp="🤥" type="tts">valetav nägu</annotation>
+	</annotations>
+</ldml>
