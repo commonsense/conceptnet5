@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.preprocessing import normalize
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .formats import load_hdf, save_hdf
+from conceptnet5.uri import get_language
 from collections import defaultdict
 
 
@@ -92,7 +93,7 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
     # improving multilingual alignment.
     rows_by_language = defaultdict(list)
     for i, label in enumerate(row_labels):
-        lang = label.split('/')[2]
+        lang = get_language(label)
         rows_by_language[lang].append(i)
     all_languages = sorted(rows_by_language)
     row_groups = [rows_by_language[lang] for lang in all_languages]
