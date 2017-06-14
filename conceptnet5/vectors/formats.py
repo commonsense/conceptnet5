@@ -138,9 +138,11 @@ def load_glove(filename, max_rows=1000000):
             values = [float(x) for x in items[1:]]
             arr[i] = values
 
+    if len(labels) < max_rows:
+        arr = arr[:len(labels)]
     return pd.DataFrame(arr, index=labels, dtype='f')
 
-    
+
 def load_fasttext(filename, max_rows=1000000):
     """
     Load a DataFrame from the fastText text format.
@@ -204,6 +206,10 @@ def load_word2vec_bin(filename, nrows):
             idx = len(label_list)
             arr[idx] = vec
             label_list.append(label)
+
+    if len(label_list) < nrows:
+        arr = arr[:len(label_list)]
+
     return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
