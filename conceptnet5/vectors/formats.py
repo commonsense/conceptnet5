@@ -207,9 +207,6 @@ def load_word2vec_bin(filename, nrows):
             arr[idx] = vec
             label_list.append(label)
 
-    if len(label_list) < nrows:
-        arr = arr[:len(label_list)]
-
     return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
