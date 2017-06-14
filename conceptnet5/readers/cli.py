@@ -1,7 +1,7 @@
 import click
 from . import (
     conceptnet4, jmdict, nadya, ptt_petgame, opencyc, verbosity,
-    wiktionary, wordnet
+    wiktionary, wordnet, emoji
 )
 
 
@@ -135,3 +135,17 @@ def run_wordnet(input, output):
       URIs to ConceptNet URIs
     """
     wordnet.handle_file(input, output)
+
+
+@cli.command(name='emoji')
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def rub_emoji(input, output):
+    """
+    Import an XML file of emojis and their related words from
+    the CLDR database.
+
+    input: an XML file of emoji data
+    output: a msgpack file of edges
+    """
+    emoji.handle_file(input, output)
