@@ -13,6 +13,7 @@ from conceptnet5.nodes import (
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
 from conceptnet5.uri import join_uri, Licenses
+import click
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -383,15 +384,3 @@ def handle_file(input_filename, output_file):
     builder = CN4Builder()
     builder.transform_file(input_filename, output_file)
 
-
-# TODO: convert this to click or just remove it if we've already done that
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
-
-if __name__ == '__main__':
-    main()

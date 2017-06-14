@@ -7,6 +7,19 @@ from collections import defaultdict
 import click
 import json
 
+def msgpack_to_json(input_filename, output_filename):
+    out_stream = JSONStreamWriter(output_filename)
+    for obj in read_msgpack_stream(input_filename):
+        out_stream.write(obj)
+    out_stream.close()
+
+
+def json_to_msgpack(input_filename, output_filename):
+    out_stream = MsgpackStreamWriter(output_filename)
+    for obj in read_json_stream(input_filename):
+        out_stream.write(obj)
+    out_stream.close()
+
 
 def msgpack_to_tab_separated(input_filename, output_filename):
     """
@@ -128,12 +141,17 @@ def cli(converter, input, output):
     """
     Convert a stream of data from one format to another. Available converters
     are:
-
+        msgpack_to_json
+        json_to_msgpack
         msgpack_to_tab_separated
         msgpack_to_assoc
     """
     if converter == 'msgpack_to_tab_separated':
         convert_func = msgpack_to_tab_separated
+    elif converter == 'json_to_msgpack':
+        convert_func = json_to_msgpack
+    elif converter == 'msgpack_to_json':
+        convert_func = msgpack_to_json
     elif converter == 'msgpack_to_assoc':
         convert_func = msgpack_to_assoc
     convert_func(input, output)

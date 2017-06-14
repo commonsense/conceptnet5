@@ -6,6 +6,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
 from collections import defaultdict
 import re
+import click
 
 # If any word in a clue matches one of these words, it is probably a bad
 # common-sense assertion.
@@ -174,12 +175,3 @@ def handle_file(infile, outfile):
                              sources=[source], surfaceText=text,
                              weight=weight)
             writer.write(edge)
-
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='Msgpack file of input')
-    parser.add_argument('output', help='Msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
