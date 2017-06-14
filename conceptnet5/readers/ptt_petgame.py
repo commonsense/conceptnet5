@@ -43,16 +43,3 @@ def handle_file(input_filename, output_file):
         if line:
             for new_obj in handle_raw_assertion(line):
                 out.write(new_obj)
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='msgpack file of input')
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
-
-
-if __name__ == '__main__':
-    main()

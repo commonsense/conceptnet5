@@ -174,12 +174,3 @@ def handle_file(infile, outfile):
                              sources=[source], surfaceText=text,
                              weight=weight)
             writer.write(edge)
-
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='Msgpack file of input')
-    parser.add_argument('output', help='Msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)

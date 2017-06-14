@@ -236,15 +236,3 @@ def output_edge(out, rel, subj_concept, obj_concept):
                      weight=2.0)
     out.write(edge)
 
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='XML copy of JMDict to read')
-    parser.add_argument('output', help='msgpack-stream file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
-
-
-if __name__ == '__main__':
-    main()

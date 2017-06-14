@@ -147,15 +147,3 @@ def cyc_to_conceptnet_uri(labels, unlabels, uri):
         if simple_tokenize(disambig) != simple_tokenize(label):
             return standardized_concept_uri('en', label, 'n', 'opencyc', disambig)
     return standardized_concept_uri('en', label, 'n')
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help="An N-triples or N-quads file of input")
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    run_opencyc(args.input, args.output)
-
-if __name__ == '__main__':
-    main()

@@ -7,6 +7,7 @@ from collections import defaultdict
 import argparse
 from conceptnet5.uri import uri_prefix
 from conceptnet5.relations import is_negative_relation
+import click
 
 
 def concept_is_bad(uri):
@@ -68,11 +69,14 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
                         print(line, file=out)
 
 
-# TODO: convert to a Click command-line interface
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_filename')
-    parser.add_argument('output_filename')
+@click.command()
+#input filename
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#output filename
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(input, output):
+    reduce_assoc(input, output)
 
-    args = parser.parse_args()
-    reduce_assoc(args.input_filename, args.output_filename)
+
+if __name__ == '__main__':
+    cli()

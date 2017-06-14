@@ -212,7 +212,7 @@ rule read_conceptnet4:
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.conceptnet4 {input} {output}"
+        "cn5-read conceptnet4 {input} {output}"
 
 rule read_dbpedia:
     input:
@@ -223,7 +223,7 @@ rule read_dbpedia:
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
-        "python3 -m conceptnet5.readers.dbpedia %(data)s/raw/dbpedia "
+        "cn5-read dbpedia %(data)s/raw/dbpedia "
         "{output} "
         "%(data)s/stats/core_concepts.txt " % {'data': DATA}
 
@@ -233,7 +233,7 @@ rule read_jmdict:
     output:
         DATA + "/edges/jmdict/jmdict.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.jmdict {input} {output}"
+        "cn5-read jmdict {input} {output}"
 
 rule read_nadya:
     input:
@@ -241,7 +241,7 @@ rule read_nadya:
     output:
         DATA + "/edges/nadya/nadya.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.nadya {input} {output}"
+        "cn5-read nadya {input} {output}"
 
 rule read_ptt_petgame:
     input:
@@ -249,7 +249,7 @@ rule read_ptt_petgame:
     output:
         DATA + "/edges/ptt_petgame/{part}.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.ptt_petgame {input} {output}"
+        "cn5-read ptt_petgame {input} {output}"
 
 rule read_opencyc:
     input:
@@ -257,7 +257,7 @@ rule read_opencyc:
     output:
         DATA + "/edges/opencyc/opencyc.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.opencyc {input} {output}"
+        "cn5-read opencyc {input} {output}"
 
 rule read_verbosity:
     input:
@@ -265,7 +265,7 @@ rule read_verbosity:
     output:
         DATA + "/edges/verbosity/verbosity.msgpack"
     shell:
-        "python3 -m conceptnet5.readers.verbosity {input} {output}"
+        "cn5-read verbosity {input} {output}"
 
 rule prescan_wiktionary:
     input:
@@ -296,7 +296,7 @@ rule read_wordnet:
     output:
         DATA + "/edges/wordnet/wordnet.msgpack",
     shell:
-        "python3 -m conceptnet5.readers.wordnet {input} {output}"
+        "cn5-read wordnet {input} {output}"
 
 
 # Converting msgpack to csv
@@ -332,7 +332,7 @@ rule combine_assertions:
     output:
         DATA + "/assertions/assertions.msgpack"
     shell:
-        "python3 -m conceptnet5.builders.combine_assertions -o {output} {input}"
+        "python3 -m conceptnet5.builders.combine_assertions {input} {output}"
 
 
 # Putting data in PostgreSQL
