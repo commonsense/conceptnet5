@@ -1,12 +1,12 @@
-import pandas as pd
-import numpy as np
-from annoy import AnnoyIndex
 import msgpack
+import numpy as np
+import pandas as pd
+from annoy import AnnoyIndex
 
-from ..vectors import standardized_uri, similar_to_vec
-from conceptnet5.uri import uri_prefix, get_language
-from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.db.query import AssertionFinder
+from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.uri import uri_prefix, get_language
+from ..vectors import standardized_uri, similar_to_vec
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -107,35 +107,43 @@ def build_annoy_tree(frame, tree_depth):
     return index, index_map
 
 
-def make_replacements(small_frame, big_frame, tree_depth):
+def make_replacements_faster(small_frame, big_frame, tree_depth=1000):
     """
     Create a replacements dictionary to map terms only present in a big frame to the closest term
-    in a small_frame
+    in a small_frame. This is a faster than make_replacements(), because it uses a fast
+    implementation of the approximate nearest neighbor algorithm.
+
+    tree_depth=1000 provides a good balance of speed and accuracy.
     """
     intersected = big_frame.loc[small_frame.index].dropna()
     index, index_map = build_annoy_tree(intersected, tree_depth)
     replacements = {}
-    average_similarity = []
     for term in big_frame.index:
         if term not in small_frame.index:
-            indices, scores = index.get_nns_by_vector(big_frame.loc[term], 2,
-                                                   include_distances=True)
-            i = 0
-            if index_map[indices[-1]] != term:
-                i = -1
-            else:
-                i = -2
-
-            replacements[term] = index_map[indices[i]]
-            average_similarity.append(scores[i])
-    print(np.mean(average_similarity))
+            most_similar = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
+            replacements[term] = index_map[most_similar]
     return replacements
 
 
-def choose_small_vocabulary(big_frame, lang):
+def make_replacements(small_frame, big_frame):
+    """
+    Create a replacements dictionary to map terms only present in a big frame to the closest term
+    in a small_frame. This method uses a brute-force solution.
+    """
+    intersected = big_frame.loc[small_frame.index].dropna()
+    replacements = {}
+    for term in big_frame.index:
+        if term not in small_frame.index:
+            most_similar = similar_to_vec(intersected, big_frame.loc[term], limit=1)
+            got = list(most_similar.index)
+            if got:
+                replacements[term] = got[0]
+    return replacements
+
+
+def choose_small_vocabulary(big_frame):
     """
     Choose the vocabulary of the small frame, by eliminating the terms which:
-     - are in a languages other than a lang specified with a lang parameter.
      - contain more than one word
      - are not in ConceptNet
     """
@@ -143,20 +151,20 @@ def choose_small_vocabulary(big_frame, lang):
     finder = AssertionFinder()
 
     for term in big_frame.index:
-        # Check if a term is in the language of choice
-        if get_language(term) == lang:
-
-            # Make sure the term is not a phrase
-            if term.count('_') < 1:
-
-                # Check if a term comes from ConceptNet, not Glove or Word2Vec
-                results = finder.lookup(term)
-                if results:
-                    small_vocabulary.append(term)
+        # Make sure the term is not a phrase
+        if term.count('_') < 1:
+            # Check if a term comes from ConceptNet
+            results = finder.lookup(term)
+            if results:
+                small_vocabulary.append(term)
     return small_vocabulary
 
 
 def make_big_frame(frame, lang):
+    """
+     Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
+     are in languages other than the language specified with the lang parameter.
+    """
     vocabulary = []
     for term in frame.index:
         if get_language(term) == lang:
@@ -165,11 +173,11 @@ def make_big_frame(frame, lang):
     return big_frame
 
 
-def make_small_frame(big_frame, language):
+def make_small_frame(big_frame):
     """
     Create a small frame using the output of choose_small_vocabulary()
     """
-    small_vocab = choose_small_vocabulary(big_frame, language)
+    small_vocab = choose_small_vocabulary(big_frame)
     return big_frame.ix[small_vocab]
 
 
@@ -179,6 +187,5 @@ def save_replacements(output_filepath, replacements):
         msgpack.dump(replacements, output_file)
 
 
-def save_small_frame(output_filepath, small_frame):
-    # Save the small frame as hdfs
-    small_frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
+def save_frame(output_filepath, frame):
+    frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
