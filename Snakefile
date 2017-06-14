@@ -492,7 +492,7 @@ rule convert_word2vec:
     output:
         DATA + "/vectors/w2v-google-news.h5"
     resources:
-        ram=16
+        ram=24
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
@@ -502,7 +502,7 @@ rule convert_glove:
     output:
         DATA + "/vectors/glove12-840B.h5"
     resources:
-        ram=16
+        ram=24
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
@@ -512,7 +512,7 @@ rule convert_fasttext:
     output:
         DATA + "/vectors/fasttext-wiki-{lang}.h5"
     resources:
-        ram=16
+        ram=24
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
 
@@ -522,9 +522,9 @@ rule convert_lexvec:
     output:
         DATA + "/vectors/lexvec-commoncrawl.h5"
     resources:
-        ram=16
+        ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2000000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_opensubtitles_ft:
     input:
@@ -532,9 +532,9 @@ rule convert_opensubtitles_ft:
     output:
         DATA + "/vectors/fasttext-opensubtitles.h5"
     resources:
-        ram=16
+        ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2000000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_polyglot:
     input:
@@ -569,7 +569,7 @@ rule join_retrofit:
     output:
         DATA + "/vectors/{name}-retrofit.h5"
     resources:
-        ram=16
+        ram=24
     shell:
         "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"
 
@@ -580,7 +580,7 @@ rule merge_intersect:
         DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
-        ram=16
+        ram=24
     shell:
         "cn5-vectors intersect {input} {output}"
 
