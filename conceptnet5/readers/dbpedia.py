@@ -37,6 +37,7 @@ import bz2
 import pathlib
 from operator import itemgetter
 import itertools
+import click
 parse_url = urllib.parse.urlparse
 
 
@@ -309,16 +310,16 @@ def process_dbpedia(input_dir, output_file, concept_file):
     out.close()
 
 
-# TODO: click
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', help="Directory containing DBPedia files")
-    parser.add_argument('output_file', help='msgpack file to output to')
-    parser.add_argument('concept_file', help="Text file of concepts used elsewhere in ConceptNet")
-    args = parser.parse_args()
-    process_dbpedia(args.input_dir, args.output_file, args.concept_file)
+@click.command()
+#Directory containing DBPedia files
+@click.argument('input_dir', type=click.Path(readable=True, dir_okay=False))
+#msgpack file to output to
+@click.argument('output_file', type=click.Path(writable=True, dir_okay=False))
+#Text file of concepts used elsewhere
+@click.argument('concept_file', type=click.Path(readable=True, dir_okay=False))
+def cli(input,output,concept):
+    process_dbpedia(input,output,concept)
 
 
 if __name__ == '__main__':
-    main()
+    cli()

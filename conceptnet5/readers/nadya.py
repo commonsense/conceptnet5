@@ -4,6 +4,7 @@ created to collect data for ConceptNet, by Nihon Unisys and Dentsu.
 """
 from conceptnet5.readers.conceptnet4 import CN4Builder
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+import click
 
 # The nadya.jp data is distributed as a PostgreSQL database. The following
 # command will extract a file in the form of 'nadya-2014.csv' from such a
@@ -96,15 +97,15 @@ def handle_file(input_filename, output_file):
             out.write(new_obj)
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
+@click.command()
+#JSON-stream file of input
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#msgpack of file to output to
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(input, output):
+    handle_file(input, output)
 
 
 if __name__ == '__main__':
-    main()
+    cli()
 

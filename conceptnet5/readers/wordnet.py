@@ -7,6 +7,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
     resource_name, parse_nquads
 )
+import click
 
 
 SOURCE = {'contributor': '/s/resource/wordnet/rdf/3.1'}
@@ -257,14 +258,14 @@ def run_wordnet(input_file, output_file):
 handle_file = run_wordnet
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', help="An .nt file containing WordNet RDF")
-    parser.add_argument('output_file', help='Msgpack file to output to')
-    args = parser.parse_args()
-    run_wordnet(args.input_file, args.output_file)
+@click.command()
+#An .nt file containing WordNet RDF
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#Msgpack file to output to
+@click.argument('output', type=click.Path(readable=True, dir_okay=False))
+def cli(input, output):
+    run_wordnet(input, output)
 
 
 if __name__ == '__main__':
-    main()
+    cli()

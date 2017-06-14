@@ -4,7 +4,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.formats.convert import msgpack_to_tab_separated
-
+import click
 
 def is_sentence(text):
     """
@@ -46,15 +46,14 @@ def handle_file(input_file, output_file):
             out.write(edge)
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='XML file of input')
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, "test.msgpack")
-    msgpack_to_tab_separated("test.msgpack", args.output)
+@click.command()
+#XML file of input
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#msgpack file to output to
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(input,output):
+  handle_file(input, output)
 
 
 if __name__ == '__main__':
-    main()
+    cli()

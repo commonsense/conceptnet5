@@ -7,6 +7,7 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
 from conceptnet5.edges import make_edge
+import click
 
 
 # Now that Unicode literals are on, get the type of a Unicode string,
@@ -237,14 +238,14 @@ def output_edge(out, rel, subj_concept, obj_concept):
     out.write(edge)
 
 
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='XML copy of JMDict to read')
-    parser.add_argument('output', help='msgpack-stream file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
+@click.command()
+#XML copy of JMDict to read
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#msgpack-stream of file to output to
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(input, output):
+    handle_file(input, output)
 
 
 if __name__ == '__main__':
-    main()
+    cli()
