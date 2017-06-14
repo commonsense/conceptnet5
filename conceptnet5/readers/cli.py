@@ -1,7 +1,7 @@
 import click
 from . import (
     conceptnet4, jmdict, nadya, ptt_petgame, opencyc, verbosity,
-    wiktionary, wordnet, emoji
+    wiktionary, wordnet
 )
 
 
