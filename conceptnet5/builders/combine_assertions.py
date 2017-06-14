@@ -41,7 +41,7 @@ def keep_concept(uri):
         return True
     if get_uri_language(uri) not in ALL_LANGUAGES:
         return False
-    if not valid_languge(get_uri_language(uri)):
+    if not valid_language(get_uri_language(uri)):
         return False
     pieces = split_uri(uri)
     return bool(pieces[2])
@@ -129,19 +129,6 @@ def combine_assertions(input_filename, output_file):
 
     out.close()
     out_bad.close()
-
-
-class AssertionCombiner(object):
-    """
-    A class that wraps the combine_assertions function, so it can be tested in
-    the same way as the readers, despite its extra parameters.
-    """
-
-    def __init__(self, license):
-        self.license = license
-
-    def handle_file(self, input_filename, output_file):
-        combine_assertions([input_filename], output_file, self.license)
 
 
 @click.command()
