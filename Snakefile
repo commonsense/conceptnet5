@@ -51,7 +51,8 @@ CORE_DATASET_NAMES = [
     "ptt_petgame/api",
     "opencyc/opencyc",
     "verbosity/verbosity",
-    "wordnet/wordnet"
+    "wordnet/wordnet",
+    "emoji/en"
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
@@ -297,6 +298,14 @@ rule read_wordnet:
         DATA + "/edges/wordnet/wordnet.msgpack",
     shell:
         "python3 -m conceptnet5.readers.wordnet {input} {output}"
+
+# rule read_emoji:
+#     input:
+#         DATA + "/raw/emoji/{language}.xml"
+#     output:
+#         DATA + "/edges/emoji/{language}.csv"
+#     shell:
+#         "python3 -m conceptnet5.readers.emoji {input} {output}"
 
 
 # Converting msgpack to csv

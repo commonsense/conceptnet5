@@ -18,6 +18,7 @@ from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.readers.conceptnet4 import filter_stopwords
 from conceptnet5.uri import Licenses
+import click
 
 SOURCE = {'contributor': '/s/resource/opencyc/2012'}
 RDF_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label'
@@ -147,15 +148,3 @@ def cyc_to_conceptnet_uri(labels, unlabels, uri):
         if simple_tokenize(disambig) != simple_tokenize(label):
             return standardized_concept_uri('en', label, 'n', 'opencyc', disambig)
     return standardized_concept_uri('en', label, 'n')
-
-
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help="An N-triples or N-quads file of input")
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    run_opencyc(args.input, args.output)
-
-if __name__ == '__main__':
-    main()
