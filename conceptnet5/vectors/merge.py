@@ -59,8 +59,6 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     del adjusted
 
     print('Saving results in /tmp')
-    save_hdf(projected, '/tmp/u.h5')
-    save_hdf(projection, '/tmp/v.h5')
     del projected
 
     print('Projecting vocabulary into new space')

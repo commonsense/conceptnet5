@@ -1,7 +1,7 @@
 import click
 from . import (
     conceptnet4, jmdict, nadya, ptt_petgame, opencyc, verbosity,
-    wiktionary, wordnet
+    wiktionary, wordnet, dbpedia
 )
 
 
@@ -72,7 +72,7 @@ def run_ptt_petgame(input, output):
 @cli.command(name='opencyc')
 @click.argument('input_file', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_file', type=click.Path(writable=True, dir_okay=False))
-def run_opencyc(input_file, output_file, mapping):
+def run_opencyc(input_file, output_file):
     """
     Import data from Umbel, a Semantic Web-ish wrapper around structured
     ontologies such as OpenCyc.
@@ -80,7 +80,7 @@ def run_opencyc(input_file, output_file, mapping):
     input: an N-Quads file of OpenCyc data
     output: a msgpack file of edges
     """
-    opencyc.handle_file(input_file, output_file)
+    opencyc.run_opencyc(input_file, output_file)
 
 
 @cli.command(name='verbosity')
@@ -135,3 +135,10 @@ def run_wordnet(input, output):
       URIs to ConceptNet URIs
     """
     wordnet.handle_file(input, output)
+
+@cli.command(name='dbpedia')
+@click.argument('input', type=click.Path(dir_okay=True))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+@click.argument('concept', type=click.Path(writable=True, dir_okay=False))
+def run_dbpedia(input, output, concept):
+    dbpedia.process_dbpedia(input, output, concept)

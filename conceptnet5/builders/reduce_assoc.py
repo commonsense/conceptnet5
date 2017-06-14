@@ -7,6 +7,7 @@ from collections import defaultdict
 import argparse
 from conceptnet5.uri import uri_prefix
 from conceptnet5.relations import is_negative_relation
+import click
 
 
 def concept_is_bad(uri):

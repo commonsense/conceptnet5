@@ -22,7 +22,7 @@ def save_hdf(table, filename):
     Save a semantic vector space into an HDF5 file, following the convention
     of storing it as a labeled matrix named 'mat'.
     """
-    return table.to_hdf(filename, 'mat', encoding='utf-8')
+    return table.to_hdf(filename, 'mat', mode='w', encoding='utf-8')
 
 
 def save_labels_and_npy(table, vocab_filename, matrix_filename):
