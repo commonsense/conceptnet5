@@ -1,3 +1,7 @@
+import random
+from os.path import join
+
+import click
 import msgpack
 import numpy as np
 import pandas as pd
@@ -6,7 +10,7 @@ from annoy import AnnoyIndex
 from conceptnet5.db.query import AssertionFinder
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.uri import uri_prefix, get_language
-from ..vectors import standardized_uri, similar_to_vec
+from conceptnet5.vectors import standardized_uri, similar_to_vec
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -107,7 +111,7 @@ def build_annoy_tree(frame, tree_depth):
     return index, index_map
 
 
-def make_replacements_faster(small_frame, big_frame, tree_depth=1000):
+def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=False):
     """
     Create a replacements dictionary to map terms only present in a big frame to the closest term
     in a small_frame. This is a faster than make_replacements(), because it uses a fast
@@ -122,6 +126,11 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000):
         if term not in small_frame.index:
             most_similar = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
             replacements[term] = index_map[most_similar]
+
+    if verbose:
+        random.seed(20)
+        for replacement_pair in random.sample(replacements.items(), 50):
+            print(replacement_pair)
     return replacements
 
 
@@ -189,3 +198,22 @@ def save_replacements(output_filepath, replacements):
 
 def save_frame(output_filepath, frame):
     frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
+
+
+@click.command()
+@click.argument('frame-filepath')
+@click.argument('output-dir')
+@click.option('--lang', default='en')
+@click.option('--tree-depth', default=1000)
+@click.option('-v', '--verbose', is_flag=True)
+def make_save_replacements(frame_filepath, output_dir, lang, tree_depth, verbose):
+    frame = pd.read_hdf(frame_filepath, 'mat', encoding='utf-8')
+    big_frame = make_big_frame(frame, lang)
+    small_frame = make_small_frame(big_frame)
+    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
+    save_replacements(join(output_dir, '{}_replacements.msgpack'.format(lang)), replacements)
+    save_frame(join(output_dir, '{}_big_frame.h5'.format(lang)), big_frame)
+    save_frame(join(output_dir, '{}_small_frame.h5'.format(lang)), small_frame)
+
+if __name__ == '__main__':
+    make_save_replacements()
