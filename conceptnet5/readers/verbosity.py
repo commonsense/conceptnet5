@@ -175,15 +175,3 @@ def handle_file(infile, outfile):
                              sources=[source], surfaceText=text,
                              weight=weight)
             writer.write(edge)
-
-
-@click.command()
-#Msgpack file of input
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#Msgpack file to output to
-@click.argument('output', type=click.Path(readable=True, dir_okay=False))
-def cli(input, output):
-    handle_file(input, output)
-
-if __name__ == '__main__':
-    cli()

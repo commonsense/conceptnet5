@@ -384,15 +384,3 @@ def handle_file(input_filename, output_file):
     builder = CN4Builder()
     builder.transform_file(input_filename, output_file)
 
-
-@click.command()
-#JSON-stream file of input
-@click.argument('input',type=click.Path(readable=True, dir_okay=False))
-#msgpack file to output to
-@click.argument('output',type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    handle_file(input,output)
-
-
-if __name__ == '__main__':
-    cli()

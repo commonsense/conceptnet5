@@ -45,15 +45,3 @@ def handle_file(input_file, output_file):
             edge = make_edge(rel, start, end, dataset, license, sources)
             out.write(edge)
 
-
-@click.command()
-#XML file of input
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack file to output to
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input,output):
-  handle_file(input, output)
-
-
-if __name__ == '__main__':
-    cli()

@@ -148,14 +148,3 @@ def cyc_to_conceptnet_uri(labels, unlabels, uri):
         if simple_tokenize(disambig) != simple_tokenize(label):
             return standardized_concept_uri('en', label, 'n', 'opencyc', disambig)
     return standardized_concept_uri('en', label, 'n')
-
-@click.command()
-#An N-triples or N-quads file of input
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack file to output to
-@click.argument('input', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    run_opencyc(input, output)
-
-if __name__ == '__main__':
-    cli()

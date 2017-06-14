@@ -237,15 +237,3 @@ def output_edge(out, rel, subj_concept, obj_concept):
                      weight=2.0)
     out.write(edge)
 
-
-@click.command()
-#XML copy of JMDict to read
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack-stream of file to output to
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    handle_file(input, output)
-
-
-if __name__ == '__main__':
-    cli()

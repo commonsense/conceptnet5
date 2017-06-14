@@ -44,16 +44,3 @@ def handle_file(input_filename, output_file):
         if line:
             for new_obj in handle_raw_assertion(line):
                 out.write(new_obj)
-
-
-@click.command()
-#msgpack file of input
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack file to output to
-@click.argument('output', typt=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    handle_file(input, output)
-
-
-if __name__ == '__main__':
-    cli()

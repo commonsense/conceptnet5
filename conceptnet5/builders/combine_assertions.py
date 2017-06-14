@@ -41,7 +41,8 @@ def keep_concept(uri):
         return True
     if get_uri_language(uri) not in ALL_LANGUAGES:
         return False
-    if valid_languge(get_uri_language(uri))
+    if not valid_languge(get_uri_language(uri)):
+        return False
     pieces = split_uri(uri)
     return bool(pieces[2])
 

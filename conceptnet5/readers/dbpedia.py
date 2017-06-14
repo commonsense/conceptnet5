@@ -309,17 +309,3 @@ def process_dbpedia(input_dir, output_file, concept_file):
 
     out.close()
 
-
-@click.command()
-#Directory containing DBPedia files
-@click.argument('input_dir', type=click.Path(readable=True, dir_okay=False))
-#msgpack file to output to
-@click.argument('output_file', type=click.Path(writable=True, dir_okay=False))
-#Text file of concepts used elsewhere
-@click.argument('concept_file', type=click.Path(readable=True, dir_okay=False))
-def cli(input,output,concept):
-    process_dbpedia(input,output,concept)
-
-
-if __name__ == '__main__':
-    cli()

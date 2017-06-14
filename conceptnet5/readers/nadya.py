@@ -96,16 +96,3 @@ def handle_file(input_filename, output_file):
         for new_obj in handle_line(line, builder):
             out.write(new_obj)
 
-
-@click.command()
-#JSON-stream file of input
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack of file to output to
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    handle_file(input, output)
-
-
-if __name__ == '__main__':
-    cli()
-

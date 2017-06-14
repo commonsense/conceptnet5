@@ -256,16 +256,3 @@ def run_wordnet(input_file, output_file):
 
 # Entry point for testing
 handle_file = run_wordnet
-
-
-@click.command()
-#An .nt file containing WordNet RDF
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#Msgpack file to output to
-@click.argument('output', type=click.Path(readable=True, dir_okay=False))
-def cli(input, output):
-    run_wordnet(input, output)
-
-
-if __name__ == '__main__':
-    cli()
