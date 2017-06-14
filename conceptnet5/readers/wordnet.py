@@ -7,7 +7,6 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.formats.semantic_web import (
     resource_name, parse_nquads
 )
-import click
 
 
 SOURCE = {'contributor': '/s/resource/wordnet/rdf/3.1'}

@@ -7,7 +7,6 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
 from conceptnet5.edges import make_edge
-import click
 
 
 # Now that Unicode literals are on, get the type of a Unicode string,

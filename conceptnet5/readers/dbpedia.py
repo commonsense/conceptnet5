@@ -37,7 +37,6 @@ import bz2
 import pathlib
 from operator import itemgetter
 import itertools
-import click
 parse_url = urllib.parse.urlparse
 
 

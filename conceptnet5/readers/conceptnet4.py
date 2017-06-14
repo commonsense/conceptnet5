@@ -13,7 +13,6 @@ from conceptnet5.nodes import (
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
 from conceptnet5.uri import join_uri, Licenses
-import click
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to

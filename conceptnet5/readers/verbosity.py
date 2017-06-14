@@ -6,7 +6,6 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.util.sounds_like import sounds_like_score
 from collections import defaultdict
 import re
-import click
 
 # If any word in a clue matches one of these words, it is probably a bad
 # common-sense assertion.

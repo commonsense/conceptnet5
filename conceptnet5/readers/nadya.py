@@ -4,7 +4,6 @@ created to collect data for ConceptNet, by Nihon Unisys and Dentsu.
 """
 from conceptnet5.readers.conceptnet4 import CN4Builder
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-import click
 
 # The nadya.jp data is distributed as a PostgreSQL database. The following
 # command will extract a file in the form of 'nadya-2014.csv' from such a

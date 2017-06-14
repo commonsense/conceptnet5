@@ -6,7 +6,6 @@ from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.edges import make_edge
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.uri import Licenses
-import click
 
 
 FRAME_DATA = json.load(
