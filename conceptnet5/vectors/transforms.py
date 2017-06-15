@@ -1,5 +1,5 @@
 import random
-from os.path import join
+from os import environ, path
 
 import click
 import msgpack
@@ -156,17 +156,10 @@ def choose_small_vocabulary(big_frame):
      - contain more than one word
      - are not in ConceptNet
     """
-    small_vocabulary = []
-    finder = AssertionFinder()
-
-    for term in big_frame.index:
-        # Make sure the term is not a phrase
-        if term.count('_') < 1:
-            # Check if a term comes from ConceptNet
-            results = finder.lookup(term)
-            if results:
-                small_vocabulary.append(term)
-    return small_vocabulary
+    DATA = environ.get("CONCEPTNET_BUILD_DATA", "data")
+    concepts = set(line.strip() for line in open(path.join(DATA, 'stats', 'core_concepts.txt')))
+    small_vocab = [term for term in big_frame.index if term.count('_') < 1 and term in concepts]
+    return small_vocab
 
 
 def make_big_frame(frame, lang):
@@ -174,10 +167,7 @@ def make_big_frame(frame, lang):
      Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
      are in languages other than the language specified with the lang parameter.
     """
-    vocabulary = []
-    for term in frame.index:
-        if get_language(term) == lang:
-            vocabulary.append(term)
+    vocabulary = [term for term in frame.index if get_language(term) == lang]
     big_frame = frame.ix[vocabulary]
     return big_frame
 
@@ -211,9 +201,9 @@ def make_save_replacements(frame_filepath, output_dir, lang, tree_depth, verbose
     big_frame = make_big_frame(frame, lang)
     small_frame = make_small_frame(big_frame)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
-    save_replacements(join(output_dir, '{}_replacements.msgpack'.format(lang)), replacements)
-    save_frame(join(output_dir, '{}_big_frame.h5'.format(lang)), big_frame)
-    save_frame(join(output_dir, '{}_small_frame.h5'.format(lang)), small_frame)
+    save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(lang)), replacements)
+    save_frame(path.join(output_dir, '{}_big_frame.h5'.format(lang)), big_frame)
+    save_frame(path.join(output_dir, '{}_small_frame.h5'.format(lang)), small_frame)
 
 if __name__ == '__main__':
     make_save_replacements()
