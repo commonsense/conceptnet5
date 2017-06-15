@@ -24,10 +24,10 @@ complain_db () {
 }
 
 check_db () {
-    psql $dbname -c 'select true;' || complain_db
+    cn5-db check || complain_db
 }
 
 check_disk_space
-check_db
 pip install -e '.[vectors]'
+check_db
 snakemake --resources 'ram=24' -j

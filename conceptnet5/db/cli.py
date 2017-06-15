@@ -1,5 +1,5 @@
 import click
-from .connection import get_db_connection
+from .connection import get_db_connection, check_db_connection
 from .prepare_data import assertions_to_sql_csv, load_sql_csv
 from .schema import create_tables, create_indices
 
@@ -23,3 +23,8 @@ def load_data(input_dir):
     create_tables(conn)
     load_sql_csv(conn, input_dir)
     create_indices(conn)
+
+
+@cli.command(name='check')
+def run_check_db_connection():
+    check_db_connection()
