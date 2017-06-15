@@ -308,17 +308,3 @@ def process_dbpedia(input_dir, output_file, concept_file):
 
     out.close()
 
-
-# TODO: click
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_dir', help="Directory containing DBPedia files")
-    parser.add_argument('output_file', help='msgpack file to output to')
-    parser.add_argument('concept_file', help="Text file of concepts used elsewhere in ConceptNet")
-    args = parser.parse_args()
-    process_dbpedia(args.input_dir, args.output_file, args.concept_file)
-
-
-if __name__ == '__main__':
-    main()

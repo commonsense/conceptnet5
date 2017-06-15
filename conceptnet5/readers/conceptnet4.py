@@ -383,15 +383,3 @@ def handle_file(input_filename, output_file):
     builder = CN4Builder()
     builder.transform_file(input_filename, output_file)
 
-
-# TODO: convert this to click or just remove it if we've already done that
-def main():
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='JSON-stream file of input')
-    parser.add_argument('output', help='msgpack file to output to')
-    args = parser.parse_args()
-    handle_file(args.input, args.output)
-
-if __name__ == '__main__':
-    main()

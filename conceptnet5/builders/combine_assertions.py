@@ -4,9 +4,11 @@ from conceptnet5.nodes import get_uri_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, split_uri, conjunction_uri, is_absolute_url, uri_prefix
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.readers.wiktionary import valid_language
 import itertools
 import json
 import os
+import click
 
 N = 100
 CURRENT_DIR = os.getcwd()
@@ -38,6 +40,8 @@ def keep_concept(uri):
     if is_absolute_url(uri):
         return True
     if get_uri_language(uri) not in ALL_LANGUAGES:
+        return False
+    if not valid_language(get_uri_language(uri)):
         return False
     pieces = split_uri(uri)
     return bool(pieces[2])
@@ -127,40 +131,16 @@ def combine_assertions(input_filename, output_file):
     out_bad.close()
 
 
-def output_assertion(out, **kwargs):
-    """
-    Output an assertion to the given output stream. All keyword arguments
-    become arguments to `make_edge`. (An assertion is a kind of edge.)
-    """
-    # Build the assertion object.
-    assertion = make_edge(**kwargs)
-
-    # Output the result in a Msgpack stream.
-    out.write(assertion)
-
-
-class AssertionCombiner(object):
-    """
-    A class that wraps the combine_assertions function, so it can be tested in
-    the same way as the readers, despite its extra parameters.
-    """
-
-    def __init__(self, license):
-        self.license = license
-
-    def handle_file(self, input_filename, output_file):
-        combine_assertions([input_filename], output_file, self.license)
-
+@click.command()
+#tab-separated csv file to be grouped into assertion
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+#msgpack stream of assertions
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def cli(input, output):
+    combine_assertions(input,output)
 
 if __name__ == '__main__':
     # This is the main command-line entry point, used in steps of building
     # ConceptNet that need to combine edges into assertions. See data/Makefile
     # for more context.
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input', help='csv file of input')
-    parser.add_argument(
-        '-o', '--output', help='msgpack file to output to'
-    )
-    args = parser.parse_args()
-    combine_assertions(args.input, args.output)
+    cli()

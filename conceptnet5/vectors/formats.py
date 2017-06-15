@@ -22,7 +22,7 @@ def save_hdf(table, filename):
     Save a semantic vector space into an HDF5 file, following the convention
     of storing it as a labeled matrix named 'mat'.
     """
-    return table.to_hdf(filename, 'mat', encoding='utf-8')
+    return table.to_hdf(filename, 'mat', mode='w', encoding='utf-8')
 
 
 def save_labels_and_npy(table, vocab_filename, matrix_filename):
@@ -125,22 +125,24 @@ def load_glove(filename, max_rows=1000000):
     columns there are.
     """
     arr = None
-    labels = []
+    label_list = []
     with gzip.open(filename, 'rt') as infile:
         for i, line in enumerate(infile):
             if i >= max_rows:
                 break
             items = line.rstrip().split(' ')
-            labels.append(items[0])
+            label_list.append(items[0])
             if arr is None:
                 ncols = len(items) - 1
                 arr = np.zeros((max_rows, ncols), 'f')
             values = [float(x) for x in items[1:]]
             arr[i] = values
 
-    return pd.DataFrame(arr, index=labels, dtype='f')
+    if len(label_list) < max_rows:
+        arr = arr[:len(label_list)]
+    return pd.DataFrame(arr, index=label_list, dtype='f')
 
-    
+
 def load_fasttext(filename, max_rows=1000000):
     """
     Load a DataFrame from the fastText text format.
@@ -204,6 +206,7 @@ def load_word2vec_bin(filename, nrows):
             idx = len(label_list)
             arr[idx] = vec
             label_list.append(label)
+
     return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
@@ -211,9 +214,9 @@ def load_polyglot(filename):
     """
     Load a pickled matrix from the Polyglot format.
     """
-    labels, mat = pickle.load(open(filename, 'rb'), encoding='bytes')
+    labels, arr = pickle.load(open(filename, 'rb'), encoding='bytes')
     label_list = list(labels)
-    return pd.DataFrame(mat, index=label_list, dtype='f')
+    return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
 def load_labels_and_npy(label_file, npy_file):
@@ -221,9 +224,9 @@ def load_labels_and_npy(label_file, npy_file):
     Load a semantic vector space from two files: a NumPy .npy file of the matrix,
     and a text file with one label per line.
     """
-    labels = [line.rstrip('\n') for line in open(label_file, encoding='utf-8')]
-    npy = np.load(npy_file)
-    return pd.DataFrame(npy, index=labels, dtype='f')
+    label_list = [line.rstrip('\n') for line in open(label_file, encoding='utf-8')]
+    arr = np.load(npy_file)
+    return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
 def load_labels_as_index(label_filename):
