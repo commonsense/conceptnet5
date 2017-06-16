@@ -8,7 +8,7 @@ from collections import defaultdict
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                     iterations=5, nshards=6, verbose=1):
+                     iterations=5, nshards=6, verbosity=0):
     # frame_box is basically a reference to a single large DataFrame. The
     # DataFrame will at times be present or absent. When it's present, the list
     # contains one item, which is the DataFrame. When it's absent, the list
@@ -29,7 +29,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
-        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbose)
+        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity)
         save_hdf(retrofitted, temp_filename)
         del retrofitted
 
@@ -51,7 +51,7 @@ def join_shards(output_filename, nshards=6):
     save_hdf(dframe, output_filename)
 
 
-def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=1):
+def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
     """
     Retrofitting is a process of combining information from a machine-learned
     space of term vectors with further structured information about those

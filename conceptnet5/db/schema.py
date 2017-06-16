@@ -82,7 +82,6 @@ INDICES = [
 def run_commands(connection, commands):
     cursor = connection.cursor()
     for cmd in commands:
-        print(cmd)
         cursor.execute(cmd)
     connection.commit()
 

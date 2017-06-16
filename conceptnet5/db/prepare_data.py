@@ -111,7 +111,6 @@ def load_sql_csv(connection, input_dir):
         (input_dir + '/node_prefixes.csv', 'node_prefixes'),
         (input_dir + '/edge_features.csv', 'edge_features')
     ]:
-        print(filename)
         cursor = connection.cursor()
         with open(filename, 'rb') as file:
             cursor.execute("COPY %s FROM STDIN" % tablename, stream=file)

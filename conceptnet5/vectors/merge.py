@@ -45,7 +45,6 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     # or in 2 different vocabularies and in the first `vocab_cutoff` rows of
     # one of them.
 
-    print('Finding expanded vocabulary')
     vocabulary = frames[0].index
     for frame in frames[1:]:
         vocabulary |= frame.index
@@ -56,7 +55,6 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     new_terms = vocabulary[term_scores >= 3].difference(joined.index)
     new_vecs = [frame.reindex(new_terms) for frame in frames]
 
-    print('Building input matrix with expanded vocabulary')
     joined2 = pd.concat([
         joined,
         pd.concat(new_vecs, join='outer', axis=1, ignore_index=True).astype('f').fillna(0.)
@@ -65,11 +63,8 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     del new_vecs
     projected, eigenvalues, projection = dataframe_svd_projection(adjusted, k)
     del adjusted
-
-    print('Saving results in /tmp')
     del projected
 
-    print('Projecting vocabulary into new space')
     reprojected = joined2.dot(projection)
     reprojected /= (eigenvalues ** .5)
     del joined2
