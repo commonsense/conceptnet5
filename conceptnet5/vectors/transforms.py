@@ -1,6 +1,5 @@
 from os import path
 
-import click
 import msgpack
 import numpy as np
 import pandas as pd
