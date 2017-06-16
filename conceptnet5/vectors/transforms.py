@@ -186,8 +186,7 @@ def save_frame(output_filepath, frame):
     frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
 
 
-def make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth,
-                           verbose):
+def make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth, verbose):
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)

@@ -230,5 +230,4 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 def run_make_save_replacements(input_filename, output_dir, concepts_filename, language, tree_depth,
                            verbose):
     frame = load_hdf(input_filename)
-    make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth,
-                           verbose)
+    make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth, verbose)
