@@ -135,7 +135,7 @@ def combine_assertions(input_filename, output_file):
 #msgpack stream of assertions
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
 def cli(input, output):
-    combine_assertions(input,output)
+    combine_assertions(input, output)
 
 if __name__ == '__main__':
     # This is the main command-line entry point, used in steps of building
