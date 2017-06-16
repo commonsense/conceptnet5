@@ -1,14 +1,16 @@
 from __future__ import unicode_literals, print_function
+import itertools
+import json
+import os
+import click
+
 from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.nodes import get_uri_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, split_uri, conjunction_uri, is_absolute_url, uri_prefix
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.readers.wiktionary import valid_language
-import itertools
-import json
-import os
-import click
+
 
 N = 100
 CURRENT_DIR = os.getcwd()
@@ -17,7 +19,6 @@ CURRENT_DIR = os.getcwd()
 def weight_scale(weight):
     """
     This scale starts out linear, then switches to a square-root scale at x=2.
-
     >>> weight_scale(-1)
     -1.0
     >>> weight_scale(0)
@@ -99,13 +100,10 @@ def combine_assertions(input_filename, output_file):
     Take in a tab-separated, sorted "CSV" files, indicated by
     `input_filename`, that should be grouped together into assertions.
     Output a msgpack stream of assertions to `output_file`.
-
     The input file should be made from multiple sources of assertions by
     concatenating and sorting them.
-
     The combined assertions will all have the dataset of the first edge that
     produces them, and the license of the strongest license being combined.
-
     This process requires its input to be a sorted CSV so that all edges for
     the same assertion will appear consecutively.
     """
@@ -143,4 +141,4 @@ if __name__ == '__main__':
     # This is the main command-line entry point, used in steps of building
     # ConceptNet that need to combine edges into assertions. See data/Makefile
     # for more context.
-    cli()
+cli()

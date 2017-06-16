@@ -5,15 +5,15 @@ associations.
 
 from collections import defaultdict
 import argparse
+import click
+
 from conceptnet5.uri import uri_prefix
 from conceptnet5.relations import is_negative_relation
-import click
 
 
 def concept_is_bad(uri):
     """
     Skip concepts that are unlikely to be useful.
-
     A concept containing too many underscores is probably a long, overly
     specific phrase, possibly mis-parsed. A concept with a colon is probably
     detritus from a wiki.
@@ -26,7 +26,6 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
     """
     Takes in a file of tab-separated simple associations, and removes
     uncommon associations and associations unlikely to be useful.
-
     All concepts that occur fewer than `cutoff` times will be removed.
     All English concepts that occur fewer than `en_cutoff` times will be removed.
     """
@@ -79,4 +78,4 @@ def cli(input, output):
 
 
 if __name__ == '__main__':
-    cli()
+cli()
