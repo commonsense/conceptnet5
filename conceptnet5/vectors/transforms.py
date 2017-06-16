@@ -4,8 +4,10 @@ import msgpack
 import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
+from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.nodes import uri_to_label
 from conceptnet5.uri import uri_prefix, get_language
 from conceptnet5.vectors import standardized_uri, similar_to_vec
 
@@ -146,14 +148,21 @@ def make_replacements(small_frame, big_frame):
     return replacements
 
 
-def choose_small_vocabulary(big_frame, concepts_filename):
+def choose_small_vocabulary(big_frame, concepts_filename, language):
     """
     Choose the vocabulary of the small frame, by eliminating the terms which:
      - contain more than one word
      - are not in ConceptNet
+     - are not frequent
     """
     concepts = set(line.strip() for line in open(concepts_filename))
-    small_vocab = [term for term in big_frame.index if term.count('_') < 1 and term in concepts]
+    vocab = []
+    for term in big_frame.index:
+        if '_' not in term and term in concepts:
+            frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            vocab.append((term, frequency))
+    small_vocab = [term for term, frequency in sorted(vocab, key=lambda x: x[1], reverse=True)[
+                                               :50000]]
     return small_vocab
 
 
@@ -167,11 +176,11 @@ def make_big_frame(frame, language):
     return big_frame
 
 
-def make_small_frame(big_frame, concepts_filename):
+def make_small_frame(big_frame, concepts_filename, language):
     """
     Create a small frame using the output of choose_small_vocabulary()
     """
-    small_vocab = choose_small_vocabulary(big_frame, concepts_filename)
+    small_vocab = choose_small_vocabulary(big_frame, concepts_filename, language)
     return big_frame.ix[small_vocab]
 
 
@@ -187,7 +196,7 @@ def save_frame(output_filepath, frame):
 
 def make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth, verbose):
     big_frame = make_big_frame(frame, language)
-    small_frame = make_small_frame(big_frame, concepts_filename)
+    small_frame = make_small_frame(big_frame, concepts_filename, language)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
     save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(language)),
                       replacements)
