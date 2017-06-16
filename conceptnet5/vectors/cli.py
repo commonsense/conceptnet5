@@ -40,13 +40,13 @@ def filter_word_vectors(dense_hdf_filename, vocab_filename):
 @click.argument('conceptnet_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--iterations', '-i', default=5)
-@click.option('--verbose', '-v', count=True)
 @click.option('--nshards', '-s', default=6)
+@click.option('--verbose', '-v', count=True)
 def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                 iterations=5, nshards=6, verbose=1):
+                 iterations=5, nshards=6, verbose=0):
     sharded_retrofit(
         dense_hdf_filename, conceptnet_filename, output_filename,
-        iterations=iterations, nshards=nshards, verbose=verbose
+        iterations=iterations, nshards=nshards, verbosity=verbose
     )
 
 

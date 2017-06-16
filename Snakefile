@@ -561,7 +561,7 @@ rule retrofit:
     resources:
         ram=16
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} -v {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
 
 rule join_retrofit:
     input:
