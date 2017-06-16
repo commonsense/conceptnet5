@@ -186,16 +186,8 @@ def save_frame(output_filepath, frame):
     frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
 
 
-@click.command()
-@click.argument('frame-filename')
-@click.argument('output-dir')
-@click.argument('concepts-filename')
-@click.option('-l', '--language', default='en')
-@click.option('--tree-depth', default=1000)
-@click.option('-v', '--verbose', is_flag=True)
-def make_save_replacements(frame_filename, output_dir, concepts_filename, language, tree_depth,
+def make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth,
                            verbose):
-    frame = pd.read_hdf(frame_filename, 'mat', encoding='utf-8')
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
@@ -203,6 +195,3 @@ def make_save_replacements(frame_filename, output_dir, concepts_filename, langua
                       replacements)
     save_frame(path.join(output_dir, '{}_big_frame.h5'.format(language)), big_frame)
     save_frame(path.join(output_dir, '{}_small_frame.h5'.format(language)), small_frame)
-
-if __name__ == '__main__':
-    make_save_replacements()

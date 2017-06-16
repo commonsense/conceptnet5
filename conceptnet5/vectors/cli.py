@@ -1,18 +1,19 @@
 import click
+
+from .debias import de_bias_frame
+from .evaluation import wordsim, analogy, bias
+from .evaluation.compare import (
+    compare_embeddings, graph_comparison
+)
 from .formats import (
     convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
     load_hdf, save_hdf, export_text
 )
-from .retrofit import sharded_retrofit, join_shards
 from .merge import merge_intersect
-from .evaluation import wordsim, analogy, bias
-from .evaluation.compare import (
-    compare_embeddings, graph_comparison, graph_bias_comparison
-)
 from .miniaturize import miniaturize
-from .debias import de_bias_frame
 from .query import VectorSpaceWrapper
-
+from .retrofit import sharded_retrofit, join_shards
+from .transforms import make_save_replacements
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -217,3 +218,17 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     del other_frame
     mini = miniaturize(frame, other_vocab=other_vocab, k=k)
     save_hdf(mini, output_filename)
+
+
+@cli.command(name='save_replacements')
+@click.argument('input_filename')
+@click.argument('output_dir')
+@click.argument('concepts_filename')
+@click.option('-l', '--language', default='en')
+@click.option('--tree-depth', default=1000)
+@click.option('-v', '--verbose', is_flag=True)
+def run_make_save_replacements(input_filename, output_dir, concepts_filename, language, tree_depth,
+                           verbose):
+    frame = load_hdf(input_filename)
+    make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth,
+                           verbose)
