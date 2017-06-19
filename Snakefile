@@ -514,7 +514,7 @@ rule convert_fasttext:
     resources:
         ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2500000 -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:
@@ -534,7 +534,7 @@ rule convert_opensubtitles_ft:
     resources:
         ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2500000 {input} {output}"
 
 rule convert_polyglot:
     input:
