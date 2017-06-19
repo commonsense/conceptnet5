@@ -2,7 +2,6 @@
 import pandas as pd
 import numpy as np
 from conceptnet5.languages import CORE_LANGUAGES
-from conceptnet5.uri import get_language
 from .transforms import l2_normalize_rows
 from .formats import save_hdf
 
@@ -28,17 +27,10 @@ def dataframe_svd_projection(frame, k):
 
 
 def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
-    label_intersection = set(frames[0].index)
-    for frame in frames[1:]:
-        label_intersection &= set(frame.index)
-    filtered_labels = pd.Series(
-        [label for label in sorted(label_intersection)
-         if '_' not in label and get_language(label) in CORE_LANGUAGES]
-    )
-    frames = [frame.loc[filtered_labels].astype('f') for frame in frames]
-    joined = pd.concat(frames, join='inner', axis=1, ignore_index=True)
+    joined = pd.concat(frames, join='inner', axis=1, ignore_index=True).astype('f')
     joined.fillna(0.)
-    adjusted = l2_normalize_rows(joined.ix[::subsample] - joined.mean(0))
+    filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])
+    adjusted = l2_normalize_rows(joined.loc[filtered_labels].ix[::subsample] - joined.mean(0))
 
     # Search the frames for significant terms that we've missed.
     # Significant terms are those that appear in 3 different vocabularies,
