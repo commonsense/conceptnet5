@@ -1,3 +1,5 @@
+from os import path
+
 import click
 
 from .debias import de_bias_frame
@@ -7,13 +9,13 @@ from .evaluation.compare import (
 )
 from .formats import (
     convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
-    load_hdf, save_hdf, export_text
+    load_hdf, save_hdf, export_text, save_labels_and_npy
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
 from .query import VectorSpaceWrapper
 from .retrofit import sharded_retrofit, join_shards
-from .transforms import make_save_replacements
+from .transforms import make_big_frame, make_small_frame, make_replacements_faster, save_replacements
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -221,13 +223,23 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 
 
 @cli.command(name='save_replacements')
-@click.argument('input_filename')
-@click.argument('output_dir')
-@click.argument('concepts_filename')
+@click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_dir', type=click.Path(writable=True, dir_okay=True))
+@click.argument('concepts_filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('-l', '--language', default='en')
 @click.option('--tree-depth', default=1000)
 @click.option('-v', '--verbose', is_flag=True)
-def run_make_save_replacements(input_filename, output_dir, concepts_filename, language, tree_depth,
+def make_save_replacements(input_filename, output_dir, concepts_filename, language, tree_depth,
                            verbose):
     frame = load_hdf(input_filename)
-    make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth, verbose)
+    big_frame = make_big_frame(frame, language)
+    small_frame = make_small_frame(big_frame, concepts_filename, language)
+    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
+    save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(language)),
+                      replacements)
+    bf_vocab_filename = path.join(output_dir, '{}_big_frame_vocab'.format(language))
+    bf_matrix_filename = path.join(output_dir, '{}_big_frame_matrix.npy'.format(language))
+    save_labels_and_npy(big_frame, bf_vocab_filename, bf_matrix_filename)
+    sf_vocab_filename = path.join(output_dir, '{}_small_frame_vocab'.format(language))
+    sf_matrix_filename = path.join(output_dir, '{}_small_frame_matrix.npy'.format(language))
+    save_labels_and_npy(small_frame, sf_vocab_filename, sf_matrix_filename)

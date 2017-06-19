@@ -1,5 +1,3 @@
-from os import path
-
 import msgpack
 import numpy as np
 import pandas as pd
@@ -127,7 +125,7 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=Fa
             most_similar = index_map[most_similar_index]
             replacements[term] = most_similar
 
-            if verbose and not (len(replacements) % 1001):
+            if verbose and not (len(replacements) % 2000):
                 print('{} ==> {}'.format(term, most_similar))
     return replacements
 
@@ -188,17 +186,3 @@ def save_replacements(output_filepath, replacements):
     # Save the replacement dictionary as a mgspack file
     with open(output_filepath, 'wb') as output_file:
         msgpack.dump(replacements, output_file)
-
-
-def save_frame(output_filepath, frame):
-    frame.to_hdf(output_filepath, 'mat', encoding='utf-8')
-
-
-def make_save_replacements(frame, output_dir, concepts_filename, language, tree_depth, verbose):
-    big_frame = make_big_frame(frame, language)
-    small_frame = make_small_frame(big_frame, concepts_filename, language)
-    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
-    save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(language)),
-                      replacements)
-    save_frame(path.join(output_dir, '{}_big_frame.h5'.format(language)), big_frame)
-    save_frame(path.join(output_dir, '{}_small_frame.h5'.format(language)), small_frame)
