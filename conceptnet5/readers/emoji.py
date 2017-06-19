@@ -6,6 +6,12 @@ from conceptnet5.nodes import standardized_concept_uri
 import xml.etree.ElementTree as ET 
 
 
+REL = '/r/SymbolOf'
+DATASET = '/d/emoji'
+LICENSE = Licenses.cc_attribution
+SOURCE = [{'contributor': '/s/resource/unicode/cldr/31'}]
+
+
 def is_sentence(text):
     """
     There are a few instances where a sentence of
@@ -37,13 +43,9 @@ def handle_file(input_file, output_file):
     lang = root[0][1].attrib['type']
     for annotation in root[1]:
     	if not is_sentence(annotation.text):
-            rel = '/r/symbolOf'
             start = standardized_concept_uri('mul', annotation.attrib['cp'])
-            license = Licenses.cc_attribution
-            sources = [{'contributor': '/s/contributor/cldr/31'}]
-            dataset = '/d/emojis'
             for word in strip_words(annotation.text):
                 end = standardized_concept_uri(lang, word)
-                edge = make_edge(rel, start, end, dataset, license, sources)
+                edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
                 out.write(edge)
 
