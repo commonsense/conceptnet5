@@ -1,13 +1,17 @@
-from __future__ import unicode_literals, print_function
+import click
+import json
+from collections import defaultdict
+
 from conceptnet5.languages import COMMON_LANGUAGES
 from conceptnet5.nodes import get_uri_language
 from conceptnet5.uri import split_uri, join_uri
 from conceptnet5.formats.msgpack_stream import read_msgpack_stream
-from collections import defaultdict
-import click
-import json
+
 
 def msgpack_to_json(input_filename, output_filename):
+    """
+    Convert a msgpack stream to a JSON file.
+    """
     out_stream = JSONStreamWriter(output_filename)
     for obj in read_msgpack_stream(input_filename):
         out_stream.write(obj)
@@ -15,6 +19,9 @@ def msgpack_to_json(input_filename, output_filename):
 
 
 def json_to_msgpack(input_filename, output_filename):
+    """
+    Convert a JSON file to a msgpack stream.
+    """
     out_stream = MsgpackStreamWriter(output_filename)
     for obj in read_json_stream(input_filename):
         out_stream.write(obj)
