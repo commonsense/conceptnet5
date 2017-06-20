@@ -113,7 +113,7 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
 
         vecs = sparse_csr.dot(vecs)
         for row_group in row_groups:
-            orig_vecs[row_group] -= orig_vecs[row_group].mean(0)
+            vecs[row_group] -= vecs[row_group].mean(0)
 
         # use sklearn's normalize, because it normalizes in place and
         # leaves zero-rows at 0
