@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import normalize
+from collections import defaultdict
+
+from conceptnet5.uri import get_language
+
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .formats import load_hdf, save_hdf
-from conceptnet5.uri import get_language
-from collections import defaultdict
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,

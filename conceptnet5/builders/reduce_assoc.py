@@ -3,11 +3,12 @@ Implements the `reduce_assoc` builder, which filters a tab-separated list of
 associations.
 """
 
-from collections import defaultdict
 import argparse
+import click
+from collections import defaultdict
+
 from conceptnet5.uri import uri_prefix
 from conceptnet5.relations import is_negative_relation
-import click
 
 
 def concept_is_bad(uri):
