@@ -12,31 +12,13 @@ LICENSE = Licenses.cc_attribution
 SOURCE = [{'contributor': '/s/resource/unicode/cldr/31'}]
 
 
-def is_sentence(text):
-    """
-    In these xml files, there are two ways to
-    describe emojis. One way is to use a phrase
-    of multiple words, like so:
-    <annotation cp="♂" type="tts">male sign</annotation>
-    Another way to describe an emoji is to use a
-    series of independent words, separated by '|':
-    <annotation cp="🖤">black | evil | wicked</annotation>
-    If we encounter a phrase, then we can simply take
-    it and make an edge out of it. If we encounter a series
-    of independent words, we must make an edge for each word.
-    Since we handle each type of description differently, it is
-    important to differentiate between them.
-    """
-    return (' ' in text and '|' not in text)
-
-
 def strip_words(text):
     """
-    When multiple words (not in a sentence, but
-    separated by '|') are used to describe emojis,
-    we need to remove the '|' in order to create
-    edges for each word. This function takes out
-    the '|' and puts all the words into a list.
+    When multiple words (separated by '|') are
+    used to describe emojis, we need to remove the
+    '|' in order to create edges for each word.
+    This function takes out the '|' and puts all
+    the words into a list.
     """
     return text.split(' | ')
 
@@ -47,14 +29,9 @@ def handle_file(input_file, output_file):
     root = tree.getroot()
     lang = root[0][1].attrib['type']
     for annotation in root[1]:
-        start = standardized_concept_uri('mul', annotation.attrib['cp'])
-        if is_sentence(annotation.text):
-            end = standardized_concept_uri(lang, annotation.text)
+               
+        for word in strip_words(annotation.text):
+            start = standardized_concept_uri('mul', annotation.attrib['cp'])   
+            end = standardized_concept_uri(lang, word)
             edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
             out.write(edge)
-    	else:           
-            for word in strip_words(annotation.text):
-                end = standardized_concept_uri(lang, word)
-                edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
-                out.write(edge)
-
