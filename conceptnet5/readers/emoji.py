@@ -14,13 +14,18 @@ SOURCE = [{'contributor': '/s/resource/unicode/cldr/31'}]
 
 def is_sentence(text):
     """
-    There are a few instances where a sentence of
-    multiple words is used to describe an emoji
-    (which is not very helpful in our case) AS WELL AS
-    single words or phrases, which are separated by '|'.
-    Using this function, we can ignore the sentences/phrases,
-    and only look at single words, which is better for
-    conceptnet to handle.
+    In these xml files, there are two ways to
+    describe emojis. One way is to use a phrase
+    of multiple words, like so:
+    <annotation cp="♂" type="tts">male sign</annotation>
+    Another way to describe an emoji is to use a
+    series of independent words, separated by '|':
+    <annotation cp="🖤">black | evil | wicked</annotation>
+    If we encounter a phrase, then we can simply take
+    it and make an edge out of it. If we encounter a series
+    of independent words, we must make an edge for each word.
+    Since we handle each type of description differently, it is
+    important to differentiate between them.
     """
     return (' ' in text and '|' not in text)
 
@@ -42,8 +47,12 @@ def handle_file(input_file, output_file):
     root = tree.getroot()
     lang = root[0][1].attrib['type']
     for annotation in root[1]:
-    	if not is_sentence(annotation.text):
-            start = standardized_concept_uri('mul', annotation.attrib['cp'])
+        start = standardized_concept_uri('mul', annotation.attrib['cp'])
+        if is_sentence(annotation.text):
+            end = standardized_concept_uri(lang, annotation.text)
+            edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
+            out.write(edge)
+    	else:           
             for word in strip_words(annotation.text):
                 end = standardized_concept_uri(lang, word)
                 edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
