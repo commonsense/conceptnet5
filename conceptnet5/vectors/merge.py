@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from conceptnet5.languages import CORE_LANGUAGES
 from .transforms import l2_normalize_rows
-from .formats import save_hdf
+from sklearn.preprocessing import normalize
 
 
 def dataframe_svd_projection(frame, k):
@@ -26,40 +26,48 @@ def dataframe_svd_projection(frame, k):
     return uframe, Σ[:k], vframe
 
 
+def concat_intersect(frames):
+    frame_col_offsets = [0]
+    ncolumns = frames[0].shape[1]
+    label_intersection = set(frames[0].index)
+    for frame in frames[1:]:
+        label_intersection &= set(frame.index)
+        frame_col_offsets.append(ncolumns)
+        ncolumns += frame.shape[1]
+    nrows = len(label_intersection)
+    label_intersection = sorted(label_intersection)
+
+    joindata = np.zeros((nrows, ncolumns), 'f')
+    for frame, offset in zip(frames, frame_col_offsets):
+        width = frame.shape[1]
+        joindata[:, offset:(offset + width)] = frame.loc[label_intersection].values
+    joined = pd.DataFrame(joindata, index=label_intersection)
+    return joined
+
+
+def concat_union(frames):
+    pass
+
+
 def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
-    joined = pd.concat(frames, join='inner', axis=1, ignore_index=True).astype('f')
-    joined.fillna(0.)
-    filtered_labels = pd.Series([label for label in joined.index if '_' not in label and label.split('/')[2] in CORE_LANGUAGES])
-    adjusted = l2_normalize_rows(joined.loc[filtered_labels].ix[::subsample] - joined.mean(0))
-
-    # Search the frames for significant terms that we've missed.
-    # Significant terms are those that appear in 3 different vocabularies,
-    # or in 2 different vocabularies and in the first `vocab_cutoff` rows of
-    # one of them.
-
-    vocabulary = frames[0].index
-    for frame in frames[1:]:
-        vocabulary |= frame.index
-    term_scores = pd.Series(index=vocabulary).fillna(0)
-    for frame in frames[1:]:
-        term_scores.loc[frame.index] += 1
-        term_scores.loc[frame.index[:vocab_cutoff]] += 1
-    new_terms = vocabulary[term_scores >= 3].difference(joined.index)
-    new_vecs = [frame.reindex(new_terms) for frame in frames]
-
-    joined2 = pd.concat([
-        joined,
-        pd.concat(new_vecs, join='outer', axis=1, ignore_index=True).astype('f').fillna(0.)
+    joined = concat_intersect(frames)
+    filtered_labels = pd.Series([
+        label for (i, label) in enumerate(joined.index)
+        if i % subsample == 0 and '_' not in label
+        and label.split('/')[2] in CORE_LANGUAGES
     ])
+    adjusted = joined.loc[filtered_labels]
+    adjusted -= joined.mean(0)
+    normalize(adjusted.values, norm='l2', copy=False)
 
-    del new_vecs
     projected, eigenvalues, projection = dataframe_svd_projection(adjusted, k)
     del adjusted
     del projected
 
-    reprojected = joined2.dot(projection)
-    reprojected /= (eigenvalues ** .5)
-    del joined2
-    reprojected = l2_normalize_rows(reprojected, offset=1e-6)
+    reprojected = joined.dot(projection)
+    del joined
+    np.divide(reprojected.values, eigenvalues ** .5, out=reprojected.values)
+    normalize(reprojected.values, norm='l2', copy=False)
+    assert not reprojected.isnull().values.any()
     reprojected.sort_index(inplace=True)
     return reprojected, projection
