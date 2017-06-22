@@ -399,8 +399,8 @@ def reject_subspace(frame, vecs):
             projection = current_array.dot(vec)
             np.subtract(current_array, np.outer(projection, vec), out=current_array)
 
-    normalize(current_array, norm='l2', copy=False)
     current_array = pd.DataFrame(current_array, index=frame.index)
+    normalize(current_array.values, norm='l2', copy=False)
     current_array.fillna(0, inplace=True)
     return current_array
 
@@ -492,8 +492,10 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
     np.add(result.values, modified_component.values, out=result.values)
-    normalize(result.values, norm='l2', copy=False)
     del modified_component
+
+    # L_2-normalize the resulting rows in-place.
+    normalize(result.values, norm='l2', copy=False)
     return result
 
 
@@ -540,8 +542,10 @@ def de_bias_category(frame, category_examples, bias_examples):
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
     np.add(result.values, modified_component.values, out=result.values)
-    normalize(result.values, norm='l2', copy=False)
     del modified_component
+
+    # L_2-normalize the resulting rows in-place.
+    normalize(result.values, norm='l2', copy=False)
     return result
 
 
