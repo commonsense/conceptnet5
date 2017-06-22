@@ -590,7 +590,7 @@ rule debias:
     output:
         DATA + "/vectors/numberbatch.h5"
     resources:
-        ram=16
+        ram=30
     shell:
         "cn5-vectors debias {input} {output}"
 
