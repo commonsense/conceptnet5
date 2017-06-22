@@ -69,6 +69,7 @@ INPUT_EMBEDDINGS = [
     'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
 SOURCE_EMBEDDING_ROWS = 1500000
+MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2500000
 
 # If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
 TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
@@ -514,7 +515,7 @@ rule convert_fasttext:
     resources:
         ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2500000 -l {wildcards.lang} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
 
 rule convert_lexvec:
     input:
@@ -534,7 +535,7 @@ rule convert_opensubtitles_ft:
     resources:
         ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n 2500000 {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_polyglot:
     input:
