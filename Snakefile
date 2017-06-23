@@ -69,7 +69,7 @@ INPUT_EMBEDDINGS = [
     'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
 SOURCE_EMBEDDING_ROWS = 1500000
-MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2500000
+MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2000000
 
 # If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
 TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
