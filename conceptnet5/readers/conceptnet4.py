@@ -12,6 +12,7 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
+from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
@@ -173,7 +174,7 @@ def skip_assertion(source_dict, start, end):
     Filter out assertions that we can tell will be unhelpful after we've
     extracted them.
     """
-    if start in CONCEPT_BLACKLIST or end in CONCEPT_BLACKLIST:
+    if lemmatize_uri(start) in CONCEPT_BLACKLIST or lemmatize_uri(end) in CONCEPT_BLACKLIST:
         return True
     if source_dict['contributor'] in CONTRIBUTOR_BLACKLIST:
         return True
