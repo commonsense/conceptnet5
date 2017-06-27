@@ -1,9 +1,9 @@
-from conceptnet5.vectors import standardized_uri, normalize_vec
-from conceptnet5.vectors.transforms import l2_normalize_rows
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn import svm
 from sklearn.preprocessing import normalize
+
+from conceptnet5.vectors import standardized_uri, normalize_vec
 
 
 # A list of English words referring to nationalities, nations, ethnicities, and
@@ -399,8 +399,9 @@ def reject_subspace(frame, vecs):
             projection = current_array.dot(vec)
             np.subtract(current_array, np.outer(projection, vec), out=current_array)
 
+    normalize(current_array, norm='l2', copy=False)
+
     current_array = pd.DataFrame(current_array, index=frame.index)
-    normalize(current_array.values, norm='l2', copy=False)
     current_array.fillna(0, inplace=True)
     return current_array
 
