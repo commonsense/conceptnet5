@@ -222,7 +222,7 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     save_hdf(mini, output_filename)
 
 
-@cli.command(name='save_replacements')
+@cli.command(name='export_background')
 @click.argument('input_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_dir', type=click.Path(writable=True, dir_okay=True))
 @click.argument('concepts_filename', type=click.Path(readable=True, dir_okay=False))
@@ -237,9 +237,6 @@ def make_save_replacements(input_filename, output_dir, concepts_filename, langua
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
     save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(language)),
                       replacements)
-    bf_vocab_filename = path.join(output_dir, '{}_big_frame_vocab'.format(language))
-    bf_matrix_filename = path.join(output_dir, '{}_big_frame_matrix.npy'.format(language))
-    save_labels_and_npy(big_frame, bf_vocab_filename, bf_matrix_filename)
-    sf_vocab_filename = path.join(output_dir, '{}_small_frame_vocab'.format(language))
-    sf_matrix_filename = path.join(output_dir, '{}_small_frame_matrix.npy'.format(language))
-    save_labels_and_npy(small_frame, sf_vocab_filename, sf_matrix_filename)
+    labels_filename = path.join(output_dir, '{}_frame.labels'.format(language))
+    matrix_filename = path.join(output_dir, '{}_frame_matrix.npy'.format(language))
+    save_labels_and_npy(small_frame, labels_filename, matrix_filename)
