@@ -1,7 +1,9 @@
-from conceptnet5.vectors import standardized_uri, normalize_vec
-from conceptnet5.vectors.transforms import l2_normalize_rows
 import numpy as np
+import pandas as pd
 from sklearn import svm
+from sklearn.preprocessing import normalize
+
+from conceptnet5.vectors import standardized_uri, normalize_vec
 
 
 # A list of English words referring to nationalities, nations, ethnicities, and
@@ -390,14 +392,18 @@ def reject_subspace(frame, vecs):
     its rows have any correlation with any rows of `vecs`, by subtracting
     the outer product of `frame` with each normalized row of `vecs`.
     """
-    current_array = frame.copy()
+    current_array = frame.copy().values
     for vec in vecs:
         if not np.isnan(vec).any():
             vec = normalize_vec(vec)
             projection = current_array.dot(vec)
-            current_array -= np.outer(projection, vec)
+            np.subtract(current_array, np.outer(projection, vec), out=current_array)
 
-    return l2_normalize_rows(current_array, offset=1e-9)
+    normalize(current_array, norm='l2', copy=False)
+
+    current_array = pd.DataFrame(current_array, index=frame.index)
+    current_array.fillna(0, inplace=True)
+    return current_array
 
 
 def get_vocabulary_vectors(frame, vocab):
@@ -482,11 +488,16 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
 
     # Make another component representing the vectors that should not be
     # de-biased: the original space times (1 - applicability).
-    original_component = frame.mul(1 - applicability, axis=0)
+    result = frame.mul(1 - applicability, axis=0)
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    return l2_normalize_rows(original_component + modified_component, offset=1e-9)
+    np.add(result.values, modified_component.values, out=result.values)
+    del modified_component
+
+    # L_2-normalize the resulting rows in-place.
+    normalize(result.values, norm='l2', copy=False)
+    return result
 
 
 def de_bias_category(frame, category_examples, bias_examples):
@@ -511,6 +522,7 @@ def de_bias_category(frame, category_examples, bias_examples):
     # Predict the probability of each word in the vocabulary being in the
     # category.
     applicability = category_predictor.predict_proba(frame)[:, 1]
+    del category_predictor
 
     # Make a matrix of vectors representing the correlations to remove.
     vocab = [
@@ -522,14 +534,20 @@ def de_bias_category(frame, category_examples, bias_examples):
     # Then weight each row of that space by "applicability", the probability
     # that each row should be de-biased.
     modified_component = reject_subspace(frame, components_to_reject).mul(applicability, axis=0)
+    del components_to_reject
 
     # Make another component representing the vectors that should not be
     # de-biased: the original space times (1 - applicability).
-    original_component = frame.mul(1 - applicability, axis=0)
+    result = frame.mul(1 - applicability, axis=0)
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    return l2_normalize_rows(original_component + modified_component, offset=1e-9)
+    np.add(result.values, modified_component.values, out=result.values)
+    del modified_component
+
+    # L_2-normalize the resulting rows in-place.
+    normalize(result.values, norm='l2', copy=False)
+    return result
 
 
 def de_bias_frame(frame):
