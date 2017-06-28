@@ -89,7 +89,8 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
 
     # Subtract the mean so that vectors don't just clump around common
     # hypernyms
-    orig_vecs -= orig_vecs.mean(0)
+    nonzero_indices = np.abs(orig_vecs).sum(1).nonzero()
+    orig_vecs[nonzero_indices] -= orig_vecs.mean(0)
 
     # Delete the frame we built, we won't need its indices again until the end
     del retroframe
@@ -100,7 +101,8 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
             print('Retrofitting: Iteration %s of %s' % (iteration+1, iterations))
 
         vecs = sparse_csr.dot(vecs)
-        vecs -= vecs.mean(0)
+        nonzero_indices = np.abs(vecs).sum(1).nonzero()
+        vecs[nonzero_indices] -= vecs.mean(0)
 
         # use sklearn's normalize, because it normalizes in place and
         # leaves zero-rows at 0
