@@ -1,9 +1,13 @@
-import pandas as pd
+import msgpack
 import numpy as np
+import pandas as pd
+from annoy import AnnoyIndex
+from wordfreq import word_frequency
 
-from ..vectors import standardized_uri, similar_to_vec
-from conceptnet5.uri import uri_prefix
 from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.nodes import uri_to_label
+from conceptnet5.uri import uri_prefix, get_language
+from conceptnet5.vectors import standardized_uri, similar_to_vec
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -91,7 +95,46 @@ def shrink_and_sort(frame, n, k):
     return shrunk
 
 
-def make_replacements(small_frame, big_frame, limit=100000):
+def build_annoy_tree(frame, tree_depth):
+    """
+    Build a tree to hold a frame's vectors for efficient lookup.
+    """
+    index = AnnoyIndex(frame.shape[1], metric='euclidean')
+    index_map = {}
+    for i, item in enumerate(frame.index):
+        index.add_item(i, frame.loc[item])
+        index_map[i] = item
+    index.build(tree_depth)
+    return index, index_map
+
+
+def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=False):
+    """
+    Create a replacements dictionary to map terms only present in a big frame to the closest term
+    in a small_frame. This is a faster than make_replacements(), because it uses a fast
+    implementation of the approximate nearest neighbor algorithm.
+
+    tree_depth=1000 provides a good balance of speed and accuracy.
+    """
+    intersected = big_frame.loc[small_frame.index].dropna()
+    index, index_map = build_annoy_tree(intersected, tree_depth)
+    replacements = {}
+    for term in big_frame.index:
+        if term not in small_frame.index:
+            most_similar_index = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
+            most_similar = index_map[most_similar_index]
+            replacements[term] = most_similar
+
+            if verbose and not (len(replacements) % 2000):
+                print('{} ==> {}'.format(term, most_similar))
+    return replacements
+
+
+def make_replacements(small_frame, big_frame):
+    """
+    Create a replacements dictionary to map terms only present in a big frame to the closest term
+    in a small_frame. This method uses a brute-force solution.
+    """
     intersected = big_frame.loc[small_frame.index].dropna()
     replacements = {}
     for term in big_frame.index:
@@ -101,3 +144,45 @@ def make_replacements(small_frame, big_frame, limit=100000):
             if got:
                 replacements[term] = got[0]
     return replacements
+
+
+def choose_small_vocabulary(big_frame, concepts_filename, language):
+    """
+    Choose the vocabulary of the small frame, by eliminating the terms which:
+     - contain more than one word
+     - are not in ConceptNet
+     - are not frequent
+    """
+    concepts = set(line.strip() for line in open(concepts_filename))
+    vocab = []
+    for term in big_frame.index:
+        if '_' not in term and term in concepts:
+            frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            vocab.append((term, frequency))
+    small_vocab = [term for term, frequency in sorted(vocab, key=lambda x: x[1], reverse=True)[
+                                               :50000]]
+    return small_vocab
+
+
+def make_big_frame(frame, language):
+    """
+     Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
+     are in languages other than the language specified.
+    """
+    vocabulary = [term for term in frame.index if get_language(term) == language]
+    big_frame = frame.ix[vocabulary]
+    return big_frame
+
+
+def make_small_frame(big_frame, concepts_filename, language):
+    """
+    Create a small frame using the output of choose_small_vocabulary()
+    """
+    small_vocab = choose_small_vocabulary(big_frame, concepts_filename, language)
+    return big_frame.ix[small_vocab]
+
+
+def save_replacements(output_filepath, replacements):
+    # Save the replacement dictionary as a mgspack file
+    with open(output_filepath, 'wb') as output_file:
+        msgpack.dump(replacements, output_file)
