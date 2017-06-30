@@ -12,6 +12,7 @@ from conceptnet5.nodes import (
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.language.english import english_filter
+from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
@@ -97,10 +98,13 @@ CONCEPT_BLACKLIST = {
     '/c/en/when', '/c/en/whether', '/c/en/nothing', '/c/en/nobody',
     '/c/en/no_one',
 
-    # It's not our job to remove all vulgar terms, especially as they may be
-    # important to understand in context. But here are a few that just pollute
-    # the results for no reason.
-    '/c/en/touch_her_cunt', '/c/en/blow_her_boyfriend'
+    # OMCS users tended to give unfortunate, stereotyped answers when asked
+    # about terms distinguished by their gender. As part of the de-biasing
+    # effort, we should skip these. We can learn enough about 'man' and 'woman'
+    # from dictionary definitions and from statements about 'person'.
+    '/c/en/man', '/c/en/woman', '/c/en/boy', '/c/en/girl', '/c/en/boyfriend',
+    '/c/en/girlfriend', '/c/en/brother', '/c/en/sister', '/c/en/mother',
+    '/c/en/father', '/c/en/daughter', '/c/en/son', '/c/en/wife', '/c/en/husband'
 }
 ACTIVITY_BLACKLIST = {
     "20 Questions",
@@ -163,13 +167,14 @@ def can_skip(parts_dict):
         return True
     return False
 
+
 # TODO: this should be combined with 'can_skip'
 def skip_assertion(source_dict, start, end):
     """
     Filter out assertions that we can tell will be unhelpful after we've
     extracted them.
     """
-    if start in CONCEPT_BLACKLIST or end in CONCEPT_BLACKLIST:
+    if lemmatize_uri(start) in CONCEPT_BLACKLIST or lemmatize_uri(end) in CONCEPT_BLACKLIST:
         return True
     if source_dict['contributor'] in CONTRIBUTOR_BLACKLIST:
         return True
