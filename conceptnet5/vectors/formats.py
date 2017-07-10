@@ -251,11 +251,11 @@ def save_orderedSet(set, filename):
     """
     Save an OrderedSet object as a text file of words.
     """
-    with open(label_filename, 'w', encoding='utf-8') as out:
+    with open(filename, 'w', encoding='utf-8') as out:
         for word in set:
             print(word, file=out)
 
-def load_labels_as_index(filename):
+def load_orderedSet(filename):
     """
     Load a set of words  from a text file, and
     represent them in an OrderedSet object.
