@@ -3,6 +3,7 @@ import numpy as np
 import gzip
 import struct
 import pickle
+from ordered_set import OrderedSet
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 
 
@@ -245,3 +246,22 @@ def save_index_as_labels(index, label_filename):
     with open(label_filename, 'w', encoding='utf-8') as out:
         for label in index:
             print(label, file=out)
+
+def save_orderedSet(set, filename):
+    """
+    Save an OrderedSet object as a text file of words.
+    """
+    with open(label_filename, 'w', encoding='utf-8') as out:
+        for word in set:
+            print(word, file=out)
+
+def load_labels_as_index(filename):
+    """
+    Load a set of words  from a text file, and
+    represent them in an OrderedSet object.
+    """
+    set = OrderedSet()
+    for line in open(filename, encoding='utf-8'):
+        set.append(line.rstrip('\n'))
+    return set
+
