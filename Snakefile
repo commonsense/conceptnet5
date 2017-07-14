@@ -209,11 +209,13 @@ rule precompute_wiktionary:
 
 rule read_conceptnet4:
     input:
-        DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons"
+        DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
-    shell:
-        "cn5-read conceptnet4 {input} {output}"
+    run:
+        single_input = input[0]
+        shell("cn5-read conceptnet4 {single_input} {output}")
 
 rule read_dbpedia:
     input:
