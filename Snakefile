@@ -70,6 +70,7 @@ INPUT_EMBEDDINGS = [
     'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
 ]
 SOURCE_EMBEDDING_ROWS = 1500000
+MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2000000
 
 # If CONCEPTNET_BUILD_TEST is set, we're running the small test build.
 TESTMODE = bool(os.environ.get("CONCEPTNET_BUILD_TEST"))
@@ -209,11 +210,13 @@ rule precompute_wiktionary:
 
 rule read_conceptnet4:
     input:
-        DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons"
+        DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
-    shell:
-        "cn5-read conceptnet4 {input} {output}"
+    run:
+        single_input = input[0]
+        shell("cn5-read conceptnet4 {single_input} {output}")
 
 rule read_dbpedia:
     input:
@@ -543,7 +546,7 @@ rule convert_opensubtitles_ft:
     resources:
         ram=24
     shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_polyglot:
     input:
@@ -599,7 +602,7 @@ rule debias:
     output:
         DATA + "/vectors/numberbatch.h5"
     resources:
-        ram=16
+        ram=30
     shell:
         "cn5-vectors debias {input} {output}"
 

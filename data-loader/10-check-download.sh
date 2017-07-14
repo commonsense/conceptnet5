@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PRECOMPUTED_PSQL_URL=http://conceptnet.s3.amazonaws.com/precomputed-data/2016/psql/5.5.5
-PRECOMPUTED_VECTOR_URL=http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.05
+PRECOMPUTED_VECTOR_URL=http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.06
 DATA=/data/conceptnet
 NAMES='edges edge_sources edge_features nodes node_prefixes sources relations'
 
