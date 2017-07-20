@@ -7,7 +7,7 @@ from wordfreq import word_frequency
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.nodes import uri_to_label
 from conceptnet5.uri import uri_prefix, get_language
-from conceptnet5.vectors import standardized_uri, similar_to_vec
+from conceptnet5.vectors import standardized_uri, similar_to_vec, get_vector, cosine_similarity
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -108,7 +108,7 @@ def build_annoy_tree(frame, tree_depth):
     return index, index_map
 
 
-def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=False):
+def make_replacements_faster(small_frame, big_frame, tree_depth=1000, lang='en', verbose=False):
     """
     Create a replacements dictionary to map terms only present in a big frame to the closest term
     in a small_frame. This is a faster than make_replacements(), because it uses a fast
@@ -123,10 +123,12 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=Fa
         if term not in small_frame.index:
             most_similar_index = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
             most_similar = index_map[most_similar_index]
-            replacements[term] = most_similar
+            similarity = cosine_similarity(get_vector(big_frame, term, lang),
+                                           get_vector(small_frame, most_similar, lang))
+            replacements[term] = [most_similar, round(similarity, 2)]
 
-            if verbose and not (len(replacements) % 2000):
-                print('{} ==> {}'.format(term, most_similar))
+            if verbose and not (len(replacements) % 200):
+                print('{} ==> {}, {}'.format(term, most_similar, similarity))
     return replacements
 
 
