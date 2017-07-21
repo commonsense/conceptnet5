@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ml"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">സ്ത്രീ | ചിഹ്നം</annotation>
+		<annotation cp="♀" type="tts">സ്ത്രീ ചിഹ്നം</annotation>
+		<annotation cp="♂" type="tts">പുരുഷൻ | ചിഹ്നം</annotation>
+		<annotation cp="♂" type="tts">പുരുഷ ചിഹ്നം</annotation>
+		<annotation cp="⚕" type="tts">മെഡിക്കൽ | അടയാളം | ചിഹ്നം</annotation>
+		<annotation cp="⚕" type="tts">മെഡിക്കൽ അടയാളം</annotation>
+		<annotation cp="🕺" type="tts">നൃത്തം | പുരുഷൻ</annotation>
+		<annotation cp="🕺" type="tts">നർത്തകൻ</annotation>
+		<annotation cp="🖤" type="tts">കറുപ്പ് | ഹൃദയം | തിന്മ</annotation>
+		<annotation cp="🖤" type="tts">ദുഷിച്ച ഹൃദയം</annotation>
+	</annotations>
+</ldml>

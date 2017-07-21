@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ka"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">ქალი</annotation>
+		<annotation cp="♀" type="tts">მდედრობითი</annotation>
+		<annotation cp="♂" type="tts">კაცი</annotation>
+		<annotation cp="♂" type="tts">მამრობითი</annotation>
+		<annotation cp="⚕" type="tts">სამედიცინო ნიშანი</annotation>
+		<annotation cp="⚕" type="tts">სამედიცინო ნიშანი</annotation>
+		<annotation cp="🕺" type="tts">ცეკვა | კაცი</annotation>
+		<annotation cp="🕺" type="tts">მოცეკვავე კაცი</annotation>
+		<annotation cp="🖤" type="tts">შავი | გული | ბოროტი | ალქაჯი</annotation>
+		<annotation cp="🖤" type="tts">შავი გული</annotation>
+	</annotations>
+</ldml>

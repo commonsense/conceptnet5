@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="sw"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">jinsia | mke | ishara</annotation>
+		<annotation cp="♀" type="tts">ishara ya jinsi ya kike</annotation>
+		<annotation cp="♂" type="tts">jinsia | mume | ishara</annotation>
+		<annotation cp="♂" type="tts">ishara ya jinsi ya kiume</annotation>
+		<annotation cp="⚕" type="tts">ishara | tiba | dawa</annotation>
+		<annotation cp="⚕" type="tts">ishara ya taaluma ya matibabu</annotation>
+		<annotation cp="🕺" type="tts">kusakata rumba</annotation>
+		<annotation cp="🕺" type="tts">kusakata rumba</annotation>
+		<annotation cp="🖤" type="tts">moyo | moyo mweusi</annotation>
+		<annotation cp="🖤" type="tts">moyo</annotation>
+	</annotations>
+</ldml>

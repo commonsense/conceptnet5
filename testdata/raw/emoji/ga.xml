@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ga"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">baineann | bean</annotation>
+		<annotation cp="♀" type="tts">comhartha baineann</annotation>
+		<annotation cp="♂" type="tts">fearann | fear</annotation>
+		<annotation cp="♂" type="tts">comhartha fearann</annotation>
+		<annotation cp="⚕" type="tts">aescaláipias | leigheas | foireann</annotation>
+		<annotation cp="⚕" type="tts">siombal leighis</annotation>
+		<annotation cp="🕺" type="tts">damhsa | rince</annotation>
+		<annotation cp="🕺" type="tts">fear ag damhsa</annotation>
+		<annotation cp="🖤" type="tts">dubh | dona | gránna</annotation>
+		<annotation cp="🖤" type="tts">croí dubh</annotation>
+	</annotations>
+</ldml>

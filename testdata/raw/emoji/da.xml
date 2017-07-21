@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="da"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">kvinde | tegn | symbol</annotation>
+		<annotation cp="♀" type="tts">kvindetegn</annotation>
+		<annotation cp="♂" type="tts">mand | tegn | symbol</annotation>
+		<annotation cp="♂" type="tts">mandetegn</annotation>
+		<annotation cp="⚕" type="tts">æskulap | æskulapstav | medicin | lægevidenskab | slange | stav | lægekunst</annotation>
+		<annotation cp="⚕" type="tts">medicinsymbol</annotation>
+		<annotation cp="🕺" type="tts">danser | mand | dans</annotation>
+		<annotation cp="🕺" type="tts">dansende mand</annotation>
+		<annotation cp="🖤" type="tts">sort | hjerte | ondt | ondskab</annotation>
+		<annotation cp="🖤" type="tts">sort hjerte</annotation>
+	</annotations>
+</ldml>

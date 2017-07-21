@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="bs"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">žensko | žena</annotation>
+		<annotation cp="♀" type="tts">žensko</annotation>
+		<annotation cp="♂" type="tts">muško | muškarac</annotation>
+		<annotation cp="♂" type="tts">muško</annotation>
+		<annotation cp="⚕" type="tts">aesculapius | medicina | osoblje</annotation>
+		<annotation cp="⚕" type="tts">medicinski simbol</annotation>
+		<annotation cp="🕺" type="tts">plesanje | čovjek</annotation>
+		<annotation cp="🕺" type="tts">plesanje</annotation>
+		<annotation cp="🖤" type="tts">crno | srce | zlo | iskvareno</annotation>
+		<annotation cp="🖤" type="tts">zlo</annotation>
+	</annotations>
+</ldml>

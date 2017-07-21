@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="mn"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">эмэгтэй | эмэгтэй хүн</annotation>
+		<annotation cp="♀" type="tts">эмэгтэй тэмдэг</annotation>
+		<annotation cp="♂" type="tts">эрэгтэй | эрэгтэй хүн</annotation>
+		<annotation cp="♂" type="tts">эрэгтэй тэмдэг</annotation>
+		<annotation cp="⚕" type="tts">эскулап | эм | ажилтан</annotation>
+		<annotation cp="⚕" type="tts">эмнэлгийн тэмдэг</annotation>
+		<annotation cp="🕺" type="tts">бүжиглэх | залуу</annotation>
+		<annotation cp="🕺" type="tts">бүжиглэх залуу</annotation>
+		<annotation cp="🖤" type="tts">хар | зүрх</annotation>
+		<annotation cp="🖤" type="tts">хар зүрх</annotation>
+	</annotations>
+</ldml>

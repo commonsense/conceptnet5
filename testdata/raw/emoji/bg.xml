@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="bg"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">жена | женски</annotation>
+		<annotation cp="♀" type="tts">знак за женски пол</annotation>
+		<annotation cp="♂" type="tts">мъж | мъжки</annotation>
+		<annotation cp="♂" type="tts">знак за мъжки пол</annotation>
+		<annotation cp="⚕" type="tts">медицина | медицински символ</annotation>
+		<annotation cp="⚕" type="tts">символ за медицина</annotation>
+		<annotation cp="🕺" type="tts">танц | мъж</annotation>
+		<annotation cp="🕺" type="tts">танцуващ мъж</annotation>
+		<annotation cp="🖤" type="tts">черно | сърце | зло</annotation>
+		<annotation cp="🖤" type="tts">черно сърце</annotation>
+	</annotations>
+</ldml>

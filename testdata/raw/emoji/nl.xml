@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="nl"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">vrouw | symbool | teken</annotation>
+		<annotation cp="♀" type="tts">vrouwelijkheidssymbool</annotation>
+		<annotation cp="♂" type="tts">man | symbool | teken</annotation>
+		<annotation cp="♂" type="tts">mannelijkheidssymbool</annotation>
+		<annotation cp="⚕" type="tts">esculaap | dokter</annotation>
+		<annotation cp="⚕" type="tts">esculaap</annotation>
+		<annotation cp="🕺" type="tts">dans | dansen | disco | man</annotation>
+		<annotation cp="🕺" type="tts">dansende man</annotation>
+		<annotation cp="🖤" type="tts">zwart | hart | kwaad | slecht | verdorven</annotation>
+		<annotation cp="🖤" type="tts">zwart hart</annotation>
+	</annotations>
+</ldml>

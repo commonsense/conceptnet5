@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="mr"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">महिला | स्त्री</annotation>
+		<annotation cp="♀" type="tts">महिला चिन्ह</annotation>
+		<annotation cp="♂" type="tts">पुरुष</annotation>
+		<annotation cp="♂" type="tts">पुरुष चिन्ह</annotation>
+		<annotation cp="⚕" type="tts">स्वास्थ्य | औषध | कर्मचारी</annotation>
+		<annotation cp="⚕" type="tts">वैद्यकीय चिन्ह</annotation>
+		<annotation cp="🕺" type="tts">नाच | माणूस</annotation>
+		<annotation cp="🕺" type="tts">नाचणारा माणूस</annotation>
+		<annotation cp="🖤" type="tts">काळा | हृदय | दुष्ट | वाईट</annotation>
+		<annotation cp="🖤" type="tts">दुःख</annotation>
+	</annotations>
+</ldml>

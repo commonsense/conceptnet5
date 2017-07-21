@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="en_001"/>
+	</identity>
+	<annotations>
+		<annotation cp="🤶" type="tts">Mother Christmas</annotation>
+		<annotation cp="🎅" type="tts">Father Christmas</annotation>
+		<annotation cp="🍆" type="tts">aubergine</annotation>
+		<annotation cp="✈" type="tts">aeroplane</annotation>
+		<annotation cp="🛩" type="tts">small aeroplane</annotation>
+		<annotation cp="🛫" type="tts">aeroplane departure</annotation>
+		<annotation cp="🛬" type="tts">aeroplane arrival</annotation>
+		<annotation cp="🚠" type="tts">mountain cable car</annotation>
+		<annotation cp="🚡" type="tts">gondola</annotation>
+		<annotation cp="🛎" type="tts">hotel call bell</annotation>
+	</annotations>
+</ldml>

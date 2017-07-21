@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ky"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">аял белгиси</annotation>
+		<annotation cp="♂" type="tts">эркек белгиси</annotation>
+		<annotation cp="⚕" type="tts">эскулап белгиси</annotation>
+		<annotation cp="🕺" type="tts">мырза | бий</annotation>
+		<annotation cp="🕺" type="tts">бийлеп жаткан мырза</annotation>
+		<annotation cp="🖤" type="tts">кара | жүрөк | жинденүү</annotation>
+		<annotation cp="🖤" type="tts">кара жүрөк</annotation>
+		<annotation cp="🤙" type="tts">ишарат | мага чал | кол</annotation>
+		<annotation cp="🤙" type="tts">“мага чал” ишараты</annotation>
+		<annotation cp="🤚" type="tts">көтөрүлгөн | алакан</annotation>
+	</annotations>
+</ldml>

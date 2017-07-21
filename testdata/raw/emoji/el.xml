@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="el"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">θηλυκό | γυναίκα</annotation>
+		<annotation cp="♀" type="tts">θηλυκό</annotation>
+		<annotation cp="♂" type="tts">αρσενικό | άντρας</annotation>
+		<annotation cp="♂" type="tts">αρσενικό</annotation>
+		<annotation cp="⚕" type="tts">σύμβολο | ιατρική</annotation>
+		<annotation cp="⚕" type="tts">ιατρικό σύμβολο</annotation>
+		<annotation cp="🕺" type="tts">χορός | άντρας</annotation>
+		<annotation cp="🕺" type="tts">άντρας που χορεύει</annotation>
+		<annotation cp="🖤" type="tts">μαύρο | καρδιά | κακός | μαγεμένος</annotation>
+		<annotation cp="🖤" type="tts">μαύρη καρδιά</annotation>
+	</annotations>
+</ldml>

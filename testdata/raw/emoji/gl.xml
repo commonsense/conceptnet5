@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="gl"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">símbolo | muller | feminismo</annotation>
+		<annotation cp="♀" type="tts">símbolo da muller</annotation>
+		<annotation cp="♂" type="tts">símbolo | home</annotation>
+		<annotation cp="♂" type="tts">símbolo do home</annotation>
+		<annotation cp="⚕" type="tts">Esculapio | medicina | serpe | farmacia</annotation>
+		<annotation cp="⚕" type="tts">símbolo da medicina</annotation>
+		<annotation cp="🕺" type="tts">bailar | bailarín | home</annotation>
+		<annotation cp="🕺" type="tts">bailarín</annotation>
+		<annotation cp="🖤" type="tts">corazón | negro | maldade | malvado</annotation>
+		<annotation cp="🖤" type="tts">corazón negro</annotation>
+	</annotations>
+</ldml>

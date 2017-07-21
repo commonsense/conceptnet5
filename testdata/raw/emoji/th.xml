@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="th"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">ผู้หญิง</annotation>
+		<annotation cp="♀" type="tts">สัญลักษณ์เพศหญิง</annotation>
+		<annotation cp="♂" type="tts">ผู้ชาย</annotation>
+		<annotation cp="♂" type="tts">สัญลักษณ์เพศชาย</annotation>
+		<annotation cp="⚕" type="tts">แอสคูลาปิอุส | การแพทย์ | ไม้เท้า | คทางูไขว้</annotation>
+		<annotation cp="⚕" type="tts">เครื่องหมายการแพทย์</annotation>
+		<annotation cp="🕺" type="tts">เต้น | ดิ้น | ผู้ชาย | ปล่อยแก่</annotation>
+		<annotation cp="🕺" type="tts">คนเต้น</annotation>
+		<annotation cp="🖤" type="tts">ใจ | ดำ | น้ำใจ</annotation>
+		<annotation cp="🖤" type="tts">ใจดำ</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ru"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">женщина | символ | венера</annotation>
+		<annotation cp="♀" type="tts">женский символ</annotation>
+		<annotation cp="♂" type="tts">мужчина | символ | марс</annotation>
+		<annotation cp="♂" type="tts">мужской символ</annotation>
+		<annotation cp="⚕" type="tts">медицина | асклепий | посох</annotation>
+		<annotation cp="⚕" type="tts">медицинский символ</annotation>
+		<annotation cp="🕺" type="tts">мужчина | танец</annotation>
+		<annotation cp="🕺" type="tts">танцующий мужчина</annotation>
+		<annotation cp="🖤" type="tts">черное | сердце | злоба</annotation>
+		<annotation cp="🖤" type="tts">черное сердце</annotation>
+	</annotations>
+</ldml>

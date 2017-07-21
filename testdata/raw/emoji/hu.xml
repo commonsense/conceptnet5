@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="hu"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">női | nem</annotation>
+		<annotation cp="♀" type="tts">női nem jelképe</annotation>
+		<annotation cp="♂" type="tts">férfi | nem</annotation>
+		<annotation cp="♂" type="tts">férfi nem jelképe</annotation>
+		<annotation cp="⚕" type="tts">Aszklépiosz | bot | orvos | orvoslás</annotation>
+		<annotation cp="⚕" type="tts">orvosi szimbólum</annotation>
+		<annotation cp="🕺" type="tts">tánc | férfi</annotation>
+		<annotation cp="🕺" type="tts">táncoló férfi</annotation>
+		<annotation cp="🖤" type="tts">fekete | szív | gonosz</annotation>
+		<annotation cp="🖤" type="tts">fekete szív</annotation>
+	</annotations>
+</ldml>

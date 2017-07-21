@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="kn"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">ಸ್ತ್ರೀ | ಮಹಿಳೆ</annotation>
+		<annotation cp="♀" type="tts">ಮಹಿಳೆ ಚಿಹ್ನೆ</annotation>
+		<annotation cp="♂" type="tts">ಪುರುಷ | ಗಂಡು</annotation>
+		<annotation cp="♂" type="tts">ಪುರುಷ ಚಿಹ್ನೆ</annotation>
+		<annotation cp="⚕" type="tts">ಔಷಧಿ | ಸಿಬ್ಬಂದಿ | ಏಸ್ಕುಲೇಪಿಯಸ್</annotation>
+		<annotation cp="⚕" type="tts">ವೈದ್ಯಕೀಯ ಚಿಹ್ನೆ</annotation>
+		<annotation cp="🕺" type="tts">ನೃತ್ಯ | ವ್ಯಕ್ತಿ</annotation>
+		<annotation cp="🕺" type="tts">ನೃತ್ಯಿಸುತ್ತಿರುವ ವ್ಯಕ್ತಿ</annotation>
+		<annotation cp="🖤" type="tts">ಕಪ್ಪು | ಹೃದಯ | ಕೆಡುಕು | ದುಷ್ಟ</annotation>
+		<annotation cp="🖤" type="tts">ಕೆಡುಕು</annotation>
+	</annotations>
+</ldml>
