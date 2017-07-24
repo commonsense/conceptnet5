@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="es"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">signo | símbolo | mujer</annotation>
+		<annotation cp="♀" type="tts">signo femenino</annotation>
+		<annotation cp="♂" type="tts">signo | símbolo | hombre</annotation>
+		<annotation cp="♂" type="tts">signo masculino</annotation>
+		<annotation cp="⚕" type="tts">esculapio | medicina | médicos | símbolo</annotation>
+		<annotation cp="⚕" type="tts">símbolo de la medicina</annotation>
+		<annotation cp="🕺" type="tts">hombre | bailar</annotation>
+		<annotation cp="🕺" type="tts">hombre bailando</annotation>
+		<annotation cp="🖤" type="tts">corazón | negro</annotation>
+		<annotation cp="🖤" type="tts">corazón negro</annotation>
+	</annotations>
+</ldml>

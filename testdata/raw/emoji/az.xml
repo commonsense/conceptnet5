@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="az"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">qadın</annotation>
+		<annotation cp="♀" type="tts">qadın işarəsi</annotation>
+		<annotation cp="♂" type="tts">kişi</annotation>
+		<annotation cp="♂" type="tts">kişi işarəsi</annotation>
+		<annotation cp="⚕" type="tts">eskulap | tibb | heyət</annotation>
+		<annotation cp="⚕" type="tts">tibb işarəsi</annotation>
+		<annotation cp="🕺" type="tts">rəqs | kişi | mahnı</annotation>
+		<annotation cp="🕺" type="tts">əylənən kişilər</annotation>
+		<annotation cp="🖤" type="tts">qara | ürək | xislət | pis</annotation>
+		<annotation cp="🖤" type="tts">qara-ürək adam</annotation>
+	</annotations>
+</ldml>

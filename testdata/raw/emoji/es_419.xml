@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="es_419"/>
+	</identity>
+	<annotations>
+		<annotation cp="🕺" type="tts">hombre | bailar | baile</annotation>
+		<annotation cp="🤙" type="tts">llamada | gesto | mano</annotation>
+		<annotation cp="🤙" type="tts">gesto de llamada</annotation>
+		<annotation cp="🤚" type="tts">palma | mano</annotation>
+		<annotation cp="🤚" type="tts">palma de la mano</annotation>
+		<annotation cp="🤛" type="tts">puño a la izquierda</annotation>
+		<annotation cp="🤜" type="tts">puño a la derecha</annotation>
+		<annotation cp="🤝" type="tts">apretón | manos | acuerdo | reunión</annotation>
+		<annotation cp="🤞" type="tts">dedos | cruzados | mano | suerte</annotation>
+		<annotation cp="🤠" type="tts">cara | vaquero | sombrero | vaquera</annotation>
+	</annotations>
+</ldml>

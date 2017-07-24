@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="kk"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">әйел | таңба</annotation>
+		<annotation cp="♀" type="tts">әйел таңбасы</annotation>
+		<annotation cp="♂" type="tts">ер | таңба</annotation>
+		<annotation cp="♂" type="tts">ер таңбасы</annotation>
+		<annotation cp="⚕" type="tts">медицина | таңба</annotation>
+		<annotation cp="⚕" type="tts">медицина таңбасы</annotation>
+		<annotation cp="🕺" type="tts">билеп | тұрған | адам</annotation>
+		<annotation cp="🕺" type="tts">билеп тұрған ер адам</annotation>
+		<annotation cp="🖤" type="tts">жүрегі | қара</annotation>
+		<annotation cp="🖤" type="tts">жүрегі қара</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="he"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">אישה | נשים</annotation>
+		<annotation cp="♀" type="tts">סמל אישה</annotation>
+		<annotation cp="♂" type="tts">איש | גבר | גברים</annotation>
+		<annotation cp="♂" type="tts">סמל גבר</annotation>
+		<annotation cp="⚕" type="tts">אסקלפיוס | אל הרפואה במיתולוגיה היוונית והרומית | רפואה</annotation>
+		<annotation cp="⚕" type="tts">סמל רפואה</annotation>
+		<annotation cp="🕺" type="tts">איש | רוקד</annotation>
+		<annotation cp="🕺" type="tts">איש רוקד</annotation>
+		<annotation cp="🖤" type="tts">כישוף | אפל | מאגיה | שחורה | לב | שחור</annotation>
+		<annotation cp="🖤" type="tts">מאגיה שחורה</annotation>
+	</annotations>
+</ldml>

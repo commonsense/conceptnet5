@@ -31,6 +31,20 @@ WIKTIONARY_VERSIONS = {
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
+# Languages that the CLDR emoji data is available in. These match the original
+# filenames, not ConceptNet language codes; they are turned into ConceptNet
+# language codes by the reader.
+EMOJI_LANGUAGES = [
+    'af', 'am', 'ar', 'as', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy',
+    'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'es', 'es_419', 'et', 'eu',
+    'fa', 'fi', 'fil', 'fr', 'ga', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy',
+    'id', 'is', 'it', 'ja', 'ka', 'kk', 'km', 'kn', 'ko', 'ky', 'lo', 'lt',
+    'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'or', 'pa',
+    'pl', 'pt', 'pt_PT', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn',
+    'sv', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
+    'zh_Hant', 'zu'
+]
+
 # Increment this number when we incompatibly change the parser
 WIKT_PARSER_VERSION = "1"
 
@@ -45,17 +59,19 @@ RETROFIT_SHARDS = 6
 # terms that ConceptNet will attempt to represent, from the additional datasets
 # that will mainly be used to find more information about those terms.
 
+
 CORE_DATASET_NAMES = [
     "jmdict/jmdict",
     "nadya/nadya",
     "ptt_petgame/api",
     "opencyc/opencyc",
     "verbosity/verbosity",
-    "wordnet/wordnet"
+    "wordnet/wordnet",
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
 CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
@@ -300,6 +316,14 @@ rule read_wordnet:
         DATA + "/edges/wordnet/wordnet.msgpack",
     shell:
         "cn5-read wordnet {input} {output}"
+
+rule read_emoji:
+    input:
+        DATA + "/raw/emoji/{language}.xml"
+    output:
+        DATA + "/edges/emoji/{language}.msgpack"
+    shell:
+        "cn5-read emoji {input} {output}"
 
 
 # Converting msgpack to csv

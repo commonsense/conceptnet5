@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="fi"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">Venus-symboli | naissymboli</annotation>
+		<annotation cp="♀" type="tts">Venus-symboli</annotation>
+		<annotation cp="♂" type="tts">Mars-symboli | miessymboli</annotation>
+		<annotation cp="♂" type="tts">Mars-symboli</annotation>
+		<annotation cp="⚕" type="tts">lääketieteen symboli | Asklepioksen sauva</annotation>
+		<annotation cp="⚕" type="tts">lääketieteen symboli</annotation>
+		<annotation cp="🕺" type="tts">tanssi | mies</annotation>
+		<annotation cp="🕺" type="tts">mies tanssii</annotation>
+		<annotation cp="🖤" type="tts">musta | sydän</annotation>
+		<annotation cp="🖤" type="tts">musta sydän</annotation>
+	</annotations>
+</ldml>

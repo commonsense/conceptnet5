@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ar"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">مؤنث | أنثى</annotation>
+		<annotation cp="♀" type="tts">أنثى</annotation>
+		<annotation cp="♂" type="tts">ذكر | مذكر</annotation>
+		<annotation cp="♂" type="tts">ذكر</annotation>
+		<annotation cp="⚕" type="tts">فريق | طب</annotation>
+		<annotation cp="⚕" type="tts">رمز طبي</annotation>
+		<annotation cp="🕺" type="tts">رجل | راقص</annotation>
+		<annotation cp="🕺" type="tts">رجل يرقص</annotation>
+		<annotation cp="🖤" type="tts">أسود | قلب | شر</annotation>
+		<annotation cp="🖤" type="tts">قلب أسود</annotation>
+	</annotations>
+</ldml>

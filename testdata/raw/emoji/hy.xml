@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="hy"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">կին</annotation>
+		<annotation cp="♀" type="tts">կնոջ նշան</annotation>
+		<annotation cp="♂" type="tts">տղամարդ</annotation>
+		<annotation cp="♂" type="tts">տղամարդու նշան</annotation>
+		<annotation cp="⚕" type="tts">բժշկություն | բժիշկ</annotation>
+		<annotation cp="⚕" type="tts">բժշկության խորհրդանիշ</annotation>
+		<annotation cp="🕺" type="tts">պար | տղամարդ</annotation>
+		<annotation cp="🕺" type="tts">պարող տղամարդ</annotation>
+		<annotation cp="🖤" type="tts">սև | սիրտ | չար</annotation>
+		<annotation cp="🖤" type="tts">սև սիրտ</annotation>
+	</annotations>
+</ldml>

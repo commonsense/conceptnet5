@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="fil"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">babae | simbolo</annotation>
+		<annotation cp="♀" type="tts">simbolo ng babae</annotation>
+		<annotation cp="♂" type="tts">lalaki | simbolo</annotation>
+		<annotation cp="♂" type="tts">simbolo ng lalaki</annotation>
+		<annotation cp="⚕" type="tts">aesculapius | medisina</annotation>
+		<annotation cp="⚕" type="tts">simbolong pang-medikal</annotation>
+		<annotation cp="🕺" type="tts">sayaw | lalaki</annotation>
+		<annotation cp="🕺" type="tts">lalaking sumasayaw</annotation>
+		<annotation cp="🖤" type="tts">itim | puso | masama | sama</annotation>
+		<annotation cp="🖤" type="tts">itim na puso</annotation>
+	</annotations>
+</ldml>

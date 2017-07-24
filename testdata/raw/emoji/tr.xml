@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="tr"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">bayan | kadın</annotation>
+		<annotation cp="♀" type="tts">kadın sembolü</annotation>
+		<annotation cp="♂" type="tts">erkek | adam</annotation>
+		<annotation cp="♂" type="tts">erkek sembolü</annotation>
+		<annotation cp="⚕" type="tts">aesculapius | tıp | personel</annotation>
+		<annotation cp="⚕" type="tts">medikal sembolü</annotation>
+		<annotation cp="🕺" type="tts">dans | adam</annotation>
+		<annotation cp="🕺" type="tts">dans eden adam</annotation>
+		<annotation cp="🖤" type="tts">siyah | kalp | kötü | fena</annotation>
+		<annotation cp="🖤" type="tts">kötü kalp</annotation>
+	</annotations>
+</ldml>

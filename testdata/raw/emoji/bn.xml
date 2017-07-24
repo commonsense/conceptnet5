@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="bn"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">মহিলা | স্ত্রি</annotation>
+		<annotation cp="♀" type="tts">স্ত্রি চিহ্ন</annotation>
+		<annotation cp="♂" type="tts">পুরুষ | ছেলে</annotation>
+		<annotation cp="♂" type="tts">পুরুষ চিহ্ন</annotation>
+		<annotation cp="⚕" type="tts">অ্যাসক্লিপিয়স | ঔযদ | চিকিৎসা | স্টাফ</annotation>
+		<annotation cp="⚕" type="tts">চিকিৎসার চিহ্ন</annotation>
+		<annotation cp="🕺" type="tts">নাচছে | পুরুষ</annotation>
+		<annotation cp="🕺" type="tts">নাচছে এমন পুরুষ</annotation>
+		<annotation cp="🖤" type="tts">কালো | হার্ট | দুষ্ট | বাজে</annotation>
+		<annotation cp="🖤" type="tts">কালো হার্ট</annotation>
+	</annotations>
+</ldml>

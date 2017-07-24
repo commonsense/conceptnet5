@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="af"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">vroulik</annotation>
+		<annotation cp="♀" type="tts">vroulik-teken</annotation>
+		<annotation cp="♂" type="tts">manlik</annotation>
+		<annotation cp="♂" type="tts">manlik-teken</annotation>
+		<annotation cp="⚕" type="tts">mediese simbool | eskulaap</annotation>
+		<annotation cp="⚕" type="tts">mediese simbool</annotation>
+		<annotation cp="🕺" type="tts">man | dans</annotation>
+		<annotation cp="🕺" type="tts">man dans</annotation>
+		<annotation cp="🖤" type="tts">hart | boos | sleg | swart</annotation>
+		<annotation cp="🖤" type="tts">swart hartjie</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="en"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">woman</annotation>
+		<annotation cp="♀" type="tts">female sign</annotation>
+		<annotation cp="♂" type="tts">man</annotation>
+		<annotation cp="♂" type="tts">male sign</annotation>
+		<annotation cp="⚕" type="tts">staff | medicine | aesculapius</annotation>
+		<annotation cp="⚕" type="tts">medical symbol</annotation>
+		<annotation cp="🕺" type="tts">dance | man</annotation>
+		<annotation cp="🕺" type="tts">man dancing</annotation>
+		<annotation cp="🖤" type="tts">black | evil | wicked</annotation>
+		<annotation cp="🖤" type="tts">black heart</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="ca"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">femení | dona | femella</annotation>
+		<annotation cp="♀" type="tts">símbol femení</annotation>
+		<annotation cp="♂" type="tts">masculí | home | mascle</annotation>
+		<annotation cp="♂" type="tts">símbol masculí</annotation>
+		<annotation cp="⚕" type="tts">Esculapi | medicina | personal</annotation>
+		<annotation cp="⚕" type="tts">símbol mèdic</annotation>
+		<annotation cp="🕺" type="tts">home | ballant | ball | disco | música</annotation>
+		<annotation cp="🕺" type="tts">home ballant</annotation>
+		<annotation cp="🖤" type="tts">cor | negre</annotation>
+		<annotation cp="🖤" type="tts">cor negre</annotation>
+	</annotations>
+</ldml>

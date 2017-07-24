@@ -1,7 +1,7 @@
 import click
 from . import (
-    conceptnet4, jmdict, nadya, ptt_petgame, opencyc, verbosity,
-    wiktionary, wordnet, dbpedia
+    conceptnet4, dbpedia, emoji, jmdict, nadya, ptt_petgame,
+    opencyc, verbosity, wiktionary, wordnet
 )
 
 
@@ -136,9 +136,23 @@ def run_wordnet(input, output):
     """
     wordnet.handle_file(input, output)
 
+
 @cli.command(name='dbpedia')
 @click.argument('input', type=click.Path(dir_okay=True))
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
 @click.argument('concept', type=click.Path(writable=True, dir_okay=False))
 def run_dbpedia(input, output, concept):
     dbpedia.process_dbpedia(input, output, concept)
+
+
+@cli.command(name='emoji')
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def run_emoji(input, output):
+    """
+    Import data from the CLDR emoji database.
+
+    input: a .xml file with emoji data
+    output: a msgpack file of edges
+    """
+    emoji.handle_file(input, output)

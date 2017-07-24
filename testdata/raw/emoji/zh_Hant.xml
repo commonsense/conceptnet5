@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="zh_Hant"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">女</annotation>
+		<annotation cp="♀" type="tts">女</annotation>
+		<annotation cp="♂" type="tts">男</annotation>
+		<annotation cp="♂" type="tts">男</annotation>
+		<annotation cp="⚕" type="tts">醫療符號</annotation>
+		<annotation cp="⚕" type="tts">醫療符號</annotation>
+		<annotation cp="🕺" type="tts">男 | 舞 | 跳</annotation>
+		<annotation cp="🕺" type="tts">男人跳著舞</annotation>
+		<annotation cp="🖤" type="tts">黑 | 心 | 邪惡</annotation>
+		<annotation cp="🖤" type="tts">黑心</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="te"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">మహిళ | స్త్రీ</annotation>
+		<annotation cp="♀" type="tts">మహిళ సంకేతం</annotation>
+		<annotation cp="♂" type="tts">పురుషుడు | మగాడు</annotation>
+		<annotation cp="♂" type="tts">పురుషుల సంకేతం</annotation>
+		<annotation cp="⚕" type="tts">వ్యాధులను నయం చేసే వ్యక్తి | వైద్యం | సిబ్బంది</annotation>
+		<annotation cp="⚕" type="tts">వైద్య చిహ్నం</annotation>
+		<annotation cp="🕺" type="tts">నృత్యం | పురుషుడు</annotation>
+		<annotation cp="🕺" type="tts">నృత్యం చేస్తున్న పురుషుడు</annotation>
+		<annotation cp="🖤" type="tts">నలుపు | హృదయం | చెడు | మోసపూరిత</annotation>
+		<annotation cp="🖤" type="tts">నలుపు హృదయం</annotation>
+	</annotations>
+</ldml>

@@ -1,0 +1,18 @@
+<ldml>
+	<identity>
+		<version number="$Revision$"/>
+		<language type="cy"/>
+	</identity>
+	<annotations>
+		<annotation cp="♀" type="tts">benywaidd | menyw</annotation>
+		<annotation cp="♀" type="tts">arwydd benyw</annotation>
+		<annotation cp="♂" type="tts">gwrywaidd | dyn</annotation>
+		<annotation cp="♂" type="tts">arwydd gwrw</annotation>
+		<annotation cp="⚕" type="tts">esgwlapaidd | meddyginiaeth | staff</annotation>
+		<annotation cp="⚕" type="tts">arwydd meddygol</annotation>
+		<annotation cp="🕺" type="tts">dawnsio | dyn</annotation>
+		<annotation cp="🕺" type="tts">dyn yn dawnsio</annotation>
+		<annotation cp="🖤" type="tts">du | calon | drwg | maleisus</annotation>
+		<annotation cp="🖤" type="tts">calon du</annotation>
+	</annotations>
+</ldml>
