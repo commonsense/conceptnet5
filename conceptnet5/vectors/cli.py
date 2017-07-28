@@ -9,7 +9,7 @@ from .evaluation.compare import (
 )
 from .formats import (
     convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
-    load_hdf, save_hdf, export_text, save_labels_and_npy
+    load_hdf, save_hdf, export_text, save_labels_and_npy, load_multiformat
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
@@ -118,7 +118,7 @@ def run_debias(input_filename, output_filename):
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate(filename, subset, semeval_by_language):
-    frame = load_hdf(filename)
+    frame = load_multiformat(filename)
     if semeval_by_language:
         scope = 'per-language'
     else:
@@ -133,7 +133,7 @@ def run_evaluate(filename, subset, semeval_by_language):
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate_wordsim(filename, subset, semeval_by_language):
-    frame = load_hdf(filename)
+    frame = load_multiformat(filename)
     if semeval_by_language:
         scope = 'per-language'
     else:
@@ -146,7 +146,7 @@ def run_evaluate_wordsim(filename, subset, semeval_by_language):
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate_raw(filename, subset, semeval_by_language):
-    frame = load_hdf(filename)
+    frame = load_multiformat(filename)
     if semeval_by_language:
         scope = 'per-language'
     else:
@@ -158,14 +158,14 @@ def run_evaluate_raw(filename, subset, semeval_by_language):
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
 def run_evaluate_analogies(filename, subset):
-    frame = load_hdf(filename)
+    frame = load_multiformat(filename)
     print(analogy.evaluate(frame, analogy_filename=ANALOGY_FILENAME))
 
 
 @cli.command(name='evaluate_bias')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 def run_evaluate_bias(filename):
-    frame = load_hdf(filename)
+    frame = load_multiformat(filename)
     print(bias.measure_bias(frame))
 
 

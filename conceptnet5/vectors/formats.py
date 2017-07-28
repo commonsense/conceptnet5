@@ -165,6 +165,22 @@ def load_fasttext(filename, max_rows=1000000):
     return pd.DataFrame(arr, index=labels, dtype='f')
 
 
+def load_multiformat(filename):
+    """
+    Load the fastText format if given a .txt.gz file, or the
+    HDF5 format if given an .h5 file.
+    """
+    if filename.endswith('.txt.gz'):
+        return load_fasttext(filename)
+    elif filename.endswith('.h5'):
+        return load_hdf(filename)
+    else:
+        raise ValueError(
+            "I don't know what format %r is in. "
+            "Use a .txt.gz or .h5 file." % filename
+        )
+
+
 def _read_until_space(file):
     chars = []
     while True:
