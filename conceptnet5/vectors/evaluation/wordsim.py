@@ -165,12 +165,31 @@ COMPARISONS['Stanford', 'GloVe'] = make_comparison_table({
 
 # Joulin et al., 2016 - "Bag of Tricks"
 # Rounded-off numbers from the blog post at https://research.facebook.com/blog/fasttext/
-COMPARISONS['Facebook', 'fastText'] = make_comparison_table({
+COMPARISONS['Facebook', 'fastText published'] = make_comparison_table({
     'rw': .46,
     'ws353': .73,
     'gur350-de': .69,
     'zg222-de': .37,
 })
+
+# Downloadable fastText vectors, including OOV
+COMPARISONS['Facebook', 'fastText precomputed'] = make_comparison_table({
+    'rw': .472,
+    'ws353': .739,
+    'gur350-de': .695,
+    'ws353-es': .614,
+    'tmu-rw-ja': .118,
+
+    'semeval-2a-en': .657,
+    'semeval-2a-de': .624,
+    'semeval-2a-es': .598,
+    'semeval-2a-it': .649,
+    'semeval-2a-fa': .165,
+})
+
+# Alias the above result for the SemEval graphing script
+COMPARISONS['SemEval2017', 'fastText precomputed'] = COMPARISONS['Facebook', 'fastText precomputed']
+
 
 # Salle et al., 2016 - LexVec
 # https://github.com/alexandres/lexvec
@@ -199,7 +218,8 @@ COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
 })
 
 # Comparisons from SemEval results
-COMPARISONS['SemEval2017', 'Luminoso'] = make_comparison_table({
+COMPARISONS['SemEval2017', 'Luminoso 2017-01'] = make_comparison_table({
+    # These results were the "run2" results we submitted to SemEval
     'semeval-2a-en': .789,
     'semeval-2a-de': .700,
     'semeval-2a-es': .743,
@@ -355,7 +375,11 @@ COMPARISONS['SemEval2017', 'fastText'] = make_comparison_table({
     'semeval-2a-fa': .334,
 })
 
-# Hypothetical SemEval runs of existing systems
+COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
+    'semeval-2a-en': .575,
+})
+
+# Variants on our system
 COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table({
     'semeval-2a-en': .747,
     'semeval-2a-de': .599,
@@ -375,9 +399,64 @@ COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table({
     'semeval-2b-it-fa': .474,
 })
 
-COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
-    'semeval-2a-en': .575,
+COMPARISONS['SemEval2017', 'Luminoso 2017-02'] = make_comparison_table({
+    # Variant B from the paper
+    'semeval-2a-en': .796,
+    'semeval-2a-de': .722,
+    'semeval-2a-es': .761,
+    'semeval-2a-it': .756,
+    'semeval-2a-fa': .541,
+
+    'semeval-2b-en-de': .767,
+    'semeval-2b-en-es': .778,
+    'semeval-2b-en-it': .786,
+    'semeval-2b-en-fa': .634,
+    'semeval-2b-de-es': .747,
+    'semeval-2b-de-it': .757,
+    'semeval-2b-de-fa': .610,
+    'semeval-2b-es-it': .765,
+    'semeval-2b-es-fa': .646,
+    'semeval-2b-it-fa': .635,
 })
+
+COMPARISONS['SemEval2017', 'Luminoso 2017-04'] = make_comparison_table({
+    'semeval-2a-en': .784,
+    'semeval-2a-de': .724,
+    'semeval-2a-es': .758,
+    'semeval-2a-it': .650,
+    'semeval-2a-fa': .536,
+
+    'semeval-2b-en-de': .759,
+    'semeval-2b-en-es': .767,
+    'semeval-2b-en-it': .712,
+    'semeval-2b-en-fa': .626,
+    'semeval-2b-de-es': .741,
+    'semeval-2b-de-it': .704,
+    'semeval-2b-de-fa': .616,
+    'semeval-2b-es-it': .700,
+    'semeval-2b-es-fa': .639,
+    'semeval-2b-it-fa': .557,
+})
+
+COMPARISONS['SemEval2017', 'Luminoso 2017-06'] = make_comparison_table({
+    'semeval-2a-en': .781,
+    'semeval-2a-de': .783,
+    'semeval-2a-es': .758,
+    'semeval-2a-it': .747,
+    'semeval-2a-fa': .510,
+
+    'semeval-2b-en-de': .786,
+    'semeval-2b-en-es': .766,
+    'semeval-2b-en-it': .775,
+    'semeval-2b-en-fa': .612,
+    'semeval-2b-de-es': .767,
+    'semeval-2b-de-it': .779,
+    'semeval-2b-de-fa': .626,
+    'semeval-2b-es-it': .758,
+    'semeval-2b-es-fa': .621,
+    'semeval-2b-it-fa': .601,
+})
+
 
 def read_ws353():
     """
