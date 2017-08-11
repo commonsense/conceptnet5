@@ -140,7 +140,4 @@ def cli(input, output):
     combine_assertions(input,output)
 
 if __name__ == '__main__':
-    # This is the main command-line entry point, used in steps of building
-    # ConceptNet that need to combine edges into assertions. See data/Makefile
-    # for more context.
     cli()

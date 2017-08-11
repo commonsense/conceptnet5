@@ -1,4 +1,6 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+from conceptnet5.languages import COMMON_LANGUAGES
+
 import os
 HTTP = HTTPRemoteProvider()
 
@@ -649,6 +651,36 @@ rule export_english_text:
     shell:
         "cn5-vectors export_text -l en {input} {output}"
 
+
+# Morphology
+# ==========
+
+rule prepare_vocab:
+    input:
+        DATA + "/stats/concept_counts.txt"
+    output:
+        DATA + "/morph/vocab/{language}.txt"
+    shell:
+        "python3 -m conceptnet5.builders.prepare_vocab {wildcards.language} {input} {output}"
+
+rule morfessor_segmentation:
+    input:
+        DATA + "/morph/vocab/{language}.txt"
+    output:
+        DATA + "/morph/segments/{language}.txt"
+    shell:
+        "morfessor -t {input} -T {input} -S {output} -f '_' --traindata-list"
+
+rule morphology:
+    input:
+        expand(
+            DATA + "/morph/segments/{language}.txt",
+            language=COMMON_LANGUAGES
+        )
+
+
+# Packaging
+# =========
 
 rule sha256sums:
     input:
