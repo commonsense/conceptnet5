@@ -1,5 +1,5 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-from conceptnet5.languages import COMMON_LANGUAGES
+from conceptnet5.languages import COMMON_LANGUAGES, ATOMIC_SPACE_LANGUAGES
 
 import os
 HTTP = HTTPRemoteProvider()
@@ -465,6 +465,17 @@ rule concepts_right:
         "cut -f 4 {input} > {output}"
 
 
+rule concept_counts:
+    input:
+        DATA + "/stats/concepts_left.txt",
+        DATA + "/stats/concepts_right.txt"
+    output:
+        DATA + "/stats/concept_counts.txt"
+    shell:
+        "cat {input} | grep '^/c/' | cut -d '/' -f 1,2,3,4 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+
+
 rule language_stats:
     input:
         DATA + "/stats/concepts_left.txt",
@@ -661,15 +672,18 @@ rule prepare_vocab:
     output:
         DATA + "/morph/vocab/{language}.txt"
     shell:
-        "python3 -m conceptnet5.builders.prepare_vocab {wildcards.language} {input} {output}"
+        "python3 -m conceptnet5.morphology.prepare_vocab {wildcards.language} {input} {output}"
 
 rule morfessor_segmentation:
     input:
         DATA + "/morph/vocab/{language}.txt"
     output:
         DATA + "/morph/segments/{language}.txt"
-    shell:
-        "morfessor -t {input} -T {input} -S {output} -f '_' --traindata-list"
+    run:
+        if wildcards.language in ATOMIC_SPACE_LANGUAGES:
+            shell("morfessor-train {input} -S {output} --traindata-list --nosplit-re '[^_].'")
+        else:
+            shell("morfessor-train {input} -S {output} -f '_' --traindata-list")
 
 rule morphology:
     input:

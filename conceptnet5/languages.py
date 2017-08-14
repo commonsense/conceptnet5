@@ -744,6 +744,21 @@ LANGUAGE_NAMES = {
 }
 
 
+# In Vietnamese, each space-separated token is a syllable, similar to a
+# Chinese character. "bánh mì" is one word made of two syllables.
+#
+# What this means for Morfessor-based morphology is that we have to handle
+# Vietnamese, and any other language that turns out to have this property,
+# differently. In most languages, a space means that there _must_ be a morpheme
+# break here. In Vietnamese, spaces are the only places where there _may_ be a
+# morpheme break, but not all spaces are morpheme breaks.
+#
+# In other words, in some languages, space-separated tokens are atomic. Which
+# leads to this awesome, sci-fi-sounding constant name.
+
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
+
 def get_language_name(code):
     """
     Get the English name of a language ConceptNet supports.
