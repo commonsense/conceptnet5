@@ -77,6 +77,7 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
+DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
 
 RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
@@ -361,7 +362,7 @@ rule combine_assertions:
     output:
         DATA + "/assertions/assertions.msgpack"
     shell:
-        "python3 -m conceptnet5.builders.combine_assertions {input} {output}"
+        "cn5-build combine {input} {output}"
 
 
 # Putting data in PostgreSQL
@@ -476,6 +477,17 @@ rule concept_counts:
         "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
 
 
+rule core_concept_counts:
+    input:
+        DATA + "/stats/core_concepts_left.txt",
+        DATA + "/stats/core_concepts_right.txt"
+    output:
+        DATA + "/stats/core_concept_counts.txt"
+    shell:
+        "cat {input} | grep '^/c/' | cut -d '/' -f 1,2,3,4 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+
+
 rule language_stats:
     input:
         DATA + "/stats/concepts_left.txt",
@@ -521,7 +533,7 @@ rule reduce_assoc:
     output:
         DATA + "/assoc/reduced.csv"
     shell:
-        "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
+        "cn5-build reduce_assoc {input} {output}"
 
 
 # Building the vector space
@@ -668,11 +680,11 @@ rule export_english_text:
 
 rule prepare_vocab:
     input:
-        DATA + "/stats/concept_counts.txt"
+        DATA + "/stats/core_concept_counts.txt"
     output:
         DATA + "/morph/vocab/{language}.txt"
     shell:
-        "python3 -m conceptnet5.morphology.prepare_vocab {wildcards.language} {input} {output}"
+        "cn5-build prepare_morphology {wildcards.language} {input} {output}"
 
 rule morfessor_segmentation:
     input:
@@ -685,12 +697,13 @@ rule morfessor_segmentation:
         else:
             shell("morfessor-train {input} -S {output} -f '_' --traindata-list")
 
-rule morphology:
+rule subwords:
     input:
-        expand(
-            DATA + "/morph/segments/{language}.txt",
-            language=COMMON_LANGUAGES
-        )
+        DATA + "/morph/segments/{language}.txt",
+    output:
+        DATA + "/edges/morphology/subwords-{language}.msgpack"
+    shell:
+        "cn5-build subwords {wildcards.language} {input} {output}"
 
 
 # Packaging
