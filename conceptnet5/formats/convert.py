@@ -73,7 +73,6 @@ def msgpack_to_assoc(input_filename, output_filename):
             start_uri = info['start']
             end_uri = info['end']
             if not (
-                start_uri.startswith('/c/') and end_uri.startswith('/c/') and
                 get_uri_language(start_uri) in COMMON_LANGUAGES and
                 get_uri_language(end_uri) in COMMON_LANGUAGES
             ):
