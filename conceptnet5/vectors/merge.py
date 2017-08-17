@@ -48,10 +48,9 @@ def concat_intersect(frames):
         frame_col_offsets.append(ncolumns)
         ncolumns += frame.shape[1]
 
-    nrows = len(label_intersection)
-
     # Get the list of labels in a predictable order.
-    label_intersection = sorted(label_intersection)
+    label_intersection = sorted(label for label in label_intersection if get_language(label) in CORE_LANGUAGES)
+    nrows = len(label_intersection)
 
     # Now we know how many rows and columns of data we have, so allocate the
     # NumPy array that will contain our results.
@@ -61,7 +60,9 @@ def concat_intersect(frames):
     # our labels, and set those as the appropriate columns of the merged array.
     for frame, offset in zip(frames, frame_col_offsets):
         width = frame.shape[1]
-        joindata[:, offset:(offset + width)] = frame.loc[label_intersection].values
+        for i, label in enumerate(label_intersection):
+            joindata[i, offset:(offset + width)] = frame.loc[label].values
+    del frame
 
     # Convert the array to a DataFrame with the appropriate labels, and
     # return it.
@@ -69,7 +70,7 @@ def concat_intersect(frames):
     return joined
 
 
-def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
+def merge_intersect(frames, subsample=20, k=300):
     """
     Combine the vector knowledge contained in `frames` over the vocabulary
     that they agree on, and use dimensionality reduction to mitigate the

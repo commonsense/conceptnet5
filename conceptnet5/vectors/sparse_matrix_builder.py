@@ -57,6 +57,7 @@ def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
             index1 = labels.add(replace_numbers(concept1))
             index2 = labels.add(replace_numbers(concept2))
             value = float(value_str)
+
             mat[index1, index2] = value
             mat[index2, index1] = value
             totals[index1] += value
