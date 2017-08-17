@@ -1,12 +1,12 @@
 from scipy import sparse
 import pandas as pd
 from conceptnet5.uri import uri_prefixes, uri_prefix, get_language
-from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.relations import SYMMETRIC_RELATIONS
 from conceptnet5.languages import CORE_LANGUAGES
 from ordered_set import OrderedSet
-from collections import defaultdict, Counter
+from collections import defaultdict
 from ..vectors import replace_numbers
+from sklearn.preprocessing import normalize
 
 
 class SparseMatrixBuilder:
@@ -83,7 +83,7 @@ def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
 
     shape = (len(labels), len(labels))
     index = pd.Index(labels)
-    return mat.tocsr(shape), index
+    return normalize(mat.tocsr(shape), norm='l1', axis=1), index
 
 
 def build_features_from_conceptnet_table(filename):
