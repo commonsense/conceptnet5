@@ -22,7 +22,7 @@ def concept_is_bad(uri):
             uri.startswith('/a/') or uri.count('/') <= 2)
 
 
-def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
+def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4):
     """
     Takes in a file of tab-separated simple associations, and removes
     uncommon associations and associations unlikely to be useful.
@@ -67,15 +67,6 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
                     if gleft != gright:
                         line = '\t'.join([gleft, gright, value, dataset, rel])
                         print(line, file=out)
-
-
-@click.command()
-#input filename
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#output filename
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    reduce_assoc(input, output)
 
 
 if __name__ == '__main__':
