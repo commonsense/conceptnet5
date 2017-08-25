@@ -22,7 +22,7 @@ def concept_is_bad(uri):
             uri.startswith('/a/') or uri.count('/') <= 2)
 
 
-def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4):
+def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
     """
     Takes in a file of tab-separated simple associations, and removes
     uncommon associations and associations unlikely to be useful.
@@ -39,8 +39,10 @@ def reduce_assoc(filename, output_filename, cutoff=4, en_cutoff=4):
             else:
                 gleft = uri_prefix(left)
                 gright = uri_prefix(right)
-                counts[gleft] += 1
-                counts[gright] += 1
+                if gright.startswith('/c/'):
+                    counts[gleft] += 1
+                if gleft.startswith('/c/'):
+                    counts[gright] += 1
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()

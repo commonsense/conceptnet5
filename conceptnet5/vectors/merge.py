@@ -49,7 +49,7 @@ def concat_intersect(frames):
         ncolumns += frame.shape[1]
 
     # Get the list of labels in a predictable order.
-    label_intersection = sorted(label for label in label_intersection if get_language(label) in CORE_LANGUAGES)
+    label_intersection = sorted(label for label in label_intersection)
     nrows = len(label_intersection)
 
     # Now we know how many rows and columns of data we have, so allocate the
