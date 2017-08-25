@@ -4,6 +4,7 @@ import wordfreq
 from collections import defaultdict
 from itertools import groupby, product
 from scipy.stats import spearmanr, hmean
+from sklearn.model_selection import KFold
 from statsmodels.stats.proportion import proportion_confint
 
 from conceptnet5.util import get_support_data_filename
@@ -136,6 +137,41 @@ def read_turk_ranks_semeval2012(subset, subclass):
         return sorted(gold_ranks)
 
 
+def read_bats(category):
+    """
+    Read a bats dataset pairs for a specific category. Turn them into questions.
+    """
+    filename = 'bats/{}.txt'.format(category)
+    pairs = []
+    with open(get_support_data_filename(filename)) as file:
+        for line in file:
+            if '\t' in line:
+                left, right = line.lower().split('\t')
+            else:
+                left, right = line.lower().split()
+            right = right.strip()
+            if '/' in right:
+                right = [i.strip() for i in right.split('/')]
+            else:
+                right = [i.strip() for i in right.split(',')]
+            pairs.append([left, right])
+
+    quads = []
+    for i in range(len(pairs)):
+        a_pair = pairs[i]
+        a_pair[1] = a_pair[1][0] # select only the first element if b1 is a list of synonyms
+        b_pairs = [pair for j, pair in enumerate(pairs) if j != i]
+        for b_pair in b_pairs:
+            quad = []
+            quad.extend([standardized_uri('en', term) for term in a_pair + b_pair[:1]])
+            if isinstance(b_pair[1], list):
+                quad.append([standardized_uri('en', term) for term in b_pair[1]])
+            else:
+                quad.append(standardized_uri('en', b_pair[1]))
+            quads.append(quad)
+    return quads
+
+
 def analogy_func(wrap, a1, b1, a2, weight_direct=2/3, weight_transpose=1/3):
     """
     Find the vector representing the best b2 to complete the analogy
@@ -155,11 +191,13 @@ def analogy_func(wrap, a1, b1, a2, weight_direct=2/3, weight_transpose=1/3):
     )
 
 
-def best_analogy_3cosmul(wrap, subframe, a1, b1, a2):
+def best_analogy_3cosmul(wrap, subframe, a1, b1, a2, pick='average'):
     """
     Find the best b2 to complete the analogy a1 : b1 :: a2 : b2, according
     to the 3CosMul metric.
     """
+    #if isinstance(b1, list): # for BATS dataset
+    #    b1 = b1[0]
     va1 = wrap.get_vector(a1)
     vb1 = wrap.get_vector(b1)
     va2 = wrap.get_vector(a2)
@@ -271,29 +309,18 @@ def eval_google_analogies(vectors, subset='semantic', vocab_size=200000, verbose
 
     I (Rob) think this data set is not very representative, but evaluating
     against it is all the rage.
-
-    These analogies are not multiple-choice; instead, you're supposed to pick
-    the best match out of your vector space's entire vocabulary, excluding the
-    three words used in the prompt. The vocabulary size can matter a lot: Set
-    it too high and you'll get low-frequency words that the data set wasn't
-    looking for as answers. Set it too low and the correct answers won't be
-    in the vocabulary.
-
-    Set vocab_size='cheat' to see the results for an unrealistically optimal
-    vocabulary (the vocabulary of the set of answer words).
     """
     filename = get_support_data_filename('google-analogies/{}-words.txt'.format(subset))
     quads = read_google_analogies(filename)
-    if vocab_size == 'cheat':
-        vocab = [
-            standardized_uri('en', word)
-            for word in sorted(set([quad[3] for quad in quads]))
-        ]
-    else:
-        vocab = [
-            standardized_uri('en', word)
-            for word in wordfreq.top_n_list('en', vocab_size)
-        ]
+    return eval_open_vocab_analogies(vectors, quads, vocab_size, verbose)
+
+
+def eval_open_vocab_analogies(vectors, quads, vocab_size=200000, verbose=False):
+    """
+    Solve open vocabulary analogies, using 3CosMul function. This is used by Google and Bats
+    test sets.
+    """
+    vocab = choose_vocab(quads, vocab_size)
     vecs = np.vstack([vectors.get_vector(word) for word in vocab])
     tframe = pd.DataFrame(vecs, index=vocab)
     total = 0
@@ -305,7 +332,7 @@ def eval_google_analogies(vectors, subset='semantic', vocab_size=200000, verbose
         result = best_analogy_3cosmul(
             vectors, tframe, *prompt
         )
-        if result == answer:
+        if result == answer or result in answer:
             correct += 1
         else:
             if verbose and result not in seen_mistakes:
@@ -320,6 +347,31 @@ def eval_google_analogies(vectors, subset='semantic', vocab_size=200000, verbose
     if verbose:
         print(result)
     return result
+
+
+def choose_vocab(quads, vocab_size):
+    """
+    Google and Bats analogies are not multiple-choice; instead, you're supposed to pick
+    the best match out of your vector space's entire vocabulary, excluding the
+    three words used in the prompt. The vocabulary size can matter a lot: Set
+    it too high and you'll get low-frequency words that the data set wasn't
+    looking for as answers. Set it too low and the correct answers won't be
+    in the vocabulary.
+
+    Set vocab_size='cheat' to see the results for an unrealistically optimal
+    vocabulary (the vocabulary of the set of answer words).
+    """
+    if vocab_size == 'cheat':
+        vocab = [
+            standardized_uri('en', word)
+            for word in sorted(set([quad[3] for quad in quads]))
+            ]
+    else:
+        vocab = [
+            standardized_uri('en', word)
+            for word in wordfreq.top_n_list('en', vocab_size)
+            ]
+    return vocab
 
 
 def eval_semeval2012_analogies(vectors, weight_direct, weight_transpose, subset, subclass):
@@ -428,7 +480,16 @@ def eval_semeval2012_global(vectors, weight_direct, weight_transpose, subset):
             pd.Series(spearman_output, index=['acc', 'low', 'high'])]
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semeval_scope='global', google_vocab_size=200000):
+def eval_bats_category(vectors, category, vocab_size=200000, verbose=False):
+    """
+    Evaluate a single category of BATS dataset.
+    """
+    quads = read_bats(category)
+    category_results = eval_open_vocab_analogies(vectors, quads, vocab_size, verbose)
+    return category_results
+
+
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope='global', google_vocab_size=200000):
     """
     Run SAT and Semeval12-2 evaluations.
 
@@ -457,32 +518,31 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
     else:
         sat_weights = (0.35, 0.65)
         semeval_weights = (0.3, 0.35)
-
-    sat_results = eval_pairwise_analogies(vectors,
-                                          analogy_filename,
-                                          sat_weights[0],
-                                          sat_weights[1],
-                                          subset)
-    results.loc['sat-analogies'] = sat_results
-
-    for gsubset in ['semantic', 'syntactic']:
-        google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=google_vocab_size)
-        results.loc['google-%s' % gsubset] = google_results
-
+    #
+    # sat_results = eval_pairwise_analogies(vectors,
+    #                                       analogy_filename,
+    #                                       sat_weights[0],
+    #                                       sat_weights[1],
+    #                                       subset)
+    # results.loc['sat-analogies'] = sat_results
+    #
+    # for gsubset in ['semantic', 'syntactic']:
+    #     google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=google_vocab_size)
+    #     results.loc['google-%s' % gsubset] = google_results
+    #
     # There's no meaningful "all" subset for semeval12, because the dev and
     # test data are stored entirely separately. Just use "test".
     if subset == 'dev':
         semeval12_subset = 'dev'
     else:
         semeval12_subset = 'test'
-    if semeval_scope == 'global':
+    if scope == 'global':
         maxdiff_score, spearman_score = eval_semeval2012_global(vectors,
                                                                 semeval_weights[0],
                                                                 semeval_weights[1],
                                                                 semeval12_subset)
         results.loc['semeval12-spearman'] = spearman_score
         results.loc['semeval12-maxdiff'] = maxdiff_score
-
     else:
         for subclass in product(range(1, 11), 'a b c d e f g h i j'):
             subclass = ''.join([str(element) for element in subclass])
@@ -496,5 +556,21 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, semev
                 results.loc['semeval12-{}-maxdiff'.format(subclass)] = maxdiff_score
             except FileNotFoundError:
                 continue
+
+    bats_results = []
+    for category in product('DEIL', range(1, 11)):
+        category = ''.join([str(element) for element in category])
+        quads = read_bats(category)
+        category_results = eval_open_vocab_analogies(vectors, quads)
+        bats_results.append((category, category_results))
+
+    if scope == 'global':
+        average_scores = []
+        for interval in ['acc', 'low', 'high']:
+            average_scores.append(np.mean([result[interval] for name, result in bats_results]))
+        results.loc['bats'] = pd.Series(average_scores, index=['acc', 'low', 'high'])
+    else:
+        for name, result in bats_results:
+            results.loc['bats-{}'.format(''.join(name))] = result
 
     return results
