@@ -1,14 +1,14 @@
+from collections import defaultdict
+from itertools import groupby, product
+
 import numpy as np
 import pandas as pd
 import wordfreq
-from collections import defaultdict
-from itertools import groupby, product
 from scipy.stats import spearmanr, hmean
-from sklearn.model_selection import KFold
 from statsmodels.stats.proportion import proportion_confint
 
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, similar_to_vec, standardized_uri
+from conceptnet5.vectors import standardized_uri
 from conceptnet5.vectors.evaluation.wordsim import confidence_interval, empty_comparison_table
 from conceptnet5.vectors.query import VectorSpaceWrapper
 
@@ -159,7 +159,7 @@ def read_bats(category):
     quads = []
     for i in range(len(pairs)):
         a_pair = pairs[i]
-        a_pair[1] = a_pair[1][0] # select only the first element if b1 is a list of synonyms
+        a_pair[1] = a_pair[1][0]  # select only the first element if b1 is a list of synonyms
         b_pairs = [pair for j, pair in enumerate(pairs) if j != i]
         for b_pair in b_pairs:
             quad = []
@@ -172,7 +172,7 @@ def read_bats(category):
     return quads
 
 
-def analogy_func(wrap, a1, b1, a2, weight_direct=2/3, weight_transpose=1/3):
+def analogy_func(wrap, a1, b1, a2, weight_direct=2 / 3, weight_transpose=1 / 3):
     """
     Find the vector representing the best b2 to complete the analogy
     a1 : b1 :: a2 : b2, according to `pairwise_analogy_func`.
@@ -196,8 +196,6 @@ def best_analogy_3cosmul(wrap, subframe, a1, b1, a2, pick='average'):
     Find the best b2 to complete the analogy a1 : b1 :: a2 : b2, according
     to the 3CosMul metric.
     """
-    #if isinstance(b1, list): # for BATS dataset
-    #    b1 = b1[0]
     va1 = wrap.get_vector(a1)
     vb1 = wrap.get_vector(b1)
     va2 = wrap.get_vector(a2)
@@ -277,7 +275,8 @@ def optimize_weights(func, *args):
     best_acc = 0.
     for weight_direct in weights:
         for weight_transpose in weights:
-            scores = func(*args, weight_direct=weight_direct, weight_transpose=weight_transpose, subset='dev')
+            scores = func(*args, weight_direct=weight_direct, weight_transpose=weight_transpose,
+                          subset='dev')
             if isinstance(scores, list):
                 # If a function to optimize returns two results, like eval_semeval2012_analogies(),
                 #  take their harmonic mean to compute the weights optimal for both results
@@ -489,7 +488,8 @@ def eval_bats_category(vectors, category, vocab_size=200000, verbose=False):
     return category_results
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope='global', google_vocab_size=200000):
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope='global',
+             google_vocab_size=200000):
     """
     Run SAT and Semeval12-2 evaluations.
 
@@ -518,18 +518,18 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope
     else:
         sat_weights = (0.35, 0.65)
         semeval_weights = (0.3, 0.35)
-    #
-    # sat_results = eval_pairwise_analogies(vectors,
-    #                                       analogy_filename,
-    #                                       sat_weights[0],
-    #                                       sat_weights[1],
-    #                                       subset)
-    # results.loc['sat-analogies'] = sat_results
-    #
-    # for gsubset in ['semantic', 'syntactic']:
-    #     google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=google_vocab_size)
-    #     results.loc['google-%s' % gsubset] = google_results
-    #
+
+    sat_results = eval_pairwise_analogies(vectors,
+                                          analogy_filename,
+                                          sat_weights[0],
+                                          sat_weights[1],
+                                          subset)
+    results.loc['sat-analogies'] = sat_results
+
+    for gsubset in ['semantic', 'syntactic']:
+        google_results = eval_google_analogies(vectors, subset=gsubset, vocab_size=google_vocab_size)
+        results.loc['google-%s' % gsubset] = google_results
+
     # There's no meaningful "all" subset for semeval12, because the dev and
     # test data are stored entirely separately. Just use "test".
     if subset == 'dev':
