@@ -191,7 +191,7 @@ def analogy_func(wrap, a1, b1, a2, weight_direct=2 / 3, weight_transpose=1 / 3):
     )
 
 
-def best_analogy_3cosmul(wrap, subframe, a1, b1, a2, pick='average'):
+def best_analogy_3cosmul(wrap, subframe, a1, b1, a2):
     """
     Find the best b2 to complete the analogy a1 : b1 :: a2 : b2, according
     to the 3CosMul metric.
