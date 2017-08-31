@@ -336,7 +336,8 @@ def eval_open_vocab_analogies(vectors, quads, vocab_size=200000, verbose=False):
         result = best_analogy_3cosmul(
             vectors, tframe, *prompt
         )
-        if result == answer or result in answer:
+        is_correct = (isinstance(answer, list) and result in answer) or (result == answer)
+        if is_correct:
             correct += 1
         else:
             if verbose and result not in seen_mistakes:
