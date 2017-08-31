@@ -139,7 +139,12 @@ def read_turk_ranks_semeval2012(subset, subclass):
 
 def read_bats(category):
     """
-    Read a bats dataset pairs for a specific category. Turn them into questions.
+    Read BATS dataset pairs for a specific category. Turn them into questions.
+
+    For some questions, BATS contains multiple answers. For example, the answer to an
+    analogy question Nicaragua:Spanish::Switzerland:? could be German, French, or Italian. These
+    will all be supplied as a list if they are an answer. However, if they are a part of a
+    question, only the first one will be used.
     """
     filename = 'bats/{}.txt'.format(category)
     pairs = []
@@ -159,7 +164,7 @@ def read_bats(category):
     quads = []
     for i in range(len(pairs)):
         a_pair = pairs[i]
-        a_pair[1] = a_pair[1][0]  # select only the first element if b1 is a list of synonyms
+        a_pair[1] = a_pair[1][0]  # select only one term for b1, even if more may be available
         b_pairs = [pair for j, pair in enumerate(pairs) if j != i]
         for b_pair in b_pairs:
             quad = []
