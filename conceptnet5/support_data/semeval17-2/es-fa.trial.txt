@@ -1,0 +1,34 @@
+piel	دوچرخه	0.08
+cine	تلویزیون	3.1
+microscopio	بیولوژیست	1.47
+Nueva York	واشنگتن	3.605
+informática	ریاضی	3.165
+teclado	چراغ	0.31
+puesta de sol	ریسمان	0.03
+ciencia ficción	کمدی	2.86
+televisión	سینما	3.1
+pelota	والیبال	1.905
+cuerda	غروب	0.03
+psicólogo	طبیب	2.875
+rama	درخت	2.145
+juicio	تست	3.055
+biólogo	میکروسکوپ	1.47
+carne	گوشت گاو	3.31
+voleibol	توپ	1.905
+nariz	سر	2.66
+luz	کیبورد	0.31
+coche	اتومبیل	3.845
+águila	شاهین	3.515
+Washington	نیویورک	3.605
+ternera	گوشت	3.31
+habitación	ساختمان	2.455
+comedia	علمی تخیلی	2.86
+automóvil	ماشین	3.845
+halcón	عقاب	3.515
+árbol	برگ	2.145
+examen	آزمایش	3.055
+cabeza	بینی	2.66
+matemáticas	علوم کامپیوتر	3.165
+curandero	روانشناس	2.875
+edificio	اتاق	2.455
+bicicleta	پوست	0.08

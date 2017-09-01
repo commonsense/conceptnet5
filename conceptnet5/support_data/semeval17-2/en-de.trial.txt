@@ -1,0 +1,34 @@
+string	Sonnenuntergang	0.055
+keyboard	Licht	0.32
+mathematics	Informatik	3.005
+trial	Test	2.45
+building	Zimmer	2.135
+eagle	Falke	3.735
+tree	Blatt	2.07
+microscope	Biologe	1.105
+beef	Fleisch	3.17
+sunset	Leine	0.055
+comedy	Science-Fiction	2.935
+car	Auto	3.81
+head	Nase	2.8
+computer science	Mathematik	3.005
+skin	Fahrrad	0.01
+ball	Volleyball	1.595
+test	Versuch	2.45
+bike	Haut	0.01
+television	Kino	3.055
+cinema	Fernseher	3.055
+room	Gebäude	2.135
+light	Tastatur	0.32
+falcon	Adler	3.735
+leaf	Baum	2.07
+biologist	Mikroskop	1.105
+Washington	New York	3.48
+meat	Rind	3.17
+curandero	Psychologe	2.91
+New York	Washington	3.48
+volleyball	Ball	1.595
+nose	Kopf	2.8
+science fiction	Komödie	2.935
+psychologist	Heiler	2.91
+automobile	Wagen	3.81

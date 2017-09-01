@@ -2,6 +2,7 @@ import marisa_trie
 import numpy as np
 import pandas as pd
 import wordfreq
+from morfessor.io import MorfessorIO
 
 from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix, get_language, split_uri
@@ -63,6 +64,7 @@ class VectorSpaceWrapper(object):
         self.small_k = None
         self.finder = None
         self.trie = None
+        self.segmentations = {}
         if use_db:
             self.finder = AssertionFinder()
 
@@ -129,45 +131,81 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         expanded = terms[:]
+        prefix_weight = 0.01
         for term, weight in terms:
             if include_neighbors and term not in self.frame.index and self.finder is not None:
-                for edge in self.finder.lookup(term, limit=limit_per_term):
-                    if field_match(edge['start']['term'], term) and not field_match(
-                            edge['end']['term'], term):
-                        neighbor = edge['end']['term']
-                    elif field_match(edge['end']['term'], term) and not field_match(
-                            edge['start']['term'], term):
-                        neighbor = edge['start']['term']
-                    else:
-                        continue
-                    # TODO: explain this formula
-                    neighbor_weight = weight * min(10, edge['weight']) * 0.01
-                    expanded.append((neighbor, neighbor_weight))
 
-                prefix_weight = 0.01
+                # Get neighbors
+                neighbors = self.get_neighbors(term, limit_per_term, weight)
+                expanded.extend(neighbors)
+
+                # Get englishified version of the term
                 if get_language(term) != 'en':
                     englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
-                while term:
-                    # Skip excessively general lookups, for either an entire
-                    # language, or all terms starting with a single
-                    # non-ideographic letter
-                    if term.endswith('/') or (term[-2] == '/' and term[-1] < chr(0x3000)):
-                        break
-                    prefixed = self.terms_with_prefix(term)
-                    if prefixed:
-                        n_prefixed = len(prefixed)
-                        for prefixed_term in prefixed:
-                            expanded.append((prefixed_term, prefix_weight / n_prefixed))
-                        break
-                    term = term[:-1]
+                # Get matching prefixes
+                prefixes = self.prefix_matching(term, prefix_weight)
+                expanded.extend(prefixes)
+
+                # Get subwords
+                subwords = self.get_subwords(term)
+                expanded.extend([(subword, .1) for subword in subwords])
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
             return []
         else:
             return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
+
+    def load_morfessor_model(self, lang):
+        io = MorfessorIO(encoding='utf-8')
+        model = io.read_any_model('data/morph/segments/{}.txt'.format(lang))
+        self.segmentations[lang] = model
+
+    def get_subwords(self, term):
+        lang = get_language(term)
+        if not lang in self.segmentations:
+            self.load_morfessor_model(lang)
+        subwords = self.segmentations[lang].viterbi_segment(split_uri(term)[2])
+        return ['/x/{}/{}'.format(lang, subword) for subword in subwords[0] if subword != \
+                '_']
+
+    def prefix_matching(self, term, prefix_weight):
+        prefixes = []
+        while term:
+            # Skip excessively general lookups, for either an entire
+            # language, or all terms starting with a single
+            # non-ideographic letter
+            if term.endswith('/') or (term[-2] == '/' and term[-1] < chr(0x3000)):
+                break
+            prefixed = self.terms_with_prefix(term)
+            if prefixed:
+                n_prefixed = len(prefixed)
+                for prefixed_term in prefixed:
+                    prefixes.append((prefixed_term, prefix_weight / n_prefixed))
+                break
+            term = term[:-1]
+        return prefixes
+
+    def get_neighbors(self, term, limit_per_term, weight):
+        neighbors = []
+        for edge in self.finder.lookup(term, limit=limit_per_term):
+            try:
+                if field_match(edge['start']['term'], term) and not field_match(
+                        edge['end']['term'], term):
+                    neighbor = edge['end']['term']
+                elif field_match(edge['end']['term'], term) and not field_match(
+                        edge['start']['term'], term):
+                    neighbor = edge['start']['term']
+                else:
+                    continue
+            except KeyError:
+                continue
+            # TODO: explain this formula
+            neighbor_weight = weight * min(10, edge['weight']) * 0.01
+            neighbors.append((neighbor, neighbor_weight))
+        return neighbors
 
     def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
         """
@@ -213,6 +251,7 @@ class VectorSpaceWrapper(object):
         else:
             raise ValueError("Can't make a query out of type %s" % type(query))
         include_neighbors = include_neighbors and (len(terms) <= 5)
+
         vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
         return normalize_vec(vec)
 
