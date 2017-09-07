@@ -1,13 +1,14 @@
+from collections import defaultdict
+from itertools import groupby, product
+
 import numpy as np
 import pandas as pd
 import wordfreq
-from collections import defaultdict
-from itertools import groupby, product
 from scipy.stats import spearmanr, hmean
 from statsmodels.stats.proportion import proportion_confint
 
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, similar_to_vec, standardized_uri
+from conceptnet5.vectors import standardized_uri
 from conceptnet5.vectors.evaluation.wordsim import confidence_interval, empty_comparison_table
 from conceptnet5.vectors.query import VectorSpaceWrapper
 
