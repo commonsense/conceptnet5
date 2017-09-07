@@ -1,10 +1,12 @@
+from itertools import combinations
+
+import numpy as np
+import pandas as pd
+from scipy.stats import spearmanr, pearsonr, tmean, hmean
+
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
-from scipy.stats import spearmanr, pearsonr, tmean, hmean
-from itertools import combinations
-import numpy as np
-import pandas as pd
 
 SAMPLE_SIZES = {
     'ws353': 353,
@@ -639,9 +641,6 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
             uri1 = standardized_uri(lang1, term1)
             uri2 = standardized_uri(lang2, term2)
             our_score = vectors.get_similarity(uri1, uri2)
-            # if not uri1 in vectors.frame.index or not uri2 in vectors.frame.index:
-            #     print(uri1, uri2)
-
         else:
             our_score = cosine_similarity(get_vector(vectors, term1, lang1),
                                           get_vector(vectors, term2, lang2))
