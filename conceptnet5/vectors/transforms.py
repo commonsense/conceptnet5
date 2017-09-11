@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
 from wordfreq import word_frequency
+from ordered_set import OrderedSet
 
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.nodes import uri_to_label
@@ -100,11 +101,10 @@ def build_annoy_tree(frame, tree_depth):
     Build a tree to hold a frame's vectors for efficient lookup.
     """
     index = AnnoyIndex(frame.shape[1], metric='euclidean')
-    index_map = {}
     for i, item in enumerate(frame.index):
         index.add_item(i, frame.loc[item])
-        index_map[i] = item
     index.build(tree_depth)
+    index_map = OrderedSet(frame.index)
     return index, index_map
 
 
@@ -120,7 +120,7 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=Fa
     index, index_map = build_annoy_tree(intersected, tree_depth)
     replacements = {}
     for term in big_frame.index:
-        if term not in small_frame.index:
+        if term not in small_frame.index and not term.startswith('/x/'):
             most_similar_index = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
             most_similar = index_map[most_similar_index]
             replacements[term] = most_similar
