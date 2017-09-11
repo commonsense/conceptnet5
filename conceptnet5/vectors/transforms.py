@@ -2,8 +2,8 @@ import msgpack
 import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
-from wordfreq import word_frequency
 from ordered_set import OrderedSet
+from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.nodes import uri_to_label
