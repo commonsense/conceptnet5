@@ -126,9 +126,6 @@ def merge_intersect(frames, subsample=20, vocab_cutoff=200000, k=300):
     np.divide(reprojected.values, eigenvalues ** .5, out=reprojected.values)
     normalize(reprojected.values, norm='l2', copy=False)
 
-    # Make sure we didn't divide by zero at any point.
-    assert not reprojected.isnull().values.any()
-
     # Return our unified vectors, and the projection that could map other
     # concatenated vectors into the same vector space.
     return reprojected, projection
