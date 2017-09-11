@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
 from ordered_set import OrderedSet
+from sklearn.preprocessing import normalize
 from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
@@ -60,22 +61,18 @@ def l1_normalize_columns(frame):
     each column's entries add up to 1. This is particularly helpful when
     post-processing GloVe output.
     """
-    col_norms = np.sum(np.abs(frame), axis='rows')
-    return frame.div(col_norms, axis='columns')
+    index = frame.index
+    return pd.DataFrame(data=normalize(frame, norm='l1', copy=False, axis=0), index=index)
 
 
-def l2_normalize_rows(frame, offset=0.):
+def l2_normalize_rows(frame):
     """
     L_2-normalize the rows of this DataFrame, so their lengths in Euclidean
     distance are all 1. This enables cosine similarities to be computed as
     dot-products between these rows.
-
-    Zero-rows will end up normalized to NaN, but that is actually the
-    Pandas-approved way to represent missing data, so Pandas should be able to
-    deal with those.
     """
-    row_norms = np.sqrt(np.sum(np.power(frame, 2), axis='columns')) + offset
-    return frame.div(row_norms, axis='rows')
+    index = frame.index
+    return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
 
 
 def subtract_mean_vector(frame):
