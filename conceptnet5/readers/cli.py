@@ -1,6 +1,6 @@
 import click
 from . import (
-    conceptnet4, dbpedia, emoji, jmdict, nadya, ptt_petgame,
+    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, nadya, ptt_petgame,
     opencyc, verbosity, wiktionary, wordnet
 )
 
@@ -156,3 +156,16 @@ def run_emoji(input, output):
     output: a msgpack file of edges
     """
     emoji.handle_file(input, output)
+
+
+@cli.command(name='cc_cedict')
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def run_cedict(input, output):
+    """
+    Import data from CEDICT dictionary
+
+    input: something
+    output: a msgpack file of edges
+    """
+    cc_cedict.handle_file(input, output)

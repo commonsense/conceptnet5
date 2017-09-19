@@ -325,6 +325,14 @@ rule read_emoji:
     shell:
         "cn5-read emoji {input} {output}"
 
+rule read_cc_cedict:
+    input:
+        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt"
+    output:
+        DATA + "/edges/cedict/cedict.msgpack",
+    shell:
+        "cn5-read cc_cedict {input} {output}"
+
 
 # Converting msgpack to csv
 # =========================
