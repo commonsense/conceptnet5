@@ -3,14 +3,15 @@
 PRECOMPUTED_PSQL_URL=http://conceptnet.s3.amazonaws.com/precomputed-data/2016/psql/5.5.5
 PRECOMPUTED_VECTOR_URL=http://conceptnet.s3.amazonaws.com/precomputed-data/2016/numberbatch/17.06
 DATA=/data/conceptnet
+CHECKSUM=/checksum
 NAMES='edges edge_sources edge_features nodes node_prefixes sources relations'
 
 get_db_files() {
     for name in $NAMES; do
         curl $PRECOMPUTED_PSQL_URL/$name.csv.gz > $DATA/psql/$name.csv.gz
     done
-    sha256sum $DATA/psql/*.csv.gz > $DATA/local/sha256sums.computed.txt
-    diff $DATA/local/sha256sums.txt $DATA/local/sha256sums.computed.txt || panic
+    sha256sum $DATA/psql/*.csv.gz > $CHECKSUM/sha256sums.computed.txt
+    diff $CHECKSUM/sha256sums.txt $CHECKSUM/sha256sums.computed.txt || panic
 }
 
 panic() {

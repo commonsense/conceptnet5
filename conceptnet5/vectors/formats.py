@@ -148,7 +148,7 @@ def load_fasttext(filename, max_rows=1000000):
     Load a DataFrame from the fastText text format.
     """
     arr = None
-    labels = []
+    label_list = []
     with gzip.open(filename, 'rt') as infile:
         nrows_str, ncols_str = infile.readline().rstrip().split()
         nrows = min(int(nrows_str), max_rows)
@@ -158,11 +158,13 @@ def load_fasttext(filename, max_rows=1000000):
             if i >= nrows:
                 break
             items = line.rstrip().split(' ')
-            labels.append(items[0])
+            label_list.append(items[0])
             values = [float(x) for x in items[1:]]
             arr[i] = values
 
-    return pd.DataFrame(arr, index=labels, dtype='f')
+    if len(label_list) < max_rows:
+        arr = arr[:len(label_list)]
+    return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
 def _read_until_space(file):
