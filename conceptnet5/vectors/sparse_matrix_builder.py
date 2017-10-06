@@ -94,57 +94,34 @@ def build_features_from_conceptnet_table(filename):
 
     concept_labels = OrderedSet()
     feature_labels = OrderedSet()
+    feature_pairs = []
 
     with open(str(filename), encoding='utf-8') as infile:
         for line in infile:
             concept1, concept2, value_str, dataset, relation = line.strip().split('\t')
-            concept1 = replace_numbers(concept1)
-            concept2 = replace_numbers(concept2)
-            value = float(value_str)
-            if relation in SYMMETRIC_RELATIONS:
-                feature_pairs = []
-                if get_language(concept1) in CORE_LANGUAGES:
-                    feature_pairs.append(
-                        ('{} {} ~'.format(uri_prefix(concept1), relation), concept2)
-                    )
-                if get_language(concept2) in CORE_LANGUAGES:
-                    feature_pairs.append(
-                        ('{} {} ~'.format(uri_prefix(concept2), relation), concept1)
-                    )
-            else:
-                if get_language(concept1) in CORE_LANGUAGES:
-                    feature_pairs.append(
-                        ('{} {} -'.format(uri_prefix(concept1), relation), concept2)
-                    )
-                if get_language(concept2) in CORE_LANGUAGES:
-                    feature_pairs.append(
-                        ('- {} {}'.format(uri_prefix(concept2), relation), concept1)
-                    )
+            if concept1.startswith('/c/') and concept2.startswith('/c/'):
+                if get_language(concept1) in CORE_LANGUAGES and get_language(concept2) in CORE_LANGUAGES:
+                    concept1 = uri_prefix(replace_numbers(concept1))
+                    concept2 = uri_prefix(replace_numbers(concept2))
+                    value = float(value_str)
+                    if relation in SYMMETRIC_RELATIONS:
+                        feature_pairs.extend([
+                            ('{} {} ~'.format(concept1, relation), concept2),
+                            ('{} {} ~'.format(concept2, relation), concept1)
+                        ])
+                    else:
+                        feature_pairs.extend([
+                            ('{} {} -'.format(concept1, relation), concept2),
+                            ('- {} {}'.format(relation, concept2), concept1)
+                        ])
 
-            feature_counts = defaultdict(int)
-            for feature, concept in feature_pairs:
-                feature_counts[feature] += 1
+        feature_counts = defaultdict(int)
+        for feature, concept in feature_pairs:
+            feature_counts[feature] += 1
 
-            for feature, concept in feature_pairs:
-                prefixes = list(uri_prefixes(concept, 3))
-                if feature_counts[feature] > 1:
-                    for prefix in prefixes:
-                        concept_index = concept_labels.add(prefix)
-                        feature_index = feature_labels.add(feature)
-                        mat[concept_index, feature_index] = value
-
-    # Link nodes to their more general versions
-    for concept in concept_labels:
-        prefixes = list(uri_prefixes(concept, 3))
-        for prefix in prefixes:
-            auto_features = [
-                '{} {} ~'.format(prefix, 'SimilarTo'),
-                '{} {} ~'.format(prefix, 'RelatedTo'),
-                '{} {} -'.format(prefix, 'FormOf'),
-                '- {} {}'.format(prefix, 'FormOf'),
-            ]
-            for feature in auto_features:
-                concept_index = concept_labels.add(prefix)
+        for feature, concept in feature_pairs:
+            if feature_counts[feature] > 1:
+                concept_index = concept_labels.add(concept)
                 feature_index = feature_labels.add(feature)
                 mat[concept_index, feature_index] = value
 
