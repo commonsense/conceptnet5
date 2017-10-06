@@ -127,7 +127,7 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, lang='en',
                                            get_vector(small_frame, most_similar, lang))
             replacements[term] = [most_similar, round(similarity, 2)]
 
-            if verbose and not (len(replacements) % 200):
+            if verbose and not (len(replacements) % 20):
                 print('{} ==> {}, {}'.format(term, most_similar, similarity))
     return replacements
 
@@ -185,6 +185,6 @@ def make_small_frame(big_frame, concepts_filename, language):
 
 
 def save_replacements(output_filepath, replacements):
-    # Save the replacement dictionary as a mgspack file
+    # Save the replacement dictionary as a msgpack file
     with open(output_filepath, 'wb') as output_file:
         msgpack.dump(replacements, output_file)
