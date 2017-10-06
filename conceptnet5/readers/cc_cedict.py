@@ -34,12 +34,62 @@ import re
 #! time=1505194732
 
 LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/'
-YEAR_REGEX = r'(.+?)\s\(.+\d.+\),'
-PAREN_REGEX = r'\(.+?\)'
+DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),'
+PAREN_REGEX = re.compile(r'\(.+?\)')
+CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+')
+BRACKETS_REGEX = re.compile(r'\[.+\]')
+ABBREV_REGEX = re.compile(r'')
+
+
+# sb, sth, remove "to" from the beginning
+
+def remove_reference_syntax(definition):
+    definition = CHINESE_CHAR_REGEX.sub('', definition)
+    return BRACKETS_REGEX.sub('', definition)
+
+
+def remove_additional_info(definition):
+    return definition.split(',')[0]
+
+
+def extract_person(match):
+    """
+    Example: "Pierre-Auguste Renoir (1841-1919), French impressionist painter"
+    Check if a date range is mentioned in a definition. This is usually the case when a person is
+    being defined. In that case, we want to only extract the name, without the date range or the
+    second, CV sentence.
+
+    Returns:
+        a list of names extracted from a definition
+    """
+    person = match.groups()[0]
+    if ',' in person: # skip the second, CV sentence
+        person = remove_additional_info(person)
+
+    person = CHINESE_CHAR_REGEX.sub('', person)
+    person = BRACKETS_REGEX.sub('', person) # delete pronunciation
+    person = person.split(' or ') # Take care of "Frederic Chopin or Fryderyk Franciszek Chopin"
+    return person
+
+
+def extract_measure_words(definition):
+    """
+    Example: CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]
+    """
+    words = definition[3:] # skip 'CL:'
+    words = words.split(',')
+    words = [BRACKETS_REGEX.sub('', word) for word in words] # delete the pronunciation
+    related_words = []
+    for word in words:
+        related_words.extend(word.split('|'))
+    return related_words
+
+
+
+
 
 def handle_file(filename, output_file):
     unmatched_count = 0
-    total_count = 0
     count = 0
     for line in open(filename):
 
@@ -54,46 +104,52 @@ def handle_file(filename, output_file):
         # iterate through the definitions
         for definition in definitions:
 
-            # check if date range is mentioned. Take what comes before it.
-            #
-            is_matched = False
-
-            year = re.match(YEAR_REGEX, definition)
-            if year:
-                candidate = year.groups()[0]
-                if ',' in candidate:
-                    first_part = candidate.split(',')[0]
-                    #print(first_part,'==>', definition)
-                    #print()
-                is_matched = True
+            # Skip pronunciations
+            if 'Taiwan pr.' in definition or 'also pr.' in definition:
                 continue
 
+            # Check if it's the definition of a person
+            match = re.match(DATE_RANGE_REGEX, definition)
+            if match:
+                edge_candidate = extract_person(match)
+                continue
 
+            # Check if a name is a measure word
             if definition.startswith('CL:'):
-                is_matched = True
+                related_words = extract_measure_words(definition)
                 continue
 
-            if len(definition.split()) == 1:
-                is_matched = True
+            # Remove clarifying information in parenthesis
+            match = re.match(PAREN_REGEX, definition)
+
+            # Capture 'variant of'
+            if definition.startswith(('variant of', 'archaic version of', 'old variant of',
+                                      'also written', 'abbr.')):
                 continue
 
-            if '(idiom)' in definition:
-                count += 1
 
-            # remove things like (name), check if it's one word
-            if '(' in definition:
-                candidate = re.sub(PAREN_REGEX, '', definition).strip()
-                is_matched = True
+            # Remove 'lit.', 'fig.'
+            if definition.startswith(('lit.', 'fig.')):
+                definition = definition[4:]
 
-            if ';' in definition:
+            # Replace sb with someone
+            if 'sth' in definition:
                 print(definition)
 
+            # Replace sth with something
 
-            if not is_matched:
-                #print(definition)
-                unmatched_count += 1
 
-        total_count += len(definitions)
+            # TODO should I skip 'e.g.'?
+
+            definition = PAREN_REGEX.sub('', definition)
+            definition = remove_reference_syntax(definition)
+            definition = remove_additional_info(definition)
+            #print(definition)
+
+
+
+
+                # length requirement will be the last one there, right before making an edge
 
 
             #for item in definition:
@@ -102,6 +158,4 @@ def handle_file(filename, output_file):
             #         print(year.groups()[0], '==>', item, definition)
             #         print()
             #         count += 1
-
-    print('count', count)
-    print(unmatched_count)
+    print(count)
