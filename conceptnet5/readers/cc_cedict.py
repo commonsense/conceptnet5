@@ -16,32 +16,20 @@ import re
 #
 # CC-CEDICT can be downloaded from:
 # http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
-#
-# Additions and corrections can be sent through:
-# https://cc-cedict.org/editor/editor.php
-#
-# For more information about CC-CEDICT see:
-# https://cc-cedict.org/wiki/
-#
-#! version=1
-#! subversion=0
-#! format=ts
-#! charset=UTF-8
-#! entries=115521
-#! publisher=MDBG
-#! license=http://creativecommons.org/licenses/by-sa/3.0/
-#! date=2017-09-12T05:38:52Z
-#! time=1505194732
 
-LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/'
-DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),'
-PAREN_REGEX = re.compile(r'\(.+?\)')
-CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+')
-BRACKETS_REGEX = re.compile(r'\[.+\]')
-ABBREV_REGEX = re.compile(r'')
+DATASET = '/d/cc_cedict'
+LICENSE = Licenses.cc_sharealike
+SOURCE = [{'contributor': '/s/resource/cc_cedict/2017-10'}]
 
+LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/' # separate traditional and simplified words, definitions
+DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),' # capture date range
+PAREN_REGEX = re.compile(r'\(.+?\)') # capture parenthesis
+CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+') # capture Chinese characters
+BRACKETS_REGEX = re.compile(r'\[.+\]') # pronunciation information
+VARIANT_REGEX = re.compile(r'(see (also )?|(old )?variant of |archaic version of |also written)')
+LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')
+ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')
 
-# sb, sth, remove "to" from the beginning
 
 def remove_reference_syntax(definition):
     definition = CHINESE_CHAR_REGEX.sub('', definition)
@@ -74,23 +62,42 @@ def extract_person(match):
 
 def extract_measure_words(definition):
     """
-    Example: CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]
+    Example: "CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]"
     """
     words = definition[3:] # skip 'CL:'
     words = words.split(',')
-    words = [BRACKETS_REGEX.sub('', word) for word in words] # delete the pronunciation
-    related_words = []
+    words = [BRACKETS_REGEX.sub('', word) for word in words]
+    measure_words = []
     for word in words:
-        related_words.extend(word.split('|'))
-    return related_words
+        measure_words.extend(word.split('|'))
+    return measure_words
 
 
+def extract_variants(definition):
+    """
+    Example: "variant of 齊大非偶|齐大非偶[qi2 da4 fei1 ou3]"
+    """
+    variants = VARIANT_REGEX.sub('', definition)
+    variants = BRACKETS_REGEX.sub('', variants)
+    variants = variants.split('|')
+    return variants
 
+
+def extract_abbreviations(definition):
+    reference = re.search(CHINESE_CHAR_REGEX, definition)
+    if reference:
+        reference = reference.group(0)
+        reference = reference.split('|')
+        return reference
+    # TODO add when an abbreviation is for an English word
+    return
 
 
 def handle_file(filename, output_file):
-    unmatched_count = 0
+
+    out = MsgpackStreamWriter(output_file)
     count = 0
+
     for line in open(filename):
 
         # skip the intro information
@@ -99,63 +106,136 @@ def handle_file(filename, output_file):
 
         # parse the data to extract the traditional form, simplified form and the English definition
         traditional, simplified, definitions = re.match(LINE_REGEX, line).groups()
-        definitions = definitions.split('/')
 
-        # iterate through the definitions
+        # Make an edge between the traditional and simplified version
+        edge = make_edge(rel='/r/Synonym',
+                         start=standardized_concept_uri('zh-Hant', traditional),
+                         end=standardized_concept_uri('zh-Hans', simplified),
+                         dataset=DATASET,
+                         license=LICENSE,
+                         sources=SOURCE)
+        out.write(edge)
+
+        definitions = re.split(r'\/|;', definitions)
         for definition in definitions:
 
-            # Skip pronunciations
+            # Skip pronunciation information
             if 'Taiwan pr.' in definition or 'also pr.' in definition:
                 continue
 
-            # Check if it's the definition of a person
-            match = re.match(DATE_RANGE_REGEX, definition)
-            if match:
-                edge_candidate = extract_person(match)
-                continue
+            # Check if it's the definition matches a person syntax, i.e. has a date range
+            person_match = re.match(DATE_RANGE_REGEX, definition)
+            if person_match:
+                persons = extract_person(person_match)
+                for person in persons:
+                    edge = make_edge(rel='/r/Synonym',
+                                 start=standardized_concept_uri('zh-Hant', traditional),
+                                 end=standardized_concept_uri('en', person),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
 
-            # Check if a name is a measure word
-            if definition.startswith('CL:'):
-                related_words = extract_measure_words(definition)
+                    edge = make_edge(rel='/r/Synonym',
+                                 start=standardized_concept_uri('zh-Hans', simplified),
+                                 end=standardized_concept_uri('en', person),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
                 continue
 
             # Remove clarifying information in parenthesis
-            match = re.match(PAREN_REGEX, definition)
+            definition = PAREN_REGEX.sub('', definition)
 
-            # Capture 'variant of'
-            if definition.startswith(('variant of', 'archaic version of', 'old variant of',
-                                      'also written', 'abbr.')):
+            # Check if a word is a measure word
+            if definition.startswith('CL:'):
+                related_words = extract_measure_words(definition)
+                for word in related_words:
+                    edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hant', traditional),
+                                 end=standardized_concept_uri('zh', word),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
+
+                    edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hans', simplified),
+                                 end=standardized_concept_uri('zh', word),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
                 continue
 
+            # Check if a word is a form/variant of a different word
+            variant_match = re.match(VARIANT_REGEX, definition)
+            if variant_match:
+                variants = extract_variants(definition)
+                for variant in variants:
+                    edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hant', traditional),
+                                 end=standardized_concept_uri('zh', variant),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
+
+                    edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hans', simplified),
+                                 end=standardized_concept_uri('zh', variant),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                    out.write(edge)
+                continue
+
+            # Handle abbreviations
+            if re.match(ABBR_REGEX, definition):
+                abbreviations = extract_abbreviations(definition)
+                if abbreviations:
+                    for abbr in abbreviations:
+                        edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hant', traditional),
+                                 end=standardized_concept_uri('zh', abbr),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                        out.write(edge)
+
+                        edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hans', simplified),
+                                 end=standardized_concept_uri('zh', abbr),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                        out.write(edge)
+                continue
 
             # Remove 'lit.', 'fig.'
-            if definition.startswith(('lit.', 'fig.')):
-                definition = definition[4:]
+            definition = LIT_FIG_REGEX.sub('', definition)
 
-            # Replace sb with someone
-            if 'sth' in definition:
-                print(definition)
+            # Expand sth and sb
+            definition = definition.replace('sth', 'something')
+            definition = definition.replace('sb', 'someone')
 
-            # Replace sth with something
-
-
-            # TODO should I skip 'e.g.'?
-
-            definition = PAREN_REGEX.sub('', definition)
             definition = remove_reference_syntax(definition)
             definition = remove_additional_info(definition)
-            #print(definition)
 
+            if len(definition.split()) < 6:
+                edge = make_edge(rel='/r/Synonym',
+                                 start=standardized_concept_uri('zh-Hant', traditional),
+                                 end=standardized_concept_uri('en', definition),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                out.write(edge)
 
-
-
-                # length requirement will be the last one there, right before making an edge
-
-
-            #for item in definition:
-            #    year = re.match(YEAR_REGEX, item)
-            #     if year and 'Adorno' in item:
-            #         print(year.groups()[0], '==>', item, definition)
-            #         print()
-            #         count += 1
-    print(count)
+                edge = make_edge(rel='/r/RelatedTo',
+                                 start=standardized_concept_uri('zh-Hans', simplified),
+                                 end=standardized_concept_uri('en', definition),
+                                 dataset=DATASET,
+                                 license=LICENSE,
+                                 sources=SOURCE)
+                out.write(edge)
