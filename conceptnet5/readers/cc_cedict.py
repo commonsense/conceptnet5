@@ -1,42 +1,51 @@
-from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
-from conceptnet5.edges import make_edge
+"""
+CC-CEDICT is a continuation of the CEDICT project started by Paul Denisowski in 1997 with the aim
+to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin
+for the Chinese characters.
+
+Creative Commons Attribution-Share Alike 3.0
+http://creativecommons.org/licenses/by-sa/3.0/
+
+Referenced works:
+CEDICT - Copyright (C) 1997, 1998 Paul Andrew Denisowski
+
+CC-CEDICT can be downloaded from:
+http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
+"""
+
 import re
 
-# CC-CEDICT is a continuation of the CEDICT project started by Paul Denisowski in 1997 with the aim
-# to provide a complete downloadable Chinese to English dictionary with pronunciation in pinyin
-# for the Chinese characters.
-#
-# Creative Commons Attribution-Share Alike 3.0
-# http://creativecommons.org/licenses/by-sa/3.0/
-#
-# Referenced works:
-# CEDICT - Copyright (C) 1997, 1998 Paul Andrew Denisowski
-#
-# CC-CEDICT can be downloaded from:
-# http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
+from conceptnet5.edges import make_edge
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import Licenses
 
 DATASET = '/d/cc_cedict'
 LICENSE = Licenses.cc_sharealike
 SOURCE = [{'contributor': '/s/resource/cc_cedict/2017-10'}]
 
-LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/' # separate traditional and simplified words, definitions
-DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),' # capture date range
-PAREN_REGEX = re.compile(r'\(.+?\)') # capture parenthesis
-CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+') # capture Chinese characters
-BRACKETS_REGEX = re.compile(r'\[.+\]') # pronunciation information
+LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/'  # separate traditional and simplified words, definitions
+DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),'  # date range
+PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
+CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+')  # Chinese characters
+BRACKETS_REGEX = re.compile(r'\[.+\]')  # pronunciation
 VARIANT_REGEX = re.compile(r'(see (also )?|(old )?variant of |archaic version of |also written)')
 LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')
 ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')
 
 
 def remove_reference_syntax(definition):
+    """
+    Example: Jiajiang county in Leshan 樂山|乐山[Le4 shan1]
+    """
     definition = CHINESE_CHAR_REGEX.sub('', definition)
     return BRACKETS_REGEX.sub('', definition)
 
 
 def remove_additional_info(definition):
+    """
+    Remove the second sentence of the definition
+    """
     return definition.split(',')[0]
 
 
@@ -51,8 +60,8 @@ def extract_person(match):
         a list of names extracted from a definition
     """
     person = match.groups()[0]
-    if ',' in person: # skip the second, CV sentence
-        person = remove_additional_info(person)
+    if ',' in person:
+        person = remove_additional_info(person)  # skip the second sentence
 
     person = CHINESE_CHAR_REGEX.sub('', person)
     person = BRACKETS_REGEX.sub('', person) # delete pronunciation
@@ -64,7 +73,7 @@ def extract_measure_words(definition):
     """
     Example: "CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]"
     """
-    words = definition[3:] # skip 'CL:'
+    words = definition[3:]  # skip 'CL:'
     words = words.split(',')
     words = [BRACKETS_REGEX.sub('', word) for word in words]
     measure_words = []
@@ -84,19 +93,20 @@ def extract_variants(definition):
 
 
 def extract_abbreviations(definition):
+    """
+    abbr.for Luxembourg 盧森堡 | 卢森堡[Lu2 sen1 bao3]
+    Only return a Chinese for which this word is an abbreviation.
+    """
     reference = re.search(CHINESE_CHAR_REGEX, definition)
     if reference:
         reference = reference.group(0)
         reference = reference.split('|')
         return reference
-    # TODO add when an abbreviation is for an English word
     return
 
 
 def handle_file(filename, output_file):
-
     out = MsgpackStreamWriter(output_file)
-    count = 0
 
     for line in open(filename):
 
@@ -123,25 +133,25 @@ def handle_file(filename, output_file):
             if 'Taiwan pr.' in definition or 'also pr.' in definition:
                 continue
 
-            # Check if it's the definition matches a person syntax, i.e. has a date range
+            # Check if it's the definition matches a person syntax, i.e. includes a date range
             person_match = re.match(DATE_RANGE_REGEX, definition)
             if person_match:
                 persons = extract_person(person_match)
                 for person in persons:
                     edge = make_edge(rel='/r/Synonym',
-                                 start=standardized_concept_uri('zh-Hant', traditional),
-                                 end=standardized_concept_uri('en', person),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hant', traditional),
+                                     end=standardized_concept_uri('en', person),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
 
                     edge = make_edge(rel='/r/Synonym',
-                                 start=standardized_concept_uri('zh-Hans', simplified),
-                                 end=standardized_concept_uri('en', person),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hans', simplified),
+                                     end=standardized_concept_uri('en', person),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
                 continue
 
@@ -153,19 +163,19 @@ def handle_file(filename, output_file):
                 related_words = extract_measure_words(definition)
                 for word in related_words:
                     edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hant', traditional),
-                                 end=standardized_concept_uri('zh', word),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hant', traditional),
+                                     end=standardized_concept_uri('zh', word),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
 
                     edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hans', simplified),
-                                 end=standardized_concept_uri('zh', word),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hans', simplified),
+                                     end=standardized_concept_uri('zh', word),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
                 continue
 
@@ -175,19 +185,19 @@ def handle_file(filename, output_file):
                 variants = extract_variants(definition)
                 for variant in variants:
                     edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hant', traditional),
-                                 end=standardized_concept_uri('zh', variant),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hant', traditional),
+                                     end=standardized_concept_uri('zh', variant),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
 
                     edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hans', simplified),
-                                 end=standardized_concept_uri('zh', variant),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                     start=standardized_concept_uri('zh-Hans', simplified),
+                                     end=standardized_concept_uri('zh', variant),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
                     out.write(edge)
                 continue
 
@@ -197,19 +207,19 @@ def handle_file(filename, output_file):
                 if abbreviations:
                     for abbr in abbreviations:
                         edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hant', traditional),
-                                 end=standardized_concept_uri('zh', abbr),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                         start=standardized_concept_uri('zh-Hant', traditional),
+                                         end=standardized_concept_uri('zh', abbr),
+                                         dataset=DATASET,
+                                         license=LICENSE,
+                                         sources=SOURCE)
                         out.write(edge)
 
                         edge = make_edge(rel='/r/RelatedTo',
-                                 start=standardized_concept_uri('zh-Hans', simplified),
-                                 end=standardized_concept_uri('zh', abbr),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                                         start=standardized_concept_uri('zh-Hans', simplified),
+                                         end=standardized_concept_uri('zh', abbr),
+                                         dataset=DATASET,
+                                         license=LICENSE,
+                                         sources=SOURCE)
                         out.write(edge)
                 continue
 
@@ -219,10 +229,10 @@ def handle_file(filename, output_file):
             # Expand sth and sb
             definition = definition.replace('sth', 'something')
             definition = definition.replace('sb', 'someone')
-
             definition = remove_reference_syntax(definition)
             definition = remove_additional_info(definition)
 
+            # Skip long definitions
             if len(definition.split()) < 6:
                 edge = make_edge(rel='/r/Synonym',
                                  start=standardized_concept_uri('zh-Hant', traditional),

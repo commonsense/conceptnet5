@@ -163,9 +163,9 @@ def run_emoji(input, output):
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
 def run_cedict(input, output):
     """
-    Import data from CEDICT dictionary
+    Import data from CC_CEDICT.
 
-    input: something
+    input: a .txt file containing CC-CEDICT data (cedict_1_0_ts_utf-8_mdbg.txt)
     output: a msgpack file of edges
     """
     cc_cedict.handle_file(input, output)

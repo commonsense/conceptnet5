@@ -67,6 +67,7 @@ CORE_DATASET_NAMES = [
     "opencyc/opencyc",
     "verbosity/verbosity",
     "wordnet/wordnet",
+    "cedict/cedict"
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
