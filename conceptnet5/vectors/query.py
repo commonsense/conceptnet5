@@ -116,7 +116,7 @@ class VectorSpaceWrapper(object):
         else:
             return field_match(label, filter)
 
-    def expand_terms(self, terms, limit_per_term=10, handle_oov=True):
+    def expand_terms(self, terms, limit_per_term=10, handle_oov=True, use_subwords=False):
         """
         Given a list of weighted terms as (term, weight) tuples, add terms that
         are one step away in ConceptNet at a lower weight, terms in English that share the
@@ -149,8 +149,9 @@ class VectorSpaceWrapper(object):
                 expanded.extend(prefixes)
 
                 # Get subwords
-                # subwords = self.get_subwords(term)
-                # expanded.extend([(subword, prefix_weight) for subword in subwords])
+                if use_subwords:
+                    subwords = self.get_subwords(term)
+                    expanded.extend([(subword, prefix_weight) for subword in subwords])
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
@@ -234,9 +235,9 @@ class VectorSpaceWrapper(object):
         Given one of the possible types of queries (see `similar_terms`), make
         a vector to look up from it.
 
-        If there are 5 or fewer terms involved and `handle_oov=True`, this
-        will allow expanded_vector to look up: neighboring terms in ConceptNet, terms sharing
-        the same prefix, and terms spelled the same way in English.
+        If there are 5 or fewer terms involved and `handle_oov=True`, expanded_vector will
+        look up: neighboring terms in ConceptNet, terms sharing the same prefix, terms spelled
+        the same way in English, and query's subwords.
         """
         self.load()
         if isinstance(query, np.ndarray):
