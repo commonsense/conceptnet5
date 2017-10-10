@@ -24,8 +24,8 @@ DATASET = '/d/cc_cedict'
 LICENSE = Licenses.cc_sharealike
 SOURCE = [{'contributor': '/s/resource/cc_cedict/2017-10'}]
 
-LINE_REGEX = r'(.+)\s(.+)\[.+\]\s/(.+)/'  # separate traditional and simplified words, definitions
-DATE_RANGE_REGEX = r'(.+?)\s\(.+\d.+\),'  # date range
+LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
+DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
 PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
 CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+')  # Chinese characters
 BRACKETS_REGEX = re.compile(r'\[.+\]')  # pronunciation
