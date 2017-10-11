@@ -13,6 +13,7 @@ CC-CEDICT can be downloaded from:
 http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
 """
 
+import gzip
 import re
 
 from conceptnet5.edges import make_edge
@@ -108,7 +109,7 @@ def extract_abbreviations(definition):
 def handle_file(filename, output_file):
     out = MsgpackStreamWriter(output_file)
 
-    for line in open(filename):
+    for line in gzip.open(filename, 'rt'):
 
         # skip the intro information
         if line.startswith('#'):

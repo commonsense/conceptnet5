@@ -328,7 +328,7 @@ rule read_emoji:
 
 rule read_cc_cedict:
     input:
-        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt"
+        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
     output:
         DATA + "/edges/cedict/cedict.msgpack",
     shell:
