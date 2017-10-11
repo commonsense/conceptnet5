@@ -230,12 +230,13 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 @click.option('-l', '--language', default='en')
 @click.option('--tree-depth', default=1000)
 @click.option('-v', '--verbose', is_flag=True)
-def export_background(input_filename, output_dir, concepts_filename, language, tree_depth,
-                           verbose):
+def export_background(input_filename, output_dir, concepts_filename, language, tree_depth, verbose):
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename, language)
-    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
+    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
+    print('replacements: ', len(replacements))
+    print('labels: ', small_frame.shape)
     save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
                       replacements)
 

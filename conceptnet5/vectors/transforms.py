@@ -159,7 +159,10 @@ def choose_small_vocabulary(big_frame, concepts_filename, language):
     vocab = []
     for term in big_frame.index:
         if '_' not in term and term in concepts:
-            frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            try:
+                frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            except LookupError:
+                frequency = word_frequency(uri_to_label(term), language, wordlist='combined')
             vocab.append((term, frequency))
     small_vocab = [term for term, frequency in sorted(vocab, key=lambda x: x[1], reverse=True)[
                                                :50000]]
