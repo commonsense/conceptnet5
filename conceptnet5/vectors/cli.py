@@ -1,6 +1,7 @@
 from os import path
 
 import click
+import numpy as np
 
 from .debias import de_bias_frame
 from .evaluation import wordsim, analogy, bias
@@ -9,7 +10,7 @@ from .evaluation.compare import (
 )
 from .formats import (
     convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
-    load_hdf, save_hdf, export_text, save_labels_and_npy
+    load_hdf, save_hdf, export_text, save_labels, save_npy
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
@@ -265,14 +266,25 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 @click.option('-l', '--language', default='en')
 @click.option('--tree-depth', default=1000)
 @click.option('-v', '--verbose', is_flag=True)
-def make_save_replacements(input_filename, output_dir, concepts_filename, language, tree_depth,
-                           verbose):
+def export_background(input_filename, output_dir, concepts_filename, language, tree_depth, verbose):
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename, language)
-    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, verbose)
-    save_replacements(path.join(output_dir, '{}_replacements.msgpack'.format(language)),
+    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
+    print('replacements: ', len(replacements))
+    print('labels: ', small_frame.shape)
+    save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
                       replacements)
-    labels_filename = path.join(output_dir, '{}_frame.labels'.format(language))
-    matrix_filename = path.join(output_dir, '{}_frame_matrix.npy'.format(language))
-    save_labels_and_npy(small_frame, labels_filename, matrix_filename)
+
+    # save labels
+    labels_filename = path.join(output_dir, 'labels.txt'.format(language))
+    save_labels(small_frame, labels_filename)
+
+    # save small_frame matrix
+    u_filename = path.join(output_dir, 'u.npy'.format(language))
+    save_npy(small_frame.values, u_filename)
+
+    # save sigma matrix
+    sigma_filename = path.join(output_dir, 'sigma.npy'.format(language))
+    save_npy(np.ones(small_frame.shape[1]), sigma_filename)
+
