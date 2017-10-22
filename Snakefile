@@ -159,25 +159,25 @@ rule download_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "curl -f {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "wget {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
 
 rule download_conceptnet_ppmi:
     output:
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 > {output}"
+        "wget {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
 
 rule download_numberbatch:
     output:
         DATA + "/precomputed/vectors/numberbatch.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
+        "wget {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
 
 rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
+        "wget {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
 
 
 # Precomputation
@@ -203,9 +203,9 @@ rule precompute_wiktionary:
         DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
-            shell("curl -f {PRECOMPUTED_DATA_URL}/wiktionary/"
+            shell("wget {PRECOMPUTED_DATA_URL}/wiktionary/"
                   "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
-                  "> {output}")
+                  "-O {output}")
         else:
             # This is a mess because, for most of these sub-steps, the file
             # being output isn't {output} but its uncompressed version
