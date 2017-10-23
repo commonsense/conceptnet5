@@ -61,6 +61,7 @@ def export_text(frame, filename, filter_language=None):
         except KeyError:
             end_idx = frame.shape[0]
         frame = frame.iloc[start_idx:end_idx]
+        vectors = frame.values
         index = frame.index
 
     with gzip.open(filename, 'wt') as out:
