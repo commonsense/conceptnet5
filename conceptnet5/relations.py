@@ -146,6 +146,17 @@ ENTAILED_RELATIONS = {
 }
 
 
+# A subset of 24 relations to use in machine learning
+COMMON_RELATIONS = [
+    '/r/RelatedTo', '/r/DistinctFrom', '/r/Synonym', '/r/Antonym',
+    '/r/SimilarTo', '/r/IsA', '/r/AtLocation', '/r/Causes',
+    '/r/CapableOf', '/r/CreatedBy', '/r/DerivedFrom', '/r/Entails',
+    '/r/HasA', '/r/HasContext', '/r/HasProperty', '/r/HasSubevent',
+    '/r/LocatedNear', '/r/MadeOf', '/r/MannerOf', '/r/MotivatedByGoal',
+    '/r/ObstructedBy', '/r/PartOf', '/r/ReceivesAction', '/r/UsedFor'
+]
+
+
 def is_negative_relation(rel):
     """
     Negative relations describe ways that concepts are different or unrelated.
