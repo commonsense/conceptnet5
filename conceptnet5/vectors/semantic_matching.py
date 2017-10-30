@@ -71,10 +71,10 @@ class SemanticMatchingModel(nn.Module):
         )
         self.rel_vecs = nn.Embedding(N_RELS, RELATION_DIM)
         assoc_t = torch.Tensor(RELATION_DIM, self.term_dim, self.term_dim)
-        nn.init.normal(assoc_t, std=.001)
+        nn.init.normal(assoc_t, std=.000001)
         self.assoc_tensor = autograd.Variable(assoc_t)
         assoc_o = torch.Tensor(RELATION_DIM)
-        nn.init.normal(assoc_o, std=.001)
+        nn.init.normal(assoc_o, std=.000001)
         self.assoc_offset = autograd.Variable(assoc_o)
 
     def forward(self, rels, terms_L, terms_R):
