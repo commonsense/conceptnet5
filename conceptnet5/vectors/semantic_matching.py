@@ -44,7 +44,8 @@ def _make_rel_chart():
     return entailed_map, unrelated_map
 
 ENTAILED_RELATIONS, UNRELATED_RELATIONS = _make_rel_chart()
-
+print(ENTAILED_RELATIONS)
+print(UNRELATED_RELATIONS)
 
 def iter_edges_forever(filename):
     while True:
@@ -69,12 +70,12 @@ class SemanticMatchingModel(nn.Module):
             torch.from_numpy(frame.values)
         )
         self.rel_vecs = nn.Embedding(N_RELS, RELATION_DIM)
-        self.assoc_tensor = autograd.Variable(
-            torch.Tensor(RELATION_DIM, self.term_dim, self.term_dim)
-        )
-        self.assoc_offset = autograd.Variable(
-            torch.Tensor(RELATION_DIM)
-        )
+        assoc_t = torch.Tensor(RELATION_DIM, self.term_dim, self.term_dim)
+        nn.init.normal(assoc_t, std=.001)
+        self.assoc_tensor = autograd.Variable(assoc_t)
+        assoc_o = torch.Tensor(RELATION_DIM)
+        nn.init.normal(assoc_o, std=.001)
+        self.assoc_offset = autograd.Variable(assoc_o)
 
     def forward(self, rels, terms_L, terms_R):
         # Get relation vectors for the whole batch, with shape (b * i)
@@ -125,6 +126,9 @@ class SemanticMatchingModel(nn.Module):
 
         for rel, left, right, weight in edge_iterator:
             try:
+                if not ENTAILED_RELATIONS[rel]:
+                    continue
+
                 # Possibly replace a relation with a more general relation
                 if coin_flip():
                     rel = random.choice(ENTAILED_RELATIONS[rel])
