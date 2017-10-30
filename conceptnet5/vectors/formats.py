@@ -25,14 +25,17 @@ def save_hdf(table, filename):
     return table.to_hdf(filename, 'mat', mode='w', encoding='utf-8')
 
 
-def save_labels_and_npy(table, vocab_filename, matrix_filename):
+def save_labels(table, vocab_filename):
+    save_index_as_labels(table.index, vocab_filename)
+
+
+def save_npy(values, matrix_filename):
     """
     Save a semantic vector space in two files: a NumPy .npy file of the matrix,
     and a text file with one label per line. We use this for exporting the
     Luminoso background space.
     """
-    np.save(matrix_filename, table.values)
-    save_index_as_labels(table.index, vocab_filename)
+    np.save(matrix_filename, values)
 
 
 def vec_to_text_line(label, vec):
@@ -58,6 +61,7 @@ def export_text(frame, filename, filter_language=None):
         except KeyError:
             end_idx = frame.shape[0]
         frame = frame.iloc[start_idx:end_idx]
+        vectors = frame.values
         index = frame.index
 
     with gzip.open(filename, 'wt') as out:

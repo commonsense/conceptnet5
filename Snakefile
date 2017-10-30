@@ -150,7 +150,6 @@ rule test:
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/plain/numberbatch-en.txt.gz",
-        DATA + "/stats/languages.txt"
 
 
 # Downloaders
