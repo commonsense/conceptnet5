@@ -9,7 +9,6 @@ RUN apt-get update \
 ADD 10-check-download.sh /docker-entrypoint-initdb.d/10-check-download.sh
 ADD 20-load-db.sql /docker-entrypoint-initdb.d/20-load-db.sql
 ADD 30-done.sh /docker-entrypoint-initdb.d/30-done.sh
-ADD sha256sums.txt /checksum/sha256sums.txt
 
 RUN chown -R root.postgres /data/conceptnet
 RUN chmod -R g+w /data/conceptnet

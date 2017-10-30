@@ -76,9 +76,9 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
-RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
+RAW_DATA_URL = "https://conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
-PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
@@ -119,8 +119,7 @@ rule all:
         DATA + "/stats/language_edges.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/mini.h5",
-        "data-loader/sha256sums.txt"
+        DATA + "/vectors/mini.h5"
 
 rule evaluation:
     input:
@@ -648,20 +647,6 @@ rule export_english_text:
     shell:
         "cn5-vectors export_text -l en {input} {output}"
 
-
-rule sha256sums:
-    input:
-        DATA + "/psql/edge_features.csv.gz",
-        DATA + "/psql/edges.csv.gz",
-        DATA + "/psql/edge_sources.csv.gz",
-        DATA + "/psql/node_prefixes.csv.gz",
-        DATA + "/psql/nodes.csv.gz",
-        DATA + "/psql/relations.csv.gz",
-        DATA + "/psql/sources.csv.gz"
-    output:
-        "data-loader/sha256sums.txt"
-    shell:
-        "sha256sum {input} | sed -e 's:%(data)s:/data/conceptnet:' > {output}" % {'data': DATA}
 
 # Evaluation
 # ==========
