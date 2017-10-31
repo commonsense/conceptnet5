@@ -157,25 +157,25 @@ rule download_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "wget {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
+        "wget -nv {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
 
 rule download_conceptnet_ppmi:
     output:
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
     shell:
-        "wget {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
 
 rule download_numberbatch:
     output:
         DATA + "/precomputed/vectors/numberbatch.h5"
     shell:
-        "wget {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
 
 rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "wget {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
 
 
 # Precomputation
