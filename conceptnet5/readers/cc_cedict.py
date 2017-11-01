@@ -16,6 +16,8 @@ http://www.mdbg.net/chindict/chindict.php?page=cc-cedict
 import gzip
 import re
 
+import regex
+
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
@@ -28,8 +30,8 @@ SOURCE = [{'contributor': '/s/resource/cc_cedict/2017-10'}]
 LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
 DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
 PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
-CHINESE_CHAR_REGEX = re.compile(r'([\u4e00-\u9fff]+[\|·]?)+')  # Chinese characters
-BRACKETS_REGEX = re.compile(r'\[.+\]')  # pronunciation
+HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+') # Han characters
+BRACKETS_REGEX = re.compile(r'\[.+?\]')  # pronunciation
 VARIANT_REGEX = re.compile(r'(see (also )?|(old )?variant of |archaic version of |also written)')
 LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')
 ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')
@@ -39,7 +41,7 @@ def remove_reference_syntax(definition):
     """
     Example: Jiajiang county in Leshan 樂山|乐山[Le4 shan1]
     """
-    definition = CHINESE_CHAR_REGEX.sub('', definition)
+    definition = HAN_CHAR_REGEX.sub('', definition)
     return BRACKETS_REGEX.sub('', definition)
 
 
@@ -64,7 +66,7 @@ def extract_person(match):
     if ',' in person:
         person = remove_additional_info(person)  # skip the second sentence
 
-    person = CHINESE_CHAR_REGEX.sub('', person)
+    person = HAN_CHAR_REGEX.sub('', person)
     person = BRACKETS_REGEX.sub('', person) # delete pronunciation
     person = person.split(' or ') # Take care of "Frederic Chopin or Fryderyk Franciszek Chopin"
     return person
@@ -98,7 +100,7 @@ def extract_abbreviations(definition):
     abbr.for Luxembourg 盧森堡 | 卢森堡[Lu2 sen1 bao3]
     Only return a Chinese for which this word is an abbreviation.
     """
-    reference = re.search(CHINESE_CHAR_REGEX, definition)
+    reference = regex.search(HAN_CHAR_REGEX, definition)
     if reference:
         reference = reference.group(0)
         reference = reference.split('|')
