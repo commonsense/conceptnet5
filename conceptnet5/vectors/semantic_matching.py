@@ -6,18 +6,27 @@ import numpy as np
 import pandas as pd
 import random
 
-random.seed(0)
 from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
-    OPPOSITE_RELATIONS
 )
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
+from conceptnet5.vectors.transforms import l2_normalize_rows
 
 RELATION_INDEX = pd.Index(COMMON_RELATIONS)
 N_RELS = len(RELATION_INDEX)
 RELATION_DIM = 5
-BATCH_SIZE = 10
+BATCH_SIZE = 100
+USE_CUDA = True
+
+FLOAT_TYPE = torch.FloatTensor
+INT_TYPE = torch.LongTensor
+if USE_CUDA:
+    FLOAT_TYPE = torch.cuda.FloatTensor
+    INT_TYPE = torch.cuda.LongTensor
+
+
+random.seed(0)
 
 
 def coin_flip():
@@ -43,9 +52,9 @@ def _make_rel_chart():
         ]
     return entailed_map, unrelated_map
 
-ENTAILED_RELATIONS, UNRELATED_RELATIONS = _make_rel_chart()
-print(ENTAILED_RELATIONS)
-print(UNRELATED_RELATIONS)
+
+ENTAILED_INDICES, UNRELATED_INDICES = _make_rel_chart()
+
 
 def iter_edges_forever(filename):
     while True:
@@ -57,7 +66,7 @@ def iter_edges_forever(filename):
 
 
 def ltvar(numbers):
-    return autograd.Variable(torch.LongTensor(numbers))
+    return autograd.Variable(INT_TYPE(numbers))
 
 
 class SemanticMatchingModel(nn.Module):
@@ -70,11 +79,26 @@ class SemanticMatchingModel(nn.Module):
             torch.from_numpy(frame.values)
         )
         self.rel_vecs = nn.Embedding(N_RELS, RELATION_DIM)
-        assoc_t = torch.Tensor(RELATION_DIM, self.term_dim, self.term_dim)
-        nn.init.normal(assoc_t, std=.000001)
+        rel_mat = np.random.normal(scale=0.1, size=(N_RELS, RELATION_DIM))
+        rel_mat[0, :] = 0
+        rel_mat[0, 0] = 1
+        self.rel_vecs.weight.data.copy_(
+            torch.from_numpy(rel_mat)
+        )
+        if USE_CUDA:
+            self.term_vecs = self.term_vecs.cuda()
+            self.rel_vecs = self.rel_vecs.cuda()
+
+        assoc_mat = np.random.normal(
+            scale=0.1, size=(RELATION_DIM, self.term_dim, self.term_dim)
+        ).astype('f')
+        assoc_mat[0] = np.eye(self.term_dim)
+        assoc_t = torch.from_numpy(assoc_mat)
+        if USE_CUDA:
+            assoc_t = assoc_t.cuda()
         self.assoc_tensor = autograd.Variable(assoc_t)
-        assoc_o = torch.Tensor(RELATION_DIM)
-        nn.init.normal(assoc_o, std=.000001)
+        assoc_o = FLOAT_TYPE(RELATION_DIM)
+        nn.init.normal(assoc_o, std=.001)
         self.assoc_offset = autograd.Variable(assoc_o)
 
     def forward(self, rels, terms_L, terms_R):
@@ -126,12 +150,12 @@ class SemanticMatchingModel(nn.Module):
 
         for rel, left, right, weight in edge_iterator:
             try:
-                if not ENTAILED_RELATIONS[rel]:
+                if not ENTAILED_INDICES[rel]:
                     continue
 
                 # Possibly replace a relation with a more general relation
                 if coin_flip():
-                    rel = random.choice(ENTAILED_RELATIONS[rel])
+                    rel = random.choice(ENTAILED_INDICES[rel])
 
                 # Possibly swap the sides of a symmetric relation
                 if rel in SYMMETRIC_RELATIONS and coin_flip():
@@ -147,8 +171,7 @@ class SemanticMatchingModel(nn.Module):
 
                 corrupt_which = random.randrange(3)
                 if corrupt_which == 0:
-                    rel = random.choice(UNRELATED_RELATIONS)
-                    corrupt_rel_idx = RELATION_INDEX.get_loc(rel)
+                    corrupt_rel_idx = random.choice(UNRELATED_INDICES[rel])
                 elif corrupt_which == 1:
                     while corrupt_left_idx == left_idx:
                         corrupt_left_idx = random.randrange(self.n_terms)
@@ -173,9 +196,8 @@ class SemanticMatchingModel(nn.Module):
 
         pos_data = (ltvar(pos_rels), ltvar(pos_left), ltvar(pos_right))
         neg_data = (ltvar(neg_rels), ltvar(neg_left), ltvar(neg_right))
-        weights = autograd.Variable(torch.Tensor(weights))
+        weights = autograd.Variable(FLOAT_TYPE(weights))
         return pos_data, neg_data, weights
-
 
     def make_batches(self, edge_iterator):
         while True:
@@ -184,14 +206,15 @@ class SemanticMatchingModel(nn.Module):
 
 def run():
     frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
-    model = SemanticMatchingModel(frame.astype(np.float32))
+    model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
+    # model = SemanticMatchingModel(frame.astype(np.float32))
     loss_function = nn.MarginRankingLoss(margin=1)
     optimizer = optim.SGD(model.parameters(), lr=0.1)
     losses = []
-    preference_labels = autograd.Variable(torch.Tensor([1] * BATCH_SIZE))
+    preference_labels = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
     steps = 0
     for pos_batch, neg_batch, weights in model.make_batches(
-        iter_edges_forever(get_data_filename('assoc/reduced.csv'))
+        iter_edges_forever(get_data_filename('assoc/reduced.shuf.csv'))
     ):
         model.zero_grad()
         pos_energy = model(*pos_batch)
@@ -201,13 +224,13 @@ def run():
         optimizer.step()
 
         losses.append(loss.data[0])
-        if len(losses) >= 200:
-            losses = losses[-100:]
         steps += 1
-        if steps in (10, 20, 50, 100, 200, 500, 1000, 2000, 5000) or steps % 10000 == 0:
+        if steps in (10, 20, 50, 100) or steps % 100 == 0:
             avg_loss = np.mean(losses)
             print("%d steps, loss=%4.4f" % (steps, avg_loss))
+            losses.clear()
     print()
 
 
-run()
+if __name__ == '__main__':
+    run()
