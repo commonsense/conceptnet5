@@ -8,17 +8,8 @@ NAMES='edges edge_sources edge_features nodes node_prefixes sources relations'
 
 get_db_files() {
     for name in $NAMES; do
-        curl $PRECOMPUTED_PSQL_URL/$name.csv.gz > $DATA/psql/$name.csv.gz
+        wget -nv -O $DATA/psql/$name.csv.gz $PRECOMPUTED_PSQL_URL/$name.csv.gz
     done
-    sha256sum $DATA/psql/*.csv.gz > $CHECKSUM/sha256sums.computed.txt
-    diff $CHECKSUM/sha256sums.txt $CHECKSUM/sha256sums.computed.txt || panic
-}
-
-panic() {
-    rm $DATA/psql/*.csv.gz
-    echo "SHA-256 hashes of input files don't match. The database will not be built."
-    echo "This could indicate a failed download, a version mismatch, or your HTTP connection getting hijacked."
-    exit 1
 }
 
 mkdir -p $DATA/psql
@@ -27,7 +18,7 @@ mkdir -p $DATA/vectors
 # Get semantic vectors (ConceptNet Numberbatch Mini) that would be
 # computationally expensive to compute
 if [ ! -e $DATA/vectors/mini.h5 ]; then
-    curl $PRECOMPUTED_VECTOR_URL/mini.h5 > $DATA/vectors/mini.h5
+    wget -nv -O $DATA/vectors/mini.h5 $PRECOMPUTED_VECTOR_URL/mini.h5
 fi
 # Get the database input files
 if [ ! -e $DATA/psql/edges.csv.gz ]; then
