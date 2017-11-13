@@ -249,7 +249,7 @@ def run_export(input_filename, output_filename, language):
 @click.option('-k', default=300, help="Number of columns to reduce to")
 def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     """
-    Save a smaller version of a frame, which includes frequent terms and doesn't include phrases.
+    Save a smaller version of a frame, which includes frequent terms and phrases.
     """
     frame = load_hdf(input_filename)
     other_frame = load_hdf(extra_vocab_filename)
