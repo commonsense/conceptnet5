@@ -67,6 +67,7 @@ CORE_DATASET_NAMES = [
     "opencyc/opencyc",
     "verbosity/verbosity",
     "wordnet/wordnet",
+    "cedict/cedict"
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
@@ -322,6 +323,14 @@ rule read_emoji:
         DATA + "/edges/emoji/{language}.msgpack"
     shell:
         "cn5-read emoji {input} {output}"
+
+rule read_cc_cedict:
+    input:
+        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+    output:
+        DATA + "/edges/cedict/cedict.msgpack",
+    shell:
+        "cn5-read cc_cedict {input} {output}"
 
 
 # Converting msgpack to csv
