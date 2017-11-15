@@ -12,10 +12,6 @@ import os
 
 DB_USERNAME = os.environ.get('CONCEPTNET_DB_USER', os.environ.get('USER', 'postgres'))
 DB_NAME = os.environ.get('CONCEPTNET_DB_NAME', 'conceptnet5')
+DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD')
 DB_SOCKET = '/var/run/postgresql/.s.PGSQL.5432'
-
-# These will not be used if DB_PASSWORD is blank -- instead, we'll use DB_SOCKET
-DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD', '')
-DB_HOSTNAME = os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost')
-DB_PORT = int(os.environ.get('CONCEPTNET_DB_PORT', '5432'))
 
