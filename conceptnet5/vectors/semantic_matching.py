@@ -203,11 +203,18 @@ class SemanticMatchingModel(nn.Module):
         while True:
             yield self.positive_negative_batch(edge_iterator)
 
+    def show_debug(self, batch, energy):
+        rel_indices, left_indices, right_indices = batch
+        for i in range(len(energy)):
+            rel = RELATION_INDEX[int(rel_indices.data[i])]
+            left = self.index[int(left_indices.data[i])]
+            right = self.index[int(right_indices.data[i])]
+            print("%s %s %s: %4.4f" % (rel, left, right, energy.data[i]))
+
 
 def run():
     frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
     model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
-    # model = SemanticMatchingModel(frame.astype(np.float32))
     loss_function = nn.MarginRankingLoss(margin=1)
     optimizer = optim.SGD(model.parameters(), lr=0.1)
     losses = []
@@ -226,6 +233,10 @@ def run():
         losses.append(loss.data[0])
         steps += 1
         if steps in (10, 20, 50, 100) or steps % 100 == 0:
+            print("POSITIVE")
+            model.show_debug(pos_batch, pos_energy)
+            print("NEGATIVE")
+            model.show_debug(neg_batch, neg_energy)
             avg_loss = np.mean(losses)
             print("%d steps, loss=%4.4f" % (steps, avg_loss))
             losses.clear()
