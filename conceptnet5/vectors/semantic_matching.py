@@ -95,10 +95,10 @@ class SemanticMatchingModel(nn.Module):
         assoc_t = torch.from_numpy(assoc_mat)
         if USE_CUDA:
             assoc_t = assoc_t.cuda()
-        self.assoc_tensor = autograd.Variable(assoc_t)
+        self.assoc_tensor = nn.Parameter(assoc_t)
         assoc_o = FLOAT_TYPE(RELATION_DIM)
         nn.init.normal(assoc_o, std=.001)
-        self.assoc_offset = autograd.Variable(assoc_o)
+        self.assoc_offset = nn.Parameter(assoc_o)
 
     def forward(self, rels, terms_L, terms_R):
         # Get relation vectors for the whole batch, with shape (b * i)
@@ -211,15 +211,25 @@ class SemanticMatchingModel(nn.Module):
         while True:
             yield self.positive_negative_batch(edge_iterator)
 
-    def show_debug(self, batch, energy):
+    def show_debug(self, batch, energy, positive):
         truth_values = torch.sigmoid(energy)
         rel_indices, left_indices, right_indices = batch
+        if positive:
+            print("POSITIVE")
+        else:
+            print("\nNEGATIVE")
         for i in range(len(energy)):
             rel = RELATION_INDEX[int(rel_indices.data[i])]
             left = self.index[int(left_indices.data[i])]
             right = self.index[int(right_indices.data[i])]
             value = truth_values.data[i]
-            print("%s %s %s: %4.4f" % (rel, left, right, value))
+            print("[%4.4f] %s %s %s" % (value, rel, left, right))
+
+
+def load_model(filename):
+    frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+    model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
+    model.load_state_dict(torch.load(filename))
 
 
 def run():
@@ -248,15 +258,13 @@ def run():
         losses.append(loss.data[0])
         steps += 1
         if steps in (10, 20, 50, 100) or steps % 100 == 0:
-            print("NEGATIVE")
-            model.show_debug(neg_batch, neg_energy)
-            print("POSITIVE")
-            model.show_debug(pos_batch, pos_energy)
+            model.show_debug(neg_batch, neg_energy, False)
+            model.show_debug(pos_batch, pos_energy, True)
             avg_loss = np.mean(losses)
             print("%d steps, loss=%4.4f" % (steps, avg_loss))
             losses.clear()
         if steps % 10000 == 0:
-            torch.save(model, 'data/vectors/sme.model')
+            torch.save(model.state_dict(), 'data/vectors/sme.model')
     print()
 
 
