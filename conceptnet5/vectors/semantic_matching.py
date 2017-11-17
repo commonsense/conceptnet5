@@ -9,6 +9,7 @@ import random
 from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
 )
+from conceptnet5.uri import uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -59,10 +60,8 @@ ENTAILED_INDICES, UNRELATED_INDICES = _make_rel_chart()
 def iter_edges_forever(filename):
     while True:
         for line in open(filename, encoding='utf-8'):
-            concept1, concept2, weight_str, _dataset, relation = line.strip().split('\t')
-            weight = float(weight_str)
-            if weight >= 1.:
-                yield (relation, concept1, concept2, weight)
+            _assertion, relation, concept1, concept2, _rest = line.split('\t', 4)
+            yield (relation, concept1, concept2, 1.)
 
 
 def ltvar(numbers):
@@ -133,7 +132,7 @@ class SemanticMatchingModel(nn.Module):
         # that some relations are rare or special-purpose.
         shifted_b_i = relmatch + self.assoc_offset
 
-        # Add up the components for each batch
+        # Add up the components for each item in the batch
         energy_b = torch.sum(shifted_b_i, 1)
         return energy_b
 
@@ -150,8 +149,13 @@ class SemanticMatchingModel(nn.Module):
 
         for rel, left, right, weight in edge_iterator:
             try:
+                if rel not in COMMON_RELATIONS:
+                    continue
                 if not ENTAILED_INDICES[rel]:
                     continue
+
+                left = uri_prefix(left)
+                right = uri_prefix(right)
 
                 # Possibly replace a relation with a more general relation
                 if coin_flip():
@@ -169,13 +173,17 @@ class SemanticMatchingModel(nn.Module):
                 corrupt_left_idx = left_idx
                 corrupt_right_idx = right_idx
 
-                corrupt_which = random.randrange(3)
+                corrupt_which = random.randrange(5)
                 if corrupt_which == 0:
-                    corrupt_rel_idx = random.choice(UNRELATED_INDICES[rel])
-                elif corrupt_which == 1:
+                    if rel not in SYMMETRIC_RELATIONS and coin_flip():
+                        corrupt_left_idx = right_idx
+                        corrupt_right_idx = left_idx
+                    else:
+                        corrupt_rel_idx = random.choice(UNRELATED_INDICES[rel])
+                elif corrupt_which == 1 or corrupt_which == 2:
                     while corrupt_left_idx == left_idx:
                         corrupt_left_idx = random.randrange(self.n_terms)
-                elif corrupt_which == 2:
+                else:
                     while corrupt_right_idx == right_idx:
                         corrupt_right_idx = random.randrange(self.n_terms)
 
@@ -204,42 +212,51 @@ class SemanticMatchingModel(nn.Module):
             yield self.positive_negative_batch(edge_iterator)
 
     def show_debug(self, batch, energy):
+        truth_values = torch.sigmoid(energy)
         rel_indices, left_indices, right_indices = batch
         for i in range(len(energy)):
             rel = RELATION_INDEX[int(rel_indices.data[i])]
             left = self.index[int(left_indices.data[i])]
             right = self.index[int(right_indices.data[i])]
-            print("%s %s %s: %4.4f" % (rel, left, right, energy.data[i]))
+            value = truth_values.data[i]
+            print("%s %s %s: %4.4f" % (rel, left, right, value))
 
 
 def run():
     frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
     model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
-    loss_function = nn.MarginRankingLoss(margin=1)
+    relative_loss_function = nn.MarginRankingLoss(margin=1)
+    absolute_loss_function = nn.BCEWithLogitsLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.1)
     losses = []
-    preference_labels = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
+    true_target = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
+    false_target = autograd.Variable(FLOAT_TYPE([0] * BATCH_SIZE))
     steps = 0
     for pos_batch, neg_batch, weights in model.make_batches(
-        iter_edges_forever(get_data_filename('assoc/reduced.shuf.csv'))
+        iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
     ):
         model.zero_grad()
         pos_energy = model(*pos_batch)
         neg_energy = model(*neg_batch)
-        loss = loss_function(pos_energy, neg_energy, preference_labels)
+        loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
+        loss2 = absolute_loss_function(pos_energy, true_target)
+        loss3 = absolute_loss_function(neg_energy, false_target)
+        loss = loss1 + loss2 + loss3
         loss.backward()
         optimizer.step()
 
         losses.append(loss.data[0])
         steps += 1
         if steps in (10, 20, 50, 100) or steps % 100 == 0:
-            print("POSITIVE")
-            model.show_debug(pos_batch, pos_energy)
             print("NEGATIVE")
             model.show_debug(neg_batch, neg_energy)
+            print("POSITIVE")
+            model.show_debug(pos_batch, pos_energy)
             avg_loss = np.mean(losses)
             print("%d steps, loss=%4.4f" % (steps, avg_loss))
             losses.clear()
+        if steps % 10000 == 0:
+            torch.save(model, 'data/vectors/sme.model')
     print()
 
 
