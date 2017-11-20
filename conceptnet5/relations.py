@@ -152,9 +152,9 @@ COMMON_RELATIONS = [
     '/r/SimilarTo', '/r/IsA', '/r/AtLocation', '/r/Causes',
     '/r/CapableOf', '/r/CreatedBy', '/r/DerivedFrom', '/r/Entails',
     '/r/HasA', '/r/HasContext', '/r/HasProperty', '/r/HasSubevent',
-    '/r/LocatedNear', '/r/MadeOf', '/r/MannerOf', '/r/MotivatedByGoal',
-    '/r/ObstructedBy', '/r/PartOf', '/r/ReceivesAction', '/r/UsedFor',
-    '/r/Desires'
+    '/r/MadeOf', '/r/MannerOf', '/r/MotivatedByGoal', '/r/ObstructedBy',
+    '/r/PartOf', '/r/ReceivesAction', '/r/UsedFor', '/r/Desires',
+    '/r/SymbolOf'
 ]
 
 

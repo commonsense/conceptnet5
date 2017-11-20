@@ -5,6 +5,7 @@ import torch.optim as optim
 import numpy as np
 import pandas as pd
 import random
+import os
 
 from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
@@ -230,11 +231,17 @@ def load_model(filename):
     frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
     model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
     model.load_state_dict(torch.load(filename))
+    return model
 
 
 def run():
-    frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
-    model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
+    if os.access('data/vectors/sme.model', os.F_OK):
+        model = load_model('data/vectors/sme.model')
+    else:
+        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+        model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
+
+    print(list(model.parameters()))
     relative_loss_function = nn.MarginRankingLoss(margin=1)
     absolute_loss_function = nn.BCEWithLogitsLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.1)
@@ -263,8 +270,9 @@ def run():
             avg_loss = np.mean(losses)
             print("%d steps, loss=%4.4f" % (steps, avg_loss))
             losses.clear()
-        if steps % 10000 == 0:
+        if steps % 1000 == 0:
             torch.save(model.state_dict(), 'data/vectors/sme.model')
+            print("saved")
     print()
 
 
