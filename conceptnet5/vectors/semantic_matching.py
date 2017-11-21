@@ -17,7 +17,7 @@ from conceptnet5.vectors.transforms import l2_normalize_rows
 
 RELATION_INDEX = pd.Index(COMMON_RELATIONS)
 N_RELS = len(RELATION_INDEX)
-RELATION_DIM = 5
+RELATION_DIM = 8
 BATCH_SIZE = 100
 USE_CUDA = True
 
@@ -80,8 +80,11 @@ class SemanticMatchingModel(nn.Module):
         )
         self.rel_vecs = nn.Embedding(N_RELS, RELATION_DIM)
         rel_mat = np.random.normal(scale=0.1, size=(N_RELS, RELATION_DIM))
-        rel_mat[0, :] = 0
-        rel_mat[0, 0] = 1
+
+        # Initialize the Synonym relationship to the identity
+        rel_mat[2, :] = 0
+        rel_mat[2, 0] = 1
+
         self.rel_vecs.weight.data.copy_(
             torch.from_numpy(rel_mat)
         )
@@ -97,9 +100,10 @@ class SemanticMatchingModel(nn.Module):
         if USE_CUDA:
             assoc_t = assoc_t.cuda()
         self.assoc_tensor = nn.Parameter(assoc_t)
-        assoc_o = FLOAT_TYPE(RELATION_DIM)
-        nn.init.normal(assoc_o, std=.001)
-        self.assoc_offset = nn.Parameter(assoc_o)
+
+        # assoc_o = FLOAT_TYPE(RELATION_DIM)
+        # nn.init.normal(assoc_o, std=.001)
+        # self.assoc_offset = nn.Parameter(assoc_o)
 
     def forward(self, rels, terms_L, terms_R):
         # Get relation vectors for the whole batch, with shape (b * i)
@@ -131,10 +135,10 @@ class SemanticMatchingModel(nn.Module):
 
         # Add the offset vector for relations -- this should help us learn
         # that some relations are rare or special-purpose.
-        shifted_b_i = relmatch + self.assoc_offset
+        # shifted_b_i = relmatch + self.assoc_offset
 
         # Add up the components for each item in the batch
-        energy_b = torch.sum(shifted_b_i, 1)
+        energy_b = torch.sum(relmatch, 1)
         return energy_b
 
     def positive_negative_batch(self, edge_iterator):
@@ -213,7 +217,7 @@ class SemanticMatchingModel(nn.Module):
             yield self.positive_negative_batch(edge_iterator)
 
     def show_debug(self, batch, energy, positive):
-        truth_values = torch.sigmoid(energy)
+        truth_values = energy
         rel_indices, left_indices, right_indices = batch
         if positive:
             print("POSITIVE")
@@ -234,6 +238,24 @@ def load_model(filename):
     return model
 
 
+def evaluate_conceptnet():
+    model = load_model('data/vectors/sme-3m-loss0.03.model')
+    for pos_batch, neg_batch, weights in model.make_batches(
+        iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
+    ):
+        model.zero_grad()
+        pos_energy = model(*pos_batch)
+        truth_values = torch.sigmoid(pos_energy)
+        rel_indices, left_indices, right_indices = pos_batch
+        for i in range(BATCH_SIZE):
+            value = truth_values.data[i]
+            if value < 0.8:
+                rel = RELATION_INDEX[int(rel_indices.data[i])]
+                left = model.index[int(left_indices.data[i])]
+                right = model.index[int(right_indices.data[i])]
+                print("[%4.4f] %s %s %s" % (value, rel, left, right))
+
+
 def run():
     if os.access('data/vectors/sme.model', os.F_OK):
         model = load_model('data/vectors/sme.model')
@@ -241,10 +263,9 @@ def run():
         frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
         model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
 
-    print(list(model.parameters()))
     relative_loss_function = nn.MarginRankingLoss(margin=1)
-    absolute_loss_function = nn.BCEWithLogitsLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.1)
+    absolute_loss_function = nn.MSELoss()
+    optimizer = optim.SGD(model.parameters(), lr=0.1, weight_decay=1e-6)
     losses = []
     true_target = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
     false_target = autograd.Variable(FLOAT_TYPE([0] * BATCH_SIZE))
@@ -255,10 +276,17 @@ def run():
         model.zero_grad()
         pos_energy = model(*pos_batch)
         neg_energy = model(*neg_batch)
+
+        synonymous = pos_batch[1]
+        synonym_rel = autograd.Variable(INT_TYPE([2] * BATCH_SIZE))
+        synonym_energy = model(synonym_rel, synonymous, synonymous)
+
         loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
         loss2 = absolute_loss_function(pos_energy, true_target)
         loss3 = absolute_loss_function(neg_energy, false_target)
-        loss = loss1 + loss2 + loss3
+        loss4 = absolute_loss_function(synonym_energy, true_target)
+
+        loss = loss1 + loss2 + loss3 + loss4
         loss.backward()
         optimizer.step()
 
