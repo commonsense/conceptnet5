@@ -434,7 +434,10 @@ RTL_LANGUAGES = {
 }
 
 # The top languages we support, in order
-CORE_LANGUAGES = ['en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl']
+CORE_LANGUAGES = [
+    'en', 'fr', 'de', 'it', 'es', 'ru', 'pt', 'ja', 'zh', 'nl',
+    'pl', 'bg', 'sv', 'hu', 'mul'
+]
 
 LANGUAGE_NAMES = {
     'en': 'English',

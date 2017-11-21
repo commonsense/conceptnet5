@@ -90,6 +90,7 @@ def standardized_concept_name(lang, text):
         "Use standardize_text instead."
     )
 
+
 normalized_concept_name = standardized_concept_name
 
 
@@ -118,6 +119,7 @@ def standardized_concept_uri(lang, text, *more):
     more_text = [standardize_text(item, token_filter) for item in more
                  if item is not None]
     return concept_uri(lang, norm_text, *more_text)
+
 
 normalized_concept_uri = standardized_concept_uri
 standardize_concept_uri = standardized_concept_uri

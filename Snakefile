@@ -1,3 +1,6 @@
+# flake8: noqa
+# (This file is a Snakefile, which has Python 3-derived syntax, but flake8
+# will not understand the cases where it differs from Python.)
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from conceptnet5.languages import COMMON_LANGUAGES, ATOMIC_SPACE_LANGUAGES
 
