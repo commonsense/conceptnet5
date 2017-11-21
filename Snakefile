@@ -169,7 +169,7 @@ rule extract_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "unzip {input} {dirname}/{filename} -d %(DATA)s/raw/"
+        "unzip {input} {wildcards.dirname}/{wildcards.filename} -d %(DATA)s/raw/"
 
 rule download_conceptnet_ppmi:
     output:
