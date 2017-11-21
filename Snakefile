@@ -77,7 +77,7 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
-RAW_DATA_URL = "https://conceptnet.s3.amazonaws.com/raw-data/2016"
+RAW_DATA_URL = "https://zenodo.org/record/998169/files/conceptnet-raw-data-5.5.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
@@ -154,11 +154,19 @@ rule test:
 
 # Downloaders
 # ===========
-rule download_raw:
+rule download_raw_package:
+    output:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
+    shell:
+        "wget -nv {RAW_DATA_URL} -O {output}"
+
+rule extract_raw:
+    input:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "wget -nv {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
+        "unzip {input} {dirname}/{filename} -d %(DATA)s/raw/"
 
 rule download_conceptnet_ppmi:
     output:
