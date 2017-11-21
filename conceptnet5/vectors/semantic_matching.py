@@ -263,7 +263,7 @@ def run():
         frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
         model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
 
-    relative_loss_function = nn.MarginRankingLoss(margin=1)
+    relative_loss_function = nn.MarginRankingLoss(margin=0.5)
     absolute_loss_function = nn.MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=0.1, weight_decay=1e-6)
     losses = []
