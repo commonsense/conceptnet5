@@ -125,8 +125,7 @@ rule all:
         DATA + "/stats/language_edges.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/mini.h5",
-        "data-loader/sha256sums.txt"
+        DATA + "/vectors/mini.h5"
 
 rule evaluation:
     input:
@@ -708,23 +707,6 @@ rule subwords:
     shell:
         "cn5-build subwords {wildcards.language} {input} {output}"
 
-
-# Packaging
-# =========
-
-rule sha256sums:
-    input:
-        DATA + "/psql/edge_features.csv.gz",
-        DATA + "/psql/edges.csv.gz",
-        DATA + "/psql/edge_sources.csv.gz",
-        DATA + "/psql/node_prefixes.csv.gz",
-        DATA + "/psql/nodes.csv.gz",
-        DATA + "/psql/relations.csv.gz",
-        DATA + "/psql/sources.csv.gz"
-    output:
-        "data-loader/sha256sums.txt"
-    shell:
-        "sha256sum {input} | sed -e 's:%(data)s:/data/conceptnet:' > {output}" % {'data': DATA}
 
 # Evaluation
 # ==========
