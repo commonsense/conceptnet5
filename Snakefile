@@ -31,6 +31,9 @@ WIKTIONARY_VERSIONS = {
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
+# Languages where morphemes should not be split anywhere except at spaces
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
