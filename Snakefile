@@ -657,6 +657,37 @@ rule export_english_text:
         "cn5-vectors export_text -l en {input} {output}"
 
 
+# Morphology
+# ==========
+
+rule prepare_vocab:
+    input:
+        DATA + "/stats/core_concept_counts.txt"
+    output:
+        DATA + "/morph/vocab/{language}.txt"
+    shell:
+        "cn5-build prepare_morphology {wildcards.language} {input} {output}"
+
+rule morfessor_segmentation:
+    input:
+        DATA + "/morph/vocab/{language}.txt"
+    output:
+        DATA + "/morph/segments/{language}.txt"
+    run:
+        if wildcards.language in ATOMIC_SPACE_LANGUAGES:
+            shell("morfessor-train {input} -S {output} --traindata-list --nosplit-re '[^_].'")
+        else:
+            shell("morfessor-train {input} -S {output} -f '_' --traindata-list")
+
+rule subwords:
+    input:
+        DATA + "/morph/segments/{language}.txt",
+    output:
+        DATA + "/edges/morphology/subwords-{language}.msgpack"
+    shell:
+        "cn5-build subwords {wildcards.language} {input} {output}"
+
+
 # Evaluation
 # ==========
 
