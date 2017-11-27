@@ -32,14 +32,19 @@ DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
 PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
 HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+') # Han characters
 BRACKETS_REGEX = re.compile(r'\[.+?\]')  # pronunciation
-VARIANT_REGEX = re.compile(r'(see (also )?|(old )?variant of |archaic version of |also written)')
+VARIANT_REGEX = re.compile(r'(see( also)?|(old |Japanese )?variant of|archaic version of|also '
+                           r'written|same as)\s')
 LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')
 ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')
 
 
 def remove_reference_syntax(definition):
     """
-    Example: Jiajiang county in Leshan 樂山|乐山[Le4 shan1]
+    Definitions in English may contain references to Chinese words. The reference syntax contains
+    vertical bar-separated Han characters as well as a pronunciation enclosed in brackets,
+    as in "Jiajiang county in Leshan 樂山|乐山[Le4 shan1]".
+
+    Remove the reference syntax.
     """
     definition = HAN_CHAR_REGEX.sub('', definition)
     return BRACKETS_REGEX.sub('', definition)
@@ -87,6 +92,7 @@ def extract_measure_words(definition):
 
 def extract_variants(definition):
     """
+    Extract variants of character
     Example: "variant of 齊大非偶|齐大非偶[qi2 da4 fei1 ou3]"
     """
     variants = VARIANT_REGEX.sub('', definition)
