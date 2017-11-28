@@ -144,8 +144,8 @@ rule webdata:
 rule clean:
     shell:
         "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
-        "do echo Removing %(data)s/$subdir; "
-        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
+        "do echo Removing {DATA}/$subdir; "
+        "rm -rf {DATA}/$subdir; done"
 
 rule test:
     input:
@@ -169,7 +169,7 @@ rule extract_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "unzip {input} {wildcards.dirname}/{wildcards.filename} -d %(DATA)s/raw/"
+        "unzip {input} {wildcards.dirname}/{wildcards.filename} -d {DATA}/raw/"
 
 rule download_conceptnet_ppmi:
     output:
@@ -252,9 +252,9 @@ rule read_dbpedia:
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
-        "cn5-read dbpedia %(data)s/raw/dbpedia "
+        "cn5-read dbpedia {DATA}/raw/dbpedia "
         "{output} "
-        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
+        "{DATA}/stats/core_concepts.txt "
 
 rule read_jmdict:
     input:
@@ -306,9 +306,9 @@ rule prescan_wiktionary:
     output:
         DATA + "/db/wiktionary.db"
     shell:
-        "mkdir -p %(data)s/tmp && "
-        "cn5-read wiktionary_pre {input} %(data)s/tmp/wiktionary.db && "
-        "mv %(data)s/tmp/wiktionary.db {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && "
+        "cn5-read wiktionary_pre {input} {DATA}/tmp/wiktionary.db && "
+        "mv {DATA}/tmp/wiktionary.db {output}"
 
 rule read_wiktionary:
     input:
@@ -369,7 +369,7 @@ rule sort_edges:
     output:
         DATA + "/collated/sorted/edges.csv"
     shell:
-        "mkdir -p %(data)s/tmp && cat {input} | LC_ALL=C sort -T %(data)s/tmp | LC_ALL=C uniq > {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && cat {input} | LC_ALL=C sort -T {DATA}/tmp | LC_ALL=C uniq > {output}"
 
 rule combine_assertions:
     input:
@@ -394,7 +394,7 @@ rule prepare_db:
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     shell:
-        "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
+        "cn5-db prepare_data {input} {DATA}/psql"
 
 rule gzip_db:
     input:
@@ -416,7 +416,7 @@ rule load_db:
     output:
         DATA + "/psql/done"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "cn5-db load_data {DATA}/psql && touch {output}"
 
 
 # Collecting statistics
@@ -606,7 +606,7 @@ rule retrofit:
     resources:
         ram=16
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -717,7 +717,7 @@ rule compare_embeddings:
     run:
         input_embeddings = input[:-2]
         input_embeddings_str = ' '.join(input_embeddings)
-        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
+        shell("cn5-vectors compare_embeddings {input_embeddings_str} {output}")
 
 rule comparison_graph:
     input:
