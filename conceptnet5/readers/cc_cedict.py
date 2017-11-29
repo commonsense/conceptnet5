@@ -128,9 +128,6 @@ def handle_file(filename, output_file):
             if 'Taiwan pr.' in definition or 'also pr.' in definition:
                 continue
 
-            # Remove clarifying information in parenthesis
-            definition = PAREN_REGEX.sub('', definition)
-
             # Check if it's the definition matches a person syntax, i.e. includes a date range
             person_match = re.match(DATE_RANGE_REGEX, definition)
             if person_match:
@@ -173,6 +170,9 @@ def handle_file(filename, output_file):
                                      sources=SOURCE)
                     out.write(edge)
                 continue
+
+            # Remove clarifying information in parenthesis
+            definition = PAREN_REGEX.sub('', definition)
 
             # Handle variants/word forms and abbreviations
             if re.match(VARIANT_REGEX, definition) or re.match(ABBR_REGEX, definition):
