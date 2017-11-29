@@ -143,8 +143,8 @@ def read_bats(category):
 
     For some questions, BATS contains multiple answers. For example, the answer to an
     analogy question Nicaragua:Spanish::Switzerland:? could be German, French, or Italian. These
-    will all be supplied as a list if they are an answer. However, if they are a part of a
-    question, only the first one will be used.
+    will all be supplied as a list if they are an answer (b2). However, if they are a part of a
+    question (b1), only the first one will be used.
     """
     filename = 'bats/{}.txt'.format(category)
     pairs = []
@@ -163,16 +163,22 @@ def read_bats(category):
 
     quads = []
     for i in range(len(pairs)):
-        a_pair = pairs[i]
-        a_pair[1] = a_pair[1][0]  # select only one term for b1, even if more may be available
-        b_pairs = [pair for j, pair in enumerate(pairs) if j != i]
-        for b_pair in b_pairs:
+        first_pair = pairs[i]
+        first_pair[1] = first_pair[1][0]  # select only one term for b1, even if more may be available
+        second_pairs = [pair for j, pair in enumerate(pairs) if j != i]
+        for second_pair in second_pairs:
             quad = []
-            quad.extend([standardized_uri('en', term) for term in a_pair + b_pair[:1]])
-            if isinstance(b_pair[1], list):
-                quad.append([standardized_uri('en', term) for term in b_pair[1]])
+
+            # the first three elements of a quad are the two terms in first_pair and the first
+            # term of the second_pair
+            quad.extend([standardized_uri('en', term) for term in first_pair + second_pair[:1]])
+
+            # if the second element of the second pair (b2) is a list, it means there are multiple
+            # correct answers for b2. We want to keep all of them.
+            if isinstance(second_pair[1], list):
+                quad.append([standardized_uri('en', term) for term in second_pair[1]])
             else:
-                quad.append(standardized_uri('en', b_pair[1]))
+                quad.append(standardized_uri('en', second_pair[1]))
             quads.append(quad)
     return quads
 
