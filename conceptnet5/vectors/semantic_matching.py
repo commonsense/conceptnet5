@@ -82,8 +82,8 @@ class SemanticMatchingModel(nn.Module):
         rel_mat = np.random.normal(scale=0.1, size=(N_RELS, RELATION_DIM))
 
         # Initialize the Synonym relationship to the identity
-        rel_mat[2, :] = 0
-        rel_mat[2, 0] = 1
+        rel_mat[0, :] = 0
+        rel_mat[0, 0] = 1
 
         self.rel_vecs.weight.data.copy_(
             torch.from_numpy(rel_mat)
@@ -95,15 +95,24 @@ class SemanticMatchingModel(nn.Module):
         assoc_mat = np.random.normal(
             scale=0.1, size=(RELATION_DIM, self.term_dim, self.term_dim)
         ).astype('f')
-        assoc_mat[0] = np.eye(self.term_dim)
         assoc_t = torch.from_numpy(assoc_mat)
         if USE_CUDA:
             assoc_t = assoc_t.cuda()
         self.assoc_tensor = nn.Parameter(assoc_t)
+        self.identity_slice = FLOAT_TYPE(np.eye(self.term_dim))
+        self.assoc_tensor.data[0] = self.identity_slice
+
+        self.truth_multiplier = nn.Parameter(FLOAT_TYPE([5.]))
+        self.truth_offset = nn.Parameter(FLOAT_TYPE([-3.]))
 
         # assoc_o = FLOAT_TYPE(RELATION_DIM)
         # nn.init.normal(assoc_o, std=.001)
         # self.assoc_offset = nn.Parameter(assoc_o)
+
+    def reset_synonym_relation(self):
+        self.assoc_tensor.data[0] = self.identity_slice
+        self.rel_vecs.weight.data[0, :] = 0
+        self.rel_vecs.weight.data[0, 0] = 1
 
     def forward(self, rels, terms_L, terms_R):
         # Get relation vectors for the whole batch, with shape (b * i)
@@ -139,7 +148,7 @@ class SemanticMatchingModel(nn.Module):
 
         # Add up the components for each item in the batch
         energy_b = torch.sum(relmatch, 1)
-        return energy_b
+        return energy_b * self.truth_multiplier + self.truth_offset
 
     def positive_negative_batch(self, edge_iterator):
         pos_rels = []
@@ -264,7 +273,7 @@ def run():
         model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
 
     relative_loss_function = nn.MarginRankingLoss(margin=0.5)
-    absolute_loss_function = nn.MSELoss()
+    absolute_loss_function = nn.BCEWithLogitsLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.1, weight_decay=1e-6)
     losses = []
     true_target = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
@@ -278,7 +287,7 @@ def run():
         neg_energy = model(*neg_batch)
 
         synonymous = pos_batch[1]
-        synonym_rel = autograd.Variable(INT_TYPE([2] * BATCH_SIZE))
+        synonym_rel = autograd.Variable(INT_TYPE([0] * BATCH_SIZE))
         synonym_energy = model(synonym_rel, synonymous, synonymous)
 
         loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
@@ -289,6 +298,7 @@ def run():
         loss = loss1 + loss2 + loss3 + loss4
         loss.backward()
         optimizer.step()
+        model.reset_synonym_relation()
 
         losses.append(loss.data[0])
         steps += 1
