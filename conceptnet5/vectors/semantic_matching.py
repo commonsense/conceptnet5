@@ -10,7 +10,7 @@ import os
 from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
 )
-from conceptnet5.uri import uri_prefix
+from conceptnet5.uri import uri_prefix, assertion_uri
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -60,9 +60,13 @@ ENTAILED_INDICES, UNRELATED_INDICES = _make_rel_chart()
 
 def iter_edges_forever(filename):
     while True:
-        for line in open(filename, encoding='utf-8'):
-            _assertion, relation, concept1, concept2, _rest = line.split('\t', 4)
-            yield (relation, concept1, concept2, 1.)
+        yield from iter_edges_once(filename)
+
+
+def iter_edges_once(filename):
+    for line in open(filename, encoding='utf-8'):
+        _assertion, relation, concept1, concept2, _rest = line.split('\t', 4)
+        yield (relation, concept1, concept2, 1.)
 
 
 def ltvar(numbers):
@@ -248,21 +252,21 @@ def load_model(filename):
 
 
 def evaluate_conceptnet():
-    model = load_model('data/vectors/sme-3m-loss0.03.model')
+    model = load_model('data/vectors/sme.model')
     for pos_batch, neg_batch, weights in model.make_batches(
-        iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
+        iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv'))
     ):
         model.zero_grad()
         pos_energy = model(*pos_batch)
-        truth_values = torch.sigmoid(pos_energy)
         rel_indices, left_indices, right_indices = pos_batch
-        for i in range(BATCH_SIZE):
-            value = truth_values.data[i]
-            if value < 0.8:
+        for i in range(len(pos_energy)):
+            value = pos_energy.data[i]
+            if value < -1:
                 rel = RELATION_INDEX[int(rel_indices.data[i])]
                 left = model.index[int(left_indices.data[i])]
                 right = model.index[int(right_indices.data[i])]
-                print("[%4.4f] %s %s %s" % (value, rel, left, right))
+                assertion = assertion_uri(rel, left, right)
+                print("%4.4f\t%s" % (value, assertion))
 
 
 def run():
