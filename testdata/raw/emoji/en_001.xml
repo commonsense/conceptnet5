@@ -1,7 +1,7 @@
 <ldml>
 	<identity>
 		<version number="$Revision$"/>
-		<language type="en_001"/>
+		<language type="en"/>
 	</identity>
 	<annotations>
 		<annotation cp="🤶" type="tts">Mother Christmas</annotation>
