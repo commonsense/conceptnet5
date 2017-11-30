@@ -662,6 +662,9 @@
 /c/tr/test/n	/c/en/test	1.0	/d/wiktionary/de	/r/Synonym
 /c/uk/система_освіти_сполучених_штатів_америки	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/vi/giáo_dục_hoa_kỳ	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
+/c/zh/一辞莫赞	/c/en/left_speechless_by_something_perfect	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/一辭莫贊	/c/en/left_speechless_by_something_perfect	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/一辭莫贊	/c/zh/一辞莫赞	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/測驗	/c/en/test/n	0.5	/d/dbpedia/en	/r/Synonym
 /c/zh/美国教育	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/zh/試/n	/c/zh/試	1.0	/d/wordnet/3.1	/r/SenseOf
@@ -695,6 +698,8 @@
 /c/zh/马可_奥勒留	/c/en/marcus_aurelius	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/马可尼	/c/en/marconi	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/马可波罗	/c/en/marco_polo	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/高抬	/c/en/speak_highly_of_someone	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/高抬	/c/zh/高抬	1.0	/d/cc_cedict	/r/Synonym
 /c/en/balalaika	/c/en/make_music	2.82842712474619	/d/conceptnet/4/en	/r/UsedFor
 /c/en/balalaika	/c/en/making_music	1.0	/d/conceptnet/4/en	/r/UsedFor
 /c/zh/檢查	/c/zh/走到飲水機	1.0	/d/conceptnet/4/zh	/r/UsedFor

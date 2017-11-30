@@ -662,6 +662,9 @@
 /c/tr/test/n	/c/tr/test	1.0	/d/wiktionary/en	/r/SenseOf
 /c/uk/система_освіти_сполучених_штатів_америки	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/vi/giáo_dục_hoa_kỳ	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
+/c/zh/一辞莫赞	/c/en/left_speechless_by_something_perfect	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/一辭莫贊	/c/en/left_speechless_by_something_perfect	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/一辭莫贊	/c/zh/一辞莫赞	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/檢查	/c/zh/經理來訪	1.0	/d/conceptnet/4/zh	/r/HasSubevent
 /c/zh/檢查	/c/zh/走到飲水機	1.0	/d/conceptnet/4/zh	/r/UsedFor
 /c/zh/測驗	/c/en/test/n	0.5	/d/dbpedia/en	/r/Synonym
@@ -697,3 +700,5 @@
 /c/zh/马可_奥勒留	/c/en/marcus_aurelius	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/马可尼	/c/en/marconi	1.0	/d/cc_cedict	/r/Synonym
 /c/zh/马可波罗	/c/en/marco_polo	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/高抬	/c/en/speak_highly_of_someone	1.0	/d/cc_cedict	/r/Synonym
+/c/zh/高抬	/c/zh/高抬	1.0	/d/cc_cedict	/r/Synonym

@@ -35,6 +35,8 @@ HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+')  # Han characters
 LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
 LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')  # literally/figuratively
 PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
+SB_REGEX = re.compile(r'\b(sb)\b')
+STH_REGEX = re.compile(r'\b(sth)\b')
 SEE_ALSO_REGEX = re.compile(r'see( also)?')  # see also
 VARIANT_REGEX = re.compile(r'((old |Japanese )?variant of|archaic version of|also '
                            r'written|same as)\s')  # variant syntax
@@ -218,8 +220,8 @@ def handle_file(filename, output_file):
             definition = LIT_FIG_REGEX.sub('', definition)
 
             # Expand sth and sb
-            definition = definition.replace(' sth ', 'something')
-            definition = definition.replace(' sb ', 'someone')
+            definition = SB_REGEX.sub('someone', definition)
+            definition = STH_REGEX.sub('something', definition)
 
             # Additional cleanups
             definition = remove_reference_syntax(definition)
