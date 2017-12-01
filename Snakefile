@@ -63,21 +63,6 @@ RETROFIT_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-CORE_DATASET_NAMES = [
-    "jmdict/jmdict",
-    "nadya/nadya",
-    "ptt_petgame/api",
-    "opencyc/opencyc",
-    "verbosity/verbosity",
-    "wordnet/wordnet",
-    "cedict/cedict"
-]
-CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
-CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
-CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
-CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
-
-
 RAW_DATA_URL = "https://zenodo.org/record/998169/files/conceptnet-raw-data-5.5.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
@@ -105,6 +90,21 @@ if TESTMODE:
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
     EMOJI_LANGUAGES = ['en', 'en_001']
+
+
+CORE_DATASET_NAMES = [
+    "jmdict/jmdict",
+    "nadya/nadya",
+    "ptt_petgame/api",
+    "opencyc/opencyc",
+    "verbosity/verbosity",
+    "wordnet/wordnet",
+    "cedict/cedict"
+]
+CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
+CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
