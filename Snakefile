@@ -106,6 +106,35 @@ if TESTMODE:
     HASH_WIDTH = 12
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
+    EMOJI_LANGUAGES = ['en', 'en_001']
+
+
+# Dataset filenames
+# =================
+# The goal of reader steps is to produce Msgpack files, and later CSV files,
+# with these names.
+#
+# We distingish *core dataset names*, which collectively determine the set of
+# terms that ConceptNet will attempt to represent, from the additional datasets
+# that will mainly be used to find more information about those terms.
+
+
+CORE_DATASET_NAMES = [
+    "jmdict/jmdict",
+    "nadya/nadya",
+    "ptt_petgame/api",
+    "opencyc/opencyc",
+    "verbosity/verbosity",
+    "wordnet/wordnet",
+    "cedict/cedict"
+]
+CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
+CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
+
+
+DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
 
 rule all:
