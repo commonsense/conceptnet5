@@ -27,19 +27,28 @@ DATASET = '/d/cc_cedict'
 LICENSE = Licenses.cc_sharealike
 SOURCE = [{'contributor': '/s/resource/cc_cedict/2017-10'}]
 
-LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
-DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
-PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
-HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+') # Han characters
+ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')  # abbreviations
 BRACKETS_REGEX = re.compile(r'\[.+?\]')  # pronunciation
-VARIANT_REGEX = re.compile(r'(see (also )?|(old )?variant of |archaic version of |also written)')
-LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')
-ABBR_REGEX = re.compile(r'(\b|\s)abbr. (to|of|for)')
+DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
+DEFINITIONS_REGEX = re.compile(r'/|;')  # separate definitions
+HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+')  # Han characters
+LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
+LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')  # literally/figuratively
+PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
+SB_REGEX = re.compile(r'\b(sb)\b')
+STH_REGEX = re.compile(r'\b(sth)\b')
+SEE_ALSO_REGEX = re.compile(r'see( also)?')  # see also
+VARIANT_REGEX = re.compile(r'((old |Japanese )?variant of|archaic version of|also '
+                           r'written|same as)\s')  # variant syntax
 
 
 def remove_reference_syntax(definition):
     """
-    Example: Jiajiang county in Leshan 樂山|乐山[Le4 shan1]
+    Definitions in English may contain references to Chinese words. The reference syntax contains
+    vertical bar-separated Han characters as well as a pronunciation enclosed in brackets,
+    as in "Jiajiang county in Leshan 樂山|乐山[Le4 shan1]".
+
+    Remove the reference syntax.
     """
     definition = HAN_CHAR_REGEX.sub('', definition)
     return BRACKETS_REGEX.sub('', definition)
@@ -47,65 +56,51 @@ def remove_reference_syntax(definition):
 
 def remove_additional_info(definition):
     """
-    Remove the second sentence of the definition
+    Remove any information in a definition after the first comma. This part of the definition
+    usually provides additional details. For example, in the definition such as 'Salt Lake City,
+    capital of Utah', 'capital of Utah' is removed.
     """
     return definition.split(',')[0]
 
 
 def extract_person(match):
     """
-    Example: "Pierre-Auguste Renoir (1841-1919), French impressionist painter"
-    Check if a date range is mentioned in a definition. This is usually the case when a person is
-    being defined. In that case, we want to only extract the name, without the date range or the
-    second, CV sentence.
-
-    Returns:
-        a list of names extracted from a definition
+    Extract the name of a person mentioned in a definition. A person definition contains a
+    date range (ex. when they were alive or active) and a biography sentence, for example:
+    "Pierre-Auguste Renoir (1841-1919), French impressionist painter". Occasionally, two forms of a
+    person's name are provided, as in "Maria Skłodowska-Curie or Marie Curie". In that case,
+    we return both names and make an edge for each of them.
     """
     person = match.groups()[0]
-    if ',' in person:
-        person = remove_additional_info(person)  # skip the second sentence
-
-    person = HAN_CHAR_REGEX.sub('', person)
-    person = BRACKETS_REGEX.sub('', person) # delete pronunciation
-    person = person.split(' or ') # Take care of "Frederic Chopin or Fryderyk Franciszek Chopin"
+    person = remove_additional_info(person)
+    person = remove_reference_syntax(person)
+    person = person.split(' or ')  # get both versions of a person's name
     return person
 
 
 def extract_measure_words(definition):
     """
-    Example: "CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]"
+    Extract measure words (classifiers). Measure words are prefixed with "CL:" and separated by a
+    comma. For example: "CL:枝[zhi1],根[gen1],個|个[ge4],把[ba3]"
     """
     words = definition[3:]  # skip 'CL:'
-    words = words.split(',')
+    words = words.split(',')  # separate each measure word
     words = [BRACKETS_REGEX.sub('', word) for word in words]
     measure_words = []
     for word in words:
-        measure_words.extend(word.split('|'))
+        measure_words.extend(word.split('|'))  # separate variants of a measure word
     return measure_words
 
 
-def extract_variants(definition):
+def extract_han_characters(definition):
     """
-    Example: "variant of 齊大非偶|齐大非偶[qi2 da4 fei1 ou3]"
+    Extract han characters. This is used when extracting variants, abbreviations and references
+    to other characters.
     """
-    variants = VARIANT_REGEX.sub('', definition)
-    variants = BRACKETS_REGEX.sub('', variants)
-    variants = variants.split('|')
-    return variants
-
-
-def extract_abbreviations(definition):
-    """
-    abbr.for Luxembourg 盧森堡 | 卢森堡[Lu2 sen1 bao3]
-    Only return a Chinese for which this word is an abbreviation.
-    """
-    reference = regex.search(HAN_CHAR_REGEX, definition)
-    if reference:
-        reference = reference.group(0)
-        reference = reference.split('|')
-        return reference
-    return
+    chars = regex.search(HAN_CHAR_REGEX, definition)
+    if chars:
+        return chars.group(0).split('|')
+    return []
 
 
 def handle_file(filename, output_file):
@@ -129,8 +124,7 @@ def handle_file(filename, output_file):
                          sources=SOURCE)
         out.write(edge)
 
-        definitions = re.split(r'\/|;', definitions)
-        for definition in definitions:
+        for definition in re.split(DEFINITIONS_REGEX, definitions):
 
             # Skip pronunciation information
             if 'Taiwan pr.' in definition or 'also pr.' in definition:
@@ -158,9 +152,6 @@ def handle_file(filename, output_file):
                     out.write(edge)
                 continue
 
-            # Remove clarifying information in parenthesis
-            definition = PAREN_REGEX.sub('', definition)
-
             # Check if a word is a measure word
             if definition.startswith('CL:'):
                 related_words = extract_measure_words(definition)
@@ -182,12 +173,14 @@ def handle_file(filename, output_file):
                     out.write(edge)
                 continue
 
-            # Check if a word is a form/variant of a different word
-            variant_match = re.match(VARIANT_REGEX, definition)
-            if variant_match:
-                variants = extract_variants(definition)
+            # Remove clarifying information in parenthesis
+            definition = PAREN_REGEX.sub('', definition)
+
+            # Handle variants/word forms and abbreviations
+            if re.match(VARIANT_REGEX, definition) or re.match(ABBR_REGEX, definition):
+                variants = extract_han_characters(definition)
                 for variant in variants:
-                    edge = make_edge(rel='/r/RelatedTo',
+                    edge = make_edge(rel='/r/Synonym',
                                      start=standardized_concept_uri('zh-Hant', traditional),
                                      end=standardized_concept_uri('zh', variant),
                                      dataset=DATASET,
@@ -195,7 +188,7 @@ def handle_file(filename, output_file):
                                      sources=SOURCE)
                     out.write(edge)
 
-                    edge = make_edge(rel='/r/RelatedTo',
+                    edge = make_edge(rel='/r/Synonym',
                                      start=standardized_concept_uri('zh-Hans', simplified),
                                      end=standardized_concept_uri('zh', variant),
                                      dataset=DATASET,
@@ -204,38 +197,37 @@ def handle_file(filename, output_file):
                     out.write(edge)
                 continue
 
-            # Handle abbreviations
-            if re.match(ABBR_REGEX, definition):
-                abbreviations = extract_abbreviations(definition)
-                if abbreviations:
-                    for abbr in abbreviations:
-                        edge = make_edge(rel='/r/RelatedTo',
-                                         start=standardized_concept_uri('zh-Hant', traditional),
-                                         end=standardized_concept_uri('zh', abbr),
-                                         dataset=DATASET,
-                                         license=LICENSE,
-                                         sources=SOURCE)
-                        out.write(edge)
+            if re.match(SEE_ALSO_REGEX, definition):
+                references = extract_han_characters(definition)
+                for reference in references:
+                    edge = make_edge(rel='/r/RelatedTo',
+                                     start=standardized_concept_uri('zh-Hant', traditional),
+                                     end=standardized_concept_uri('zh', reference),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
+                    out.write(edge)
 
-                        edge = make_edge(rel='/r/RelatedTo',
-                                         start=standardized_concept_uri('zh-Hans', simplified),
-                                         end=standardized_concept_uri('zh', abbr),
-                                         dataset=DATASET,
-                                         license=LICENSE,
-                                         sources=SOURCE)
-                        out.write(edge)
-                continue
+                    edge = make_edge(rel='/r/RelatedTo',
+                                     start=standardized_concept_uri('zh-Hans', simplified),
+                                     end=standardized_concept_uri('zh', reference),
+                                     dataset=DATASET,
+                                     license=LICENSE,
+                                     sources=SOURCE)
+                    out.write(edge)
 
             # Remove 'lit.', 'fig.'
             definition = LIT_FIG_REGEX.sub('', definition)
 
             # Expand sth and sb
-            definition = definition.replace('sth', 'something')
-            definition = definition.replace('sb', 'someone')
+            definition = SB_REGEX.sub('someone', definition)
+            definition = STH_REGEX.sub('something', definition)
+
+            # Additional cleanups
             definition = remove_reference_syntax(definition)
             definition = remove_additional_info(definition)
 
-            # Skip long definitions
+            # Skip long definitions and make an edge out of remaining information
             if len(definition.split()) < 6:
                 edge = make_edge(rel='/r/Synonym',
                                  start=standardized_concept_uri('zh-Hant', traditional),
@@ -245,7 +237,7 @@ def handle_file(filename, output_file):
                                  sources=SOURCE)
                 out.write(edge)
 
-                edge = make_edge(rel='/r/RelatedTo',
+                edge = make_edge(rel='/r/Synonym',
                                  start=standardized_concept_uri('zh-Hans', simplified),
                                  end=standardized_concept_uri('en', definition),
                                  dataset=DATASET,

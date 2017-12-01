@@ -6,6 +6,6 @@ RUN apt-get update \
   && apt-get install -y coreutils diffutils wget gzip \
   && rm -rf /var/lib/apt/lists/*
 
-ADD 10-download.sh /docker-entrypoint-initdb.d/10-check-download.sh
+ADD 10-download.sh /docker-entrypoint-initdb.d/10-download.sh
 ADD 20-load-db.sql /docker-entrypoint-initdb.d/20-load-db.sql
 ADD 30-done.sh /docker-entrypoint-initdb.d/30-done.sh

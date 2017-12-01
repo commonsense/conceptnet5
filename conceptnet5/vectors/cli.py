@@ -271,8 +271,6 @@ def export_background(input_filename, output_dir, concepts_filename, language, t
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename, language)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
-    print('replacements: ', len(replacements))
-    print('labels: ', small_frame.shape)
     save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
                       replacements)
 
