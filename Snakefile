@@ -604,9 +604,9 @@ rule retrofit:
         DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
-        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        temp(expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS)))
     resources:
-        ram=16
+        ram=24
     shell:
         "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
