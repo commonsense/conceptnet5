@@ -14,7 +14,6 @@ from conceptnet5.uri import uri_prefix, assertion_uri
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
-from sklearn.preprocessing import normalize
 
 RELATION_INDEX = pd.Index(COMMON_RELATIONS)
 N_RELS = len(RELATION_INDEX)
@@ -118,10 +117,6 @@ class SemanticMatchingModel(nn.Module):
         self.assoc_tensor.data[0] = self.identity_slice
         self.rel_vecs.weight.data[0, :] = 0
         self.rel_vecs.weight.data[0, 0] = 1
-
-    def normalize_embeddings(self):
-        normalize(self.rel_vecs.weight, copy=False)
-        normalize(self.term_vecs.weight, copy=False)
 
     def forward(self, rels, terms_L, terms_R):
         # Get relation vectors for the whole batch, with shape (b * i)
@@ -308,7 +303,6 @@ def run():
         loss.backward()
         optimizer.step()
         model.reset_synonym_relation()
-        model.normalize_embeddings()
 
         losses.append(loss.data[0])
         steps += 1
@@ -325,4 +319,5 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    # run()
+    evaluate_conceptnet()
