@@ -17,15 +17,6 @@ from conceptnet5.vectors.transforms import l2_normalize_rows
 
 RELATION_INDEX = pd.Index(COMMON_RELATIONS)
 N_RELS = len(RELATION_INDEX)
-RELATION_DIM = 8
-BATCH_SIZE = 100
-USE_CUDA = True
-
-FLOAT_TYPE = torch.FloatTensor
-INT_TYPE = torch.LongTensor
-if USE_CUDA:
-    FLOAT_TYPE = torch.cuda.FloatTensor
-    INT_TYPE = torch.cuda.LongTensor
 
 
 random.seed(0)
@@ -69,90 +60,72 @@ def iter_edges_once(filename):
         yield (relation, concept1, concept2, 1.)
 
 
-def ltvar(numbers):
-    return autograd.Variable(INT_TYPE(numbers))
-
-
 class SemanticMatchingModel(nn.Module):
-    def __init__(self, frame):
+    def __init__(self, frame, use_cuda=True, relation_dim=8, batch_size=100):
         super().__init__()
         self.n_terms, self.term_dim = frame.shape
+        self.relation_dim = relation_dim
+        self.batch_size = batch_size
+
+        # Initialize term embeddings, including the index that converts terms
+        # from strings to row numbers
         self.index = frame.index
         self.term_vecs = nn.Embedding(frame.shape[0], self.term_dim)
         self.term_vecs.weight.data.copy_(
             torch.from_numpy(frame.values)
         )
-        self.rel_vecs = nn.Embedding(N_RELS, RELATION_DIM)
-        rel_mat = np.random.normal(scale=0.1, size=(N_RELS, RELATION_DIM))
 
+        # Initialize relation embeddings
+        self.rel_vecs = nn.Embedding(N_RELS, self.relation_dim)
+        rel_mat = np.random.normal(scale=0.1, size=(N_RELS, self.relation_dim))
         # Initialize the Synonym relationship to the identity
         rel_mat[0, :] = 0
         rel_mat[0, 0] = 1
-
         self.rel_vecs.weight.data.copy_(
             torch.from_numpy(rel_mat)
         )
-        if USE_CUDA:
+
+        self.assoc_tensor = nn.Bilinear(self.term_dim, self.term_dim, self.relation_dim)
+
+        # Using CUDA to run on the GPU requires different data types
+        if use_cuda:
+            self.float_type = torch.cuda.FloatTensor
+            self.int_type = torch.cuda.LongTensor
             self.term_vecs = self.term_vecs.cuda()
             self.rel_vecs = self.rel_vecs.cuda()
+            self.assoc_tensor = self.assoc_tensor.cuda()
 
-        assoc_mat = np.random.normal(
-            scale=0.1, size=(RELATION_DIM, self.term_dim, self.term_dim)
-        ).astype('f')
-        assoc_t = torch.from_numpy(assoc_mat)
-        if USE_CUDA:
-            assoc_t = assoc_t.cuda()
-        self.assoc_tensor = nn.Parameter(assoc_t)
-        self.identity_slice = FLOAT_TYPE(np.eye(self.term_dim))
-        self.assoc_tensor.data[0] = self.identity_slice
+        self.identity_slice = self.float_type(np.eye(self.term_dim))
+        self.assoc_tensor.weight.data[0] = self.identity_slice
 
-        self.truth_multiplier = nn.Parameter(FLOAT_TYPE([5.]))
-        self.truth_offset = nn.Parameter(FLOAT_TYPE([-3.]))
-
-        # assoc_o = FLOAT_TYPE(RELATION_DIM)
-        # nn.init.normal(assoc_o, std=.001)
-        # self.assoc_offset = nn.Parameter(assoc_o)
+        self.truth_multiplier = nn.Parameter(self.float_type([5.]))
+        # self.truth_offset = nn.Parameter(self.float_type([-3.]))
 
     def reset_synonym_relation(self):
-        self.assoc_tensor.data[0] = self.identity_slice
+        self.assoc_tensor.weight.data[0] = self.identity_slice
         self.rel_vecs.weight.data[0, :] = 0
         self.rel_vecs.weight.data[0, 0] = 1
 
     def forward(self, rels, terms_L, terms_R):
-        # Get relation vectors for the whole batch, with shape (b * i)
+        # Get relation vectors for the whole batch, with shape (b, i)
         rels_b_i = self.rel_vecs(rels)
-        # Get left term vectors for the whole batch, with shape (b * j)
+        # Get left term vectors for the whole batch, with shape (b, j)
         terms_b_j = self.term_vecs(terms_L)
-        # Get right term vectors for the whole batch, with shape (b * k)
+        # Get right term vectors for the whole batch, with shape (b, k)
         terms_b_k = self.term_vecs(terms_R)
-        # Reshape our (i * j * k) assoc_tensor into (ij * k), then (k * ij)
-        assoc_ij_k = self.assoc_tensor.view(-1, self.term_dim)
-        assoc_k_ij = assoc_ij_k.transpose(0, 1)
 
-        # An intermediate product of shape (b * i * j)
-        inter_b_ij = torch.mm(terms_b_k, assoc_k_ij)
-        inter_b_i_j = inter_b_ij.view(-1, RELATION_DIM, self.term_dim)
-
-        # Next we want to batch-multiply this (b * i * j) term by a term of
-        # shape (b * j * 1), giving a (b * i * 1) result.
-        terms_b_j_1 = terms_b_j.view(-1, self.term_dim, 1)
-        inter_b_i_1 = torch.bmm(inter_b_i_j, terms_b_j_1)
-
-        # Reshape the result to (b * i).
-        inter_b_i = inter_b_i_1.view(-1, RELATION_DIM)
+        # Get the interaction of the terms in relation-embedding space, with
+        # shape (b, i).
+        inter_b_i = self.assoc_tensor(terms_b_j, terms_b_k)
 
         # Multiply our (b * i) term elementwise by rels_b_i. This indicates
         # how well the interaction between term j and term k matches each
         # component of the relation vector.
         relmatch = inter_b_i * rels_b_i
 
-        # Add the offset vector for relations -- this should help us learn
-        # that some relations are rare or special-purpose.
-        # shifted_b_i = relmatch + self.assoc_offset
-
         # Add up the components for each item in the batch
         energy_b = torch.sum(relmatch, 1)
-        return energy_b * self.truth_multiplier + self.truth_offset
+        return energy_b * self.truth_multiplier
 
     def positive_negative_batch(self, edge_iterator):
         pos_rels = []
@@ -217,12 +190,12 @@ class SemanticMatchingModel(nn.Module):
             except KeyError:
                 pass
 
-            if len(weights) == BATCH_SIZE:
+            if len(weights) == self.batch_size:
                 break
 
-        pos_data = (ltvar(pos_rels), ltvar(pos_left), ltvar(pos_right))
-        neg_data = (ltvar(neg_rels), ltvar(neg_left), ltvar(neg_right))
-        weights = autograd.Variable(FLOAT_TYPE(weights))
+        pos_data = (self.ltvar(pos_rels), self.ltvar(pos_left), self.ltvar(pos_right))
+        neg_data = (self.ltvar(neg_rels), self.ltvar(neg_left), self.ltvar(neg_right))
+        weights = autograd.Variable(self.float_type(weights))
         return pos_data, neg_data, weights
 
     def make_batches(self, edge_iterator):
@@ -243,81 +216,85 @@ class SemanticMatchingModel(nn.Module):
             value = truth_values.data[i]
             print("[%4.4f] %s %s %s" % (value, rel, left, right))
 
+    @staticmethod
+    def load_model(filename):
+        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+        model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32)))
+        model.load_state_dict(torch.load(filename))
+        return model
 
-def load_model(filename):
-    frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
-    model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
-    model.load_state_dict(torch.load(filename))
+    def evaluate_conceptnet(self):
+        for pos_batch, neg_batch, weights in self.make_batches(
+            iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv'))
+        ):
+            model.zero_grad()
+            pos_energy = model(*pos_batch)
+            rel_indices, left_indices, right_indices = pos_batch
+            for i in range(len(pos_energy)):
+                value = pos_energy.data[i]
+                if value < -1:
+                    rel = RELATION_INDEX[int(rel_indices.data[i])]
+                    left = model.index[int(left_indices.data[i])]
+                    right = model.index[int(right_indices.data[i])]
+                    assertion = assertion_uri(rel, left, right)
+                    print("%4.4f\t%s" % (value, assertion))
+
+    def train(self):
+        relative_loss_function = nn.MarginRankingLoss(margin=0.5)
+        absolute_loss_function = nn.BCEWithLogitsLoss()
+        optimizer = optim.SGD(self.parameters(), lr=0.1)
+        losses = []
+        true_target = autograd.Variable(self.float_type([1] * self.batch_size))
+        false_target = autograd.Variable(self.float_type([0] * self.batch_size))
+        steps = 0
+        for pos_batch, neg_batch, weights in self.make_batches(
+            iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
+        ):
+            self.zero_grad()
+            pos_energy = self(*pos_batch)
+            neg_energy = self(*neg_batch)
+
+            synonymous = pos_batch[1]
+            synonym_rel = autograd.Variable(self.int_type([0] * self.batch_size))
+            synonym_energy = self(synonym_rel, synonymous, synonymous)
+
+            loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
+            loss2 = absolute_loss_function(pos_energy, true_target)
+            loss3 = absolute_loss_function(neg_energy, false_target)
+            loss4 = absolute_loss_function(synonym_energy, true_target)
+
+            loss = loss1 + loss2 + loss3 + loss4
+            loss.backward()
+            optimizer.step()
+            self.reset_synonym_relation()
+
+            losses.append(loss.data[0])
+            steps += 1
+            if steps in (10, 20, 50, 100) or steps % 100 == 0:
+                self.show_debug(neg_batch, neg_energy, False)
+                self.show_debug(pos_batch, pos_energy, True)
+                avg_loss = np.mean(losses)
+                print("%d steps, loss=%4.4f" % (steps, avg_loss))
+                losses.clear()
+            if steps % 1000 == 0:
+                torch.save(self.state_dict(), 'data/vectors/sme.model')
+                print("saved")
+        print()
+
+    def ltvar(self, numbers):
+        return autograd.Variable(self.int_type(numbers))
+
+
+def get_model():
+    if os.access('data/vectors/sme.model', os.F_OK):
+        model = SemanticMatchingModel.load_model('data/vectors/sme.model')
+    else:
+        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+        model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32)))
     return model
 
 
-def evaluate_conceptnet():
-    model = load_model('data/vectors/sme.model')
-    for pos_batch, neg_batch, weights in model.make_batches(
-        iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv'))
-    ):
-        model.zero_grad()
-        pos_energy = model(*pos_batch)
-        rel_indices, left_indices, right_indices = pos_batch
-        for i in range(len(pos_energy)):
-            value = pos_energy.data[i]
-            if value < -1:
-                rel = RELATION_INDEX[int(rel_indices.data[i])]
-                left = model.index[int(left_indices.data[i])]
-                right = model.index[int(right_indices.data[i])]
-                assertion = assertion_uri(rel, left, right)
-                print("%4.4f\t%s" % (value, assertion))
-
-
-def run():
-    if os.access('data/vectors/sme.model', os.F_OK):
-        model = load_model('data/vectors/sme.model')
-    else:
-        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
-        model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32), offset=1e-6))
-
-    relative_loss_function = nn.MarginRankingLoss(margin=0.5)
-    absolute_loss_function = nn.BCEWithLogitsLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.1, weight_decay=1e-6)
-    losses = []
-    true_target = autograd.Variable(FLOAT_TYPE([1] * BATCH_SIZE))
-    false_target = autograd.Variable(FLOAT_TYPE([0] * BATCH_SIZE))
-    steps = 0
-    for pos_batch, neg_batch, weights in model.make_batches(
-        iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
-    ):
-        model.zero_grad()
-        pos_energy = model(*pos_batch)
-        neg_energy = model(*neg_batch)
-
-        synonymous = pos_batch[1]
-        synonym_rel = autograd.Variable(INT_TYPE([0] * BATCH_SIZE))
-        synonym_energy = model(synonym_rel, synonymous, synonymous)
-
-        loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
-        loss2 = absolute_loss_function(pos_energy, true_target)
-        loss3 = absolute_loss_function(neg_energy, false_target)
-        loss4 = absolute_loss_function(synonym_energy, true_target)
-
-        loss = loss1 + loss2 + loss3 + loss4
-        loss.backward()
-        optimizer.step()
-        model.reset_synonym_relation()
-
-        losses.append(loss.data[0])
-        steps += 1
-        if steps in (10, 20, 50, 100) or steps % 100 == 0:
-            model.show_debug(neg_batch, neg_energy, False)
-            model.show_debug(pos_batch, pos_energy, True)
-            avg_loss = np.mean(losses)
-            print("%d steps, loss=%4.4f" % (steps, avg_loss))
-            losses.clear()
-        if steps % 1000 == 0:
-            torch.save(model.state_dict(), 'data/vectors/sme.model')
-            print("saved")
-    print()
-
-
 if __name__ == '__main__':
-    # run()
-    evaluate_conceptnet()
+    model = get_model()
+    model.train()
+    # model.evaluate_conceptnet()
