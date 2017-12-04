@@ -36,6 +36,9 @@ WIKTIONARY_VERSIONS = {
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
+# Languages where morphemes should not be split anywhere except at spaces
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
@@ -65,26 +68,9 @@ RETROFIT_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-CORE_DATASET_NAMES = [
-    "jmdict/jmdict",
-    "nadya/nadya",
-    "ptt_petgame/api",
-    "opencyc/opencyc",
-    "verbosity/verbosity",
-    "wordnet/wordnet",
-]
-CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
-CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
-CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
-CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
-
-
-DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
-DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
-
-RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
+RAW_DATA_URL = "https://zenodo.org/record/998169/files/conceptnet-raw-data-5.5.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
-PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
@@ -108,6 +94,25 @@ if TESTMODE:
     HASH_WIDTH = 12
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
+    EMOJI_LANGUAGES = ['en', 'en_001']
+
+
+CORE_DATASET_NAMES = [
+    "jmdict/jmdict",
+    "nadya/nadya",
+    "ptt_petgame/api",
+    "opencyc/opencyc",
+    "verbosity/verbosity",
+    "wordnet/wordnet",
+    "cedict/cedict"
+]
+CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
+CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
+
+
+DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
 
 
 rule all:
@@ -146,8 +151,8 @@ rule webdata:
 rule clean:
     shell:
         "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
-        "do echo Removing %(data)s/$subdir; "
-        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
+        "do echo Removing {DATA}/$subdir; "
+        "rm -rf {DATA}/$subdir; done"
 
 rule test:
     input:
@@ -155,34 +160,41 @@ rule test:
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/plain/numberbatch-en.txt.gz",
-        DATA + "/stats/languages.txt"
 
 
 # Downloaders
 # ===========
-rule download_raw:
+rule download_raw_package:
+    output:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
+    shell:
+        "wget -nv {RAW_DATA_URL} -O {output}"
+
+rule extract_raw:
+    input:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "curl -f {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "unzip {input} raw/{wildcards.dirname}/{wildcards.filename} -d {DATA}"
 
 rule download_conceptnet_ppmi:
     output:
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
 
 rule download_numberbatch:
     output:
         DATA + "/precomputed/vectors/numberbatch.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
 
 rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
 
 
 # Precomputation
@@ -208,9 +220,9 @@ rule precompute_wiktionary:
         DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
-            shell("curl -f {PRECOMPUTED_DATA_URL}/wiktionary/"
+            shell("wget {PRECOMPUTED_DATA_URL}/wiktionary/"
                   "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
-                  "> {output}")
+                  "-O {output}")
         else:
             # This is a mess because, for most of these sub-steps, the file
             # being output isn't {output} but its uncompressed version
@@ -247,9 +259,9 @@ rule read_dbpedia:
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
-        "cn5-read dbpedia %(data)s/raw/dbpedia "
+        "cn5-read dbpedia {DATA}/raw/dbpedia "
         "{output} "
-        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
+        "{DATA}/stats/core_concepts.txt "
 
 rule read_jmdict:
     input:
@@ -301,9 +313,9 @@ rule prescan_wiktionary:
     output:
         DATA + "/db/wiktionary.db"
     shell:
-        "mkdir -p %(data)s/tmp && "
-        "cn5-read wiktionary_pre {input} %(data)s/tmp/wiktionary.db && "
-        "mv %(data)s/tmp/wiktionary.db {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && "
+        "cn5-read wiktionary_pre {input} {DATA}/tmp/wiktionary.db && "
+        "mv {DATA}/tmp/wiktionary.db {output}"
 
 rule read_wiktionary:
     input:
@@ -329,6 +341,14 @@ rule read_emoji:
         DATA + "/edges/emoji/{language}.msgpack"
     shell:
         "cn5-read emoji {input} {output}"
+
+rule read_cc_cedict:
+    input:
+        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+    output:
+        DATA + "/edges/cedict/cedict.msgpack",
+    shell:
+        "cn5-read cc_cedict {input} {output}"
 
 
 # Converting msgpack to csv
@@ -356,7 +376,7 @@ rule sort_edges:
     output:
         DATA + "/collated/sorted/edges.csv"
     shell:
-        "mkdir -p %(data)s/tmp && cat {input} | LC_ALL=C sort -T %(data)s/tmp | LC_ALL=C uniq > {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && cat {input} | LC_ALL=C sort -T {DATA}/tmp | LC_ALL=C uniq > {output}"
 
 rule combine_assertions:
     input:
@@ -381,7 +401,7 @@ rule prepare_db:
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     shell:
-        "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
+        "cn5-db prepare_data {input} {DATA}/psql"
 
 rule gzip_db:
     input:
@@ -403,7 +423,7 @@ rule load_db:
     output:
         DATA + "/psql/done"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "cn5-db load_data {DATA}/psql && touch {output}"
 
 
 # Collecting statistics
@@ -611,11 +631,11 @@ rule retrofit:
         DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
-        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        temp(expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS)))
     resources:
-        ram=16
+        ram=24
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -681,6 +701,7 @@ rule export_english_text:
 # ==========
 
 rule prepare_vocab:
+<<<<<<< HEAD
     input:
         DATA + "/stats/core_concept_counts.txt"
     output:
@@ -705,6 +726,32 @@ rule subwords:
     output:
         DATA + "/edges/morphology/subwords-{language}.msgpack"
     shell:
+=======
+    input:
+        DATA + "/stats/core_concept_counts.txt"
+    output:
+        DATA + "/morph/vocab/{language}.txt"
+    shell:
+        "cn5-build prepare_morphology {wildcards.language} {input} {output}"
+
+rule morfessor_segmentation:
+    input:
+        DATA + "/morph/vocab/{language}.txt"
+    output:
+        DATA + "/morph/segments/{language}.txt"
+    run:
+        if wildcards.language in ATOMIC_SPACE_LANGUAGES:
+            shell("morfessor-train {input} -S {output} --traindata-list --nosplit-re '[^_].'")
+        else:
+            shell("morfessor-train {input} -S {output} -f '_' --traindata-list")
+
+rule subwords:
+    input:
+        DATA + "/morph/segments/{language}.txt",
+    output:
+        DATA + "/edges/morphology/subwords-{language}.msgpack"
+    shell:
+>>>>>>> setup-fixes
         "cn5-build subwords {wildcards.language} {input} {output}"
 
 
@@ -726,7 +773,7 @@ rule compare_embeddings:
     run:
         input_embeddings = input[:-2]
         input_embeddings_str = ' '.join(input_embeddings)
-        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
+        shell("cn5-vectors compare_embeddings {input_embeddings_str} {output}")
 
 rule comparison_graph:
     input:

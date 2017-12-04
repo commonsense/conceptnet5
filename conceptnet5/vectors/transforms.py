@@ -2,12 +2,14 @@ import msgpack
 import numpy as np
 import pandas as pd
 from annoy import AnnoyIndex
+from ordered_set import OrderedSet
+from sklearn.preprocessing import normalize
 from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.nodes import uri_to_label
 from conceptnet5.uri import uri_prefix, get_language
-from conceptnet5.vectors import standardized_uri, similar_to_vec
+from conceptnet5.vectors import standardized_uri, similar_to_vec, get_vector, cosine_similarity
 
 
 def standardize_row_labels(frame, language='en', forms=True):
@@ -59,22 +61,19 @@ def l1_normalize_columns(frame):
     each column's entries add up to 1. This is particularly helpful when
     post-processing GloVe output.
     """
-    col_norms = np.sum(np.abs(frame), axis='rows')
-    return frame.div(col_norms, axis='columns')
+    index = frame.index
+    return pd.DataFrame(data=normalize(frame, norm='l1', copy=False, axis=0), index=index)
 
 
-def l2_normalize_rows(frame, offset=0.):
+def l2_normalize_rows(frame):
     """
     L_2-normalize the rows of this DataFrame, so their lengths in Euclidean
     distance are all 1. This enables cosine similarities to be computed as
     dot-products between these rows.
-
-    Zero-rows will end up normalized to NaN, but that is actually the
-    Pandas-approved way to represent missing data, so Pandas should be able to
-    deal with those.
+    DataFrame of zeros will be normalized to zeros.
     """
-    row_norms = np.sqrt(np.sum(np.power(frame, 2), axis='columns')) + offset
-    return frame.div(row_norms, axis='rows')
+    index = frame.index
+    return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
 
 
 def subtract_mean_vector(frame):
@@ -100,15 +99,14 @@ def build_annoy_tree(frame, tree_depth):
     Build a tree to hold a frame's vectors for efficient lookup.
     """
     index = AnnoyIndex(frame.shape[1], metric='euclidean')
-    index_map = {}
     for i, item in enumerate(frame.index):
         index.add_item(i, frame.loc[item])
-        index_map[i] = item
     index.build(tree_depth)
+    index_map = OrderedSet(frame.index)
     return index, index_map
 
 
-def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=False):
+def make_replacements_faster(small_frame, big_frame, tree_depth=1000, lang='en', verbose=False):
     """
     Create a replacements dictionary to map terms only present in a big frame to the closest term
     in a small_frame. This is a faster than make_replacements(), because it uses a fast
@@ -120,13 +118,15 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, verbose=Fa
     index, index_map = build_annoy_tree(intersected, tree_depth)
     replacements = {}
     for term in big_frame.index:
-        if term not in small_frame.index:
+        if term not in small_frame.index and not term.startswith('/x/'):
             most_similar_index = index.get_nns_by_vector(big_frame.loc[term], 1)[0]
             most_similar = index_map[most_similar_index]
-            replacements[term] = most_similar
+            similarity = cosine_similarity(get_vector(big_frame, term, lang),
+                                           get_vector(small_frame, most_similar, lang))
+            replacements[term] = [most_similar, round(similarity, 2)]
 
-            if verbose and not (len(replacements) % 2000):
-                print('{} ==> {}'.format(term, most_similar))
+            if verbose and not (len(replacements) % 20):
+                print('{} ==> {}, {}'.format(term, most_similar, similarity))
     return replacements
 
 
@@ -157,7 +157,10 @@ def choose_small_vocabulary(big_frame, concepts_filename, language):
     vocab = []
     for term in big_frame.index:
         if '_' not in term and term in concepts:
-            frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            try:
+                frequency = word_frequency(uri_to_label(term), language, wordlist='large')
+            except LookupError:
+                frequency = word_frequency(uri_to_label(term), language, wordlist='combined')
             vocab.append((term, frequency))
     small_vocab = [term for term, frequency in sorted(vocab, key=lambda x: x[1], reverse=True)[
                                                :50000]]
@@ -183,6 +186,6 @@ def make_small_frame(big_frame, concepts_filename, language):
 
 
 def save_replacements(output_filepath, replacements):
-    # Save the replacement dictionary as a mgspack file
+    # Save the replacement dictionary as a msgpack file
     with open(output_filepath, 'wb') as output_file:
         msgpack.dump(replacements, output_file)
