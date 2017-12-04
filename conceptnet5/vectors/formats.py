@@ -247,21 +247,23 @@ def save_index_as_labels(index, label_filename):
         for label in index:
             print(label, file=out)
 
-def save_orderedSet(set, filename):
+
+def save_ordered_set(oset, filename):
     """
     Save an OrderedSet object as a text file of words.
     """
     with open(filename, 'w', encoding='utf-8') as out:
-        for word in set:
+        for word in oset:
             print(word, file=out)
 
-def load_orderedSet(filename):
+
+def load_ordered_set(filename):
     """
     Load a set of words  from a text file, and
     represent them in an OrderedSet object.
     """
-    set = OrderedSet()
+    oset = OrderedSet()
     for line in open(filename, encoding='utf-8'):
-        set.append(line.rstrip('\n'))
-    return set
+        oset.append(line.rstrip('\n'))
+    return oset
 
