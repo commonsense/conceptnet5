@@ -75,17 +75,10 @@ class SemanticMatchingModel(nn.Module):
             torch.from_numpy(frame.values)
         )
 
-        # Initialize relation embeddings
-        self.rel_vecs = nn.Embedding(N_RELS, self.relation_dim)
-        rel_mat = np.random.normal(scale=0.1, size=(N_RELS, self.relation_dim))
-        # Initialize the Synonym relationship to the identity
-        rel_mat[0, :] = 0
-        rel_mat[0, 0] = 1
-        self.rel_vecs.weight.data.copy_(
-            torch.from_numpy(rel_mat)
+        self.assoc_tensor = nn.Bilinear(
+            self.term_dim, self.term_dim, self.relation_dim, bias=False
         )
-
-        self.assoc_tensor = nn.Bilinear(self.term_dim, self.term_dim, self.relation_dim)
+        self.rel_vecs = nn.Embedding(N_RELS, self.relation_dim)
 
         # Using CUDA to run on the GPU requires different data types
         if use_cuda:
@@ -94,12 +87,15 @@ class SemanticMatchingModel(nn.Module):
             self.term_vecs = self.term_vecs.cuda()
             self.rel_vecs = self.rel_vecs.cuda()
             self.assoc_tensor = self.assoc_tensor.cuda()
+        else:
+            self.float_type = torch.FloatTensor
+            self.int_type = torch.LongTensor
 
         self.identity_slice = self.float_type(np.eye(self.term_dim))
-        self.assoc_tensor.weight.data[0] = self.identity_slice
+        self.reset_synonym_relation()
 
         self.truth_multiplier = nn.Parameter(self.float_type([5.]))
-        # self.truth_offset = nn.Parameter(self.float_type([-3.]))
+        self.truth_offset = nn.Parameter(self.float_type([-3.]))
 
     def reset_synonym_relation(self):
         self.assoc_tensor.weight.data[0] = self.identity_slice
@@ -121,11 +117,19 @@ class SemanticMatchingModel(nn.Module):
         # Multiply our (b * i) term elementwise by rels_b_i. This indicates
         # how well the interaction between term j and term k matches each
         # component of the relation vector.
-        relmatch = inter_b_i * rels_b_i
+        relmatch_b_i = inter_b_i * rels_b_i
 
         # Add up the components for each item in the batch
-        energy_b = torch.sum(relmatch, 1)
-        return energy_b * self.truth_multiplier
+        energy_b = torch.sum(relmatch_b_i, 1)
+
+        norm_inter_b = torch.sum(inter_b_i * inter_b_i, 1)
+        norm_rel_b = torch.sum(rels_b_i * rels_b_i, 1)
+
+        return (
+            energy_b * self.truth_multiplier + self.truth_offset,
+            norm_inter_b,
+            norm_rel_b
+        )
 
     def positive_negative_batch(self, edge_iterator):
         pos_rels = []
@@ -223,25 +227,28 @@ class SemanticMatchingModel(nn.Module):
         model.load_state_dict(torch.load(filename))
         return model
 
-    def evaluate_conceptnet(self):
+    def evaluate_conceptnet(self, cutoff_value=-1):
         for pos_batch, neg_batch, weights in self.make_batches(
             iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv'))
         ):
-            model.zero_grad()
-            pos_energy = model(*pos_batch)
+            self.zero_grad()
+            pos_energy, _, _ = self(*pos_batch)
             rel_indices, left_indices, right_indices = pos_batch
             for i in range(len(pos_energy)):
                 value = pos_energy.data[i]
-                if value < -1:
+                if value < cutoff_value:
                     rel = RELATION_INDEX[int(rel_indices.data[i])]
-                    left = model.index[int(left_indices.data[i])]
-                    right = model.index[int(right_indices.data[i])]
+                    left = self.index[int(left_indices.data[i])]
+                    right = self.index[int(right_indices.data[i])]
                     assertion = assertion_uri(rel, left, right)
                     print("%4.4f\t%s" % (value, assertion))
 
     def train(self):
         relative_loss_function = nn.MarginRankingLoss(margin=0.5)
         absolute_loss_function = nn.BCEWithLogitsLoss()
+        max_norm_loss_function = nn.MarginRankingLoss(margin=0)
+        norm_loss_function = nn.MSELoss()
+
         optimizer = optim.SGD(self.parameters(), lr=0.1)
         losses = []
         true_target = autograd.Variable(self.float_type([1] * self.batch_size))
@@ -251,19 +258,21 @@ class SemanticMatchingModel(nn.Module):
             iter_edges_forever(get_data_filename('collated/sorted/edges-shuf.csv'))
         ):
             self.zero_grad()
-            pos_energy = self(*pos_batch)
-            neg_energy = self(*neg_batch)
+            pos_energy, pos_inter_norm, pos_rel_norm = self(*pos_batch)
+            neg_energy, neg_inter_norm, neg_rel_norm = self(*neg_batch)
 
             synonymous = pos_batch[1]
             synonym_rel = autograd.Variable(self.int_type([0] * self.batch_size))
-            synonym_energy = self(synonym_rel, synonymous, synonymous)
+            synonym_energy, syn_inter_norm, _ = self(synonym_rel, synonymous, synonymous)
 
-            loss1 = relative_loss_function(pos_energy, neg_energy, true_target)
-            loss2 = absolute_loss_function(pos_energy, true_target)
-            loss3 = absolute_loss_function(neg_energy, false_target)
-            loss4 = absolute_loss_function(synonym_energy, true_target)
+            loss = relative_loss_function(pos_energy, neg_energy, true_target)
+            loss += absolute_loss_function(pos_energy, true_target)
+            loss += absolute_loss_function(neg_energy, false_target)
+            loss += absolute_loss_function(synonym_energy, true_target)
+            for this_norm in [pos_inter_norm, pos_rel_norm, neg_inter_norm, neg_rel_norm]:
+                loss += max_norm_loss_function(true_target, this_norm, true_target)
+            loss += norm_loss_function(syn_inter_norm, true_target)
 
-            loss = loss1 + loss2 + loss3 + loss4
             loss.backward()
             optimizer.step()
             self.reset_synonym_relation()
