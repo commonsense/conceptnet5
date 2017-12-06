@@ -148,7 +148,7 @@ ENTAILED_RELATIONS = {
 
 # A subset of 24 relations to use in machine learning
 COMMON_RELATIONS = [
-    '/r/Synonym', '/r/RelatedTo', '/r/FormOf', '/r/Antonym',
+    '/r/Synonym', '/r/RelatedTo', '/r/Antonym',
     '/r/SimilarTo', '/r/IsA', '/r/AtLocation', '/r/Causes',
     '/r/CapableOf', '/r/CreatedBy', '/r/DerivedFrom', '/r/Entails',
     '/r/HasA', '/r/HasContext', '/r/HasProperty', '/r/HasSubevent',

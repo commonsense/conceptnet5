@@ -74,24 +74,27 @@ class SemanticMatchingModel(nn.Module):
         self.term_vecs.weight.data.copy_(
             torch.from_numpy(frame.values)
         )
+        self.term_vecs = self.term_vecs.half()
 
         self.assoc_tensor = nn.Bilinear(
-            self.term_dim, self.term_dim, self.relation_dim, bias=False
-        )
-        self.rel_vecs = nn.Embedding(N_RELS, self.relation_dim)
+            self.term_dim, self.term_dim, self.relation_dim, bias=True
+        ).half()
+        self.rel_vecs = nn.Embedding(N_RELS, self.relation_dim).half()
 
         # Using CUDA to run on the GPU requires different data types
         if use_cuda:
+            self.half_type = torch.cuda.HalfTensor
             self.float_type = torch.cuda.FloatTensor
             self.int_type = torch.cuda.LongTensor
             self.term_vecs = self.term_vecs.cuda()
             self.rel_vecs = self.rel_vecs.cuda()
             self.assoc_tensor = self.assoc_tensor.cuda()
         else:
+            self.half_type = torch.HalfTensor
             self.float_type = torch.FloatTensor
             self.int_type = torch.LongTensor
 
-        self.identity_slice = self.float_type(np.eye(self.term_dim))
+        self.identity_slice = self.half_type(np.eye(self.term_dim))
         self.reset_synonym_relation()
 
         self.truth_multiplier = nn.Parameter(self.float_type([5.]))
@@ -126,9 +129,9 @@ class SemanticMatchingModel(nn.Module):
         norm_rel_b = torch.sum(rels_b_i * rels_b_i, 1)
 
         return (
-            energy_b * self.truth_multiplier + self.truth_offset,
-            norm_inter_b,
-            norm_rel_b
+            energy_b.float() * self.truth_multiplier + self.truth_offset,
+            norm_inter_b.float(),
+            norm_rel_b.float()
         )
 
     def positive_negative_batch(self, edge_iterator):
@@ -199,7 +202,7 @@ class SemanticMatchingModel(nn.Module):
 
         pos_data = (self.ltvar(pos_rels), self.ltvar(pos_left), self.ltvar(pos_right))
         neg_data = (self.ltvar(neg_rels), self.ltvar(neg_left), self.ltvar(neg_right))
-        weights = autograd.Variable(self.float_type(weights))
+        weights = autograd.Variable(self.half_type(weights))
         return pos_data, neg_data, weights
 
     def make_batches(self, edge_iterator):
@@ -222,7 +225,7 @@ class SemanticMatchingModel(nn.Module):
 
     @staticmethod
     def load_model(filename):
-        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+        frame = load_hdf(get_data_filename('vectors/numberbatch-biased.h5'))
         model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32)))
         model.load_state_dict(torch.load(filename))
         return model
@@ -285,7 +288,7 @@ class SemanticMatchingModel(nn.Module):
                 avg_loss = np.mean(losses)
                 print("%d steps, loss=%4.4f" % (steps, avg_loss))
                 losses.clear()
-            if steps % 1000 == 0:
+            if steps % 5000 == 0:
                 torch.save(self.state_dict(), 'data/vectors/sme.model')
                 print("saved")
         print()
@@ -298,7 +301,7 @@ def get_model():
     if os.access('data/vectors/sme.model', os.F_OK):
         model = SemanticMatchingModel.load_model('data/vectors/sme.model')
     else:
-        frame = load_hdf(get_data_filename('vectors-20170630/mini.h5'))
+        frame = load_hdf(get_data_filename('vectors/numberbatch-biased.h5'))
         model = SemanticMatchingModel(l2_normalize_rows(frame.astype(np.float32)))
     return model
 
