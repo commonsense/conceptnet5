@@ -9,6 +9,7 @@ import os
 
 from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
+    reverse_relation
 )
 from conceptnet5.uri import uri_prefix, assertion_uri
 from conceptnet5.util import get_data_filename
@@ -155,17 +156,18 @@ class SemanticMatchingModel(nn.Module):
                 left = uri_prefix(left)
                 right = uri_prefix(right)
 
-                # Possibly replace a relation with a more general relation
+                # Possibly swap the sides of a relation
                 if coin_flip():
-                    rel = random.choice(ENTAILED_INDICES[rel])
-
-                # Possibly swap the sides of a symmetric relation
-                if rel in SYMMETRIC_RELATIONS and coin_flip():
+                    rel = reverse_relation(rel)
                     left, right = right, left
 
                 rel_idx = RELATION_INDEX.get_loc(rel)
                 left_idx = self.index.get_loc(left)
                 right_idx = self.index.get_loc(right)
+
+                # Possibly replace a relation with a more general relation
+                if coin_flip():
+                    rel_idx = random.choice(ENTAILED_INDICES[rel])
 
                 corrupt_rel_idx = rel_idx
                 corrupt_left_idx = left_idx
@@ -277,6 +279,7 @@ class SemanticMatchingModel(nn.Module):
             loss += norm_loss_function(syn_inter_norm, true_target)
 
             loss.backward()
+            nn.utils.clip_grad_norm(self.parameters(), 10)
             optimizer.step()
             self.reset_synonym_relation()
 
