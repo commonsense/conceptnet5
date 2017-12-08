@@ -2,9 +2,11 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 import torch.optim as optim
+from conceptnet5.vectors.formats import save_hdf, save_npy
 import numpy as np
 import pandas as pd
 import random
+import pathlib
 import os
 
 from conceptnet5.relations import (
@@ -356,6 +358,17 @@ class SemanticMatchingModel(nn.Module):
                 torch.save(self.state_dict(), 'data/vectors/sme.model')
                 print("saved")
         print()
+
+    def export(self, dirname):
+        path = pathlib.Path(dirname)
+        term_mat = self.term_vecs.weight.data.float().cpu().numpy()
+        term_frame = pd.DataFrame(term_mat, index=self.index)
+        save_hdf(term_frame, str(path / "terms.h5"))
+        rel_mat = self.rel_vecs.weight.data.float().cpu().numpy()
+        rel_frame = pd.DataFrame(rel_mat, index=RELATION_INDEX)
+        save_hdf(rel_frame, str(path / "relations.h5"))
+        assoc_t = self.assoc_tensor.weight.data.float().cpu().numpy()
+        save_npy(assoc_t, str(path / "assoc.npy"))
 
     def ltvar(self, numbers):
         return autograd.Variable(self.int_type(numbers))
