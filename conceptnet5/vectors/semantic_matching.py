@@ -11,7 +11,9 @@ from conceptnet5.relations import (
     COMMON_RELATIONS, ALL_RELATIONS, SYMMETRIC_RELATIONS, ENTAILED_RELATIONS,
     reverse_relation
 )
+from conceptnet5.vectors.debias import GENDERED_WORDS, GENDER_NEUTRAL_WORDS, MALE_WORDS, FEMALE_WORDS
 from conceptnet5.uri import uri_prefix, assertion_uri
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -101,6 +103,25 @@ class SemanticMatchingModel(nn.Module):
         self.truth_multiplier = nn.Parameter(self.float_type([5.]))
         self.truth_offset = nn.Parameter(self.float_type([-3.]))
 
+        self.gender_bias = nn.Linear(self.term_dim, 1, bias=True).half().cuda()
+        self.gender_appropriateness = nn.Linear(self.term_dim, 1, bias=True).half().cuda()
+
+        self.bias_indices = {
+            'gendered': self.precompute_term_indices(GENDERED_WORDS),
+            'neutral': self.precompute_term_indices(GENDER_NEUTRAL_WORDS),
+            'female': self.precompute_term_indices(FEMALE_WORDS),
+            'male': self.precompute_term_indices(MALE_WORDS),
+        }
+
+    def precompute_term_indices(self, terms, language='en'):
+        return self.ltvar(
+            [
+                self.index.get_loc(standardized_concept_uri(language, term))
+                for term in terms
+                if standardized_concept_uri(language, term) in self.index
+            ]
+        )
+
     def reset_synonym_relation(self):
         self.assoc_tensor.weight.data[0] = self.identity_slice
         self.rel_vecs.weight.data[0, :] = 0
@@ -132,7 +153,28 @@ class SemanticMatchingModel(nn.Module):
         return (
             energy_b.float() * self.truth_multiplier + self.truth_offset,
             norm_inter_b.float(),
-            norm_rel_b.float()
+            norm_rel_b.float(),
+        )
+
+    def measure_bias(self):
+        # Train our predictors to recognize gender distinctions in term vectors
+        gendered_vecs = self.term_vecs(self.bias_indices['gendered']).detach()
+        gendered_batch = self.gender_appropriateness(gendered_vecs)
+        neutral_vecs = self.term_vecs(self.bias_indices['neutral']).detach()
+        neutral_batch = -self.gender_appropriateness(neutral_vecs)
+        female_vecs = self.term_vecs(self.bias_indices['female']).detach()
+        female_batch = self.gender_bias(female_vecs)
+        male_vecs = self.term_vecs(self.bias_indices['male']).detach()
+        male_batch = -self.gender_bias(male_vecs)
+
+        all_terms_gender = self.gender_bias(self.term_vecs.weight)
+        all_terms_appropriateness = self.gender_appropriateness(self.term_vecs.weight)
+
+        return (
+            torch.cat((female_batch, male_batch)).float(),
+            torch.cat((gendered_batch, neutral_batch)).float(),
+            all_terms_gender.float(),
+            all_terms_appropriateness.float()
         )
 
     def positive_negative_batch(self, edge_iterator):
@@ -232,26 +274,31 @@ class SemanticMatchingModel(nn.Module):
         model.load_state_dict(torch.load(filename))
         return model
 
-    def evaluate_conceptnet(self, cutoff_value=-1):
-        for pos_batch, neg_batch, weights in self.make_batches(
-            iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv'))
-        ):
-            self.zero_grad()
-            pos_energy, _, _ = self(*pos_batch)
-            rel_indices, left_indices, right_indices = pos_batch
-            for i in range(len(pos_energy)):
-                value = pos_energy.data[i]
-                if value < cutoff_value:
-                    rel = RELATION_INDEX[int(rel_indices.data[i])]
-                    left = self.index[int(left_indices.data[i])]
-                    right = self.index[int(right_indices.data[i])]
-                    assertion = assertion_uri(rel, left, right)
-                    print("%4.4f\t%s" % (value, assertion))
+    def evaluate_conceptnet(self, cutoff_value=-1, output_filename=None):
+        if output_filename:
+            out = open(output_filename, 'w', encoding='utf-8')
+        else:
+            out = None
+        for rel, left, right, weight in iter_edges_once(get_data_filename('collated/sorted/edges-shuf.csv')):
+            try:
+                rel_idx = RELATION_INDEX.get_loc(rel)
+                left_idx = self.index.get_loc(left)
+                right_idx = self.index.get_loc(right)
+            except KeyError:
+                continue
+
+            model_output, _, _ = self(self.ltvar([rel_idx]), self.ltvar([left_idx]), self.ltvar([right_idx]))
+            value = model_output.data[0]
+            assertion = assertion_uri(rel, left, right)
+            if value < cutoff_value:
+                print("%4.4f\t%s" % (value, assertion))
+            if out is not None:
+                print("%4.4f\t%s" % (value, assertion), file=out)
 
     def train(self):
         relative_loss_function = nn.MarginRankingLoss(margin=0.5)
         absolute_loss_function = nn.BCEWithLogitsLoss()
-        max_norm_loss_function = nn.MarginRankingLoss(margin=0)
+        one_side_loss_function = nn.MarginRankingLoss(margin=0)
         norm_loss_function = nn.MSELoss()
 
         optimizer = optim.SGD(self.parameters(), lr=0.1)
@@ -270,26 +317,40 @@ class SemanticMatchingModel(nn.Module):
             synonym_rel = autograd.Variable(self.int_type([0] * self.batch_size))
             synonym_energy, syn_inter_norm, _ = self(synonym_rel, synonymous, synonymous)
 
-            loss = relative_loss_function(pos_energy, neg_energy, true_target)
-            loss += absolute_loss_function(pos_energy, true_target)
-            loss += absolute_loss_function(neg_energy, false_target)
-            loss += absolute_loss_function(synonym_energy, true_target)
+            sem_loss = relative_loss_function(pos_energy, neg_energy, true_target)
+            sem_loss += absolute_loss_function(pos_energy, true_target)
+            sem_loss += absolute_loss_function(neg_energy, false_target)
+            sem_loss += absolute_loss_function(synonym_energy, true_target)
+            norm_loss = norm_loss_function(syn_inter_norm, true_target)
             for this_norm in [pos_inter_norm, pos_rel_norm, neg_inter_norm, neg_rel_norm]:
-                loss += max_norm_loss_function(true_target, this_norm, true_target)
-            loss += norm_loss_function(syn_inter_norm, true_target)
+                norm_loss += one_side_loss_function(true_target, this_norm, true_target)
 
+            gender_predictions, approp_predictions, gender_vals, approp_vals = self.measure_bias()
+            ones_like_gender = autograd.Variable(torch.ones_like(gender_predictions.data))
+            ones_like_approp = autograd.Variable(torch.ones_like(approp_predictions.data))
+            ones_like_terms = autograd.Variable(torch.ones_like(gender_vals.data))
+
+            measurement_loss = absolute_loss_function(gender_predictions, ones_like_gender)
+            measurement_loss += absolute_loss_function(approp_predictions, ones_like_approp)
+            prejudice_loss = one_side_loss_function(approp_vals, gender_vals, ones_like_terms)
+            prejudice_loss += one_side_loss_function(gender_vals, -approp_vals, ones_like_terms)
+
+            loss = sem_loss + norm_loss + measurement_loss + prejudice_loss
             loss.backward()
+
             nn.utils.clip_grad_norm(self.parameters(), 10)
             optimizer.step()
             self.reset_synonym_relation()
 
             losses.append(loss.data[0])
             steps += 1
-            if steps in (10, 20, 50, 100) or steps % 100 == 0:
+            if steps in (1, 10, 20, 50, 100) or steps % 100 == 0:
                 self.show_debug(neg_batch, neg_energy, False)
                 self.show_debug(pos_batch, pos_energy, True)
                 avg_loss = np.mean(losses)
-                print("%d steps, loss=%4.4f" % (steps, avg_loss))
+                print("%d steps, loss=%4.4f, sem=%4.4f, norm=%4.4f, measure=%4.4f, prejudice=%4.4f" % (
+                    steps, avg_loss, sem_loss.data[0], norm_loss.data[0], measurement_loss.data[0], prejudice_loss.data[0]
+                ))
                 losses.clear()
             if steps % 5000 == 0:
                 torch.save(self.state_dict(), 'data/vectors/sme.model')
