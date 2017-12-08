@@ -62,6 +62,37 @@ ALL_RELATIONS = [
     "/r/dbpedia/leader",
     "/r/dbpedia/occupation",
     "/r/dbpedia/product",
+    "/r/AtLocation/rev",
+    "/r/CapableOf/rev",
+    "/r/Causes/rev",
+    "/r/CausesDesire/rev",
+    "/r/CreatedBy/rev",
+    "/r/DefinedAs/rev",
+    "/r/DerivedFrom/rev",
+    "/r/Desires/rev",
+    "/r/Entails/rev",
+    "/r/FormOf/rev",
+    "/r/HasA/rev",
+    "/r/HasContext/rev",
+    "/r/HasFirstSubevent/rev",
+    "/r/HasLastSubevent/rev",
+    "/r/HasPrerequisite/rev",
+    "/r/HasProperty/rev",
+    "/r/HasSubevent/rev",
+    "/r/InstanceOf/rev",
+    "/r/IsA/rev",
+    "/r/MadeOf/rev",
+    "/r/MannerOf/rev",
+    "/r/MotivatedByGoal/rev",
+    "/r/NotCapableOf/rev",
+    "/r/NotDesires/rev",
+    "/r/NotHasProperty/rev",
+    "/r/NotUsedFor/rev",
+    "/r/ObstructedBy/rev",
+    "/r/PartOf/rev",
+    "/r/ReceivesAction/rev",
+    "/r/SymbolOf/rev",
+    "/r/UsedFor/rev",
 ]
 
 # These relations are symmetric: it doesn't matter which concept is their
@@ -90,6 +121,16 @@ OPPOSITE_RELATIONS = _make_symmetric_dict({
 })
 
 
+def reverse_relation(rel):
+    if rel.endswith('/rev'):
+        return rel[:-4]
+    elif rel in SYMMETRIC_RELATIONS:
+        return rel
+    else:
+        return rel + '/rev'
+
+
+
 # Most relations can be generalized into less specific relations. They don't
 # form a strict tree in this way, but if you follow the chain of entailed
 # relations, you'll usually get to either the very general /r/RelatedTo
@@ -100,7 +141,7 @@ OPPOSITE_RELATIONS = _make_symmetric_dict({
 #
 # This mapping is not currently used in the ConceptNet code, but it could
 # be used either in querying or in learning about relations.
-ENTAILED_RELATIONS = {
+_ENTAILED_RELATIONS_BASE = {
     '/r/Antonym': '/r/DistinctFrom',
 
     '/r/Causes': '/r/RelatedTo',
@@ -137,8 +178,8 @@ ENTAILED_RELATIONS = {
 
     '/r/AtLocation': '/r/LocatedNear',
     '/r/HasA': '/r/LocatedNear',
-
-    '/r/PartOf': '/r/AtLocation',
+    '/r/HasA/rev': '/r/AtLocation',
+    '/r/PartOf': '/r/HasA/rev',
 
     '/r/MadeOf': '/r/HasA',
 
@@ -146,15 +187,25 @@ ENTAILED_RELATIONS = {
 }
 
 
+ENTAILED_RELATIONS = dict(_ENTAILED_RELATIONS_BASE)
+for _key, _val in _ENTAILED_RELATIONS_BASE.items():
+    if _key not in SYMMETRIC_RELATIONS:
+        ENTAILED_RELATIONS[reverse_relation(_key)] = reverse_relation(_val)
+
+
 # A subset of 24 relations to use in machine learning
 COMMON_RELATIONS = [
-    '/r/Synonym', '/r/RelatedTo', '/r/Antonym',
-    '/r/SimilarTo', '/r/IsA', '/r/AtLocation', '/r/Causes',
-    '/r/CapableOf', '/r/CreatedBy', '/r/DerivedFrom', '/r/Entails',
-    '/r/HasA', '/r/HasContext', '/r/HasProperty', '/r/HasSubevent',
-    '/r/MadeOf', '/r/MannerOf', '/r/MotivatedByGoal', '/r/ObstructedBy',
-    '/r/PartOf', '/r/ReceivesAction', '/r/UsedFor', '/r/Desires',
-    '/r/SymbolOf'
+    '/r/Synonym', '/r/RelatedTo', '/r/Antonym', '/r/SimilarTo',
+    '/r/IsA', '/r/AtLocation', '/r/Causes', '/r/CapableOf',
+    '/r/CreatedBy', '/r/DerivedFrom', '/r/Entails', '/r/HasA',
+    '/r/HasContext', '/r/HasProperty', '/r/HasSubevent', '/r/MadeOf',
+    '/r/MannerOf', '/r/MotivatedByGoal', '/r/ObstructedBy', '/r/PartOf',
+    '/r/ReceivesAction', '/r/UsedFor', '/r/Desires', '/r/SymbolOf',
+    '/r/IsA/rev', '/r/AtLocation/rev', '/r/Causes/rev', '/r/CapableOf/rev',
+    '/r/CreatedBy/rev', '/r/DerivedFrom/rev', '/r/Entails/rev', '/r/HasA/rev',
+    '/r/HasContext/rev', '/r/HasProperty/rev', '/r/HasSubevent/rev', '/r/MadeOf/rev',
+    '/r/MannerOf/rev', '/r/MotivatedByGoal/rev', '/r/ObstructedBy/rev', '/r/PartOf/rev',
+    '/r/ReceivesAction/rev', '/r/UsedFor/rev', '/r/Desires/rev', '/r/SymbolOf/rev',
 ]
 
 
