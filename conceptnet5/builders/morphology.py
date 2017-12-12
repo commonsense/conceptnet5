@@ -51,7 +51,7 @@ def subwords_to_edges(language, input, output):
                     dataset='/d/morphology',
                     license=Licenses.cc_attribution,
                     sources=MORPH_SOURCES,
-                    weight=0.1
+                    weight=0.01
                 )
                 writer.write(edge)
     writer.close()
