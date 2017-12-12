@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from nose.tools import ok_, eq_, assert_almost_equal
 
+from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
 from conceptnet5.vectors.evaluation.compare import load_any_embeddings
 from conceptnet5.vectors.query import VectorSpaceWrapper
@@ -37,21 +38,21 @@ def test_vector_space_wrapper(frame=None):
         frame = load_any_embeddings(frame)
         wrap = VectorSpaceWrapper(frame=frame)
         wrap.load()
-        ok_(all(label.startswith('/c') for label in wrap.frame.index[1:]))
+        ok_(all(is_term(label) for label in wrap.frame.index[1:]))
         ok_(wrap.frame.index.is_monotonic_increasing)
 
     # Load a VSW from a filename
     vector_filename = DATA + '/vectors/glove12-840B.h5'
     wrap = VectorSpaceWrapper(vector_filename=vector_filename)
     wrap.load()
-    ok_(all(label.startswith('/c') for label in wrap.frame.index[1:]))
+    ok_(all(is_term(label) for label in wrap.frame.index[1:]))
     ok_(wrap.frame.index.is_monotonic_increasing)
 
     # Load a VSW from a frame
     frame = load_any_embeddings(DATA + '/vectors/glove12-840B.h5')
     wrap = VectorSpaceWrapper(frame=frame)
     wrap.load()
-    ok_(all(label.startswith('/c') for label in wrap.frame.index[1:]))
+    ok_(all(is_term(label) for label in wrap.frame.index[1:]))
     ok_(wrap.frame.index.is_monotonic_increasing)
 
 
@@ -65,8 +66,8 @@ def test_standardize_row_labels(frame=None):
     vec3 = vectors.loc['things']
     standardized_vectors = standardize_row_labels(vectors)
 
-    # Check if all labels are concepts
-    ok_(all(label.startswith('/c') for label in standardized_vectors.index[1:]))
+    # Check if all labels are terms
+    ok_(all(is_term(label) for label in standardized_vectors.index[1:]))
 
     # Check if all terms standardized to the same concept are merged
     ok_(standardized_vectors.index.is_unique)
