@@ -103,11 +103,11 @@ def test_l2_normalize_rows(frame=None):
     for length in lengths:
         assert_almost_equal(length, 1.0, places=4)
 
-    # Check if a data frame of all zeroes will be normalized to NaN
+    # Check if a data frame of all zeros will be normalized to zeros
     frame = pd.DataFrame(np.zeros(shape=(1, 10)))
     frame = l2_normalize_rows(frame)
     lengths = np.sqrt(np.sum(np.power(frame, 2), axis=1))
-    ok_(all(np.isnan(length) for length in lengths))
+    ok_(all(length == 0 for length in lengths))
 
 
 def test_shrink_and_sort(frame=None):

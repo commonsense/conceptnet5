@@ -60,7 +60,8 @@ def miniaturize(frame, other_vocab=None, k=300, debias=True):
     smaller = frame.loc[vocab]
     U, _S, _Vt = np.linalg.svd(smaller, full_matrices=False)
     redecomposed = pd.DataFrame(U[:, :k], index=vocab, dtype='f')
-    redecomposed = de_bias_frame(redecomposed)
+    if debias:
+        redecomposed = de_bias_frame(redecomposed)
     mini = (redecomposed * 64).astype(np.int8)
     mini.sort_index(inplace=True)
     return mini

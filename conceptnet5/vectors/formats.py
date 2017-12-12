@@ -3,6 +3,7 @@ import numpy as np
 import gzip
 import struct
 import pickle
+from ordered_set import OrderedSet
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 
 
@@ -25,14 +26,17 @@ def save_hdf(table, filename):
     return table.to_hdf(filename, 'mat', mode='w', encoding='utf-8')
 
 
-def save_labels_and_npy(table, vocab_filename, matrix_filename):
+def save_labels(table, vocab_filename):
+    save_index_as_labels(table.index, vocab_filename)
+
+
+def save_npy(values, matrix_filename):
     """
     Save a semantic vector space in two files: a NumPy .npy file of the matrix,
     and a text file with one label per line. We use this for exporting the
     Luminoso background space.
     """
-    np.save(matrix_filename, table.values)
-    save_index_as_labels(table.index, vocab_filename)
+    np.save(matrix_filename, values)
 
 
 def vec_to_text_line(label, vec):
@@ -58,6 +62,7 @@ def export_text(frame, filename, filter_language=None):
         except KeyError:
             end_idx = frame.shape[0]
         frame = frame.iloc[start_idx:end_idx]
+        vectors = frame.values
         index = frame.index
 
     with gzip.open(filename, 'wt') as out:
@@ -247,3 +252,24 @@ def save_index_as_labels(index, label_filename):
     with open(label_filename, 'w', encoding='utf-8') as out:
         for label in index:
             print(label, file=out)
+
+
+def save_ordered_set(oset, filename):
+    """
+    Save an OrderedSet object as a text file of words.
+    """
+    with open(filename, 'w', encoding='utf-8') as out:
+        for word in oset:
+            print(word, file=out)
+
+
+def load_ordered_set(filename):
+    """
+    Load a set of words  from a text file, and
+    represent them in an OrderedSet object.
+    """
+    oset = OrderedSet()
+    for line in open(filename, encoding='utf-8'):
+        oset.append(line.rstrip('\n'))
+    return oset
+

@@ -1,18 +1,0 @@
-<ldml>
-	<identity>
-		<version number="$Revision$"/>
-		<language type="fa"/>
-	</identity>
-	<annotations>
-		<annotation cp="♀" type="tts">نماد ونوس | نماد جنس ماده | نماد زن</annotation>
-		<annotation cp="♀" type="tts">نماد ناهید</annotation>
-		<annotation cp="♂" type="tts">نماد مارس | نماد جنس نر | نماد مرد</annotation>
-		<annotation cp="♂" type="tts">نماد مریخ</annotation>
-		<annotation cp="⚕" type="tts">عصای آسکِلِپیوس | نماد مار و عصا | مار و عصا | چوبدست اسقلبیوس</annotation>
-		<annotation cp="⚕" type="tts">نماد پزشکی</annotation>
-		<annotation cp="🕺" type="tts">مرد | شیک | رقص</annotation>
-		<annotation cp="🕺" type="tts">مرد درحال رقص</annotation>
-		<annotation cp="🖤" type="tts">سیاه | تاریک | تیره | تار | شیطانی | قلب | سنگ‌دل | سیاه‌دل | دل | سیاه</annotation>
-		<annotation cp="🖤" type="tts">قلب سیاه</annotation>
-	</annotations>
-</ldml>
