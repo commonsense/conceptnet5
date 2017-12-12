@@ -52,36 +52,9 @@ WIKT_PARSER_VERSION = "1"
 
 RETROFIT_SHARDS = 6
 
-# Dataset filenames
-# =================
-# The goal of reader steps is to produce Msgpack files, and later CSV files,
-# with these names.
-#
-# We distingish *core dataset names*, which collectively determine the set of
-# terms that ConceptNet will attempt to represent, from the additional datasets
-# that will mainly be used to find more information about those terms.
-
-
-CORE_DATASET_NAMES = [
-    "jmdict/jmdict",
-    "nadya/nadya",
-    "ptt_petgame/api",
-    "opencyc/opencyc",
-    "verbosity/verbosity",
-    "wordnet/wordnet",
-]
-CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
-CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
-CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
-CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
-
-
-DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
-DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
-
-RAW_DATA_URL = "http://conceptnet.s3.amazonaws.com/raw-data/2016"
+RAW_DATA_URL = "https://conceptnet.s3.amazonaws.com/raw-data/2016"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
-PRECOMPUTED_DATA_URL = "http://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
+PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
@@ -105,6 +78,36 @@ if TESTMODE:
     HASH_WIDTH = 12
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
+    EMOJI_LANGUAGES = ['en', 'en_001']
+
+
+# Dataset filenames
+# =================
+# The goal of reader steps is to produce Msgpack files, and later CSV files,
+# with these names.
+#
+# We distingish *core dataset names*, which collectively determine the set of
+# terms that ConceptNet will attempt to represent, from the additional datasets
+# that will mainly be used to find more information about those terms.
+
+
+CORE_DATASET_NAMES = [
+    "jmdict/jmdict",
+    "nadya/nadya",
+    "ptt_petgame/api",
+    "opencyc/opencyc",
+    "verbosity/verbosity",
+    "wordnet/wordnet",
+    "cedict/cedict"
+]
+CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
+CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
+CORE_DATASET_NAMES += ["wiktionary/{}".format(lang) for lang in WIKTIONARY_LANGUAGES]
+CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
+
+
+DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
+DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
 
 
 rule all:
@@ -122,8 +125,7 @@ rule all:
         DATA + "/stats/language_edges.txt",
         DATA + "/stats/relations.txt",
         DATA + "/assoc/reduced.csv",
-        DATA + "/vectors/mini.h5",
-        "data-loader/sha256sums.txt"
+        DATA + "/vectors/mini.h5"
 
 rule evaluation:
     input:
@@ -153,7 +155,6 @@ rule test:
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv",
         DATA + "/vectors/plain/numberbatch-en.txt.gz",
-        DATA + "/stats/languages.txt"
 
 
 # Downloaders
@@ -162,25 +163,25 @@ rule download_raw:
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "curl -f {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} > {output}"
+        "wget -nv {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
 
 rule download_conceptnet_ppmi:
     output:
         DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
     shell:
-        "curl {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
 
 rule download_numberbatch:
     output:
         DATA + "/precomputed/vectors/numberbatch.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
 
 rule download_opensubtitles_ppmi:
     output:
         DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
     shell:
-        "curl -f {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 > {output}"
+        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
 
 
 # Precomputation
@@ -206,9 +207,9 @@ rule precompute_wiktionary:
         DATA + "/precomputed/wiktionary/parsed-{version}/{language}.jsons.gz"
     run:
         if USE_PRECOMPUTED:
-            shell("curl -f {PRECOMPUTED_DATA_URL}/wiktionary/"
+            shell("wget {PRECOMPUTED_DATA_URL}/wiktionary/"
                   "parsed-{wildcards.version}/{wildcards.language}.jsons.gz "
-                  "> {output}")
+                  "-O {output}")
         else:
             # This is a mess because, for most of these sub-steps, the file
             # being output isn't {output} but its uncompressed version
@@ -327,6 +328,14 @@ rule read_emoji:
         DATA + "/edges/emoji/{language}.msgpack"
     shell:
         "cn5-read emoji {input} {output}"
+
+rule read_cc_cedict:
+    input:
+        DATA + "/raw/cedict/cedict_1_0_ts_utf-8_mdbg.txt.gz"
+    output:
+        DATA + "/edges/cedict/cedict.msgpack",
+    shell:
+        "cn5-read cc_cedict {input} {output}"
 
 
 # Converting msgpack to csv
@@ -705,23 +714,6 @@ rule subwords:
     shell:
         "cn5-build subwords {wildcards.language} {input} {output}"
 
-
-# Packaging
-# =========
-
-rule sha256sums:
-    input:
-        DATA + "/psql/edge_features.csv.gz",
-        DATA + "/psql/edges.csv.gz",
-        DATA + "/psql/edge_sources.csv.gz",
-        DATA + "/psql/node_prefixes.csv.gz",
-        DATA + "/psql/nodes.csv.gz",
-        DATA + "/psql/relations.csv.gz",
-        DATA + "/psql/sources.csv.gz"
-    output:
-        "data-loader/sha256sums.txt"
-    shell:
-        "sha256sum {input} | sed -e 's:%(data)s:/data/conceptnet:' > {output}" % {'data': DATA}
 
 # Evaluation
 # ==========

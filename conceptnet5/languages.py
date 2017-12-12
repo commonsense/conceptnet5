@@ -16,6 +16,8 @@ LCODE_ALIASES = {
     'zh_cn': 'zh',
     'zh-tw': 'zh',
     'zh-cn': 'zh',
+    'zh-hant' : 'zh',
+    'zh-hans' : 'zh',
 
     'nds-de': 'nds',
     'nds-nl': 'nds',

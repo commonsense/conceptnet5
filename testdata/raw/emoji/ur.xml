@@ -1,18 +1,0 @@
-<ldml>
-	<identity>
-		<version number="$Revision$"/>
-		<language type="ur"/>
-	</identity>
-	<annotations>
-		<annotation cp="♀" type="tts">عورت | لڑکی | علامت</annotation>
-		<annotation cp="♀" type="tts">عورتوں کیلئے</annotation>
-		<annotation cp="♂" type="tts">مرد | لڑکا | علامت</annotation>
-		<annotation cp="♂" type="tts">مردوں کیلئے</annotation>
-		<annotation cp="⚕" type="tts">طبی | صحت | علامت | نشان</annotation>
-		<annotation cp="⚕" type="tts">طبی علامت</annotation>
-		<annotation cp="🕺" type="tts">ناچ | آدمی</annotation>
-		<annotation cp="🕺" type="tts">ناچتا ہوا شخص</annotation>
-		<annotation cp="🖤" type="tts">کالا | دل | شیطانی | برا</annotation>
-		<annotation cp="🖤" type="tts">کالا دل</annotation>
-	</annotations>
-</ldml>

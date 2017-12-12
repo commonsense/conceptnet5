@@ -3,6 +3,7 @@ import numpy as np
 import gzip
 import struct
 import pickle
+from ordered_set import OrderedSet
 from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 
 
@@ -25,14 +26,17 @@ def save_hdf(table, filename):
     return table.to_hdf(filename, 'mat', mode='w', encoding='utf-8')
 
 
-def save_labels_and_npy(table, vocab_filename, matrix_filename):
+def save_labels(table, vocab_filename):
+    save_index_as_labels(table.index, vocab_filename)
+
+
+def save_npy(values, matrix_filename):
     """
     Save a semantic vector space in two files: a NumPy .npy file of the matrix,
     and a text file with one label per line. We use this for exporting the
     Luminoso background space.
     """
-    np.save(matrix_filename, table.values)
-    save_index_as_labels(table.index, vocab_filename)
+    np.save(matrix_filename, values)
 
 
 def vec_to_text_line(label, vec):
@@ -58,6 +62,7 @@ def export_text(frame, filename, filter_language=None):
         except KeyError:
             end_idx = frame.shape[0]
         frame = frame.iloc[start_idx:end_idx]
+        vectors = frame.values
         index = frame.index
 
     with gzip.open(filename, 'wt') as out:
@@ -148,7 +153,7 @@ def load_fasttext(filename, max_rows=1000000):
     Load a DataFrame from the fastText text format.
     """
     arr = None
-    labels = []
+    label_list = []
     with gzip.open(filename, 'rt') as infile:
         nrows_str, ncols_str = infile.readline().rstrip().split()
         nrows = min(int(nrows_str), max_rows)
@@ -158,11 +163,13 @@ def load_fasttext(filename, max_rows=1000000):
             if i >= nrows:
                 break
             items = line.rstrip().split(' ')
-            labels.append(items[0])
+            label_list.append(items[0])
             values = [float(x) for x in items[1:]]
             arr[i] = values
 
-    return pd.DataFrame(arr, index=labels, dtype='f')
+    if len(label_list) < max_rows:
+        arr = arr[:len(label_list)]
+    return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
 def _read_until_space(file):
@@ -245,3 +252,24 @@ def save_index_as_labels(index, label_filename):
     with open(label_filename, 'w', encoding='utf-8') as out:
         for label in index:
             print(label, file=out)
+
+
+def save_ordered_set(oset, filename):
+    """
+    Save an OrderedSet object as a text file of words.
+    """
+    with open(filename, 'w', encoding='utf-8') as out:
+        for word in oset:
+            print(word, file=out)
+
+
+def load_ordered_set(filename):
+    """
+    Load a set of words  from a text file, and
+    represent them in an OrderedSet object.
+    """
+    oset = OrderedSet()
+    for line in open(filename, encoding='utf-8'):
+        oset.append(line.rstrip('\n'))
+    return oset
+
