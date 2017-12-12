@@ -20,6 +20,10 @@ USE_PRECOMPUTED = not os.environ.get("CONCEPTNET_REBUILD_PRECOMPUTED")
 # can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
 UPLOAD = False
 
+# If USE_MORPHOLOGY is true, we will build and learn from sub-words derived
+# from Morfessor.
+USE_MORPHOLOGY = False
+
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
@@ -107,7 +111,8 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
-DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
+if USE_MORPHOLOGY:
+    DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
 
 
 rule all:
