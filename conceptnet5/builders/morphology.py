@@ -1,10 +1,10 @@
-import click
-from conceptnet5.nodes import get_uri_language, split_uri
-from conceptnet5.languages import ATOMIC_SPACE_LANGUAGES
-from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses
 from collections import defaultdict
+
+from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.languages import ATOMIC_SPACE_LANGUAGES
+from conceptnet5.nodes import get_uri_language, split_uri
+from conceptnet5.uri import Licenses, join_uri
 
 
 def prepare_vocab_for_morphology(language, input, output):
@@ -41,8 +41,8 @@ def subwords_to_edges(language, input, output):
 
         # Strip a possible trailing underscore, which would particularly show
         # up in the way we segment ATOMIC_SPACE_LANGUAGES (Vietnamese)
-        slug = ''.join(chunks).strip('_')
-        end = join_uri('c', language, slug)
+        full_text = ''.join(chunks).strip('_')
+        end = join_uri('c', language, full_text)
         for chunk in chunks:
             if chunk != '_':
                 start = join_uri('x', language, chunk.strip('_'))

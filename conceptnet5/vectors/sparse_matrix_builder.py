@@ -1,12 +1,15 @@
-from scipy import sparse
-import pandas as pd
-from conceptnet5.uri import uri_prefixes, uri_prefix, get_language
-from conceptnet5.relations import SYMMETRIC_RELATIONS
-from conceptnet5.languages import CORE_LANGUAGES
-from ordered_set import OrderedSet
 from collections import defaultdict
-from ..vectors import replace_numbers
+
+import pandas as pd
+from scipy import sparse
 from sklearn.preprocessing import normalize
+
+from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.relations import SYMMETRIC_RELATIONS
+from conceptnet5.uri import get_language, uri_prefix, uri_prefixes
+from ordered_set import OrderedSet
+
+from ..vectors import replace_numbers
 
 
 class SparseMatrixBuilder:
