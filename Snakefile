@@ -1,4 +1,6 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+from conceptnet5.languages import COMMON_LANGUAGES, ATOMIC_SPACE_LANGUAGES
+
 import os
 HTTP = HTTPRemoteProvider()
 
@@ -17,6 +19,10 @@ USE_PRECOMPUTED = not os.environ.get("CONCEPTNET_REBUILD_PRECOMPUTED")
 # If USE_PRECOMPUTED is False, should we upload the files we compute so they
 # can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
 UPLOAD = False
+
+# If USE_MORPHOLOGY is true, we will build and learn from sub-words derived
+# from Morfessor.
+USE_MORPHOLOGY = False
 
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
@@ -105,6 +111,8 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
+if USE_MORPHOLOGY:
+    DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
 
 
 rule all:
@@ -368,7 +376,7 @@ rule combine_assertions:
     output:
         DATA + "/assertions/assertions.msgpack"
     shell:
-        "python3 -m conceptnet5.builders.combine_assertions {input} {output}"
+        "cn5-build combine {input} {output}"
 
 
 # Putting data in PostgreSQL
@@ -472,6 +480,28 @@ rule concepts_right:
         "cut -f 4 {input} > {output}"
 
 
+rule concept_counts:
+    input:
+        DATA + "/stats/concepts_left.txt",
+        DATA + "/stats/concepts_right.txt"
+    output:
+        DATA + "/stats/concept_counts.txt"
+    shell:
+        "cat {input} | grep '^/c/' | cut -d '/' -f 1,2,3,4 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+
+
+rule core_concept_counts:
+    input:
+        DATA + "/stats/core_concepts_left.txt",
+        DATA + "/stats/core_concepts_right.txt"
+    output:
+        DATA + "/stats/core_concept_counts.txt"
+    shell:
+        "cat {input} | grep '^/c/' | cut -d '/' -f 1,2,3,4 "
+        "| LC_ALL=C sort | LC_ALL=C uniq -c > {output}"
+
+
 rule language_stats:
     input:
         DATA + "/stats/concepts_left.txt",
@@ -517,7 +547,7 @@ rule reduce_assoc:
     output:
         DATA + "/assoc/reduced.csv"
     shell:
-        "python3 -m conceptnet5.builders.reduce_assoc {input} {output}"
+        "cn5-build reduce_assoc {input} {output}"
 
 
 # Building the vector space
@@ -657,6 +687,37 @@ rule export_english_text:
         DATA + "/vectors/plain/numberbatch-en.txt.gz"
     shell:
         "cn5-vectors export_text -l en {input} {output}"
+
+
+# Morphology
+# ==========
+
+rule prepare_vocab:
+    input:
+        DATA + "/stats/core_concept_counts.txt"
+    output:
+        DATA + "/morph/vocab/{language}.txt"
+    shell:
+        "cn5-build prepare_morphology {wildcards.language} {input} {output}"
+
+rule morfessor_segmentation:
+    input:
+        DATA + "/morph/vocab/{language}.txt"
+    output:
+        DATA + "/morph/segments/{language}.txt"
+    run:
+        if wildcards.language in ATOMIC_SPACE_LANGUAGES:
+            shell("morfessor-train {input} -S {output} --traindata-list --nosplit-re '[^_].'")
+        else:
+            shell("morfessor-train {input} -S {output} -f '_' --traindata-list")
+
+rule subwords:
+    input:
+        DATA + "/morph/segments/{language}.txt",
+    output:
+        DATA + "/edges/morphology/subwords-{language}.msgpack"
+    shell:
+        "cn5-build subwords {wildcards.language} {input} {output}"
 
 
 # Evaluation

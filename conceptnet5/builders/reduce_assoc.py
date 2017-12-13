@@ -39,8 +39,10 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
             else:
                 gleft = uri_prefix(left)
                 gright = uri_prefix(right)
-                counts[gleft] += 1
-                counts[gright] += 1
+                if gright.startswith('/c/'):
+                    counts[gleft] += 1
+                if gleft.startswith('/c/'):
+                    counts[gright] += 1
 
     filtered_concepts = {
         concept for (concept, count) in counts.items()
@@ -67,15 +69,6 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
                     if gleft != gright:
                         line = '\t'.join([gleft, gright, value, dataset, rel])
                         print(line, file=out)
-
-
-@click.command()
-#input filename
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#output filename
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    reduce_assoc(input, output)
 
 
 if __name__ == '__main__':

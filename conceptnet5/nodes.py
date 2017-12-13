@@ -130,7 +130,7 @@ def get_uri_language(uri):
     """
     if uri.startswith('/a/'):
         return get_uri_language(parse_possible_compound_uri('a', uri)[0])
-    elif uri.startswith('/c/'):
+    elif uri.startswith('/c/') or uri.startswith('/x/'):
         return split_uri(uri)[1]
     else:
         return None

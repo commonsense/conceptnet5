@@ -10,7 +10,7 @@ http://conceptnet.io for more information and a browsable Web interface.
 
 Further documentation is available on the Wiki: https://github.com/commonsense/conceptnet5/wiki
 
-Licensing and attribution appear in LICENSE.txt and DATA-CREDITS.txt.
+Licensing and attribution appear in LICENSE.txt and DATA-CREDITS.md.
 
 
 ## Discussion groups

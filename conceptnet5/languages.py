@@ -746,6 +746,72 @@ LANGUAGE_NAMES = {
 }
 
 
+NEGATIVE_PREFIXES = {
+    'af': {'on-'},
+    'am': {'հակա-', 'ան-', 'չ-', 'դժ-', 'տ-', 'ապ-'}, # check
+    'ang': {'un-', 'ond-', 'and-'},
+    'az': {'na-'},  # check
+    'be': {'не-'},
+    'bn': {'অ-'},
+    'bg': {'не-'},
+    'ca': {'in-'},
+    'cs': {'ne-'},
+    'da': {'u-'},
+    'de': {'un-'},
+    'el': {'α-', 'αντι-', 'απο-'},
+    'eo': {'mal-'},
+    'en': {'non-', 'un-', 'in-', 'il-', 'im-', 'ir-', 'a-', 'anti-', 'mis-',
+           'dis-', 'de-'},
+    'es': {'in-', 'des-'},
+    'eu': {'-a'},
+    'fi': {'epä-', 'ton-'},
+    'fil': {'hi-'},
+    'fo': {'ó-'},
+    'fr': {'anti-', 'in-', 'non-', 'mal-', 'dés-'},
+    'ga': {'an-', 'mì-', 'ao-', 'neo-', 'eu-', 'do-', 'di-'},
+    'grc': {'ἀ-'},
+    'hsb': {'nje-'},
+    'is': {'ó-', 'af-'},
+    'it': {'in-'},  # not including 's-' due to false positives
+    'ja': {'不-', '無-', '脱-'},
+    'jv': {'ora-'},
+    'ka': {'უ-', 'უკუ-'},
+    'la': {'in-'},
+    'lb': {'on-'},
+    'lo': {'ບໍ-່'},
+    'mk': {'не-'},
+    'ms': {'nyah-', 'de-'},
+    'nl': {'de-', 'on-', 'ont-', 'ver-'},
+    'no': {'u-', 'de-'},
+    'pl': {'bez-', 'nie-'},
+    'pt': {'in-', 'anti-', 'não-', 'des-'},
+    'ro': {'ne-', 'de-', 'des-', 'dez-'},
+    'ru': {'не-', 'без-', 'бес-'},
+    'sh': {'не-', 'ne-'},
+    'sk': {'ne-'},
+    'sl': {'ne-'},
+    'sq': {'pa-'},
+    'sv': {'o-', 'anti-', 'van-', 'av-', 'de-'},
+    'uk': {'не-'},
+    'zh': {'不-', '無-', '无-'},
+}
+
+
+# In Vietnamese, each space-separated token is a syllable, similar to a
+# Chinese character. "bánh mì" is one word made of two syllables.
+#
+# What this means for Morfessor-based morphology is that we have to handle
+# Vietnamese, and any other language that turns out to have this property,
+# differently. In most languages, a space means that there _must_ be a morpheme
+# break here. In Vietnamese, spaces are the only places where there _may_ be a
+# morpheme break, but not all spaces are morpheme breaks.
+#
+# In other words, in some languages, space-separated tokens are atomic. Which
+# leads to this awesome, sci-fi-sounding constant name.
+
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
+
 def get_language_name(code):
     """
     Get the English name of a language ConceptNet supports.

@@ -32,6 +32,7 @@ setup(
         'console_scripts': [
             'cn5-vectors = conceptnet5.vectors.cli:cli',
             'cn5-read = conceptnet5.readers.cli:cli',
+            'cn5-build = conceptnet5.builders.cli:cli',
             'cn5-convert = conceptnet5.formats.convert:cli',
             'cn5-db = conceptnet5.db.cli:cli'
         ]
