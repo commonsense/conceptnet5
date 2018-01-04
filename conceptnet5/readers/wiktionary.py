@@ -143,6 +143,8 @@ def transform_relation(rel):
 
 def transform_term(data_language, termdata, assumed_languages, db, use_etyms=True):
     text = termdata['text']
+    if text == '-':
+        return None
     language = termdata.get('language')
     if language is None:
         language = disambiguate_language(text, assumed_languages, db)

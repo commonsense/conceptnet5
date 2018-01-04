@@ -31,9 +31,9 @@ N_PIECES = 16
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
-    'en': '20160305',
-    'fr': '20160305',
-    'de': '20160407'
+    'en': '20171201',
+    'fr': '20171201',
+    'de': '20171201'
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
@@ -52,7 +52,7 @@ EMOJI_LANGUAGES = [
 ]
 
 # Increment this number when we incompatibly change the parser
-WIKT_PARSER_VERSION = "1"
+WIKT_PARSER_VERSION = "2"
 
 RETROFIT_SHARDS = 6
 
