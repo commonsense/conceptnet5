@@ -32,8 +32,8 @@ N_PIECES = 16
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
     'en': '20171201',
-    'fr': '20171201',
-    'de': '20171201'
+    'fr': '20160305',
+    'de': '20160407'
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
@@ -150,7 +150,7 @@ rule webdata:
 
 rule clean:
     shell:
-        "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
+        "for subdir in assertions assoc collated db edges morph psql tmp vectors stats; "
         "do echo Removing %(data)s/$subdir; "
         "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
