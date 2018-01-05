@@ -143,6 +143,13 @@ def transform_relation(rel):
 
 def transform_term(data_language, termdata, assumed_languages, db, use_etyms=True):
     text = termdata['text']
+
+    # Sometimes - is used to fill a slot in a Wiktionary template where the
+    # term would usually be. It typically means "don't show this part", with
+    # the implication "the term in question is obvious from context".
+    #
+    # Context is hard, so let's just cope with a hyphen as the term by
+    # discarding it.
     if text == '-':
         return None
     language = termdata.get('language')
