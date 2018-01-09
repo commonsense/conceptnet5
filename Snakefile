@@ -62,7 +62,7 @@ PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
-    'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
+    'crawl-300d-2M', 'w2v-google-news', 'glove12-840B', 'fasttext-opensubtitles'
 ]
 SOURCE_EMBEDDING_ROWS = 1500000
 MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2000000
@@ -571,6 +571,16 @@ rule convert_glove:
         ram=24
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+
+rule convert_fasttext_crawl:
+    input:
+        DATA + "/raw/vectors/crawl-300d-2M.vec.gz"
+    output:
+        DATA + "/vectors/crawl-300d-2M.h5"
+    resources:
+        ram=24
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
 rule convert_fasttext:
     input:
