@@ -265,7 +265,7 @@ rule read_jmdict:
 
 rule read_nadya:
     input:
-        DATA + "/raw/nadya/nadya-2014.csv"
+        DATA + "/raw/nadya/nadya-2017.csv"
     output:
         DATA + "/edges/nadya/nadya.msgpack"
     shell:
