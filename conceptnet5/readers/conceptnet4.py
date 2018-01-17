@@ -319,6 +319,9 @@ def build_sources(parts_dict, preposition_fix=False):
 
 # TODO: this doesn't need to be a class
 class CN4Builder(object):
+    def __init__(self, weight=1.):
+        self.weight = weight
+
     def handle_assertion(self, parts_dict):
         """
         Process one assertion from ConceptNet 4, which appears in the input
@@ -374,7 +377,7 @@ class CN4Builder(object):
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
                     sources=[source_dict], surfaceText=frame_text,
-                    weight=weight
+                    weight=weight * self.weight
                 )
 
     def transform_file(self, input_filename, output_file):

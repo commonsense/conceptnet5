@@ -90,7 +90,7 @@ def handle_line(line, builder):
 
 
 def handle_file(input_filename, output_file):
-    builder = CN4Builder()
+    builder = CN4Builder(weight=0.1)
     out = MsgpackStreamWriter(output_file)
     for line in open(input_filename, encoding='utf-8'):
         # Get a line from the file
