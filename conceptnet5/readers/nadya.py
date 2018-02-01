@@ -64,29 +64,30 @@ def handle_line(line, builder):
     freq = int(freq)
     vote = int(vote)
 
-    # Create the parts_dict that CN4Builder expects
-    parts_dict = {
-        'lang': lang,
-        'polarity': freq,
-        'cnet4_id': cnet4_id,
-        'relname': relname,
-        'frame_text': frame_text,
-        'startText': start_text,
-        'endText': end_text,
-        # In the case of nadya.jp, it's not important to track the creator
-        # separately from the voters -- they were all doing the same
-        # thing.
-        #
-        # Each voter just shows up as the source of a separate
-        # edge, which is what the CN4Builder ultimately does with the
-        # votes anyway. The only reason the CN4Builder takes more complex
-        # input is to handle weird edge cases.
-        'creator': voter,
-        'votes': [],
-        'activity': 'nadya.jp',
-        'goodness': 3
-    }
-    yield from builder.handle_assertion(parts_dict)
+    if vote > 0:
+        # Create the parts_dict that CN4Builder expects
+        parts_dict = {
+            'lang': lang,
+            'polarity': freq,
+            'cnet4_id': cnet4_id,
+            'relname': relname,
+            'frame_text': frame_text,
+            'startText': start_text,
+            'endText': end_text,
+            # In the case of nadya.jp, it's not important to track the creator
+            # separately from the voters -- they were all doing the same
+            # thing.
+            #
+            # Each voter just shows up as the source of a separate
+            # edge, which is what the CN4Builder ultimately does with the
+            # votes anyway. The only reason the CN4Builder takes more complex
+            # input is to handle weird edge cases.
+            'creator': voter,
+            'votes': [],
+            'activity': 'nadya.jp',
+            'goodness': 3
+        }
+        yield from builder.handle_assertion(parts_dict)
 
 
 def handle_file(input_filename, output_file):
