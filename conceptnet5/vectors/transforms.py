@@ -72,6 +72,8 @@ def l2_normalize_rows(frame):
     dot-products between these rows.
     DataFrame of zeros will be normalized to zeros.
     """
+    if 0 in frame.shape:
+        return frame
     index = frame.index
     return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
 
