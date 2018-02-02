@@ -40,12 +40,21 @@ def get_db_connection(dbname=None, building=False):
 
 
 def _get_db_connection_inner(dbname):
-    conn = pg8000.connect(
-        user=config.DB_USERNAME,
-        password=config.DB_PASSWORD or None,
-        unix_sock=config.DB_SOCKET,
-        database=dbname
-    )
+    if not config.DB_PASSWORD:
+        conn = pg8000.connect(
+            user=config.DB_USERNAME,
+            unix_sock=config.DB_SOCKET,
+            database=dbname
+        )
+    else:
+        conn = pg8000.connect(
+            user=config.DB_USERNAME,
+            password=config.DB_PASSWORD,
+            host=config.DB_HOSTNAME,
+            port=config.DB_PORT,
+            database=dbname
+        )
+
     pg8000.paramstyle = 'named'
     return conn
 
