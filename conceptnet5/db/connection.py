@@ -30,14 +30,12 @@ def get_db_connection(dbname=None, building=False):
             except pg8000.InterfaceError:
                 if attempt == 0:
                     print(
-                        "Database %r at %s:%s is not available, retrying for 10 seconds"
-                        % (dbname, config.DB_HOSTNAME, config.DB_PORT),
+                        "Database %r is not available, retrying for 10 seconds" % dbname,
                         file=sys.stderr
                     )
                 time.sleep(1)
         raise IOError(
-            "Couldn't connect to database %r at %s:%s" %
-            (dbname, config.DB_HOSTNAME, config.DB_PORT)
+            "Couldn't connect to database %r" % dbname
         )
 
 

@@ -312,6 +312,10 @@ def is_concept(uri):
     return uri.startswith('/c/')
 
 
+def is_term(uri):
+    return uri.startswith('/c/') or uri.startswith('/x/')
+
+
 def is_absolute_url(uri):
     # We have URLs pointing to Creative Commons licenses, starting with 'cc:',
     # which for Linked Data purposes are absolute URLs because they'll be

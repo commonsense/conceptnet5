@@ -94,11 +94,12 @@ def make_assertion(line_group):
     )
 
 
-def combine_assertions(input_filename, output_file):
+def combine_assertions(input_filename, output_filename):
     """
     Take in a tab-separated, sorted "CSV" files, indicated by
     `input_filename`, that should be grouped together into assertions.
-    Output a msgpack stream of assertions to `output_file`.
+    Output a msgpack stream of assertions the file indicated by
+    `output_filename`.
 
     The input file should be made from multiple sources of assertions by
     concatenating and sorting them.
@@ -113,8 +114,8 @@ def combine_assertions(input_filename, output_file):
         "Group lines by their URI (their first column)."
         return line.split('\t', 1)[0]
 
-    out = MsgpackStreamWriter(output_file)
-    out_bad = MsgpackStreamWriter(output_file + '.reject')
+    out = MsgpackStreamWriter(output_filename)
+    out_bad = MsgpackStreamWriter(output_filename + '.reject')
 
     with open(input_filename, encoding='utf-8') as stream:
         for key, line_group in itertools.groupby(stream, group_func):
@@ -129,18 +130,3 @@ def combine_assertions(input_filename, output_file):
 
     out.close()
     out_bad.close()
-
-
-@click.command()
-#tab-separated csv file to be grouped into assertion
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
-#msgpack stream of assertions
-@click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def cli(input, output):
-    combine_assertions(input,output)
-
-if __name__ == '__main__':
-    # This is the main command-line entry point, used in steps of building
-    # ConceptNet that need to combine edges into assertions. See data/Makefile
-    # for more context.
-    cli()

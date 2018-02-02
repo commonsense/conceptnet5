@@ -18,4 +18,3 @@ DB_SOCKET = '/var/run/postgresql/.s.PGSQL.5432'
 DB_PASSWORD = os.environ.get('CONCEPTNET_DB_PASSWORD', '')
 DB_HOSTNAME = os.environ.get('CONCEPTNET_DB_HOSTNAME', 'localhost')
 DB_PORT = int(os.environ.get('CONCEPTNET_DB_PORT', '5432'))
-
