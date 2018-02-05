@@ -94,9 +94,9 @@
 /c/ja/バイト/n	/c/ja/バイト	1.0	/d/jmdict	/r/SenseOf
 /c/ja/バイト/n	/c/en/computer_terminology	2.0	/d/jmdict	/r/HasContext
 /c/ja/バイト/n	/c/en/mathematics	2.0	/d/jmdict	/r/HasContext
-/c/ja/テスト	/c/ja/勉強	2.0	/d/conceptnet/4/ja	/r/HasPrerequisite
+/c/ja/テスト	/c/ja/勉強	0.20000000000000018	/d/conceptnet/4/ja	/r/HasPrerequisite
 /c/en/education_in_united_states	/c/en/certainly_thing	1.0	/d/conceptnet/4/en	/r/HasProperty
-/c/ja/テスト	/c/ja/名前を書くこと	3.4641016151377544	/d/conceptnet/4/ja	/r/HasSubevent
+/c/ja/テスト	/c/ja/名前を書くこと	0.3999999999999999	/d/conceptnet/4/ja	/r/HasSubevent
 /c/pt/estão_com_sono	/c/pt/dormem	2.82842712474619	/d/conceptnet/4/pt	/r/HasSubevent
 /c/zh/檢查	/c/zh/經理來訪	1.0	/d/conceptnet/4/zh	/r/HasSubevent
 /c/en/adjudging/n	/c/en/adjudging	1.0	/d/opencyc	/r/SenseOf
