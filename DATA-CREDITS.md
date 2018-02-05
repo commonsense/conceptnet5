@@ -159,3 +159,24 @@ under a [Creative Commons Attribution 3.0 license][CC-By-3].
 
 [opencyc-license]: http://www.cyc.com/documentation/opencyc-license/
 [CC-By-3]: http://creativecommons.org/licenses/by/3.0/
+
+
+## Distributional word embeddings
+
+ConceptNet takes input from these sources of distributional word embeddings:
+
+### GloVe
+
+Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. GloVe: Global Vectors for Word Representation.
+https://nlp.stanford.edu/projects/glove/
+
+### word2vec
+
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. Efficient Estimation of Word Representations in Vector Space.
+In Computing Research Repository. http://dblp.org/rec/bib/journals/corr/abs-1301-3781
+
+### fastText
+
+Piotr Bojanowski, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2016. Enriching Word Vectors with Subword Information.
+http://fasttext.cc
+
