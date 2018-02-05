@@ -318,8 +318,19 @@ def build_sources(parts_dict, preposition_fix=False):
     return sources
 
 
-# TODO: this doesn't need to be a class
 class CN4Builder(object):
+    def __init__(self, weight=1.):
+        """
+        Create a builder for processing a source of ConceptNet-4-style
+        assertions.
+
+        The optional parameter provides a weight multiplier, which will modify
+        the weight computed by `build_sources`. For example, this can be set
+        lower than 1 for GWAPs, where we don't necessarily trust that every edge
+        is a real assertion about common sense.
+        """
+        self.weight = weight
+
     def handle_assertion(self, parts_dict):
         """
         Process one assertion from ConceptNet 4, which appears in the input
@@ -375,7 +386,10 @@ class CN4Builder(object):
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
                     sources=[source_dict], surfaceText=frame_text,
-                    weight=weight
+
+                    # The edge weight is the weight computed by build_sources,
+                    # times the multiplier set on this instance
+                    weight=weight * self.weight
                 )
 
     def transform_file(self, input_filename, output_file):
