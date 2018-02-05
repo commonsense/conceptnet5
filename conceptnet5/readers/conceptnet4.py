@@ -88,6 +88,7 @@ CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/mrt',
     '/s/contributor/omcs/humplik',
     '/s/contributor/omcs/mickh',
+    '/s/contributor/omcs/visionsofkaos',
 }
 CONCEPT_BLACKLIST = {
     # Too vague
@@ -112,7 +113,7 @@ ACTIVITY_BLACKLIST = {
     "response to picture",
     "response to diagram",
     "commons2_reject",
-    "globalmind",    # avoid double-counting with the GlobalMind reader
+    "globalmind",
     "pycommons/question"
 }
 
