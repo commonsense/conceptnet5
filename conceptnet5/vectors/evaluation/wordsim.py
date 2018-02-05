@@ -1,10 +1,12 @@
+from itertools import combinations
+
+import numpy as np
+import pandas as pd
+from scipy.stats import spearmanr, pearsonr, tmean, hmean
+
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
-from scipy.stats import spearmanr, pearsonr, tmean, hmean
-from itertools import combinations
-import numpy as np
-import pandas as pd
 
 SAMPLE_SIZES = {
     'ws353': 353,
@@ -512,7 +514,7 @@ def read_mc():
             yield parts[0], parts[1], float(parts[2])
 
 
-def read_semeval_monolingual(lang, subset='test'):
+def read_semeval_monolingual(lang, subset='trial'):
     """
     Parses Semeval2017-Task2 monolingual word similarity (subtask 1) test collection.
     """
@@ -524,7 +526,7 @@ def read_semeval_monolingual(lang, subset='test'):
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
-def read_semeval_crosslingual(lang1, lang2, subset='test'):
+def read_semeval_crosslingual(lang1, lang2, subset='trial'):
     """
     Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
     """
@@ -558,27 +560,30 @@ def compute_semeval_score(pearson_score, spearman_score):
     )
 
 
-def evaluate_semeval_monolingual(vectors, lang):
+def evaluate_semeval_monolingual(vectors, lang, subset='dev'):
     """
     Get a semeval score for a single monolingual test set.
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monolingual(lang))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monolingual(lang))
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monolingual(lang, subset))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monolingual(lang, subset))
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
 
-def evaluate_semeval_crosslingual(vectors, lang1, lang2):
+def evaluate_semeval_crosslingual(vectors, lang1, lang2, subset='dev'):
     """
     Get a semeval score for a single crosslingual test set
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crosslingual(lang1, lang2))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crosslingual(lang1, lang2))
+    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crosslingual(lang1,
+                                                                                       lang2,
+                                                                                       subset))
+    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crosslingual(lang1,
+                                                                                     lang2, subset))
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
 
-def evaluate_semeval_monolingual_global(vectors):
+def evaluate_semeval_monolingual_global(vectors, subset='dev'):
     """
     According to Semeval2017-Subtask2 rules, the global score for a system is the average the final
     individual scores on the four languages on which the system performed best. If less than four
@@ -586,7 +591,7 @@ def evaluate_semeval_monolingual_global(vectors):
     """
     scores = []
     for lang in ['en', 'de', 'es', 'it', 'fa']:
-        score = evaluate_semeval_monolingual(vectors, lang)
+        score = evaluate_semeval_monolingual(vectors, lang, subset)
         scores.append(score)
 
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-4:]
@@ -599,7 +604,7 @@ def evaluate_semeval_monolingual_global(vectors):
     )
 
 
-def evaluate_semeval_crosslingual_global(vectors):
+def evaluate_semeval_crosslingual_global(vectors, subset='dev'):
     """
     According to Semeval2017-Subtask2 rules. the global score is the average of the individual
     scores on the six cross-lingual datasets on which the system performs best. If less than six
@@ -608,7 +613,7 @@ def evaluate_semeval_crosslingual_global(vectors):
     scores = []
     languages = ['en', 'de', 'es', 'it', 'fa']
     for lang1, lang2 in combinations(languages, 2):
-        score = evaluate_semeval_crosslingual(vectors, lang1, lang2)
+        score = evaluate_semeval_crosslingual(vectors, lang1, lang2, subset)
         scores.append(score)
 
     top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-6:]
@@ -636,7 +641,6 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
             uri1 = standardized_uri(lang1, term1)
             uri2 = standardized_uri(lang2, term2)
             our_score = vectors.get_similarity(uri1, uri2)
-
         else:
             our_score = cosine_similarity(get_vector(vectors, term1, lang1),
                                           get_vector(vectors, term2, lang2))
@@ -667,6 +671,11 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     else:
         men_subset = subset
 
+    if subset == 'dev':
+        semeval_subset = 'trial'
+    else:
+        semeval_subset = subset
+
     vectors = VectorSpaceWrapper(frame=frame)
 
     men_score = measure_correlation(spearmanr, vectors, read_men3000(men_subset))
@@ -693,18 +702,19 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     results.loc['tmu-rw-ja'] = tmu_score
 
     if semeval_scope == 'global':
-        results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors)
-        results.loc['semeval17-2b'] = evaluate_semeval_crosslingual_global(vectors)
+        results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors, semeval_subset)
+        results.loc['semeval17-2b'] = evaluate_semeval_crosslingual_global(vectors, semeval_subset)
 
     else:
         languages = ['en', 'de', 'es', 'it', 'fa']
 
         for lang in languages:
-            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(vectors, lang)
+            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(vectors,
+                                                                                     lang, semeval_subset)
 
         for lang1, lang2 in combinations(languages, 2):
             results.loc['semeval-2b-{}-{}'.format(lang1, lang2)] = evaluate_semeval_crosslingual(
-                vectors, lang1, lang2)
+                vectors, lang1, lang2, semeval_subset)
 
     return results
 

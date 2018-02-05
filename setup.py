@@ -25,7 +25,7 @@ setup(
         'snakemake', 'click', 'requests', 'ftfy', 'numpy', 'scipy',
         'msgpack-python', 'langcodes >= 1.3', 'wordfreq >= 1.5',
         'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'pg8000',
-        'marisa-trie'
+        'marisa-trie', 'morfessor'
     ],
     license = 'Apache License 2.0',
     entry_points = {

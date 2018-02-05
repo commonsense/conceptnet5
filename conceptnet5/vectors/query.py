@@ -2,6 +2,7 @@ import marisa_trie
 import numpy as np
 import pandas as pd
 import wordfreq
+from morfessor.io import MorfessorIO
 
 from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import uri_prefix, get_language, split_uri
@@ -63,6 +64,7 @@ class VectorSpaceWrapper(object):
         self.small_k = None
         self.finder = None
         self.trie = None
+        self.segmentations = {}
         if use_db:
             self.finder = AssertionFinder()
 
@@ -114,7 +116,7 @@ class VectorSpaceWrapper(object):
         else:
             return field_match(label, filter)
 
-    def expand_terms(self, terms, limit_per_term=10, include_neighbors=True):
+    def expand_terms(self, terms, limit_per_term=10, handle_oov=True, use_subwords=False):
         """
         Given a list of weighted terms as (term, weight) tuples, add terms that
         are one step away in ConceptNet at a lower weight, terms in English that share the
@@ -129,39 +131,27 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         expanded = terms[:]
+        prefix_weight = 0.01
         for term, weight in terms:
-            if include_neighbors and term not in self.frame.index and self.finder is not None:
-                for edge in self.finder.lookup(term, limit=limit_per_term):
-                    if field_match(edge['start']['term'], term) and not field_match(
-                            edge['end']['term'], term):
-                        neighbor = edge['end']['term']
-                    elif field_match(edge['end']['term'], term) and not field_match(
-                            edge['start']['term'], term):
-                        neighbor = edge['start']['term']
-                    else:
-                        continue
-                    # TODO: explain this formula
-                    neighbor_weight = weight * min(10, edge['weight']) * 0.01
-                    expanded.append((neighbor, neighbor_weight))
+            if handle_oov and term not in self.frame.index and self.finder is not None:
 
-                prefix_weight = 0.01
+                # Get neighbors
+                neighbors = self.get_neighbors(term, limit_per_term, weight)
+                expanded.extend(neighbors)
+
+                # Get englishified version of the term
                 if get_language(term) != 'en':
                     englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
-                while term:
-                    # Skip excessively general lookups, for either an entire
-                    # language, or all terms starting with a single
-                    # non-ideographic letter
-                    if term.endswith('/') or (term[-2] == '/' and term[-1] < chr(0x3000)):
-                        break
-                    prefixed = self.terms_with_prefix(term)
-                    if prefixed:
-                        n_prefixed = len(prefixed)
-                        for prefixed_term in prefixed:
-                            expanded.append((prefixed_term, prefix_weight / n_prefixed))
-                        break
-                    term = term[:-1]
+                # Get matching prefixes
+                prefixes = self.prefix_matching(term, prefix_weight)
+                expanded.extend(prefixes)
+
+                # Get subwords
+                if use_subwords:
+                    subwords = self.get_subwords(term)
+                    expanded.extend([(subword, prefix_weight) for subword in subwords])
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
@@ -169,7 +159,56 @@ class VectorSpaceWrapper(object):
         else:
             return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
 
-    def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
+    def load_morfessor_model(self, lang):
+        io = MorfessorIO(encoding='utf-8')
+        model_file = get_data_filename('morph/segments/{}.txt'.format(lang))
+        model = io.read_any_model(model_file)
+        self.segmentations[lang] = model
+
+    def get_subwords(self, term):
+        lang = get_language(term)
+        if not lang in self.segmentations:
+            self.load_morfessor_model(lang)
+        subwords = self.segmentations[lang].viterbi_segment(split_uri(term)[2])[0]
+        return ['/x/{}/{}'.format(lang, subword) for subword in subwords if len(subword) > 1]
+
+    def prefix_matching(self, term, prefix_weight):
+        prefixes = []
+        while term:
+            # Skip excessively general lookups, for either an entire
+            # language, or all terms starting with a single
+            # non-ideographic letter
+            if term.endswith('/') or (term[-2] == '/' and term[-1] < chr(0x3000)):
+                break
+            prefixed = self.terms_with_prefix(term)
+            if prefixed:
+                n_prefixed = len(prefixed)
+                for prefixed_term in prefixed:
+                    prefixes.append((prefixed_term, prefix_weight / n_prefixed))
+                break
+            term = term[:-1]
+        return prefixes
+
+    def get_neighbors(self, term, limit_per_term, weight):
+        neighbors = []
+        for edge in self.finder.lookup(term, limit=limit_per_term):
+            try:
+                if field_match(edge['start']['term'], term) and not field_match(
+                        edge['end']['term'], term):
+                    neighbor = edge['end']['term']
+                elif field_match(edge['end']['term'], term) and not field_match(
+                        edge['start']['term'], term):
+                    neighbor = edge['start']['term']
+                else:
+                    continue
+            except KeyError:
+                continue
+            # TODO: explain this formula
+            neighbor_weight = weight * min(10, edge['weight']) * 0.01
+            neighbors.append((neighbor, neighbor_weight))
+        return neighbors
+
+    def expanded_vector(self, terms, limit_per_term=10, handle_oov=True):
         """
         Given a list of weighted terms as (term, weight) tuples, make a vector
         representing information from:
@@ -182,22 +221,23 @@ class VectorSpaceWrapper(object):
         self.load()
         return weighted_average(
             self.frame,
-            self.expand_terms(terms, limit_per_term, include_neighbors)
+            self.expand_terms(terms, limit_per_term, handle_oov)
         )
 
     def text_to_vector(self, language, text):
         """Used in Story Cloze Test to create a vector for text """
         tokens = wordfreq.tokenize(text, language)
         weighted_terms = [(uri_prefix(standardized_uri(language, token)), 1.) for token in tokens]
-        return self.get_vector(weighted_terms, include_neighbors=False)
+        return self.get_vector(weighted_terms, handle_oov=False)
 
-    def get_vector(self, query, include_neighbors=True):
+    def get_vector(self, query, handle_oov=True):
         """
         Given one of the possible types of queries (see `similar_terms`), make
         a vector to look up from it.
 
-        If there are 5 or fewer terms involved and `include_neighbors=True`, this
-        will allow expanded_vector to look up neighboring terms in ConceptNet.
+        If there are 5 or fewer terms involved and `handle_oov=True`, expanded_vector will
+        look up: neighboring terms in ConceptNet, terms sharing the same prefix, terms spelled
+        the same way in English, and query's subwords.
         """
         self.load()
         if isinstance(query, np.ndarray):
@@ -212,8 +252,9 @@ class VectorSpaceWrapper(object):
             terms = query
         else:
             raise ValueError("Can't make a query out of type %s" % type(query))
-        include_neighbors = include_neighbors and (len(terms) <= 5)
-        vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
+        handle_oov = handle_oov and (len(terms) <= 5)
+
+        vec = self.expanded_vector(terms, handle_oov=handle_oov)
         return normalize_vec(vec)
 
     def similar_terms(self, query, filter=None, limit=20):
@@ -229,7 +270,8 @@ class VectorSpaceWrapper(object):
         - An existing vector
 
         If the query contains 5 or fewer terms, it will be expanded to include
-        neighboring terms in ConceptNet.
+        neighboring terms in ConceptNet, terms sharing the same prefix, and terms spelled the
+        same way in English.
         """
         self.load()
         vec = self.get_vector(query)
