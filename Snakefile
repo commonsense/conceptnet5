@@ -69,7 +69,7 @@ RETROFIT_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-RAW_DATA_URL = "https://zenodo.org/record/998169/files/conceptnet-raw-data-5.5.zip"
+RAW_DATA_URL = "https://zenodo.org/record/1165009/files/conceptnet-raw-data-5.6.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
@@ -154,8 +154,8 @@ rule webdata:
 rule clean:
     shell:
         "for subdir in assertions assoc collated db edges morph psql tmp vectors stats; "
-        "do echo Removing %(data)s/$subdir; "
-        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
+        "do echo Removing {DATA}/$subdir; "
+        "rm -rf {DATA}/$subdir; done"
 
 rule test:
     input:
@@ -169,13 +169,13 @@ rule test:
 # ===========
 rule download_raw_package:
     output:
-        DATA + "/raw/conceptnet-raw-data-5.5.zip"
+        DATA + "/raw/conceptnet-raw-data-5.6.zip"
     shell:
         "wget -nv {RAW_DATA_URL} -O {output}"
 
 rule extract_raw:
     input:
-        DATA + "/raw/conceptnet-raw-data-5.5.zip"
+        DATA + "/raw/conceptnet-raw-data-5.6.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
