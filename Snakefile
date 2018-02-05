@@ -31,7 +31,7 @@ N_PIECES = 16
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
-    'en': '20160305',
+    'en': '20171201',
     'fr': '20160305',
     'de': '20160407'
 }
@@ -55,7 +55,7 @@ EMOJI_LANGUAGES = [
 ]
 
 # Increment this number when we incompatibly change the parser
-WIKT_PARSER_VERSION = "1"
+WIKT_PARSER_VERSION = "2"
 
 RETROFIT_SHARDS = 6
 
@@ -153,9 +153,9 @@ rule webdata:
 
 rule clean:
     shell:
-        "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
-        "do echo Removing {DATA}/$subdir; "
-        "rm -rf {DATA}/$subdir; done"
+        "for subdir in assertions assoc collated db edges morph psql tmp vectors stats; "
+        "do echo Removing %(data)s/$subdir; "
+        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
 
 rule test:
     input:
