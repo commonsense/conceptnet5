@@ -37,6 +37,9 @@ WIKTIONARY_VERSIONS = {
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
+# Languages where morphemes should not be split anywhere except at spaces
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
@@ -56,7 +59,17 @@ WIKT_PARSER_VERSION = "2"
 
 RETROFIT_SHARDS = 6
 
-RAW_DATA_URL = "https://conceptnet.s3.amazonaws.com/raw-data/2016"
+# Dataset filenames
+# =================
+# The goal of reader steps is to produce Msgpack files, and later CSV files,
+# with these names.
+#
+# We distingish *core dataset names*, which collectively determine the set of
+# terms that ConceptNet will attempt to represent, from the additional datasets
+# that will mainly be used to find more information about those terms.
+
+
+RAW_DATA_URL = "https://zenodo.org/record/998169/files/conceptnet-raw-data-5.5.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
@@ -83,16 +96,6 @@ if TESTMODE:
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
     EMOJI_LANGUAGES = ['en', 'en_001']
-
-
-# Dataset filenames
-# =================
-# The goal of reader steps is to produce Msgpack files, and later CSV files,
-# with these names.
-#
-# We distingish *core dataset names*, which collectively determine the set of
-# terms that ConceptNet will attempt to represent, from the additional datasets
-# that will mainly be used to find more information about those terms.
 
 
 CORE_DATASET_NAMES = [
@@ -164,11 +167,19 @@ rule test:
 
 # Downloaders
 # ===========
-rule download_raw:
+rule download_raw_package:
+    output:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
+    shell:
+        "wget -nv {RAW_DATA_URL} -O {output}"
+
+rule extract_raw:
+    input:
+        DATA + "/raw/conceptnet-raw-data-5.5.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "wget -nv {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
+        "unzip {input} raw/{wildcards.dirname}/{wildcards.filename} -d {DATA}"
 
 rule download_conceptnet_ppmi:
     output:
@@ -251,9 +262,9 @@ rule read_dbpedia:
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
-        "cn5-read dbpedia %(data)s/raw/dbpedia "
+        "cn5-read dbpedia {DATA}/raw/dbpedia "
         "{output} "
-        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
+        "{DATA}/stats/core_concepts.txt "
 
 rule read_jmdict:
     input:
@@ -305,9 +316,9 @@ rule prescan_wiktionary:
     output:
         DATA + "/db/wiktionary.db"
     shell:
-        "mkdir -p %(data)s/tmp && "
-        "cn5-read wiktionary_pre {input} %(data)s/tmp/wiktionary.db && "
-        "mv %(data)s/tmp/wiktionary.db {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && "
+        "cn5-read wiktionary_pre {input} {DATA}/tmp/wiktionary.db && "
+        "mv {DATA}/tmp/wiktionary.db {output}"
 
 rule read_wiktionary:
     input:
@@ -368,7 +379,7 @@ rule sort_edges:
     output:
         DATA + "/collated/sorted/edges.csv"
     shell:
-        "mkdir -p %(data)s/tmp && cat {input} | LC_ALL=C sort -T %(data)s/tmp | LC_ALL=C uniq > {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && cat {input} | LC_ALL=C sort -T {DATA}/tmp | LC_ALL=C uniq > {output}"
 
 rule combine_assertions:
     input:
@@ -393,7 +404,7 @@ rule prepare_db:
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     shell:
-        "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
+        "cn5-db prepare_data {input} {DATA}/psql"
 
 rule gzip_db:
     input:
@@ -415,7 +426,7 @@ rule load_db:
     output:
         DATA + "/psql/done"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "cn5-db load_data {DATA}/psql && touch {output}"
 
 
 # Collecting statistics
@@ -623,11 +634,11 @@ rule retrofit:
         DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
-        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        temp(expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS)))
     resources:
-        ram=16
+        ram=24
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -738,7 +749,7 @@ rule compare_embeddings:
     run:
         input_embeddings = input[:-2]
         input_embeddings_str = ' '.join(input_embeddings)
-        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
+        shell("cn5-vectors compare_embeddings {input_embeddings_str} {output}")
 
 rule comparison_graph:
     input:

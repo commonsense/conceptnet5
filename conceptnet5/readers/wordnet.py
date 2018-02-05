@@ -24,6 +24,7 @@ PARTS_OF_SPEECH = {
 
 REL_MAPPING = {
     'hypernym': ('IsA', '{0} is a type of {1}'),
+    'hypernym-v': ('MannerOf', '{0} is a way to {1}'),
     'part_meronym': ('PartOf', '{0} is a part of {1}'),
     'domain_category': ('HasContext', '{0} is used in the context of {1}'),
     'domain_region': ('HasContext', '{0} is used in the region of {1}'),
@@ -199,6 +200,9 @@ def run_wordnet(input_file, output_file):
         obj = obj_dict.get('url')
         relname = resource_name(rel)
         if relname in REL_MAPPING:
+            pos, sense = synset_disambig.get(subj, (None, None))
+            if relname == 'hypernym' and pos == 'v':
+                relname = 'hypernym-v'
             rel, frame = REL_MAPPING[relname]
             reversed_frame = False
             if rel.startswith('~'):
@@ -217,7 +221,6 @@ def run_wordnet(input_file, output_file):
                 if (not text) or '!' in text:
                     continue
                 lang = obj_dict['lang']
-                pos, sense = synset_disambig.get(subj, (None, None))
                 obj_uri = standardized_concept_uri(lang, text, pos, 'wn', sense)
                 obj_label = text
 
