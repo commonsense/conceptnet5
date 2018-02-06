@@ -353,6 +353,14 @@ rule read_cc_cedict:
     shell:
         "cn5-read cc_cedict {input} {output}"
 
+rule read_open_images:
+    input:
+        DATA + "/raw/open_images/annotations_human_bbox_2017_11.tar.gz"
+    output:
+        DATA + "/edges/open_images/open_images.msgpack"
+    shell:
+        "cn5-read open_images {input} {output}"
+
 
 # Converting msgpack to csv
 # =========================

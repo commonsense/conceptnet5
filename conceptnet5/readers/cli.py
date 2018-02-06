@@ -1,7 +1,7 @@
 import click
 from . import (
-    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, nadya, ptt_petgame,
-    opencyc, verbosity, wiktionary, wordnet
+    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, nadya,
+    opencyc, open_images, ptt_petgame, verbosity, wiktionary, wordnet
 )
 
 
@@ -169,3 +169,13 @@ def run_cedict(input, output):
     output: a msgpack file of edges
     """
     cc_cedict.handle_file(input, output)
+
+
+@cli.command(name='open_images')
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def run_open_images(input, output):
+    """
+     Import data from OpenImages.
+    """
+    open_images.handle_file(input, output)
