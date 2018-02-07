@@ -1,6 +1,7 @@
 from itertools import permutations
 
 import pandas as pd
+import numpy as np
 from collections import Counter
 
 from conceptnet5.edges import make_edge
@@ -34,11 +35,19 @@ def handle_files(inputs, labels_descriptions, output):
                 pairs = list(permutations(image_labels, 2))
                 all_pairs.extend(pairs)
     counter = Counter(all_pairs)
-    for rank, (pair, count) in enumerate(counter.most_common()):
-        edge = make_edge(rel='/r/RelatedTo',
+
+    counts = [count for pair, count in counter.most_common()]
+    log_counts = [np.log(count) for count in counts]
+    max_count = max(log_counts)
+    min_count = min(log_counts)
+    norm = max_count - min_count
+    for rank, (pair, count) in enumerate(counter.most_common(), 1):
+        weight = (np.log(count) - min_count) / norm
+        edge = make_edge(rel='/r/LocatedNear',
                          start=pair[0],
                          end=pair[1],
                          dataset=DATASET,
                          license=LICENSE,
-                         sources=SOURCE)
+                         sources=SOURCE,
+                         weight=max(weight, 0.2))
         out.write(edge)
