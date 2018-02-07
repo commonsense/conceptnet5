@@ -1,3 +1,5 @@
+from itertools import permutations
+
 import pandas as pd
 from collections import Counter
 
@@ -5,7 +7,6 @@ from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import Licenses
-from itertools import combinations
 
 DATASET = '/d/open_images'
 LICENSE = Licenses.cc_attribution
@@ -30,7 +31,7 @@ def handle_files(inputs, labels_descriptions, output):
         for key, group in frame.groupby('ImageID'):
             if len(group) > 1: # there are at least two objects in an image
                 image_labels = [labels_map[label] for label in group['LabelName']]
-                pairs = list(combinations(image_labels, 2))
+                pairs = list(permutations(image_labels, 2))
                 all_pairs.extend(pairs)
     counter = Counter(all_pairs)
     for rank, (pair, count) in enumerate(counter.most_common()):
