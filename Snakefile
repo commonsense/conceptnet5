@@ -105,7 +105,8 @@ CORE_DATASET_NAMES = [
     "opencyc/opencyc",
     "verbosity/verbosity",
     "wordnet/wordnet",
-    "cedict/cedict"
+    "cedict/cedict",
+    "open_images/open_images"
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
@@ -355,7 +356,10 @@ rule read_cc_cedict:
 
 rule read_open_images:
     input:
-        DATA + "/raw/open_images/annotations_human_bbox_2017_11.tar.gz"
+        DATA + "/raw/open_images/test_annotations-human-bbox.csv",
+        DATA + "/raw/open_images/train_annotations-human-bbox.csv",
+        DATA + "/raw/open_images/validation_annotations-human-bbox.csv",
+        DATA + "/raw/open_images/class-descriptions.csv"
     output:
         DATA + "/edges/open_images/open_images.msgpack"
     shell:

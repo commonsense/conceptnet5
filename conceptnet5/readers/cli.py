@@ -172,10 +172,11 @@ def run_cedict(input, output):
 
 
 @cli.command(name='open_images')
-@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('inputs', type=click.Path(readable=True, dir_okay=False), nargs=-1)
+@click.argument('class_descriptions', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def run_open_images(input, output):
+def run_open_images(inputs, class_descriptions, output):
     """
      Import data from OpenImages.
     """
-    open_images.handle_file(input, output)
+    open_images.handle_files(inputs, class_descriptions, output)
