@@ -4,10 +4,9 @@ associations.
 """
 
 from collections import defaultdict
-import argparse
-from conceptnet5.uri import uri_prefix
+
 from conceptnet5.relations import is_negative_relation
-import click
+from conceptnet5.uri import uri_prefix, is_concept
 
 
 def concept_is_bad(uri):
@@ -48,7 +47,7 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
         concept for (concept, count) in counts.items()
         if (
             count >= en_cutoff or
-            (not concept.startswith('/c/en/') and count >= cutoff)
+            (not is_concept(concept) and count >= cutoff)
         )
     }
 
@@ -70,6 +69,3 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
                         line = '\t'.join([gleft, gright, value, dataset, rel])
                         print(line, file=out)
 
-
-if __name__ == '__main__':
-    cli()
