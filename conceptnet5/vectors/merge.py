@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import normalize
 
-from conceptnet5.uri import get_language
+from conceptnet5.nodes import get_uri_language
 from conceptnet5.languages import CORE_LANGUAGES
 
 
@@ -92,7 +92,7 @@ def merge_intersect(frames, subsample=20, k=300):
     filtered_labels = pd.Series([
         label for (i, label) in enumerate(joined.index)
         if i % subsample == 0 and '_' not in label
-        and get_language(label) in CORE_LANGUAGES
+        and get_uri_language(label) in CORE_LANGUAGES
     ])
 
     # Mean-center and L_2-normalize the data, to prevent artifacts

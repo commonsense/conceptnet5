@@ -4,15 +4,15 @@ puts the tools in conceptnet5.uri together with functions that normalize
 terms and languages into a standard form.
 """
 
-import re
 from urllib.parse import urlparse
 
+import re
 from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
-from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
-    get_language, is_term
 from conceptnet5.languages import LCODE_ALIASES
+from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
+    is_term
 
 
 def standardize_text(text, token_filter=None):
@@ -136,7 +136,7 @@ def get_uri_language(uri):
     """
     if uri.startswith('/a/'):
         return get_uri_language(parse_possible_compound_uri('a', uri)[1])
-    elif uri.startswith('/c/') or uri.startswith('/x/'):
+    elif is_term(uri):
         return split_uri(uri)[1]
     else:
         return None
@@ -191,7 +191,7 @@ def ld_node(uri, label=None):
     }
     if is_term(uri):
         pieces = split_uri(uri)
-        ld['language'] = get_language(uri)
+        ld['language'] = get_uri_language(uri)
         if len(pieces) > 3:
             ld['sense_label'] = '/'.join(pieces[3:])
         ld['term'] = uri_prefix(uri)

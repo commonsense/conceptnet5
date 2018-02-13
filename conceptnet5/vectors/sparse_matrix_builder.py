@@ -1,14 +1,13 @@
-from collections import defaultdict
-
 import pandas as pd
+from collections import defaultdict
+from ordered_set import OrderedSet
 from scipy import sparse
 from sklearn.preprocessing import normalize
 
 from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.nodes import get_uri_language
 from conceptnet5.relations import SYMMETRIC_RELATIONS
-from conceptnet5.uri import get_language, uri_prefix, uri_prefixes
-from ordered_set import OrderedSet
-
+from conceptnet5.uri import uri_prefix, uri_prefixes
 from ..vectors import replace_numbers
 
 
@@ -103,20 +102,20 @@ def build_features_from_conceptnet_table(filename):
             value = float(value_str)
             if relation in SYMMETRIC_RELATIONS:
                 feature_pairs = []
-                if get_language(concept1) in CORE_LANGUAGES:
+                if get_uri_language(concept1) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} ~'.format(uri_prefix(concept1), relation), concept2)
                     )
-                if get_language(concept2) in CORE_LANGUAGES:
+                if get_uri_language(concept2) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} ~'.format(uri_prefix(concept2), relation), concept1)
                     )
             else:
-                if get_language(concept1) in CORE_LANGUAGES:
+                if get_uri_language(concept1) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} -'.format(uri_prefix(concept1), relation), concept2)
                     )
-                if get_language(concept2) in CORE_LANGUAGES:
+                if get_uri_language(concept2) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('- {} {}'.format(uri_prefix(concept2), relation), concept1)
                     )

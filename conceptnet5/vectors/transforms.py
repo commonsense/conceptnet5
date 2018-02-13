@@ -7,8 +7,8 @@ from sklearn.preprocessing import normalize
 from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
-from conceptnet5.nodes import uri_to_label
-from conceptnet5.uri import uri_prefix, get_language
+from conceptnet5.nodes import get_uri_language, uri_to_label
+from conceptnet5.uri import uri_prefix
 from conceptnet5.vectors import standardized_uri, similar_to_vec, get_vector, cosine_similarity
 
 
@@ -172,7 +172,7 @@ def make_big_frame(frame, language):
      Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
      are in languages other than the language specified.
     """
-    vocabulary = [term for term in frame.index if get_language(term) == language]
+    vocabulary = [term for term in frame.index if get_uri_language(term) == language]
     big_frame = frame.ix[vocabulary]
     return big_frame
 

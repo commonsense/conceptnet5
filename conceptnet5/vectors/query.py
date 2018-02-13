@@ -1,10 +1,12 @@
 import marisa_trie
+
 import numpy as np
 import pandas as pd
 import wordfreq
 
 from conceptnet5.db.query import AssertionFinder
-from conceptnet5.uri import uri_prefix, get_language, split_uri
+from conceptnet5.nodes import get_uri_language
+from conceptnet5.uri import uri_prefix, split_uri
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
     similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
@@ -145,7 +147,7 @@ class VectorSpaceWrapper(object):
                     expanded.append((neighbor, neighbor_weight))
 
                 prefix_weight = 0.01
-                if get_language(term) != 'en':
+                if get_uri_language(term) != 'en':
                     englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
