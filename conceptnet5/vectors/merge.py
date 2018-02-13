@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import normalize
 
-from conceptnet5.nodes import get_uri_language
+from conceptnet5.uri import get_uri_language
 from conceptnet5.languages import CORE_LANGUAGES
 
 

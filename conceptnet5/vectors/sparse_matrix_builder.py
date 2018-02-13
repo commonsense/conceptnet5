@@ -5,9 +5,8 @@ from scipy import sparse
 from sklearn.preprocessing import normalize
 
 from conceptnet5.languages import CORE_LANGUAGES
-from conceptnet5.nodes import get_uri_language
 from conceptnet5.relations import SYMMETRIC_RELATIONS
-from conceptnet5.uri import uri_prefix, uri_prefixes
+from conceptnet5.uri import get_uri_language, uri_prefix, uri_prefixes
 from ..vectors import replace_numbers
 
 

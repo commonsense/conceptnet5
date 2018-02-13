@@ -7,8 +7,8 @@ from sklearn.preprocessing import normalize
 from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
-from conceptnet5.nodes import get_uri_language, uri_to_label
-from conceptnet5.uri import uri_prefix
+from conceptnet5.nodes import uri_to_label
+from conceptnet5.uri import get_uri_language, uri_prefix
 from conceptnet5.vectors import standardized_uri, similar_to_vec, get_vector, cosine_similarity
 
 

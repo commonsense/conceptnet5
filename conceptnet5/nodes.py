@@ -11,8 +11,7 @@ from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
-from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
-    is_term
+from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, uri_prefix
 
 
 def standardize_text(text, token_filter=None):
@@ -121,25 +120,6 @@ def standardized_concept_uri(lang, text, *more):
 
 normalized_concept_uri = standardized_concept_uri
 standardize_concept_uri = standardized_concept_uri
-
-
-def get_uri_language(uri):
-    """
-    Extract the language from a concept URI. If the URI points to an assertion,
-    get the language of its first concept.
-        >>> get_uri_language('/a/[/r/RelatedTo/,/c/en/orchestra/,/c/en/symphony/]')
-        'en'
-        >>> get_uri_language('/c/pl/cześć')
-        'pl'
-        >>> get_uri_language('/x/en/able')
-        'en'
-    """
-    if uri.startswith('/a/'):
-        return get_uri_language(parse_possible_compound_uri('a', uri)[1])
-    elif is_term(uri):
-        return split_uri(uri)[1]
-    else:
-        return None
 
 
 def valid_concept_name(text):

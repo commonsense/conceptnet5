@@ -344,6 +344,24 @@ def is_absolute_url(uri):
     return uri.startswith('http') or uri.startswith('cc:')
 
 
+def get_uri_language(uri):
+    """
+    Extract the language from a concept URI. If the URI points to an assertion,
+    get the language of its first concept.
+    >>> get_uri_language('/a/[/r/RelatedTo/,/c/en/orchestra/,/c/en/symphony/]')
+    'en'
+    >>> get_uri_language('/c/pl/cześć')
+    'pl'
+    >>> get_uri_language('/x/en/able')
+    'en'
+    """
+    if uri.startswith('/a/'):
+        return get_uri_language(parse_possible_compound_uri('a', uri)[1])
+    elif is_term(uri):
+        return split_uri(uri)[1]
+    else:
+        return None
+
 class Licenses:
     cc_attribution = 'cc:by/4.0'
     cc_sharealike = 'cc:by-sa/4.0'
