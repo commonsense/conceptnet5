@@ -6,7 +6,7 @@ associations.
 from collections import defaultdict
 
 from conceptnet5.relations import is_negative_relation
-from conceptnet5.uri import uri_prefix, is_concept
+from conceptnet5.uri import is_concept, uri_prefix
 
 
 def concept_is_bad(uri):
@@ -38,9 +38,9 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
             else:
                 gleft = uri_prefix(left)
                 gright = uri_prefix(right)
-                if gright.startswith('/c/'):
+                if is_concept(gright):
                     counts[gleft] += 1
-                if gleft.startswith('/c/'):
+                if is_concept(gleft):
                     counts[gright] += 1
 
     filtered_concepts = {
