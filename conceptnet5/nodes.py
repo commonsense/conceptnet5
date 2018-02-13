@@ -11,7 +11,7 @@ from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
-    get_language
+    get_language, is_term
 from conceptnet5.languages import LCODE_ALIASES
 
 
@@ -174,7 +174,7 @@ def uri_to_label(uri):
         >>> uri_to_label('/c/en/canary_islands')
         'canary islands'
     """
-    if uri.startswith('/c/'):
+    if is_term(uri):
         uri = uri_prefix(uri)
     return uri.split('/')[-1].replace('_', ' ')
 
@@ -189,7 +189,7 @@ def ld_node(uri, label=None):
         '@id': uri,
         'label': label
     }
-    if uri.startswith('/c/'):
+    if is_term(uri):
         pieces = split_uri(uri)
         ld['language'] = get_language(uri)
         if len(pieces) > 3:
