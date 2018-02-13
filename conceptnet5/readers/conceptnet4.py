@@ -8,10 +8,9 @@ from wordfreq import simple_tokenize
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
-    standardized_concept_uri, concept_uri, standardize_text, valid_concept_name
+    standardized_concept_uri, standardize_text, valid_concept_name
 )
 from conceptnet5.edges import make_edge
-from conceptnet5.language.english import english_filter
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.uri import join_uri, Licenses
 
@@ -228,13 +227,10 @@ def build_relation(parts_dict):
     return relation
 
 
-# TODO: is this redundant with something in nodes.py?
 def filtered_uri(lang, text):
     if lang == 'en':
         text = filter_stopwords(text)
-        return concept_uri('en', standardize_text(text, english_filter))
-    else:
-        return standardized_concept_uri(lang, text)
+    return standardized_concept_uri(lang, text)
 
 
 def filter_stopwords(text):
