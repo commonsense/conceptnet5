@@ -362,6 +362,22 @@ def get_uri_language(uri):
     else:
         return None
 
+
+def uri_to_label(uri):
+    """
+    Convert a ConceptNet uri into a label to be used in nodes. This
+    function replaces an underscore with a space, so while '/c/en/example' will be converted into
+    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+    >>> uri_to_label('/c/en/example')
+    'example'
+    >>> uri_to_label('/c/en/canary_islands')
+    'canary islands'
+    """
+    if is_term(uri):
+        uri = uri_prefix(uri)
+    return uri.split('/')[-1].replace('_', ' ')
+
+
 class Licenses:
     cc_attribution = 'cc:by/4.0'
     cc_sharealike = 'cc:by-sa/4.0'

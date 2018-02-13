@@ -11,7 +11,8 @@ from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
-from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, uri_prefix
+from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, uri_prefix, \
+    uri_to_label
 
 
 def standardize_text(text, token_filter=None):
@@ -142,21 +143,6 @@ def valid_concept_name(text):
         False
     """
     return bool(standardize_text(text))
-
-
-def uri_to_label(uri):
-    """
-    Convert a ConceptNet uri into a label to be used in nodes. This
-    function replaces an underscore with a space, so while '/c/en/example' will be converted into
-    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
-        >>> uri_to_label('/c/en/example')
-        'example'
-        >>> uri_to_label('/c/en/canary_islands')
-        'canary islands'
-    """
-    if is_term(uri):
-        uri = uri_prefix(uri)
-    return uri.split('/')[-1].replace('_', ' ')
 
 
 def ld_node(uri, label=None):
