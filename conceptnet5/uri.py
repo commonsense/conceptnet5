@@ -309,17 +309,38 @@ def assertion_uri(rel, start, end):
 
 
 def is_concept(uri):
+    """
+    >>> is_concept('/c/sv/klänning')
+    True
+    >>> is_concept('/x/en/ly')
+    False
+    >>> is_concept('/a/[/r/Synonym/,/c/ro/funcția_beta/,/c/en/beta_function/]')
+    False
+    """
     return uri.startswith('/c/')
 
 
 def is_term(uri):
+    """
+    >>> is_term('/c/sv/kostym')
+    True
+    >>> is_term('/x/en/ify')
+    True
+    >>> is_term('/a/[/r/RelatedTo/,/c/en/cake/,/c/en/flavor/]')
+    False
+    """
     return uri.startswith('/c/') or uri.startswith('/x/')
 
 
 def is_absolute_url(uri):
-    # We have URLs pointing to Creative Commons licenses, starting with 'cc:',
-    # which for Linked Data purposes are absolute URLs because they'll be
-    # resolved into full URLs.
+    """
+    We have URLs pointing to Creative Commons licenses, starting with 'cc:', which for Linked
+    Data purposes are absolute URLs because they'll be resolved into full URLs.
+    >>> is_absolute_url('http://fr.wiktionary.org/wiki/mįkká’e_uxpáðe')
+    True
+    >>> is_absolute_url('/c/fr/nouveau')
+    False
+    """
     return uri.startswith('http') or uri.startswith('cc:')
 
 
