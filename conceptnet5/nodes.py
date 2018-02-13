@@ -12,7 +12,7 @@ from wordfreq import simple_tokenize
 from conceptnet5.language.english import english_filter
 from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
     get_language
-from .languages import LCODE_ALIASES
+from conceptnet5.languages import LCODE_ALIASES
 
 
 def standardize_text(text, token_filter=None):
@@ -72,8 +72,8 @@ def topic_to_concept(language, topic):
     a disambiguation string in parentheses. Returns a concept URI that
     may be disambiguated as a noun.
 
-    >>> topic_to_concept('en', 'Township (United States)')
-    '/c/en/township/n/wp/united_states'
+        >>> topic_to_concept('en', 'Township (United States)')
+        '/c/en/township/n/wp/united_states'
     """
     # find titles of the form Foo (bar)
     topic = topic.replace('_', ' ')
@@ -102,10 +102,10 @@ def standardized_concept_uri(lang, text, *more):
     Items in 'more' will not be stemmed, but will go through the other
     normalization steps.
 
-    >>> standardized_concept_uri('en', 'this is a test')
-    '/c/en/this_is_test'
-    >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
-    '/c/en/this_is_test/n/example_phrase'
+        >>> standardized_concept_uri('en', 'this is a test')
+        '/c/en/this_is_test'
+        >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
+        '/c/en/this_is_test/n/example_phrase'
     """
     lang = lang.lower()
     if lang in LCODE_ALIASES:
@@ -127,9 +127,15 @@ def get_uri_language(uri):
     """
     Extract the language from a concept URI. If the URI points to an assertion,
     get the language of its first concept.
+        >>> get_uri_language('/a/[/r/RelatedTo/,/c/en/orchestra/,/c/en/symphony/]')
+        'en'
+        >>> get_uri_language('/c/pl/cześć')
+        'pl'
+        >>> get_uri_language('/x/en/able')
+        'en'
     """
     if uri.startswith('/a/'):
-        return get_uri_language(parse_possible_compound_uri('a', uri)[0])
+        return get_uri_language(parse_possible_compound_uri('a', uri)[1])
     elif uri.startswith('/c/') or uri.startswith('/x/'):
         return split_uri(uri)[1]
     else:
@@ -142,18 +148,18 @@ def valid_concept_name(text):
     URI. This helps to protect against making useless concepts out of
     empty strings or punctuation.
 
-    >>> valid_concept_name('word')
-    True
-    >>> valid_concept_name('the')
-    True
-    >>> valid_concept_name(',,')
-    False
-    >>> valid_concept_name(',')
-    False
-    >>> valid_concept_name('/')
-    False
-    >>> valid_concept_name(' ')
-    False
+        >>> valid_concept_name('word')
+        True
+        >>> valid_concept_name('the')
+        True
+        >>> valid_concept_name(',,')
+        False
+        >>> valid_concept_name(',')
+        False
+        >>> valid_concept_name('/')
+        False
+        >>> valid_concept_name(' ')
+        False
     """
     return bool(standardize_text(text))
 
@@ -163,6 +169,10 @@ def uri_to_label(uri):
     Convert a ConceptNet uri into a label to be used in nodes. This
     function replaces an underscore with a space, so while '/c/en/example' will be converted into
     'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+        >>> uri_to_label('/c/en/example')
+        'example'
+        >>> uri_to_label('/c/en/canary_islands')
+        'canary islands'
     """
     if uri.startswith('/c/'):
         uri = uri_prefix(uri)
