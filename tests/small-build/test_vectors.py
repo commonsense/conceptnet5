@@ -16,8 +16,8 @@ TEST_FRAME = None
 def setup():
     data = [[4, 4, 4],
             [1, 1, 1],
-            [1, 2, 3],
-            [3, 3, 3],
+            [1, 2, 10],
+            [3, 3, 4],
             [2, 3, 4],
             [2, 3, 5],
             [7, 2, 7],
@@ -49,6 +49,15 @@ def test_vector_space_wrapper():
     wrap.load()
     ok_(all(is_term(label) for label in wrap.frame.index))
     ok_(wrap.frame.index.is_monotonic_increasing)
+
+    # test index_prefix_range
+    ok_(wrap.index_prefix_range('/c/en/figure') == (2, 5))
+    ok_(wrap.index_prefix_range('/c/en/skating') == (0, 0))
+
+    # test_similar_terms
+    ok_('/c/en/figure_skating' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
+    ok_('/c/en/figure_skater' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
+    ok_('/c/en/figure' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
 
 
 def test_standardize_row_labels():
