@@ -20,7 +20,7 @@ def standardize_row_labels(frame, language='en', forms=True):
     URI get combined, with earlier rows given more weight.
     """
     # Check for en/term format we use to train fastText on OpenSubtitles data
-    if all(label.count('/') == 1 for label in frame.index[10:20]):
+    if all(label.count('/') == 1 for label in frame.index[0:5]):
         tuples = [label.partition('/') for label in frame.index]
         frame.index = [uri_prefix(standardized_uri(language, text))
                        for language, _slash, text in tuples]
