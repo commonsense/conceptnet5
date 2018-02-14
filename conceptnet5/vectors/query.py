@@ -5,6 +5,7 @@ import pandas as pd
 import wordfreq
 
 from conceptnet5.db.query import AssertionFinder
+from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
@@ -77,9 +78,6 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
-            if not self.frame.index.is_monotonic_increasing:
-                self.frame = self.frame.sort_index()
-
             if not self.frame.index[1].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
                 # they're in English, and stick the English language tag on
@@ -87,9 +85,12 @@ class VectorSpaceWrapper(object):
                 # we're evaluating the vectors as provided.
                 self.finder = None
                 self.frame.index = [
-                    '/c/en/' + label
+                    standardized_concept_uri('en', label)
                     for label in self.frame.index
                     ]
+
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
 
             self.k = self.frame.shape[1]
             self.small_k = 100

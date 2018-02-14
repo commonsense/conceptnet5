@@ -18,11 +18,17 @@ def setup():
             [1, 1, 1],
             [1, 2, 3],
             [3, 3, 3],
-            [2, 3, 4]]
+            [2, 3, 4],
+            [2, 3, 5],
+            [7, 2, 7],
+            [3, 8, 2]]
 
     index = ['island',
             'Island',
             'cat',
+             'figure',
+             'figure skating',
+             'figure skater',
             'thing',
             '17']
     global TEST_FRAME
