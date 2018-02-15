@@ -1,7 +1,7 @@
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with functions that normalize
-terms and languages into a standard form.
+terms and languages into a standard form (english_filter, simple_tokenize, LCODE_ALIASES).
 """
 
 from urllib.parse import urlparse
