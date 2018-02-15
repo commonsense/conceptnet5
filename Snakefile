@@ -44,14 +44,14 @@ ATOMIC_SPACE_LANGUAGES = {'vi'}
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
 EMOJI_LANGUAGES = [
-    'af', 'am', 'ar', 'as', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy',
-    'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'es', 'es_419', 'et', 'eu',
-    'fa', 'fi', 'fil', 'fr', 'ga', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy',
-    'id', 'is', 'it', 'ja', 'ka', 'kk', 'km', 'kn', 'ko', 'ky', 'lo', 'lt',
-    'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'or', 'pa',
-    'pl', 'pt', 'pt_PT', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn',
-    'sv', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
-    'zh_Hant', 'zu'
+    'af', 'am', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'chr', 'cs', 'cy', 'da',
+    'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA', 'en_GB', 'es', 'es_419', 'es_MX',
+    'es_US', 'et', 'eu', 'fa', 'fi', 'fil', 'fo', 'fr', 'fr_CA', 'ga', 'gd', 'gl', 'gu', 'he',
+    'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kab', 'kk', 'km', 'kn', 'ko', 'ky',
+    'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'nn', 'or', 'pa',
+    'pl', 'ps', 'pt', 'pt_PT', 'ro', 'ru', 'sd', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn', 'sv',
+    'sw', 'ta', 'te', 'th', 'tk', 'to', 'tr', 'uk', 'ur', 'uz', 'vi', 'yue', 'yue_Hans', 'zh',
+    'zh_Hant', 'zh_Hant_HK', 'zu'
 ]
 
 # Increment this number when we incompatibly change the parser
