@@ -237,6 +237,7 @@ class VectorSpaceWrapper(object):
         vec = self.get_vector(query)
         small_vec = vec[:self.small_k]
         search_frame = self.small_frame
+        # TODO: document filter
         if filter:
             exact_only = filter.count('/') >= 3
             if filter.endswith('/.'):
