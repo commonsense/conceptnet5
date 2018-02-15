@@ -21,44 +21,44 @@ def standardize_text(text, token_filter=None):
     underscores. The tokens may have a language-specific `token_filter`
     applied to them. See `standardize_as_list()`.
 
-        >>> standardize_text(' cat')
-        'cat'
+    >>> standardize_text(' cat')
+    'cat'
 
-        >>> standardize_text('a big dog', token_filter=english_filter)
-        'big_dog'
+    >>> standardize_text('a big dog', token_filter=english_filter)
+    'big_dog'
 
-        >>> standardize_text('Italian supercat')
-        'italian_supercat'
+    >>> standardize_text('Italian supercat')
+    'italian_supercat'
 
-        >>> standardize_text('a big dog')
-        'a_big_dog'
+    >>> standardize_text('a big dog')
+    'a_big_dog'
 
-        >>> standardize_text('a big dog', token_filter=english_filter)
-        'big_dog'
+    >>> standardize_text('a big dog', token_filter=english_filter)
+    'big_dog'
 
-        >>> standardize_text('to go', token_filter=english_filter)
-        'go'
+    >>> standardize_text('to go', token_filter=english_filter)
+    'go'
 
-        >>> standardize_text('Test?!')
-        'test'
+    >>> standardize_text('Test?!')
+    'test'
 
-        >>> standardize_text('TEST.')
-        'test'
+    >>> standardize_text('TEST.')
+    'test'
 
-        >>> standardize_text('test/test')
-        'test_test'
+    >>> standardize_text('test/test')
+    'test_test'
 
-        >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
-        'über'
+    >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
+    'über'
 
-        >>> standardize_text('embedded' + chr(9) + 'tab')
-        'embedded_tab'
+    >>> standardize_text('embedded' + chr(9) + 'tab')
+    'embedded_tab'
 
-        >>> standardize_text('_')
-        ''
+    >>> standardize_text('_')
+    ''
 
-        >>> standardize_text(',')
-        ''
+    >>> standardize_text(',')
+    ''
     """
     tokens = simple_tokenize(text.replace('_', ' '))
     if token_filter is not None:
@@ -72,8 +72,8 @@ def topic_to_concept(language, topic):
     a disambiguation string in parentheses. Returns a concept URI that
     may be disambiguated as a noun.
 
-        >>> topic_to_concept('en', 'Township (United States)')
-        '/c/en/township/n/wp/united_states'
+    >>> topic_to_concept('en', 'Township (United States)')
+    '/c/en/township/n/wp/united_states'
     """
     # find titles of the form Foo (bar)
     topic = topic.replace('_', ' ')
@@ -102,10 +102,10 @@ def standardized_concept_uri(lang, text, *more):
     Items in 'more' will not be stemmed, but will go through the other
     normalization steps.
 
-        >>> standardized_concept_uri('en', 'this is a test')
-        '/c/en/this_is_test'
-        >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
-        '/c/en/this_is_test/n/example_phrase'
+    >>> standardized_concept_uri('en', 'this is a test')
+    '/c/en/this_is_test'
+    >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
+    '/c/en/this_is_test/n/example_phrase'
     """
     lang = lang.lower()
     if lang in LCODE_ALIASES:
@@ -129,18 +129,18 @@ def valid_concept_name(text):
     URI. This helps to protect against making useless concepts out of
     empty strings or punctuation.
 
-        >>> valid_concept_name('word')
-        True
-        >>> valid_concept_name('the')
-        True
-        >>> valid_concept_name(',,')
-        False
-        >>> valid_concept_name(',')
-        False
-        >>> valid_concept_name('/')
-        False
-        >>> valid_concept_name(' ')
-        False
+    >>> valid_concept_name('word')
+    True
+    >>> valid_concept_name('the')
+    True
+    >>> valid_concept_name(',,')
+    False
+    >>> valid_concept_name(',')
+    False
+    >>> valid_concept_name('/')
+    False
+    >>> valid_concept_name(' ')
+    False
     """
     return bool(standardize_text(text))
 
