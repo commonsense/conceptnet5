@@ -58,14 +58,18 @@ def test_vector_space_wrapper():
     ok_(all(is_term(label) for label in wrap.frame.index))
     ok_(wrap.frame.index.is_monotonic_increasing)
 
+    # test there are no transformations to raw terms other than adding the english tag
+    ok_('/c/en/figure skater' in wrap.frame.index) # no underscore
+    ok_('/c/en/Island' in wrap.frame.index) # no case folding
+
     # test index_prefix_range
-    ok_(wrap.index_prefix_range('/c/en/figure') == (2, 5))
+    ok_(wrap.index_prefix_range('/c/en/figure') == (3, 6))
     ok_(wrap.index_prefix_range('/c/en/skating') == (0, 0))
 
     # test_similar_terms
-    ok_('/c/en/figure_skating' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
-    ok_('/c/en/figure_skater' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
-    ok_('/c/en/figure' in wrap.similar_terms('/c/en/figure_skating', limit=3).index)
+    ok_('/c/en/figure skating' in wrap.similar_terms('/c/en/figure skating', limit=3).index)
+    ok_('/c/en/figure skater' in wrap.similar_terms('/c/en/figure skating', limit=3).index)
+    ok_('/c/en/figure' in wrap.similar_terms('/c/en/figure skating', limit=3).index)
 
 
 @with_setup(setup_multi_ling_frame)

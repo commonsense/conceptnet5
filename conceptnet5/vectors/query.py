@@ -83,10 +83,7 @@ class VectorSpaceWrapper(object):
                 # them without any further transformation, so we can be sure
                 # we're evaluating the vectors as provided.
                 self.finder = None
-                self.frame.index = [
-                    standardized_concept_uri('en', label)
-                    for label in self.frame.index
-                    ]
+                self.frame.index = ['/c/en/' + label for label in self.frame.index]
 
             if not self.frame.index.is_monotonic_increasing:
                 self.frame = self.frame.sort_index()
