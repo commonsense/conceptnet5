@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import normalize
 
-from conceptnet5.nodes import standardized_concept_uri, uri_to_label
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import uri_to_label
 
 DOUBLE_DIGIT_RE = re.compile(r'[0-9][0-9]')
 DIGIT_RE = re.compile(r'[0-9]')

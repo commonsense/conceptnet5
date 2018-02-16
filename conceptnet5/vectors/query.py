@@ -1,14 +1,15 @@
 import marisa_trie
+
 import numpy as np
 import pandas as pd
 import wordfreq
 
 from conceptnet5.db.query import AssertionFinder
-from conceptnet5.uri import uri_prefix, get_language, split_uri
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
-    similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
-    standardized_uri
+    similar_to_vec, weighted_average, normalize_vec, cosine_similarity, standardized_uri
 )
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -76,19 +77,16 @@ class VectorSpaceWrapper(object):
             if self.frame is None:
                 self.frame = load_hdf(self.vector_filename)
 
-            if not self.frame.index.is_monotonic_increasing:
-                self.frame = self.frame.sort_index()
-
             if not self.frame.index[1].startswith('/c/'):
                 # These terms weren't in ConceptNet standard form. Assume
                 # they're in English, and stick the English language tag on
                 # them without any further transformation, so we can be sure
                 # we're evaluating the vectors as provided.
                 self.finder = None
-                self.frame.index = [
-                    '/c/en/' + label
-                    for label in self.frame.index
-                    ]
+                self.frame.index = ['/c/en/' + label for label in self.frame.index]
+
+            if not self.frame.index.is_monotonic_increasing:
+                self.frame = self.frame.sort_index()
 
             self.k = self.frame.shape[1]
             self.small_k = 100
@@ -145,7 +143,7 @@ class VectorSpaceWrapper(object):
                     expanded.append((neighbor, neighbor_weight))
 
                 prefix_weight = 0.01
-                if get_language(term) != 'en':
+                if get_uri_language(term) != 'en':
                     englishified = '/c/en/' + split_uri(term)[2]
                     expanded.append((englishified, prefix_weight))
 
@@ -235,6 +233,7 @@ class VectorSpaceWrapper(object):
         vec = self.get_vector(query)
         small_vec = vec[:self.small_k]
         search_frame = self.small_frame
+        # TODO: document filter
         if filter:
             exact_only = filter.count('/') >= 3
             if filter.endswith('/.'):

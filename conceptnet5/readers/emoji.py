@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 REL = '/r/SymbolOf'
 DATASET = '/d/emoji'
 LICENSE = Licenses.cc_attribution
-SOURCE = [{'contributor': '/s/resource/unicode/cldr/31'}]
+SOURCE = [{'contributor': '/s/resource/unicode/cldr/32.0.1'}]
 
 
 def strip_words(text):

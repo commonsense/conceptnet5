@@ -1,18 +1,18 @@
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with functions that normalize
-terms and languages into a standard form.
+terms and languages into a standard form (english_filter, simple_tokenize, LCODE_ALIASES).
 """
 
-import re
 from urllib.parse import urlparse
 
+import re
 from wordfreq import simple_tokenize
 
 from conceptnet5.language.english import english_filter
-from conceptnet5.uri import concept_uri, split_uri, uri_prefix, parse_possible_compound_uri, \
-    get_language
-from .languages import LCODE_ALIASES
+from conceptnet5.languages import LCODE_ALIASES
+from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, uri_prefix, \
+    uri_to_label
 
 
 def standardize_text(text, token_filter=None):
@@ -21,44 +21,44 @@ def standardize_text(text, token_filter=None):
     underscores. The tokens may have a language-specific `token_filter`
     applied to them. See `standardize_as_list()`.
 
-        >>> standardize_text(' cat')
-        'cat'
+    >>> standardize_text(' cat')
+    'cat'
 
-        >>> standardize_text('a big dog', token_filter=english_filter)
-        'big_dog'
+    >>> standardize_text('a big dog', token_filter=english_filter)
+    'big_dog'
 
-        >>> standardize_text('Italian supercat')
-        'italian_supercat'
+    >>> standardize_text('Italian supercat')
+    'italian_supercat'
 
-        >>> standardize_text('a big dog')
-        'a_big_dog'
+    >>> standardize_text('a big dog')
+    'a_big_dog'
 
-        >>> standardize_text('a big dog', token_filter=english_filter)
-        'big_dog'
+    >>> standardize_text('a big dog', token_filter=english_filter)
+    'big_dog'
 
-        >>> standardize_text('to go', token_filter=english_filter)
-        'go'
+    >>> standardize_text('to go', token_filter=english_filter)
+    'go'
 
-        >>> standardize_text('Test?!')
-        'test'
+    >>> standardize_text('Test?!')
+    'test'
 
-        >>> standardize_text('TEST.')
-        'test'
+    >>> standardize_text('TEST.')
+    'test'
 
-        >>> standardize_text('test/test')
-        'test_test'
+    >>> standardize_text('test/test')
+    'test_test'
 
-        >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
-        'über'
+    >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
+    'über'
 
-        >>> standardize_text('embedded' + chr(9) + 'tab')
-        'embedded_tab'
+    >>> standardize_text('embedded' + chr(9) + 'tab')
+    'embedded_tab'
 
-        >>> standardize_text('_')
-        ''
+    >>> standardize_text('_')
+    ''
 
-        >>> standardize_text(',')
-        ''
+    >>> standardize_text(',')
+    ''
     """
     tokens = simple_tokenize(text.replace('_', ' '))
     if token_filter is not None:
@@ -123,19 +123,6 @@ normalized_concept_uri = standardized_concept_uri
 standardize_concept_uri = standardized_concept_uri
 
 
-def get_uri_language(uri):
-    """
-    Extract the language from a concept URI. If the URI points to an assertion,
-    get the language of its first concept.
-    """
-    if uri.startswith('/a/'):
-        return get_uri_language(parse_possible_compound_uri('a', uri)[0])
-    elif uri.startswith('/c/') or uri.startswith('/x/'):
-        return split_uri(uri)[1]
-    else:
-        return None
-
-
 def valid_concept_name(text):
     """
     Returns whether this text can be reasonably represented in a concept
@@ -158,17 +145,6 @@ def valid_concept_name(text):
     return bool(standardize_text(text))
 
 
-def uri_to_label(uri):
-    """
-    Convert a ConceptNet uri into a label to be used in nodes. This
-    function replaces an underscore with a space, so while '/c/en/example' will be converted into
-    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
-    """
-    if uri.startswith('/c/'):
-        uri = uri_prefix(uri)
-    return uri.split('/')[-1].replace('_', ' ')
-
-
 def ld_node(uri, label=None):
     """
     Convert a ConceptNet URI into a dictionary suitable for Linked Data.
@@ -179,9 +155,9 @@ def ld_node(uri, label=None):
         '@id': uri,
         'label': label
     }
-    if uri.startswith('/c/'):
+    if is_term(uri):
         pieces = split_uri(uri)
-        ld['language'] = get_language(uri)
+        ld['language'] = get_uri_language(uri)
         if len(pieces) > 3:
             ld['sense_label'] = '/'.join(pieces[3:])
         ld['term'] = uri_prefix(uri)
