@@ -173,6 +173,7 @@ rule download_raw_package:
     shell:
         "wget -nv {RAW_DATA_URL} -O {output}"
 
+# Get emoji data directly from Unicode CLDR
 rule download_unicode_data:
     output:
         DATA + "/raw/cldr-common-32.0.1.zip"
@@ -187,7 +188,8 @@ rule extract_raw:
     shell:
         "unzip {input} raw/{wildcards.dirname}/{wildcards.filename} -d {DATA}"
 
-# Get emoji data directly from Unicode CLDR
+# This rule takes precedence over extract_raw, extracting the emoji data from
+# the Unicode CLDR zip file.
 rule extract_emoji_data:
     input:
         DATA + "/raw/cldr-common-32.0.1.zip"
