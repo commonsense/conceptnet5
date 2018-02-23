@@ -173,6 +173,13 @@ rule download_raw_package:
     shell:
         "wget -nv {RAW_DATA_URL} -O {output}"
 
+# Get emoji data directly from Unicode CLDR
+rule download_unicode_data:
+    output:
+        DATA + "/raw/cldr-common-32.0.1.zip"
+    shell:
+        "wget -nv http://unicode.org/Public/cldr/32.0.1/cldr-common-32.0.1.zip -O {output}"
+
 rule extract_raw:
     input:
         DATA + "/raw/conceptnet-raw-data-5.6.zip"
@@ -180,6 +187,18 @@ rule extract_raw:
         DATA + "/raw/{dirname}/{filename}"
     shell:
         "unzip {input} raw/{wildcards.dirname}/{wildcards.filename} -d {DATA}"
+
+# This rule takes precedence over extract_raw, extracting the emoji data from
+# the Unicode CLDR zip file.
+rule extract_emoji_data:
+    input:
+        DATA + "/raw/cldr-common-32.0.1.zip"
+    output:
+        DATA + "/raw/emoji/{filename}"
+    shell:
+        # The -j option strips the path from the file we're extracting, so
+        # we can use -d to put it in exactly the path we need.
+        "unzip -j {input} common/annotations/{wildcards.filename} -d {DATA}/raw/emoji"
 
 rule download_conceptnet_ppmi:
     output:
@@ -771,4 +790,4 @@ rule comparison_graph:
 
 
 ruleorder:
-    join_retrofit > convert_polyglot
+    join_retrofit > convert_polyglot > extract_emoji_data > extract_raw
