@@ -8,6 +8,20 @@ from conceptnet5.uri import get_uri_language, join_uri, Licenses
 
 
 def prepare_vocab_for_morphology(language, input, output):
+    """
+    Morfessor's input is a list of terms with their counts. Here, we
+    read a ConceptNet vocabulary file with counts (core_concept_counts.txt),
+    filter it for a single language, and convert it into the input form that
+    Morfessor expects.
+
+    We're stripping out the word sense information here, which would cause
+    the same term to appear multiple times. Because of that, we build up
+    a new dictionary of counts, summing all occurrences of a term.
+
+    We use _ to represent all spaces. In languages where the space-separated
+    segments are atomic (Vietnamese), we use _ to represent the locations where
+    subwords are allowed to end, and thus add _ to the end of the term as well.
+    """
     vocab_counts = defaultdict(int)
     for line in input:
         countstr, uri = line.strip().split(' ', 1)
