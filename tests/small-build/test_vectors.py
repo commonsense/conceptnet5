@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
-from nose.tools import ok_, assert_almost_equal, with_setup
+from nose.tools import ok_, eq_, assert_almost_equal, with_setup
 
 from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
@@ -39,7 +39,7 @@ def setup_multi_ling_frame():
              '/c/en/nordic_combined',
              '/c/en/present',
              '/c/en/gift']
-    global  TEST_FRAME
+    global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
 
@@ -80,6 +80,17 @@ def test_vector_space_wrapper_filter():
                                                  limit=1).index)
 
     ok_('/c/en/present' in wrap.similar_terms('/c/en/gift', filter='/c/en/present', limit=1).index)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_missing_language():
+    wrap = VectorSpaceWrapper(frame=TEST_FRAME)
+    wrap.load()
+
+    # The frame contains no Esperanto, of course, so the out-of-vocabulary
+    # mechanism will fail. We should simply get no results, not crash.
+    similarity = wrap.similar_terms('/c/eo/ekzemplo')
+    eq_(len(similarity), 0)
 
 
 @with_setup(setup_simple_frame)

@@ -69,8 +69,12 @@ def l2_normalize_rows(frame):
     L_2-normalize the rows of this DataFrame, so their lengths in Euclidean
     distance are all 1. This enables cosine similarities to be computed as
     dot-products between these rows.
-    DataFrame of zeros will be normalized to zeros.
+
+    Rows of zeroes will be normalized to zeroes, and frames with no rows will
+    be returned as-is.
     """
+    if frame.shape[0] == 0:
+        return frame
     index = frame.index
     return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
 
