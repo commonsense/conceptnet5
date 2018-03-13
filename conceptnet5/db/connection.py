@@ -8,14 +8,11 @@ from conceptnet5.util import get_data_filename
 _CONNECTIONS = {}
 
 
-def get_db_connection(dbname=None, building=None):
+def get_db_connection(dbname=None):
     """
     Get a global connection to the ConceptNet PostgreSQL database.
 
     `dbname` specifies the name of the database in PostgreSQL.
-
-    `building` specifies whether it's okay for the DB to not exist, because
-    we're in the middle of building it. It currently has no effect.
     """
     if dbname is None:
         dbname = config.DB_NAME
