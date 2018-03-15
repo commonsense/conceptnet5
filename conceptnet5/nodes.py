@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import re
 from wordfreq import simple_tokenize
+from wordfreq.preprocess import preprocess_text
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
@@ -90,6 +91,7 @@ def standardized_concept_name(lang, text):
         "Use standardize_text instead."
     )
 
+
 normalized_concept_name = standardized_concept_name
 
 
@@ -106,6 +108,8 @@ def standardized_concept_uri(lang, text, *more):
     '/c/en/this_is_test'
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
     '/c/en/this_is_test/n/example_phrase'
+    >>> standardized_concept_uri('sh', 'симетрија')
+    '/c/sh/simetrija'
     """
     lang = lang.lower()
     if lang in LCODE_ALIASES:
@@ -114,10 +118,13 @@ def standardized_concept_uri(lang, text, *more):
         token_filter = english_filter
     else:
         token_filter = None
+
+    text = preprocess_text(text.replace('_', ' '), lang)
     norm_text = standardize_text(text, token_filter)
     more_text = [standardize_text(item, token_filter) for item in more
                  if item is not None]
     return concept_uri(lang, norm_text, *more_text)
+
 
 normalized_concept_uri = standardized_concept_uri
 standardize_concept_uri = standardized_concept_uri

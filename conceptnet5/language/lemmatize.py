@@ -5,7 +5,6 @@ from conceptnet5.uri import split_uri, join_uri
 
 
 WORDFREQ_LANGUAGES = set(wordfreq.available_languages())
-WORDFREQ_LANGUAGES_LARGE = set(wordfreq.available_languages('large'))
 
 # These are the languages for which we are reasonably confident in Wiktionary's
 # lemmatization.
@@ -160,9 +159,7 @@ class DBLemmatizer:
             possibilities = []
             for row in rows:
                 root, form, pos = row
-                if language in WORDFREQ_LANGUAGES_LARGE:
-                    goodness = wordfreq.word_frequency(root, language, 'large')
-                elif language in WORDFREQ_LANGUAGES:
+                if language in WORDFREQ_LANGUAGES:
                     goodness = wordfreq.word_frequency(root, language)
                 else:
                     goodness = 0.
