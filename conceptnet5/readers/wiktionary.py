@@ -58,7 +58,7 @@ def prepare_db(inputs, dbfile):
                         # Use only Etymology 1 entries for learning word forms.
                         if (tfrom.get('etym') or '1') == '1':
                             language = tfrom.get('language', tto.get('language'))
-                            if language is not None and tfrom['text'] != tto['text']:
+                            if valid_language(language) and tfrom['text'] != tto['text']:
                                 add_form(
                                     db, file_language, language,
                                     tfrom['text'], pos, tto['text'], form_name
@@ -74,6 +74,8 @@ ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
 
 
 def valid_language(code):
+    if code is None:
+        return False
     if not code or code == 'und' or '-pro' in code:
         return False
     if ALPHA3_RE.match(code):
