@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.5.5'
+version_str = '5.6'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
@@ -22,8 +22,8 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'snakemake', 'click', 'requests', 'ftfy', 'numpy', 'scipy',
-        'msgpack-python', 'langcodes >= 1.3', 'wordfreq >= 1.5',
+        'snakemake', 'click', 'requests', 'ftfy', 'msgpack-python',
+        'langcodes >= 1.4.1', 'wordfreq >= 2.0',
         'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'pg8000',
         'marisa-trie'
     ],
