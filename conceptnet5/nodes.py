@@ -98,11 +98,19 @@ normalized_concept_name = standardized_concept_name
 def standardized_concept_uri(lang, text, *more):
     """
     Make the appropriate URI for a concept in a particular language, including
-    stemming the text if necessary, normalizing it, and joining it into a
-    concept URI.
+    removing English stopwords, normalizing the text in a way appropriate
+    to that language (using the text normalization from wordfreq), and joining
+    its tokens with underscores in a concept URI.
 
-    Items in 'more' will not be stemmed, but will go through the other
-    normalization steps.
+    This text normalization can smooth over some writing differences: for
+    example, it removes vowel points from Arabic words, and it transliterates
+    Serbian written in the Cyrillic alphabet to the Latin alphabet so that it
+    can match other words written in Latin letters.
+
+    'more' contains information to distinguish word senses, such as a part
+    of speech or a WordNet domain. The items in 'more' get lowercased and
+    joined with underscores, but skip many of the other steps -- for example,
+    they won't have stopwords removed.
 
     >>> standardized_concept_uri('en', 'this is a test')
     '/c/en/this_is_test'
