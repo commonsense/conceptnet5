@@ -1,3 +1,8 @@
+import re
+
+import langcodes
+from langcodes.tag_parser import LanguageTagError
+
 # There are various cases of language codes that we want to merge or redirect
 # to another language code. To promote data alignment, when there is
 # uncertainty about whether multiple language codes are just variations of the
@@ -16,8 +21,8 @@ LCODE_ALIASES = {
     'zh_cn': 'zh',
     'zh-tw': 'zh',
     'zh-cn': 'zh',
-    'zh-hant' : 'zh',
-    'zh-hans' : 'zh',
+    'zh-hant': 'zh',
+    'zh-hans': 'zh',
 
     'nds-de': 'nds',
     'nds-nl': 'nds',
@@ -819,3 +824,26 @@ def get_language_name(code):
     if code in LCODE_ALIASES:
         code = LCODE_ALIASES['code']
     return LANGUAGE_NAMES.get(code, code)
+
+
+# A regex that simple language codes will match. This is not the complete
+# way that we check language codes, it's just a shortcut.
+ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
+
+
+def valid_language(code):
+    """
+    Check whether a language code refers to a language we could represent in
+    ConceptNet.
+    """
+    if code is None:
+        return False
+    if not code or code == 'und' or '-pro' in code:
+        return False
+    if ALPHA3_RE.match(code):
+        return True
+    try:
+        lcode = langcodes.get(code)
+        return lcode.language is not None and len(lcode.language) <= 3
+    except LanguageTagError:
+        return False

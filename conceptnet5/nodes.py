@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import re
 from wordfreq import simple_tokenize
+from wordfreq.preprocess import preprocess_text
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
@@ -90,22 +91,33 @@ def standardized_concept_name(lang, text):
         "Use standardize_text instead."
     )
 
+
 normalized_concept_name = standardized_concept_name
 
 
 def standardized_concept_uri(lang, text, *more):
     """
     Make the appropriate URI for a concept in a particular language, including
-    stemming the text if necessary, normalizing it, and joining it into a
-    concept URI.
+    removing English stopwords, normalizing the text in a way appropriate
+    to that language (using the text normalization from wordfreq), and joining
+    its tokens with underscores in a concept URI.
 
-    Items in 'more' will not be stemmed, but will go through the other
-    normalization steps.
+    This text normalization can smooth over some writing differences: for
+    example, it removes vowel points from Arabic words, and it transliterates
+    Serbian written in the Cyrillic alphabet to the Latin alphabet so that it
+    can match other words written in Latin letters.
+
+    'more' contains information to distinguish word senses, such as a part
+    of speech or a WordNet domain. The items in 'more' get lowercased and
+    joined with underscores, but skip many of the other steps -- for example,
+    they won't have stopwords removed.
 
     >>> standardized_concept_uri('en', 'this is a test')
     '/c/en/this_is_test'
     >>> standardized_concept_uri('en', 'this is a test', 'n', 'example phrase')
     '/c/en/this_is_test/n/example_phrase'
+    >>> standardized_concept_uri('sh', 'симетрија')
+    '/c/sh/simetrija'
     """
     lang = lang.lower()
     if lang in LCODE_ALIASES:
@@ -114,10 +126,13 @@ def standardized_concept_uri(lang, text, *more):
         token_filter = english_filter
     else:
         token_filter = None
+
+    text = preprocess_text(text.replace('_', ' '), lang)
     norm_text = standardize_text(text, token_filter)
     more_text = [standardize_text(item, token_filter) for item in more
                  if item is not None]
     return concept_uri(lang, norm_text, *more_text)
+
 
 normalized_concept_uri = standardized_concept_uri
 standardize_concept_uri = standardized_concept_uri

@@ -156,16 +156,19 @@ def load_fasttext(filename, max_rows=1000000):
     label_list = []
     with gzip.open(filename, 'rt') as infile:
         nrows_str, ncols_str = infile.readline().rstrip().split()
+
         nrows = min(int(nrows_str), max_rows)
         ncols = int(ncols_str)
         arr = np.zeros((nrows, ncols), dtype='f')
-        for i, line in enumerate(infile):
-            if i >= nrows:
+        for line in infile:
+            if len(label_list) >= nrows:
                 break
             items = line.rstrip().split(' ')
-            label_list.append(items[0])
-            values = [float(x) for x in items[1:]]
-            arr[i] = values
+            label = items[0]
+            if label != '</s>':
+                values = [float(x) for x in items[1:]]
+                arr[len(label_list)] = values
+                label_list.append(label)
 
     if len(label_list) < max_rows:
         arr = arr[:len(label_list)]

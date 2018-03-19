@@ -257,10 +257,10 @@
 /c/mul/🛬	/c/en/aeroplane_arrival	1.0	/d/emoji	/r/SymbolOf
 /c/mul/🤶	/c/en/mother_christmas	1.0	/d/emoji	/r/SymbolOf
 /c/ar/التعليم_في_الولايات_المتحدة	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
-/c/ar/تَجْرِبَة/n	/c/ar/تَجْرِبَة	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ar/تَجْرِبَة/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
-/c/ar/فَحْص/n	/c/ar/فَحْص	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ar/فَحْص/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
+/c/ar/تجربة/n	/c/ar/تجربة	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/ar/تجربة/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
+/c/ar/فحص/n	/c/ar/فحص	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/ar/فحص/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
 /c/az/abş_da_təhsil_sistemi	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/ca/assaig/n	/c/ca/assaig	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ca/assaig/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
@@ -319,8 +319,7 @@
 /c/en/test/n	/c/ru/испытание	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/ru/проба	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/ru/тест	1.0	/d/wiktionary/en	/r/Synonym
-/c/en/test/n	/c/sh/test	1.0	/d/wiktionary/en	/r/Synonym
-/c/en/test/n	/c/sh/тест	1.0	/d/wiktionary/en	/r/Synonym
+/c/en/test/n	/c/sh/test	2.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sl/preizkus	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sl/preizkušnja	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sq/prova	1.0	/d/wiktionary/en	/r/Synonym
