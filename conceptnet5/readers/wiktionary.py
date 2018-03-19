@@ -1,16 +1,13 @@
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.languages import ALL_LANGUAGES
+from conceptnet5.languages import ALL_LANGUAGES, valid_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, uri_prefix
 import sqlite3
 import pathlib
 import os
-import re
 from collections import Counter
-import langcodes
-from langcodes.tag_parser import LanguageTagError
 
 
 PARSER_RULE = '/s/process/wikiparsec/1'
@@ -66,25 +63,6 @@ def prepare_db(inputs, dbfile):
             db.commit()
     finally:
         db.close()
-
-
-# A regex that simple language codes will match. This is not the complete
-# way that we check language codes, it's just a shortcut.
-ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
-
-
-def valid_language(code):
-    if code is None:
-        return False
-    if not code or code == 'und' or '-pro' in code:
-        return False
-    if ALPHA3_RE.match(code):
-        return True
-    try:
-        lcode = langcodes.get(code)
-        return lcode.language is not None and len(lcode.language) <= 3
-    except LanguageTagError:
-        return False
 
 
 def make_tables(db):
@@ -273,13 +251,14 @@ def read_wiktionary(input_file, db_file, output_file):
         }
         word_languages = {wlang for (wlang, _) in all_etyms}
         for wlang in sorted(word_languages):
-            cpage = standardized_concept_uri(wlang, title)
-            ld_edge = make_edge(
-                '/r/ExternalURL', cpage, web_url,
-                dataset=dataset, weight=0.25, sources=[source],
-                license=Licenses.cc_sharealike
-            )
-            out.write(ld_edge)
+            if valid_language(wlang):
+                cpage = standardized_concept_uri(wlang, title)
+                ld_edge = make_edge(
+                    '/r/ExternalURL', cpage, web_url,
+                    dataset=dataset, weight=0.25, sources=[source],
+                    license=Licenses.cc_sharealike
+                )
+                out.write(ld_edge)
         etym_to_translation_sense = {}
         language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
         polysemous_languages = {
