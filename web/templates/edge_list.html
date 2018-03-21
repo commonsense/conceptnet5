@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% from '_macros.html' import show_term, show_edge %}
 {% block title %}
-<title>ConceptNet 5: Edges found</title>
+<title>ConceptNet 5: Query results</title>
 {% endblock %}
 {% block headleft %}
 <h1>
@@ -14,7 +14,7 @@
     {% endif %}
 </h1>
 <h2 class="subtitle">
-    Results from <a href="/" class="version">ConceptNet 5.5</a>
+    Results from <a href="/" class="version">ConceptNet 5.6</a>
 </h2>
 <div class="sources">
     {{ sources | describe_sources_brief }}

@@ -38,7 +38,13 @@ def regex_replacement_stack(replacements):
 linker = regex_replacement_stack([
     (r'&quot;((https?://|/[acdrs]/)([^& ]|&amp;)*)&quot;', r'&quot;<a href="\1">\1</a>&quot;'),
     (r'&quot;cc:([^& ]+)&quot;', r'&quot;<a href="http://creativecommons.org/licenses/\1">cc:\1</a>&quot;'),
-    (r'&quot;lang:([^& ]+)&quot;', r'&quot;<a href="http://www.lexvo.org/page/code/\1">cc:\1</a>&quot;')
+    (r'&quot;lang:([^& ]+)&quot;', r'&quot;<a href="http://www.lexvo.org/page/code/\1">cc:\1</a>&quot;'),
+
+    # Unrelatedly to linking, but using the same mechanism, we can highlight comments.
+    # Apologies for the messy regex that finds the values of 'comment' or 'rdfs:comment' keys
+    # in already-formatted HTML.
+    (r'(&quot;(:?rdfs:)?comment&quot;[^&]*&quot;)(([^&]|&#39;)*)&quot;',
+     r'\1<span class="json-comment">\3</span>&quot;'),
 ])
 
 
