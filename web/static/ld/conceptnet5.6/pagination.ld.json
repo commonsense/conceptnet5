@@ -1,0 +1,32 @@
+{
+  "rdfs:comment": "Pagination in JSON-LD is not standardized yet. This context implements the proposal at https://www.w3.org/community/hydra/wiki/Pagination#PartialCollectionView.",
+  "@context": {
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "comment": "rdfs:comment",
+    "pages": "http://api.conceptnet.io/ld/conceptnet5.5/pagination.ld.json#",
+    "view": {
+      "@id": "pages:view",
+      "comment": "Indicates that the returned API result is a paginated view, and tells you where to find the first, next, and previous pages of the view."
+    },
+    "paginatedProperty": {
+      "@id": "pages:paginatedProperty",
+      "@type": "@vocab",
+      "comment": "Indicates which property of the API response -- such as 'edges' -- is being paginated."
+    },
+    "firstPage": {
+      "@id": "pages:firstPage",
+      "@type": "@id",
+      "comment": "A link to the first page of results."
+    },
+    "nextPage": {
+      "@id": "pages:nextPage",
+      "@type": "@id",
+      "comment": "A link to the next page of results. Only present if there is a next page."
+    },
+    "previousPage": {
+      "@id": "pages:previousPage",
+      "@type": "@id",
+      "comment": "A link to the previous page of results. Only present if there is a previous page."
+    }
+  }
+}
