@@ -12,8 +12,6 @@ from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
 
 import flask
 from flask_limiter import Limiter
-from raven.contrib.flask import Sentry
-import logging
 import os
 
 

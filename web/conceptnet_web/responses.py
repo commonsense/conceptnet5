@@ -26,6 +26,11 @@ def error(response, status, details):
 
 
 def make_query_url(url, items):
+    """
+    Take a URL base and a list of key/value pairs representing parameters,
+    and convert them to a complete URL with those parameters in the query
+    string.
+    """
     str_items = ['{}={}'.format(*item) for item in items]
     if not str_items:
         return url
@@ -34,6 +39,11 @@ def make_query_url(url, items):
 
 
 def groupkey_to_pairs(groupkey, term):
+    """
+    Convert a 'groupkey', a structure defined below in 'lookup_grouped_by_feature',
+    to a list of pairs representing the parameters that query for just the
+    edges in that feature group.
+    """
     direction, rel = groupkey
     if direction == 1:
         return [('rel', rel), ('start', term)]
@@ -44,6 +54,10 @@ def groupkey_to_pairs(groupkey, term):
 
 
 def paginated_url(url, params, offset, limit):
+    """
+    Take in a URL and set 'offset=' and 'limit=' parameters on its query string,
+    replacing those parameters if they already existed.
+    """
     new_params = [
         (key, val) for (key, val) in params
         if key != 'offset' and key != 'limit'
@@ -52,6 +66,15 @@ def paginated_url(url, params, offset, limit):
 
 
 def make_paginated_view(url, params, offset, limit, more):
+    """
+    Create a JSON-LD structure that describes the fact that this is just
+    one page of results and more pages exist.
+
+    This follows what used to be the recommendation at
+    https://www.w3.org/community/hydra/wiki/Pagination. It now sort of resembles
+    the "PartialCollectionView" proposal. This stuff is still not
+    well-standardized.
+    """
     prev_offset = max(0, offset - limit)
     next_offset = offset + limit
     pager = {
@@ -112,6 +135,10 @@ def lookup_grouped_by_feature(term, filters=None, feature_limit=10):
 
 
 def lookup_paginated(term, limit=50, offset=0):
+    """
+    Look up edges associated with a particular URI, and return a paginated,
+    flat list of results.
+    """
     # Query one more edge than asked for, so we know if there are more
     found = FINDER.lookup(term, limit=(limit + 1), offset=offset)
     edges = found[:limit]
@@ -131,6 +158,11 @@ def lookup_paginated(term, limit=50, offset=0):
 
 
 def lookup_single_assertion(uri):
+    """
+    Look up an edge with a particular URI (starting with /a/). This differs
+    from `lookup_paginated` because there will be at most one matching edge.
+    We return that edge if it exists, and if not, we return a 404 error.
+    """
     found = FINDER.lookup(uri, limit=1)
     response = {
         '@id': uri
@@ -142,7 +174,12 @@ def lookup_single_assertion(uri):
         return success(response)
 
 
+# TODO: document querying for a list of terms
 def query_related(uri, filter=None, limit=20):
+    """
+    Query for terms that are related to a term, or list of terms, according
+    to the mini version of ConceptNet Numberbatch.
+    """
     if uri.startswith('/c/'):
         query = uri
     elif uri.startswith('/list/') and uri.count('/') >= 3:
@@ -182,6 +219,12 @@ def query_related(uri, filter=None, limit=20):
 
 
 def query_paginated(query, offset=0, limit=50):
+    """
+    Search ConceptNet for edges matching a query.
+
+    The query should be provided as a dictionary of criteria. The `query`
+    function in the `.api` module constructs such a dictionary.
+    """
     found = FINDER.query(query, limit=limit + 1, offset=offset)
     edges = found[:limit]
     response = {
@@ -198,8 +241,7 @@ def query_paginated(query, offset=0, limit=50):
 
 def standardize_uri(language, text):
     """
-    Look up the URI for a given piece of text. 'text' and 'language' should be
-    given as parameters.
+    Look up the URI for a given piece of text.
     """
     if text is None or language is None:
         return error({}, 400, "You should include the 'text' and 'language' parameters.")
