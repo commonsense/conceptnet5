@@ -1,22 +1,9 @@
-For ConceptNet 5.5.x:
+For ConceptNet 5.6.x:
 
-- [ ] Use standardized language codes in Wiktionary forms
-- [ ] Remove "archaïque" context
-- [ ] Avoid extracting the wrong chunk from Wiktionary's "synonym", "antonym", etc. entries
+- [ ] Remove the massive cluster of French communes
 - [ ] Higher weights on monolingual things, lower weights on uncommon languages
-
-Web interface:
-
-- [x] Link to an FAQ
-- [x] Link to the JSON-LD version of the current page
 - [ ] Add a page listing languages
 - [ ] Add a page per language
-- [x] API root should link to docs
-- [x] Serve some Noto web fonts (not CJK ones though)
-- [x] Handle MemoryErrors
-
-ConceptNet 5.6 perhaps:
-
 - [ ] Nodes should have labels that are stored separately from their edges
 - [ ] Relabel vague nodes like "someone" and "something"
 - [ ] Infer things from verb phrases

@@ -275,4 +275,3 @@ def load_ordered_set(filename):
     for line in open(filename, encoding='utf-8'):
         oset.append(line.rstrip('\n'))
     return oset
-

@@ -66,11 +66,15 @@ def prepare_db(inputs, dbfile):
 
 
 def make_tables(db):
-    db.execute("CREATE TABLE titles (id integer primary key, site_language text, language text, title text)")
-    db.execute("CREATE UNIQUE INDEX titles_uniq ON titles (site_language, language, title)")
+    db.execute("CREATE TABLE titles "
+               "(id integer primary key, site_language text, language text, "
+               "title text)")
+    db.execute("CREATE UNIQUE INDEX titles_uniq ON titles "
+               "(site_language, language, title)")
     db.execute("CREATE INDEX titles_search ON titles (language, title)")
-
-    db.execute("CREATE TABLE forms (id integer primary key, site_language text, language text, word text, pos text, root text, form text)")
+    db.execute("CREATE TABLE forms "
+               "(id integer primary key, site_language text, language text, "
+               "word text, pos text, root text, form text)")
     db.execute("CREATE INDEX forms_search ON forms (language, word)")
 
 

@@ -426,8 +426,10 @@ LANGUAGES = {
     }
 }
 
-COMMON_LANGUAGES = LANGUAGES['common'] | LANGUAGES['common-historical'] | LANGUAGES['common-artificial']
-ALL_LANGUAGES = COMMON_LANGUAGES | LANGUAGES['more'] | LANGUAGES['more-historical'] | LANGUAGES['more-artificial']
+COMMON_LANGUAGES = (LANGUAGES['common'] | LANGUAGES['common-historical'] |
+                    LANGUAGES['common-artificial'])
+ALL_LANGUAGES = (COMMON_LANGUAGES | LANGUAGES['more'] |
+                 LANGUAGES['more-historical'] | LANGUAGES['more-artificial'])
 HISTORICAL_LANGUAGES = LANGUAGES['common-historical'] | LANGUAGES['more-historical']
 RTL_LANGUAGES = {
     # Arabic script
@@ -753,7 +755,7 @@ LANGUAGE_NAMES = {
 
 NEGATIVE_PREFIXES = {
     'af': {'on-'},
-    'am': {'հակա-', 'ան-', 'չ-', 'դժ-', 'տ-', 'ապ-'}, # check
+    'am': {'հակա-', 'ան-', 'չ-', 'դժ-', 'տ-', 'ապ-'},  # check
     'ang': {'un-', 'ond-', 'and-'},
     'az': {'na-'},  # check
     'be': {'не-'},
