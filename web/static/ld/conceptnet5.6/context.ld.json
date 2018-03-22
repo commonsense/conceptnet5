@@ -1,114 +1,104 @@
 {
-  "@id": "cn:",
-  "rdfs:comment": "Hey, you've found the JSON-LD context for ConceptNet. This file defines everything that appears in ConceptNet API responses, mostly for the benefit of software that understands JSON-LD, but it may be reasonably human-readable too. See http://www.conceptnet.io for more information about ConceptNet, http://api.conceptnet.io/docs for the API documentation, or http://json-ld.org/ for an introduction to JSON-LD.",
-  "vann:usageNote": "http://api.conceptnet.io/docs",
-  "dc:creator": "rspeer@luminoso.com",
-  "vann:preferredNamespacePrefix": "cn",
+  "comment": "Hey, you've found the JSON-LD context for ConceptNet. This file defines everything that appears in ConceptNet API responses, mostly for the benefit of software that understands JSON-LD, but it may be reasonably human-readable too. See http://www.conceptnet.io for more information about ConceptNet, http://api.conceptnet.io/docs for the API documentation, or http://json-ld.org/ for an introduction to JSON-LD.",
+
+  "definitions": [
+
+  ],
+
+  "info": {
+    "info": "This 'info' section contains human-readable documentation of the types and property names used in the ConceptNet API. Because this section is for humans to read and not for computers, we don't even define what 'info' means in JSON-LD.",
+    "types": {
+
+    },
+    "properties": {
+      "_context": "The '@context' section of an API response describes to computers what the fields mean, making use of the JSON-LD standard. The @context definitions sometimes point to existing definitions out there on the Semantic Web, such as 'rdf:subject'. Prefixes such as 'rdf:' are defined at the start of the '@context' section.",
+
+      "comment": "A 'comment' field contains a human-readable explanation of a particular value in the ConceptNet API.",
+
+      "rel": "The 'rel' of an edge links to the kind of relationship that holds between two terms. This is the same as the RDF property called 'rdf:predicate'. In this API, the 'rel' will always be a ConceptNet URI beginning with /r/.",
+      "start": "The 'start' of an edge links to the node that this edge points from. This is the same as the RDF property called 'rdf:subject'.",
+      "end": "The 'end' of an edge links to the node that this edge points to. This is the same as the RDF property called 'rdf:object'.",
+      "symmetric": "A relation, feature, or edge can be 'symmetric'. When this boolean value is true, it indicates that it doesn't matter which node is the 'start' or 'end'.",
+      "weight": "The 'weight' of an edge is a numerical value indicating how strongly one should believe the statement it makes. Weights are set in an ad-hoc way by the modules that import data into ConceptNet.",
+
+      "node": "Sometimes we want to specify that a ConceptNet edge either starts or ends at a certain node, but it doesn't matter which. This is the case for symmetric relations, such as /r/Synonym. In those cases, we can refer to either node with the 'node' property.",
+      "label": "The natural-language label of a node. Same as 'rdfs:label'. Every node with a 'label' will also have a 'language'.",
+      "language": "The language code (according to BCP 47) for the language this node is labeled in. This is an alias for the JSON-LD built-in called '@language'.",
+      "sense_label": "The 'sense_label' of a node is a URL-safe string that can distinguish multiple senses of a word. Often this is just a part-of-speech label, such as 'n' or 'v'.",
+      "term": "The 'term' property links a node to its plain, possibly ambiguous form, without any sense label attached to it. If there wasn't a sense label, then the node's 'term' will link to itself.",
+      "site": "ConceptNet has 'ExternalURL' edges that point to terms in other Linked Data resources. The '@id' of such a term contains its complete URL, where you may be able to find more data. The 'site' property contains just the domain name of the resource.",
+
+      "edges": "When you look up a node, its 'edges' property is a list of its incoming and outgoing edges. Each edge represents an RDF statement, with a subject, predicate, and object.",
+      "related": "A list returned when you make a '/related' query, listing the nodes that are most related to the query according to the ConceptNet Numberbatch term vectors. Each node is expressed as a dictionary with an '@id' and a 'weight'. Here, the 'weight' is the cosine similarity of the term vectors, from -1 to 1.",
+
+      "sources": "The 'sources' of an edge are a set of independent reasons we believe this assertion. Edges with more than one source are more reliable. Each of these individual sources is identified by an '@id', and can have a 'contributor', a 'process', and/or an 'activity' identifying more specifically where the data came from. If it only takes one of those to describe the source, then its @id will also be the @id of the source.",
+      "contributor": "A property of a source, indicating the person or resource that contributed an edge in ConceptNet.",
+      "process": "A property of a source, identifying a computational process that led to an edge in ConceptNet.",
+      "activity": "A property of a source, identifying a crowd-sourcing activity that led to an edge in ConceptNet.",
+
+      "dataset": "A property of an edge, separating edges broadly into different 'datasets' that came from different sources or processes.",
+      "surfaceText": "The natural language text that corresponds to an edge. If both nodes attached to the edge are in the same language, the surfaceText will be in that language. We may add a property in the future that more helpfully distinguishes the language of these surface texts.",
+      "license": "A link to the Creative Commons license under which you can remix or redistribute this information. Each edge will have a 'license' property, as well as some other values returned by the API.",
+
+      "view": "When the API returns a 'view' property, it means that the response contains a list (such as 'edges') that is incomplete because there's more than one page of results. The 'view' will be an object containing links to more pages of results.",
+      "paginatedProperty": "A property of the 'view'. Indicates which property -- such as 'edges' -- contains the list that's being paginated.",
+      "firstPage": "A link to the first page of results.",
+      "nextPage": "A link to the next page of results. Only present if there is a next page.",
+      "previousPage": "A link to the previous page of results. Only present if there is a previous page."
+    }
+  },
   "@context": {
-    "@base": "http://api.conceptnet.io/ld/conceptnet5.5/context.ld.json",
-    "cn": "http://api.conceptnet.io/ld/conceptnet5.5/context.ld.json#",
-    "cnapi": "http://api.conceptnet.io/",
+    "@base": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
+    "cn": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#",
+    "cntype": "http://api.conceptnet.io/ld/conceptnet5.6/types.ld.json#",
+    "pages": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#pagination-",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "dc": "http://purl.org/dc/terms/",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "cc": "http://creativecommons.org/licenses/",
-    "vann": "http://purl.org/vocab/vann/",
     "lang": "http://www.lexvo.org/id/code/",
+    "vann": "http://purl.org/vocab/vann/",
+
+    "Node": "cntype:Node",
+    "Edge": "cntype:Edge",
+    "Relation": "cntype:Relation",
+    "Source": "cntype:Source",
+    "RelatedNode": "cntype:RelatedNode",
+    "PartialCollectionView": "cntype:PartialCollectionView",
+
     "comment": "rdfs:comment",
-    "uri": {
-      "@id": "cn:uri",
-      "@type": "@id",
-      "comment": "The URI of an edge is a slash-separated path that contains the information that fundamentally defines it -- its start, end, and relation. This serves as its @id for Linked Data purposes, so in practice, the 'uri' and '@id' fields will be equal, and you should probably be looking up the '@id' instead from now on. If you're pedantic, by 'URI' we actually mean 'IRI'. If you're not pedantic, by 'URI' we actually mean 'URL'."
-    },
-    "rel": {
-      "@id": "rdf:predicate",
-      "@type": "@id",
-      "comment": "The 'rel' property labels the kind of relationship that holds between two terms. This is the same as RDF's notion of a 'predicate'."
-    },
-    "start": {
-      "@id": "rdf:subject",
-      "@type": "@id",
-      "comment": "The 'start' property labels the node that this edge points from. This is the same as RDF's notion of a 'subject'."
-    },
-    "end": {
-      "@id": "rdf:object",
-      "@type": "@id",
-      "comment": "The 'end' property labels the node that this edge points to. This is the same as RDF's notion of an 'object'."
-    },
-    "node": {
-      "@id": "cn:node",
-      "@type": "@id",
-      "comment": "Features built from symmetric relations don't have to specify the 'start' or 'end'. Instead, they can just specify 'node', which matches either."
-    },
-    "symmetric": {
-      "@id": "cn:symmetric",
-      "@type": "xsd:boolean",
-      "comment": "A relation, feature, or assertion can be 'symmetric', indicating that it doesn't matter which node is the 'start' or 'end'."
-    },
-    "weight": {
-      "@id": "cn:weight",
-      "@type": "xsd:float",
-      "comment": "A numerical value indicating how strongly one should believe the statement this edge makes."
-    },
-    "edges": {
-      "@id": "cn:edge",
-      "@container": "@set",
-      "@type": "rdf:Statement",
-      "comment": "When you look up a node, its 'edges' property is a list of its incoming and outgoing edges."
-    },
-    "related": {
-      "@id": "cn:related",
-      "@container": "@set",
-      "@type": "@id",
-      "comment": "A list of nodes that are related to the query, according to the ConceptNet Numberbatch term vectors."
-    },
-    "features": {
-      "@id": "cn:feature",
-      "@container": "@set",
-      "comment": "A feature selects edges that match a particular two of 'rel', 'start', and 'end' (or 'rel' and 'node', which covers both 'start' and 'end'). For example, 'parts of a car' (with rel=/r/PartOf and end=/c/en/car) is a feature."
-    },
-    "sources": {
-      "@id": "cn:source",
-      "@container": "@set",
-      "@type": "@id",
-      "comment": "The 'sources' of an edge are a set of independent reasons we believe this assertion."
-    },
-    "dataset": {
-      "@id": "cn:dataset",
-      "@type": "@id",
-      "comment": "An identifier that separates assertions into different 'datasets' that came from different sources or processes."
-    },
-    "surfaceText": {
-      "@id": "cn:surfaceText",
-      "@type": "xsd:string",
-      "comment": "The natural language text that corresponds to an edge. This may change to an rdf:langString in the future."
-    },
-    "license": {
-      "@id": "dc:license",
-      "@type": "@id",
-      "comment": "A link to the Creative Commons license under which you can remix or redistribute this information."
-    },
-    "contributor": {
-      "@id": "dc:contributor",
-      "@type": "@id",
-      "comment": "A person or resource that contributed an assertion in ConceptNet."
-    },
-    "process": {
-      "@id": "cn:process",
-      "@type": "@id",
-      "comment": "An identifier for a computational process that led to an assertion in ConceptNet."
-    },
-    "activity": {
-      "@id": "cn:activity",
-      "@type": "@id",
-      "comment": "An identifier for a crowd-sourcing activity that led to an assertion in ConceptNet."
-    },
-    "seeAlso": {
-      "@id": "rdfs:seeAlso",
-      "@container": "@set",
-      "@type": "@id",
-      "comment": "Links to this term in other Linked Data resources."
-    },
-  }
+    "seeAlso": "rdfs:seeAlso",
+    "definitions": "vann:termGroup",
+    "rel": {"@id": "rdf:predicate", "@type": "@id"},
+    "start": {"@id": "rdf:subject", "@type": "@id"},
+    "end": {"@id": "rdf:object", "@type": "@id"},
+    "symmetric": {"@id": "cn:symmetric", "@type": "xsd:boolean"},
+    "weight": {"@id": "cn:weight", "@type": "xsd:float"},
+    "node": {"@id": "cn:node", "@type": "@id"},
+    "label": {"@id": "rdfs:label", "@type": "xsd:string"},
+    "language": "@language",
+    "sense_label": {"@id": "cn:sense_label", "@type": "xsd:string"},
+    "term": {"@id": "cn:term", "@type": "@id"},
+    "site": {"@id": "cn:site", "@type": "xsd:string"},
+    "edges": {"@id": "cn:edge", "@container": "@set", "@type": "cn:Edge"},
+    "related": {"@id": "cn:related", "@container": "@set", "@type": "@id"},
+    "sources": {"@id": "cn:source", "@container": "@set", "@type": "@id"},
+    "contributor": {"@id": "dc:contributor", "@type": "@id"},
+    "process": {"@id": "cn:process", "@type": "@id"},
+    "activity": {"@id": "cn:activity", "@type": "@id"},
+    "dataset": {"@id": "cn:dataset", "@type": "@id"},
+    "surfaceText": {"@id": "cn:surfaceText", "@type": "xsd:string"},
+    "license": {"@id": "dc:license", "@type": "@id"},
+
+    "view": {"@id": "pages:view", "@type": "cn:PartialCollectionView"},
+    "paginatedProperty": {"@id": "pages:paginatedProperty", "@type": "@vocab"},
+    "firstPage": {"@id": "pages:firstPage", "@type": "@id"},
+    "nextPage": {"@id": "pages:nextPage", "@type": "@id"},
+    "previousPage": {"@id": "pages:previousPage", "@type": "@id"}
+  },
+  "@id": "cn:",
+  "vann:preferredNamespacePrefix": "cn",
+  "dc:creator": "rspeer@luminoso.com",
+  "seeAlso": "http://api.conceptnet.io/docs"
 }
