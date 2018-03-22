@@ -7,9 +7,15 @@
         {{term.language}}
     {% endif %}
     </span>
-    <a href="{{term.term}}">
-        {{term.label}}
-    </a>
+    {% if term.language or term.site_available %}
+        <a href="{{term.term}}">
+            {{term.label}}
+        </a>
+    {% else %}
+        <span class="nolink" title="This vocabulary can't be browsed on the Web.">
+            {{term.label}}
+        </span>
+    {% endif %}
     {% if term.sense_label %}
     <sup>
         (<a href="{{term['@id']}}" class="sense">{{term.sense_label}}</a>)

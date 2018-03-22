@@ -9,6 +9,7 @@ REL_HEADINGS = {
         '/r/DerivedFrom': ['Derived terms', 'Derived from'],
         '/r/IsA': ['Types of {0}', '{0} is a type of…'],
         '/r/EtymologicallyRelatedTo': ['Etymologically related'],
+        '/r/EtymologicallyDerivedFrom': ['Etymologically derived terms', 'Etymological roots of "{0}"'],
         '/r/AtLocation': ['Things located at {0}', 'Location of {0}'],
         '/r/Causes': ['Causes of {0}', 'Effects of {0}'],
         '/r/UsedFor': ['Things used for {0}', '{0} is used for…'],
@@ -40,5 +41,15 @@ REL_HEADINGS = {
         '/r/ControlledBy': ['{0} controls…', '{0} is controlled by…'],
         '/r/LocatedNear': ['Things located near {0}', '{0} is near…'],
         '/r/ExternalURL': ['Links to ConceptNet', 'Links to other sites'],
+        '/r/dbpedia/field': ['In the field of {0}', '{0} is in the field of…'],
+        '/r/dbpedia/genre': ['In the genre of {0}', '{0} is in the genre of…'],
+        '/r/dbpedia/knownFor': ['People known for {0}', '{0} is known for…'],
+        '/r/dbpedia/product': ['Makers of {0}', '{0} makes the product…'],
+        '/r/dbpedia/occupation': ['People with the occupation {0}', 'Occupation of {0}'],
+        '/r/dbpedia/language': ['Things whose language is {0}', 'Language of {0}'],
+        '/r/dbpedia/influencedBy': ['{0} influenced…', '{0} was influenced by…'],
+        '/r/dbpedia/capital': ['{0} is the capital of…', 'Capital of {0}'],
+        '/r/dbpedia/leader': ['{0} has led…', '{0} has been led by…'],
+        '/r/dbpedia/genus': ['Species of {0}', '{0} is a species of…'],
     }
 }

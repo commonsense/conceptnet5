@@ -5,7 +5,6 @@ from conceptnet_web.json_rendering import jsonify, highlight_and_link_json
 from conceptnet_web import responses
 from conceptnet_web.responses import VALID_KEYS, error
 from conceptnet_web.filters import FILTERS
-from conceptnet_web.whereami import get_code_base
 from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet5.nodes import standardized_concept_uri
 
@@ -17,17 +16,16 @@ import os
 
 # Configuration
 
-BASE_DIR = get_code_base()
-STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(BASE_DIR, 'static'))
-TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(BASE_DIR, 'templates'))
-
-app = flask.Flask(
-    'conceptnet5',
-    template_folder=TEMPLATE_PATH,
-    static_folder=STATIC_PATH
-)
-app.config['JSON_AS_ASCII'] = False
+app = flask.Flask('conceptnet5_web')
+STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(app.root_path, 'static'))
+TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(app.root_path, 'templates'))
 app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
+
+app.config.update({
+    'template_folder': TEMPLATE_PATH,
+    'static_folder': STATIC_PATH,
+    'JSON_AS_ASCII': False
+})
 
 
 for filter_name, filter_func in FILTERS.items():
