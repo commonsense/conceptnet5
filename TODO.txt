@@ -7,3 +7,7 @@ For ConceptNet 5.6.x:
 - [ ] Nodes should have labels that are stored separately from their edges
 - [ ] Relabel vague nodes like "someone" and "something"
 - [ ] Infer things from verb phrases
+- [ ] DBPedia relations can be cleaned up; for example, with some gerund to noun
+      mapping, we can turn "occupation" into "InstanceOf" or "IsA"
+- [ ] Drop the DBPedia 'leader' relation, it's underused and very time-dependent
+
