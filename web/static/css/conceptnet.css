@@ -104,15 +104,10 @@ a {
     padding-right: 1rem;
 }
 .footer {
-    background-color: #333;
-    color: #fff;
+    background-color: #ddd;
     margin: 0;
     padding: 1em;
     font-size: 1rem;
-}
-
-.footer a {
-    color: #bdf;
 }
 
 .footer .creative-commons {

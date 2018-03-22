@@ -6,12 +6,12 @@ from conceptnet_web import responses
 from conceptnet_web.responses import VALID_KEYS, error
 from conceptnet_web.filters import FILTERS
 from conceptnet_web.whereami import get_code_base
+from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet5.nodes import standardized_concept_uri
+
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
-from raven.contrib.flask import Sentry
-import logging
 import os
 
 
@@ -35,6 +35,7 @@ for filter_name, filter_func in FILTERS.items():
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
+try_configuring_sentry(app)
 application = app  # for uWSGI
 
 
@@ -148,6 +149,14 @@ def internal_server_error(e):
     )
 
 
+# Visiting this URL intentionally causes an error, so we can see if Sentry
+# is working. It has a silly name instead of just 'error' to decrease the
+# probability of it being accidentally crawled.
+@app.route('/i-am-error')
+def fake_error():
+    raise Exception("Fake error for testing")
+
+
 def render_error(status, details):
     return jsonify(error({}, status=status, details=details), status=status)
 
@@ -155,12 +164,3 @@ def render_error(status, details):
 if __name__ == '__main__':
     app.debug = True
     app.run('127.0.0.1', debug=True, port=8084)
-
-
-if not app.debug:
-    # Error logging configuration -- requires SENTRY_DSN to be set to a valid
-    # Sentry client key
-    if os.environ.get('SENTRY_DSN'):
-        sentry = Sentry(app, logging=True, level=logging.ERROR)
-    else:
-        sentry = None

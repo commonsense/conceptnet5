@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'conceptnet >= %s' % version_str,
         'limits', 'flask==0.11', 'flask-cors', 'flask-limiter',
-        'langcodes >= 1.4.1', 'jinja2-highlight', 'pygments', 'raven[flask]'
+        'langcodes >= 1.4.1', 'jinja2-highlight', 'pygments', 'raven[flask] >= 6.6'
     ],
     license = 'Apache License 2.0',
 )
