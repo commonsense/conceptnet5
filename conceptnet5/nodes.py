@@ -180,4 +180,9 @@ def ld_node(uri, label=None):
         domain = urlparse(uri).netloc
         ld['site'] = domain
         ld['term'] = uri
+
+        # OpenCyc is down and UMBEL doesn't host their vocabulary on the
+        # Web. This property indicates whether you can follow a link
+        # via HTTP and retrieve more information.
+        ld['site_available'] = domain not in {'sw.opencyc.org', 'umbel.org'}
     return ld
