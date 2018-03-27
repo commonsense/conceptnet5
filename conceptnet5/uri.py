@@ -24,13 +24,13 @@ def join_uri(*pieces):
     `join_uri` builds a URI from constituent pieces that should be joined
     with slashes (/).
 
-    Leading and trailing on the pieces are acceptable, but will be ignored.
-    The resulting URI will always begin with a slash and have its pieces
-    separated by a single slash.
+    Leading and trailing slashes on the pieces are acceptable, but will be
+    ignored. The resulting URI will always begin with a slash and have its
+    pieces separated by a single slash.
 
-    The pieces do not have `standardize_text` applied to them; to make sure your
-    URIs are in normal form, run `standardize_text` on each piece that represents
-    arbitrary text.
+    The pieces do not have `standardize_text` applied to them; to make sure
+    your URIs are in normal form, run `conceptnet5.nodes.standardize_text` on
+    each piece that represents arbitrary text.
 
     >>> join_uri('/c', 'en', 'cat')
     '/c/en/cat'

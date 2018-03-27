@@ -160,6 +160,7 @@ def choose_small_vocabulary(big_frame, concepts_filename, language):
     vocab = []
     for term in big_frame.index:
         if '_' not in term and term in concepts:
+            # TODO: update for features of wordfreq 2
             try:
                 frequency = word_frequency(uri_to_label(term), language, wordlist='large')
             except LookupError:
@@ -175,6 +176,7 @@ def make_big_frame(frame, language):
      Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
      are in languages other than the language specified.
     """
+    # FIXME: this should just be part of choose_small_vocabulary
     vocabulary = [term for term in frame.index if get_uri_language(term) == language]
     big_frame = frame.ix[vocabulary]
     return big_frame

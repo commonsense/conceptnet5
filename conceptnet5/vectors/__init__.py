@@ -96,6 +96,8 @@ def similar_to_vec(frame, vec, limit=50):
 
 
 def weighted_average(frame, weight_series):
+    # FIXME: this is actually implementing a weighted sum; we should at least
+    # describe that correctly
     if isinstance(weight_series, list):
         weight_dict = dict(weight_series)
         weight_series = pd.Series(weight_dict)
