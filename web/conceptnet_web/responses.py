@@ -6,7 +6,6 @@ VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder
 CONTEXT = [
     "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
-    "http://api.conceptnet.io/ld/conceptnet5.6/pagination.ld.json"
 ]
 VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 
