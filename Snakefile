@@ -686,7 +686,7 @@ rule merge_intersect:
         DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
-        ram=24
+        ram=30
     shell:
         "cn5-vectors intersect {input} {output}"
 

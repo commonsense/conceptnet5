@@ -83,6 +83,7 @@ def merge_intersect(frames, subsample=20, k=300):
     # Find the intersected vocabulary of the frames, and concatenate their
     # vectors over that vocabulary.
     joined = concat_intersect(frames)
+    frames.clear()
 
     # Find a subset of the labels that we'll use for calculating the
     # dimensionality-reduced version. The labels we particularly care about
