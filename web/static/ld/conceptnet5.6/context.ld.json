@@ -23,6 +23,12 @@
       "comment": "Each edge in ConceptNet represents a fact of general knowledge. The edge can also be interpreted as an RDF statement, with a subject, predicate, and object."
     },
     {
+      "@id": "#Feature",
+      "@type": "rdfs:Datatype",
+      "subClassOf": "rdf:Resource",
+      "comment": "A Feature is a pattern that edges can match, specifying the relation and _one_ node. That node can be the 'start', 'end', or simply the 'node' of a symmetric relation."
+    },
+    {
       "@id": "#Query",
       "@type": "rdfs:Datatype",
       "subClassOf": "rdf:Resource",
@@ -51,7 +57,7 @@
       "@id": "#rel",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:predicate",
-      "domain": "cn:Edge",
+      "domain": ["cn:Edge", "cn:Feature"],
       "range": "cn:Relation",
       "comment": "Links to the kind of relationship that holds between two terms. In this API, the 'rel' will always be a ConceptNet URI beginning with /r/. In RDF, this would be called the 'predicate'."
     },
@@ -59,7 +65,7 @@
       "@id": "#start",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:subject",
-      "domain": "cn:Edge",
+      "domain": ["cn:Edge", "cn:Feature"],
       "range": "cn:Node",
       "comment": "Links to the node that this edge points from. In RDF, this would be called the 'subject'."
     },
@@ -67,7 +73,7 @@
       "@id": "#end",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:object",
-      "domain": "cn:Edge",
+      "domain": ["cn:Edge", "cn:Feature"],
       "range": "cn:Node",
       "comment": "Links to the node that this edge points to. In RDF, this would be called the 'object'."
     },
@@ -88,9 +94,23 @@
     {
       "@id": "#node",
       "@type": "rdf:Property",
-      "domain": "cn:Edge",
+      "domain": ["cn:Edge", "cn:Feature"],
       "range": "cn:Node",
       "comment": "Sometimes we want to specify that a ConceptNet edge either starts or ends at a certain node, but it doesn't matter which. This is the case for symmetric relations, such as /r/Synonym. In those cases, we can refer to either node with the 'node' property. Not to be confused with 'cn:Node', which is a data type."
+    },
+    {
+      "@id": "#features",
+      "@type": "rdf:Property",
+      "domain": "cn:Query",
+      "range": "cn:Query",
+      "comment": "API responses can be grouped into 'features' (see the comment for the type #Feature) based on what they describe about the node being queried. In a grouped API response, the 'features' property is a list of all these groups. Each group is a smaller Query with a 'feature' property."
+    },
+    {
+      "@id": "#feature",
+      "@type": "rdf:Property",
+      "domain": "cn:Query",
+      "range": "cn:Feature",
+      "comment": "When this property is present, the query is selecting edges that match a particular feature (see the comment for #Feature)."
     },
     {
       "@id": "#label",
@@ -253,6 +273,8 @@
     "symmetric": {"@id": "cn:symmetric", "@type": "xsd:boolean"},
     "weight": {"@id": "cn:weight", "@type": "xsd:float"},
     "node": {"@id": "cn:node", "@type": "@id"},
+    "feature": {"@id": "cn:feature", "@type": "@id"},
+    "features": {"@id": "cn:feature", "@container": "@set", "@type": "@id"},
     "label": {"@id": "cn:label", "@type": "xsd:string"},
     "language": "@language",
     "sense_label": {"@id": "cn:sense_label", "@type": "xsd:string"},

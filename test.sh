@@ -2,6 +2,7 @@
 
 export CONCEPTNET_BUILD_TEST=1
 export CONCEPTNET_BUILD_DATA=testdata
+export CONCEPTNET_DB_NAME=conceptnet-test
 dropdb conceptnet-test 2>/dev/null || true
 createdb conceptnet-test
 build_test () {
