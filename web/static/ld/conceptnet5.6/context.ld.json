@@ -49,151 +49,151 @@
     {
       "@id": "#edges",
       "@type": "rdf:Property",
-      "domain": "cn:Edge",
-      "range": "cn:Relation",
+      "domain": "#Edge",
+      "range": "#Relation",
       "comment": "When you look up a node, its 'edges' property is a list of (some of) its incoming and outgoing edges. NOTE: Edge lists are paginated! By default you only get 20 edges, so you should follow the links in the 'pages:view' to get more."
     },
     {
       "@id": "#rel",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:predicate",
-      "domain": ["cn:Edge", "cn:Feature"],
-      "range": "cn:Relation",
+      "domain": ["#Edge", "#Feature"],
+      "range": "#Relation",
       "comment": "Links to the kind of relationship that holds between two terms. In this API, the 'rel' will always be a ConceptNet URI beginning with /r/. In RDF, this would be called the 'predicate'."
     },
     {
       "@id": "#start",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:subject",
-      "domain": ["cn:Edge", "cn:Feature"],
-      "range": "cn:Node",
+      "domain": ["#Edge", "#Feature"],
+      "range": "#Node",
       "comment": "Links to the node that this edge points from. In RDF, this would be called the 'subject'."
     },
     {
       "@id": "#end",
       "@type": "rdf:Property",
       "subPropertyOf": "rdf:object",
-      "domain": ["cn:Edge", "cn:Feature"],
-      "range": "cn:Node",
+      "domain": ["#Edge", "#Feature"],
+      "range": "#Node",
       "comment": "Links to the node that this edge points to. In RDF, this would be called the 'object'."
     },
     {
       "@id": "#symmetric",
       "@type": "rdf:Property",
-      "domain": ["cn:Edge", "cn:Relation"],
+      "domain": ["#Edge", "#Relation"],
       "range": "xsd:boolean",
       "comment": "A relation or edge can be 'symmetric'. When this boolean value is true, it indicates that it doesn't matter which node is the 'start' or 'end'."
     },
     {
-      "id": "#weight",
+      "@id": "#weight",
       "@type": "rdf:Property",
-      "domain": ["cn:Edge", "cn:RelatedNode"],
+      "domain": ["#Edge", "#RelatedNode"],
       "range": "xsd:float",
       "comment": "A numerical value indicating how strongly one should believe the statement this edge makes. Weights are set in an ad-hoc way by the modules that import data into ConceptNet. Weights also appear on RelatedNodes, indicating how related that node is to the query, on a scale from -1 to 1."
     },
     {
       "@id": "#node",
       "@type": "rdf:Property",
-      "domain": ["cn:Edge", "cn:Feature"],
-      "range": "cn:Node",
+      "domain": ["#Edge", "#Feature"],
+      "range": "#Node",
       "comment": "Sometimes we want to specify that a ConceptNet edge either starts or ends at a certain node, but it doesn't matter which. This is the case for symmetric relations, such as /r/Synonym. In those cases, we can refer to either node with the 'node' property. Not to be confused with 'cn:Node', which is a data type."
     },
     {
       "@id": "#features",
       "@type": "rdf:Property",
-      "domain": "cn:Query",
-      "range": "cn:Query",
+      "domain": "#Query",
+      "range": "#Query",
       "comment": "API responses can be grouped into 'features' (see the comment for the type #Feature) based on what they describe about the node being queried. In a grouped API response, the 'features' property is a list of all these groups. Each group is a smaller Query with a 'feature' property."
     },
     {
       "@id": "#feature",
       "@type": "rdf:Property",
-      "domain": "cn:Query",
-      "range": "cn:Feature",
+      "domain": "#Query",
+      "range": "#Feature",
       "comment": "When this property is present, the query is selecting edges that match a particular feature (see the comment for #Feature)."
     },
     {
       "@id": "#label",
       "@type": "rdf:Property",
       "subPropertyOf": "rdfs:label",
-      "domain": "cn:Node",
+      "domain": "#Node",
       "range": "xsd:string",
       "comment": "The natural-language label of a node. Every node with a 'label' will also have a 'language' containing the BCP 47 language code for the language it's in. The 'language' isn't a property we define ourselves, it's just an alias for the JSON-LD keyword '@language'."
     },
     {
       "@id": "#sense_label",
       "@type": "rdf:Property",
-      "domain": "cn:Node",
+      "domain": "#Node",
       "range": "xsd:string",
       "comment": "A URL-safe string that can distinguish multiple senses of a word. Often this is just a part-of-speech label, such as 'n' or 'v'."
     },
     {
       "@id": "#term",
       "@type": "rdf:Property",
-      "domain": "cn:Node",
-      "range": "cn:Node",
+      "domain": "#Node",
+      "range": "#Node",
       "comment": "The 'term' property links a node to its plain, possibly ambiguous form, without any sense label attached to it. If there wasn't a sense label, then the node's 'term' will link to itself."
     },
     {
       "@id": "#site",
       "@type": "rdf:Property",
-      "domain": "cn:Node",
+      "domain": "#Node",
       "range": "xsd:string",
       "comment": "ConceptNet has 'ExternalURL' edges that point to terms in other Linked Data resources. The '@id' of such a term contains its complete URL, where you may be able to find more data. The 'site' property contains just the domain name of the resource."
     },
     {
       "@id": "#related",
       "@type": "rdf:Property",
-      "domain": "cn:Query",
-      "range": "cn:RelatedNode",
+      "domain": "#Query",
+      "range": "#RelatedNode",
       "comment": "A list returned when you make a '/related' query, listing the nodes that are most related to the query according to the ConceptNet Numberbatch term vectors. Each node is expressed as a RelatedNode object, with an @id and a weight."
     },
     {
       "@id": "#sources",
       "@type": "rdf:Property",
-      "domain": "cn:Edge",
-      "range": "cn:Source",
+      "domain": "#Edge",
+      "range": "#Source",
       "comment": "The 'sources' of an edge are a set of independent reasons we believe this assertion. Edges with more than one source are more reliable. Each of these individual sources is identified by an '@id', and can have a 'contributor', a 'process', and/or an 'activity' identifying more specifically where the data came from. If it only takes one of those to describe the source, then its @id will also be the @id of the source."
     },
     {
       "@id": "#contributor",
       "@type": "rdf:Property",
-      "domain": "cn:Source",
+      "domain": "#Source",
       "range": "rdfs:Resource",
       "comment": "A property of a source, indicating the person or resource that contributed an edge in ConceptNet."
     },
     {
       "@id": "#process",
       "@type": "rdf:Property",
-      "domain": "cn:Source",
+      "domain": "#Source",
       "range": "rdfs:Resource",
       "comment": "A property of a source, indicating a computational process that led to an edge in ConceptNet."
     },
     {
       "@id": "#activity",
       "@type": "rdf:Property",
-      "domain": "cn:Source",
+      "domain": "#Source",
       "range": "rdfs:Resource",
       "comment": "A property of a source, identifying a crowd-sourcing activity that led to an edge in ConceptNet."
     },
     {
       "@id": "#dataset",
       "@type": "rdf:Property",
-      "domain": "cn:Edge",
+      "domain": "#Edge",
       "range": "rdfs:Resource",
       "comment": "A property of an edge, separating edges broadly into different 'datasets' that came from different sources or processes."
     },
     {
       "@id": "#surfaceText",
       "@type": "rdf:Property",
-      "domain": "cn:Edge",
+      "domain": "#Edge",
       "range": "xsd:string",
       "comment": "The natural language text that corresponds to an edge. If both nodes attached to the edge are in the same language, the surfaceText will be in that language. We may add a property in the future that more helpfully distinguishes the language of these surface texts."
     },
     {
       "@id": "#license",
       "@type": "rdf:Property",
-      "domain": ["cn:Edge", "cn:Query"],
+      "domain": ["#Edge", "#Query"],
       "range": "https://creativecommons.org/ns#License",
       "comment": "A link to the Creative Commons license under which you can remix or redistribute this information."
     },
@@ -205,7 +205,7 @@
     {
       "@id": "pages:view",
       "@type": "rdf:Property",
-      "domain": "cn:Query",
+      "domain": "#Query",
       "range": "pages:PartialCollectionView",
       "comment": "Appears on a response that returns more edges than fit in the response. Contains links to more pages of results."
     },
@@ -220,21 +220,21 @@
       "@id": "pages:firstPage",
       "@type": "rdf:Property",
       "domain": "pages:PartialCollectionView",
-      "range": "cn:Query",
+      "range": "#Query",
       "comment": "A link to the first page of results."
     },
     {
       "@id": "pages:nextPage",
       "@type": "rdf:Property",
       "domain": "pages:PartialCollectionView",
-      "range": "cn:Query",
+      "range": "#Query",
       "comment": "A link to the next page of results. Only present if there is a next page."
     },
     {
       "@id": "pages:previousPage",
       "@type": "rdf:Property",
       "domain": "pages:PartialCollectionView",
-      "range": "cn:Query",
+      "range": "#Query",
       "comment": "A link to the previous page of results. Only present if there is a previous page."
     }
   ],
@@ -243,13 +243,13 @@
     "@base": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
     "cn": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#",
     "pages": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#pagination-",
+
+    "cc": "http://creativecommons.org/licenses/",
+    "dc": "http://purl.org/dc/terms/",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "dc": "http://purl.org/dc/terms/",
-    "xsd": "http://www.w3.org/2001/XMLSchema#",
-    "cc": "http://creativecommons.org/licenses/",
-    "lang": "http://www.lexvo.org/id/code/",
     "vann": "http://purl.org/vocab/vann/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
 
     "Node": "cn:Node",
     "Edge": "cn:Edge",
@@ -258,14 +258,14 @@
     "RelatedNode": "cn:RelatedNode",
     "PartialCollectionView": "pages:PartialCollectionView",
 
-    "comment": "rdfs:comment",
-    "seeAlso": "rdfs:seeAlso",
-    "definitions": "vann:termGroup",
+    "comment": {"@id": "rdfs:comment", "@type": "xsd:string"},
+    "definitions": {"@id": "vann:termGroup", "@type": "@id"},
+    "seeAlso": {"@id": "rdfs:seeAlso", "@type": "@id"},
 
-    "subPropertyOf": {"@id": "rdfs:subPropertyOf", "@type": "@id"},
-    "subClassOf": {"@id": "rdfs:subClassOf", "@type": "@id"},
     "domain": {"@id": "rdfs:domain", "@type": "@id"},
     "range": {"@id": "rdfs:range", "@type": "@id"},
+    "subClassOf": {"@id": "rdfs:subClassOf", "@type": "@id"},
+    "subPropertyOf": {"@id": "rdfs:subPropertyOf", "@type": "@id"},
 
     "rel": {"@id": "cn:rel", "@type": "@id"},
     "start": {"@id": "cn:start", "@type": "@id"},
@@ -274,7 +274,7 @@
     "weight": {"@id": "cn:weight", "@type": "xsd:float"},
     "node": {"@id": "cn:node", "@type": "@id"},
     "feature": {"@id": "cn:feature", "@type": "@id"},
-    "features": {"@id": "cn:feature", "@container": "@set", "@type": "@id"},
+    "features": {"@id": "cn:features", "@container": "@set", "@type": "@id"},
     "label": {"@id": "cn:label", "@type": "xsd:string"},
     "language": "@language",
     "sense_label": {"@id": "cn:sense_label", "@type": "xsd:string"},
