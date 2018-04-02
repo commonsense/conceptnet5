@@ -127,14 +127,18 @@ def transform_for_linked_data(edge):
       attributes
     - All dictionaries should have an '@id'. For the edge itself, it's the
       URI. Without this, we get RDF blank nodes, which are awful.
+    - Set '@type' on objects representing edges and sources. (Nodes get their
+      @type from the `ld_node` function.)
     """
     if 'features' in edge:
         del edge['features']
     for source in edge['sources']:
         conj = conjunction_uri(*sorted(source.values()))
         source['@id'] = conj
+        source['@type'] = 'Source'
     edge['@id'] = edge['uri']
     del edge['uri']
+    edge['@type'] = 'Edge'
 
     start_uri = edge['start']
     end_uri = edge['end']

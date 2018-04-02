@@ -176,6 +176,7 @@ def ld_node(uri, label=None):
         if len(pieces) > 3:
             ld['sense_label'] = '/'.join(pieces[3:])
         ld['term'] = uri_prefix(uri)
+        ld['@type'] = 'Node'
     elif uri.startswith('http'):
         domain = urlparse(uri).netloc
         ld['site'] = domain
@@ -185,4 +186,7 @@ def ld_node(uri, label=None):
         # Web. This property indicates whether you can follow a link
         # via HTTP and retrieve more information.
         ld['site_available'] = domain not in {'sw.opencyc.org', 'umbel.org'}
+        ld['@type'] = 'Node'
+    elif uri.startswith('/r/'):
+        ld['@type'] = 'Relation'
     return ld

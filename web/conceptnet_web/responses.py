@@ -6,7 +6,6 @@ VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder
 CONTEXT = [
     "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
-    "http://api.conceptnet.io/ld/conceptnet5.6/pagination.ld.json"
 ]
 VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 
@@ -79,6 +78,7 @@ def make_paginated_view(url, params, offset, limit, more):
     next_offset = offset + limit
     pager = {
         '@id': paginated_url(url, params, offset, limit),
+        '@type': 'PartialCollectionView',
         'firstPage': paginated_url(url, params, 0, limit),
         'paginatedProperty': 'edges',
     }
