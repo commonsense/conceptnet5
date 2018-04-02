@@ -27,13 +27,9 @@ def app_path(path):
     return os.path.join(os.path.dirname(app.root_path), path)
 
 
-STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', app_path('static'))
-TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', app_path('templates'))
 app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
 
 app.config.update({
-    'template_folder': TEMPLATE_PATH,
-    'static_folder': STATIC_PATH,
     'JSON_AS_ASCII': False
 })
 
