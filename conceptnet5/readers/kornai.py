@@ -1,5 +1,17 @@
-import tatsu
+"""
+Parse a notation by Andras Kornai for expressing hand-curated common-sense
+facts.
 
+Kornai's notation is designed for building a formalism of computation known
+as Eilenberg machines. We don't really want to be working with Eilenberg
+machines, but the graph structure that results from parsing Kornai's notation
+contains edges that we can interpret as ConceptNet edges. When they do, they
+frequently represent common-sense facts.
+
+Kornai explains his motivation and his representation in his paper
+"Competence in Lexical Semantics": http://www.aclweb.org/anthology/S15-1019
+"""
+import tatsu
 
 GRAMMAR = """
 start = definition $ ;
@@ -33,6 +45,10 @@ definition = ','.{ expression }+ ;
 
 
 class KornaiNotationSemantics:
+    """
+    A packrat parser for the notation of the 4lang system, defined formally
+    in http://www.aclweb.org/anthology/S15-1019 .
+    """
     def unary_deep_identifier(self, ast):
         return '=' + ast['name']
 
@@ -79,6 +95,22 @@ class KornaiNotationSemantics:
 
 
 class KornaiValue:
+    """
+    A KornaiValue represents a graph node and the edges pointing away from
+    it.
+
+    The node can be unary or binary, indicating the number of outgoing
+    edges (or arguments) it takes to express a complete fact using that node.
+    One of the arguments may be unspecified, to be filled in later;
+    this is represented by the argument value None.
+
+    We allow constructing binary nodes with no arguments, but only so that
+    we can apply them to one argument (this is basically currying).
+
+    "Specifiers" are other facts that come along with the fact being expressed,
+    as part of a larger graph that we're not really representing. Often they
+    have edges pointing _in_ to the node we're returning.
+    """
     def __init__(self, name, num=None, arity=1, args=None, specifiers=None):
         self.name = name
         assert isinstance(name, str)
@@ -99,6 +131,12 @@ class KornaiValue:
             self.specifiers = specifiers
 
     def apply(self, *args):
+        """
+        Set the arguments of this node. Unary nodes must be applied to one
+        value, and binary nodes must be applied to two. Up to one of the
+        values may be None, indicating that it's a slot that can be filled
+        later.
+        """
         assert len(args) == self.arity
         copy = self.copy()
         copy.args = args
@@ -110,6 +148,14 @@ class KornaiValue:
         return copy
 
     def complete(self, facts):
+        """
+        When we parse a 4lang definition, we get a list of facts, many of
+        which have an unspecified argument.
+
+        We 'complete' the definition by taking a value (which is `self`) and
+        filling it in as the unspecified argument of each fact, and also
+        filling what we can of the 'specifiers' that come with those facts.
+        """
         completed = []
         for fact in facts:
             if fact.arity == 1:
