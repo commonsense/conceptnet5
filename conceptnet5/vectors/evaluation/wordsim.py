@@ -379,6 +379,7 @@ COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
     'semeval-2a-en': .575,
 })
 
+
 def read_ws353():
     """
     Parses the word-similarity 353 test collection (ws353). ws353 is a
@@ -428,6 +429,17 @@ def read_mturk():
     with open(get_support_data_filename('mturk/MTURK-771.csv')) as file:
         for line in file:
             term1, term2, sscore = line.split(',')
+            gold_score = float(sscore)
+            yield term1, term2, gold_score, lang1, lang2
+
+
+def read_simlex():
+    lang1, lang2 = 'en', 'en'
+    with open(get_support_data_filename('simlex/SimLex-999.txt')) as file:
+        for line in file:
+            if line.startswith("word1"):
+                continue
+            term1, term2, _, sscore, _, _, _, ascore, _, _ = line.split('\t')
             gold_score = float(sscore)
             yield term1, term2, gold_score, lang1, lang2
 
@@ -672,6 +684,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     men_score = measure_correlation(spearmanr, vectors, read_men3000(men_subset))
     rw_score = measure_correlation(spearmanr, vectors, read_rw(subset))
     mturk_score = measure_correlation(spearmanr, vectors, read_mturk())
+    simlex_score = measure_correlation(spearmanr, vectors, read_simlex())
     gur350_score = measure_correlation(spearmanr, vectors, read_gurevych('350'))
     zg222_score = measure_correlation(spearmanr, vectors, read_gurevych('222'))
     ws_score = measure_correlation(spearmanr, vectors, read_ws353())
@@ -684,6 +697,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['simlex'] = simlex_score
     results.loc['gur350-de'] = gur350_score
     results.loc['zg222-de'] = zg222_score
     results.loc['ws353'] = ws_score
