@@ -1,12 +1,13 @@
-from scipy import sparse
 import pandas as pd
-from conceptnet5.uri import uri_prefixes, uri_prefix, get_language
-from conceptnet5.relations import SYMMETRIC_RELATIONS
-from conceptnet5.languages import CORE_LANGUAGES
-from ordered_set import OrderedSet
 from collections import defaultdict
-from ..vectors import replace_numbers
+from ordered_set import OrderedSet
+from scipy import sparse
 from sklearn.preprocessing import normalize
+
+from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.relations import SYMMETRIC_RELATIONS
+from conceptnet5.uri import get_uri_language, uri_prefix, uri_prefixes
+from ..vectors import replace_numbers
 
 
 class SparseMatrixBuilder:
@@ -58,9 +59,6 @@ def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):
             index2 = labels.add(replace_numbers(concept2))
             value = float(value_str)
 
-            if dataset == '/d/morphology':
-                value /= 10
-
             mat[index1, index2] = value
             mat[index2, index1] = value
             totals[index1] += value
@@ -103,20 +101,20 @@ def build_features_from_conceptnet_table(filename):
             value = float(value_str)
             if relation in SYMMETRIC_RELATIONS:
                 feature_pairs = []
-                if get_language(concept1) in CORE_LANGUAGES:
+                if get_uri_language(concept1) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} ~'.format(uri_prefix(concept1), relation), concept2)
                     )
-                if get_language(concept2) in CORE_LANGUAGES:
+                if get_uri_language(concept2) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} ~'.format(uri_prefix(concept2), relation), concept1)
                     )
             else:
-                if get_language(concept1) in CORE_LANGUAGES:
+                if get_uri_language(concept1) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('{} {} -'.format(uri_prefix(concept1), relation), concept2)
                     )
-                if get_language(concept2) in CORE_LANGUAGES:
+                if get_uri_language(concept2) in CORE_LANGUAGES:
                     feature_pairs.append(
                         ('- {} {}'.format(uri_prefix(concept2), relation), concept1)
                     )

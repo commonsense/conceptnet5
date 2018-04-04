@@ -8,10 +8,9 @@ from wordfreq import simple_tokenize
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
-    standardized_concept_uri, concept_uri, standardize_text, valid_concept_name
+    standardized_concept_uri, standardize_text, valid_concept_name
 )
 from conceptnet5.edges import make_edge
-from conceptnet5.language.english import english_filter
 from conceptnet5.language.lemmatize import lemmatize_uri
 from conceptnet5.uri import join_uri, Licenses
 
@@ -88,6 +87,7 @@ CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/mrt',
     '/s/contributor/omcs/humplik',
     '/s/contributor/omcs/mickh',
+    '/s/contributor/omcs/visionsofkaos',
 }
 CONCEPT_BLACKLIST = {
     # Too vague
@@ -112,7 +112,7 @@ ACTIVITY_BLACKLIST = {
     "response to picture",
     "response to diagram",
     "commons2_reject",
-    "globalmind",    # avoid double-counting with the GlobalMind reader
+    "globalmind",
     "pycommons/question"
 }
 
@@ -227,13 +227,10 @@ def build_relation(parts_dict):
     return relation
 
 
-# TODO: is this redundant with something in nodes.py?
 def filtered_uri(lang, text):
     if lang == 'en':
         text = filter_stopwords(text)
-        return concept_uri('en', standardize_text(text, english_filter))
-    else:
-        return standardized_concept_uri(lang, text)
+    return standardized_concept_uri(lang, text)
 
 
 def filter_stopwords(text):
@@ -317,8 +314,19 @@ def build_sources(parts_dict, preposition_fix=False):
     return sources
 
 
-# TODO: this doesn't need to be a class
 class CN4Builder(object):
+    def __init__(self, weight=1.):
+        """
+        Create a builder for processing a source of ConceptNet-4-style
+        assertions.
+
+        The optional parameter provides a weight multiplier, which will modify
+        the weight computed by `build_sources`. For example, this can be set
+        lower than 1 for GWAPs, where we don't necessarily trust that every edge
+        is a real assertion about common sense.
+        """
+        self.weight = weight
+
     def handle_assertion(self, parts_dict):
         """
         Process one assertion from ConceptNet 4, which appears in the input
@@ -374,7 +382,10 @@ class CN4Builder(object):
                     rel=relation, start=start, end=end,
                     dataset=dataset, license=Licenses.cc_attribution,
                     sources=[source_dict], surfaceText=frame_text,
-                    weight=weight
+
+                    # The edge weight is the weight computed by build_sources,
+                    # times the multiplier set on this instance
+                    weight=weight * self.weight
                 )
 
     def transform_file(self, input_filename, output_file):

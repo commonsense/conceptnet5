@@ -1,16 +1,13 @@
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.languages import ALL_LANGUAGES
+from conceptnet5.languages import ALL_LANGUAGES, valid_language
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses, uri_prefix
 import sqlite3
 import pathlib
 import os
-import re
 from collections import Counter
-import langcodes
-from langcodes.tag_parser import LanguageTagError
 
 
 PARSER_RULE = '/s/process/wikiparsec/1'
@@ -58,7 +55,7 @@ def prepare_db(inputs, dbfile):
                         # Use only Etymology 1 entries for learning word forms.
                         if (tfrom.get('etym') or '1') == '1':
                             language = tfrom.get('language', tto.get('language'))
-                            if language is not None and tfrom['text'] != tto['text']:
+                            if valid_language(language) and tfrom['text'] != tto['text']:
                                 add_form(
                                     db, file_language, language,
                                     tfrom['text'], pos, tto['text'], form_name
@@ -68,29 +65,16 @@ def prepare_db(inputs, dbfile):
         db.close()
 
 
-# A regex that simple language codes will match. This is not the complete
-# way that we check language codes, it's just a shortcut.
-ALPHA3_RE = re.compile(r'^[a-z][a-z][a-z]?$')
-
-
-def valid_language(code):
-    if not code or code == 'und' or '-pro' in code:
-        return False
-    if ALPHA3_RE.match(code):
-        return True
-    try:
-        lcode = langcodes.get(code)
-        return lcode.language is not None and len(lcode.language) <= 3
-    except LanguageTagError:
-        return False
-
-
 def make_tables(db):
-    db.execute("CREATE TABLE titles (id integer primary key, site_language text, language text, title text)")
-    db.execute("CREATE UNIQUE INDEX titles_uniq ON titles (site_language, language, title)")
+    db.execute("CREATE TABLE titles "
+               "(id integer primary key, site_language text, language text, "
+               "title text)")
+    db.execute("CREATE UNIQUE INDEX titles_uniq ON titles "
+               "(site_language, language, title)")
     db.execute("CREATE INDEX titles_search ON titles (language, title)")
-
-    db.execute("CREATE TABLE forms (id integer primary key, site_language text, language text, word text, pos text, root text, form text)")
+    db.execute("CREATE TABLE forms "
+               "(id integer primary key, site_language text, language text, "
+               "word text, pos text, root text, form text)")
     db.execute("CREATE INDEX forms_search ON forms (language, word)")
 
 
@@ -143,6 +127,15 @@ def transform_relation(rel):
 
 def transform_term(data_language, termdata, assumed_languages, db, use_etyms=True):
     text = termdata['text']
+
+    # Sometimes - is used to fill a slot in a Wiktionary template where the
+    # term would usually be. It typically means "don't show this part", with
+    # the implication "the term in question is obvious from context".
+    #
+    # Context is hard, so let's just cope with a hyphen as the term by
+    # discarding it.
+    if text == '-':
+        return None
     language = termdata.get('language')
     if language is None:
         language = disambiguate_language(text, assumed_languages, db)
@@ -262,13 +255,14 @@ def read_wiktionary(input_file, db_file, output_file):
         }
         word_languages = {wlang for (wlang, _) in all_etyms}
         for wlang in sorted(word_languages):
-            cpage = standardized_concept_uri(wlang, title)
-            ld_edge = make_edge(
-                '/r/ExternalURL', cpage, web_url,
-                dataset=dataset, weight=0.25, sources=[source],
-                license=Licenses.cc_sharealike
-            )
-            out.write(ld_edge)
+            if valid_language(wlang):
+                cpage = standardized_concept_uri(wlang, title)
+                ld_edge = make_edge(
+                    '/r/ExternalURL', cpage, web_url,
+                    dataset=dataset, weight=0.25, sources=[source],
+                    license=Licenses.cc_sharealike
+                )
+                out.write(ld_edge)
         etym_to_translation_sense = {}
         language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
         polysemous_languages = {

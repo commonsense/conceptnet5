@@ -20,6 +20,10 @@ USE_PRECOMPUTED = not os.environ.get("CONCEPTNET_REBUILD_PRECOMPUTED")
 # can be used as precomputed files later? (Requires ConceptNet S3 credentials.)
 UPLOAD = False
 
+# If USE_MORPHOLOGY is true, we will build and learn from sub-words derived
+# from Morfessor.
+USE_MORPHOLOGY = False
+
 # How many pieces to split edge files into. (Works best when it's a power of
 # 2 that's 64 or less.)
 N_PIECES = 16
@@ -27,38 +31,51 @@ N_PIECES = 16
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
-    'en': '20160305',
+    'en': '20171201',
     'fr': '20160305',
     'de': '20160407'
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
 
+# Languages where morphemes should not be split anywhere except at spaces
+ATOMIC_SPACE_LANGUAGES = {'vi'}
+
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
 EMOJI_LANGUAGES = [
-    'af', 'am', 'ar', 'as', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'cs', 'cy',
-    'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'es', 'es_419', 'et', 'eu',
-    'fa', 'fi', 'fil', 'fr', 'ga', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy',
-    'id', 'is', 'it', 'ja', 'ka', 'kk', 'km', 'kn', 'ko', 'ky', 'lo', 'lt',
-    'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'or', 'pa',
-    'pl', 'pt', 'pt_PT', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn',
-    'sv', 'sw', 'ta', 'te', 'th', 'tr', 'uk', 'ur', 'uz', 'vi', 'zh',
-    'zh_Hant', 'zu'
+    'af', 'am', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'chr', 'cs', 'cy', 'da',
+    'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA', 'en_GB', 'es', 'es_419', 'es_MX',
+    'es_US', 'et', 'eu', 'fa', 'fi', 'fil', 'fo', 'fr', 'fr_CA', 'ga', 'gd', 'gl', 'gu', 'he',
+    'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kab', 'kk', 'km', 'kn', 'ko', 'ky',
+    'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'nn', 'or', 'pa',
+    'pl', 'ps', 'pt', 'pt_PT', 'ro', 'ru', 'sd', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn', 'sv',
+    'sw', 'ta', 'te', 'th', 'tk', 'to', 'tr', 'uk', 'ur', 'uz', 'vi', 'yue', 'yue_Hans', 'zh',
+    'zh_Hant', 'zh_Hant_HK', 'zu'
 ]
 
 # Increment this number when we incompatibly change the parser
-WIKT_PARSER_VERSION = "1"
+WIKT_PARSER_VERSION = "2"
 
 RETROFIT_SHARDS = 6
 
-RAW_DATA_URL = "https://conceptnet.s3.amazonaws.com/raw-data/2016"
+# Dataset filenames
+# =================
+# The goal of reader steps is to produce Msgpack files, and later CSV files,
+# with these names.
+#
+# We distingish *core dataset names*, which collectively determine the set of
+# terms that ConceptNet will attempt to represent, from the additional datasets
+# that will mainly be used to find more information about those terms.
+
+
+RAW_DATA_URL = "https://zenodo.org/record/1165009/files/conceptnet-raw-data-5.6.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
 INPUT_EMBEDDINGS = [
-    'glove12-840B', 'w2v-google-news', 'fasttext-opensubtitles'
+    'crawl-300d-2M', 'w2v-google-news', 'glove12-840B', 'fasttext-opensubtitles'
 ]
 SOURCE_EMBEDDING_ROWS = 1500000
 MULTILINGUAL_SOURCE_EMBEDDING_ROWS = 2000000
@@ -81,16 +98,6 @@ if TESTMODE:
     EMOJI_LANGUAGES = ['en', 'en_001']
 
 
-# Dataset filenames
-# =================
-# The goal of reader steps is to produce Msgpack files, and later CSV files,
-# with these names.
-#
-# We distingish *core dataset names*, which collectively determine the set of
-# terms that ConceptNet will attempt to represent, from the additional datasets
-# that will mainly be used to find more information about those terms.
-
-
 CORE_DATASET_NAMES = [
     "jmdict/jmdict",
     "nadya/nadya",
@@ -107,7 +114,8 @@ CORE_DATASET_NAMES += ["emoji/{}".format(lang) for lang in EMOJI_LANGUAGES]
 
 
 DATASET_NAMES = CORE_DATASET_NAMES + ["dbpedia/dbpedia_en"]
-DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
+if USE_MORPHOLOGY:
+    DATASET_NAMES += ["morphology/subwords-{}".format(lang) for lang in COMMON_LANGUAGES]
 
 
 rule all:
@@ -145,9 +153,9 @@ rule webdata:
 
 rule clean:
     shell:
-        "for subdir in assertions assoc collated db edges psql tmp vectors stats; "
-        "do echo Removing %(data)s/$subdir; "
-        "rm -rf %(data)s/$subdir; done" % {'data': DATA}
+        "for subdir in assertions assoc collated db edges morph psql tmp vectors stats; "
+        "do echo Removing {DATA}/$subdir; "
+        "rm -rf {DATA}/$subdir; done"
 
 rule test:
     input:
@@ -159,11 +167,38 @@ rule test:
 
 # Downloaders
 # ===========
-rule download_raw:
+rule download_raw_package:
+    output:
+        DATA + "/raw/conceptnet-raw-data-5.6.zip"
+    shell:
+        "wget -nv {RAW_DATA_URL} -O {output}"
+
+# Get emoji data directly from Unicode CLDR
+rule download_unicode_data:
+    output:
+        DATA + "/raw/cldr-common-32.0.1.zip"
+    shell:
+        "wget -nv http://unicode.org/Public/cldr/32.0.1/cldr-common-32.0.1.zip -O {output}"
+
+rule extract_raw:
+    input:
+        DATA + "/raw/conceptnet-raw-data-5.6.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
-        "wget -nv {RAW_DATA_URL}/{wildcards.dirname}/{wildcards.filename} -O {output}"
+        "unzip {input} raw/{wildcards.dirname}/{wildcards.filename} -d {DATA}"
+
+# This rule takes precedence over extract_raw, extracting the emoji data from
+# the Unicode CLDR zip file.
+rule extract_emoji_data:
+    input:
+        DATA + "/raw/cldr-common-32.0.1.zip"
+    output:
+        DATA + "/raw/emoji/{filename}"
+    shell:
+        # The -j option strips the path from the file we're extracting, so
+        # we can use -d to put it in exactly the path we need.
+        "unzip -j {input} common/annotations/{wildcards.filename} -d {DATA}/raw/emoji"
 
 rule download_conceptnet_ppmi:
     output:
@@ -246,9 +281,9 @@ rule read_dbpedia:
     output:
         DATA + "/edges/dbpedia/dbpedia_en.msgpack",
     shell:
-        "cn5-read dbpedia %(data)s/raw/dbpedia "
+        "cn5-read dbpedia {DATA}/raw/dbpedia "
         "{output} "
-        "%(data)s/stats/core_concepts.txt " % {'data': DATA}
+        "{DATA}/stats/core_concepts.txt "
 
 rule read_jmdict:
     input:
@@ -260,7 +295,7 @@ rule read_jmdict:
 
 rule read_nadya:
     input:
-        DATA + "/raw/nadya/nadya-2014.csv"
+        DATA + "/raw/nadya/nadya-2017.csv"
     output:
         DATA + "/edges/nadya/nadya.msgpack"
     shell:
@@ -300,9 +335,9 @@ rule prescan_wiktionary:
     output:
         DATA + "/db/wiktionary.db"
     shell:
-        "mkdir -p %(data)s/tmp && "
-        "cn5-read wiktionary_pre {input} %(data)s/tmp/wiktionary.db && "
-        "mv %(data)s/tmp/wiktionary.db {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && "
+        "cn5-read wiktionary_pre {input} {DATA}/tmp/wiktionary.db && "
+        "mv {DATA}/tmp/wiktionary.db {output}"
 
 rule read_wiktionary:
     input:
@@ -363,7 +398,7 @@ rule sort_edges:
     output:
         DATA + "/collated/sorted/edges.csv"
     shell:
-        "mkdir -p %(data)s/tmp && cat {input} | LC_ALL=C sort -T %(data)s/tmp | LC_ALL=C uniq > {output}" % {'data': DATA}
+        "mkdir -p {DATA}/tmp && cat {input} | LC_ALL=C sort -T {DATA}/tmp | LC_ALL=C uniq > {output}"
 
 rule combine_assertions:
     input:
@@ -388,7 +423,7 @@ rule prepare_db:
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     shell:
-        "cn5-db prepare_data {input} %(data)s/psql" % {'data': DATA}
+        "cn5-db prepare_data {input} {DATA}/psql"
 
 rule gzip_db:
     input:
@@ -410,7 +445,7 @@ rule load_db:
     output:
         DATA + "/psql/done"
     shell:
-        "cn5-db load_data %(data)s/psql && touch {output}" % {'data': DATA}
+        "cn5-db load_data {DATA}/psql && touch {output}"
 
 
 # Collecting statistics
@@ -567,6 +602,16 @@ rule convert_glove:
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
 
+rule convert_fasttext_crawl:
+    input:
+        DATA + "/raw/vectors/crawl-300d-2M.vec.gz"
+    output:
+        DATA + "/vectors/crawl-300d-2M.h5"
+    resources:
+        ram=24
+    shell:
+        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+
 rule convert_fasttext:
     input:
         DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz"
@@ -618,11 +663,11 @@ rule retrofit:
         DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
-        expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS))
+        temp(expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS)))
     resources:
-        ram=16
+        ram=24
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} %(data)s/vectors/{wildcards.name}-retrofit.h5" % {'data': DATA}
+        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -733,7 +778,7 @@ rule compare_embeddings:
     run:
         input_embeddings = input[:-2]
         input_embeddings_str = ' '.join(input_embeddings)
-        shell("cn5-vectors compare_embeddings %s {output}" % input_embeddings_str)
+        shell("cn5-vectors compare_embeddings {input_embeddings_str} {output}")
 
 rule comparison_graph:
     input:
@@ -745,4 +790,4 @@ rule comparison_graph:
 
 
 ruleorder:
-    join_retrofit > convert_polyglot
+    join_retrofit > convert_polyglot > extract_emoji_data > extract_raw

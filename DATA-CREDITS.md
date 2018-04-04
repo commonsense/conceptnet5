@@ -23,7 +23,8 @@ To give credit to ConceptNet, we suggest this text:
 
     The included data was created by contributors to Commonsense Computing
     projects, contributors to Wikimedia projects, Games with a Purpose,
-    Princeton University's WordNet, DBPedia, and Cycorp's OpenCyc.
+    Princeton University's WordNet, DBPedia, Unicode, Jim Breen, MDBG, and
+    Cycorp's OpenCyc.
 
 
 ## Credits and acknowledgements
@@ -55,7 +56,9 @@ Significant amounts of data were imported from:
 * Luis von Ahn's "Games with a Purpose"
 * DBPedia
 * OpenCyc
+* CC-CEDict, by MDBG
 * JMDict, by Jim Breen
+* Unicode CLDR
 
 Here is a short, incomplete list of people who have made significant
 contributions to the development of ConceptNet as a data resource, roughly in
@@ -143,7 +146,7 @@ a Purpose", is used and released under ConceptNet's license, by permission from
 Luis von Ahn and Harshit Surana.
 
 
-## Multilingual dictionaries
+### Multilingual dictionaries
 
 We import data from [CEDict][] and [JMDict][], both of which are available
 under the [Creative Commons Attribution-ShareAlike license][CC-By-SA-3].
@@ -159,3 +162,32 @@ under a [Creative Commons Attribution 3.0 license][CC-By-3].
 
 [opencyc-license]: http://www.cyc.com/documentation/opencyc-license/
 [CC-By-3]: http://creativecommons.org/licenses/by/3.0/
+
+
+### Unicode CLDR
+
+We use information from the Unicode Common Language Data Runtime, particularly
+to align words in a variety of languages via the descriptions of emoji.
+The [Unicode License Agreement][unicode-license] for data files is a permissive
+license very similar to the MIT license.
+
+
+## Distributional word embeddings
+
+ConceptNet takes input from these sources of distributional word embeddings:
+
+### GloVe
+
+Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. GloVe: Global Vectors for Word Representation.
+https://nlp.stanford.edu/projects/glove/
+
+### word2vec
+
+Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. Efficient Estimation of Word Representations in Vector Space.
+In Computing Research Repository. http://dblp.org/rec/bib/journals/corr/abs-1301-3781
+
+### fastText
+
+Piotr Bojanowski, Edouard Grave, Armand Joulin, and Tomas Mikolov. 2016. Enriching Word Vectors with Subword Information.
+http://fasttext.cc
+

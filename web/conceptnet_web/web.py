@@ -5,29 +5,34 @@ from conceptnet_web import responses
 from conceptnet_web.filters import FILTERS
 from conceptnet_web.relations import REL_HEADINGS
 from conceptnet_web.responses import VALID_KEYS
+from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet5.uri import split_uri
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
+
 import flask
 from flask_limiter import Limiter
-from raven.contrib.flask import Sentry
-import logging
 import os
 
 
 # Configuration
-app = flask.Flask('conceptnet5_web')
-STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(app.root_path, 'static'))
-TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(app.root_path, 'templates'))
+app = flask.Flask('conceptnet_web')
+
+
+def app_path(path):
+    """
+    Get a path next to the Flask app directory, where static files and
+    templates may be.
+    """
+    return os.path.join(os.path.dirname(app.root_path), path)
+
+
 app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
 
-app.config.update({
-    'template_folder': TEMPLATE_PATH,
-    'static_folder': STATIC_PATH
-})
 for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
+try_configuring_sentry(app)
 application = app  # for uWSGI
 
 
@@ -176,10 +181,17 @@ def error_page_not_found(e):
         404, "%r isn't a URL that we understand." % flask.request.path
     )
 
-
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_error(500, '%s: %s' % (e.__class__.__name__, e))
+
+
+# Visiting this URL intentionally causes an error, so we can see if Sentry
+# is working. It has a silly name instead of just 'error' to decrease the
+# probability of it being accidentally crawled.
+@app.route('/i-am-error')
+def fake_error():
+    raise Exception("Fake error for testing")
 
 
 def render_error(status, details):
@@ -195,11 +207,3 @@ if __name__ == '__main__':
     app.debug = True
     app.run('127.0.0.1', debug=True, port=8084)
 
-
-if not app.debug:
-    # Error logging configuration -- requires SENTRY_DSN to be set to a valid
-    # Sentry client key
-    if os.environ.get('SENTRY_DSN'):
-        sentry = Sentry(app, logging=True, level=logging.ERROR)
-    else:
-        sentry = None

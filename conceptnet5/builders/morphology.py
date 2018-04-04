@@ -1,13 +1,27 @@
-import click
-from conceptnet5.nodes import get_uri_language, split_uri
-from conceptnet5.languages import ATOMIC_SPACE_LANGUAGES
-from conceptnet5.edges import make_edge
-from conceptnet5.uri import join_uri, Licenses
 from collections import defaultdict
+
+from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.languages import ATOMIC_SPACE_LANGUAGES
+from conceptnet5.nodes import split_uri
+from conceptnet5.uri import get_uri_language, join_uri, Licenses
 
 
 def prepare_vocab_for_morphology(language, input, output):
+    """
+    Morfessor's input is a list of terms with their counts. Here, we
+    read a ConceptNet vocabulary file with counts (core_concept_counts.txt),
+    filter it for a single language, and convert it into the input form that
+    Morfessor expects.
+
+    We're stripping out the word sense information here, which would cause
+    the same term to appear multiple times. Because of that, we build up
+    a new dictionary of counts, summing all occurrences of a term.
+
+    We use _ to represent all spaces. In languages where the space-separated
+    segments are atomic (Vietnamese), we use _ to represent the locations where
+    subwords are allowed to end, and thus add _ to the end of the term as well.
+    """
     vocab_counts = defaultdict(int)
     for line in input:
         countstr, uri = line.strip().split(' ', 1)
@@ -41,8 +55,8 @@ def subwords_to_edges(language, input, output):
 
         # Strip a possible trailing underscore, which would particularly show
         # up in the way we segment ATOMIC_SPACE_LANGUAGES (Vietnamese)
-        slug = ''.join(chunks).strip('_')
-        end = join_uri('c', language, slug)
+        full_text = ''.join(chunks).strip('_')
+        end = join_uri('c', language, full_text)
         for chunk in chunks:
             if chunk != '_':
                 start = join_uri('x', language, chunk.strip('_'))
@@ -51,7 +65,7 @@ def subwords_to_edges(language, input, output):
                     dataset='/d/morphology',
                     license=Licenses.cc_attribution,
                     sources=MORPH_SOURCES,
-                    weight=0.1
+                    weight=0.01
                 )
                 writer.write(edge)
     writer.close()

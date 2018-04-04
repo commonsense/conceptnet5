@@ -7,8 +7,7 @@ from sklearn.preprocessing import normalize
 from wordfreq import word_frequency
 
 from conceptnet5.language.lemmatize import lemmatize_uri
-from conceptnet5.nodes import uri_to_label
-from conceptnet5.uri import uri_prefix, get_language
+from conceptnet5.uri import get_uri_language, uri_prefix, uri_to_label
 from conceptnet5.vectors import standardized_uri, similar_to_vec, get_vector, cosine_similarity
 
 
@@ -21,7 +20,7 @@ def standardize_row_labels(frame, language='en', forms=True):
     URI get combined, with earlier rows given more weight.
     """
     # Check for en/term format we use to train fastText on OpenSubtitles data
-    if all(label.count('/') == 1 for label in frame.index[10:20]):
+    if all(label.count('/') == 1 for label in frame.index[0:5]):
         tuples = [label.partition('/') for label in frame.index]
         frame.index = [uri_prefix(standardized_uri(language, text))
                        for language, _slash, text in tuples]
@@ -70,8 +69,12 @@ def l2_normalize_rows(frame):
     L_2-normalize the rows of this DataFrame, so their lengths in Euclidean
     distance are all 1. This enables cosine similarities to be computed as
     dot-products between these rows.
-    DataFrame of zeros will be normalized to zeros.
+
+    Rows of zeroes will be normalized to zeroes, and frames with no rows will
+    be returned as-is.
     """
+    if frame.shape[0] == 0:
+        return frame
     index = frame.index
     return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
 
@@ -172,7 +175,7 @@ def make_big_frame(frame, language):
      Choose the vocabulary for the big frame and make the big frame. Eliminate the terms which
      are in languages other than the language specified.
     """
-    vocabulary = [term for term in frame.index if get_language(term) == language]
+    vocabulary = [term for term in frame.index if get_uri_language(term) == language]
     big_frame = frame.ix[vocabulary]
     return big_frame
 

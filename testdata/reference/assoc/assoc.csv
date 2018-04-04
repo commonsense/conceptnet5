@@ -1,8 +1,8 @@
 /c/ar/التعليم_في_الولايات_المتحدة	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
-/c/ar/تَجْرِبَة/n	/c/ar/تَجْرِبَة	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ar/تَجْرِبَة/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
-/c/ar/فَحْص/n	/c/ar/فَحْص	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ar/فَحْص/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
+/c/ar/تجربة/n	/c/ar/تجربة	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/ar/تجربة/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
+/c/ar/فحص/n	/c/ar/فحص	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/ar/فحص/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
 /c/az/abş_da_təhsil_sistemi	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/ca/assaig/n	/c/ca/assaig	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ca/assaig/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
@@ -170,8 +170,7 @@
 /c/en/test/n	/c/ru/испытание	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/ru/проба	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/ru/тест	1.0	/d/wiktionary/en	/r/Synonym
-/c/en/test/n	/c/sh/test	1.0	/d/wiktionary/en	/r/Synonym
-/c/en/test/n	/c/sh/тест	1.0	/d/wiktionary/en	/r/Synonym
+/c/en/test/n	/c/sh/test	2.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sl/preizkus	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sl/preizkušnja	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test/n	/c/sq/prova	1.0	/d/wiktionary/en	/r/Synonym
@@ -349,8 +348,8 @@
 /c/it/test/n	/c/it/test	1.0	/d/wiktionary/en	/r/SenseOf
 /c/it/test/n	/c/it/test	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ja/アメリカ_合衆国の教育	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
-/c/ja/テスト	/c/ja/勉強	2.0	/d/conceptnet/4/ja	/r/HasPrerequisite
-/c/ja/テスト	/c/ja/名前を書くこと	3.4641016151377544	/d/conceptnet/4/ja	/r/HasSubevent
+/c/ja/テスト	/c/ja/勉強	0.20000000000000018	/d/conceptnet/4/ja	/r/HasPrerequisite
+/c/ja/テスト	/c/ja/名前を書くこと	0.3999999999999999	/d/conceptnet/4/ja	/r/HasSubevent
 /c/ja/テスト/n	/c/de/probe	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト/n	/c/de/prüfung	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト/n	/c/de/quiz	2.0	/d/jmdict	/r/Synonym

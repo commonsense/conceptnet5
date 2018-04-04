@@ -309,18 +309,73 @@ def assertion_uri(rel, start, end):
 
 
 def is_concept(uri):
+    """
+    >>> is_concept('/c/sv/klänning')
+    True
+    >>> is_concept('/x/en/ly')
+    False
+    >>> is_concept('/a/[/r/Synonym/,/c/ro/funcția_beta/,/c/en/beta_function/]')
+    False
+    """
     return uri.startswith('/c/')
 
 
+def is_term(uri):
+    """
+    >>> is_term('/c/sv/kostym')
+    True
+    >>> is_term('/x/en/ify')
+    True
+    >>> is_term('/a/[/r/RelatedTo/,/c/en/cake/,/c/en/flavor/]')
+    False
+    """
+    return uri.startswith('/c/') or uri.startswith('/x/')
+
+
 def is_absolute_url(uri):
-    # We have URLs pointing to Creative Commons licenses, starting with 'cc:',
-    # which for Linked Data purposes are absolute URLs because they'll be
-    # resolved into full URLs.
+    """
+    We have URLs pointing to Creative Commons licenses, starting with 'cc:', which for Linked
+    Data purposes are absolute URLs because they'll be resolved into full URLs.
+    >>> is_absolute_url('http://fr.wiktionary.org/wiki/mįkká’e_uxpáðe')
+    True
+    >>> is_absolute_url('/c/fr/nouveau')
+    False
+    """
     return uri.startswith('http') or uri.startswith('cc:')
 
 
-def get_language(uri):
-    return uri.split('/')[2]
+def get_uri_language(uri):
+    """
+    Extract the language from a concept URI. If the URI points to an assertion,
+    get the language of its first concept.
+    >>> get_uri_language('/a/[/r/RelatedTo/,/c/en/orchestra/,/c/en/symphony/]')
+    'en'
+    >>> get_uri_language('/c/pl/cześć')
+    'pl'
+    >>> get_uri_language('/x/en/able')
+    'en'
+    """
+    if uri.startswith('/a/'):
+        return get_uri_language(parse_possible_compound_uri('a', uri)[1])
+    elif is_term(uri):
+        return split_uri(uri)[1]
+    else:
+        return None
+
+
+def uri_to_label(uri):
+    """
+    Convert a ConceptNet uri into a label to be used in nodes. This
+    function replaces an underscore with a space, so while '/c/en/example' will be converted into
+    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+    >>> uri_to_label('/c/en/example')
+    'example'
+    >>> uri_to_label('/c/en/canary_islands')
+    'canary islands'
+    """
+    if is_term(uri):
+        uri = uri_prefix(uri)
+    return uri.split('/')[-1].replace('_', ' ')
 
 
 class Licenses:

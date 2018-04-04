@@ -5,29 +5,33 @@ from conceptnet_web.json_rendering import jsonify, highlight_and_link_json
 from conceptnet_web import responses
 from conceptnet_web.responses import VALID_KEYS, error
 from conceptnet_web.filters import FILTERS
+from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet5.nodes import standardized_concept_uri
+
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
-from raven.contrib.flask import Sentry
-import logging
 import os
-# TODO: vector wrapper
 
 
 # Configuration
 
-WORKING_DIR = os.getcwd()
-STATIC_PATH = os.environ.get('CONCEPTNET_WEB_STATIC', os.path.join(WORKING_DIR, 'static'))
-TEMPLATE_PATH = os.environ.get('CONCEPTNET_WEB_TEMPLATES', os.path.join(WORKING_DIR, 'templates'))
+app = flask.Flask('conceptnet_web')
 
-app = flask.Flask(
-    'conceptnet5',
-    template_folder=TEMPLATE_PATH,
-    static_folder=STATIC_PATH
-)
-app.config['JSON_AS_ASCII'] = False
+
+def app_path(path):
+    """
+    Get a path next to the Flask app directory, where static files and
+    templates may be.
+    """
+    return os.path.join(os.path.dirname(app.root_path), path)
+
+
 app.config['RATELIMIT_ENABLED'] = os.environ.get('CONCEPTNET_RATE_LIMITING') == '1'
+
+app.config.update({
+    'JSON_AS_ASCII': False
+})
 
 
 for filter_name, filter_func in FILTERS.items():
@@ -35,6 +39,7 @@ for filter_name, filter_func in FILTERS.items():
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
+try_configuring_sentry(app)
 application = app  # for uWSGI
 
 
@@ -148,6 +153,14 @@ def internal_server_error(e):
     )
 
 
+# Visiting this URL intentionally causes an error, so we can see if Sentry
+# is working. It has a silly name instead of just 'error' to decrease the
+# probability of it being accidentally crawled.
+@app.route('/i-am-error')
+def fake_error():
+    raise Exception("Fake error for testing")
+
+
 def render_error(status, details):
     return jsonify(error({}, status=status, details=details), status=status)
 
@@ -155,12 +168,3 @@ def render_error(status, details):
 if __name__ == '__main__':
     app.debug = True
     app.run('127.0.0.1', debug=True, port=8084)
-
-
-if not app.debug:
-    # Error logging configuration -- requires SENTRY_DSN to be set to a valid
-    # Sentry client key
-    if os.environ.get('SENTRY_DSN'):
-        sentry = Sentry(app, logging=True, level=logging.ERROR)
-    else:
-        sentry = None

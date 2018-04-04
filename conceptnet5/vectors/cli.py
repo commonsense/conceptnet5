@@ -16,7 +16,10 @@ from .merge import merge_intersect
 from .miniaturize import miniaturize
 from .query import VectorSpaceWrapper
 from .retrofit import sharded_retrofit, join_shards
-from .transforms import make_big_frame, make_small_frame, make_replacements_faster, save_replacements
+from .transforms import (
+    make_big_frame, make_small_frame, make_replacements_faster,
+    save_replacements
+)
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -266,7 +269,8 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 @click.option('-l', '--language', default='en')
 @click.option('--tree-depth', default=1000)
 @click.option('-v', '--verbose', is_flag=True)
-def export_background(input_filename, output_dir, concepts_filename, language, tree_depth, verbose):
+def export_background(input_filename, output_dir, concepts_filename, language,
+                      tree_depth, verbose):
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
     small_frame = make_small_frame(big_frame, concepts_filename, language)
@@ -285,4 +289,3 @@ def export_background(input_filename, output_dir, concepts_filename, language, t
     # save sigma matrix
     sigma_filename = path.join(output_dir, 'sigma.npy'.format(language))
     save_npy(np.ones(small_frame.shape[1]), sigma_filename)
-
