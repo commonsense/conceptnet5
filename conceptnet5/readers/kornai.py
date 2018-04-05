@@ -12,6 +12,8 @@ Kornai explains his motivation and his representation in his paper
 "Competence in Lexical Semantics": http://www.aclweb.org/anthology/S15-1019
 """
 import tatsu
+from conceptnet5.nodes import standardized_concept_uri, topic_to_concept
+from conceptnet5.language.hungarian import decode_prószéky
 
 GRAMMAR = """
 start = definition $ ;
@@ -23,7 +25,7 @@ encyclopedic_identifier = '@' name:/[-_()A-Za-z0-9]/ ;
 binary_identifier = /[_A-Z0-9]+/ ;
 disambig = '/' @:/[0-9]+/ ;
 
-unary_p = name:(unary_identifier | unary_deep_identifier | encyclopedic_identifier | default_unary | unary_prime) [ num:disambig ] ;
+unary_p = (name:(unary_identifier | unary_deep_identifier | encyclopedic_identifier | unary_prime) [ num:disambig ] | defa:default_unary) ;
 binary_p = name:binary_identifier [ num:disambig ] ;
 
 unary_expr = unary_paren_arg | unary_bracket_arg | unary_p ;
@@ -35,7 +37,7 @@ binary_full = left:expression func:binary_p right:expression ;
 binary_left_curry = left:expression func:binary_p ;
 binary_right_curry = func:binary_p right:expression ;
 
-default_unary = '<' @:unary_identifier '>' ;
+default_unary = '<' @:unary_p '>' ;
 default_expr = '<' @:expression '>' ;
 bracket_expr = '[' @:definition ']' ;
 
@@ -56,7 +58,10 @@ class KornaiNotationSemantics:
         return '@' + ast['name']
 
     def unary_p(self, ast):
-        return KornaiValue(ast['name'], ast['num'])
+        if 'defa' in ast:
+            return ast['defa']
+        else:
+            return KornaiValue(ast['name'], ast['num'])
 
     def binary_p(self, ast):
         return KornaiValue(ast['name'], ast['num'], arity=2)
@@ -208,9 +213,156 @@ class KornaiValue:
             )
 
 
+class Vocabulary:
+    NAMES_TO_CONCEPTNET_RELATIONS = {
+        'ABOUT': '/r/HasContext',
+        'AT': '/r/LocatedNear',
+        'CAUSE': '/r/Causes',
+        'CONTAIN': '/r/HasA',
+        'FOR': '/r/UsedFor',
+        'FROM': '/r/RelatedTo',
+        'HAS': '/r/HasA',
+        'IN': '/r/AtLocation',
+        'INSTRUMENT': '/r/UsedFor/rev',
+        'IS_A': '/r/IsA',
+        'LEAD': '/r/ControlledBy/rev',
+        'MAKE': '/r/CreatedBy/rev',
+        'MEMBER': '/r/PartOf',
+        'NEXT_TO': '/r/LocatedNear',
+        'PART_OF': '/r/PartOf',
+        'RESEMBLE': '/r/SimilarTo',
+        'WANT': '/r/CausesDesire',
+        # 'after': '/r/HasPrerequisite/rev',
+        'can': '/r/CapableOf',   # needs to be can/1246
+        'before': '/r/HasPrerequisite',
+        'lack': '/r/Antonym'
+    }
+
+    POS_MAP = {
+        'N': 'n',
+        'V': 'v',
+        'U': 'v',
+        'A': 'a',
+        'D': 'r'
+    }
+
+    def __init__(self):
+        self.name_to_num = {}
+        self.num_to_entry = {}
+
+    def add_line(self, line):
+        text_en, text_hu, text_la, text_pl, num, _, pos, definition = line.split('\t')[:8]
+        if num == '#':
+            return
+        num = int(num)
+        entry = {
+            'name': {
+                'en': text_en,
+                'hu': text_hu,
+                'la': text_la,
+                'pl': text_pl,
+            },
+            'num': num,
+            'pos': pos,
+            'definition': definition,
+            'value': KornaiValue(text_en, num)
+        }
+        self.name_to_num.setdefault(text_en, []).append(num)
+        self.num_to_entry[num] = entry
+        return entry['value']
+
+    def get_entry(self, value):
+        name = value.name
+        num = value.num
+        if num is not None:
+            return self.num_to_entry[num]
+        else:
+            nums = self.name_to_num.get(name, [])
+            if len(nums) == 0:
+                # print("Missing entry: %r" % name)
+                return None
+            elif len(nums) > 1:
+                # print("Ambiguous entry: %r" % name)
+                return self.num_to_entry[nums[0]]
+            else:
+                return self.num_to_entry[nums[0]]
+
+    def value_to_conceptnet_term(self, value, lang='en'):
+        if value.arity == 2 or value.name.startswith('='):
+            return None
+        if value.name == "'":
+            return None
+        if value.name.startswith('@'):
+            return topic_to_concept(value.name)
+
+        arg = value.args[0]
+        if arg is not None:
+            # This is often an adjective-noun phrase, such as four(leg),
+            # and the key information is usually on the inside
+            return self.value_to_conceptnet_term(arg)
+
+        entry = self.get_entry(value)
+        if entry is not None:
+            pos = self.POS_MAP.get(entry['pos'], '_')
+            text = entry['name'][lang]
+            if lang == 'hu' or lang == 'pl':
+                text = decode_prószéky(text, lang)
+            return standardized_concept_uri(lang, text, pos, '4lang', str(entry['num']))
+
+        return None
+
+    def interpret_definition(self, num, lang='en'):
+        term_info = self.num_to_entry[num]
+        definition = term_info['definition']
+        if not definition:
+            return []
+        term = self.value_to_conceptnet_term(term_info['value'])
+        edges = []
+        for fact in term_info['value'].complete(parse(definition)):
+            if fact.arity == 1:
+                if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0]:
+                    obj = self.value_to_conceptnet_term(fact.args[0], lang)
+                    rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
+                    if rel and obj:
+                        edges.append((rel, term, obj))
+                else:
+                    # this is an IsA, entailment, or property
+                    obj = self.value_to_conceptnet_term(fact, lang)
+                    entry = self.get_entry(fact)
+                    if entry and term and obj:
+                        if entry['pos'] == 'n':
+                            edges.append(('/r/IsA', term, obj))
+                        elif entry['pos'] == 'v':
+                            edges.append(('/r/Entails', term, obj))
+                        elif entry['pos'] == 'a':
+                            edges.append(('/r/HasProperty', term, obj))
+            else:
+                if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0] and fact.args[1]:
+                    subj = self.value_to_conceptnet_term(fact.args[0], lang)
+                    obj = self.value_to_conceptnet_term(fact.args[1], lang)
+                    rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
+                    if subj and obj and rel:
+                        edges.append((rel, subj, obj))
+        return edges
+
+    def read_file(self, filename):
+        for line in open(filename):
+            print(self.add_line(line))
+
+        for num in sorted(self.num_to_entry):
+            for lang in ('en', 'hu', 'la', 'pl'):
+                for edge in self.interpret_definition(num, lang):
+                    print(edge)
+
+
 MODEL = tatsu.compile(GRAMMAR)
 SEMANTICS = KornaiNotationSemantics()
 
 
 def parse(definition, **kwargs):
     return MODEL.parse(definition, semantics=SEMANTICS, **kwargs)
+
+
+if __name__ == '__main__':
+    vocab = Vocabulary()
+    vocab.read_file('/home/rspeer/corpus/4lang.txt')
