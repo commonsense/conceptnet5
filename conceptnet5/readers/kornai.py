@@ -13,19 +13,54 @@ Kornai explains his motivation and his representation in his paper
 """
 import tatsu
 from conceptnet5.nodes import standardized_concept_uri, topic_to_concept
+from conceptnet5.uri import Licenses, split_uri
 from conceptnet5.language.hungarian import decode_prószéky
+from conceptnet5.edges import make_edge
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+
+# We'll be parsing this grammar using TatSu, a Python library for packrat
+# parsing. (It's the followup to Grako.) The optimal way to use TatSu is to
+# generate a standalone parser module from a grammar, but it also contains
+# a mode where you can simply interpret a grammar on the fly.
+#
+# This is much slower, but the file we need to parse is not large, so we'll
+# do it the simple and slow way for readability and maintainability.
 
 GRAMMAR = """
+# This parser is designed to parse one definition at a time, as found in the
+# 'definition' field of the 4lang file.
 start = definition $ ;
+
+# The 4lang conventions are that unary nodes are:
+# - ordinary terms written in lowercase
+# - "deep identifiers" that refer to something by its semantic role, written
+#   like =AGT (we don't handle these)
+# - A single apostrophe, meaning "something"
+# - An @ sign followed by a Wikipedia article name, with underscores in place
+#   of spaces, referring to the entity the article is about
+#
+# A problem with Wikipedia article names is that one of them that's used in
+# the file, "@Java_(programming_language)", contains unescaped parentheses
+# that seem to be indistinguishable from parentheses used in syntax. I think
+# we'll just parse this one wrong.
+#
+# Binary nodes are written in capital letters, possibly with digits and
+# underscores.
+#
+# Either kind of node can be followed by a / and an ID number, disambiguating
+# nodes that have the same name by their ID.
 
 unary_identifier = /[-_#a-z0-9]+/ ;
 unary_prime = "'" ;
 unary_deep_identifier = '=' name:/[A-Z_]+/ ;
-encyclopedic_identifier = '@' name:/[-_()A-Za-z0-9]/ ;
-binary_identifier = /[_A-Z0-9]+/ ;
+encyclopedic_identifier = '@' name:/[-_A-Za-z0-9]+/ ;
+binary_identifier = /[A-Z][_A-Z0-9]*/ ;
 disambig = '/' @:/[0-9]+/ ;
 
-unary_p = (name:(unary_identifier | unary_deep_identifier | encyclopedic_identifier | unary_prime) [ num:disambig ] | defa:default_unary) ;
+unary_p = (
+    name:(unary_identifier | unary_deep_identifier | encyclopedic_identifier | unary_prime) [ num:disambig ]
+    | defa:default_unary
+) ;
 binary_p = name:binary_identifier [ num:disambig ] ;
 
 unary_expr = unary_paren_arg | unary_bracket_arg | unary_p ;
@@ -158,16 +193,17 @@ class KornaiValue:
         which have an unspecified argument.
 
         We 'complete' the definition by taking a value (which is `self`) and
-        filling it in as the unspecified argument of each fact, and also
+        filling it in as the unspecified argument of each binary fact, and also
         filling what we can of the 'specifiers' that come with those facts.
+
+        Filling in unary facts seems like it would make sense, but actually
+        messes up the things we want to understand about entailment. This will
+        instead happen in Vocabulary.interpret_definition.
         """
         completed = []
         for fact in facts:
             if fact.arity == 1:
-                if fact.args[0] is None:
-                    completed.append(fact.apply(self))
-                else:
-                    completed.append(fact)
+                completed.append(fact)
             elif fact.arity == 2:
                 left, right = fact.args
                 if left is None:
@@ -216,7 +252,9 @@ class KornaiValue:
 class Vocabulary:
     NAMES_TO_CONCEPTNET_RELATIONS = {
         'ABOUT': '/r/HasContext',
-        'AT': '/r/LocatedNear',
+        # I don't think we can cover all the metaphorical uses of 'AT' in
+        # this data with one relation
+        'AT': '/r/RelatedTo',
         'CAUSE': '/r/Causes',
         'CONTAIN': '/r/HasA',
         'FOR': '/r/UsedFor',
@@ -229,12 +267,14 @@ class Vocabulary:
         'MAKE': '/r/CreatedBy/rev',
         'MEMBER': '/r/PartOf',
         'NEXT_TO': '/r/LocatedNear',
+        'ON': '/r/AtLocation',
         'PART_OF': '/r/PartOf',
         'RESEMBLE': '/r/SimilarTo',
         'WANT': '/r/CausesDesire',
         # 'after': '/r/HasPrerequisite/rev',
         'can': '/r/CapableOf',   # needs to be can/1246
         'before': '/r/HasPrerequisite',
+        'after': '/r/RelatedTo',  # 'after' is messy
         'lack': '/r/Antonym'
     }
 
@@ -250,20 +290,33 @@ class Vocabulary:
         self.name_to_num = {}
         self.num_to_entry = {}
 
+        # We would like to assign IDs to some late entries to the 4lang file
+        # that lack them. 10000 is comfortably above any ID in use.
+        self.unique_id = 10000
+
+    def read_label(self, text):
+        if text == '#' or text == 'N/A' or text == 'NA' or text.startswith('-') or text.endswith('-'):
+            return []
+        else:
+            return text.split('/')
+
     def add_line(self, line):
         text_en, text_hu, text_la, text_pl, num, _, pos, definition = line.split('\t')[:8]
         if num == '#':
-            return
-        num = int(num)
+            num = self.unique_id
+            self.unique_id += 1
+        else:
+            num = int(num)
         entry = {
-            'name': {
-                'en': text_en,
-                'hu': text_hu,
-                'la': text_la,
-                'pl': text_pl,
+            'names': {
+                # There's only one English label per term
+                'en': [text_en],
+                'hu': self.read_label(text_hu),
+                'la': self.read_label(text_la),
+                'pl': self.read_label(text_pl),
             },
             'num': num,
-            'pos': pos,
+            'pos': self.POS_MAP.get(pos, '_'),
             'definition': definition,
             'value': KornaiValue(text_en, num)
         }
@@ -287,72 +340,99 @@ class Vocabulary:
             else:
                 return self.num_to_entry[nums[0]]
 
-    def value_to_conceptnet_term(self, value, lang='en'):
+    def value_to_conceptnet_terms(self, value, lang='en'):
         if value.arity == 2 or value.name.startswith('='):
-            return None
+            return []
         if value.name == "'":
-            return None
+            return []
         if value.name.startswith('@'):
-            return topic_to_concept(value.name)
+            return [topic_to_concept('en', value.name)]
 
         arg = value.args[0]
         if arg is not None:
             # This is often an adjective-noun phrase, such as four(leg),
             # and the key information is usually on the inside
-            return self.value_to_conceptnet_term(arg)
+            return self.value_to_conceptnet_terms(arg, lang)
 
         entry = self.get_entry(value)
+        names = []
         if entry is not None:
-            pos = self.POS_MAP.get(entry['pos'], '_')
-            text = entry['name'][lang]
-            if lang == 'hu' or lang == 'pl':
-                text = decode_prószéky(text, lang)
-            return standardized_concept_uri(lang, text, pos, '4lang', str(entry['num']))
-
-        return None
+            pos = entry['pos']
+            for text in entry['names'][lang]:
+                if lang == 'hu' or lang == 'pl':
+                    text = decode_prószéky(text, lang)
+                name = standardized_concept_uri(lang, text, pos, '4lang', str(entry['num']))
+                names.append(name)
+        return names
 
     def interpret_definition(self, num, lang='en'):
         term_info = self.num_to_entry[num]
         definition = term_info['definition']
         if not definition:
             return []
-        term = self.value_to_conceptnet_term(term_info['value'])
+        terms = self.value_to_conceptnet_terms(term_info['value'], lang)
+        root_value = term_info['value']
         edges = []
-        for fact in term_info['value'].complete(parse(definition)):
-            if fact.arity == 1:
-                if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0]:
-                    obj = self.value_to_conceptnet_term(fact.args[0], lang)
-                    rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
-                    if rel and obj:
-                        edges.append((rel, term, obj))
+        for term in terms:
+            for fact in root_value.complete(parse(definition)):
+                if fact.arity == 1:
+                    if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0]:
+                        rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
+                        for obj in self.value_to_conceptnet_terms(fact.args[0], lang):
+                            edges.append((rel, term, obj))
+                    else:
+                        for obj in self.value_to_conceptnet_terms(fact, lang):
+                            pieces = split_uri(obj)
+                            if len(pieces) > 3:
+                                pos = pieces[3]
+                            else:
+                                pos = '_'
+                            if len(pieces) > 4 and pieces[4] == 'wp':
+                                # This is a named entity, mapped to a Wikipedia
+                                # article. An entailment pointing to a named
+                                # entity must represent synonymy. If X is
+                                # Canada, then Canada is X.
+                                edges.append(('/r/Synonym', term, obj))
+                            elif pos == 'n':
+                                edges.append(('/r/IsA', term, obj))
+                            elif pos == 'v':
+                                edges.append(('/r/Entails', term, obj))
+                            elif pos == 'a' or pos == 'r':
+                                edges.append(('/r/HasProperty', term, obj))
+                            else:
+                                edges.append(('/r/RelatedTo', term, obj))
                 else:
-                    # this is an IsA, entailment, or property
-                    obj = self.value_to_conceptnet_term(fact, lang)
-                    entry = self.get_entry(fact)
-                    if entry and term and obj:
-                        if entry['pos'] == 'n':
-                            edges.append(('/r/IsA', term, obj))
-                        elif entry['pos'] == 'v':
-                            edges.append(('/r/Entails', term, obj))
-                        elif entry['pos'] == 'a':
-                            edges.append(('/r/HasProperty', term, obj))
-            else:
-                if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0] and fact.args[1]:
-                    subj = self.value_to_conceptnet_term(fact.args[0], lang)
-                    obj = self.value_to_conceptnet_term(fact.args[1], lang)
-                    rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
-                    if subj and obj and rel:
-                        edges.append((rel, subj, obj))
+                    if fact.name in self.NAMES_TO_CONCEPTNET_RELATIONS and fact.args[0] and fact.args[1]:
+                        for subj in self.value_to_conceptnet_terms(fact.args[0], lang):
+                            for obj in self.value_to_conceptnet_terms(fact.args[1], lang):
+                                rel = self.NAMES_TO_CONCEPTNET_RELATIONS[fact.name]
+                                edges.append((rel, subj, obj))
         return edges
 
-    def read_file(self, filename):
-        for line in open(filename):
-            print(self.add_line(line))
+    def handle_file(self, input_filename, output_filename):
+        for line in open(input_filename):
+            self.add_line(line)
 
+        out = MsgpackStreamWriter(output_filename)
         for num in sorted(self.num_to_entry):
             for lang in ('en', 'hu', 'la', 'pl'):
                 for edge in self.interpret_definition(num, lang):
-                    print(edge)
+                    rel, start, end = edge
+                    if rel.endswith('/rev'):
+                        rel = rel[:-4]
+                        start, end = end, start
+                    edge = make_edge(
+                        rel=rel,
+                        start=start,
+                        end=end,
+                        dataset='/d/4lang',
+                        license=Licenses.cc_attribution,
+                        sources=[{'contributor': '/s/resource/4lang'}],
+                        weight=1.5
+                    )
+                    print(edge['uri'])
+                    out.write(edge)
+        out.close()
 
 
 MODEL = tatsu.compile(GRAMMAR)
@@ -365,4 +445,4 @@ def parse(definition, **kwargs):
 
 if __name__ == '__main__':
     vocab = Vocabulary()
-    vocab.read_file('/home/rspeer/corpus/4lang.txt')
+    vocab.handle_file('/home/rspeer/corpus/4lang.txt', '/tmp/4lang.msgpack')
