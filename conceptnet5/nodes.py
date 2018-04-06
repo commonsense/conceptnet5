@@ -71,7 +71,8 @@ def topic_to_concept(language, topic):
     """
     Get a canonical representation of a Wikipedia topic, which may include
     a disambiguation string in parentheses. Returns a concept URI that
-    may be disambiguated as a noun.
+    is specified as a noun, and in particular, as the noun sense that is the
+    subject of the Wikipedia article.
 
     >>> topic_to_concept('en', 'Township (United States)')
     '/c/en/township/n/wp/united_states'
@@ -80,7 +81,7 @@ def topic_to_concept(language, topic):
     topic = topic.replace('_', ' ')
     match = re.match(r'([^(]+) \(([^)]+)\)', topic)
     if not match:
-        return standardized_concept_uri(language, topic)
+        return standardized_concept_uri(language, topic, 'n', 'wp')
     else:
         return standardized_concept_uri(language, match.group(1), 'n', 'wp', match.group(2))
 
