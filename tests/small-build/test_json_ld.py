@@ -4,7 +4,7 @@ from pyld import jsonld
 from nose.tools import eq_
 
 from conceptnet_web.responses import lookup_grouped_by_feature, lookup_paginated
-from conceptnet_web.api import STATIC_PATH
+from conceptnet_web.api import app
 
 
 context = None
@@ -13,7 +13,7 @@ CONTEXT_PATH = "ld/conceptnet5.6/context.ld.json"
 
 def setUp():
     global context
-    context_filename = os.path.join(STATIC_PATH, CONTEXT_PATH)
+    context_filename = os.path.join(app.root_path, 'static', CONTEXT_PATH)
     context = json.load(open(context_filename))
 
 
