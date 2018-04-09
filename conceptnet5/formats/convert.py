@@ -138,6 +138,7 @@ def cli(converter, input, output):
     """
     Convert a stream of data from one format to another. Available converters
     are:
+
         msgpack_to_json
         json_to_msgpack
         msgpack_to_tab_separated
