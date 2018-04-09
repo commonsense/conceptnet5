@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, print_function
 from conceptnet5.languages import COMMON_LANGUAGES
 from conceptnet5.uri import get_uri_language, join_uri, split_uri
-from conceptnet5.formats.msgpack_stream import read_msgpack_stream
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter, read_msgpack_stream
+from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
 from collections import defaultdict
 import click
 import json
+
 
 def msgpack_to_json(input_filename, output_filename):
     out_stream = JSONStreamWriter(output_filename)
@@ -49,20 +51,17 @@ def msgpack_to_assoc(input_filename, output_filename):
     Convert a msgpack stream to a tab-separated "CSV" of concept-to-concept
     associations.
 
-    The relation is mostly ignored, except:
+    As a special case, we convert some "Desires" and "NotDesires" relations
+    to "HasProperty" relations, so that:
 
-    - An assertion that means "People want X" in English or Chinese is converted to
-      an association between X and "good"
+    - An assertion that means "People want X" in English or Chinese is converted
+      to an association meaning "X is good"
     - An assertion that "People don't want X" is converted to an association
-      between X and "bad"
+      meaning "X is bad"
 
-    The result can be used to predict word associations using ConceptNet by using
-    dimensionality reduction, as in the `assoc_space` package.
-
-    FIXME: the above is out of date, we use conceptnet5.vectors now
-
-    The relation is mostly ignored because we have not yet found a good way to
-    take the relation into account in dimensionality reduction.
+    The result is used to build machine-learning models that recognize
+    semantic similarities between words, and particularly the ConceptNet
+    Numberbatch embedding space.
     """
     with open(output_filename, 'w', encoding='utf-8') as out_stream:
         weight_by_dataset = defaultdict(float)
@@ -97,7 +96,7 @@ def msgpack_to_assoc(input_filename, output_filename):
                     count_by_dataset[dataset] += 1
                     print(line, file=out_stream)
 
-            if start_uri == '/c/en/person':
+            if start_uri == '/c/en/person' or start_uri == '/c/en/people':
                 if rel == '/r/Desires':
                     pairs = [('/c/en/good', end_uri)]
                 elif rel == '/r/NotDesires':
