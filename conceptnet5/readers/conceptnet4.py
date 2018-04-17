@@ -8,7 +8,7 @@ from wordfreq import simple_tokenize
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import (
-    standardized_concept_uri, standardize_text, valid_concept_name
+    standardized_concept_uri, valid_concept_name
 )
 from conceptnet5.edges import make_edge
 from conceptnet5.language.lemmatize import lemmatize_uri
@@ -271,7 +271,8 @@ def standardize_username(username):
     If the username is an e-mail address, just keep the part before the @ sign.
     """
     name = username.strip('@').split('@')[0]
-    return standardize_text(name)
+    name = '_'.join(simple_tokenize(name.replace('_', ' ')))
+    return name
 
 
 def build_sources(parts_dict, preposition_fix=False):
@@ -291,7 +292,8 @@ def build_sources(parts_dict, preposition_fix=False):
     creator_source['contributor'] = creator_node
 
     activity = parts_dict["activity"]
-    activity_node = join_uri('/s/activity/omcs', standardize_text(activity))
+    activity = '_'.join(simple_tokenize(activity.replace('_', ' ')))
+    activity_node = join_uri('/s/activity/omcs', activity)
     creator_source['activity'] = activity_node
 
     if preposition_fix:
