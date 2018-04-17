@@ -5,7 +5,6 @@ import pandas as pd
 import wordfreq
 
 from conceptnet5.db.query import AssertionFinder
-from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (

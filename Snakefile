@@ -1,5 +1,5 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-from conceptnet5.languages import COMMON_LANGUAGES, ATOMIC_SPACE_LANGUAGES
+from conceptnet5.languages import COMMON_LANGUAGES, ATOMIC_SPACE_LANGUAGES, CORE_LANGUAGES
 
 import os
 HTTP = HTTPRemoteProvider()
@@ -36,9 +36,6 @@ WIKTIONARY_VERSIONS = {
     'de': '20160407'
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
-
-# Languages where morphemes should not be split anywhere except at spaces
-ATOMIC_SPACE_LANGUAGES = {'vi'}
 
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
@@ -542,6 +539,7 @@ rule language_stats:
         "cat {input} | grep '^/c/' | LC_ALL=C sort | LC_ALL=C uniq | cut -d '/' -f 3 "
         "| LC_ALL=C sort | LC_ALL=C uniq -c | sort -nbr > {output}"
 
+
 rule language_edge_stats:
     input:
         DATA + "/stats/concepts_left.txt",
@@ -720,13 +718,39 @@ rule export_text:
         "cn5-vectors export_text {input} {output}"
 
 
-rule export_english_text:
+rule export_single_language:
     input:
         DATA + "/vectors/numberbatch.h5",
     output:
-        DATA + "/vectors/plain/numberbatch-en.txt.gz"
+        DATA + "/vectors/plain/numberbatch-{language}.txt.gz"
     shell:
-        "cn5-vectors export_text -l en {input} {output}"
+        "cn5-vectors export_text -l {wildcards.language} {input} {output}"
+
+
+rule unzip_single_language:
+    input:
+        DATA + "/vectors/plain/numberbatch-{language}.txt.gz"
+    output:
+        temp(DATA + "/vectors/plain/numberbatch-{language}.txt")
+    shell:
+        "gunzip -c {input} > {output}"
+
+
+rule convert_to_magnitude:
+    input:
+        DATA + "/vectors/plain/numberbatch-{language}.txt"
+    output:
+        DATA + "/vectors/magnitude/numberbatch-{language}.magnitude"
+    shell:
+        "python -m pymagnitude.converter -i {input} -o {output}"
+
+
+rule magnitude_models:
+    input:
+        expand(
+            DATA + "/vectors/magnitude/numberbatch-{language}.magnitude",
+            language=CORE_LANGUAGES
+        )
 
 
 # Morphology

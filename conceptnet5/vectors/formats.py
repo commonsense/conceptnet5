@@ -73,7 +73,10 @@ def export_text(frame, filename, filter_language=None):
             if filter_language is not None:
                 label = label.split('/', 3)[-1]
             vec = vectors[i]
-            print(vec_to_text_line(label, vec), file=out)
+
+            # Don't write useless zero rows
+            if vec.dot(vec) > 0:
+                print(vec_to_text_line(label, vec), file=out)
 
 
 def convert_glove(glove_filename, output_filename, nrows):
