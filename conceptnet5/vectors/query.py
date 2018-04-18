@@ -144,14 +144,18 @@ class VectorSpaceWrapper(object):
 
                 prefix_weight = 0.01
                 if get_uri_language(term) != 'en':
-                    englishified = '/c/en/' + split_uri(term)[2]
-                    expanded.append((englishified, prefix_weight))
+                    splits = split_uri(term)
+                    if len(splits) > 2:
+                        englishified = '/c/en/' + splits[2]
+                        expanded.append((englishified, prefix_weight))
 
                 while term:
                     # Skip excessively general lookups, for either an entire
                     # language, or all terms starting with a single
                     # non-ideographic letter
-                    if term.endswith('/') or (term[-2] == '/' and term[-1] < chr(0x3000)):
+                    if len(split_uri(term))< 3  \
+                       or term.endswith('/') \
+                       or (term[-2] == '/' and term[-1] < chr(0x3000)):
                         break
                     prefixed = self.terms_with_prefix(term)
                     if prefixed:
