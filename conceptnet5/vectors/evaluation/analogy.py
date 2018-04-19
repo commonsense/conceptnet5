@@ -514,7 +514,7 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, scope=
     Optional parameters:
       subset (string, default 'test')
           a subset of a data to evaluate on, either 'test' or 'dev'
-      tune_analogies (boolean, default Tune)
+      tune_analogies (boolean, default True)
           tune the weights in eval_pairwise_analogies()
       semeval_scope (string, default 'global')
           'global' to get the average of the results across all subclasses of semeval12-2,
