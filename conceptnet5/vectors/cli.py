@@ -206,7 +206,8 @@ def run_evaluate_bias(filename):
 @cli.command(name='compare_embeddings')
 @click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
-def run_compare_embeddings(input_filenames, output_filename):
+@click.option('--run-analogies', is_flag=True)
+def run_compare_embeddings(input_filenames, output_filename, run_analogies):
     """
     The `input_filenames` are files that can be loaded as matrices of word
     embeddings. They'll be run through the relatedness and analogy evaluations,
@@ -218,7 +219,7 @@ def run_compare_embeddings(input_filenames, output_filename):
     neighbors in the ConceptNet graph. These embeddings could have been stored
     in the matrix, but this saves memory and download time.
     """
-    results = compare_embeddings(input_filenames, subset='all', tune_analogies=True)
+    results = compare_embeddings(input_filenames, subset='all', run_analogies=run_analogies)
     print(results)
     save_hdf(results, output_filename)
 
