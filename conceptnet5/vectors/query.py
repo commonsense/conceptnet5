@@ -64,6 +64,7 @@ class VectorSpaceWrapper(object):
         self.small_k = None
         self.finder = None
         self.trie = None
+        self.cache = {}
         if use_db:
             self.finder = AssertionFinder()
 
@@ -198,6 +199,11 @@ class VectorSpaceWrapper(object):
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
+
+        query_index = tuple(query)
+        if query_index in self.cache:
+            return self.cache[query_index]
+
         if isinstance(query, np.ndarray):
             return query
         elif isinstance(query, pd.Series) or isinstance(query, dict):
@@ -212,7 +218,8 @@ class VectorSpaceWrapper(object):
             raise ValueError("Can't make a query out of type %s" % type(query))
         include_neighbors = include_neighbors and (len(terms) <= 5)
         vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
-        return normalize_vec(vec)
+        self.cache[query_index] = normalize_vec(vec)
+        return self.cache[query_index]
 
     def similar_terms(self, query, filter=None, limit=20):
         """

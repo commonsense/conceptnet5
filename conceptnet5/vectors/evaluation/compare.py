@@ -31,8 +31,7 @@ def compare_embeddings(filenames, subset='dev', run_analogies=False):
         frame_results = [wordsim_results, story_results]
 
         if run_analogies:
-            analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME,
-                                               subset=subset, tune_analogies=True)
+            analogy_results = analogy.evaluate(frame, ANALOGY_FILENAME, subset=subset)
             frame_results.append(analogy_results)
 
         results.append(

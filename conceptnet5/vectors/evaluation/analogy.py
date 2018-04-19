@@ -520,7 +520,6 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, scope=
           'global' to get the average of the results across all subclasses of semeval12-2,
           or another string to get the results broken down by a subclass (1a, 1b, etc.)
     """
-
     vectors = VectorSpaceWrapper(frame=frame)
     results = empty_comparison_table()
 
