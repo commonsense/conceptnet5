@@ -16,54 +16,43 @@ from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, u
     uri_to_label
 
 
-def standardize_text(text, token_filter=None):
+def preprocess_and_tokenize_text(lang, text):
     """
     Get a string made from the tokens in the text, joined by
-    underscores. The tokens may have a language-specific `token_filter`
-    applied to them. See `standardize_as_list()`.
+    underscores.
 
-    >>> standardize_text(' cat')
+    >>> preprocess_and_tokenize_text('en', ' cat')
     'cat'
 
-    >>> standardize_text('a big dog', token_filter=english_filter)
-    'big_dog'
-
-    >>> standardize_text('Italian supercat')
+    >>> preprocess_and_tokenize_text('en', 'Italian supercat')
     'italian_supercat'
 
-    >>> standardize_text('a big dog')
+    >>> preprocess_and_tokenize_text('en', 'a big dog')
     'a_big_dog'
 
-    >>> standardize_text('a big dog', token_filter=english_filter)
-    'big_dog'
-
-    >>> standardize_text('to go', token_filter=english_filter)
-    'go'
-
-    >>> standardize_text('Test?!')
+    >>> preprocess_and_tokenize_text('en', 'Test?!')
     'test'
 
-    >>> standardize_text('TEST.')
+    >>> preprocess_and_tokenize_text('en', 'TEST.')
     'test'
 
-    >>> standardize_text('test/test')
+    >>> preprocess_and_tokenize_text('en', 'test/test')
     'test_test'
 
-    >>> standardize_text('   u\N{COMBINING DIAERESIS}ber\\n')
+    >>> preprocess_and_tokenize_text('de', '   u\N{COMBINING DIAERESIS}ber\\n')
     'über'
 
-    >>> standardize_text('embedded' + chr(9) + 'tab')
+    >>> preprocess_and_tokenize_text('en', 'embedded' + chr(9) + 'tab')
     'embedded_tab'
 
-    >>> standardize_text('_')
+    >>> preprocess_and_tokenize_text('en', '_')
     ''
 
-    >>> standardize_text(',')
+    >>> preprocess_and_tokenize_text('en', ',')
     ''
     """
-    tokens = simple_tokenize(text.replace('_', ' '))
-    if token_filter is not None:
-        tokens = token_filter(tokens)
+    text = preprocess_text(text.replace('_', ' '), lang)
+    tokens = simple_tokenize(text)
     return '_'.join(tokens)
 
 
@@ -88,7 +77,7 @@ def topic_to_concept(language, topic):
 def standardized_concept_name(lang, text):
     raise NotImplementedError(
         "standardized_concept_name has been removed. "
-        "Use standardize_text instead."
+        "Use preprocess_and_tokenize_text instead."
     )
 
 
@@ -128,9 +117,18 @@ def standardized_concept_uri(lang, text, *more):
         token_filter = None
 
     text = preprocess_text(text.replace('_', ' '), lang)
-    norm_text = standardize_text(text, token_filter)
-    more_text = [standardize_text(item, token_filter) for item in more
-                 if item is not None]
+    tokens = simple_tokenize(text)
+    if token_filter is not None:
+        tokens = token_filter(tokens)
+    norm_text = '_'.join(tokens)
+    more_text = []
+    for item in more:
+        if item is not None:
+            tokens = simple_tokenize(item.replace('_', ' '))
+            if token_filter is not None:
+                tokens = token_filter(tokens)
+            more_text.append('_'.join(tokens))
+    
     return concept_uri(lang, norm_text, *more_text)
 
 
@@ -157,7 +155,8 @@ def valid_concept_name(text):
     >>> valid_concept_name(' ')
     False
     """
-    return bool(standardize_text(text))
+    tokens = simple_tokenize(text.replace('_', ' '))
+    return (len(tokens) > 0)
 
 
 def ld_node(uri, label=None):

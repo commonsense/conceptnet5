@@ -24,6 +24,7 @@ ALL_RELATIONS = [
     "/r/Desires",
     "/r/DistinctFrom",
     "/r/Entails",
+    "/r/EtymologicallyDerivedFrom",
     "/r/EtymologicallyRelatedTo",
     "/r/ExternalURL",
     "/r/FormOf",

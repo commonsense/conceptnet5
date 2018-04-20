@@ -200,24 +200,6 @@ rule extract_emoji_data:
         # we can use -d to put it in exactly the path we need.
         "unzip -j {input} common/annotations/{wildcards.filename} -d {DATA}/raw/emoji"
 
-rule download_conceptnet_ppmi:
-    output:
-        DATA + "/precomputed/vectors/conceptnet-55-ppmi.h5"
-    shell:
-        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/conceptnet-55-ppmi.h5 -O {output}"
-
-rule download_numberbatch:
-    output:
-        DATA + "/precomputed/vectors/numberbatch.h5"
-    shell:
-        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/16.09/numberbatch.h5 -O {output}"
-
-rule download_opensubtitles_ppmi:
-    output:
-        DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
-    shell:
-        "wget -nv {PRECOMPUTED_DATA_URL}/numberbatch/17.02/opensubtitles-ppmi-5.h5 -O {output}"
-
 
 # Precomputation
 # ==============
@@ -265,7 +247,6 @@ rule precompute_wiktionary:
 rule read_conceptnet4:
     input:
         DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons",
-        DATA + "/db/wiktionary.db"
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     run:
@@ -649,14 +630,6 @@ rule convert_polyglot:
         DATA + "/vectors/polyglot-{language}.h5"
     shell:
         "CONCEPTNET_DATA=data cn5-vectors convert_polyglot -l {wildcards.language} {input} {output}"
-
-rule import_opensubtitles_ppmi:
-    input:
-        DATA + "/precomputed/vectors/opensubtitles-ppmi-5.h5"
-    output:
-        DATA + "/vectors/opensubtitles-ppmi-5.h5"
-    shell:
-        "cp {input} {output}"
 
 rule retrofit:
     input:

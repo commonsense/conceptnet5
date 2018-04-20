@@ -15,7 +15,7 @@ can be referred to, or retrieved, using this complete URI:
 def standardize_text(text, lowercase=True):
     raise NotImplementedError(
         "This function has been superseded by "
-        "conceptnet5.nodes.standardize_text."
+        "conceptnet5.nodes.preprocess_and_tokenize_text."
     )
 
 
@@ -28,8 +28,8 @@ def join_uri(*pieces):
     The resulting URI will always begin with a slash and have its pieces
     separated by a single slash.
 
-    The pieces do not have `standardize_text` applied to them; to make sure your
-    URIs are in normal form, run `standardize_text` on each piece that represents
+    The pieces do not have `preprocess_and_tokenize_text` applied to them; to make sure your
+    URIs are in normal form, run `preprocess_and_tokenize_text` on each piece that represents
     arbitrary text.
 
     >>> join_uri('/c', 'en', 'cat')
@@ -71,7 +71,7 @@ def concept_uri(lang, text, *more):
         concept_uri(lang, text, pos, disambiguation...)
 
     `text` and `disambiguation` should be strings that have already been run
-    through `standardize_text`.
+    through `preprocess_and_tokenize_text`.
 
     This is a low-level interface. See `standardized_concept_uri` in nodes.py for
     a more generally applicable function that also deals with special

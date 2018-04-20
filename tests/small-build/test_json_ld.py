@@ -3,7 +3,7 @@ import os
 from pyld import jsonld
 from nose.tools import eq_
 
-from conceptnet_web.responses import lookup_grouped_by_feature, lookup_paginated
+from conceptnet5.api import lookup_grouped_by_feature, lookup_paginated
 from conceptnet_web.api import app
 
 
