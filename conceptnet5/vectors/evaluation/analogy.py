@@ -500,7 +500,7 @@ def eval_bats_category(vectors, category, vocab_size=200000, verbose=False):
     return category_results
 
 
-def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope='global',
+def evaluate(frame, analogy_filename, subset='test', tune_analogies=True, scope='global',
              google_vocab_size=200000):
     """
     Run SAT and Semeval12-2 evaluations.
@@ -514,13 +514,12 @@ def evaluate(frame, analogy_filename, subset='test', tune_analogies=False, scope
     Optional parameters:
       subset (string, default 'test')
           a subset of a data to evaluate on, either 'test' or 'dev'
-      tune_analogies (boolean, default False)
+      tune_analogies (boolean, default True)
           tune the weights in eval_pairwise_analogies()
       semeval_scope (string, default 'global')
           'global' to get the average of the results across all subclasses of semeval12-2,
           or another string to get the results broken down by a subclass (1a, 1b, etc.)
     """
-
     vectors = VectorSpaceWrapper(frame=frame)
     results = empty_comparison_table()
 
