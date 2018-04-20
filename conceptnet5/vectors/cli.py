@@ -136,9 +136,10 @@ def run_debias(input_filename, output_filename):
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
-def run_evaluate(filename, subset, semeval_by_language):
+@click.option('--run-analogies', is_flag=True)
+def run_evaluate(filename, subset, semeval_by_language, run_analogies):
     """
-    Evaluate a frame on word similarity and analogy tasks. Measure its bias.
+    Evaluate a frame on word similarity and (optionally) analogy tasks. Measure its bias.
     """
     frame = load_hdf(filename)
     if semeval_by_language:
@@ -146,7 +147,8 @@ def run_evaluate(filename, subset, semeval_by_language):
     else:
         scope = 'global'
     print(wordsim.evaluate(frame, subset=subset, semeval_scope=scope))
-    print(analogy.evaluate(frame, subset=subset, analogy_filename=ANALOGY_FILENAME))
+    if run_analogies:
+        print(analogy.evaluate(frame, subset=subset, analogy_filename=ANALOGY_FILENAME))
     print(bias.measure_bias(frame))
 
 
