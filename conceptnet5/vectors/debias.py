@@ -394,10 +394,9 @@ def reject_subspace(frame, vecs):
     """
     current_array = frame.copy().values
     for vec in vecs:
-        if not np.isnan(vec).any():
-            vec = normalize_vec(vec)
-            projection = current_array.dot(vec)
-            np.subtract(current_array, np.outer(projection, vec), out=current_array)
+        vec = normalize_vec(vec)
+        projection = current_array.dot(vec)
+        np.subtract(current_array, np.outer(projection, vec), out=current_array)
 
     normalize(current_array, norm='l2', copy=False)
 
@@ -412,7 +411,7 @@ def get_vocabulary_vectors(frame, vocab):
     given DataFrame containing just the known vectors for that vocabulary.
     """
     uris = [standardized_uri('en', term) for term in vocab]
-    return frame.loc[uris].dropna()
+    return frame.reindex(uris).dropna()
 
 
 def two_class_svm(frame, pos_vocab, neg_vocab):
@@ -528,7 +527,7 @@ def de_bias_category(frame, category_examples, bias_examples):
     vocab = [
         standardized_uri('en', term) for term in bias_examples
     ]
-    components_to_reject = frame.loc[vocab].values
+    components_to_reject = frame.reindex(vocab).dropna().values
 
     # Make a modified version of the space that projects the bias vectors to 0.
     # Then weight each row of that space by "applicability", the probability
