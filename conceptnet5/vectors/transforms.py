@@ -117,7 +117,7 @@ def make_replacements_faster(small_frame, big_frame, tree_depth=1000, lang='en',
 
     tree_depth=1000 provides a good balance of speed and accuracy.
     """
-    intersected = big_frame.loc[small_frame.index].dropna()
+    intersected = big_frame.reindex(small_frame.index).dropna()
     index, index_map = build_annoy_tree(intersected, tree_depth)
     replacements = {}
     for term in big_frame.index:
@@ -138,7 +138,7 @@ def make_replacements(small_frame, big_frame):
     Create a replacements dictionary to map terms only present in a big frame to the closest term
     in a small_frame. This method uses a brute-force solution.
     """
-    intersected = big_frame.loc[small_frame.index].dropna()
+    intersected = big_frame.reindex(small_frame.index).dropna()
     replacements = {}
     for term in big_frame.index:
         if term not in small_frame.index:

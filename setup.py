@@ -5,19 +5,24 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.6'
+version_str = '5.6.2'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
     sys.exit(1)
 
 
+DESCRIPTION = open('README.md').read()
+
+
 setup(
-    name = 'ConceptNet',
-    version = version_str,
-    description = 'A semantic network of general knowledge',
-    author = "Rob Speer",
-    author_email = 'rspeer@luminoso.com',
+    name='ConceptNet',
+    version=version_str,
+    description='A semantic network of general knowledge',
+    long_description=DESCRIPTION,
+    long_description_content_type='text/markdown',
+    author="Rob Speer",
+    author_email='rspeer@luminoso.com',
     packages=packages,
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
@@ -27,8 +32,9 @@ setup(
         'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'pg8000',
         'marisa-trie'
     ],
-    license = 'Apache License 2.0',
-    entry_points = {
+    python_requires='>=3.5',
+    license='Apache License 2.0',
+    entry_points={
         'console_scripts': [
             'cn5-vectors = conceptnet5.vectors.cli:cli',
             'cn5-read = conceptnet5.readers.cli:cli',
