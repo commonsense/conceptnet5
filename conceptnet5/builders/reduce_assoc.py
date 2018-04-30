@@ -7,6 +7,8 @@ from collections import defaultdict
 
 from conceptnet5.relations import is_negative_relation
 from conceptnet5.uri import is_concept, uri_prefix
+from conceptnet5.vectors.formats import load_hdf
+import pandas as pd
 
 
 def concept_is_bad(uri):
@@ -77,14 +79,14 @@ class Graph:
                         stack.append(neighbor)
 
         return component_labels
-        
-        
 
-def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
+
+def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
     """
-    Takes in a file of tab-separated simple associations, and removes
-    uncommon associations and associations unlikely to be useful.
-
+    Takes in a file of tab-separated associations, and returns a set of 
+    concepts from which those which are unlikely to be useful have been 
+    removed. 
+    
     All concepts that occur fewer than `cutoff` times will be removed.
     All English concepts that occur fewer than `en_cutoff` times will be removed.
     """
@@ -109,12 +111,19 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
             (not is_concept(concept) and count >= cutoff)
         )
     }
+    return filtered_concepts
 
+
+def make_graph(filename, filtered_concepts, bad_concept=concept_is_bad,
+               bad_relation=is_negative_relation):
+    """
+    Reads an association file and builds an (undirected) graph from it, 
+    """
     graph = Graph()
     with open(filename, encoding='utf-8') as file:
         for line in file:
             left, right, value, dataset, rel = line.rstrip().split('\t', 4)
-            if concept_is_bad(left) or concept_is_bad(right) or is_negative_relation(rel):
+            if bad_concept(left) or bad_concept(right) or bad_relation(rel):
                 continue
             fvalue = float(value)
             gleft = uri_prefix(left)
@@ -126,33 +135,50 @@ def reduce_assoc(filename, output_filename, cutoff=3, en_cutoff=3):
             ):
                 if gleft != gright:
                     graph.add_edge(gleft, gright, value, dataset, rel)
+    return graph
+
+
+def read_embedding_vocabularies(filenames):
+    result = pd.Index([])
+    for filename in filenames:
+        vectors = load_hdf(filename)
+        result = result.union(vectors.index)
+    return result
+
+
+
+def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
+                 cutoff=3, en_cutoff=3):
+    """
+    Takes in a file of tab-separated simple associations, and removes
+    uncommon associations and associations unlikely to be useful.  Also 
+    requires one or more vector embedding files (from which only the 
+    vocabularies are used; associations involving terms that have no 
+    connection, no matter how distant, to the union of those vocabularies 
+    will be removed).
+
+    All concepts that occur fewer than `cutoff` times will be removed.
+    All English concepts that occur fewer than `en_cutoff` times will be removed.
+    """
+
+    filtered_concepts = make_filtered_concepts(assoc_filename, cutoff=cutoff,
+                                               en_cutoff=en_cutoff)
+
+    graph = make_graph(assoc_filename, filtered_concepts)
 
     component_labels = graph.find_components()
+
+    embedding_vocab = read_embedding_vocabularies(embedding_filenames)
+
+    good_component_labels = set(label for term, label
+                                in component_labels.items()
+                                if term in embedding_vocab)
     
-    component_sizes = defaultdict(int)
-    max_component_size = 0
-    for vertex in graph.vertices():
-        component_sizes[component_labels[vertex]] += 1
-        if component_sizes[component_labels[vertex]] > max_component_size:
-            max_component_size = component_sizes[component_labels[vertex]]
-
-    max_size_labels = [label for label in component_sizes.keys()
-                       if component_sizes[label] == max_component_size]
-    assert len(max_size_labels) > 0
-    if len(max_size_labels) != 1:
-        print('Warning: largest component of ConceptNet graph is not unique.')
-    max_size_label = min(max_size_labels)
-
-    print('The ConceptNet graph given has {} vertices and {} components, and the largest component has size {}.'.
-          format(len(graph.vertices()),
-                 len(component_sizes),
-                 max_component_size))
-
     with open(output_filename, 'w', encoding='utf-8') as out:
         for gleft, gright, value, dataset, rel in graph.edges():
-            if component_labels[gleft] != max_size_label:
+            if component_labels[gleft] not in good_component_labels:
                 continue
-            if component_labels[gright] != max_size_label:
+            if component_labels[gright] not in good_component_labels:
                 continue
             line = '\t'.join([gleft, gright, value, dataset, rel])
             print(line, file=out)

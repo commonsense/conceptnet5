@@ -250,8 +250,7 @@ rule read_conceptnet4:
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     run:
-        single_input = input[0]
-        shell("cn5-read conceptnet4 {single_input} {output}")
+        shell("cn5-read conceptnet4 {input} {output}")
 
 rule read_dbpedia:
     input:
@@ -554,7 +553,8 @@ rule assoc_uniq:
 
 rule reduce_assoc:
     input:
-        DATA + "/assoc/assoc.csv"
+        DATA + "/assoc/assoc.csv",
+        expand(DATA + "/vectors/{name}.h5", name=INPUT_EMBEDDINGS)
     output:
         DATA + "/assoc/reduced.csv"
     shell:

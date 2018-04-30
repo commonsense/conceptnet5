@@ -52,14 +52,16 @@ def filter_word_vectors(dense_hdf_filename, vocab_filename):
 @click.option('--iterations', '-i', default=5)
 @click.option('--nshards', '-s', default=6)
 @click.option('--verbose', '-v', count=True)
+@click.option('--max_cleanup_iters', '-m', default=20)
 def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                 iterations=5, nshards=6, verbose=0):
+                 iterations=5, nshards=6, verbose=0, max_cleanup_iters=20):
     """
     Run retrofit, operating on a part of a frame at a time.
     """
     sharded_retrofit(
         dense_hdf_filename, conceptnet_filename, output_filename,
-        iterations=iterations, nshards=nshards, verbosity=verbose
+        iterations=iterations, nshards=nshards, verbosity=verbose,
+        max_cleanup_iters=max_cleanup_iters
     )
 
 
