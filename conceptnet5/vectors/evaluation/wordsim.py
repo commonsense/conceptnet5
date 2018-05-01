@@ -444,6 +444,17 @@ def read_simlex():
             yield term1, term2, gold_score, lang1, lang2
 
 
+def read_emosim():
+    lang1, lang2 = 'mul', 'mul'
+    with open(get_support_data_filename('emosim/emosim-table.txt')) as file:
+        for line in file:
+            if line.startswith("ID"):
+                continue
+            _id, term1, term2, sscore = line.split('\t')[:4]
+            gold_score = float(sscore)
+            yield term1, term2, gold_score, lang1, lang2
+
+
 def read_pku500():
     lang1, lang2 = 'zh', 'zh'
     filename = 'pku-500/pku-500.csv'
@@ -692,6 +703,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     ws_ro_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('ro'))
     pku500_score = measure_correlation(spearmanr, vectors, read_pku500())
     tmu_score = measure_correlation(spearmanr, vectors, read_tmu())
+    emosim_score = measure_correlation(spearmanr, vectors, read_emosim())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -705,6 +717,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     results.loc['ws353-ro'] = ws_ro_score
     results.loc['pku500-zh'] = pku500_score
     results.loc['tmu-rw-ja'] = tmu_score
+    results.loc['emosim-mul'] = emosim_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors)
@@ -741,6 +754,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     ws_ro_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('ro'))
     pku500_score = measure_correlation(spearmanr, frame, read_pku500())
     tmu_score = measure_correlation(spearmanr, frame, read_tmu())
+    emosim_score = measure_correlation(spearmanr, frame, read_emosim())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -753,6 +767,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     results.loc['ws353-ro'] = ws_ro_score
     results.loc['pku500-zh'] = pku500_score
     results.loc['tmu-rw-ja'] = tmu_score
+    results.loc['emosim-mul'] = emosim_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(frame)

@@ -1,0 +1,20 @@
+Explanation of these files:
+
+- `orig.txt` was copied and pasted from the HTML table at
+  http://emojinet.knoesis.org/emojipairs508_userstudy_embedding.htm. Its
+  data is unhelpful because it only contains pictures of the emoji, not
+  their codepoints or strings.
+
+- `emojipairs.json` is a file that the authors e-mailed to fill in the data
+  about which row numbers correspond to which emoji. However, in addition to
+  being an ASCII JSON file, it has another layer of escaping, and also sticks
+  underscores in the middle of flags. It appears that the authors have avoided
+  confronting their software with actual emoji at all costs.
+
+- With an interactive Jupyter session which will never have to be run again,
+  I created `emosim-table.txt`, which combines the data extracted from these
+  two files, and thus contains all the information in one place. It contains
+  a table of tab-separated UTF-8 values, with a header row.
+
+The only file that is needed for the evaluation is `emosim-table.txt`. The
+other two files are just there for record-keeping.
