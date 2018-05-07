@@ -53,6 +53,7 @@ CONTRIBUTOR_NAME_MAP = {
     '/s/resource/cc_cedict/2017-10': 'CC-CEDICT 2017-10',
     '/s/resource/unicode/cldr/31': 'Unicode CLDR',
     '/s/resource/unicode/cldr/32': 'Unicode CLDR',
+    '/s/resource/unicode/cldr/32.0.1': 'Unicode CLDR',
 }
 
 

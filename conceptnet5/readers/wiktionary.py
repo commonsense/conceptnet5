@@ -10,7 +10,7 @@ import os
 from collections import Counter
 
 
-PARSER_RULE = '/s/process/wikiparsec/1'
+PARSER_RULE = '/s/process/wikiparsec/2'
 
 
 def prepare_db(inputs, dbfile):
