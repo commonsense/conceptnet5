@@ -27,15 +27,23 @@ class Graph:
     '''
     Class to hold the concept-association edge graph.
     '''
-    def __init__(self):
+    def __init__(self, save_edge_list=True):
         '''Construct a graph with no vertices or edges.'''
-        self.edge_list = list()
+        if save_edge_list:
+            self._edge_list = list()
+            self._edge_set = None
+        else:
+            self._edge_list = None
+            self._edge_set = set()
         self.vertex_to_neighbors = defaultdict(set)
         return
 
     def add_edge(self, left, right, value, dataset, rel):
         '''Insert an edge in the graph.'''
-        self.edge_list.append((left, right, value, dataset, rel))
+        if self._edge_list is not None:
+            self._edge_list.append((left, right, value, dataset, rel))
+        else:
+            self._edge_set.add((left, right))
         self.vertex_to_neighbors[left].add(right)
         self.vertex_to_neighbors[right].add(left)
         return
@@ -44,9 +52,22 @@ class Graph:
         '''Returns an iterator over the vertices of the graph.'''
         return self.vertex_to_neighbors.keys()
 
-    def edges(self):
-        '''Returns an iterator over the edges of the graph.'''
-        for edge in self.edge_list:
+    def edge_list(self):
+        '''
+        Returns an iterator over the edges (left, right, value, dataset, erl) 
+        of the graph.  Can only be used if the graph was constructed with 
+        save_edge_list=True.
+        '''
+        for edge in self._edge_list:
+            yield edge
+        return
+
+    def edge_set(self):
+        '''
+        Returns an iterator over the edges (left, right) of the graph.  
+        Can only be used if the graph was constructed with save_edge_list=False.
+        '''
+        for edge in self._edge_set:
             yield edge
         return
 
@@ -114,12 +135,20 @@ def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
     return filtered_concepts
 
 
-def make_graph(filename, filtered_concepts, bad_concept=concept_is_bad,
+def make_graph(filename, save_edge_list=True,
+               concept_filter=None, bad_concept=concept_is_bad,
                bad_relation=is_negative_relation):
     """
     Reads an association file and builds an (undirected) graph from it, 
     """
-    graph = Graph()
+    graph = Graph(save_edge_list)
+    if concept_filter is None:
+        concept_filter = lambda concept: True
+    if bad_concept is None:
+        bad_concept = lambda concept: False
+    if bad_relation is None:
+        bad_relation = lambda rel: False
+    
     with open(filename, encoding='utf-8') as file:
         for line in file:
             left, right, value, dataset, rel = line.rstrip().split('\t', 4)
@@ -128,13 +157,9 @@ def make_graph(filename, filtered_concepts, bad_concept=concept_is_bad,
             fvalue = float(value)
             gleft = uri_prefix(left)
             gright = uri_prefix(right)
-            if (
-                gleft in filtered_concepts and
-                gright in filtered_concepts and
-                fvalue != 0
-            ):
-                if gleft != gright:
-                    graph.add_edge(gleft, gright, value, dataset, rel)
+            if concept_filter(gleft) and concept_filter(gright) \
+               and fvalue != 0 and gleft != gright:
+                graph.add_edge(gleft, gright, value, dataset, rel)
     return graph
 
 
@@ -164,7 +189,11 @@ def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
     filtered_concepts = make_filtered_concepts(assoc_filename, cutoff=cutoff,
                                                en_cutoff=en_cutoff)
 
-    graph = make_graph(assoc_filename, filtered_concepts)
+    graph = make_graph(assoc_filename,
+                       concept_filter=lambda concept:
+                           concept in filtered_concepts,
+                       bad_concept=concept_is_bad,
+                       bad_relation=is_negative_relation)
 
     component_labels = graph.find_components()
 
@@ -175,7 +204,7 @@ def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
                                 if term in embedding_vocab)
     
     with open(output_filename, 'w', encoding='utf-8') as out:
-        for gleft, gright, value, dataset, rel in graph.edges():
+        for gleft, gright, value, dataset, rel in graph.edge_list():
             if component_labels[gleft] not in good_component_labels:
                 continue
             if component_labels[gright] not in good_component_labels:
