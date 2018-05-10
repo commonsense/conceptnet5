@@ -6,7 +6,8 @@ from .formats import load_hdf, save_hdf
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                     iterations=5, nshards=6, verbosity=0):
+                     iterations=5, nshards=6, verbosity=0,
+                     max_cleanup_iters=20):
     # frame_box is basically a reference to a single large DataFrame. The
     # DataFrame will at times be present or absent. When it's present, the list
     # contains one item, which is the DataFrame. When it's absent, the list
@@ -27,7 +28,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
-        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity)
+        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity, max_cleanup_iters)
         save_hdf(retrofitted, temp_filename)
         del retrofitted
 
@@ -49,7 +50,8 @@ def join_shards(output_filename, nshards=6):
     save_hdf(dframe, output_filename)
 
 
-def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
+def retrofit(row_labels, dense_frame, sparse_csr,
+             iterations=5, verbosity=0, max_cleanup_iters=20):
     """
     Retrofitting is a process of combining information from a machine-learned
     space of term vectors with further structured information about those
@@ -111,6 +113,30 @@ def retrofit(row_labels, dense_frame, sparse_csr, iterations=5, verbosity=0):
         # Average known rows with original vectors
         vecs += orig_vecs
         vecs /= (weight_array + 1.)
+
+    # Clean up as many all-zero vectors as possible.  Zero vectors
+    # can either come from components of the conceptnet graph that
+    # don't contain any terms from the embedding we are currently
+    # retrofitting (and there is nothing we can do about those here,
+    # but when retrofitting is done on that embedding they should be
+    # taken care of then) or from terms whose distance in the graph is
+    # larger than the number of retrofitting iterations used above; we
+    # propagate non-zero values to those terms by averaging over their
+    # non-zero neighbors.  Note that this propagation can never reach
+    # the first class of terms, so we can't necessarily expect the
+    # number of zero vectors to go to zero at any one invocation of
+    # this code.
+    n_zero_indices_old = -1
+    for iteration in range(max_cleanup_iters):
+        zero_indices = (np.abs(vecs).sum(1) == 0)
+        n_zero_indices = np.sum(zero_indices)
+        if n_zero_indices == 0 or n_zero_indices == n_zero_indices_old:
+            break
+        n_zero_indices_old = n_zero_indices
+        vecs[zero_indices, :] = sparse_csr[zero_indices, :].dot(vecs)
+        normalize(vecs[zero_indices, :], norm='l2', copy=False)
+    else:
+        print('Warning: cleanup iteration limit exceeded.')
 
     retroframe = pd.DataFrame(data=vecs, index=row_labels, columns=dense_frame.columns)
     return retroframe

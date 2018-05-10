@@ -59,7 +59,9 @@ def miniaturize(frame, other_vocab=None, k=300, debias=True):
     vocab = vocab1 + extra_vocab
     smaller = frame.loc[vocab]
     U, _S, _Vt = np.linalg.svd(smaller, full_matrices=False)
+    del smaller, _S, _Vt, vocab1, extra_vocab, vocab_set
     redecomposed = pd.DataFrame(U[:, :k], index=vocab, dtype='f')
+    del U, vocab
     if debias:
         redecomposed = de_bias_frame(redecomposed)
     mini = (redecomposed * 64).astype(np.int8)

@@ -20,6 +20,7 @@ from .transforms import (
     make_big_frame, make_small_frame, make_replacements_faster,
     save_replacements
 )
+from .propagate import sharded_propagate
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -52,14 +53,16 @@ def filter_word_vectors(dense_hdf_filename, vocab_filename):
 @click.option('--iterations', '-i', default=5)
 @click.option('--nshards', '-s', default=6)
 @click.option('--verbose', '-v', count=True)
+@click.option('--max_cleanup_iters', '-m', default=20)
 def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                 iterations=5, nshards=6, verbose=0):
+                 iterations=5, nshards=6, verbose=0, max_cleanup_iters=20):
     """
     Run retrofit, operating on a part of a frame at a time.
     """
     sharded_retrofit(
         dense_hdf_filename, conceptnet_filename, output_filename,
-        iterations=iterations, nshards=nshards, verbosity=verbose
+        iterations=iterations, nshards=nshards, verbosity=verbose,
+        max_cleanup_iters=max_cleanup_iters
     )
 
 
@@ -292,3 +295,28 @@ def export_background(input_filename, output_dir, concepts_filename, language,
     # save sigma matrix
     sigma_filename = path.join(output_dir, 'sigma.npy'.format(language))
     save_npy(np.ones(small_frame.shape[1]), sigma_filename)
+
+
+
+@cli.command(name='propagate')
+@click.argument('assoc_filename',
+                type=click.Path(readable=True, dir_okay=False))
+@click.argument('embedding_filename',
+                type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename',
+                type=click.Path(writable=True, dir_okay=False))
+@click.option('--nshards', '-s', default=6)
+@click.option('--iterations', default=20)
+def run_propagate(assoc_filename, embedding_filename, output_filename,
+                  nshards=6, iterations=20):
+    sharded_propagate(assoc_filename, embedding_filename, output_filename, 
+                      nshards=nshards, iterations=iterations)
+    
+@cli.command(name='join_propagate')
+@click.argument('filename', type=click.Path(writable=True, dir_okay=False))
+@click.option('--nshards', '-s', default=6)
+def run_join_propagate(filename, nshards=6):
+    """
+    Join parts of a propagated frame.
+    """
+    join_shards(filename, nshards)

@@ -58,6 +58,7 @@ EMOJI_LANGUAGES = [
 WIKT_PARSER_VERSION = "2"
 
 RETROFIT_SHARDS = 6
+PROPAGATE_SHARDS = 6
 
 # Dataset filenames
 # =================
@@ -250,8 +251,7 @@ rule read_conceptnet4:
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     run:
-        single_input = input[0]
-        shell("cn5-read conceptnet4 {single_input} {output}")
+        shell("cn5-read conceptnet4 {input} {output}")
 
 rule read_dbpedia:
     input:
@@ -554,7 +554,8 @@ rule assoc_uniq:
 
 rule reduce_assoc:
     input:
-        DATA + "/assoc/assoc.csv"
+        DATA + "/assoc/assoc.csv",
+        expand(DATA + "/vectors/{name}.h5", name=INPUT_EMBEDDINGS)
     output:
         DATA + "/assoc/reduced.csv"
     shell:
@@ -663,9 +664,30 @@ rule merge_intersect:
     shell:
         "cn5-vectors intersect {input} {output}"
 
+rule propagate:
+    input:
+        DATA + "/assoc/assoc.csv",
+        DATA + "/vectors/numberbatch-biased.h5"
+    output:
+        temp(expand(DATA + "/vectors/numberbatch-propagated.h5.shard{n}", n=range(PROPAGATE_SHARDS)))
+    resources:
+        ram=24
+    shell:
+        "cn5-vectors propagate -s {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-propagated.h5"
+
+rule join_propagate:
+    input:
+        expand(DATA + "/vectors/numberbatch-propagated.h5.shard{n}", n=range(PROPAGATE_SHARDS))
+    output:
+        DATA + "/vectors/numberbatch-propagated.h5"
+    resources:
+        ram=24
+    shell:
+        "cn5-vectors join_propagate -s {PROPAGATE_SHARDS} {output}"
+
 rule debias:
     input:
-        DATA + "/vectors/numberbatch-biased.h5"
+        DATA + "/vectors/numberbatch-propagated.h5"
     output:
         DATA + "/vectors/numberbatch.h5"
     resources:
@@ -675,7 +697,7 @@ rule debias:
 
 rule miniaturize:
     input:
-        DATA + "/vectors/numberbatch-biased.h5",
+        DATA + "/vectors/numberbatch-propagated.h5",
         DATA + "/vectors/w2v-google-news.h5"
     output:
         DATA + "/vectors/mini.h5"
@@ -742,7 +764,7 @@ rule compare_embeddings:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/vectors/glove12-840B.h5",
         DATA + "/raw/vectors/fasttext-wiki-en.vec.gz",
-        DATA + "/vectors/numberbatch-biased.h5",
+        DATA + "/vectors/numberbatch-propagated.h5",
         DATA + "/vectors/numberbatch.h5",
         DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"
