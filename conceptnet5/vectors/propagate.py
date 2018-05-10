@@ -7,7 +7,7 @@ reduced graph.
 import numpy as np
 import pandas as pd
 from scipy.sparse import diags
-from conceptnet5.builders.reduce_assoc import make_graph
+from conceptnet5.builders.reduce_assoc import make_conceptnet_association_graph
 from conceptnet5.uri import get_uri_language
 from .sparse_matrix_builder import SparseMatrixBuilder
 from .formats import load_hdf, save_hdf
@@ -63,8 +63,9 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # overlap the vocabulary of the embedding; we can't do anything with
     # those terms.
 
-    graph = make_graph(assoc_filename, save_edge_list=False,
-                       bad_concept=None, bad_relation=None)
+    graph = make_conceptnet_association_graph(
+        assoc_filename, save_edge_list=False,
+        bad_concept=None, bad_relation=None)
     component_labels = graph.find_components()
     good_component_labels = set(label for term, label
                                 in component_labels.items()

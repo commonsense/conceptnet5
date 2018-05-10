@@ -23,7 +23,7 @@ def concept_is_bad(uri):
             uri.startswith('/a/') or uri.count('/') <= 2)
 
 
-class Graph:
+class ConceptNetAssociationGraph:
     '''
     Class to hold the concept-association edge graph.
     '''
@@ -135,13 +135,14 @@ def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
     return filtered_concepts
 
 
-def make_graph(filename, save_edge_list=True,
-               concept_filter=None, bad_concept=concept_is_bad,
-               bad_relation=is_negative_relation):
+def make_conceptnet_association_graph(
+        filename, save_edge_list=True,
+        concept_filter=None, bad_concept=concept_is_bad,
+        bad_relation=is_negative_relation):
     """
     Reads an association file and builds an (undirected) graph from it, 
     """
-    graph = Graph(save_edge_list)
+    graph = ConceptNetAssociationGraph(save_edge_list)
     if concept_filter is None:
         concept_filter = lambda concept: True
     if bad_concept is None:
@@ -189,11 +190,12 @@ def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
     filtered_concepts = make_filtered_concepts(assoc_filename, cutoff=cutoff,
                                                en_cutoff=en_cutoff)
 
-    graph = make_graph(assoc_filename,
-                       concept_filter=lambda concept:
-                           concept in filtered_concepts,
-                       bad_concept=concept_is_bad,
-                       bad_relation=is_negative_relation)
+    graph = make_conceptnet_association_graph(
+        assoc_filename,
+        concept_filter=lambda concept:
+        concept in filtered_concepts,
+        bad_concept=concept_is_bad,
+        bad_relation=is_negative_relation)
 
     component_labels = graph.find_components()
 
