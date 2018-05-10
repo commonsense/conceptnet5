@@ -134,7 +134,7 @@ def retrofit(row_labels, dense_frame, sparse_csr,
             break
         n_zero_indices_old = n_zero_indices
         vecs[zero_indices, :] = sparse_csr[zero_indices, :].dot(vecs)
-        normalize(vecs, norm='l2', copy=False)
+        normalize(vecs[zero_indices, :], norm='l2', copy=False)
     else:
         print('Warning: cleanup iteration limit exceeded.')
 
