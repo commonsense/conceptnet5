@@ -171,7 +171,7 @@ def test_make_language_frame():
 @with_setup(setup_multi_ling_frame)
 def test_make_small_frame():
     concepts_to_keep = ['/c/en/ski_jumping', '/c/en/nordic_combined', '/c/en/present']
-    small_frame = make_small_frame(TEST_FRAME, concepts_to_keep, 'en')
+    small_frame = make_small_frame(TEST_FRAME, concepts_to_keep)
     ok_('/c/en/ski_jumping' not in small_frame.index)
     ok_('/c/en/nordic_combined' not in small_frame.index)
     ok_('/c/en/present' in small_frame.index)
