@@ -7,7 +7,7 @@ from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.vectors.transforms import standardize_row_labels, l1_normalize_columns, \
-    l2_normalize_rows, shrink_and_sort
+    l2_normalize_rows, make_big_frame, make_small_frame, shrink_and_sort
 
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "testdata")
 TEST_FRAME = None
@@ -23,7 +23,7 @@ def setup_simple_frame():
             [7, 2, 7],
             [3, 8, 2]]
 
-    index = ['island', 'Island', 'cat', 'figure', 'figure skating', 'figure skater','thing','17']
+    index = ['island', 'Island', 'cat', 'figure', 'figure skating', 'figure skater', 'thing', '17']
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
@@ -59,8 +59,8 @@ def test_vector_space_wrapper():
     ok_(wrap.frame.index.is_monotonic_increasing)
 
     # test there are no transformations to raw terms other than adding the english tag
-    ok_('/c/en/figure skater' in wrap.frame.index) # no underscore
-    ok_('/c/en/Island' in wrap.frame.index) # no case folding
+    ok_('/c/en/figure skater' in wrap.frame.index)  # no underscore
+    ok_('/c/en/Island' in wrap.frame.index)  # no case folding
 
     # test index_prefix_range
     ok_(wrap.index_prefix_range('/c/en/figure') == (3, 6))
@@ -142,7 +142,6 @@ def test_l2_normalize_rows():
 
 @with_setup(setup_simple_frame)
 def test_shrink_and_sort():
-
     n, k = 3, 2
     shrank = shrink_and_sort(TEST_FRAME, n, k)
 
@@ -156,3 +155,23 @@ def test_shrink_and_sort():
 
     # Check if the index is sorted
     ok_(shrank.index.is_monotonic_increasing)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_make_language_frame():
+    english_frame = make_big_frame(TEST_FRAME, 'en')
+    ok_('/c/en/ski_jumping' in english_frame.index)
+    ok_('/c/en/nordic_combined' in english_frame.index)
+    ok_('/c/en/present' in english_frame.index)
+    ok_('/c/en/gift' in english_frame.index)
+    ok_('/c/pl/kombinacja' not in english_frame.index)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_make_small_frame():
+    concepts_to_keep = ['/c/en/ski_jumping', '/c/en/nordic_combined', '/c/en/present']
+    small_frame = make_small_frame(TEST_FRAME, concepts_to_keep)
+    ok_('/c/en/ski_jumping' not in small_frame.index)
+    ok_('/c/en/nordic_combined' not in small_frame.index)
+    ok_('/c/en/present' in small_frame.index)
+    ok_('/c/en/gift' not in small_frame.index)

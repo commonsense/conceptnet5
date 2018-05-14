@@ -1,7 +1,5 @@
-from os import path
-
 import click
-import numpy as np
+from os import path
 
 from .debias import de_bias_frame
 from .evaluation import wordsim, analogy, bias
@@ -14,13 +12,12 @@ from .formats import (
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
+from .propagate import sharded_propagate
 from .query import VectorSpaceWrapper
 from .retrofit import sharded_retrofit, join_shards
 from .transforms import (
-    make_big_frame, make_small_frame, make_replacements_faster,
-    save_replacements
+    make_big_frame, make_small_frame
 )
-from .propagate import sharded_propagate
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -273,29 +270,19 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 @click.argument('output_dir', type=click.Path(writable=True, dir_okay=True))
 @click.argument('concepts_filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('-l', '--language', default='en')
-@click.option('--tree-depth', default=1000)
-@click.option('-v', '--verbose', is_flag=True)
-def export_background(input_filename, output_dir, concepts_filename, language,
-                      tree_depth, verbose):
+def export_background(input_filename, output_dir, concepts_filename, language):
+    concepts = set(line.strip() for line in open(concepts_filename))
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
-    small_frame = make_small_frame(big_frame, concepts_filename, language)
-    replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
-    save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
-                      replacements)
+    small_frame = make_small_frame(big_frame, concepts)
 
     # save labels
-    labels_filename = path.join(output_dir, 'labels.txt'.format(language))
+    labels_filename = path.join(output_dir, 'labels.txt')
     save_labels(small_frame, labels_filename)
 
     # save small_frame matrix
-    u_filename = path.join(output_dir, 'u.npy'.format(language))
-    save_npy(small_frame.values, u_filename)
-
-    # save sigma matrix
-    sigma_filename = path.join(output_dir, 'sigma.npy'.format(language))
-    save_npy(np.ones(small_frame.shape[1]), sigma_filename)
-
+    vectors_filename = path.join(output_dir, 'vectors.npy')
+    save_npy(small_frame.values, vectors_filename)
 
 
 @cli.command(name='propagate')
@@ -311,7 +298,8 @@ def run_propagate(assoc_filename, embedding_filename, output_filename,
                   nshards=6, iterations=20):
     sharded_propagate(assoc_filename, embedding_filename, output_filename, 
                       nshards=nshards, iterations=iterations)
-    
+
+
 @cli.command(name='join_propagate')
 @click.argument('filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nshards', '-s', default=6)
