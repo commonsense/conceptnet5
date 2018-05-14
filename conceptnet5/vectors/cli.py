@@ -277,11 +277,11 @@ def export_background(input_filename, output_dir, concepts_filename, language):
     small_frame = make_small_frame(big_frame, concepts)
 
     # save labels
-    labels_filename = path.join(output_dir, 'labels.txt'.format(language))
+    labels_filename = path.join(output_dir, 'labels.txt')
     save_labels(small_frame, labels_filename)
 
     # save small_frame matrix
-    vectors_filename = path.join(output_dir, 'vectors.npy'.format(language))
+    vectors_filename = path.join(output_dir, 'vectors.npy')
     save_npy(small_frame.values, vectors_filename)
 
 

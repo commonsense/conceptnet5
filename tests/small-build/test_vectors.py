@@ -23,7 +23,7 @@ def setup_simple_frame():
             [7, 2, 7],
             [3, 8, 2]]
 
-    index = ['island', 'Island', 'cat', 'figure', 'figure skating', 'figure skater','thing','17']
+    index = ['island', 'Island', 'cat', 'figure', 'figure skating', 'figure skater', 'thing', '17']
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
@@ -59,8 +59,8 @@ def test_vector_space_wrapper():
     ok_(wrap.frame.index.is_monotonic_increasing)
 
     # test there are no transformations to raw terms other than adding the english tag
-    ok_('/c/en/figure skater' in wrap.frame.index) # no underscore
-    ok_('/c/en/Island' in wrap.frame.index) # no case folding
+    ok_('/c/en/figure skater' in wrap.frame.index)  # no underscore
+    ok_('/c/en/Island' in wrap.frame.index)  # no case folding
 
     # test index_prefix_range
     ok_(wrap.index_prefix_range('/c/en/figure') == (3, 6))
@@ -142,7 +142,6 @@ def test_l2_normalize_rows():
 
 @with_setup(setup_simple_frame)
 def test_shrink_and_sort():
-
     n, k = 3, 2
     shrank = shrink_and_sort(TEST_FRAME, n, k)
 
