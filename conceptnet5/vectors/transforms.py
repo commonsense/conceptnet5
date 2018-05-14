@@ -149,24 +149,14 @@ def make_replacements(small_frame, big_frame):
     return replacements
 
 
-def choose_small_vocabulary(big_frame, concepts, language):
+def choose_small_vocabulary(index, concepts):
     """
     Choose the vocabulary of the small frame, by eliminating the terms which:
      - contain more than one word
      - are not in ConceptNet
-     - are not frequent
     """
-    vocab = []
-    for term in big_frame.index:
-        if '_' not in term and term in concepts:
-            try:
-                frequency = word_frequency(uri_to_label(term), language, wordlist='large')
-            except LookupError:
-                frequency = word_frequency(uri_to_label(term), language, wordlist='combined')
-            vocab.append((term, frequency))
-    small_vocab = [term for term, frequency in sorted(vocab, key=lambda x: x[1], reverse=True)[
-                                               :50000]]
-    return small_vocab
+    vocab = [term for term in index if '_' not in term and term in concepts]
+    return vocab
 
 
 def make_big_frame(frame, language):
@@ -179,11 +169,11 @@ def make_big_frame(frame, language):
     return big_frame
 
 
-def make_small_frame(big_frame, concepts, language):
+def make_small_frame(big_frame, concepts):
     """
     Create a small frame using the output of choose_small_vocabulary()
     """
-    small_vocab = choose_small_vocabulary(big_frame, concepts, language)
+    small_vocab = choose_small_vocabulary(big_frame.index, concepts)
     return big_frame.ix[small_vocab]
 
 

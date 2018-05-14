@@ -280,7 +280,7 @@ def export_background(input_filename, output_dir, concepts_filename, language,
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
     concepts = set(line.strip() for line in open(concepts_filename))
-    small_frame = make_small_frame(big_frame, concepts, language)
+    small_frame = make_small_frame(big_frame, concepts)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
     save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
                       replacements)
