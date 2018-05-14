@@ -7,7 +7,7 @@ from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.vectors.transforms import standardize_row_labels, l1_normalize_columns, \
-    l2_normalize_rows, shrink_and_sort
+    l2_normalize_rows, make_big_frame, make_small_frame, shrink_and_sort
 
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "testdata")
 TEST_FRAME = None
@@ -156,3 +156,23 @@ def test_shrink_and_sort():
 
     # Check if the index is sorted
     ok_(shrank.index.is_monotonic_increasing)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_make_language_frame():
+    english_frame = make_big_frame(TEST_FRAME, 'en')
+    ok_('/c/en/ski_jumping' in english_frame.index)
+    ok_('/c/en/nordic_combined' in english_frame.index)
+    ok_('/c/en/present' in english_frame.index)
+    ok_('/c/en/gift' in english_frame.index)
+    ok_('/c/pl/kombinacja' not in english_frame.index)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_make_small_frame():
+    concepts_to_keep = ['/c/en/ski_jumping', '/c/en/nordic_combined', '/c/en/present']
+    small_frame = make_small_frame(TEST_FRAME, concepts_to_keep, 'en')
+    ok_('/c/en/ski_jumping' not in small_frame.index)
+    ok_('/c/en/nordic_combined' not in small_frame.index)
+    ok_('/c/en/present' in small_frame.index)
+    ok_('/c/en/gift' not in small_frame.index)

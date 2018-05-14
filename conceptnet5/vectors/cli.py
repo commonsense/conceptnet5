@@ -279,7 +279,8 @@ def export_background(input_filename, output_dir, concepts_filename, language,
                       tree_depth, verbose):
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
-    small_frame = make_small_frame(big_frame, concepts_filename, language)
+    concepts = set(line.strip() for line in open(concepts_filename))
+    small_frame = make_small_frame(big_frame, concepts, language)
     replacements = make_replacements_faster(small_frame, big_frame, tree_depth, language, verbose)
     save_replacements(path.join(output_dir, 'replacements.msgpack'.format(language)),
                       replacements)
@@ -297,7 +298,6 @@ def export_background(input_filename, output_dir, concepts_filename, language,
     save_npy(np.ones(small_frame.shape[1]), sigma_filename)
 
 
-
 @cli.command(name='propagate')
 @click.argument('assoc_filename',
                 type=click.Path(readable=True, dir_okay=False))
@@ -311,7 +311,8 @@ def run_propagate(assoc_filename, embedding_filename, output_filename,
                   nshards=6, iterations=20):
     sharded_propagate(assoc_filename, embedding_filename, output_filename, 
                       nshards=nshards, iterations=iterations)
-    
+
+
 @cli.command(name='join_propagate')
 @click.argument('filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nshards', '-s', default=6)

@@ -149,14 +149,13 @@ def make_replacements(small_frame, big_frame):
     return replacements
 
 
-def choose_small_vocabulary(big_frame, concepts_filename, language):
+def choose_small_vocabulary(big_frame, concepts, language):
     """
     Choose the vocabulary of the small frame, by eliminating the terms which:
      - contain more than one word
      - are not in ConceptNet
      - are not frequent
     """
-    concepts = set(line.strip() for line in open(concepts_filename))
     vocab = []
     for term in big_frame.index:
         if '_' not in term and term in concepts:
@@ -180,11 +179,11 @@ def make_big_frame(frame, language):
     return big_frame
 
 
-def make_small_frame(big_frame, concepts_filename, language):
+def make_small_frame(big_frame, concepts, language):
     """
     Create a small frame using the output of choose_small_vocabulary()
     """
-    small_vocab = choose_small_vocabulary(big_frame, concepts_filename, language)
+    small_vocab = choose_small_vocabulary(big_frame, concepts, language)
     return big_frame.ix[small_vocab]
 
 
