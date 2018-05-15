@@ -5,7 +5,7 @@ an edge.
 """
 
 from conceptnet5.uri import (
-    assertion_uri, uri_prefix, conjunction_uri, is_concept, split_uri
+    assertion_uri, uri_prefix, conjunction_uri, is_concept
 )
 from conceptnet5.nodes import ld_node
 import re
