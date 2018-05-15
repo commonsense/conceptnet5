@@ -79,7 +79,6 @@ def msgpack_to_assoc(input_filename, output_filename):
             weight = info['weight']
             dataset = info['dataset']
 
-            pairs = []
             for uri in (start_uri, end_uri):
                 pieces = split_uri(uri)
                 if len(pieces) > 3 and (uri, dataset) not in prefixed:
