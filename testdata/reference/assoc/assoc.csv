@@ -347,7 +347,7 @@
 /c/it/test/n	/c/it/test	1.0	/d/wiktionary/de	/r/SenseOf
 /c/it/test/n	/c/it/test	1.0	/d/wiktionary/en	/r/SenseOf
 /c/it/test/n	/c/it/test	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ja/アメリカ_合衆国の教育	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
+/c/ja/アメリカ合衆国の教育	/c/en/education_in_united_states	0.5	/d/dbpedia/en	/r/Synonym
 /c/ja/テスト	/c/ja/勉強	0.20000000000000018	/d/conceptnet/4/ja	/r/HasPrerequisite
 /c/ja/テスト	/c/ja/名前を書くこと	0.3999999999999999	/d/conceptnet/4/ja	/r/HasSubevent
 /c/ja/テスト/n	/c/de/probe	2.0	/d/jmdict	/r/Synonym
@@ -371,8 +371,8 @@
 /c/ja/テスト/n	/c/nl/test	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト/n	/c/nl/toets	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト/n	/c/ru/тест	2.0	/d/jmdict	/r/Synonym
-/c/ja/テスト_作業/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
-/c/ja/テスト_作業/n	/c/ja/テスト_作業	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/ja/テスト作業/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
+/c/ja/テスト作業/n	/c/ja/テスト作業	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ja/トライアル/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym
 /c/ja/トライアル/n	/c/ja/トライアル	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ja/トライヤル/n	/c/en/test/n	2.0	/d/wordnet/3.1	/r/Synonym

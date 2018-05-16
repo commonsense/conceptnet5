@@ -33,7 +33,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         del retrofitted
 
 
-def join_shards(output_filename, nshards=6):
+def join_shards(output_filename, nshards=6, sort=False):
     joined_matrix = None
     joined_labels = None
     for i in range(nshards):
@@ -47,6 +47,8 @@ def join_shards(output_filename, nshards=6):
 
     normalize(joined_matrix, axis=1, norm='l2', copy=False)
     dframe = pd.DataFrame(joined_matrix, index=joined_labels)
+    if sort:
+        dframe.sort_index(inplace=True)
     save_hdf(dframe, output_filename)
 
 
