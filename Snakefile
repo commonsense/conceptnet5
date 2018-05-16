@@ -683,7 +683,7 @@ rule join_propagate:
     resources:
         ram=24
     shell:
-        "cn5-vectors join_propagate -s {PROPAGATE_SHARDS} {output}"
+        "cn5-vectors join_propagate -s {PROPAGATE_SHARDS} --sort {output}"
 
 rule debias:
     input:

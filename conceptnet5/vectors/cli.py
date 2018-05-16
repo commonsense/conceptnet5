@@ -303,8 +303,9 @@ def run_propagate(assoc_filename, embedding_filename, output_filename,
 @cli.command(name='join_propagate')
 @click.argument('filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nshards', '-s', default=6)
-def run_join_propagate(filename, nshards=6):
+@click.option('--sort/--no-sort', default=True)
+def run_join_propagate(filename, nshards=6, sort=True):
     """
     Join parts of a propagated frame.
     """
-    join_shards(filename, nshards)
+    join_shards(filename, nshards, sort=sort)
