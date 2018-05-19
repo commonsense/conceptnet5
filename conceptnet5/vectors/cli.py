@@ -63,16 +63,6 @@ def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
     )
 
 
-@cli.command(name='join_retrofit')
-@click.argument('filename', type=click.Path(writable=True, dir_okay=False))
-@click.option('--nshards', '-s', default=6)
-def run_join_retrofit(filename, nshards=6):
-    """
-    Join parts of a retrofitted frame.
-    """
-    join_shards(filename, nshards)
-
-
 @cli.command(name='convert_glove')
 @click.argument('glove_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
@@ -300,12 +290,12 @@ def run_propagate(assoc_filename, embedding_filename, output_filename,
                       nshards=nshards, iterations=iterations)
 
 
-@cli.command(name='join_propagate')
+@cli.command(name='join_shard_files')
 @click.argument('filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nshards', '-s', default=6)
 @click.option('--sort/--no-sort', default=True)
-def run_join_propagate(filename, nshards=6, sort=True):
+def run_join_shard_files(filename, nshards=6, sort=True):
     """
-    Join parts of a propagated frame.
+    Join parts of a sharded (e.g. from retrofitting or propagation) frame.
     """
     join_shards(filename, nshards, sort=sort)
