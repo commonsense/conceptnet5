@@ -8,15 +8,15 @@ NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 
-RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT :limit"
-RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT :limit"
-DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = :dataset ORDER BY weight DESC OFFSET :offset LIMIT :limit"
+RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT %(limit)s"
+RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT %(limit)s"
+DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = %(dataset)s ORDER BY weight DESC OFFSET %(offset)s LIMIT %(limit)s"
 
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=:node
+    WHERE p.prefix_id=n.id AND n.uri=%(node)s
     LIMIT 10
 )
 SELECT rf.direction, r.uri, e.data
@@ -24,7 +24,7 @@ FROM ranked_features rf, edges e, relations r
 WHERE rf.node_id IN (SELECT node_id FROM node_ids)
 AND rf.edge_id = e.id
 AND rf.rel_id = r.id
-AND rank <= :limit
+AND rank <= %(limit)s
 ORDER BY direction, uri, rank;
 """
 MAX_GROUP_SIZE = 20
@@ -59,29 +59,29 @@ def make_list_query(criteria):
             AND p2.node_id=n2.id
         """)
         if 'source' in criteria:
-            parts.append("AND s.uri=:source AND es.source_id=s.id AND es.edge_id=e.id")
+            parts.append("AND s.uri=%(source)s AND es.source_id=s.id AND es.edge_id=e.id")
         if 'node' in criteria:
             if direction == 1:
-                parts.append("AND np1.uri = :node")
+                parts.append("AND np1.uri = %(node)s")
             else:
-                parts.append("AND np2.uri = :node")
+                parts.append("AND np2.uri = %(node)s")
         if 'other' in criteria:
             if direction == 1:
-                parts.append("AND np2.uri = :other")
+                parts.append("AND np2.uri = %(other)s")
             else:
-                parts.append("AND np1.uri = :other")
+                parts.append("AND np1.uri = %(other)s")
         if 'rel' in criteria:
-            parts.append("AND r.uri = :rel")
+            parts.append("AND r.uri = %(rel)s")
         if 'start' in criteria:
-            parts.append("AND np1.uri = :start")
+            parts.append("AND np1.uri = %(start)s")
         if 'end' in criteria:
-            parts.append("AND np2.uri = :end")
+            parts.append("AND np2.uri = %(end)s")
     parts.append("LIMIT 10000")
     parts.append(")")
     parts.append("""
         SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges
         ORDER BY weight DESC, uri
-        OFFSET :offset LIMIT :limit
+        OFFSET %(offset)s LIMIT %(limit)s
     """)
     query = '\n'.join(parts)
     LIST_QUERIES[crit_tuple] = query
@@ -142,7 +142,7 @@ class AssertionFinder(object):
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
-        cursor.execute("SELECT data FROM edges WHERE uri=:uri", {'uri': uri})
+        cursor.execute("SELECT data FROM edges WHERE uri=%(uri)s", {'uri': uri})
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
         return results
 

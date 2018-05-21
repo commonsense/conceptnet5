@@ -113,6 +113,6 @@ def load_sql_csv(connection, input_dir):
     ]:
         cursor = connection.cursor()
         with open(filename, 'rb') as file:
-            cursor.execute("COPY %s FROM STDIN" % tablename, stream=file)
+            cursor.copy_from(file, tablename)
         cursor.close()
         connection.commit()

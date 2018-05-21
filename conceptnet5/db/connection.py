@@ -1,4 +1,4 @@
-import pg8000
+import psycopg2
 import time
 import sys
 import os
@@ -19,39 +19,24 @@ def get_db_connection(dbname=None):
     if dbname in _CONNECTIONS:
         return _CONNECTIONS[dbname]
     else:
-        for attempt in range(10):
-            try:
-                _CONNECTIONS[dbname] = _get_db_connection_inner(dbname)
-                return _CONNECTIONS[dbname]
-            except pg8000.InterfaceError:
-                if attempt == 0:
-                    print(
-                        "Database %r is not available, retrying for 10 seconds" % dbname,
-                        file=sys.stderr
-                    )
-                time.sleep(1)
-        raise IOError(
-            "Couldn't connect to database %r" % dbname
-        )
+        _CONNECTIONS[dbname] = _get_db_connection_inner(dbname)
+        return _CONNECTIONS[dbname]
 
 
 def _get_db_connection_inner(dbname):
-    if not config.DB_PASSWORD:
-        conn = pg8000.connect(
-            user=config.DB_USERNAME,
-            unix_sock=config.DB_SOCKET,
-            database=dbname
-        )
-    else:
-        conn = pg8000.connect(
+    if config.DB_PASSWORD:
+        conn = psycopg2.connect(
+            dbname=dbname,
             user=config.DB_USERNAME,
             password=config.DB_PASSWORD,
             host=config.DB_HOSTNAME,
-            port=config.DB_PORT,
-            database=dbname
+            port=config.DB_PORT
         )
+    else:
+        conn = psycopg2.connect(dbname=dbname)
 
-    pg8000.paramstyle = 'named'
+    conn.autocommit = True
+    psycopg2.paramstyle = 'named'
     return conn
 
 
