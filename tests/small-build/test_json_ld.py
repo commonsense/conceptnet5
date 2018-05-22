@@ -4,16 +4,14 @@ from pyld import jsonld
 from nose.tools import eq_
 
 from conceptnet5.api import lookup_grouped_by_feature, lookup_paginated
-from conceptnet_web.api import app
-
+from conceptnet5.util import get_support_data_filename
 
 context = None
-CONTEXT_PATH = "ld/conceptnet5.6/context.ld.json"
 
 
 def setUp():
     global context
-    context_filename = os.path.join(app.root_path, 'static', CONTEXT_PATH)
+    context_filename = get_support_data_filename('ld/context.ld.json')
     context = json.load(open(context_filename))
 
 
@@ -82,7 +80,7 @@ def test_lookup_paginated():
     # The original response points to a context file retrieved over HTTP.
     # Check its value before we mess with it.
     orig_context = response['@context']
-    eq_(orig_context, ["http://api.conceptnet.io/" + CONTEXT_PATH])
+    eq_(orig_context, ["http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json"])
 
     ld = flat_map(response)
 
