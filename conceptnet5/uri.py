@@ -372,10 +372,15 @@ def uri_to_label(uri):
     'example'
     >>> uri_to_label('/c/en/canary_islands')
     'canary islands'
+    >>> uri_to_label('/c/en')
+    ''
     """
     if is_term(uri):
         uri = uri_prefix(uri)
-    return uri.split('/')[-1].replace('_', ' ')
+    parts = split_uri(uri)
+    if len(parts) < 3:
+        return ''
+    return parts[-1].replace('_', ' ')
 
 
 class Licenses:
