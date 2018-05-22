@@ -28,7 +28,7 @@ setup(
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
         'snakemake', 'click', 'requests', 'ftfy', 'msgpack-python', 'numpy',
-        'langcodes >= 1.4.1', 'wordfreq >= 2.0',
+        'langcodes >= 1.4.1', 'wordfreq >= 2.0.1',
         'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'psycopg2-binary',
         'marisa-trie'
     ],
