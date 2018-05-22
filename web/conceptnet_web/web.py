@@ -1,10 +1,9 @@
 """
 This file sets up Flask to serve the ConceptNet 5 API in JSON-LD format.
 """
-from conceptnet_web import responses
+from conceptnet5 import api as responses
 from conceptnet_web.filters import FILTERS
 from conceptnet_web.relations import REL_HEADINGS
-from conceptnet_web.responses import VALID_KEYS
 from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet5.uri import split_uri
 from conceptnet5.nodes import standardized_concept_uri
@@ -78,7 +77,7 @@ def browse_concept(uri):
     offset = get_int(req_args, 'offset', 0, 0, 10000)
 
     filters = {}
-    for key in VALID_KEYS:
+    for key in responses.VALID_KEYS:
         if key != 'node' and key in req_args:
             filters[key] = req_args[key]
 
@@ -142,7 +141,7 @@ def query():
     offset = get_int(req_args, 'offset', 0, 0, 100000)
     limit = get_int(req_args, 'limit', 100, 0, 1000)
     for key in flask.request.args:
-        if key in VALID_KEYS:
+        if key in responses.VALID_KEYS:
             criteria[key] = flask.request.args[key]
     return edge_list_query(criteria, offset=offset, limit=limit)
 
