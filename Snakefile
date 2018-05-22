@@ -641,7 +641,7 @@ rule retrofit:
     resources:
         ram=24
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
+        "cn5-vectors retrofit -n {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -651,7 +651,7 @@ rule join_retrofit:
     resources:
         ram=24
     shell:
-        "cn5-vectors join_shard_files -s {RETROFIT_SHARDS} {output}"
+        "cn5-vectors join_shard_files -n {RETROFIT_SHARDS} {output}"
 
 rule merge_intersect:
     input:
@@ -673,7 +673,7 @@ rule propagate:
     resources:
         ram=24
     shell:
-        "cn5-vectors propagate -s {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-biased.h5"
+        "cn5-vectors propagate -n {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-biased.h5"
 
 rule join_propagate:
     input:
@@ -683,7 +683,7 @@ rule join_propagate:
     resources:
         ram=24
     shell:
-        "cn5-vectors join_shard_files -s {PROPAGATE_SHARDS} --sort {output}"
+        "cn5-vectors join_shard_files -n {PROPAGATE_SHARDS} --sort {output}"
 
 rule debias:
     input:

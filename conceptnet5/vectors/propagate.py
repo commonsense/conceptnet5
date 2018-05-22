@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import diags
 from conceptnet5.builders.reduce_assoc import ConceptNetAssociationGraph
-from conceptnet5.builders.reduce_assoc import make_conceptnet_association_graph
 from conceptnet5.uri import get_uri_language
 from .sparse_matrix_builder import SparseMatrixBuilder
 from .formats import load_hdf, save_hdf
@@ -90,10 +89,8 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # overlap the vocabulary of the embedding; we can't do anything with
     # those terms.
 
-    graph = make_conceptnet_association_graph(
-        assoc_filename,
-        graph_class=ConceptNetAssociationGraphForPropagation,
-        reject_negative_relations=False)
+    graph = ConceptNetAssociationGraphForPropagation.from_csv(
+        assoc_filename, reject_negative_relations=False)
     component_labels = graph.find_components()
 
     # Get the labels of components that overlap the embedding vocabulary.

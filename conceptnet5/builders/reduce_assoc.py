@@ -26,12 +26,6 @@ def concept_is_bad(uri):
 class ConceptNetAssociationGraph:
     '''
     Class to hold the concept-association edge graph.
-    
-    Note that this class currently has two use cases (reduced 
-    association graphs and full graphs used for propagation of vector 
-    embeddings), and the edge data needed in each case is different.  
-    So that data is not stored in the graph, but is returned along 
-    with the graph by the factory function make_conceptnet_association_graph.
     '''
     def __init__(self):
         '''Construct a graph with no vertices or edges.'''
@@ -76,6 +70,51 @@ class ConceptNetAssociationGraph:
                         stack.append(neighbor)
 
         return component_labels
+
+    @classmethod
+    def from_csv(cls, filename, filtered_concepts=None,
+                 reject_negative_relations=True):
+        """
+        Reads an association file and builds an (undirected) graph from it. 
+
+        If filtered_concepts isn't None, it should be a collection of concepts, 
+        and only vertices from this collection and edges that link two such 
+        vertices will be added to the graph.  If it _is_ None (the default), 
+        however, please note that no such filtering will be done (i.e. the 
+        effective filter collection is then the universal set of concepts, not 
+        the empty set).
+
+        If reject_negative_relations is True (the default), only edges not 
+        corresponding to negative relations will be added to the graph.
+        """
+        graph = cls()
+
+        if filtered_concepts is None:
+            filter_concepts = False
+        else:
+            filter_concepts = True
+
+        with open(filename, encoding='utf-8') as file:
+            for line in file:
+                left, right, value, dataset, rel = line.rstrip().split('\t', 4)
+                if concept_is_bad(left) or concept_is_bad(right):
+                    continue
+                if reject_negative_relations and is_negative_relation(rel):
+                    continue
+                fvalue = float(value)
+                gleft = uri_prefix(left)
+                gright = uri_prefix(right)
+                if fvalue == 0:
+                    continue
+                if gleft == gright:
+                    continue
+                if filter_concepts and gleft not in filtered_concepts:
+                    continue
+                if filter_concepts and gright not in filtered_concepts:
+                    continue
+                graph.add_edge(gleft, gright, value, dataset, rel)
+
+        return graph
 
 
 class ConceptNetAssociationGraphForReduction(ConceptNetAssociationGraph):
@@ -130,60 +169,6 @@ def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
     return filtered_concepts
 
 
-def make_conceptnet_association_graph(
-        filename,
-        graph_class=ConceptNetAssociationGraph,
-        filtered_concepts=None,
-        reject_negative_relations=True):
-    """
-    Reads an association file and builds an (undirected) graph from it. 
-    
-    Returns a pair: the graph, and associated edge data.
-    
-    The optional graph_class parameter should be a subclass of 
-    ConceptNetAssociationGraph (which is the default value); an instance 
-    of this class will be returned.
-    
-    If filtered_concepts is not None, it should be a collection of concepts, 
-    and only vertices from this collection and edges that link two such 
-    vertices will be added to the graph.  If it _is_ None (the default), 
-    however, please note that no such filtering will be done (i.e. the 
-    effective filter collection is then the universal set of concepts, not 
-    the empty set).
-    
-    If reject_negative_relations is True (the default), only edges not 
-    corresponding to negative relations will be added to the graph.
-    """
-    graph = graph_class()
-    
-    if filtered_concepts is None:
-        filter_concepts = False
-    else:
-        filter_concepts = True
-        
-    with open(filename, encoding='utf-8') as file:
-        for line in file:
-            left, right, value, dataset, rel = line.rstrip().split('\t', 4)
-            if concept_is_bad(left) or concept_is_bad(right):
-                continue
-            if reject_negative_relations and is_negative_relation(rel):
-                continue
-            fvalue = float(value)
-            gleft = uri_prefix(left)
-            gright = uri_prefix(right)
-            if fvalue == 0:
-                continue
-            if gleft == gright:
-                continue
-            if filter_concepts and gleft not in filtered_concepts:
-                continue
-            if filter_concepts and gright not in filtered_concepts:
-                continue
-            graph.add_edge(gleft, gright, value, dataset, rel)
-                
-    return graph
-
-
 def read_embedding_vocabularies(filenames):
     """
     Reads every vector embedding file in the given collection of 
@@ -216,9 +201,8 @@ def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
     filtered_concepts = make_filtered_concepts(assoc_filename, cutoff=cutoff,
                                                en_cutoff=en_cutoff)
 
-    graph = make_conceptnet_association_graph(
+    graph = ConceptNetAssociationGraphForReduction.from_csv(
         assoc_filename,
-        graph_class=ConceptNetAssociationGraphForReduction, 
         filtered_concepts=filtered_concepts,
         reject_negative_relations=True
     )
