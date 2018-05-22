@@ -27,23 +27,12 @@ class ConceptNetAssociationGraph:
     '''
     Class to hold the concept-association edge graph.
     '''
-    def __init__(self, save_edge_list=True):
+    def __init__(self):
         '''Construct a graph with no vertices or edges.'''
-        if save_edge_list:
-            self._edge_list = list()
-            self._edge_set = None
-        else:
-            self._edge_list = None
-            self._edge_set = set()
         self.vertex_to_neighbors = defaultdict(set)
-        return
 
-    def add_edge(self, left, right, value, dataset, rel):
+    def add_edge(self, left, right, value, dataset, relation):
         '''Insert an edge in the graph.'''
-        if self._edge_list is not None:
-            self._edge_list.append((left, right, value, dataset, rel))
-        else:
-            self._edge_set.add((left, right))
         self.vertex_to_neighbors[left].add(right)
         self.vertex_to_neighbors[right].add(left)
         return
@@ -51,25 +40,6 @@ class ConceptNetAssociationGraph:
     def vertices(self):
         '''Returns an iterator over the vertices of the graph.'''
         return self.vertex_to_neighbors.keys()
-
-    def edge_list(self):
-        '''
-        Returns an iterator over the edges (left, right, value, dataset, erl) 
-        of the graph.  Can only be used if the graph was constructed with 
-        save_edge_list=True.
-        '''
-        for edge in self._edge_list:
-            yield edge
-        return
-
-    def edge_set(self):
-        '''
-        Returns an iterator over the edges (left, right) of the graph.  
-        Can only be used if the graph was constructed with save_edge_list=False.
-        '''
-        for edge in self._edge_set:
-            yield edge
-        return
 
     def find_components(self):
         '''
@@ -100,6 +70,70 @@ class ConceptNetAssociationGraph:
                         stack.append(neighbor)
 
         return component_labels
+
+    @classmethod
+    def from_csv(cls, filename, filtered_concepts=None,
+                 reject_negative_relations=True):
+        """
+        Reads an association file and builds an (undirected) graph from it. 
+
+        If filtered_concepts isn't None, it should be a collection of concepts, 
+        and only vertices from this collection and edges that link two such 
+        vertices will be added to the graph.  If it _is_ None (the default), 
+        however, please note that no such filtering will be done (i.e. the 
+        effective filter collection is then the universal set of concepts, not 
+        the empty set).
+
+        If reject_negative_relations is True (the default), only edges not 
+        corresponding to negative relations will be added to the graph.
+        """
+        graph = cls()
+
+        if filtered_concepts is None:
+            filter_concepts = False
+        else:
+            filter_concepts = True
+
+        with open(filename, encoding='utf-8') as file:
+            for line in file:
+                left, right, value, dataset, rel = line.rstrip().split('\t', 4)
+                if concept_is_bad(left) or concept_is_bad(right):
+                    continue
+                if reject_negative_relations and is_negative_relation(rel):
+                    continue
+                fvalue = float(value)
+                gleft = uri_prefix(left)
+                gright = uri_prefix(right)
+                if fvalue == 0:
+                    continue
+                if gleft == gright:
+                    continue
+                if filter_concepts and gleft not in filtered_concepts:
+                    continue
+                if filter_concepts and gright not in filtered_concepts:
+                    continue
+                graph.add_edge(gleft, gright, value, dataset, rel)
+
+        return graph
+
+
+class ConceptNetAssociationGraphForReduction(ConceptNetAssociationGraph):
+    """
+    Subclass of ConceptNetAssociationGraph specialized for use in making 
+    the reduced subgraph of a full set of associations.
+    """
+    def __init__(self):
+        super().__init__()
+        self.edges = []
+    
+    def add_edge(self, left, right, value, dataset, relation):
+        """
+        In addition to the superclass's handling of a new edge, 
+        saves the full edge data.
+        """
+        super().add_edge(left, right, value, dataset, relation)
+        self.edges.append((left, right, value, dataset, relation))
+
 
 
 def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
@@ -135,36 +169,13 @@ def make_filtered_concepts(filename, cutoff=3, en_cutoff=3):
     return filtered_concepts
 
 
-def make_conceptnet_association_graph(
-        filename, save_edge_list=True,
-        concept_filter=None, bad_concept=concept_is_bad,
-        bad_relation=is_negative_relation):
-    """
-    Reads an association file and builds an (undirected) graph from it, 
-    """
-    graph = ConceptNetAssociationGraph(save_edge_list)
-    if concept_filter is None:
-        concept_filter = lambda concept: True
-    if bad_concept is None:
-        bad_concept = lambda concept: False
-    if bad_relation is None:
-        bad_relation = lambda rel: False
-    
-    with open(filename, encoding='utf-8') as file:
-        for line in file:
-            left, right, value, dataset, rel = line.rstrip().split('\t', 4)
-            if bad_concept(left) or bad_concept(right) or bad_relation(rel):
-                continue
-            fvalue = float(value)
-            gleft = uri_prefix(left)
-            gright = uri_prefix(right)
-            if concept_filter(gleft) and concept_filter(gright) \
-               and fvalue != 0 and gleft != gright:
-                graph.add_edge(gleft, gright, value, dataset, rel)
-    return graph
-
-
 def read_embedding_vocabularies(filenames):
+    """
+    Reads every vector embedding file in the given collection of 
+    filenames, and returns the union of their vocabularies.  (The 
+    files are assumed to be hdf5 files containing dataframes, and 
+    the vocabularies are their indices.
+    """
     result = pd.Index([])
     for filename in filenames:
         vectors = load_hdf(filename)
@@ -190,23 +201,27 @@ def reduce_assoc(assoc_filename, embedding_filenames, output_filename,
     filtered_concepts = make_filtered_concepts(assoc_filename, cutoff=cutoff,
                                                en_cutoff=en_cutoff)
 
-    graph = make_conceptnet_association_graph(
+    graph = ConceptNetAssociationGraphForReduction.from_csv(
         assoc_filename,
-        concept_filter=lambda concept:
-        concept in filtered_concepts,
-        bad_concept=concept_is_bad,
-        bad_relation=is_negative_relation)
+        filtered_concepts=filtered_concepts,
+        reject_negative_relations=True
+    )
 
     component_labels = graph.find_components()
 
     embedding_vocab = read_embedding_vocabularies(embedding_filenames)
 
+    # If a connected component of the conceptnet graph contains no terms
+    # from any of the embedding vocabularies, there will be no way to assign
+    # vectors to any of its vertices, so we remove that component from the
+    # output.
+    
     good_component_labels = set(label for term, label
                                 in component_labels.items()
                                 if term in embedding_vocab)
     
     with open(output_filename, 'w', encoding='utf-8') as out:
-        for gleft, gright, value, dataset, rel in graph.edge_list():
+        for gleft, gright, value, dataset, rel in graph.edges:
             if component_labels[gleft] not in good_component_labels:
                 continue
             if component_labels[gright] not in good_component_labels:

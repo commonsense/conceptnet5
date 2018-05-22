@@ -641,7 +641,7 @@ rule retrofit:
     resources:
         ram=24
     shell:
-        "cn5-vectors retrofit -s {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
+        "cn5-vectors retrofit -n {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
 rule join_retrofit:
     input:
@@ -651,13 +651,13 @@ rule join_retrofit:
     resources:
         ram=24
     shell:
-        "cn5-vectors join_retrofit -s {RETROFIT_SHARDS} {output}"
+        "cn5-vectors join_shard_files -n {RETROFIT_SHARDS} {output}"
 
 rule merge_intersect:
     input:
         expand(DATA + "/vectors/{name}-retrofit.h5", name=INPUT_EMBEDDINGS)
     output:
-        DATA + "/vectors/numberbatch-biased.h5",
+        DATA + "/vectors/numberbatch-retrofitted.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
         ram=24
@@ -667,27 +667,27 @@ rule merge_intersect:
 rule propagate:
     input:
         DATA + "/assoc/assoc.csv",
-        DATA + "/vectors/numberbatch-biased.h5"
+        DATA + "/vectors/numberbatch-retrofitted.h5"
     output:
-        temp(expand(DATA + "/vectors/numberbatch-propagated.h5.shard{n}", n=range(PROPAGATE_SHARDS)))
+        temp(expand(DATA + "/vectors/numberbatch-biased.h5.shard{n}", n=range(PROPAGATE_SHARDS)))
     resources:
         ram=24
     shell:
-        "cn5-vectors propagate -s {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-propagated.h5"
+        "cn5-vectors propagate -n {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-biased.h5"
 
 rule join_propagate:
     input:
-        expand(DATA + "/vectors/numberbatch-propagated.h5.shard{n}", n=range(PROPAGATE_SHARDS))
+        expand(DATA + "/vectors/numberbatch-biased.h5.shard{n}", n=range(PROPAGATE_SHARDS))
     output:
-        DATA + "/vectors/numberbatch-propagated.h5"
+        DATA + "/vectors/numberbatch-biased.h5"
     resources:
         ram=24
     shell:
-        "cn5-vectors join_propagate -s {PROPAGATE_SHARDS} --sort {output}"
+        "cn5-vectors join_shard_files -n {PROPAGATE_SHARDS} --sort {output}"
 
 rule debias:
     input:
-        DATA + "/vectors/numberbatch-propagated.h5"
+        DATA + "/vectors/numberbatch-biased.h5"
     output:
         DATA + "/vectors/numberbatch.h5"
     resources:
@@ -697,7 +697,7 @@ rule debias:
 
 rule miniaturize:
     input:
-        DATA + "/vectors/numberbatch-propagated.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/w2v-google-news.h5"
     output:
         DATA + "/vectors/mini.h5"
@@ -764,7 +764,7 @@ rule compare_embeddings:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/vectors/glove12-840B.h5",
         DATA + "/raw/vectors/fasttext-wiki-en.vec.gz",
-        DATA + "/vectors/numberbatch-propagated.h5",
+        DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/numberbatch.h5",
         DATA + "/raw/analogy/SAT-package-V3.txt",
         DATA + "/psql/done"

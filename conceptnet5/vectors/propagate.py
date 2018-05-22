@@ -7,10 +7,30 @@ reduced graph.
 import numpy as np
 import pandas as pd
 from scipy.sparse import diags
-from conceptnet5.builders.reduce_assoc import make_conceptnet_association_graph
+from conceptnet5.builders.reduce_assoc import ConceptNetAssociationGraph
 from conceptnet5.uri import get_uri_language
 from .sparse_matrix_builder import SparseMatrixBuilder
 from .formats import load_hdf, save_hdf
+
+
+class ConceptNetAssociationGraphForPropagation(ConceptNetAssociationGraph):
+    """
+    Subclass of ConceptNetAssociationGraph specialized for use in making 
+    the full graph of a set of associations as required for propagation.
+    """
+    def __init__(self):
+        super().__init__()
+        self.edges = set()
+
+    def add_edge(self, left, right, value, dataset, relation):
+        """
+        In addition to the superclass's handling of a new edge, 
+        saves the edges as a set of (left, right) pairs.  Note that 
+        we do not save (right, left) as well as (left, right) (but also 
+        do not guarantee that only one of the two has been saved).
+        """
+        super().add_edge(left, right, value, dataset, relation)
+        self.edges.add((left, right))
 
 
 def sharded_propagate(assoc_filename, embedding_filename, 
@@ -20,6 +40,10 @@ def sharded_propagate(assoc_filename, embedding_filename,
     splitting the embedding into shards (along the dimensions of the 
     embedding feature space).
     """
+    # frame_box is basically a reference to a single large DataFrame. The
+    # DataFrame will at times be present or absent. When it's present, the list
+    # contains one item, which is the DataFrame. When it's absent, the list
+    # is empty.
     frame_box = [load_hdf(embedding_filename)]
     adjacency_matrix, combined_index, n_new_english = \
         make_adjacency_matrix(assoc_filename, frame_box[0].index)
@@ -34,6 +58,8 @@ def sharded_propagate(assoc_filename, embedding_filename,
         embedding_shard = pd.DataFrame(
             frame_box[0].iloc[:, shard_from:shard_to])
 
+        # Delete full_dense_frame while running retrofitting, because it takes
+        # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
         propagated = propagate(combined_index, embedding_shard,
@@ -63,18 +89,25 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # overlap the vocabulary of the embedding; we can't do anything with
     # those terms.
 
-    graph = make_conceptnet_association_graph(
-        assoc_filename, save_edge_list=False,
-        bad_concept=None, bad_relation=None)
+    graph = ConceptNetAssociationGraphForPropagation.from_csv(
+        assoc_filename, reject_negative_relations=False)
     component_labels = graph.find_components()
+
+    # Get the labels of components that overlap the embedding vocabulary.
     good_component_labels = set(label for term, label
                                 in component_labels.items()
                                 if term in embedding_vocab)
+
+    # Now get the concepts in those components.
     good_concepts = set(term for term, label
                         in component_labels.items()
                         if label in good_component_labels)
+    
     del component_labels, good_component_labels
 
+    # Put terms from the embedding first, then terms from the good part
+    # of the graph neither from the embedding nor in English, then terms
+    # from the good part of the graph in English but not from the embedding.
     new_vocab = good_concepts - set(embedding_vocab)
     good_concepts = embedding_vocab.append(
         pd.Index(term for term in new_vocab
@@ -99,7 +132,7 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # we may want to add such edges here as well.
     
     builder = SparseMatrixBuilder()
-    for v,w in graph.edge_set():
+    for v,w in graph.edges:
         try:
             index0 = good_concepts_map[v]
             index1 = good_concepts_map[w]
@@ -141,12 +174,14 @@ def propagate(combined_index, embedding, adjacency_matrix, n_new_english,
         nonzero_indices = np.logical_not(zero_indices)
         fringe = (adjacency_matrix.dot(nonzero_indices.astype(np.int8)) != 0)
         fringe = np.logical_and(fringe, zero_indices)
-        # Then pick a neighbor for each, and use it to update the zero vector.
-        adjacent_nonzeros = adjacency_matrix.dot(
+        # Update each as the average of its nonzero neighbors
+        adjacent_nonzeros = adjacency_matrix[fringe, :].dot(
             diags([nonzero_indices.astype(np.int8)], [0], format='csc'))
-        neighbors = np.argmax(adjacent_nonzeros[fringe, :], axis=1)
-        neighbors = neighbors.A[:, 0] # convert matrix to 1D ndarray
-        vectors[fringe, :] = vectors[neighbors, :]
+        n_adjacent_nonzeros = adjacent_nonzeros.sum(axis=1).A[:, 0]
+        weights = 1.0 / n_adjacent_nonzeros
+        vectors[fringe, :] = adjacency_matrix[fringe, :].dot(vectors)
+        vectors[fringe, :] = diags([weights], [0], format='csr').dot(
+            vectors[fringe, :])
 
     n_old_plus_new_non_en = len(combined_index) - n_new_english
     result = pd.DataFrame(index=combined_index[0:n_old_plus_new_non_en],
