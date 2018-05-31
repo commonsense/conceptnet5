@@ -1,14 +1,6 @@
-from __future__ import print_function, unicode_literals
 import json
 import sys
-import codecs
 import gzip
-
-# Python 2/3 compatibility
-if sys.version_info.major >= 3:
-    string_type = str
-else:
-    string_type = basestring
 
 
 class JSONStreamWriter(object):
@@ -29,10 +21,10 @@ class JSONStreamWriter(object):
         if hasattr(filename_or_stream, 'write'):
             self.stream = filename_or_stream
         else:
-            self.stream = codecs.open(filename_or_stream, 'w', encoding='utf-8')
+            self.stream = open(filename_or_stream, 'w', encoding='utf-8')
 
     def write(self, obj):
-        if isinstance(obj, string_type):
+        if isinstance(obj, str):
             raise ValueError(
                 "%r is already a string. It shouldn't be written to a JSON stream."
                 % obj
