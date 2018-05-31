@@ -9,6 +9,9 @@ import json
 
 
 def msgpack_to_json(input_filename, output_filename):
+    """
+    Convert a msgpack stream to a JSON stream (with one object per line).
+    """
     out_stream = JSONStreamWriter(output_filename)
     for obj in read_msgpack_stream(input_filename):
         out_stream.write(obj)
@@ -16,6 +19,9 @@ def msgpack_to_json(input_filename, output_filename):
 
 
 def json_to_msgpack(input_filename, output_filename):
+    """
+    Convert a JSON stream (with one object per line) to a msgpack stream.
+    """
     out_stream = MsgpackStreamWriter(output_filename)
     for obj in read_json_stream(input_filename):
         out_stream.write(obj)
