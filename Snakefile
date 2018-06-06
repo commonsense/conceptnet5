@@ -248,10 +248,12 @@ rule precompute_wiktionary:
 rule read_conceptnet4:
     input:
         DATA + "/raw/conceptnet4/conceptnet4_flat_{num}.jsons",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/edges/conceptnet4/conceptnet4_flat_{num}.msgpack"
     run:
-        shell("cn5-read conceptnet4 {input} {output}")
+        single_input = input[0]
+        shell("cn5-read conceptnet4 {single_input} {output}")
 
 rule read_dbpedia:
     input:
@@ -276,11 +278,13 @@ rule read_jmdict:
 
 rule read_nadya:
     input:
-        DATA + "/raw/nadya/nadya-2017.csv"
+        DATA + "/raw/nadya/nadya-2017.csv",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/edges/nadya/nadya.msgpack"
-    shell:
-        "cn5-read nadya {input} {output}"
+    run:
+        single_input = input[0]
+        shell("cn5-read nadya {single_input} {output}")
 
 rule read_ptt_petgame:
     input:
@@ -566,71 +570,85 @@ rule reduce_assoc:
 # =========================
 rule convert_word2vec:
     input:
-        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz"
+        DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/w2v-google-news.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_glove:
     input:
-        DATA + "/raw/vectors/glove12.840B.300d.txt.gz"
+        DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/glove12-840B.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_fasttext_crawl:
     input:
-        DATA + "/raw/vectors/crawl-300d-2M.vec.gz"
+        DATA + "/raw/vectors/crawl-300d-2M.vec.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/crawl-300d-2M.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_fasttext:
     input:
-        DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz"
+        DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/fasttext-wiki-{lang}.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {single_input} {output}")
 
 rule convert_lexvec:
     input:
         DATA + "/raw/vectors/lexvec.commoncrawl.300d.W+C.pos.vectors.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/lexvec-commoncrawl.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_opensubtitles_ft:
     input:
         DATA + "/raw/vectors/ft-opensubtitles.vec.gz",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/fasttext-opensubtitles.h5"
     resources:
         ram=24
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_polyglot:
     input:
-        DATA + "/raw/vectors/polyglot-{language}.pkl"
+        DATA + "/raw/vectors/polyglot-{language}.pkl",
+        DATA + "/db/wiktionary.db"
     output:
         DATA + "/vectors/polyglot-{language}.h5"
-    shell:
-        "CONCEPTNET_DATA=data cn5-vectors convert_polyglot -l {wildcards.language} {input} {output}"
+    run:
+        single_input = input[0]
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_polyglot -l {wildcards.language} {single_input} {output}")
 
 rule retrofit:
     input:

@@ -104,8 +104,7 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     """
     Combine the vector knowledge contained in frames.
     """
-    frames = [load_hdf(filename) for filename in input_filenames]
-    intersected, projection = merge_intersect(frames)
+    intersected, projection = merge_intersect(input_filenames)
     save_hdf(intersected, output_filename)
     save_hdf(projection, projection_filename)
 
@@ -118,8 +117,8 @@ def run_debias(input_filename, output_filename):
     Modify a frame to attempt to remove biases and prejudices.
     """
     frame = load_hdf(input_filename)
-    debiased = de_bias_frame(frame)
-    save_hdf(debiased, output_filename)
+    de_bias_frame(frame)
+    save_hdf(frame, output_filename)
 
 
 @cli.command(name='evaluate')

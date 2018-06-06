@@ -63,7 +63,7 @@ def miniaturize(frame, other_vocab=None, k=300, debias=True):
     redecomposed = pd.DataFrame(U[:, :k], index=vocab, dtype='f')
     del U, vocab
     if debias:
-        redecomposed = de_bias_frame(redecomposed)
+        de_bias_frame(redecomposed)
     mini = (redecomposed * 64).astype(np.int8)
     mini.sort_index(inplace=True)
     return mini

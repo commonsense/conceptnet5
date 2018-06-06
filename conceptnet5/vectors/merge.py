@@ -4,6 +4,7 @@ from sklearn.preprocessing import normalize
 
 from conceptnet5.uri import get_uri_language
 from conceptnet5.languages import CORE_LANGUAGES
+from .formats import load_hdf
 
 
 def dataframe_svd_projection(frame, k):
@@ -23,10 +24,11 @@ def dataframe_svd_projection(frame, k):
     return uframe, Σ[:k], vframe
 
 
-def concat_intersect(frames):
+def concat_intersect(frame_filenames):
     """
-    Find the intersection of the labels of all the `frames`, and concatenate
-    the vectors that the frames have for each of those labels.
+    Find the intersection of the labels of all the frames in the given 
+    files , and concatenate the vectors that the frames have for each of 
+    those labels.
 
     This is exactly what `pd.concat` is for. However, `pd.concat` uses too
     much memory. We have to emulate what it does while building the result
@@ -36,14 +38,17 @@ def concat_intersect(frames):
     # frame. As we scan through the frames, find out what the indices of those
     # columns are.
     frame_col_offsets = [0]
-    ncolumns = frames[0].shape[1]
+    assert len(frame_filenames) > 0
+    frame = load_hdf(frame_filenames[0])
+    ncolumns = frame.shape[1]
 
     # Our label intersection starts out as the label set of the first frame.
-    label_intersection = set(frames[0].index)
+    label_intersection = set(frame.index)
 
     # Narrow down the label intersection, and find the column offset of
     # each subsequent frame.
-    for frame in frames[1:]:
+    for frame_filename in frame_filenames[1:]:
+        frame = load_hdf(frame_filename)
         label_intersection &= set(frame.index)
         frame_col_offsets.append(ncolumns)
         ncolumns += frame.shape[1]
@@ -58,7 +63,8 @@ def concat_intersect(frames):
 
     # Find the appropriate rows of each frame, extract them in the order of
     # our labels, and set those as the appropriate columns of the merged array.
-    for frame, offset in zip(frames, frame_col_offsets):
+    for frame_filename, offset in zip(frame_filenames, frame_col_offsets):
+        frame = load_hdf(frame_filename)
         width = frame.shape[1]
         for i, label in enumerate(label_intersection):
             joindata[i, offset:(offset + width)] = frame.loc[label].values
@@ -70,9 +76,9 @@ def concat_intersect(frames):
     return joined
 
 
-def merge_intersect(frames, subsample=20, k=300):
+def merge_intersect(frame_filenames, subsample=20, k=300):
     """
-    Combine the vector knowledge contained in `frames` over the vocabulary
+    Combine the vector knowledge contained in the frames over the vocabulary
     that they agree on, and use dimensionality reduction to mitigate the
     redundancy of learning the same thing multiple ways.
 
@@ -82,7 +88,7 @@ def merge_intersect(frames, subsample=20, k=300):
     """
     # Find the intersected vocabulary of the frames, and concatenate their
     # vectors over that vocabulary.
-    joined = concat_intersect(frames)
+    joined = concat_intersect(frame_filenames)
 
     # Find a subset of the labels that we'll use for calculating the
     # dimensionality-reduced version. The labels we particularly care about
