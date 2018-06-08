@@ -359,6 +359,28 @@ GENDER_NEUTRAL_WORDS = [
 ]
 
 
+def make_shard_endpoints(total_length, shard_size=int(1e6)):
+    """
+    Partition the half-open integer interval [0, total_length) into a 
+    sequence of half-open subintervals [s0,e0), [s1,e1), ... [s_n, e_n) 
+    such that s0 = 0, s_(k+1) = e_k, e_n = total_length, and each of these 
+    subintervals (except possibly the last) has length equal to the given 
+    shard_size.  Return the sequence of pairs of endpoints of the 
+    subintervals.
+    """
+    shard_end = 0
+    shards = []
+    while True:
+        shard_start = shard_end
+        shard_end = shard_start + shard_size
+        if shard_end > total_length:
+            shard_end = total_length
+        if shard_start >= shard_end:
+            break
+        shards.append((shard_start, shard_end))
+    return shards
+
+
 def get_weighted_vector(frame, weighted_terms):
     """
     Given a list of (term, weight) pairs, get a unit vector corresponding
@@ -473,8 +495,12 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
     # The SVM can predict the probability, for each vector in the frame, that
     # it's in each class. The positive class is column 1 of this prediction.
     # This gives us a vector of how much each word in the vocabulary should be
-    # de-biased.
-    applicability = category_predictor.predict_proba(frame)[:, 1]
+    # de-biased.  This is done on shards, to reduce peak memory consumption.
+    applicability = np.zeros(shape=(len(frame),), dtype=np.float32)
+    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+        applicability[shard_start:shard_end] = category_predictor.predict_proba(
+            frame[shard_start:shard_end])[:, 1]
+    del category_predictor
 
     # The bias axis is the vector difference between the average right example
     # and the average left example.
@@ -482,21 +508,25 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
 
     # Make a modified version of the space that projects the bias axis to 0.
     # Then weight each row of that space by "applicability", the probability
-    # that each row should be de-biased.
-    modified_component = reject_subspace(frame, [bias_axis]).mul(applicability, axis=0)
+    # that each row should be de-biased.  This is also done on shards.
+    modified_component = np.zeros(shape=frame.values.shape, dtype=np.float32)
+    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+        modified_component[shard_start:shard_end, :] = \
+            reject_subspace(frame[shard_start:shard_end], [bias_axis]).mul(
+                applicability[shard_start:shard_end], axis=0).values
 
     # Make another component representing the vectors that should not be
     # de-biased: the original space times (1 - applicability).
-    result = frame.mul(1 - applicability, axis=0)
+    np.multiply(1 - applicability.reshape((len(frame), 1)), frame.values,
+                out=frame.values)
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    np.add(result.values, modified_component.values, out=result.values)
+    np.add(frame.values, modified_component, out=frame.values)
     del modified_component
 
     # L_2-normalize the resulting rows in-place.
-    normalize(result.values, norm='l2', copy=False)
-    return result
+    normalize(frame.values, norm='l2', copy=False)
 
 
 def de_bias_category(frame, category_examples, bias_examples):
@@ -519,8 +549,11 @@ def de_bias_category(frame, category_examples, bias_examples):
     category_predictor = two_class_svm(frame, category_examples, bias_examples)
 
     # Predict the probability of each word in the vocabulary being in the
-    # category.
-    applicability = category_predictor.predict_proba(frame)[:, 1]
+    # category.  This is done on shards, to reduce peak memory consumption.
+    applicability = np.zeros(shape=(len(frame),), dtype=np.float32)
+    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+        applicability[shard_start:shard_end] = category_predictor.predict_proba(
+            frame[shard_start:shard_end])[:, 1]
     del category_predictor
 
     # Make a matrix of vectors representing the correlations to remove.
@@ -531,22 +564,26 @@ def de_bias_category(frame, category_examples, bias_examples):
 
     # Make a modified version of the space that projects the bias vectors to 0.
     # Then weight each row of that space by "applicability", the probability
-    # that each row should be de-biased.
-    modified_component = reject_subspace(frame, components_to_reject).mul(applicability, axis=0)
+    # that each row should be de-biased.  This is also done on shards.
+    modified_component = np.zeros(shape=frame.values.shape, dtype=np.float32)
+    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+        modified_component[shard_start:shard_end, :] = \
+            reject_subspace(frame[shard_start:shard_end], components_to_reject).mul(
+                applicability[shard_start:shard_end], axis=0).values
     del components_to_reject
 
     # Make another component representing the vectors that should not be
     # de-biased: the original space times (1 - applicability).
-    result = frame.mul(1 - applicability, axis=0)
+    np.multiply(1 - applicability.reshape((len(frame), 1)), frame.values,
+                out=frame.values)
 
     # The sum of these two components is the de-biased space, where de-biasing
     # applies to each row proportional to its applicability.
-    np.add(result.values, modified_component.values, out=result.values)
+    np.add(frame.values, modified_component, out=frame.values)
     del modified_component
 
     # L_2-normalize the resulting rows in-place.
-    normalize(result.values, norm='l2', copy=False)
-    return result
+    normalize(frame.values, norm='l2', copy=False)
 
 
 def de_bias_frame(frame):
@@ -558,9 +595,11 @@ def de_bias_frame(frame):
     The resulting space attempts not to learn stereotyped associations with
     anyone's race, color, religion, national origin, sex, gender presentation,
     or sexual orientation.
+    
+    The input frame is modified in-place; this can save considerable memory 
+    with realistically sized semantic spaces.
     """
-    newframe = de_bias_category(frame, PEOPLE_BY_ETHNICITY, CULTURE_PREJUDICES + SEX_PREJUDICES)
-    newframe = de_bias_category(newframe, PEOPLE_BY_BELIEF, CULTURE_PREJUDICES + SEX_PREJUDICES)
-    newframe = de_bias_category(newframe, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS, CULTURE_PREJUDICES + SEX_PREJUDICES)
-    newframe = de_bias_binary(newframe, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)
-    return newframe
+    de_bias_category(frame, PEOPLE_BY_ETHNICITY, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    de_bias_category(frame, PEOPLE_BY_BELIEF, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    de_bias_category(frame, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    de_bias_binary(frame, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)
