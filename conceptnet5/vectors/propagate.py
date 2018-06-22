@@ -107,14 +107,18 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # Put terms from the embedding first, then terms from the good part
     # of the graph neither from the embedding nor in English, then terms
     # from the good part of the graph in English but not from the embedding.
+    #
+    # (In the corner case where either of these addtional sets of terms is
+    # empty, construction of a pandas index will fail using generator rather
+    # than list comprehensions.)
     new_vocab = good_concepts - set(embedding_vocab)
     good_concepts = embedding_vocab.append(
-        pd.Index(term for term in new_vocab
-                 if get_uri_language(term) != 'en'))
+        pd.Index([term for term in new_vocab
+                      if get_uri_language(term) != 'en']))
     n_good_concepts_not_new_en = len(good_concepts)
     good_concepts = good_concepts.append(
-        pd.Index(term for term in new_vocab
-                 if get_uri_language(term) == 'en'))
+        pd.Index([term for term in new_vocab
+                      if get_uri_language(term) == 'en']))
     del new_vocab
     n_new_english = len(good_concepts) - n_good_concepts_not_new_en
     
