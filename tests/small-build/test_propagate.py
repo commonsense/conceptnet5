@@ -11,9 +11,9 @@ from unittest.mock import patch, Mock
 # Constant parameters.
 N_TRIALS = 20
 EMBEDDING_DIM = 4
-N_EMBEDDING_TERMS = 25
-N_EXTRA_GRAPH_TERMS = 25
-GRAPH_EDGE_PROBA = 0.25
+MAX_N_GRAPH_TERMS = 40
+MAX_N_EXTRA_FRAME_TERMS = 5
+GRAPH_EDGE_PROBA = 0.4
 LANGUAGES = ['en', 'fr']
 NON_ENGLISH_LANGUAGES = ['fr', 'zh']
 LANGUAGE_PROBA = [0.8, 0.2]
@@ -74,13 +74,17 @@ def extract_positional_arg(mock_obj, call_number, position):
     return positional_args[position]
 
 
-def make_term(i_term):
+_term_count = 0
+
+def make_term():
     """
     Make and return a string representing a (synthetic) term in a randomly-
     chosen language.
     """
+    global _term_count
     language = random_gen.choice(LANGUAGES, p=LANGUAGE_PROBA)
-    term = '/c/{}/term{}'.format(language, i_term)
+    term = '/c/{}/term{}'.format(language, _term_count)
+    _term_count += 1
     return term
 
 
@@ -89,13 +93,13 @@ def make_term_list(length):
     Make and return a list of terms, of the requested length, each generated 
     by make_term.
     """
-    terms = [make_term(i_term) for i_term in range(length)]
+    terms = [make_term() for i_term in range(length)]
     return terms
 
 
 def make_random_frame(terms):
     """
-    Make a frame with synthetic terms and random embedding vectors.
+    Make a frame with the given terms and random embedding vectors.
     """
     frame_index = pd.Index(terms)
     frame_data = random_gen.randn(len(frame_index), EMBEDDING_DIM)
@@ -108,13 +112,13 @@ class ConceptNetRandomTestGraph:
     Instances are randomly-generated association graphs suitable for testing 
     propagation code.
     """
-    def __init__(self, initial_terms):
+    def __init__(self, max_n_terms=MAX_N_GRAPH_TERMS):
         """
         Construct a random concept graph by making its set of edges (pairs of
         terms) and vertices (single terms), and create an association edge list
         for it in the appropriate format for reading by the code under test.  
-        Note that the resulting set of vertices/terms may be a proper subset of 
-        the initial terms supplied, as we do not include vertices without any 
+        Note that the resulting set of vertices/terms may not have the full 
+        number of terms requested, as we do not include vertices without any 
         incident edges in the output.
         """
         # Represent the graph as simply as possible, namely with a set of
@@ -125,21 +129,76 @@ class ConceptNetRandomTestGraph:
         # But we also need a representation of the graph readable as an
         # assoc file to feed to code to be tested.
         self.assoc_file_contents = []
-        
-        for left in initial_terms:
-            for right in initial_terms:
+
+        # We ensure some variability in the connectivity of the generated
+        # graphs, by choosing a random number (at least one) of "pieces"
+        # (by which we mean unions of connected components), and enforcing
+        # that there are no edges between pieces.  (We don't enforce that
+        # each piece is connected, as that would be a bother.)  To make
+        # realistic test data, we make all but the first piece small.
+        n_pieces = random_gen.choice(3) + 1
+        piece_sizes = [0] * n_pieces
+        piece_sizes[0] = max_n_terms
+        for i_piece in range(1, n_pieces):
+            piece_sizes[i_piece] = random_gen.choice(max_n_terms // 5)
+            piece_sizes[0] -= piece_sizes[i_piece]
+
+        terms = []
+        pieces = []
+        piece_map = {}
+        for i_piece, piece_size in enumerate(piece_sizes):
+            piece = make_term_list(piece_size)
+            for term in piece:
+                piece_map[term] = i_piece
+                terms.append(term)
+            pieces.append(piece)
+
+        # Create edges, and populate the edge and vertex sets, and the associations.
+        for left in terms:
+            for right in terms:
                 if left <= right:
                     continue # make no self-edges, consider each pair only once
+                if piece_map[left] != piece_map[right]:
+                    continue # make no edges between pieces
                 if random_gen.uniform() < GRAPH_EDGE_PROBA:
                     weight = random_gen.choice(WEIGHTS, p=WEIGHT_PROBA)
                     dataset = random_gen.choice(DATASETS, p=DATASET_PROBA)
                     rel = random_gen.choice(RELATIONS, p=RELATION_PROBA)
                     self.assoc_file_contents.append('\t'.join([left, right, str(weight), dataset, rel]))
                     self.edge_set.add((left, right))
-                    self.edge_set.add((right, left)) # make the graph undirected
-                    self.vertices.add(left)
+                    self.edge_set.add((right, left))  # make the graph undirected
+                    self.vertices.add(left)  # only collect vertices on at least one edge
                     self.vertices.add(right)
         self.assoc_file_contents = '\n'.join(self.assoc_file_contents)
+
+        # Save the pieces (for use in making frames to use with the graph).
+        pieces = [
+            [term for term in piece if term in self.vertices] for piece in pieces
+        ]
+        self.pieces = [piece for piece in pieces if len(piece) > 0]
+
+    
+    def make_frame(self, max_n_extra_terms=MAX_N_EXTRA_FRAME_TERMS):
+        """
+        Return a frame to use together with this graph in testing.  The 
+        frame will have controlled probability of satsifying edge cases 
+        concerning its overlap with connected components of the graph.
+        """
+        n_extra_terms = random_gen.choice(max_n_extra_terms + 1)
+        terms = make_term_list(n_extra_terms)
+        for i_piece, piece in enumerate(self.pieces):
+            if i_piece == 0: # Take a random subset of the big piece.
+                n_terms = random_gen.choice(len(piece))
+                new_terms = list(random_gen.choice(piece, size=n_terms, replace=False))
+            else: # Take no, one, or all the elements of any other piece.
+                none = []
+                one = [random_gen.choice(piece)]
+                new_terms = random_gen.choice([none, one, piece])
+            terms.extend(new_terms)
+        random_gen.shuffle(terms) # destroy order by pieces
+        frame = make_random_frame(terms)
+        return frame
+
 
     def combined_index_and_new_term_sets(self, frame):
         """
@@ -177,6 +236,7 @@ class ConceptNetRandomTestGraph:
         )
         return combined_index, new_non_english_terms, new_english_terms
 
+
     def adjacency_matrix(self, combined_index):
         """
         Return the adjacency matrix of the graph with respect to the given 
@@ -200,6 +260,7 @@ class ConceptNetRandomTestGraph:
             dtype=np.int8
         ).tocsr()
         return adjacency_matrix
+
 
     def rank_vertices(self, frame):
         """
@@ -243,18 +304,16 @@ class ConceptNetRandomTestGraph:
 
 def setup_frame_and_edges():
     global FRAME, ASSOC_FILE_CONTENTS, EDGE_SET
-    initial_terms = make_term_list(N_EMBEDDING_TERMS + N_EXTRA_GRAPH_TERMS)
-    FRAME = make_random_frame(initial_terms[:N_EMBEDDING_TERMS])
-    graph = ConceptNetRandomTestGraph(initial_terms)
+    graph = ConceptNetRandomTestGraph()
+    FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     EDGE_SET = graph.edge_set
 
 def setup_combined_index():
     global FRAME, ASSOC_FILE_CONTENTS
     global COMBINED_INDEX, NEW_ENGLISH_TERMS, NEW_NON_ENGLISH_TERMS
-    initial_terms = make_term_list(N_EMBEDDING_TERMS + N_EXTRA_GRAPH_TERMS)
-    FRAME = make_random_frame(initial_terms[:N_EMBEDDING_TERMS])
-    graph = ConceptNetRandomTestGraph(initial_terms)
+    graph = ConceptNetRandomTestGraph()
+    FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
         graph.combined_index_and_new_term_sets(FRAME)
@@ -263,9 +322,8 @@ def setup_adjacency_matrix():
     global FRAME, ASSOC_FILE_CONTENTS
     global COMBINED_INDEX, NEW_ENGLISH_TERMS, NEW_NON_ENGLISH_TERMS
     global ADJACENCY_MATRIX
-    initial_terms = make_term_list(N_EMBEDDING_TERMS + N_EXTRA_GRAPH_TERMS)
-    FRAME = make_random_frame(initial_terms[:N_EMBEDDING_TERMS])
-    graph = ConceptNetRandomTestGraph(initial_terms)
+    graph = ConceptNetRandomTestGraph()
+    FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
         graph.combined_index_and_new_term_sets(FRAME)
@@ -275,9 +333,8 @@ def setup_ranks():
     global FRAME, ASSOC_FILE_CONTENTS, EDGE_SET
     global COMBINED_INDEX, NEW_ENGLISH_TERMS, NEW_NON_ENGLISH_TERMS
     global ADJACENCY_MATRIX, RANKS
-    initial_terms = make_term_list(N_EMBEDDING_TERMS + N_EXTRA_GRAPH_TERMS)
-    FRAME = make_random_frame(initial_terms[:N_EMBEDDING_TERMS])
-    graph = ConceptNetRandomTestGraph(initial_terms)
+    graph = ConceptNetRandomTestGraph()
+    FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     EDGE_SET = graph.edge_set
     COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
@@ -300,7 +357,7 @@ def teardown_all():
 
 
 @do_setup(setup_frame_and_edges, teardown_all)
-def do_single_test_adjacency_matrix():
+def single_test_adjacency_matrix():
     # Call the code under test, but feed it an association list from the test
     # fixture rather than from a file.
     with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)):
@@ -336,7 +393,7 @@ def do_single_test_adjacency_matrix():
 
 
 @do_setup(setup_combined_index, teardown_all)
-def do_single_test_combined_index():
+def single_test_combined_index():
     # Call the code under test, but feed it an association list from the test
     # fixture rather than from a file.
     with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)):
@@ -369,7 +426,7 @@ def do_single_test_combined_index():
 
 
 @do_setup(setup_ranks, teardown_all)
-def do_single_test_propagate():
+def single_test_propagate():
     # Call the code under test.
     propagated = propagate(
         COMBINED_INDEX, FRAME, ADJACENCY_MATRIX, len(NEW_ENGLISH_TERMS)
@@ -412,7 +469,7 @@ def do_single_test_propagate():
 
 
 @do_setup(setup_adjacency_matrix, teardown_all)
-def do_single_test_sharded_propagate():
+def single_test_sharded_propagate():
     # Run the sharded propagation code over the test data in 2 shards.
     nshards = 2
     shard_collector = Mock(return_value=None)
@@ -467,11 +524,11 @@ def do_single_test_sharded_propagate():
 
 def test_adjacency_matrix():
     for i_test in range(N_TRIALS):
-        do_single_test_adjacency_matrix()
+        single_test_adjacency_matrix()
 
 def test_combined_index():
     for i_test in range(N_TRIALS):
-        do_single_test_combined_index()
+        single_test_combined_index()
 
 def test_propagate():
     # It is useful to test propagation on graphs with no English terms,
@@ -482,13 +539,13 @@ def test_propagate():
     # necessarily be computed just from the propagation output.)
     global LANGUAGES
     for i_test in range(N_TRIALS):
-        do_single_test_propagate()
+        single_test_propagate()
     saved_languages = LANGUAGES
     LANGUAGES = NON_ENGLISH_LANGUAGES
     for i_test in range(N_TRIALS):
-        do_single_test_propagate()
+        single_test_propagate()
     LANGUAGES = saved_languages
 
 def test_sharded_propagate():
     for i_test in range(N_TRIALS):
-        do_single_test_sharded_propagate()
+        single_test_sharded_propagate()
