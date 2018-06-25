@@ -128,15 +128,15 @@ def retrofit(row_labels, dense_frame, sparse_csr,
     # the first class of terms, so we can't necessarily expect the
     # number of zero vectors to go to zero at any one invocation of
     # this code.
-    n_zero_indices_old = -1
+    n_zero_indicators_old = -1
     for iteration in range(max_cleanup_iters):
-        zero_indices = (np.abs(vecs).sum(1) == 0)
-        n_zero_indices = np.sum(zero_indices)
-        if n_zero_indices == 0 or n_zero_indices == n_zero_indices_old:
+        zero_indicators = (np.abs(vecs).sum(1) == 0)
+        n_zero_indicators = np.sum(zero_indicators)
+        if n_zero_indicators == 0 or n_zero_indicators == n_zero_indicators_old:
             break
-        n_zero_indices_old = n_zero_indices
-        vecs[zero_indices, :] = sparse_csr[zero_indices, :].dot(vecs)
-        normalize(vecs[zero_indices, :], norm='l2', copy=False)
+        n_zero_indicators_old = n_zero_indicators
+        vecs[zero_indicators, :] = sparse_csr[zero_indicators, :].dot(vecs)
+        normalize(vecs[zero_indicators, :], norm='l2', copy=False)
     else:
         print('Warning: cleanup iteration limit exceeded.')
 

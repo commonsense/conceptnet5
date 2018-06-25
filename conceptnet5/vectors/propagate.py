@@ -25,12 +25,11 @@ class ConceptNetAssociationGraphForPropagation(ConceptNetAssociationGraph):
     def add_edge(self, left, right, value, dataset, relation):
         """
         In addition to the superclass's handling of a new edge, 
-        saves the edges as a set of (left, right) pairs.  Note that 
-        we do not save (right, left) as well as (left, right) (but also 
-        do not guarantee that only one of the two has been saved).
+        saves the edges as a set of (left, right) pairs.
         """
         super().add_edge(left, right, value, dataset, relation)
         self.edges.add((left, right))
+        self.edges.add((right, left)) # save undirected edges
 
 
 def sharded_propagate(assoc_filename, embedding_filename, 
@@ -108,14 +107,18 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # Put terms from the embedding first, then terms from the good part
     # of the graph neither from the embedding nor in English, then terms
     # from the good part of the graph in English but not from the embedding.
+    #
+    # (In the corner case where either of these addtional sets of terms is
+    # empty, construction of a pandas index will fail using generator rather
+    # than list comprehensions.)
     new_vocab = good_concepts - set(embedding_vocab)
     good_concepts = embedding_vocab.append(
-        pd.Index(term for term in new_vocab
-                 if get_uri_language(term) != 'en'))
+        pd.Index([term for term in new_vocab
+                      if get_uri_language(term) != 'en']))
     n_good_concepts_not_new_en = len(good_concepts)
     good_concepts = good_concepts.append(
-        pd.Index(term for term in new_vocab
-                 if get_uri_language(term) == 'en'))
+        pd.Index([term for term in new_vocab
+                      if get_uri_language(term) == 'en']))
     del new_vocab
     n_new_english = len(good_concepts) - n_good_concepts_not_new_en
     
@@ -137,7 +140,6 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
             index0 = good_concepts_map[v]
             index1 = good_concepts_map[w]
             builder[index0, index1] = 1
-            builder[index1, index0] = 1
         except KeyError:
             pass # one of v, w wasn't good
     del graph
@@ -167,16 +169,16 @@ def propagate(combined_index, embedding, adjacency_matrix, n_new_english,
                                   dtype=embedding.values.dtype)])
     
     for iteration in range(iterations):
-        zero_indices = (np.abs(vectors).sum(1) == 0)
-        if not np.any(zero_indices):
+        zero_indicators = (np.abs(vectors).sum(1) == 0)
+        if not np.any(zero_indicators):
             break
         # Find terms with zero vectors having neighbors with nonzero vectors.
-        nonzero_indices = np.logical_not(zero_indices)
-        fringe = (adjacency_matrix.dot(nonzero_indices.astype(np.int8)) != 0)
-        fringe = np.logical_and(fringe, zero_indices)
+        nonzero_indicators = np.logical_not(zero_indicators)
+        fringe = (adjacency_matrix.dot(nonzero_indicators.astype(np.int8)) != 0)
+        fringe = np.logical_and(fringe, zero_indicators)
         # Update each as the average of its nonzero neighbors
         adjacent_nonzeros = adjacency_matrix[fringe, :].dot(
-            diags([nonzero_indices.astype(np.int8)], [0], format='csc'))
+            diags([nonzero_indicators.astype(np.int8)], [0], format='csc'))
         n_adjacent_nonzeros = adjacent_nonzeros.sum(axis=1).A[:, 0]
         weights = 1.0 / n_adjacent_nonzeros
         vectors[fringe, :] = adjacency_matrix[fringe, :].dot(vectors)
