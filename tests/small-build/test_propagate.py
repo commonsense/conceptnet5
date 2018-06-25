@@ -436,7 +436,7 @@ def single_test_propagate():
     # starting with the terms of the frame and going up to the last new
     # term from the graph that is not in English.
     assert (len(propagated) == len(FRAME) + len(NEW_NON_ENGLISH_TERMS)), \
-        'Incorrect number {} (should be {}) of propataged terms.'.format(len(propagated), len(FRAME) + len(NEW_NON_ENGLISH_TERMS))
+        'Incorrect number {} (should be {}) of propagated terms.'.format(len(propagated), len(FRAME) + len(NEW_NON_ENGLISH_TERMS))
     for i_term in range(len(propagated)):
         assert (propagated.index[i_term] == COMBINED_INDEX[i_term]), \
             'Propagated output terms do not agree with the input terms.'
