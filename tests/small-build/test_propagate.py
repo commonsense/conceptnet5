@@ -2,7 +2,7 @@ import io
 import numpy as np
 import pandas as pd
 
-from conceptnet5.uri import get_uri_language
+from conceptnet5.uri import concept_uri, get_uri_language
 from conceptnet5.vectors.propagate import sharded_propagate, make_adjacency_matrix, propagate
 from numpy.testing import assert_allclose
 from scipy import sparse
@@ -83,7 +83,8 @@ def make_term():
     """
     global _term_count
     language = random_gen.choice(LANGUAGES, p=LANGUAGE_PROBA)
-    term = '/c/{}/term{}'.format(language, _term_count)
+    term_text = 'term{}'.format(_term_count)
+    term = concept_uri(language, term_text)
     _term_count += 1
     return term
 
@@ -471,8 +472,18 @@ def single_test_propagate():
 @do_setup(setup_adjacency_matrix, teardown_all)
 def single_test_sharded_propagate():
     # Run the sharded propagation code over the test data in 2 shards.
+    # We patch several functions with mock objects:  sharded_propagate reads
+    # an assoc edge file, so we patch builtins.open to give sharded_propagate
+    # the test data graph as that input.  It reads an embedding (a dataframe)
+    # as well, and we patch load_hdf to give it the test data frame.  It writes
+    # a shard file for each shard, so we patch save_hdf with a mock object
+    # that we will later query to retrieve the output shards for testing.
+    # Finally we patch make_adjacency_matrix with a mock object that returns
+    # the known good test data for the adjacency matrix, combined index, and
+    # number of new terms in English, to make this test independent of any
+    # failures of that function.
     nshards = 2
-    shard_collector = Mock(return_value=None)
+    shard_collector = Mock(return_value=None)  # save_hdf returns None
     with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)), \
          patch('conceptnet5.vectors.propagate.make_adjacency_matrix',
                return_value=(ADJACENCY_MATRIX, COMBINED_INDEX, len(NEW_ENGLISH_TERMS))), \
@@ -497,12 +508,17 @@ def single_test_sharded_propagate():
         'Incorrect number {} (should be {}) of shards written.'.format(
             len(shard_collector.call_args_list), nshards)
     for i_shard in range(nshards):
+        # Get the positional argument in the filename position of the (i_shard)-th
+        # call to the shard_collector Mock object (which mocks save_hdf).
         filename = extract_positional_arg(shard_collector, i_shard, fname_arg)
         assert (filename == 'shard_filename_root.shard{}'.format(i_shard)), \
             'Shard {} written to incorrect file name {}.'.format(i_shard, filename)
 
     # The shards should agree with the appropriate pieces of the unsharded output.
     for i_shard in range(nshards):
+        # Get the positional argument in the shard dataframe position of the
+        # (i-shard)-th call to the shard_collector Mock object (which mocks
+        # save_hdf).
         shard = extract_positional_arg(shard_collector, i_shard, shard_arg)
         shard_start_dim = i_shard * EMBEDDING_DIM // nshards
         shard_end_dim = shard_start_dim + EMBEDDING_DIM // nshards
