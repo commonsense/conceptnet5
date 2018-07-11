@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import math
 from sklearn.preprocessing import normalize
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .formats import load_hdf, save_hdf
