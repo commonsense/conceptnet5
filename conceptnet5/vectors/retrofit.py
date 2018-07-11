@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 from sklearn.preprocessing import normalize
 from .sparse_matrix_builder import build_from_conceptnet_table
 from .formats import load_hdf, save_hdf
@@ -7,7 +8,7 @@ from .formats import load_hdf, save_hdf
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
                      iterations=5, nshards=6, verbosity=0,
-                     max_cleanup_iters=20):
+                     max_cleanup_iters=20, orig_vec_weight=0.15):
     # frame_box is basically a reference to a single large DataFrame. The
     # DataFrame will at times be present or absent. When it's present, the list
     # contains one item, which is the DataFrame. When it's absent, the list
@@ -28,7 +29,7 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
-        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity, max_cleanup_iters)
+        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity, max_cleanup_iters, orig_vec_weight)
         save_hdf(retrofitted, temp_filename)
         del retrofitted
 
@@ -53,7 +54,8 @@ def join_shards(output_filename, nshards=6, sort=False):
 
 
 def retrofit(row_labels, dense_frame, sparse_csr,
-             iterations=5, verbosity=0, max_cleanup_iters=20):
+             iterations=5, verbosity=0, max_cleanup_iters=20,
+             orig_vec_weight=0.15):
     """
     Retrofitting is a process of combining information from a machine-learned
     space of term vectors with further structured information about those
@@ -88,13 +90,12 @@ def retrofit(row_labels, dense_frame, sparse_csr,
 
     # orig_weights = 1 for known vectors, 0 for unknown vectors
     orig_weights = 1 - retroframe.iloc[:, 0].isnull()
-    weight_array = orig_weights.values[:, np.newaxis].astype('f')
+    orig_vec_indicators = (orig_weights.values != 0)
     orig_vecs = retroframe.fillna(0).values
 
     # Subtract the mean so that vectors don't just clump around common
     # hypernyms
-    nonzero_indices = np.abs(orig_vecs).sum(1).nonzero()
-    orig_vecs[nonzero_indices] -= orig_vecs.mean(0)
+    orig_vecs[orig_vec_indicators] -= orig_vecs[orig_vec_indicators].mean(0)
 
     # Delete the frame we built, we won't need its indices again until the end
     del retroframe
@@ -104,17 +105,39 @@ def retrofit(row_labels, dense_frame, sparse_csr,
         if verbosity >= 1:
             print('Retrofitting: Iteration %s of %s' % (iteration+1, iterations))
 
-        vecs = sparse_csr.dot(vecs)
-        nonzero_indices = np.abs(vecs).sum(1).nonzero()
-        vecs[nonzero_indices] -= vecs.mean(0)
+        # Since the sparse weight matrix is row-stochastic and has self-loops,
+        # pre-multiplication by it replaces each vector by a weighted average
+        # of itself and its neighbors.  We really want to take the average
+        # of (itself and) the nonzero neighbors, which we can do by dividing
+        # the average with all the neighbors by the total of the weights of the
+        # nonzero neighbors.  This avoids unduly shrinking vectors assigned to
+        # terms with lots of zero neighbors.
 
-        # use sklearn's normalize, because it normalizes in place and
-        # leaves zero-rows at 0
-        normalize(vecs, norm='l2', copy=False)
+        # Find, for every term, the total weight of its nonzero neighbors.
+        nonzero_indicators = (np.abs(vecs).sum(1) != 0)
+        total_neighbor_weights = sparse_csr.dot(nonzero_indicators)
+
+        # Now average with all the neighbors.
+        vecs = sparse_csr.dot(vecs)
+
+        # Now divide each vector (row) by the associated total weight.
+        # Some of the total weights could be zero, but only for rows that,
+        # before averaging, were zero and had all neighbors zero, whence
+        # after averaging will be zero.  So only do the division for rows
+        # that are nonzero now, after averaging.  Also, we reshape the total
+        # weights into a column vector so that numpy will broadcast the
+        # division by weights across the columns of the embedding matrix.
+        nonzero_indicators = (np.abs(vecs).sum(1) != 0)
+        total_neighbor_weights = total_neighbor_weights[nonzero_indicators]
+        total_neighbor_weights = total_neighbor_weights.reshape((len(total_neighbor_weights), 1))
+        vecs[nonzero_indicators] /= total_neighbor_weights
+
+        # Re-center the (new) non-zero vectors.
+        vecs[nonzero_indicators] -= vecs[nonzero_indicators].mean(0)
 
         # Average known rows with original vectors
-        vecs += orig_vecs
-        vecs /= (weight_array + 1.)
+        vecs[orig_vec_indicators, :] = \
+            (1.0 - orig_vec_weight) * vecs[orig_vec_indicators, :] + orig_vec_weight * orig_vecs[orig_vec_indicators, :]
 
     # Clean up as many all-zero vectors as possible.  Zero vectors
     # can either come from components of the conceptnet graph that
@@ -135,8 +158,15 @@ def retrofit(row_labels, dense_frame, sparse_csr,
         if n_zero_indicators == 0 or n_zero_indicators == n_zero_indicators_old:
             break
         n_zero_indicators_old = n_zero_indicators
+        # First replace each zero vector (row) by the weighted average of all its
+        # neighbors.
         vecs[zero_indicators, :] = sparse_csr[zero_indicators, :].dot(vecs)
-        normalize(vecs[zero_indicators, :], norm='l2', copy=False)
+        # Now divide each newly nonzero vector (row) by the total weight of its
+        # old nonzero neighbors.
+        new_nonzero_indicators = np.logical_and(zero_indicators, np.abs(vecs).sum(1) != 0)
+        total_neighbor_weights = sparse_csr[new_nonzero_indicators, :].dot(np.logical_not(zero_indicators))
+        total_neighbor_weights = total_neighbor_weights.reshape((len(total_neighbor_weights), 1))
+        vecs[new_nonzero_indicators, :] /= total_neighbor_weights
     else:
         print('Warning: cleanup iteration limit exceeded.')
 
