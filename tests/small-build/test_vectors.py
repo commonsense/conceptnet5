@@ -33,12 +33,14 @@ def setup_multi_ling_frame():
             [4, 5, 6],
             [4, 4, 5],
             [10, 6, 12],
-            [10, 7, 11]]
+            [10, 7, 11],
+            [20, 20, 7]]
     index = ['/c/pl/kombinacja',
              '/c/en/ski_jumping',
              '/c/en/nordic_combined',
              '/c/en/present',
-             '/c/en/gift']
+             '/c/en/gift',
+             '/c/en/quiz']
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
@@ -175,3 +177,15 @@ def test_make_small_frame():
     ok_('/c/en/nordic_combined' not in small_frame.index)
     ok_('/c/en/present' in small_frame.index)
     ok_('/c/en/gift' not in small_frame.index)
+
+
+@with_setup(setup_multi_ling_frame)
+def test_cache_with_include_neighbors():
+    wrap = VectorSpaceWrapper(frame=TEST_FRAME)
+    wrap.load()
+    # check the vector of all zeros is returned if the term is not present
+    ok_(not wrap.get_vector('/c/en/test', include_neighbors=False).any())
+
+    # If include_neighbors=True, the neighbor of 'test' in ConceptNet ('trial')
+    #  will be used to approximate its vector
+    ok_(wrap.get_vector('/c/en/test', include_neighbors=True).any())
