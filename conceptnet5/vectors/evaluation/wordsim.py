@@ -734,6 +734,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     men_score = measure_correlation(spearmanr, frame, read_men3000(subset))
     rw_score = measure_correlation(spearmanr, frame, read_rw(subset))
     mturk_score = measure_correlation(spearmanr, frame, read_mturk())
+    simlex_score = measure_correlation(spearmanr, frame, read_simlex())
     gur350_score = measure_correlation(spearmanr, frame, read_gurevych('350'))
     zg222_score = measure_correlation(spearmanr, frame, read_gurevych('222'))
     ws_score = measure_correlation(spearmanr, frame, read_ws353())
@@ -746,6 +747,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     results.loc['men3000'] = men_score
     results.loc['rw'] = rw_score
     results.loc['mturk'] = mturk_score
+    results.loc['simlex'] = simlex_score
     results.loc['gur350-de'] = gur350_score
     results.loc['zg222-de'] = zg222_score
     results.loc['ws353'] = ws_score
