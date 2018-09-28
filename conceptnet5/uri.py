@@ -320,6 +320,16 @@ def is_concept(uri):
     return uri.startswith('/c/')
 
 
+def is_relation(uri):
+    """
+    >>> is_relation('/r/IsA')
+    True
+    >>> is_relation('/c/sv/klänning')
+    False
+    """
+    return uri.startswith('/r/')
+
+
 def is_term(uri):
     """
     >>> is_term('/c/sv/kostym')
@@ -368,17 +378,20 @@ def uri_to_label(uri):
     Convert a ConceptNet uri into a label to be used in nodes. This
     function replaces an underscore with a space, so while '/c/en/example' will be converted into
     'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+
     >>> uri_to_label('/c/en/example')
     'example'
     >>> uri_to_label('/c/en/canary_islands')
     'canary islands'
     >>> uri_to_label('/c/en')
     ''
+    >>> uri_to_label('/r/RelatedTo')
+    'RelatedTo'
     """
     if is_term(uri):
         uri = uri_prefix(uri)
     parts = split_uri(uri)
-    if len(parts) < 3:
+    if len(parts) < 3 and not is_relation(uri):
         return ''
     return parts[-1].replace('_', ' ')
 
