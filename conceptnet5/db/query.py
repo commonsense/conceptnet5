@@ -2,7 +2,7 @@ from .connection import get_db_connection
 from conceptnet5.edges import transform_for_linked_data
 import json
 import itertools
-
+from ftfy.fixes import remove_control_chars
 
 NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
@@ -107,10 +107,11 @@ class AssertionFinder(object):
         elif uri.startswith('/d/'):
             return self.sample_dataset(uri, limit, offset)
         else:
-            raise ValueError
+            raise ValueError("%r isn't a ConceptNet URI that can be looked up")
         return self.query(criteria, limit, offset)
 
     def lookup_grouped_by_feature(self, uri, limit=20):
+        uri = remove_control_chars(uri)
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
 
@@ -139,6 +140,9 @@ class AssertionFinder(object):
         return results
 
     def lookup_assertion(self, uri):
+        # Sanitize URIs to remove control characters such as \x00. The postgres driver would
+        # remove \x00 anyway, but this avoids reporting a server error when that happens.
+        uri = remove_control_chars(uri)
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
@@ -147,6 +151,7 @@ class AssertionFinder(object):
         return results
 
     def sample_dataset(self, uri, limit=50, offset=0):
+        uri = remove_control_chars(uri)
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
@@ -166,7 +171,10 @@ class AssertionFinder(object):
     def query(self, criteria, limit=20, offset=0):
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
-        params = dict(criteria)
+        params = {
+            key: remove_control_chars(value)
+            for (key, value) in criteria.items()
+        }
         params['limit'] = limit
         params['offset'] = offset
         query_string = make_list_query(criteria)
