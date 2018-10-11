@@ -21,7 +21,7 @@ setup(
     description='A semantic network of general knowledge',
     long_description=DESCRIPTION,
     long_description_content_type='text/markdown',
-    author="Rob Speer",
+    author="Robyn Speer",
     author_email='rspeer@luminoso.com',
     packages=packages,
     include_package_data=True,

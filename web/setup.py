@@ -16,8 +16,8 @@ setup(
     name = 'conceptnet-web',
     version = version_str,
     description = 'Runs the Web site and API for ConceptNet',
-    author = "Rob Speer",
-    author_email = 'rob@luminoso.com',
+    author = "Robyn Speer",
+    author_email = 'rspeer@luminoso.com',
     packages=packages,
     include_package_data=True,
     install_requires=[
