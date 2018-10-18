@@ -5,7 +5,7 @@ from setuptools.command.develop import develop
 import sys
 
 packages = find_packages()
-version_str = '5.6.3'
+version_str = '5.6.4'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
@@ -21,7 +21,7 @@ setup(
     description='A semantic network of general knowledge',
     long_description=DESCRIPTION,
     long_description_content_type='text/markdown',
-    author="Rob Speer",
+    author="Robyn Speer",
     author_email='rspeer@luminoso.com',
     packages=packages,
     include_package_data=True,

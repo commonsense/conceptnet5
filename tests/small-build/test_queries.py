@@ -31,16 +31,9 @@ def test_lookup():
     eq_(source['@id'], '/and/[/s/process/split_words/,/s/resource/verbosity/]')
 
 
-def test_null_codepoint():
-    # This test would break pg8000. Thankfully, we're not using it anymore.
-    try:
-        test_finder.lookup('/c/en/denial_of_service\x00attack')
-    except ValueError:
-        # SQL doesn't allow the null codepoint, so it returns an error
-        pass
-
-    # Test that the connection isn't broken
-    assert test_finder.lookup('/c/en/test')
+def test_strip_control_chars():
+    assert test_finder.lookup('/c/en/test\x00') == test_finder.lookup('/c/en/test')
+    assert not test_finder.lookup('/s/\x1a')
 
 
 def get_query_ids(query):
