@@ -1,10 +1,9 @@
-'''
+"""
 This file defines the ConceptNet web API responses.
-'''
+"""
 
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.nodes import standardized_concept_uri, ld_node
-
 
 VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder
@@ -176,6 +175,26 @@ def lookup_single_assertion(uri):
     else:
         response.update(found[0])
         return success(response)
+
+
+def query_similarity(uri1, uri2):
+    """
+    Query the similarity between the two terms, uri1 and uri2. Return the
+    cosine similarity between the vectors of these two terms.
+    """
+    url = make_query_url('/similarity', [('uri1', uri1), ('uri2', uri2)])
+    try:
+        similarity = VECTORS.get_similarity(uri1, uri2)
+        response = {
+            '@id': url,
+            'similarity': round(float(similarity), 3)
+        }
+        return success(response)
+    except ValueError:
+        return error(
+            {'@id': url}, 400,
+            "Couldn't look up {} or {} (or both)".format(repr(uri1), repr(uri2))
+        )
 
 
 # TODO: document querying for a list of terms

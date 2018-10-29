@@ -1,7 +1,7 @@
 import json
-import os
-from pyld import jsonld
+
 from nose.tools import eq_
+from pyld import jsonld
 
 from conceptnet5.api import lookup_grouped_by_feature, lookup_paginated
 from conceptnet5.util import get_support_data_filename
