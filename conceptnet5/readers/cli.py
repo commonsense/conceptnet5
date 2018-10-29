@@ -1,7 +1,7 @@
 import click
 from . import (
-    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, nadya, ptt_petgame,
-    opencyc, verbosity, wiktionary, wordnet
+    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, kyoto_yahoo,
+    nadya, ptt_petgame, opencyc, verbosity, wiktionary, wordnet
 )
 
 
@@ -51,6 +51,19 @@ def run_nadya(input, output):
     output: a msgpack file of edges
     """
     nadya.handle_file(input, output)
+
+
+@cli.command(name='kyoto_yahoo')
+@click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output', type=click.Path(writable=True, dir_okay=False))
+def run_kyoto_yahoo(input, output):
+    """
+    Import crowd-sourced data from Kyoto University & Yahoo Japan Corporation.
+
+    input: a file of tab-separated ConceptNet assertions
+    output: a msgpack file of edges
+    """
+    kyoto_yahoo.handle_file(input, output)
 
 
 @cli.command(name='ptt_petgame')

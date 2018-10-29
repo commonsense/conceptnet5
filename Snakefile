@@ -106,7 +106,8 @@ CORE_DATASET_NAMES = [
     "opencyc/opencyc",
     "verbosity/verbosity",
     "wordnet/wordnet",
-    "cedict/cedict"
+    "cedict/cedict",
+    "kyoto_yahoo/facts"
 ]
 CORE_DATASET_NAMES += ["conceptnet4/conceptnet4_flat_{}".format(num) for num in range(10)]
 CORE_DATASET_NAMES += ["ptt_petgame/part{}".format(num) for num in range(1, 13)]
@@ -356,6 +357,14 @@ rule read_cc_cedict:
         DATA + "/edges/cedict/cedict.msgpack",
     shell:
         "cn5-read cc_cedict {input} {output}"
+
+rule read_kyoto_yahoo:
+    input:
+        DATA + "/raw/kyoto_yahoo/facts.tsv"
+    output:
+        DATA + "/edges/kyoto_yahoo/facts.msgpack"
+    shell:
+        "cn5-read kyoto_yahoo {input} {output}"
 
 
 # Converting msgpack to csv
