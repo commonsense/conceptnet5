@@ -177,14 +177,14 @@ def lookup_single_assertion(uri):
         return success(response)
 
 
-def query_similarity(uri1, uri2):
+def query_similarity(node1, node2):
     """
-    Query the similarity between the two terms, uri1 and uri2. Return the
-    cosine similarity between the vectors of these two terms.
+    Query for the similarity between node1 and node2. Return the cosine
+    similarity between the vectors of these two terms.
     """
-    url = make_query_url('/similarity', [('uri1', uri1), ('uri2', uri2)])
+    url = make_query_url('/similarity', [('node1', node1), ('node2', node2)])
     try:
-        similarity = VECTORS.get_similarity(uri1, uri2)
+        similarity = VECTORS.get_similarity(node1, node2)
         response = {
             '@id': url,
             'similarity': round(float(similarity), 3)
@@ -193,7 +193,7 @@ def query_similarity(uri1, uri2):
     except ValueError:
         return error(
             {'@id': url}, 400,
-            "Couldn't look up {} or {} (or both)".format(repr(uri1), repr(uri2))
+            "Couldn't look up {} or {} (or both)".format(repr(node1), repr(node2))
         )
 
 

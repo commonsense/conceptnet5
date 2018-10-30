@@ -129,9 +129,9 @@ def query_top_related(uri):
 @limiter.limit("60 per minute")
 def query_similarity():
     req_args = flask.request.args
-    uri1 = req_args.get('uri1')
-    uri2 = req_args.get('uri2')
-    result = responses.query_similarity(uri1, uri2)
+    node1 = req_args.get('node1')
+    node2 = req_args.get('node2')
+    result = responses.query_similarity(node1, node2)
     return jsonify(result)
 
 
