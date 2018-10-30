@@ -1,0 +1,51 @@
+{
+    "class": "dataset",
+        "task": "similarity",
+        "language": ["Japanese"],
+        "name": "jSIM",
+        "description": "Japanese Similarity dataset (subsets for tokenized Japanese corpora)",
+        "domain": "general",
+        "date": "2018",
+        "source": "based on Japanese Similarity Dataset (https://github.com/tmu-nlp/JapaneseWordSimilarityDataset)",
+        "project_page": "http://vecto.space/projects/jSIM",
+        "version": "2.0",
+        "size": "1997-4429 word pairs",
+        "cite": [{
+		"contribution": "the original dataset",
+		"bibtex":        {
+				  "title": "Construction of a Japanese Word Similarity Dataset",
+				  "author": [
+					{"name":"Yuya Sakaizawa"},
+					{"name":"Mamoru Komachi"}
+					    ],
+				  "url": "http://www.lrec-conf.org/proceedings/lrec2018/pdf/96.pdf",
+				  "booktitle": "Proceedings of the Eleventh International Conference on Language Resources and Evaluation (LREC 2018)",
+				  "address": "Miyazaki, Japan",
+				  "publisher": "European Language Resources Association (ELRA)",
+				  "year": 2018,
+				  "pages": "948-951",
+				  "type": "inproceedings",
+				  "id":"SakaizawaKomachi2018"
+				   }
+		},
+		{"contribution": "subsets for tokenized corpora",
+		"bibtex":        {
+				  "title": "Subcharacter Information in Japanese embeddings: when is it worth it?",
+				  "author":[
+					{"name":"Marzena Karpinska"},
+					{"name":"Bofang Li"},
+					{"name":"Anna Rogers"},
+					{"name":"Aleksandr Drozd"}
+				  	   ],
+				   "year": 2018,
+				   "type": "inproceedings",
+				   "booktitle":"Proceedings of the Workshop on the Relevance of Linguistic Structure in Neural Architectures for NLP",
+				   "url": "http://aclweb.org/anthology/W18-2905",
+				   "pages": "28-37",
+				   "address": "Melbourne, Australia",
+				   "publisher": "Association for Computational Linguistics", 
+				   "id":"KarpinskaLiEtAl_2018"
+				}
+		}]
+
+}
