@@ -28,6 +28,6 @@ def handle_file(input_filename, output_file):
             dataset=DATASET,
             sources=[{'activity': SOURCE}],
             license=Licenses.cc_attribution,
-            weight=(float(weight) - 2) / 2
+            weight=float(weight) / 4
         )
         out.write(edge)
