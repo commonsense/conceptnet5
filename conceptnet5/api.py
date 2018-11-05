@@ -182,6 +182,9 @@ def query_similarity(node1, node2):
     Query for the similarity between node1 and node2. Return the cosine
     similarity between the vectors of these two terms.
     """
+    if node1 is None or node2 is None:
+        return error({}, '400', 'Arguments should be called node1 and node2.')
+
     url = make_query_url('/similarity', [('node1', node1), ('node2', node2)])
     try:
         similarity = VECTORS.get_similarity(node1, node2)
@@ -193,7 +196,8 @@ def query_similarity(node1, node2):
     except ValueError:
         return error(
             {'@id': url}, 400,
-            "Couldn't look up {} or {} (or both)".format(repr(node1), repr(node2))
+            "Couldn't look up {} or {} (or both).".format(repr(node1),
+                                                          repr(node2))
         )
 
 
