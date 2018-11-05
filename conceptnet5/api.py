@@ -183,7 +183,7 @@ def query_similarity(node1, node2):
     similarity between the vectors of these two terms.
     """
     if node1 is None or node2 is None:
-        return error({}, '400', 'Arguments should be called node1 and node2.')
+        return error({}, 400, 'Arguments should be called node1 and node2.')
 
     url = make_query_url('/similarity', [('node1', node1), ('node2', node2)])
     try:
