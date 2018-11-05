@@ -387,7 +387,11 @@ def uri_to_label(uri):
     ''
     >>> uri_to_label('/r/RelatedTo')
     'RelatedTo'
+    >>> uri_to_label('http://wikidata.dbpedia.org/resource/Q89')
+    'Q89'
     """
+    if is_absolute_url(uri):
+        return uri.split('/')[-1]
     if is_term(uri):
         uri = uri_prefix(uri)
     parts = split_uri(uri)
