@@ -177,7 +177,7 @@ def lookup_single_assertion(uri):
         return success(response)
 
 
-def query_similarity(node1, node2):
+def query_relatedness(node1, node2):
     """
     Query for the similarity between node1 and node2. Return the cosine
     similarity between the vectors of these two terms.
@@ -185,12 +185,12 @@ def query_similarity(node1, node2):
     if node1 is None or node2 is None:
         return error({}, 400, 'Arguments should be called node1 and node2.')
 
-    url = make_query_url('/similarity', [('node1', node1), ('node2', node2)])
+    url = make_query_url('/relatedness', [('node1', node1), ('node2', node2)])
     try:
-        similarity = VECTORS.get_similarity(node1, node2)
+        relatedness = VECTORS.get_similarity(node1, node2)
         response = {
             '@id': url,
-            'similarity': round(float(similarity), 3)
+            'value': round(float(relatedness), 3)
         }
         return success(response)
     except ValueError:
