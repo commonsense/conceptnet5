@@ -125,13 +125,13 @@ def query_top_related(uri):
     return jsonify(results)
 
 
-@app.route('/similarity')
+@app.route('/relatedness')
 @limiter.limit("60 per minute")
-def query_similarity():
+def query_relatedness():
     req_args = flask.request.args
     node1 = req_args.get('node1')
     node2 = req_args.get('node2')
-    result = responses.query_similarity(node1, node2)
+    result = responses.query_relatedness(node1, node2)
     return jsonify(result)
 
 
