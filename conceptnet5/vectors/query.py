@@ -172,10 +172,8 @@ class VectorSpaceWrapper(object):
         expanded = terms[:]
         for term, weight in terms:
             if oov_vector and term not in self.frame.index and self.finder is not None:
-
                 neighbors = self._find_neighbors(term, limit_per_term, weight)
-                if neighbors:
-                    expanded.extend(neighbors)
+                expanded.extend(neighbors)
 
                 prefix_weight = 0.01
                 if get_uri_language(term) != 'en':
@@ -183,14 +181,14 @@ class VectorSpaceWrapper(object):
                     expanded.append((englishified, prefix_weight))
 
                 prefix_matches = self._match_prefix(term, prefix_weight)
-                if prefix_matches:
-                    expanded.extend(prefix_matches)
+                expanded.extend(prefix_matches)
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
             return []
         else:
-            return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
+            return [(uri_prefix(term), weight / total_weight) for
+                    (term, weight) in expanded]
 
     def expanded_vector(self, terms, limit_per_term=10, oov_vector=True):
         """
