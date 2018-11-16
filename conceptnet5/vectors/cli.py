@@ -3,21 +3,24 @@ from os import path
 
 from .debias import de_bias_frame
 from .evaluation import wordsim, analogy, bias
-from .evaluation.compare import (
-    compare_embeddings, graph_comparison
-)
+from .evaluation.compare import compare_embeddings, graph_comparison
 from .formats import (
-    convert_glove, convert_word2vec, convert_fasttext, convert_polyglot,
-    load_hdf, save_hdf, export_text, save_labels, save_npy
+    convert_glove,
+    convert_word2vec,
+    convert_fasttext,
+    convert_polyglot,
+    load_hdf,
+    save_hdf,
+    export_text,
+    save_labels,
+    save_npy,
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
 from .propagate import sharded_propagate
 from .query import VectorSpaceWrapper
 from .retrofit import sharded_retrofit, join_shards
-from .transforms import (
-    make_big_frame, make_small_frame
-)
+from .transforms import make_big_frame, make_small_frame
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'
 
@@ -52,16 +55,28 @@ def filter_word_vectors(dense_hdf_filename, vocab_filename):
 @click.option('--verbose', '-v', count=True)
 @click.option('--max_cleanup_iters', '-m', default=20)
 @click.option('--orig_vec_weight', '-w', default=0.15)
-def run_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                 iterations=5, nshards=6, verbose=0, max_cleanup_iters=20,
-                 orig_vec_weight=0.15):
+def run_retrofit(
+    dense_hdf_filename,
+    conceptnet_filename,
+    output_filename,
+    iterations=5,
+    nshards=6,
+    verbose=0,
+    max_cleanup_iters=20,
+    orig_vec_weight=0.15,
+):
     """
     Run retrofit, operating on a part of a frame at a time.
     """
     sharded_retrofit(
-        dense_hdf_filename, conceptnet_filename, output_filename,
-        iterations=iterations, nshards=nshards, verbosity=verbose,
-        max_cleanup_iters=max_cleanup_iters, orig_vec_weight=orig_vec_weight
+        dense_hdf_filename,
+        conceptnet_filename,
+        output_filename,
+        iterations=iterations,
+        nshards=nshards,
+        verbosity=verbose,
+        max_cleanup_iters=max_cleanup_iters,
+        orig_vec_weight=orig_vec_weight,
     )
 
 
@@ -78,7 +93,9 @@ def run_convert_glove(glove_filename, output_filename, nrows=500000):
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=500000)
 @click.option('--language', '-l', default='en')
-def run_convert_fasttext(fasttext_filename, output_filename, nrows=500000, language='en'):
+def run_convert_fasttext(
+    fasttext_filename, output_filename, nrows=500000, language='en'
+):
     convert_fasttext(fasttext_filename, output_filename, nrows=nrows, language=language)
 
 
@@ -99,7 +116,9 @@ def run_convert_polyglot(polyglot_filename, output_filename, language):
 
 
 @cli.command(name='intersect')
-@click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument(
+    'input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False)
+)
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.argument('projection_filename', type=click.Path(writable=True, dir_okay=False))
 def run_intersect(input_filenames, output_filename, projection_filename):
@@ -125,7 +144,9 @@ def run_debias(input_filename, output_filename):
 
 @cli.command(name='evaluate')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option(
+    '--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev'
+)
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 @click.option('--run-analogies', is_flag=True)
 def run_evaluate(filename, subset, semeval_by_language, run_analogies):
@@ -145,7 +166,9 @@ def run_evaluate(filename, subset, semeval_by_language, run_analogies):
 
 @cli.command(name='evaluate_wordsim')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option(
+    '--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev'
+)
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate_wordsim(filename, subset, semeval_by_language):
     """
@@ -161,7 +184,9 @@ def run_evaluate_wordsim(filename, subset, semeval_by_language):
 
 @cli.command(name='evaluate_raw')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option(
+    '--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev'
+)
 @click.option('--semeval-by-language/--semeval-global', '-l', default=False)
 def run_evaluate_raw(filename, subset, semeval_by_language):
     """
@@ -177,7 +202,9 @@ def run_evaluate_raw(filename, subset, semeval_by_language):
 
 @cli.command(name='evaluate_analogies')
 @click.argument('filename', type=click.Path(readable=True, dir_okay=False))
-@click.option('--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev')
+@click.option(
+    '--subset', '-s', type=click.Choice(['dev', 'test', 'all']), default='dev'
+)
 def run_evaluate_analogies(filename, subset):
     """
     Evaluate a frame on analogy datasets: SAT, Google analogies, Semeval2012-Task2.
@@ -197,7 +224,9 @@ def run_evaluate_bias(filename):
 
 
 @cli.command(name='compare_embeddings')
-@click.argument('input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument(
+    'input_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False)
+)
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--run-analogies', is_flag=True)
 def run_compare_embeddings(input_filenames, output_filename, run_analogies):
@@ -212,7 +241,9 @@ def run_compare_embeddings(input_filenames, output_filename, run_analogies):
     neighbors in the ConceptNet graph. These embeddings could have been stored
     in the matrix, but this saves memory and download time.
     """
-    results = compare_embeddings(input_filenames, subset='all', run_analogies=run_analogies)
+    results = compare_embeddings(
+        input_filenames, subset='all', run_analogies=run_analogies
+    )
     print(results)
     save_hdf(results, output_filename)
 
@@ -277,18 +308,21 @@ def export_background(input_filename, output_dir, concepts_filename, language):
 
 
 @cli.command(name='propagate')
-@click.argument('assoc_filename',
-                type=click.Path(readable=True, dir_okay=False))
-@click.argument('embedding_filename',
-                type=click.Path(readable=True, dir_okay=False))
-@click.argument('output_filename',
-                type=click.Path(writable=True, dir_okay=False))
+@click.argument('assoc_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('embedding_filename', type=click.Path(readable=True, dir_okay=False))
+@click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nshards', '-n', default=6)
 @click.option('--iterations', default=20)
-def run_propagate(assoc_filename, embedding_filename, output_filename,
-                  nshards=6, iterations=20):
-    sharded_propagate(assoc_filename, embedding_filename, output_filename, 
-                      nshards=nshards, iterations=iterations)
+def run_propagate(
+    assoc_filename, embedding_filename, output_filename, nshards=6, iterations=20
+):
+    sharded_propagate(
+        assoc_filename,
+        embedding_filename,
+        output_filename,
+        nshards=nshards,
+        iterations=iterations,
+    )
 
 
 @cli.command(name='join_shard_files')

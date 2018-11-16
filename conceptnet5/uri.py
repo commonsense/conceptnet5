@@ -21,16 +21,16 @@ def standardize_text(text, lowercase=True):
 
 def join_uri(*pieces):
     """
-    `join_uri` builds a URI from constituent pieces that should be joined
-    with slashes (/).
+    `join_uri` builds a URI from constituent pieces that should be joined with
+    slashes (/).
 
-    Leading and trailing on the pieces are acceptable, but will be ignored.
-    The resulting URI will always begin with a slash and have its pieces
-    separated by a single slash.
+    Leading and trailing on the pieces are acceptable, but will be ignored. The
+    resulting URI will always begin with a slash and have its pieces separated
+    by a single slash.
 
-    The pieces do not have `preprocess_and_tokenize_text` applied to them; to make sure your
-    URIs are in normal form, run `preprocess_and_tokenize_text` on each piece that represents
-    arbitrary text.
+    The pieces do not have `preprocess_and_tokenize_text` applied to them; to
+    make sure your URIs are in normal form, run `preprocess_and_tokenize_text`
+    on each piece that represents arbitrary text.
 
     >>> join_uri('/c', 'en', 'cat')
     '/c/en/cat'
@@ -95,8 +95,7 @@ def concept_uri(lang, text, *more):
             # probably junk
             more = []
         for dis1 in more[1:]:
-            assert ' ' not in dis1,\
-                "%r is not in normalized form" % dis1
+            assert ' ' not in dis1, "%r is not in normalized form" % dis1
 
     return join_uri('/c', lang, text, *more)
 
@@ -223,8 +222,9 @@ def parse_compound_uri(uri):
     if pieces[-1] != ']':
         raise ValueError("Compound URIs must end with /]")
     if '[' not in pieces:
-        raise ValueError("Compound URIs must contain /[/ at the beginning of "
-                         "the argument list")
+        raise ValueError(
+            "Compound URIs must contain /[/ at the beginning of " "the argument list"
+        )
     list_start = pieces.index('[')
     op = join_uri(*pieces[:list_start])
 
@@ -233,7 +233,7 @@ def parse_compound_uri(uri):
     depth = 0
 
     # Split on commas, but not if they're within additional pairs of brackets.
-    for piece in pieces[(list_start + 1):-1]:
+    for piece in pieces[(list_start + 1) : -1]:
         if piece == ',' and depth == 0:
             chunks.append('/' + ('/'.join(current)).strip('/'))
             current = []
@@ -344,8 +344,10 @@ def is_term(uri):
 
 def is_absolute_url(uri):
     """
-    We have URLs pointing to Creative Commons licenses, starting with 'cc:', which for Linked
-    Data purposes are absolute URLs because they'll be resolved into full URLs.
+    We have URLs pointing to Creative Commons licenses, starting with 'cc:',
+    which for Linked Data purposes are absolute URLs because they'll be resolved
+    into full URLs.
+
     >>> is_absolute_url('http://fr.wiktionary.org/wiki/mįkká’e_uxpáðe')
     True
     >>> is_absolute_url('/c/fr/nouveau')
@@ -358,6 +360,7 @@ def get_uri_language(uri):
     """
     Extract the language from a concept URI. If the URI points to an assertion,
     get the language of its first concept.
+
     >>> get_uri_language('/a/[/r/RelatedTo/,/c/en/orchestra/,/c/en/symphony/]')
     'en'
     >>> get_uri_language('/c/pl/cześć')
@@ -375,9 +378,10 @@ def get_uri_language(uri):
 
 def uri_to_label(uri):
     """
-    Convert a ConceptNet uri into a label to be used in nodes. This
-    function replaces an underscore with a space, so while '/c/en/example' will be converted into
-    'example', '/c/en/canary_islands' will be converted into 'canary islands'.
+    Convert a ConceptNet uri into a label to be used in nodes. This function
+    replaces an underscore with a space, so while '/c/en/example' will be
+    converted into 'example', '/c/en/canary_islands' will be converted into
+    'canary islands'.
 
     >>> uri_to_label('/c/en/example')
     'example'
