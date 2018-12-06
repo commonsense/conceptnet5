@@ -68,7 +68,7 @@ order of appearance:
 * Catherine Havasi
 * Hugo Liu
 * Hyemin Chung
-* Rob Speer
+* Robyn Speer
 * Ken Arnold
 * Yen-Ling Kuo
 

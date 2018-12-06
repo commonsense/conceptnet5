@@ -1,18 +1,17 @@
 """
 This file sets up Flask to serve the ConceptNet 5 API in JSON-LD format.
 """
-from conceptnet_web.json_rendering import jsonify, highlight_and_link_json
-from conceptnet5 import api as responses
-from conceptnet5.api import VALID_KEYS, error
-from conceptnet_web.filters import FILTERS
-from conceptnet_web.error_logging import try_configuring_sentry
-from conceptnet5.nodes import standardized_concept_uri
-
-import flask
-from flask_cors import CORS
-from flask_limiter import Limiter
 import os
 
+import flask
+from conceptnet5 import api as responses
+from conceptnet5.api import VALID_KEYS, error
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet_web.error_logging import try_configuring_sentry
+from conceptnet_web.filters import FILTERS
+from conceptnet_web.json_rendering import jsonify
+from flask_cors import CORS
+from flask_limiter import Limiter
 
 # Configuration
 
@@ -124,6 +123,16 @@ def query_top_related(uri):
     filter = req_args.get('filter')
     results = responses.query_related(uri, filter=filter, limit=limit)
     return jsonify(results)
+
+
+@app.route('/relatedness')
+@limiter.limit("60 per minute")
+def query_relatedness():
+    req_args = flask.request.args
+    node1 = req_args.get('node1')
+    node2 = req_args.get('node2')
+    result = responses.query_relatedness(node1, node2)
+    return jsonify(result)
 
 
 @app.errorhandler(IOError)

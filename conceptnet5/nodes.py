@@ -12,8 +12,14 @@ from wordfreq.preprocess import preprocess_text
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
-from conceptnet5.uri import concept_uri, get_uri_language, is_term, split_uri, uri_prefix, \
-    uri_to_label
+from conceptnet5.uri import (
+    concept_uri,
+    get_uri_language,
+    is_term,
+    split_uri,
+    uri_prefix,
+    uri_to_label,
+)
 
 
 def preprocess_and_tokenize_text(lang, text):
@@ -71,7 +77,9 @@ def topic_to_concept(language, topic):
     if not match:
         return standardized_concept_uri(language, topic)
     else:
-        return standardized_concept_uri(language, match.group(1), 'n', 'wp', match.group(2))
+        return standardized_concept_uri(
+            language, match.group(1), 'n', 'wp', match.group(2)
+        )
 
 
 def standardized_concept_name(lang, text):
@@ -128,7 +136,7 @@ def standardized_concept_uri(lang, text, *more):
             if token_filter is not None:
                 tokens = token_filter(tokens)
             more_text.append('_'.join(tokens))
-    
+
     return concept_uri(lang, norm_text, *more_text)
 
 
@@ -156,7 +164,7 @@ def valid_concept_name(text):
     False
     """
     tokens = simple_tokenize(text.replace('_', ' '))
-    return (len(tokens) > 0)
+    return len(tokens) > 0
 
 
 def ld_node(uri, label=None):
@@ -165,10 +173,7 @@ def ld_node(uri, label=None):
     """
     if label is None:
         label = uri_to_label(uri)
-    ld = {
-        '@id': uri,
-        'label': label
-    }
+    ld = {'@id': uri, 'label': label}
     if is_term(uri):
         pieces = split_uri(uri)
         ld['language'] = get_uri_language(uri)

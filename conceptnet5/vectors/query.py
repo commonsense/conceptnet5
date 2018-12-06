@@ -8,8 +8,11 @@ from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
-    similar_to_vec, weighted_average, normalize_vec, cosine_similarity, standardized_uri
-
+    similar_to_vec,
+    weighted_average,
+    normalize_vec,
+    cosine_similarity,
+    standardized_uri,
 )
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -26,8 +29,10 @@ def field_match(value, query):
     """
     Determines whether a given field of an edge (or, in particular, an
     assertion) matches the given query.
-    If the query is a URI, it will match prefixes of longer URIs, unless
-    `/.` is added to the end of the query.
+
+    If the query is a URI, it will match prefixes of longer URIs, unless `/.` is
+    added to the end of the query.
+
     For example, `/c/en/dog` will match assertions about `/c/en/dog/n/animal`,
     but `/c/en/dog/.` will only match assertions about `/c/en/dog`.
     """
@@ -37,8 +42,9 @@ def field_match(value, query):
     elif query.endswith('/.'):
         return value == query[:-2]
     else:
-        return (value[:len(query)] == query
-                and (len(value) == len(query) or value[len(query)] == '/'))
+        return value[: len(query)] == query and (
+            len(value) == len(query) or value[len(query)] == '/'
+        )
 
 
 class VectorSpaceWrapper(object):
@@ -55,7 +61,9 @@ class VectorSpaceWrapper(object):
     def __init__(self, vector_filename=None, frame=None, use_db=True):
         if frame is None:
             self.frame = None
-            self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
+            self.vector_filename = vector_filename or get_data_filename(
+                'vectors/mini.h5'
+            )
         else:
             self.frame = frame
             self.vector_filename = None
@@ -91,7 +99,7 @@ class VectorSpaceWrapper(object):
 
             self.k = self.frame.shape[1]
             self.small_k = 100
-            self.small_frame = self.frame.iloc[:, :self.small_k].copy()
+            self.small_frame = self.frame.iloc[:, : self.small_k].copy()
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
@@ -113,7 +121,52 @@ class VectorSpaceWrapper(object):
         else:
             return field_match(label, filter)
 
-    def expand_terms(self, terms, limit_per_term=10, include_neighbors=True):
+    @staticmethod
+    def _englishify(term):
+        splits = split_uri(term)
+        if len(splits) > 2:
+            englishified = '/c/en/' + splits[2]
+            return englishified
+
+    def _find_neighbors(self, term, limit_per_term, weight):
+        neighbors = []
+        for edge in self.finder.lookup(term, limit=limit_per_term):
+            if field_match(edge['start']['term'], term) and not field_match(
+                edge['end']['term'], term
+            ):
+                neighbor = edge['end']['term']
+            elif field_match(edge['end']['term'], term) and not field_match(
+                edge['start']['term'], term
+            ):
+                neighbor = edge['start']['term']
+            else:
+                continue
+            neighbor_weight = weight * min(10, edge['weight']) * 0.01
+            neighbors.append((neighbor, neighbor_weight))
+        return neighbors
+
+    def _match_prefix(self, term, prefix_weight):
+        results = []
+        while term:
+            # Skip excessively general lookups, for either an entire
+            # language, or all terms starting with a single
+            # non-ideographic letter
+            if (
+                len(split_uri(term)) < 3
+                or term.endswith('/')
+                or (term[-2] == '/' and term[-1] < chr(0x3000))
+            ):
+                break
+            prefixed = self._terms_with_prefix(term)
+            if prefixed:
+                n_prefixed = len(prefixed)
+                for prefixed_term in prefixed:
+                    results.append((prefixed_term, prefix_weight / n_prefixed))
+                break
+            term = term[:-1]
+        return results
+
+    def expand_terms(self, terms, limit_per_term=10, oov_vector=True):
         """
         Given a list of weighted terms as (term, weight) tuples, add terms that
         are one step away in ConceptNet at a lower weight, terms in English that share the
@@ -129,50 +182,27 @@ class VectorSpaceWrapper(object):
         self.load()
         expanded = terms[:]
         for term, weight in terms:
-            if include_neighbors and term not in self.frame.index and self.finder is not None:
-                for edge in self.finder.lookup(term, limit=limit_per_term):
-                    if field_match(edge['start']['term'], term) and not field_match(
-                            edge['end']['term'], term):
-                        neighbor = edge['end']['term']
-                    elif field_match(edge['end']['term'], term) and not field_match(
-                            edge['start']['term'], term):
-                        neighbor = edge['start']['term']
-                    else:
-                        continue
-                    # TODO: explain this formula
-                    neighbor_weight = weight * min(10, edge['weight']) * 0.01
-                    expanded.append((neighbor, neighbor_weight))
+            if oov_vector and term not in self.frame.index and self.finder is not None:
+                neighbors = self._find_neighbors(term, limit_per_term, weight)
+                expanded.extend(neighbors)
 
                 prefix_weight = 0.01
                 if get_uri_language(term) != 'en':
-                    splits = split_uri(term)
-                    if len(splits) > 2:
-                        englishified = '/c/en/' + splits[2]
-                        expanded.append((englishified, prefix_weight))
+                    englishified = self._englishify(term)
+                    expanded.append((englishified, prefix_weight))
 
-                while term:
-                    # Skip excessively general lookups, for either an entire
-                    # language, or all terms starting with a single
-                    # non-ideographic letter
-                    if len(split_uri(term))< 3  \
-                       or term.endswith('/') \
-                       or (term[-2] == '/' and term[-1] < chr(0x3000)):
-                        break
-                    prefixed = self.terms_with_prefix(term)
-                    if prefixed:
-                        n_prefixed = len(prefixed)
-                        for prefixed_term in prefixed:
-                            expanded.append((prefixed_term, prefix_weight / n_prefixed))
-                        break
-                    term = term[:-1]
+                prefix_matches = self._match_prefix(term, prefix_weight)
+                expanded.extend(prefix_matches)
 
         total_weight = sum(abs(weight) for term, weight in expanded)
         if total_weight == 0:
             return []
         else:
-            return [(uri_prefix(term), weight / total_weight) for (term, weight) in expanded]
+            return [
+                (uri_prefix(term), weight / total_weight) for (term, weight) in expanded
+            ]
 
-    def expanded_vector(self, terms, limit_per_term=10, include_neighbors=True):
+    def expanded_vector(self, terms, limit_per_term=10, oov_vector=True):
         """
         Given a list of weighted terms as (term, weight) tuples, make a vector
         representing information from:
@@ -184,22 +214,25 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         return weighted_average(
-            self.frame,
-            self.expand_terms(terms, limit_per_term, include_neighbors)
+            self.frame, self.expand_terms(terms, limit_per_term, oov_vector)
         )
 
     def text_to_vector(self, language, text):
-        """Used in Story Cloze Test to create a vector for text """
+        """
+        Used in Story Cloze Test to create a vector for text.
+        """
         tokens = wordfreq.tokenize(text, language)
-        weighted_terms = [(uri_prefix(standardized_uri(language, token)), 1.) for token in tokens]
-        return self.get_vector(weighted_terms, include_neighbors=False)
+        weighted_terms = [
+            (uri_prefix(standardized_uri(language, token)), 1.) for token in tokens
+        ]
+        return self.get_vector(weighted_terms, oov_vector=False)
 
-    def get_vector(self, query, include_neighbors=True):
+    def get_vector(self, query, oov_vector=True):
         """
         Given one of the possible types of queries (see `similar_terms`), make
         a vector to look up from it.
 
-        If there are 5 or fewer terms involved and `include_neighbors=True`, this
+        If there are 5 or fewer terms involved and `oov_vector=True`, this
         will allow expanded_vector to look up neighboring terms in ConceptNet.
         """
         self.load()
@@ -217,13 +250,13 @@ class VectorSpaceWrapper(object):
         else:
             raise ValueError("Can't make a query out of type %s" % type(query))
 
-        cache_key = tuple(terms + [include_neighbors])
+        cache_key = tuple(terms + [oov_vector])
         if cache_key in self.cache:
             return self.cache[cache_key]
 
-        include_neighbors = include_neighbors and (len(terms) <= 5)
+        oov_vector = oov_vector and (len(terms) <= 5)
 
-        vec = self.expanded_vector(terms, include_neighbors=include_neighbors)
+        vec = self.expanded_vector(terms, oov_vector=oov_vector)
         self.cache[cache_key] = normalize_vec(vec)
         return self.cache[cache_key]
 
@@ -244,7 +277,7 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         vec = self.get_vector(query)
-        small_vec = vec[:self.small_k]
+        small_vec = vec[: self.small_k]
         search_frame = self.small_frame
         # TODO: document filter
         if filter:
@@ -255,14 +288,16 @@ class VectorSpaceWrapper(object):
             if exact_only:
                 if filter in search_frame.index:
                     idx = search_frame.index.get_loc(filter)
-                    search_frame = search_frame[idx:idx + 1]
+                    search_frame = search_frame[idx : idx + 1]
                 else:
                     search_frame = search_frame.iloc[0:0]
             else:
-                start_idx, end_idx = self.index_prefix_range(filter + '/')
+                start_idx, end_idx = self._index_prefix_range(filter + '/')
                 search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
-        similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index].astype('f'))
+        similar_choices = l2_normalize_rows(
+            self.frame.loc[similar_sloppy.index].astype('f')
+        )
 
         similar = similar_to_vec(similar_choices, vec, limit=limit)
         return similar
@@ -272,14 +307,14 @@ class VectorSpaceWrapper(object):
         vec2 = self.get_vector(query2)
         return cosine_similarity(vec1, vec2)
 
-    def terms_with_prefix(self, prefix):
+    def _terms_with_prefix(self, prefix):
         """
         Get a list of terms whose URI begins with the given prefix. The list
         will be in an arbitrary order.
         """
         return self._trie.keys(prefix)
 
-    def index_prefix_range(self, prefix):
+    def _index_prefix_range(self, prefix):
         """
         Get the range of indices on the DataFrame we're wrapping that begin
         with a given prefix.
@@ -293,7 +328,7 @@ class VectorSpaceWrapper(object):
         # Use the trie to find all terms with the given prefix. Then sort them,
         # because the range will span from our first prefix in sorted
         # order to just after our last.
-        terms = sorted(self.terms_with_prefix(prefix))
+        terms = sorted(self._terms_with_prefix(prefix))
         if not terms:
             return (0, 0)
 

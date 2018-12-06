@@ -1,16 +1,13 @@
-'''
+"""
 This file defines the ConceptNet web API responses.
-'''
+"""
 
 from conceptnet5.vectors.query import VectorSpaceWrapper
 from conceptnet5.nodes import standardized_concept_uri, ld_node
 
-
 VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder
-CONTEXT = [
-    "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
-]
+CONTEXT = ["http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json"]
 VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 
 
@@ -21,10 +18,7 @@ def success(response):
 
 def error(response, status, details):
     response['@context'] = CONTEXT
-    response['error'] = {
-        'status': status,
-        'details': details
-    }
+    response['error'] = {'status': status, 'details': details}
     return response
 
 
@@ -62,8 +56,7 @@ def paginated_url(url, params, offset, limit):
     replacing those parameters if they already existed.
     """
     new_params = [
-        (key, val) for (key, val) in params
-        if key != 'offset' and key != 'limit'
+        (key, val) for (key, val) in params if key != 'offset' and key != 'limit'
     ] + [('offset', offset), ('limit', limit)]
     return make_query_url(url, new_params)
 
@@ -90,7 +83,9 @@ def make_paginated_view(url, params, offset, limit, more):
         pager['previousPage'] = paginated_url(url, params, prev_offset, limit)
     if more:
         pager['nextPage'] = paginated_url(url, params, next_offset, limit)
-        pager['comment'] = "There are more results. Follow the 'nextPage' link for more."
+        pager[
+            'comment'
+        ] = "There are more results. Follow the 'nextPage' link for more."
     return pager
 
 
@@ -101,8 +96,7 @@ def lookup_grouped_by_feature(term, filters=None, feature_limit=10):
     """
     if not term.startswith('/c/'):
         return error(
-            {}, 400,
-            'Only concept nodes (starting with /c/) can be grouped by feature.'
+            {}, 400, 'Only concept nodes (starting with /c/) can be grouped by feature.'
         )
 
     found = FINDER.lookup_grouped_by_feature(term, limit=(feature_limit + 1))
@@ -118,10 +112,12 @@ def lookup_grouped_by_feature(term, filters=None, feature_limit=10):
             'weight': sum(assertion['weight'] for assertion in assertions),
             'feature': dict(feature_pairs),
             'edges': assertions[:feature_limit],
-            'symmetric': symmetric
+            'symmetric': symmetric,
         }
         if len(assertions) > feature_limit:
-            view = make_paginated_view(base_url, feature_pairs, 0, feature_limit, more=True)
+            view = make_paginated_view(
+                base_url, feature_pairs, 0, feature_limit, more=True
+            )
             group['view'] = view
 
         grouped.append(group)
@@ -132,7 +128,9 @@ def lookup_grouped_by_feature(term, filters=None, feature_limit=10):
 
     response = ld_node(term)
     if not grouped and not filters:
-        return error(response, 404, '%r is not a node in ConceptNet.' % response['label'])
+        return error(
+            response, 404, '%r is not a node in ConceptNet.' % response['label']
+        )
     else:
         response['features'] = grouped
         return success(response)
@@ -146,15 +144,10 @@ def lookup_paginated(term, limit=50, offset=0):
     # Query one more edge than asked for, so we know if there are more
     found = FINDER.lookup(term, limit=(limit + 1), offset=offset)
     edges = found[:limit]
-    response = {
-        '@id': term,
-        'edges': edges
-    }
+    response = {'@id': term, 'edges': edges}
     more = len(found) > len(edges)
     if len(found) > len(edges) or offset != 0:
-        response['view'] = make_paginated_view(
-            term, (), offset, limit, more=more
-        )
+        response['view'] = make_paginated_view(term, (), offset, limit, more=more)
     if not found:
         return error(response, 404, '%r is not a node in ConceptNet.' % term)
     else:
@@ -168,14 +161,33 @@ def lookup_single_assertion(uri):
     We return that edge if it exists, and if not, we return a 404 error.
     """
     found = FINDER.lookup(uri, limit=1)
-    response = {
-        '@id': uri
-    }
+    response = {'@id': uri}
     if not found:
         return error(response, 404, '%r is not an assertion in ConceptNet.' % uri)
     else:
         response.update(found[0])
         return success(response)
+
+
+def query_relatedness(node1, node2):
+    """
+    Query for the similarity between node1 and node2. Return the cosine
+    similarity between the vectors of these two terms.
+    """
+    if node1 is None or node2 is None:
+        return error({}, 400, 'Arguments should be called node1 and node2.')
+
+    url = make_query_url('/relatedness', [('node1', node1), ('node2', node2)])
+    try:
+        relatedness = VECTORS.get_similarity(node1, node2)
+        response = {'@id': url, 'value': round(float(relatedness), 3)}
+        return success(response)
+    except ValueError:
+        return error(
+            {'@id': url},
+            400,
+            "Couldn't look up {} or {} (or both).".format(repr(node1), repr(node2)),
+        )
 
 
 # TODO: document querying for a list of terms
@@ -200,14 +212,12 @@ def query_related(uri, filter=None, limit=20):
                     weight = 1.
                 query.append(('/c/{}/{}'.format(language, term), weight))
         except ValueError:
-            return error(
-                {'@id': uri}, 400,
-                "Couldn't parse this term list: %r" % uri
-            )
+            return error({'@id': uri}, 400, "Couldn't parse this term list: %r" % uri)
     else:
         return error(
-            {'@id': uri}, 404,
-            '%r is not something that I can find related terms to.' % uri
+            {'@id': uri},
+            404,
+            '%r is not something that I can find related terms to.' % uri,
         )
 
     found = VECTORS.similar_terms(query, filter=filter, limit=limit)
@@ -215,10 +225,7 @@ def query_related(uri, filter=None, limit=20):
         {'@id': key, 'weight': round(float(weight), 3)}
         for (key, weight) in found.items()
     ]
-    response = {
-        '@id': uri,
-        'related': related
-    }
+    response = {'@id': uri, 'related': related}
     return response
 
 
@@ -231,10 +238,7 @@ def query_paginated(query, offset=0, limit=50):
     """
     found = FINDER.query(query, limit=limit + 1, offset=offset)
     edges = found[:limit]
-    response = {
-        '@id': make_query_url('/query', query.items()),
-        'edges': edges
-    }
+    response = {'@id': make_query_url('/query', query.items()), 'edges': edges}
     more = len(found) > len(edges)
     if len(found) > len(edges) or offset != 0:
         response['view'] = make_paginated_view(
@@ -248,11 +252,11 @@ def standardize_uri(language, text):
     Look up the URI for a given piece of text.
     """
     if text is None or language is None:
-        return error({}, 400, "You should include the 'text' and 'language' parameters.")
+        return error(
+            {}, 400, "You should include the 'text' and 'language' parameters."
+        )
 
     text = text.replace('_', ' ')
     uri = standardized_concept_uri(language, text)
-    response = {
-        '@id': uri
-    }
+    response = {'@id': uri}
     return success(response)
