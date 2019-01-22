@@ -31,7 +31,7 @@ N_PIECES = 16
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
-    'en': '20171201',
+    'en': '20190101',
     'fr': '20160305',
     'de': '20160407'
 }
@@ -70,7 +70,7 @@ PROPAGATE_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-RAW_DATA_URL = "https://zenodo.org/record/1165009/files/conceptnet-raw-data-5.6.zip"
+RAW_DATA_URL = "https://zenodo.org/record/1165009/files/conceptnet-raw-data-5.7.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
@@ -171,7 +171,7 @@ rule test:
 # ===========
 rule download_raw_package:
     output:
-        DATA + "/raw/conceptnet-raw-data-5.6.zip"
+        DATA + "/raw/conceptnet-raw-data-5.7.zip"
     shell:
         "wget -nv {RAW_DATA_URL} -O {output}"
 
@@ -184,7 +184,7 @@ rule download_unicode_data:
 
 rule extract_raw:
     input:
-        DATA + "/raw/conceptnet-raw-data-5.6.zip"
+        DATA + "/raw/conceptnet-raw-data-5.7.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
