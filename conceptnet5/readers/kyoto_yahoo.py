@@ -13,6 +13,13 @@ DATASET = '/d/conceptnet/5/ja'
 SOURCE = '/s/activity/kyoto_yahoo'
 
 
+WEIGHT_TABLE = {
+    '3': 0.5,
+    '4': 1.0,
+    '5': 2.0
+}
+
+
 def handle_file(input_filename, output_file):
     out = MsgpackStreamWriter(output_file)
     for line in open(input_filename, encoding='utf-8'):
@@ -20,7 +27,7 @@ def handle_file(input_filename, output_file):
         uri, start, rel, end, weight, source = parts
         if uri == 'uri':
             return
-        
+
         edge = make_edge(
             rel=rel,
             start=start,
@@ -28,6 +35,6 @@ def handle_file(input_filename, output_file):
             dataset=DATASET,
             sources=[{'activity': SOURCE}],
             license=Licenses.cc_attribution,
-            weight=float(weight) / 4
+            weight=WEIGHT_TABLE[weight]
         )
         out.write(edge)
