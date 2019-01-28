@@ -206,7 +206,7 @@ def match_filter_later(data, filter_later):
     if 'end' in filter_later:
         prefix = filter_later['end'] + '/'
         if not data['end'].startswith(prefix):
-            print(data['end'], prefix)
+            return False
 
     # TODO: node and other
     return True
