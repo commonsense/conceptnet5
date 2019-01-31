@@ -13,6 +13,8 @@ RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :
 DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = %(dataset)s ORDER BY weight DESC OFFSET %(offset)s LIMIT %(limit)s"
 
 
+TOO_BIG_PREFIXES = ['/c/en', '/c/fr', '/c/es', '/c/de', '/c/ja', '/c/zh', '/c/pt', '/c/la', '/c/it', '/c/ru' ,'/c/fi']
+
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
     SELECT p.node_id FROM nodes n, node_prefixes p
@@ -169,6 +171,7 @@ class AssertionFinder(object):
         return results
 
     def query(self, criteria, limit=20, offset=0):
+        filter_later = {}
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
         params = {
@@ -177,8 +180,34 @@ class AssertionFinder(object):
         }
         params['limit'] = limit
         params['offset'] = offset
+        for criterion in ['node', 'other', 'start', 'end']:
+            if criterion in criteria and criteria[criterion] in TOO_BIG_PREFIXES:
+                filter_later[criterion] = criteria[criterion]
+                del criteria[criterion]
+                params['limit'] = limit * 10
+
         query_string = make_list_query(criteria)
         cursor = self.connection.cursor()
         cursor.execute(query_string, params)
-        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
+        results = [
+            transform_for_linked_data(data) for uri, data in cursor.fetchall()
+            if match_filter_later(data, filter_later)
+        ][:limit]
         return results
+
+
+def match_filter_later(data, filter_later):
+    # TODO: this is spaghetti designed to make the API go back up. Clean up.
+    if 'start' in filter_later:
+        prefix = filter_later['start'] + '/'
+        if not data['start'].startswith(prefix):
+            return False
+
+    if 'end' in filter_later:
+        prefix = filter_later['end'] + '/'
+        if not data['end'].startswith(prefix):
+            return False
+
+    # TODO: node and other
+    return True
+
