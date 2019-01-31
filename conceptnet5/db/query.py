@@ -44,8 +44,12 @@ def make_list_query(criteria):
     for direction in piece_directions:
         if direction == -1:
             parts.append("UNION ALL")
+        parts.append("SELECT e.uri, e.weight, e.data, np1.uri as starturi, np2.uri as enduri")
+        if direction == 1:
+            parts.append(", np1.uri as node, np2.uri as other")
+        else:
+            parts.append(", np2.uri as node, np1.uri as other")
         parts.append("""
-            SELECT e.uri, e.weight, e.data
             FROM relations r, edges e, nodes n1, nodes n2,
                  node_prefixes p1, node_prefixes p2, nodes np1, nodes np2
         """)
@@ -62,26 +66,37 @@ def make_list_query(criteria):
         """)
         if 'source' in criteria:
             parts.append("AND s.uri=%(source)s AND es.source_id=s.id AND es.edge_id=e.id")
-        if 'node' in criteria:
+        if 'node' in criteria and 'filter_node' not in criteria:
             if direction == 1:
                 parts.append("AND np1.uri = %(node)s")
             else:
                 parts.append("AND np2.uri = %(node)s")
-        if 'other' in criteria:
+        if 'other' in criteria and 'filter_other' not in criteria:
             if direction == 1:
                 parts.append("AND np2.uri = %(other)s")
             else:
                 parts.append("AND np1.uri = %(other)s")
         if 'rel' in criteria:
             parts.append("AND r.uri = %(rel)s")
-        if 'start' in criteria:
+        if 'start' in criteria and 'filter_start' not in criteria:
             parts.append("AND np1.uri = %(start)s")
-        if 'end' in criteria:
+        if 'end' in criteria and 'filter_end' not in criteria:
             parts.append("AND np2.uri = %(end)s")
     parts.append("LIMIT 10000")
     parts.append(")")
+    parts.append("SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges")
+    more_clauses = []
+    if 'filter_node' in criteria:
+        more_clauses.append('node LIKE %(filter_node)s')
+    if 'filter_other' in criteria:
+        more_clauses.append('other LIKE %(filter_other)s')
+    if 'filter_start' in criteria:
+        more_clauses.append('starturi LIKE %(filter_start)s')
+    if 'filter_end' in criteria:
+        more_clauses.append('enduri LIKE %(filter_end)s')
+    if more_clauses:
+        parts.append("WHERE " + " AND ".join(more_clauses))
     parts.append("""
-        SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges
         ORDER BY weight DESC, uri
         OFFSET %(offset)s LIMIT %(limit)s
     """)
@@ -171,43 +186,25 @@ class AssertionFinder(object):
         return results
 
     def query(self, criteria, limit=20, offset=0):
-        filter_later = {}
+        criteria = criteria.copy()
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
+        for criterion in ['node', 'other', 'start', 'end']:
+            if criterion in criteria and criteria[criterion] in TOO_BIG_PREFIXES:
+                criteria['filter_' + criterion] = criteria[criterion] + '%'
+
+        query_string = make_list_query(criteria)
         params = {
             key: remove_control_chars(value)
             for (key, value) in criteria.items()
         }
         params['limit'] = limit
         params['offset'] = offset
-        for criterion in ['node', 'other', 'start', 'end']:
-            if criterion in criteria and criteria[criterion] in TOO_BIG_PREFIXES:
-                filter_later[criterion] = criteria[criterion]
-                del criteria[criterion]
-                params['limit'] = limit * 10
 
-        query_string = make_list_query(criteria)
         cursor = self.connection.cursor()
+        print(query_string, params)
         cursor.execute(query_string, params)
         results = [
             transform_for_linked_data(data) for uri, data in cursor.fetchall()
-            if match_filter_later(data, filter_later)
-        ][:limit]
+        ]
         return results
-
-
-def match_filter_later(data, filter_later):
-    # TODO: this is spaghetti designed to make the API go back up. Clean up.
-    if 'start' in filter_later:
-        prefix = filter_later['start'] + '/'
-        if not data['start'].startswith(prefix):
-            return False
-
-    if 'end' in filter_later:
-        prefix = filter_later['end'] + '/'
-        if not data['end'].startswith(prefix):
-            return False
-
-    # TODO: node and other
-    return True
-
