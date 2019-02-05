@@ -18,7 +18,7 @@ SAMPLE_SIZES = {
     'simlex': 999,
     'scws': 2003,
     'pku500-zh': 500,
-    'tmu-rw-ja': 4431,
+    'jsim-ja': 4429,
 
     'semeval-2a-en': 500,
     'semeval-2a-de': 500,
