@@ -1,4 +1,4 @@
-from .connection import get_db_connection
+from conceptnet5.db.connection import get_db_connection
 from conceptnet5.edges import transform_for_linked_data
 import json
 import itertools
@@ -53,7 +53,7 @@ def make_list_query(criteria):
     parts = ["WITH matched_edges AS ("]
     # If this is a 'node' query, it happens as the union of two parts: the outgoing
     # direction (1) and the incoming direction (-1).
-    if 'node' in criteria:
+    if 'node' in criteria or 'filter_node' in criteria:
         piece_directions = [1, -1]
     else:
         piece_directions = [1]
