@@ -13,7 +13,8 @@ RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :
 DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = %(dataset)s ORDER BY weight DESC OFFSET %(offset)s LIMIT %(limit)s"
 
 
-TOO_BIG_PREFIXES = ['/c/en', '/c/fr', '/c/es', '/c/de', '/c/ja', '/c/zh', '/c/pt', '/c/la', '/c/it', '/c/ru' ,'/c/fi']
+TOO_BIG_PREFIXES = ['/c/en', '/c/fr', '/c/es', '/c/de', '/c/ja', '/c/zh',
+                    '/c/pt', '/c/la', '/c/it', '/c/ru' ,'/c/fi']
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
@@ -89,7 +90,6 @@ def make_list_query(criteria):
         if 'source' in criteria:
             parts.append(", edge_sources es, sources s")
 
-        #
         parts.append("""
             WHERE e.relation_id=r.id
             AND e.start_id=n1.id
