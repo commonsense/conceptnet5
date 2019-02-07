@@ -73,7 +73,7 @@ SYMMETRIC_RELATIONS = {
     '/r/EtymologicallyRelatedTo',
     '/r/Synonym',
     '/r/Antonym',
-    '/r/DistinctFrom',
+    '/r/DistinctFrom'
 }
 
 
@@ -81,16 +81,14 @@ SYMMETRIC_RELATIONS = {
 # having one relation implies that they don't have the opposite relation.
 # You could consider these relations themselves to be related by the
 # /r/Antonym relation.
-OPPOSITE_RELATIONS = _make_symmetric_dict(
-    {
-        '/r/NotDesires': '/r/Desires',
-        '/r/NotUsedFor': '/r/UsedFor',
-        '/r/NotCapableOf': '/r/CapableOf',
-        '/r/NotHasProperty': '/r/HasProperty',
-        '/r/Antonym': '/r/Synonym',
-        '/r/ObstructedBy': '/r/HasPrerequisite',
-    }
-)
+OPPOSITE_RELATIONS = _make_symmetric_dict({
+    '/r/NotDesires': '/r/Desires',
+    '/r/NotUsedFor': '/r/UsedFor',
+    '/r/NotCapableOf': '/r/CapableOf',
+    '/r/NotHasProperty': '/r/HasProperty',
+    '/r/Antonym': '/r/Synonym',
+    '/r/ObstructedBy': '/r/HasPrerequisite',
+})
 
 
 # Most relations can be generalized into less specific relations. They don't
@@ -105,13 +103,14 @@ OPPOSITE_RELATIONS = _make_symmetric_dict(
 # be used either in querying or in learning about relations.
 ENTAILED_RELATIONS = {
     '/r/Antonym': '/r/DistinctFrom',
+
     '/r/Causes': '/r/RelatedTo',
     '/r/CausesDesire': '/r/RelatedTo',
     '/r/CapableOf': '/r/RelatedTo',
     '/r/CreatedBy': '/r/RelatedTo',
     '/r/DerivedFrom': '/r/RelatedTo',
     '/r/EtymologicallyRelatedTo': '/r/RelatedTo',
-    '/r/Entails': '/r/RelatedTo',  # can we connect entailment and sub-events?
+    '/r/Entails': '/r/RelatedTo',   # can we connect entailment and sub-events?
     '/r/HasContext': '/r/RelatedTo',
     '/r/HasProperty': '/r/RelatedTo',
     '/r/HasSubevent': '/r/RelatedTo',
@@ -125,17 +124,25 @@ ENTAILED_RELATIONS = {
     '/r/SymbolOf': '/r/RelatedTo',
     '/r/UsedFor': '/r/RelatedTo',
     '/r/dbpedia': '/r/RelatedTo',
+
     '/r/FormOf': '/r/DerivedFrom',
+
     '/r/HasFirstSubevent': '/r/HasSubevent',
     '/r/HasLastSubevent': '/r/HasSubevent',
     '/r/HasPrerequisite': '/r/HasSubevent',
+
     '/r/MannerOf': '/r/Entails',
+
     '/r/DefinedAs': '/r/IsA',
     '/r/InstanceOf': '/r/IsA',
+
     '/r/AtLocation': '/r/LocatedNear',
     '/r/HasA': '/r/LocatedNear',
+
     '/r/PartOf': '/r/AtLocation',
+
     '/r/MadeOf': '/r/HasA',
+
     '/r/Synonym': '/r/SimilarTo',
 }
 

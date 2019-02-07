@@ -8,11 +8,9 @@ from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
-    similar_to_vec,
-    weighted_average,
-    normalize_vec,
-    cosine_similarity,
-    standardized_uri,
+    similar_to_vec, weighted_average, normalize_vec, cosine_similarity,
+    standardized_uri
+
 )
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows
@@ -29,10 +27,8 @@ def field_match(value, query):
     """
     Determines whether a given field of an edge (or, in particular, an
     assertion) matches the given query.
-
-    If the query is a URI, it will match prefixes of longer URIs, unless `/.` is
-    added to the end of the query.
-
+    If the query is a URI, it will match prefixes of longer URIs, unless
+    `/.` is added to the end of the query.
     For example, `/c/en/dog` will match assertions about `/c/en/dog/n/animal`,
     but `/c/en/dog/.` will only match assertions about `/c/en/dog`.
     """
@@ -42,9 +38,8 @@ def field_match(value, query):
     elif query.endswith('/.'):
         return value == query[:-2]
     else:
-        return value[: len(query)] == query and (
-            len(value) == len(query) or value[len(query)] == '/'
-        )
+        return (value[:len(query)] == query
+                and (len(value) == len(query) or value[len(query)] == '/'))
 
 
 class VectorSpaceWrapper(object):
@@ -61,9 +56,7 @@ class VectorSpaceWrapper(object):
     def __init__(self, vector_filename=None, frame=None, use_db=True):
         if frame is None:
             self.frame = None
-            self.vector_filename = vector_filename or get_data_filename(
-                'vectors/mini.h5'
-            )
+            self.vector_filename = vector_filename or get_data_filename('vectors/mini.h5')
         else:
             self.frame = frame
             self.vector_filename = None
@@ -99,7 +92,7 @@ class VectorSpaceWrapper(object):
 
             self.k = self.frame.shape[1]
             self.small_k = 100
-            self.small_frame = self.frame.iloc[:, : self.small_k].copy()
+            self.small_frame = self.frame.iloc[:, :self.small_k].copy()
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
@@ -132,12 +125,10 @@ class VectorSpaceWrapper(object):
         neighbors = []
         for edge in self.finder.lookup(term, limit=limit_per_term):
             if field_match(edge['start']['term'], term) and not field_match(
-                edge['end']['term'], term
-            ):
+                    edge['end']['term'], term):
                 neighbor = edge['end']['term']
             elif field_match(edge['end']['term'], term) and not field_match(
-                edge['start']['term'], term
-            ):
+                    edge['start']['term'], term):
                 neighbor = edge['start']['term']
             else:
                 continue
@@ -151,11 +142,9 @@ class VectorSpaceWrapper(object):
             # Skip excessively general lookups, for either an entire
             # language, or all terms starting with a single
             # non-ideographic letter
-            if (
-                len(split_uri(term)) < 3
-                or term.endswith('/')
-                or (term[-2] == '/' and term[-1] < chr(0x3000))
-            ):
+            if len(split_uri(term)) < 3 \
+                    or term.endswith('/') \
+                    or (term[-2] == '/' and term[-1] < chr(0x3000)):
                 break
             prefixed = self._terms_with_prefix(term)
             if prefixed:
@@ -198,9 +187,8 @@ class VectorSpaceWrapper(object):
         if total_weight == 0:
             return []
         else:
-            return [
-                (uri_prefix(term), weight / total_weight) for (term, weight) in expanded
-            ]
+            return [(uri_prefix(term), weight / total_weight) for
+                    (term, weight) in expanded]
 
     def expanded_vector(self, terms, limit_per_term=10, oov_vector=True):
         """
@@ -214,17 +202,14 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         return weighted_average(
-            self.frame, self.expand_terms(terms, limit_per_term, oov_vector)
+            self.frame,
+            self.expand_terms(terms, limit_per_term, oov_vector)
         )
 
     def text_to_vector(self, language, text):
-        """
-        Used in Story Cloze Test to create a vector for text.
-        """
+        """Used in Story Cloze Test to create a vector for text """
         tokens = wordfreq.tokenize(text, language)
-        weighted_terms = [
-            (uri_prefix(standardized_uri(language, token)), 1.) for token in tokens
-        ]
+        weighted_terms = [(uri_prefix(standardized_uri(language, token)), 1.) for token in tokens]
         return self.get_vector(weighted_terms, oov_vector=False)
 
     def get_vector(self, query, oov_vector=True):
@@ -277,7 +262,7 @@ class VectorSpaceWrapper(object):
         """
         self.load()
         vec = self.get_vector(query)
-        small_vec = vec[: self.small_k]
+        small_vec = vec[:self.small_k]
         search_frame = self.small_frame
         # TODO: document filter
         if filter:
@@ -288,16 +273,14 @@ class VectorSpaceWrapper(object):
             if exact_only:
                 if filter in search_frame.index:
                     idx = search_frame.index.get_loc(filter)
-                    search_frame = search_frame[idx : idx + 1]
+                    search_frame = search_frame[idx:idx + 1]
                 else:
                     search_frame = search_frame.iloc[0:0]
             else:
                 start_idx, end_idx = self._index_prefix_range(filter + '/')
                 search_frame = search_frame.iloc[start_idx:end_idx]
         similar_sloppy = similar_to_vec(search_frame, small_vec, limit=limit * 50)
-        similar_choices = l2_normalize_rows(
-            self.frame.loc[similar_sloppy.index].astype('f')
-        )
+        similar_choices = l2_normalize_rows(self.frame.loc[similar_sloppy.index].astype('f'))
 
         similar = similar_to_vec(similar_choices, vec, limit=limit)
         return similar
