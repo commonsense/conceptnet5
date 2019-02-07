@@ -11,9 +11,15 @@ from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.readers.wiktionary import valid_language
 from conceptnet5.uri import conjunction_uri,get_uri_language, is_absolute_url, Licenses, \
     split_uri, uri_prefix
+from conceptnet5.util import get_support_data_filename
 
 N = 100
 CURRENT_DIR = os.getcwd()
+
+
+def get_blacklist():
+    filename = get_support_data_filename('blacklist.txt')
+    return set(open(filename).readlines())
 
 
 def weight_scale(weight):
@@ -119,15 +125,19 @@ def combine_assertions(input_filename, output_filename):
     out = MsgpackStreamWriter(output_filename)
     out_bad = MsgpackStreamWriter(output_filename + '.reject')
 
+    blacklist = get_blacklist()
+
     with open(input_filename, encoding='utf-8') as stream:
         for key, line_group in itertools.groupby(stream, group_func):
             assertion = make_assertion(line_group)
+            destination = out
             if assertion is None:
                 continue
-            if assertion['weight'] > 0:
-                destination = out
-            else:
+            if assertion['weight'] <= 0:
                 destination = out_bad
+            for value in assertion.values():
+                if isinstance(value, str) and value in blacklist:
+                    destination = out_bad
             destination.write(assertion)
 
     out.close()
