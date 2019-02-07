@@ -27,10 +27,15 @@ def handle_file(input_file, output_file):
     out = MsgpackStreamWriter(output_file)
     root = tree.getroot()
     lang = root[0][1].attrib['type']  # language is at position [1] within the child node [0]
-    for annotation in root[1]:
 
-        for word in strip_words(annotation.text):
-            start = standardized_concept_uri('mul', annotation.attrib['cp'])
-            end = standardized_concept_uri(lang, word)
-            edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
-            out.write(edge)
+    if len(root) >= 2:
+        for annotation in root[1]:
+            for word in strip_words(annotation.text):
+                start = standardized_concept_uri('mul', annotation.attrib['cp'])
+                end = standardized_concept_uri(lang, word)
+                edge = make_edge(REL, start, end, DATASET, LICENSE, SOURCE)
+                out.write(edge)
+    else:
+        print("No emoji data in {!r}".format(input_file))
+
+    out.close()

@@ -24,10 +24,6 @@ UPLOAD = False
 # from Morfessor.
 USE_MORPHOLOGY = False
 
-# How many pieces to split edge files into. (Works best when it's a power of
-# 2 that's 64 or less.)
-N_PIECES = 16
-
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
@@ -43,15 +39,19 @@ ATOMIC_SPACE_LANGUAGES = {'vi'}
 # Languages that the CLDR emoji data is available in. These match the original
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
+#
+# This list is the list of languages with emoji names in CLDR v34, but
+# skipping the en_GB file, which is empty and causes an error.
 EMOJI_LANGUAGES = [
-    'af', 'am', 'ar', 'as', 'ast', 'az', 'be', 'bg', 'bn', 'bs', 'ca', 'chr', 'cs', 'cy', 'da',
-    'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA', 'en_GB', 'es', 'es_419', 'es_MX',
-    'es_US', 'et', 'eu', 'fa', 'fi', 'fil', 'fo', 'fr', 'fr_CA', 'ga', 'gd', 'gl', 'gu', 'he',
-    'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kab', 'kk', 'km', 'kn', 'ko', 'ky',
-    'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my', 'nb', 'ne', 'nl', 'nn', 'or', 'pa',
-    'pl', 'ps', 'pt', 'pt_PT', 'ro', 'ru', 'sd', 'si', 'sk', 'sl', 'sq', 'sr', 'sr_Latn', 'sv',
-    'sw', 'ta', 'te', 'th', 'tk', 'to', 'tr', 'uk', 'ur', 'uz', 'vi', 'yue', 'yue_Hans', 'zh',
-    'zh_Hant', 'zh_Hant_HK', 'zu'
+    'af', 'am', 'ar', 'ar_SA', 'as', 'ast', 'az', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'ccp',
+    'chr', 'cs', 'cy', 'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA',
+    'es', 'es_419', 'es_MX', 'es_US', 'et', 'eu', 'fa', 'fi', 'fil', 'fo', 'fr', 'fr_CA', 'ga',
+    'gd', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'ia', 'id', 'is', 'it', 'ja', 'ka', 'kab',
+    'kk', 'km', 'kn', 'ko', 'ku', 'ky', 'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my',
+    'nb', 'ne', 'nl', 'nn', 'or', 'pa', 'pl', 'ps', 'pt', 'pt_PT', 'ro', 'ru', 'sd', 'si', 'sk',
+    'sl', 'sq', 'sr', 'sr_Cyrl', 'sr_Cyrl_BA', 'sr_Latn', 'sr_Latn_BA', 'sv', 'sw', 'ta', 'te',
+    'th', 'tk', 'to', 'tr', 'uk', 'ur', 'uz', 'vi', 'yue', 'yue_Hans', 'zh', 'zh_Hant',
+    'zh_Hant_HK', 'zu'
 ]
 
 # Increment this number when we incompatibly change the parser
@@ -178,9 +178,9 @@ rule download_raw_package:
 # Get emoji data directly from Unicode CLDR
 rule download_unicode_data:
     output:
-        DATA + "/raw/cldr-common-32.0.1.zip"
+        DATA + "/raw/cldr-common-34.0.zip"
     shell:
-        "wget -nv http://unicode.org/Public/cldr/32.0.1/cldr-common-32.0.1.zip -O {output}"
+        "wget -nv http://unicode.org/Public/cldr/34/cldr-common-34.0.zip -O {output}"
 
 rule extract_raw:
     input:
@@ -192,9 +192,11 @@ rule extract_raw:
 
 # This rule takes precedence over extract_raw, extracting the emoji data from
 # the Unicode CLDR zip file.
+#
+# TODO: integrate this with the rest of the raw data
 rule extract_emoji_data:
     input:
-        DATA + "/raw/cldr-common-32.0.1.zip"
+        DATA + "/raw/cldr-common-34.0.zip"
     output:
         DATA + "/raw/emoji/{filename}"
     shell:
