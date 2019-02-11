@@ -25,6 +25,7 @@
 /c/en/test	/c/fr/épreuve	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test	/c/fr/épreuve	1.0	/d/wiktionary/fr	/r/RelatedTo
 /c/en/test	/c/it/prova	1.0	/d/wiktionary/en	/r/Synonym
+/c/en/test	/c/ja/実験	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test	/c/nl/proef	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test	/c/nl/test	1.0	/d/wiktionary/en	/r/Synonym
 /c/en/test	/c/pt/teste	1.0	/d/wiktionary/en	/r/Synonym
@@ -50,6 +51,7 @@
 /c/fr/test	/c/fr/examen	1.0	/d/wiktionary/fr	/r/RelatedTo
 /c/fr/test	/c/fr/épreuve	1.0	/d/wiktionary/fr	/r/RelatedTo
 /c/fr/test	/c/it/prova	1.0	/d/wiktionary/fr	/r/Synonym
+/c/fr/test	/c/ja/実験	1.0	/d/wiktionary/fr	/r/Synonym
 /c/fr/test	/c/nl/proef	1.0	/d/wiktionary/fr	/r/Synonym
 /c/fr/test	/c/nl/test	1.0	/d/wiktionary/fr	/r/Synonym
 /c/fr/test	/c/pt/teste	1.0	/d/wiktionary/fr	/r/Synonym
@@ -63,6 +65,9 @@
 /c/it/test	/c/en/test	1.0	/d/wiktionary/en	/r/RelatedTo
 /c/it/test	/c/en/test	2.0	/d/wordnet/3.1	/r/Synonym
 /c/it/test	/c/it/prova	1.0	/d/wiktionary/de	/r/Synonym
+/c/ja/β_テスト	/c/ja/テスト	1.0	/d/conceptnet/5/ja	/r/IsA
+/c/ja/テスト	/c/ja/実験	1.0	/d/conceptnet/5/ja	/r/IsA
+/c/ja/テスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
 /c/ja/テスト	/c/de/probe	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/de/test	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/en/test	2.0	/d/jmdict	/r/Synonym
@@ -74,6 +79,11 @@
 /c/ja/テスト	/c/nl/proef	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/nl/test	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/ru/тест	2.0	/d/jmdict	/r/Synonym
+/c/ja/フィールド_テスト	/c/ja/テスト	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/フィールド_テスト	/c/ja/実験	1.0	/d/conceptnet/5/ja	/r/IsA
+/c/ja/フィールド_テスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/ベータテスト	/c/ja/テスト	1.0	/d/conceptnet/5/ja	/r/IsA
+/c/ja/ベータテスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
 /c/ja/偸閑	/c/de/aufrichtig	2.0	/d/jmdict	/r/Synonym
 /c/ja/偸閑	/c/de/ausdrücklich	2.0	/d/jmdict	/r/Synonym
 /c/ja/偸閑	/c/de/deutlich	2.0	/d/jmdict	/r/Synonym
@@ -185,6 +195,8 @@
 /c/ja/白地	/c/nl/tijdelijk	2.0	/d/jmdict	/r/Synonym
 /c/ja/白地	/c/nl/vluchtig	2.0	/d/jmdict	/r/Synonym
 /c/ja/白地	/c/nl/voorlopig	2.0	/d/jmdict	/r/Synonym
+/c/ja/試験	/c/ja/テスト	1.0	/d/conceptnet/5/ja	/r/IsA
+/c/ja/試験	/c/en/test	2.0	/d/wordnet/3.1	/r/Synonym
 /c/nl/test	/c/en/test	0.25	/d/wiktionary/en	/r/EtymologicallyRelatedTo
 /c/nl/test	/c/de/test	1.0	/d/wiktionary/de	/r/Synonym
 /c/nl/test	/c/en/test	1.0	/d/wiktionary/en	/r/RelatedTo
