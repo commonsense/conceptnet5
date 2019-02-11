@@ -18,7 +18,7 @@ SAMPLE_SIZES = {
     'simlex': 999,
     'scws': 2003,
     'pku500-zh': 500,
-    'tmu-rw-ja': 4431,
+    'jsim-ja': 4429,
 
     'semeval-2a-en': 500,
     'semeval-2a-de': 500,
@@ -498,13 +498,13 @@ def read_rw(subset='dev'):
             yield parts[0], parts[1], float(parts[2]), lang1, lang2
 
 
-def read_tmu():
+def read_jsim():
     """
     Read the Japanese rare-words dataset from Tokyo Metropolitan University.
     """
     lang1, lang2 = 'ja', 'ja'
     for pos in ('noun', 'verb', 'adj', 'adv'):
-        filename = get_support_data_filename('tmu-rw/score_{}.csv'.format(pos))
+        filename = get_support_data_filename('jSIM/similarity_full/score_{}_new_full.csv'.format(pos))
         with open(filename, encoding='utf-8') as file:
             for line in file:
                 if line.startswith('word1'):
@@ -691,7 +691,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     ws_es_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('es'))
     ws_ro_score = measure_correlation(spearmanr, vectors, read_ws353_multilingual('ro'))
     pku500_score = measure_correlation(spearmanr, vectors, read_pku500())
-    tmu_score = measure_correlation(spearmanr, vectors, read_tmu())
+    jsim_score = measure_correlation(spearmanr, vectors, read_jsim())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -704,7 +704,7 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
     results.loc['pku500-zh'] = pku500_score
-    results.loc['tmu-rw-ja'] = tmu_score
+    results.loc['jsim-ja'] = jsim_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(vectors)
@@ -740,7 +740,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     ws_es_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('es'))
     ws_ro_score = measure_correlation(spearmanr, frame, read_ws353_multilingual('ro'))
     pku500_score = measure_correlation(spearmanr, frame, read_pku500())
-    tmu_score = measure_correlation(spearmanr, frame, read_tmu())
+    jsim_score = measure_correlation(spearmanr, frame, read_jsim())
 
     results = empty_comparison_table()
     results.loc['men3000'] = men_score
@@ -752,7 +752,7 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
     results.loc['ws353-es'] = ws_es_score
     results.loc['ws353-ro'] = ws_ro_score
     results.loc['pku500-zh'] = pku500_score
-    results.loc['tmu-rw-ja'] = tmu_score
+    results.loc['jsim-ja'] = jsim_score
 
     if semeval_scope == 'global':
         results.loc['semeval17-2a'] = evaluate_semeval_monolingual_global(frame)
