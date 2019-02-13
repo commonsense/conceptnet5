@@ -83,9 +83,9 @@ def make_paginated_view(url, params, offset, limit, more):
         pager['previousPage'] = paginated_url(url, params, prev_offset, limit)
     if more:
         pager['nextPage'] = paginated_url(url, params, next_offset, limit)
-        pager[
-            'comment'
-        ] = "There are more results. Follow the 'nextPage' link for more."
+        pager['comment'] = (
+            "There are more results. Follow the 'nextPage' link for more."
+        )
     return pager
 
 

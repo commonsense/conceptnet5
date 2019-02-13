@@ -223,7 +223,7 @@ def parse_compound_uri(uri):
         raise ValueError("Compound URIs must end with /]")
     if '[' not in pieces:
         raise ValueError(
-            "Compound URIs must contain /[/ at the beginning of " "the argument list"
+            "Compound URIs must contain /[/ at the beginning of the argument list"
         )
     list_start = pieces.index('[')
     op = join_uri(*pieces[:list_start])
