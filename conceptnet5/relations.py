@@ -105,6 +105,7 @@ OPPOSITE_RELATIONS = _make_symmetric_dict(
 # be used either in querying or in learning about relations.
 ENTAILED_RELATIONS = {
     '/r/Antonym': '/r/DistinctFrom',
+
     '/r/Causes': '/r/RelatedTo',
     '/r/CausesDesire': '/r/RelatedTo',
     '/r/CapableOf': '/r/RelatedTo',
@@ -125,17 +126,25 @@ ENTAILED_RELATIONS = {
     '/r/SymbolOf': '/r/RelatedTo',
     '/r/UsedFor': '/r/RelatedTo',
     '/r/dbpedia': '/r/RelatedTo',
+
     '/r/FormOf': '/r/DerivedFrom',
+
     '/r/HasFirstSubevent': '/r/HasSubevent',
     '/r/HasLastSubevent': '/r/HasSubevent',
     '/r/HasPrerequisite': '/r/HasSubevent',
+
     '/r/MannerOf': '/r/Entails',
+
     '/r/DefinedAs': '/r/IsA',
     '/r/InstanceOf': '/r/IsA',
+
     '/r/AtLocation': '/r/LocatedNear',
     '/r/HasA': '/r/LocatedNear',
+
     '/r/PartOf': '/r/AtLocation',
+
     '/r/MadeOf': '/r/HasA',
+
     '/r/Synonym': '/r/SimilarTo',
 }
 
