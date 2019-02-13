@@ -73,7 +73,7 @@ SYMMETRIC_RELATIONS = {
     '/r/EtymologicallyRelatedTo',
     '/r/Synonym',
     '/r/Antonym',
-    '/r/DistinctFrom'
+    '/r/DistinctFrom',
 }
 
 
@@ -81,14 +81,16 @@ SYMMETRIC_RELATIONS = {
 # having one relation implies that they don't have the opposite relation.
 # You could consider these relations themselves to be related by the
 # /r/Antonym relation.
-OPPOSITE_RELATIONS = _make_symmetric_dict({
-    '/r/NotDesires': '/r/Desires',
-    '/r/NotUsedFor': '/r/UsedFor',
-    '/r/NotCapableOf': '/r/CapableOf',
-    '/r/NotHasProperty': '/r/HasProperty',
-    '/r/Antonym': '/r/Synonym',
-    '/r/ObstructedBy': '/r/HasPrerequisite',
-})
+OPPOSITE_RELATIONS = _make_symmetric_dict(
+    {
+        '/r/NotDesires': '/r/Desires',
+        '/r/NotUsedFor': '/r/UsedFor',
+        '/r/NotCapableOf': '/r/CapableOf',
+        '/r/NotHasProperty': '/r/HasProperty',
+        '/r/Antonym': '/r/Synonym',
+        '/r/ObstructedBy': '/r/HasPrerequisite',
+    }
+)
 
 
 # Most relations can be generalized into less specific relations. They don't
@@ -110,7 +112,7 @@ ENTAILED_RELATIONS = {
     '/r/CreatedBy': '/r/RelatedTo',
     '/r/DerivedFrom': '/r/RelatedTo',
     '/r/EtymologicallyRelatedTo': '/r/RelatedTo',
-    '/r/Entails': '/r/RelatedTo',   # can we connect entailment and sub-events?
+    '/r/Entails': '/r/RelatedTo',  # can we connect entailment and sub-events?
     '/r/HasContext': '/r/RelatedTo',
     '/r/HasProperty': '/r/RelatedTo',
     '/r/HasSubevent': '/r/RelatedTo',
