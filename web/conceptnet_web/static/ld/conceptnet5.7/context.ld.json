@@ -94,7 +94,7 @@
     {
       "@id": "#value",
       "@type": "rdf:Property",
-      "domain": "#Query"],
+      "domain": "#Query",
       "range": "xsd:float",
       "comment": "A value indicating the result of a numerical query, such as the /relatedness query for how related two nodes are."
     },
