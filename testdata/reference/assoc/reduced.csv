@@ -67,7 +67,7 @@
 /c/it/test	/c/it/prova	1.0	/d/wiktionary/de	/r/Synonym
 /c/ja/β_テスト	/c/ja/テスト	1.0	/d/conceptnet/5/ja	/r/IsA
 /c/ja/テスト	/c/ja/実験	1.0	/d/conceptnet/5/ja	/r/IsA
-/c/ja/テスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/テスト	/c/ja/試験	0.5	/d/conceptnet/5/ja	/r/IsA
 /c/ja/テスト	/c/de/probe	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/de/test	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/en/test	2.0	/d/jmdict	/r/Synonym
@@ -79,11 +79,11 @@
 /c/ja/テスト	/c/nl/proef	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/nl/test	2.0	/d/jmdict	/r/Synonym
 /c/ja/テスト	/c/ru/тест	2.0	/d/jmdict	/r/Synonym
-/c/ja/フィールド_テスト	/c/ja/テスト	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/フィールド_テスト	/c/ja/テスト	0.5	/d/conceptnet/5/ja	/r/IsA
 /c/ja/フィールド_テスト	/c/ja/実験	1.0	/d/conceptnet/5/ja	/r/IsA
-/c/ja/フィールド_テスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/フィールド_テスト	/c/ja/試験	0.5	/d/conceptnet/5/ja	/r/IsA
 /c/ja/ベータテスト	/c/ja/テスト	1.0	/d/conceptnet/5/ja	/r/IsA
-/c/ja/ベータテスト	/c/ja/試験	0.75	/d/conceptnet/5/ja	/r/IsA
+/c/ja/ベータテスト	/c/ja/試験	0.5	/d/conceptnet/5/ja	/r/IsA
 /c/ja/偸閑	/c/de/aufrichtig	2.0	/d/jmdict	/r/Synonym
 /c/ja/偸閑	/c/de/ausdrücklich	2.0	/d/jmdict	/r/Synonym
 /c/ja/偸閑	/c/de/deutlich	2.0	/d/jmdict	/r/Synonym
