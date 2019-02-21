@@ -94,6 +94,7 @@ def test_lookup_neighbors():
                                         weight=1.0)
     expected_neighbors = [('/c/en/ski_jumping', 0.02),
                           ('http://pl.dbpedia.org/resource/Skoki_narciarskie', 0.01),
+                          ('/c/de/skispringen', 0.01),
                           ('/c/en/ski_jumping', 0.01),
                           ('/c/en/ski_jumping', 0.005)]
     eq_(expected_neighbors, neighbors)
