@@ -40,11 +40,10 @@ ATOMIC_SPACE_LANGUAGES = {'vi'}
 # filenames, not ConceptNet language codes; they are turned into ConceptNet
 # language codes by the reader.
 #
-# This list is the list of languages with emoji names in CLDR v34, but
-# skipping the en_GB file, which is empty and causes an error.
+# This list is the list of languages with emoji names in CLDR v34.
 EMOJI_LANGUAGES = [
     'af', 'am', 'ar', 'ar_SA', 'as', 'ast', 'az', 'be', 'bg', 'bn', 'br', 'bs', 'ca', 'ccp',
-    'chr', 'cs', 'cy', 'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA',
+    'chr', 'cs', 'cy', 'da', 'de', 'de_CH', 'el', 'en', 'en_001', 'en_AU', 'en_CA', 'en_GB',
     'es', 'es_419', 'es_MX', 'es_US', 'et', 'eu', 'fa', 'fi', 'fil', 'fo', 'fr', 'fr_CA', 'ga',
     'gd', 'gl', 'gu', 'he', 'hi', 'hr', 'hu', 'hy', 'ia', 'id', 'is', 'it', 'ja', 'ka', 'kab',
     'kk', 'km', 'kn', 'ko', 'ku', 'ky', 'lo', 'lt', 'lv', 'mk', 'ml', 'mn', 'mr', 'ms', 'my',
