@@ -7,7 +7,7 @@ from conceptnet5.nodes import standardized_concept_uri, ld_node
 
 VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder
-CONTEXT = ["http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json"]
+CONTEXT = ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"]
 VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 
 
