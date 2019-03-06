@@ -172,7 +172,7 @@ class AssertionFinder(object):
         if uri.startswith('/c/') or uri.startswith('http'):
             criteria = {'node': uri}
         elif uri.startswith('/r/'):
-            criteria = {'rel': uri}
+            return self.lookup_relation(uri, limit, offset)
         elif uri.startswith('/s/'):
             criteria = {'source': uri}
         elif uri.startswith('/a/'):
@@ -230,6 +230,24 @@ class AssertionFinder(object):
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute("SELECT data FROM edges WHERE uri=%(uri)s", {'uri': uri})
+        results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
+        return results
+
+    def lookup_relation(self, uri):
+        """
+        Get a single assertion, given its URI starting with /a/.
+        """
+        uri = remove_control_chars(uri)
+        if self.connection is None:
+            self.connection = get_db_connection(self.dbname)
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            SELECT e.data FROM edges e, relations r
+            WHERE e.relation_id = r.id and r.uri=%(uri)s
+            """,
+            {'uri': uri}
+        )
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
         return results
 
