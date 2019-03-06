@@ -69,7 +69,7 @@ PROPAGATE_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-RAW_DATA_URL = "https://zenodo.org/record/1165009/files/conceptnet-raw-data-5.7.zip"
+RAW_DATA_URL = "https://zenodo.org/record/2579347/files/conceptnet-raw-data-5.7.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH

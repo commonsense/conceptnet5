@@ -46,6 +46,8 @@ ConceptNet has been developed by:
   - Tilburg University
   - Nihon Unisys Labs
   - Dentsu Inc.
+  - Kyoto University
+  - Yahoo Research Japan
 
 * Luminoso Technologies, Inc.
 
@@ -71,7 +73,7 @@ order of appearance:
 * Robyn Speer
 * Ken Arnold
 * Yen-Ling Kuo
-
+* Naoki Otani
 
 ## Licenses for included resources
 
