@@ -26,7 +26,7 @@ def handle_file(input_filename, output_file):
         parts = line.rstrip('\n').split('\t')
         uri, start, rel, end, weight, source = parts
         if uri == 'uri':
-            return
+            continue
 
         edge = make_edge(
             rel=rel,

@@ -44,7 +44,7 @@ def vocab(name):
     Given a property such as 'rel', get its fully-qualified URL in our
     JSON-LD vocabulary.
     """
-    return "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#" + name
+    return "http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json#" + name
 
 
 def api(uri):

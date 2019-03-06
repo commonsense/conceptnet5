@@ -500,7 +500,8 @@ def read_rw(subset='dev'):
 
 def read_jsim():
     """
-    Read the Japanese rare-words dataset from Tokyo Metropolitan University.
+    Read the updated Japanese rare-words dataset from Karpinska et al.
+    (http://www.aclweb.org/anthology/W18-2905)
     """
     lang1, lang2 = 'ja', 'ja'
     for pos in ('noun', 'verb', 'adj', 'adv'):

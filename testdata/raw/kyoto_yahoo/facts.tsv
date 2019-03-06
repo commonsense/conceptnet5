@@ -1,3 +1,4 @@
+uri	rel	start	end	weight	source
 /a/[/c/ja/α_テスト,/r/IsA,/c/ja/テスト]	/c/ja/α_テスト	/r/IsA	/c/ja/テスト	3	Kyoto University & Yahoo Japan Corporation
 /a/[/c/ja/α_テスト,/r/IsA,/c/ja/試験]	/c/ja/α_テスト	/r/IsA	/c/ja/試験	3	Kyoto University & Yahoo Japan Corporation
 /a/[/c/ja/β_テスト,/r/IsA,/c/ja/テスト]	/c/ja/β_テスト	/r/IsA	/c/ja/テスト	4	Kyoto University & Yahoo Japan Corporation
