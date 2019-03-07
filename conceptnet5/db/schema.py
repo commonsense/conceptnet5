@@ -76,6 +76,32 @@ INDICES = [
     ) WITH DATA
     """,
     "CREATE INDEX rf_node ON ranked_features (node_id)",
+
+    """
+    CREATE TABLE slot_lookup AS
+        SELECT e.id AS edge_id, p.prefix_id AS prefix_id, 'start' AS slot,
+               e.weight AS weight
+        FROM edges e, node_prefixes p
+        WHERE p.node_id = e.start_id
+    """,
+    """
+    INSERT INTO slot_lookup (
+        SELECT e.id AS edge_id, p.prefix_id AS prefix_id, 'end' AS slot,
+               e.weight AS weight
+        FROM edges e, node_prefixes p
+        WHERE p.node_id = e.end_id
+    )
+    """,
+    """
+    INSERT INTO slot_lookup (
+        SELECT es.edge_id AS edge_id, p.prefix_id AS prefix_id,
+                'source' AS slot, e.weight AS weight
+        FROM edge_sources es, edges e, node_prefixes p
+        WHERE p.node_id = es.source_id
+        AND es.edge_id = e.id
+    )
+    """,
+
 ]
 
 
