@@ -93,15 +93,24 @@ INDICES = [
     )
     """,
     """
-    INSERT INTO slot_lookup (
-        SELECT es.edge_id AS edge_id, p.prefix_id AS prefix_id,
-                'source' AS slot, e.weight AS weight
-        FROM edge_sources es, edges e, node_prefixes p
-        WHERE p.node_id = es.source_id
-        AND es.edge_id = e.id
-    )
+    CREATE TABLE two_way_lookup AS
+        SELECT e.id AS edge_id, p1.prefix_id AS node_prefix_id,
+        p2.prefix_id AS other_prefix_id, e.weight AS weight,
+        1 AS direction
+        FROM edges e, node_prefixes p1, node_prefixes p2
+        WHERE p1.node_id = e.start_id
+          AND p2.node_id = e.end_id
     """,
-
+    """
+    INSERT INTO two_way_lookup (
+        SELECT e.id AS edge_id, p1.prefix_id AS node_prefix_id,
+        p2.prefix_id AS other_prefix_id, e.weight AS weight,
+        -1 AS direction
+        FROM edges e, node_prefixes p1, node_prefixes p2
+        WHERE p1.node_id = e.end_id
+          AND p2.node_id = e.start_id
+    )
+    """
 ]
 
 

@@ -30,6 +30,8 @@ AND rf.rel_id = r.id
 AND rank <= %(limit)s
 ORDER BY direction, uri, rank;
 """
+
+
 MAX_GROUP_SIZE = 20
 
 
@@ -38,111 +40,26 @@ def make_list_query(criteria):
     Given a dictionary of criteria being searched for, construct the SQL
     query for it.
 
-    This may require the union of two queries (one for outgoing edges and one
-    for incoming), and it may require saving certain query criteria for last
-    because we know they match too many things.
-
     We don't substitute in the actual values of the criteria here -- that's
     PostgreSQL's job. We just return a properly parameterized query.
     """
-    # Look up the given criteria in the cache, and use the cached query if available
     crit_tuple = tuple(sorted(criteria))
     if crit_tuple in LIST_QUERIES:
         return LIST_QUERIES[crit_tuple]
 
-    # Start the inner query, finding edges that match the criteria
-    parts = ["WITH matched_edges AS ("]
-    # If this is a 'node' query, it happens as the union of two parts: the outgoing
-    # direction (1) and the incoming direction (-1).
-    if 'node' in criteria or 'filter_node' in criteria:
-        piece_directions = [1, -1]
+    if 'node' in criteria and 'other' in criteria:
+        parts = _query_parts_node_other(criteria)
+    elif 'start' in criteria and 'end' in criteria:
+        parts = _query_parts_start_end(criteria)
+    elif 'start' in criteria or 'end' in criteria or 'node' in criteria:
+        parts = _query_parts_slot(criteria)
+    elif 'source' in criteria:
+        parts = _query_parts_source(criteria)
+    elif 'rel' in criteria:
+        parts = _query_parts_rel(criteria)
     else:
-        piece_directions = [1]
-    # Construct the parts of the union
-    for direction in piece_directions:
-        # If this is the incoming part (the second one), put the "UNION ALL" keyword
-        # between the parts that we want to union
-        if direction == -1:
-            parts.append("UNION ALL")
+        raise ValueError("Can't construct a query for these criteria: %r" % criteria)
 
-        parts.append("SELECT e.uri, e.weight, e.data")
-        # If we need to do some after-the-fact filtering, select the URIs of the
-        # things we're filtering on.
-        if 'filter_start' in criteria or 'filter_end' in criteria:
-            parts.append(", np1.uri as start_uri, np2.uri as end_uri")
-        # If the filter is 'filter_node' or 'filter_other', do the bookkeeping
-        # for each direction to remember which one was 'node' and which one was
-        # 'other'.
-        if 'filter_node' in criteria or 'filter_other' in criteria:
-            if direction == 1:
-                parts.append(", np1.uri as node_uri, np2.uri as other_uri")
-            else:
-                parts.append(", np2.uri as node_uri, np1.uri as other_uri")
-
-        # Name the tables that we need to join. We select from the nodes table
-        # as 'n1' and 'n2' to find the nodes that actually participate in the
-        # query, and 'np1' and 'np2' to get node IDs that we match against the
-        # 'node_prefixes' table.
-        parts.append("""
-            FROM relations r, edges e, nodes n1, nodes n2,
-                 node_prefixes p1, node_prefixes p2, nodes np1, nodes np2
-        """)
-        if 'source' in criteria:
-            parts.append(", edge_sources es, sources s")
-
-        parts.append("""
-            WHERE e.relation_id=r.id
-            AND e.start_id=n1.id
-            AND e.end_id=n2.id
-            AND p1.prefix_id=np1.id
-            AND p1.node_id=n1.id
-            AND p2.prefix_id=np2.id
-            AND p2.node_id=n2.id
-        """)
-
-        # Apply the criteria...
-        if 'source' in criteria:
-            parts.append("AND s.uri=%(source)s AND es.source_id=s.id AND es.edge_id=e.id")
-        # But don't apply the criteria that we said to filter later
-        if 'node' in criteria and 'filter_node' not in criteria:
-            if direction == 1:
-                parts.append("AND np1.uri = %(node)s")
-            else:
-                parts.append("AND np2.uri = %(node)s")
-        if 'other' in criteria and 'filter_other' not in criteria:
-            if direction == 1:
-                parts.append("AND np2.uri = %(other)s")
-            else:
-                parts.append("AND np1.uri = %(other)s")
-        if 'rel' in criteria:
-            parts.append("AND r.uri = %(rel)s")
-        if 'start' in criteria and 'filter_start' not in criteria:
-            parts.append("AND np1.uri = %(start)s")
-        if 'end' in criteria and 'filter_end' not in criteria:
-            parts.append("AND np2.uri = %(end)s")
-
-    # Put a reasonable limit on how many edges this inner query can match.
-    # This keeps a bound on the runtime but it means that you can't see more
-    # than 10000 results of a query in total.
-    parts.append("LIMIT 10000")
-    parts.append(")")
-
-    # That was the inner query. Now extract the information from it, remove
-    # duplicate results, and apply the filters we saved for later.
-    parts.append("SELECT DISTINCT ON (weight, uri) uri, data FROM matched_edges")
-    more_clauses = []
-    if 'filter_node' in criteria:
-        more_clauses.append('node_uri LIKE %(filter_node)s')
-    if 'filter_other' in criteria:
-        more_clauses.append('other_uri LIKE %(filter_other)s')
-    if 'filter_start' in criteria:
-        more_clauses.append('start_uri LIKE %(filter_start)s')
-    if 'filter_end' in criteria:
-        more_clauses.append('end_uri LIKE %(filter_end)s')
-    # We only have a WHERE clause if one of these filters applies
-    if more_clauses:
-        parts.append("WHERE " + " AND ".join(more_clauses))
-    # Sort the results by weight and apply the offset and limit
     parts.append("""
         ORDER BY weight DESC, uri
         OFFSET %(offset)s LIMIT %(limit)s
@@ -152,6 +69,110 @@ def make_list_query(criteria):
     # Cache the query string
     LIST_QUERIES[crit_tuple] = query
     return query
+
+
+def _query_parts_node_other(criteria):
+    parts = [
+        """
+        SELECT e.uri as uri, e.data as data
+        FROM edges e, nodes n1, nodes n2, two_way_lookup twl
+        """
+    ]
+    if 'source' in criteria:
+        parts.append(", sources s, edge_sources es")
+    parts.append(
+        """
+        WHERE twl.node_prefix_id = n1.id AND n1.uri = %(node)s
+        AND twl.other_prefix_id = n2.id AND n2.uri = %(other)s
+        """
+    )
+    if 'source' in criteria:
+        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
+        parts.append("AND s.uri = %(source)s")
+    if 'rel' in criteria:
+        parts.append("AND data ->> 'rel' = %(rel)s")
+    return parts
+
+
+def _query_parts_start_end(criteria):
+    parts = [
+        "SELECT e.uri as uri, e.data as data",
+        "FROM edges e, nodes n1, nodes n2, two_way_lookup twl"
+    ]
+    if 'source' in criteria:
+        parts.append(", sources s, edge_sources es")
+    parts.append(
+        """
+        WHERE twl.node_prefix_id = n1.id AND n1.uri = %(start)s
+        AND twl.other_prefix_id = n2.id AND n2.uri = %(end)s
+        AND direction = 1
+        """
+    )
+    if 'source' in criteria:
+        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
+        parts.append("AND s.uri = %(source)s")
+    if 'rel' in criteria:
+        parts.append("AND data ->> 'rel' = %(rel)s")
+    return parts
+
+
+def _query_parts_source(criteria):
+    if (set(criteria) & {'node', 'other', 'start', 'end'}):
+        raise ValueError(
+            "The 'source' should not be the primary query when we're also "
+            "querying by node."
+        )
+    parts = [
+        "SELECT e.uri as uri, e.data as data",
+        "FROM edges e, edge_sources es, sources s",
+        "WHERE es.edge_id = e.id AND es.source_id = s.id",
+        "AND s.uri = %(source)s"
+    ]
+    if 'rel' in criteria:
+        parts.append("AND e.data ->> 'rel' = %(rel)s")
+    return parts
+
+
+def _query_parts_slot(criteria):
+    parts = [
+        "SELECT e.uri as uri, e.data as data",
+        "FROM edges e, slot_lookup sl, nodes n"
+    ]
+    if 'source' in criteria:
+        parts.append(", edge_sources es, sources s")
+
+    n_criteria = len(set(criteria) & {'start', 'end', 'node'})
+    if n_criteria != 1:
+        raise ValueError(
+            "This function should be used to query by exactly one "
+            "node slot, not %d." % n_criteria
+        )
+    if 'start' in criteria:
+        parts.append("WHERE n.uri = %(start)s AND sl.prefix_id = n.id")
+        parts.append("AND sl.slot = 'start'")
+    elif 'end' in criteria:
+        parts.append("WHERE n.uri = %(end)s AND sl.prefix_id = n.id")
+        parts.append("AND sl.slot = 'end'")
+    elif 'node' in criteria:
+        parts.append("WHERE n.uri = %(node)s AND sl.prefix_id = n.id")
+        # no slot restriction
+    else:
+        raise RuntimeError("shouldn't get here")
+
+    if 'source' in criteria:
+        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
+        parts.append("AND s.uri = %(source)s")
+    if 'rel' in criteria:
+        parts.append("AND e.data ->> 'rel' = %(rel)s")
+    return parts
+
+
+def _query_parts_rel(_criteria):
+    return [
+        "SELECT e.uri as uri, e.data as data",
+        "FROM edges e, relations r",
+        "WHERE e.relation_id = r.id and r.uri=%(uri)s"
+    ]
 
 
 class AssertionFinder(object):
@@ -172,7 +193,7 @@ class AssertionFinder(object):
         if uri.startswith('/c/') or uri.startswith('http'):
             criteria = {'node': uri}
         elif uri.startswith('/r/'):
-            return self.lookup_relation(uri, limit, offset)
+            criteria = {'rel': uri}
         elif uri.startswith('/s/'):
             criteria = {'source': uri}
         elif uri.startswith('/a/'):
@@ -233,24 +254,6 @@ class AssertionFinder(object):
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
         return results
 
-    def lookup_relation(self, uri):
-        """
-        Get a single assertion, given its URI starting with /a/.
-        """
-        uri = remove_control_chars(uri)
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
-        cursor = self.connection.cursor()
-        cursor.execute(
-            """
-            SELECT e.data FROM edges e, relations r
-            WHERE e.relation_id = r.id and r.uri=%(uri)s
-            """,
-            {'uri': uri}
-        )
-        results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
-        return results
-
     def sample_dataset(self, uri, limit=50, offset=0):
         """
         Get a subsample of edges matching a particular dataset.
@@ -279,12 +282,8 @@ class AssertionFinder(object):
         """
         The most general way to query based on a set of criteria.
         """
-        criteria = criteria.copy()
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
-        for criterion in ['node', 'other', 'start', 'end']:
-            if criterion in criteria and criteria[criterion] in TOO_BIG_PREFIXES:
-                criteria['filter_' + criterion] = criteria[criterion] + '%'
 
         query_string = make_list_query(criteria)
         params = {

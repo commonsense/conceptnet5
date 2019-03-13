@@ -116,32 +116,3 @@ def load_sql_csv(connection, input_dir):
             cursor.copy_from(file, tablename)
         cursor.close()
         connection.commit()
-
-    lookup_table_queries = [
-        """
-        CREATE TABLE slot_lookup AS
-            SELECT e.id AS edge_id, p.prefix_id AS prefix_id, 'start' AS slot
-            FROM edges e, node_prefixes p
-            WHERE p.node_id = e.start_id
-        """,
-        """
-        INSERT INTO slot_lookup (
-            SELECT e.id AS edge_id, p.prefix_id AS prefix_id, 'end' AS slot
-            FROM edges e, node_prefixes p
-            WHERE p.node_id = e.end_id
-        )
-        """,
-        """
-        INSERT INTO slot_lookup (
-            SELECT es.edge_id AS edge_id, p.prefix_id AS prefix_id,
-                   'source' AS slot
-            FROM edge_sources es, node_prefixes p
-            WHERE p.node_id = es.source_id
-        )
-        """,
-    ]
-    for query in lookup_table_queries:
-        cursor = connection.cursor()
-        cursor.execute(query)
-        cursor.close()
-        connection.commit()
