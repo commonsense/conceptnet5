@@ -92,6 +92,13 @@
       "comment": "A numerical value indicating how strongly one should believe the statement this edge makes. Weights are set in an ad-hoc way by the modules that import data into ConceptNet. Weights also appear on RelatedNodes, indicating how related that node is to the query, on a scale from -1 to 1."
     },
     {
+      "@id": "#value",
+      "@type": "rdf:Property",
+      "domain": "#Query",
+      "range": "xsd:float",
+      "comment": "A value indicating the result of a numerical query, such as the /relatedness query for how related two nodes are."
+    },
+    {
       "@id": "#node",
       "@type": "rdf:Property",
       "domain": ["#Edge", "#Feature"],
@@ -240,9 +247,9 @@
   ],
 
   "@context": {
-    "@base": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json",
-    "cn": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#",
-    "pages": "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#pagination-",
+    "@base": "http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json",
+    "cn": "http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json#",
+    "pages": "http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json#pagination-",
 
     "cc": "http://creativecommons.org/licenses/",
     "dc": "http://purl.org/dc/terms/",
@@ -272,6 +279,7 @@
     "end": {"@id": "cn:end", "@type": "@id"},
     "symmetric": {"@id": "cn:symmetric", "@type": "xsd:boolean"},
     "weight": {"@id": "cn:weight", "@type": "xsd:float"},
+    "value": {"@id": "cn:value", "@type": "xsd:float"},
     "node": {"@id": "cn:node", "@type": "@id"},
     "feature": {"@id": "cn:feature", "@type": "@id"},
     "features": {"@id": "cn:features", "@container": "@set", "@type": "@id"},

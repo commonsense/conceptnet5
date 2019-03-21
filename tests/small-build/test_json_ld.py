@@ -44,7 +44,7 @@ def vocab(name):
     Given a property such as 'rel', get its fully-qualified URL in our
     JSON-LD vocabulary.
     """
-    return "http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json#" + name
+    return "http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json#" + name
 
 
 def api(uri):
@@ -80,7 +80,7 @@ def test_lookup_paginated():
     # The original response points to a context file retrieved over HTTP.
     # Check its value before we mess with it.
     orig_context = response['@context']
-    eq_(orig_context, ["http://api.conceptnet.io/ld/conceptnet5.6/context.ld.json"])
+    eq_(orig_context, ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"])
 
     ld = flat_map(response)
 
@@ -155,4 +155,3 @@ def test_meta_context():
     check_id_match(rel["http://www.w3.org/2000/01/rdf-schema#range"], vocab('Relation'))
     comment = rel["http://www.w3.org/2000/01/rdf-schema#comment"][0]["@value"]
     assert comment.startswith("Links to the kind of relationship")
-
