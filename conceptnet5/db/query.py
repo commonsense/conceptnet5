@@ -8,13 +8,18 @@ NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 
-RANDOM_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) ORDER BY random() LIMIT %(limit)s"
-RANDOM_NODES_QUERY = "SELECT * FROM nodes TABLESAMPLE SYSTEM(1) WHERE uri LIKE :prefix ORDER BY random() LIMIT %(limit)s"
-DATASET_QUERY = "SELECT uri, data FROM edges TABLESAMPLE SYSTEM(0.01) WHERE data->'dataset' = %(dataset)s ORDER BY weight DESC OFFSET %(offset)s LIMIT %(limit)s"
-
-
-TOO_BIG_PREFIXES = ['/c/en', '/c/fr', '/c/es', '/c/de', '/c/ja', '/c/zh',
-                    '/c/pt', '/c/la', '/c/it', '/c/ru' ,'/c/fi']
+RANDOM_QUERY = """
+    SELECT uri, data, weight FROM edges
+    TABLESAMPLE SYSTEM(0.01)
+    ORDER BY random() LIMIT %(limit)s
+"""
+DATASET_QUERY = """
+    SELECT uri, data, weight FROM edges
+    TABLESAMPLE SYSTEM(0.01)
+    WHERE data->>'dataset' = %(dataset)s
+    ORDER BY weight DESC
+    OFFSET %(offset)s LIMIT %(limit)s
+"""
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
@@ -74,7 +79,7 @@ def make_list_query(criteria):
 def _query_parts_node_other(criteria):
     parts = [
         """
-        SELECT e.uri as uri, e.data as data
+        SELECT DISTINCT e.uri as uri, e.data as data, twl.weight as weight
         FROM edges e, nodes n1, nodes n2, two_way_lookup twl
         """
     ]
@@ -82,7 +87,8 @@ def _query_parts_node_other(criteria):
         parts.append(", sources s, edge_sources es")
     parts.append(
         """
-        WHERE twl.node_prefix_id = n1.id AND n1.uri = %(node)s
+        WHERE e.id = twl.edge_id
+        AND twl.node_prefix_id = n1.id AND n1.uri = %(node)s
         AND twl.other_prefix_id = n2.id AND n2.uri = %(other)s
         """
     )
@@ -96,14 +102,15 @@ def _query_parts_node_other(criteria):
 
 def _query_parts_start_end(criteria):
     parts = [
-        "SELECT e.uri as uri, e.data as data",
+        "SELECT DISTINCT e.uri as uri, e.data as data, twl.weight as weight",
         "FROM edges e, nodes n1, nodes n2, two_way_lookup twl"
     ]
     if 'source' in criteria:
         parts.append(", sources s, edge_sources es")
     parts.append(
         """
-        WHERE twl.node_prefix_id = n1.id AND n1.uri = %(start)s
+        WHERE e.id = twl.edge_id
+        AND twl.node_prefix_id = n1.id AND n1.uri = %(start)s
         AND twl.other_prefix_id = n2.id AND n2.uri = %(end)s
         AND direction = 1
         """
@@ -123,7 +130,7 @@ def _query_parts_source(criteria):
             "querying by node."
         )
     parts = [
-        "SELECT e.uri as uri, e.data as data",
+        "SELECT DISTINCT e.uri as uri, e.data as data, e.weight as weight",
         "FROM edges e, edge_sources es, sources s",
         "WHERE es.edge_id = e.id AND es.source_id = s.id",
         "AND s.uri = %(source)s"
@@ -135,11 +142,12 @@ def _query_parts_source(criteria):
 
 def _query_parts_slot(criteria):
     parts = [
-        "SELECT e.uri as uri, e.data as data",
+        "SELECT DISTINCT e.uri as uri, e.data as data, sl.weight as weight",
         "FROM edges e, slot_lookup sl, nodes n"
     ]
     if 'source' in criteria:
         parts.append(", edge_sources es, sources s")
+    parts.append("WHERE sl.edge_id = e.id")
 
     n_criteria = len(set(criteria) & {'start', 'end', 'node'})
     if n_criteria != 1:
@@ -148,13 +156,13 @@ def _query_parts_slot(criteria):
             "node slot, not %d." % n_criteria
         )
     if 'start' in criteria:
-        parts.append("WHERE n.uri = %(start)s AND sl.prefix_id = n.id")
+        parts.append("AND n.uri = %(start)s AND sl.prefix_id = n.id")
         parts.append("AND sl.slot = 'start'")
     elif 'end' in criteria:
-        parts.append("WHERE n.uri = %(end)s AND sl.prefix_id = n.id")
+        parts.append("AND n.uri = %(end)s AND sl.prefix_id = n.id")
         parts.append("AND sl.slot = 'end'")
     elif 'node' in criteria:
-        parts.append("WHERE n.uri = %(node)s AND sl.prefix_id = n.id")
+        parts.append("AND n.uri = %(node)s AND sl.prefix_id = n.id")
         # no slot restriction
     else:
         raise RuntimeError("shouldn't get here")
@@ -169,7 +177,7 @@ def _query_parts_slot(criteria):
 
 def _query_parts_rel(_criteria):
     return [
-        "SELECT e.uri as uri, e.data as data",
+        "SELECT e.uri as uri, e.data as data, e.weight as weight",
         "FROM edges e, relations r",
         "WHERE e.relation_id = r.id and r.uri=%(uri)s"
     ]
@@ -264,7 +272,7 @@ class AssertionFinder(object):
         cursor = self.connection.cursor()
         dataset_json = json.dumps(uri)
         cursor.execute(DATASET_QUERY, {'dataset': dataset_json, 'limit': limit, 'offset': offset})
-        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
+        results = [transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()]
         return results
 
     def random_edges(self, limit=20):
@@ -275,7 +283,7 @@ class AssertionFinder(object):
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute(RANDOM_QUERY, {'limit': limit})
-        results = [transform_for_linked_data(data) for uri, data in cursor.fetchall()]
+        results = [transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()]
         return results
 
     def query(self, criteria, limit=20, offset=0):
@@ -284,6 +292,10 @@ class AssertionFinder(object):
         """
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
+
+        # If the only criterion is 'dataset', use sampling instead
+        if list(criteria) == ['dataset']:
+            return self.sample_dataset(criteria['dataset'])
 
         query_string = make_list_query(criteria)
         params = {
@@ -296,6 +308,6 @@ class AssertionFinder(object):
         cursor = self.connection.cursor()
         cursor.execute(query_string, params)
         results = [
-            transform_for_linked_data(data) for uri, data in cursor.fetchall()
+            transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
         ]
         return results

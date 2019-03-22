@@ -110,7 +110,13 @@ INDICES = [
         WHERE p1.node_id = e.end_id
           AND p2.node_id = e.start_id
     )
-    """
+    """,
+    "CREATE INDEX sl_edge ON slot_lookup (edge_id)",
+    "CREATE INDEX sl_prefix ON slot_lookup (prefix_id)",
+    "CREATE INDEX sl_weight ON slot_lookup (weight)",
+    "CREATE INDEX twl_edge ON two_way_lookup (edge_id)",
+    "CREATE INDEX twl_pair ON two_way_lookup (node_prefix_id, other_prefix_id)",
+    "CREATE INDEX twl_weight ON two_way_lookup (weight)",
 ]
 
 
