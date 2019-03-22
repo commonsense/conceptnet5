@@ -1,9 +1,5 @@
 import psycopg2
-import time
-import sys
-import os
 from conceptnet5.db import config
-from conceptnet5.util import get_data_filename
 
 _CONNECTIONS = {}
 
@@ -52,4 +48,3 @@ def check_db_connection(dbname=None):
     if dbname is None:
         dbname = config.DB_NAME
     _get_db_connection_inner(dbname)
-

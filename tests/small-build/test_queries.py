@@ -31,6 +31,16 @@ def test_lookup():
     eq_(source['@id'], '/and/[/s/process/split_words/,/s/resource/verbosity/]')
 
 
+def test_lookup_dataset():
+    verbosity = list(test_finder.lookup('/d/verbosity'))
+    assert len(verbosity) >= 2
+
+
+def test_random_edges():
+    results = list(test_finder.random_edges(limit=10))
+    assert len(results) == 10
+
+
 def test_strip_control_chars():
     assert test_finder.lookup('/c/en/test\x00') == test_finder.lookup('/c/en/test')
     assert not test_finder.lookup('/s/\x1a')

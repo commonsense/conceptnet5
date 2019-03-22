@@ -1,4 +1,5 @@
 from conceptnet5.db.connection import get_db_connection
+from conceptnet5.db.config import DB_NAME
 from conceptnet5.edges import transform_for_linked_data
 import json
 import itertools
@@ -8,18 +9,42 @@ NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 
-RANDOM_QUERY = """
-    SELECT uri, data, weight FROM edges
-    TABLESAMPLE SYSTEM(0.01)
-    ORDER BY random() LIMIT %(limit)s
-"""
-DATASET_QUERY = """
-    SELECT uri, data, weight FROM edges
-    TABLESAMPLE SYSTEM(0.01)
-    WHERE data->>'dataset' = %(dataset)s
-    ORDER BY weight DESC
-    OFFSET %(offset)s LIMIT %(limit)s
-"""
+if DB_NAME == 'conceptnet-test':
+    # Random queries sample 10% of edges; dataset queries sample 100% of edges.
+    # This makes sure that we get matches in the test database where there
+    # isn't much data.
+    #
+    # The TABLESAMPLE SYSTEM sampler gets 'chunks' of edges in a way that
+    # favors efficiency over independent sampling, so it's quite possible for
+    # it to skip every edge in a dataset in a correlated way unless we sample
+    # 100%.
+    RANDOM_QUERY = """
+        SELECT uri, data, weight FROM edges
+        TABLESAMPLE SYSTEM(10)
+        ORDER BY random() LIMIT %(limit)s
+    """
+    DATASET_QUERY = """
+        SELECT uri, data, weight FROM edges
+        TABLESAMPLE SYSTEM(100)
+        WHERE data->>'dataset' = %(dataset)s
+        ORDER BY weight DESC
+        OFFSET %(offset)s LIMIT %(limit)s
+    """
+else:
+    # In the real database, random queries sample 0.01% of edges, and dataset
+    # queries sample 1% of edges.
+    RANDOM_QUERY = """
+        SELECT uri, data, weight FROM edges
+        TABLESAMPLE SYSTEM(0.01)
+        ORDER BY random() LIMIT %(limit)s
+    """
+    DATASET_QUERY = """
+        SELECT uri, data, weight FROM edges
+        TABLESAMPLE SYSTEM(1)
+        WHERE data->>'dataset' = %(dataset)s
+        ORDER BY weight DESC
+        OFFSET %(offset)s LIMIT %(limit)s
+    """
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
@@ -77,10 +102,22 @@ def make_list_query(criteria):
 
 
 def _query_parts_node_other(criteria):
+    # We need to use DISTINCT because otherwise this could match the same edge
+    # multiple times. For example, if node and other are both '/c/en', then
+    # every edge it matches will be matched once with direction == 1 and once
+    # with direction == -1.
     parts = [
         """
-        SELECT DISTINCT e.uri as uri, e.data as data, twl.weight as weight
-        FROM edges e, nodes n1, nodes n2, two_way_lookup twl
+        WITH subq AS (
+            SELECT e.uri AS uri, e.data AS data, twl.weight AS weight
+            FROM two_way_lookup twl, edges e
+            WHERE e.id = twl.edge_id
+            AND node_prefix_id=(select id from nodes where uri='/c/en')
+            AND other_prefix_id=(select id from nodes where uri='/c/en')
+            ORDER by weight DESC LIMIT ((%(offset)s + %(limit)s) * 2)
+        )
+        SELECT DISTINCT ON (weight, uri) uri, data, weight
+        FROM subq
         """
     ]
     if 'source' in criteria:
@@ -102,7 +139,7 @@ def _query_parts_node_other(criteria):
 
 def _query_parts_start_end(criteria):
     parts = [
-        "SELECT DISTINCT e.uri as uri, e.data as data, twl.weight as weight",
+        "SELECT e.uri as uri, e.data as data, twl.weight as weight",
         "FROM edges e, nodes n1, nodes n2, two_way_lookup twl"
     ]
     if 'source' in criteria:
@@ -172,15 +209,20 @@ def _query_parts_slot(criteria):
         parts.append("AND s.uri = %(source)s")
     if 'rel' in criteria:
         parts.append("AND e.data ->> 'rel' = %(rel)s")
+    if 'dataset' in criteria:
+        parts.append("AND e.data ->> 'dataset' = %(dataset)s")
     return parts
 
 
-def _query_parts_rel(_criteria):
-    return [
+def _query_parts_rel(criteria):
+    parts = [
         "SELECT e.uri as uri, e.data as data, e.weight as weight",
         "FROM edges e, relations r",
-        "WHERE e.relation_id = r.id and r.uri=%(uri)s"
+        "WHERE e.relation_id = r.id and r.uri=%(rel)s"
     ]
+    if 'dataset' in criteria:
+        parts.append("AND e.data ->> 'dataset' = %(dataset)s")
+    return parts
 
 
 class AssertionFinder(object):
@@ -270,8 +312,8 @@ class AssertionFinder(object):
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
-        dataset_json = json.dumps(uri)
-        cursor.execute(DATASET_QUERY, {'dataset': dataset_json, 'limit': limit, 'offset': offset})
+        print(DATASET_QUERY)
+        cursor.execute(DATASET_QUERY, {'dataset': uri, 'limit': limit, 'offset': offset})
         results = [transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()]
         return results
 
