@@ -28,14 +28,34 @@ def sanitize(text):
     return text.replace('\n', '').replace('\t', '').replace('\\', '\\\\')
 
 
+def gin_indexable_edge(edge):
+    gin_edge = {}
+    gin_edge['uri'] = edge['uri']
+    gin_edge['start'] = uri_prefixes(edge['start'])
+    gin_edge['end'] = uri_prefixes(edge['end'])
+    gin_edge['rel'] = uri_prefixes(edge['rel'])
+    gin_edge['dataset'] = uri_prefixes(edge['dataset'])
+    gin_edge['pairs'] = [
+        '%s %s' % tuple(sorted([prefix1, prefix2]))
+        for prefix1 in gin_edge['start']
+        for prefix2 in gin_edge['end']
+    ]
+    flat_sources = set()
+    for source in edge['sources']:
+        for value in source.values():
+            flat_sources.update(uri_prefixes(value, min_pieces=3))
+    gin_edge['sources'] = sorted(flat_sources)
+    return gin_edge
+
+
 def assertions_to_sql_csv(msgpack_filename, output_dir):
     output_nodes = output_dir + '/nodes.csv'
     output_edges = output_dir + '/edges.csv'
     output_relations = output_dir + '/relations.csv'
     output_sources = output_dir + '/sources.csv'
-    output_edge_sources = output_dir + '/edge_sources.csv'
     output_node_prefixes = output_dir + '/node_prefixes.csv'
     output_features = output_dir + '/edge_features.csv'
+    output_edges_gin = output_dir + '/edges_gin.csv'
 
     node_list = OrderedSet()
     source_list = OrderedSet()
@@ -44,7 +64,7 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     seen_prefixes = set()
 
     edge_file = open(output_edges, 'w', encoding='utf-8')
-    edge_source_file = open(output_edge_sources, 'w', encoding='utf-8')
+    edge_gin_file = open(output_edges_gin, 'w', encoding='utf-8')
     node_prefix_file = open(output_node_prefixes, 'w', encoding='utf-8')
     feature_file = open(output_features, 'w', encoding='utf-8')
 
@@ -71,10 +91,13 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
              rel_idx, start_idx, end_idx,
              weight, jsondata]
         )
+        write_row(
+            edge_gin_file,
+            [assertion_idx, weight,
+             json.dumps(gin_indexable_edge(assertion), ensure_ascii=False)]
+        )
         for node in (assertion['start'], assertion['end'], assertion['dataset']):
             write_prefixes(node_prefix_file, seen_prefixes, node_list, node)
-        for source_idx in sorted(set(source_indices)):
-            write_row(edge_source_file, [assertion_idx, source_idx])
 
         if assertion['rel'] in SYMMETRIC_RELATIONS:
             features = [(0, start_idx), (0, end_idx)]
@@ -85,7 +108,7 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
             write_row(feature_file, [rel_idx, direction, node_idx, assertion_idx])
 
     edge_file.close()
-    edge_source_file.close()
+    edge_gin_file.close()
     node_prefix_file.close()
     write_ordered_set(output_nodes, node_list)
     write_ordered_set(output_sources, source_list)
@@ -107,9 +130,9 @@ def load_sql_csv(connection, input_dir):
         (input_dir + '/nodes.csv', 'nodes'),
         (input_dir + '/edges.csv', 'edges'),
         (input_dir + '/sources.csv', 'sources'),
-        (input_dir + '/edge_sources.csv', 'edge_sources'),
+        (input_dir + '/edges_gin.shuf.csv', 'edges_gin'),
         (input_dir + '/node_prefixes.csv', 'node_prefixes'),
-        (input_dir + '/edge_features.csv', 'edge_features')
+        (input_dir + '/edge_features.csv', 'edge_features'),
     ]:
         cursor = connection.cursor()
         with open(filename, 'rb') as file:

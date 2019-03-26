@@ -122,13 +122,13 @@ if USE_MORPHOLOGY:
 rule all:
     input:
         DATA + "/assertions/assertions.csv",
-        DATA + "/psql/edges.csv.gz",
-        DATA + "/psql/edge_sources.csv.gz",
-        DATA + "/psql/edge_features.csv.gz",
-        DATA + "/psql/nodes.csv.gz",
-        DATA + "/psql/node_prefixes.csv.gz",
-        DATA + "/psql/sources.csv.gz",
-        DATA + "/psql/relations.csv.gz",
+        DATA + "/psql/edges.csv",
+        DATA + "/psql/edge_features.csv",
+        DATA + "/psql/edges_gin.shuf.csv",
+        DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/nodes.csv",
+        DATA + "/psql/sources.csv",
+        DATA + "/psql/relations.csv",
         DATA + "/psql/done",
         DATA + "/stats/languages.txt",
         DATA + "/stats/language_edges.txt",
@@ -142,13 +142,13 @@ rule evaluation:
 
 rule webdata:
     input:
-        DATA + "/psql/edges.csv.gz",
-        DATA + "/psql/edge_sources.csv.gz",
-        DATA + "/psql/edge_features.csv.gz",
-        DATA + "/psql/nodes.csv.gz",
-        DATA + "/psql/node_prefixes.csv.gz",
-        DATA + "/psql/sources.csv.gz",
-        DATA + "/psql/relations.csv.gz",
+        DATA + "/psql/edges.csv",
+        DATA + "/psql/edge_features.csv",
+        DATA + "/psql/edges_gin.shuf.csv",
+        DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/nodes.csv",
+        DATA + "/psql/sources.csv",
+        DATA + "/psql/relations.csv",
         DATA + "/psql/done",
         DATA + "/vectors/mini.h5",
 
@@ -411,30 +411,30 @@ rule prepare_db:
         DATA + "/assertions/assertions.msgpack"
     output:
         DATA + "/psql/edges.csv",
-        DATA + "/psql/edge_sources.csv",
         DATA + "/psql/edge_features.csv",
-        DATA + "/psql/nodes.csv",
+        DATA + "/psql/edges_gin.csv",
         DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     shell:
         "cn5-db prepare_data {input} {DATA}/psql"
 
-rule gzip_db:
+rule shuffle_gin:
     input:
-        DATA + "/psql/{name}.csv"
+        DATA + "/psql/edges_gin.csv"
     output:
-        DATA + "/psql/{name}.csv.gz"
+        DATA + "/psql/edges_gin.shuf.csv"
     shell:
-        "gzip -c {input} > {output}"
+        "shuf {input} > {output}"
 
 rule load_db:
     input:
         DATA + "/psql/edges.csv",
-        DATA + "/psql/edge_sources.csv",
         DATA + "/psql/edge_features.csv",
-        DATA + "/psql/nodes.csv",
+        DATA + "/psql/edges_gin.shuf.csv",
         DATA + "/psql/node_prefixes.csv",
+        DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
     output:

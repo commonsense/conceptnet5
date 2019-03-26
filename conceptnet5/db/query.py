@@ -23,13 +23,6 @@ if DB_NAME == 'conceptnet-test':
         TABLESAMPLE SYSTEM(10)
         ORDER BY random() LIMIT %(limit)s
     """
-    DATASET_QUERY = """
-        SELECT uri, data, weight FROM edges
-        TABLESAMPLE SYSTEM(100)
-        WHERE data->>'dataset' = %(dataset)s
-        ORDER BY weight DESC
-        OFFSET %(offset)s LIMIT %(limit)s
-    """
 else:
     # In the real database, random queries sample 0.01% of edges, and dataset
     # queries sample 1% of edges.
@@ -38,13 +31,7 @@ else:
         TABLESAMPLE SYSTEM(0.01)
         ORDER BY random() LIMIT %(limit)s
     """
-    DATASET_QUERY = """
-        SELECT uri, data, weight FROM edges
-        TABLESAMPLE SYSTEM(1)
-        WHERE data->>'dataset' = %(dataset)s
-        ORDER BY weight DESC
-        OFFSET %(offset)s LIMIT %(limit)s
-    """
+
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
@@ -62,167 +49,58 @@ ORDER BY direction, uri, rank;
 """
 
 
-MAX_GROUP_SIZE = 20
+GIN_QUERY_1WAY = """
+WITH matched_edges AS (
+    SELECT edge_id FROM edges_gin
+    WHERE data @> %(query)s
+    LIMIT 10000
+)
+SELECT e.uri, e.data, e.weight
+FROM matched_edges m, edges e
+WHERE m.edge_id = e.id
+ORDER BY weight DESC;
+"""
+
+GIN_QUERY_2WAY = """
+WITH matched_edges AS (
+    SELECT edge_id FROM edges_gin
+    WHERE data @> %(query_forward)s OR data @> %(query_backward)s
+    LIMIT 10000
+)
+SELECT e.uri, e.data, e.weight
+FROM matched_edges m, edges e
+WHERE m.edge_id = e.id
+ORDER BY weight DESC
+OFFSET %(offset)s LIMIT %(limit)s;
+"""
 
 
-def make_list_query(criteria):
-    """
-    Given a dictionary of criteria being searched for, construct the SQL
-    query for it.
+def jsonify(value):
+    return json.dumps(value, ensure_ascii=False)
 
-    We don't substitute in the actual values of the criteria here -- that's
-    PostgreSQL's job. We just return a properly parameterized query.
-    """
-    crit_tuple = tuple(sorted(criteria))
-    if crit_tuple in LIST_QUERIES:
-        return LIST_QUERIES[crit_tuple]
 
-    if 'node' in criteria and 'other' in criteria:
-        parts = _query_parts_node_other(criteria)
-    elif 'start' in criteria and 'end' in criteria:
-        parts = _query_parts_start_end(criteria)
-    elif 'start' in criteria or 'end' in criteria or 'node' in criteria:
-        parts = _query_parts_slot(criteria)
-    elif 'source' in criteria:
-        parts = _query_parts_source(criteria)
-    elif 'rel' in criteria:
-        parts = _query_parts_rel(criteria)
+def gin_jsonb_value(criteria, node_forward=True):
+    criteria_map = {
+        'start': 'start',
+        'end': 'end',
+        'rel': 'rel',
+        'dataset': 'dataset',
+        'source': 'sources',
+        'sources': 'sources'
+    }
+    if node_forward:
+        criteria_map['node'] = 'start'
+        criteria_map['other'] = 'end'
     else:
-        raise ValueError("Can't construct a query for these criteria: %r" % criteria)
+        criteria_map['node'] = 'end'
+        criteria_map['other'] = 'start'
 
-    parts.append("""
-        ORDER BY weight DESC, uri
-        OFFSET %(offset)s LIMIT %(limit)s
-    """)
-    # Put the parts together into one query string
-    query = '\n'.join(parts)
-    # Cache the query string
-    LIST_QUERIES[crit_tuple] = query
+    query = {}
+    for criterion_in, criterion_out in criteria_map.items():
+        if criterion_in in criteria:
+            assert isinstance(criteria[criterion_in], str)
+            query[criterion_out] = [criteria[criterion_in]]
     return query
-
-
-def _query_parts_node_other(criteria):
-    # We need to use DISTINCT because otherwise this could match the same edge
-    # multiple times. For example, if node and other are both '/c/en', then
-    # every edge it matches will be matched once with direction == 1 and once
-    # with direction == -1.
-    parts = [
-        """
-        WITH subq AS (
-            SELECT e.uri AS uri, e.data AS data, twl.weight AS weight
-            FROM two_way_lookup twl, edges e
-            WHERE e.id = twl.edge_id
-            AND node_prefix_id=(select id from nodes where uri='/c/en')
-            AND other_prefix_id=(select id from nodes where uri='/c/en')
-            ORDER by weight DESC LIMIT ((%(offset)s + %(limit)s) * 2)
-        )
-        SELECT DISTINCT ON (weight, uri) uri, data, weight
-        FROM subq
-        """
-    ]
-    if 'source' in criteria:
-        parts.append(", sources s, edge_sources es")
-    parts.append(
-        """
-        WHERE e.id = twl.edge_id
-        AND twl.node_prefix_id = n1.id AND n1.uri = %(node)s
-        AND twl.other_prefix_id = n2.id AND n2.uri = %(other)s
-        """
-    )
-    if 'source' in criteria:
-        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
-        parts.append("AND s.uri = %(source)s")
-    if 'rel' in criteria:
-        parts.append("AND data ->> 'rel' = %(rel)s")
-    return parts
-
-
-def _query_parts_start_end(criteria):
-    parts = [
-        "SELECT e.uri as uri, e.data as data, twl.weight as weight",
-        "FROM edges e, nodes n1, nodes n2, two_way_lookup twl"
-    ]
-    if 'source' in criteria:
-        parts.append(", sources s, edge_sources es")
-    parts.append(
-        """
-        WHERE e.id = twl.edge_id
-        AND twl.node_prefix_id = n1.id AND n1.uri = %(start)s
-        AND twl.other_prefix_id = n2.id AND n2.uri = %(end)s
-        AND direction = 1
-        """
-    )
-    if 'source' in criteria:
-        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
-        parts.append("AND s.uri = %(source)s")
-    if 'rel' in criteria:
-        parts.append("AND data ->> 'rel' = %(rel)s")
-    return parts
-
-
-def _query_parts_source(criteria):
-    if (set(criteria) & {'node', 'other', 'start', 'end'}):
-        raise ValueError(
-            "The 'source' should not be the primary query when we're also "
-            "querying by node."
-        )
-    parts = [
-        "SELECT DISTINCT e.uri as uri, e.data as data, e.weight as weight",
-        "FROM edges e, edge_sources es, sources s",
-        "WHERE es.edge_id = e.id AND es.source_id = s.id",
-        "AND s.uri = %(source)s"
-    ]
-    if 'rel' in criteria:
-        parts.append("AND e.data ->> 'rel' = %(rel)s")
-    return parts
-
-
-def _query_parts_slot(criteria):
-    parts = [
-        "SELECT DISTINCT e.uri as uri, e.data as data, sl.weight as weight",
-        "FROM edges e, slot_lookup sl, nodes n"
-    ]
-    if 'source' in criteria:
-        parts.append(", edge_sources es, sources s")
-    parts.append("WHERE sl.edge_id = e.id")
-
-    n_criteria = len(set(criteria) & {'start', 'end', 'node'})
-    if n_criteria != 1:
-        raise ValueError(
-            "This function should be used to query by exactly one "
-            "node slot, not %d." % n_criteria
-        )
-    if 'start' in criteria:
-        parts.append("AND n.uri = %(start)s AND sl.prefix_id = n.id")
-        parts.append("AND sl.slot = 'start'")
-    elif 'end' in criteria:
-        parts.append("AND n.uri = %(end)s AND sl.prefix_id = n.id")
-        parts.append("AND sl.slot = 'end'")
-    elif 'node' in criteria:
-        parts.append("AND n.uri = %(node)s AND sl.prefix_id = n.id")
-        # no slot restriction
-    else:
-        raise RuntimeError("shouldn't get here")
-
-    if 'source' in criteria:
-        parts.append("AND es.edge_id = e.id AND es.source_id = s.id")
-        parts.append("AND s.uri = %(source)s")
-    if 'rel' in criteria:
-        parts.append("AND e.data ->> 'rel' = %(rel)s")
-    if 'dataset' in criteria:
-        parts.append("AND e.data ->> 'dataset' = %(dataset)s")
-    return parts
-
-
-def _query_parts_rel(criteria):
-    parts = [
-        "SELECT e.uri as uri, e.data as data, e.weight as weight",
-        "FROM edges e, relations r",
-        "WHERE e.relation_id = r.id and r.uri=%(rel)s"
-    ]
-    if 'dataset' in criteria:
-        parts.append("AND e.data ->> 'dataset' = %(dataset)s")
-    return parts
 
 
 class AssertionFinder(object):
@@ -246,10 +124,10 @@ class AssertionFinder(object):
             criteria = {'rel': uri}
         elif uri.startswith('/s/'):
             criteria = {'source': uri}
+        elif uri.startswith('/d/'):
+            criteria = {'dataset': uri}
         elif uri.startswith('/a/'):
             return self.lookup_assertion(uri)
-        elif uri.startswith('/d/'):
-            return self.sample_dataset(uri, limit, offset)
         else:
             raise ValueError("%r isn't a ConceptNet URI that can be looked up")
         return self.query(criteria, limit, offset)
@@ -304,19 +182,6 @@ class AssertionFinder(object):
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
         return results
 
-    def sample_dataset(self, uri, limit=50, offset=0):
-        """
-        Get a subsample of edges matching a particular dataset.
-        """
-        uri = remove_control_chars(uri)
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
-        cursor = self.connection.cursor()
-        print(DATASET_QUERY)
-        cursor.execute(DATASET_QUERY, {'dataset': uri, 'limit': limit, 'offset': offset})
-        results = [transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()]
-        return results
-
     def random_edges(self, limit=20):
         """
         Get a collection of distinct, randomly-selected edges.
@@ -335,20 +200,23 @@ class AssertionFinder(object):
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
 
-        # If the only criterion is 'dataset', use sampling instead
-        if list(criteria) == ['dataset']:
-            return self.sample_dataset(criteria['dataset'])
-
-        query_string = make_list_query(criteria)
-        params = {
-            key: remove_control_chars(value)
-            for (key, value) in criteria.items()
-        }
-        params['limit'] = limit
-        params['offset'] = offset
-
         cursor = self.connection.cursor()
-        cursor.execute(query_string, params)
+        if 'node' in criteria:
+            query_forward = gin_jsonb_value(criteria, node_forward=True)
+            query_backward = gin_jsonb_value(criteria, node_forward=False)
+            cursor.execute(
+                GIN_QUERY_2WAY,
+                {
+                    'query_forward': jsonify(query_forward),
+                    'query_backward': jsonify(query_backward),
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
+        else:
+            query = gin_jsonb_value(criteria)
+            cursor.execute(GIN_QUERY_1WAY, {'query': jsonify(query)})
+
         results = [
             transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
         ]
