@@ -99,10 +99,23 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
         for node in (assertion['start'], assertion['end'], assertion['dataset']):
             write_prefixes(node_prefix_file, seen_prefixes, node_list, node)
 
+        features = []
+        start_p_indices = [
+            node_list.add(prefix) for prefix in uri_prefixes(assertion['start'], 3)
+        ]
+        end_p_indices = [
+            node_list.add(prefix) for prefix in uri_prefixes(assertion['end'], 3)
+        ]
         if assertion['rel'] in SYMMETRIC_RELATIONS:
-            features = [(0, start_idx), (0, end_idx)]
+            for start_p_idx in start_p_indices:
+                features.append((0, start_p_idx))
+            for end_p_idx in end_p_indices:
+                features.append((0, end_p_idx))
         else:
-            features = [(1, start_idx), (-1, end_idx)]
+            for start_p_idx in start_p_indices:
+                features.append((1, start_p_idx))
+            for end_p_idx in end_p_indices:
+                features.append((-1, end_p_idx))
 
         for direction, node_idx in features:
             write_row(feature_file, [rel_idx, direction, node_idx, assertion_idx])

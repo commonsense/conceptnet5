@@ -35,19 +35,17 @@ else:
 
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
-    SELECT p.node_id FROM nodes n, node_prefixes p
-    WHERE p.prefix_id=n.id AND n.uri=%(node)s
-    LIMIT 10
+    SELECT n.id FROM nodes n
+    WHERE n.uri=%(node)s
 )
 SELECT rf.direction, r.uri, e.data
 FROM ranked_features rf, edges e, relations r
-WHERE rf.node_id IN (SELECT node_id FROM node_ids)
+WHERE rf.node_id = (SELECT n.id FROM nodes n where n.uri=%(node)s)
 AND rf.edge_id = e.id
 AND rf.rel_id = r.id
 AND rank <= %(limit)s
 ORDER BY direction, uri, rank;
 """
-
 
 GIN_QUERY_1WAY = """
 WITH matched_edges AS (
@@ -99,7 +97,7 @@ def gin_jsonb_value(criteria, node_forward=True):
     for criterion_in, criterion_out in criteria_map.items():
         if criterion_in in criteria:
             assert isinstance(criteria[criterion_in], str)
-            query[criterion_out] = [criteria[criterion_in]]
+            query[criterion_out] = [remove_control_chars(criteria[criterion_in])]
     return query
 
 
