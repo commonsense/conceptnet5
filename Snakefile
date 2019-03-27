@@ -125,7 +125,6 @@ rule all:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_features.csv",
         DATA + "/psql/edges_gin.shuf.csv",
-        DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv",
@@ -145,7 +144,6 @@ rule webdata:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_features.csv",
         DATA + "/psql/edges_gin.shuf.csv",
-        DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv",
@@ -413,7 +411,6 @@ rule prepare_db:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_features.csv",
         DATA + "/psql/edges_gin.csv",
-        DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
@@ -433,7 +430,6 @@ rule load_db:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_features.csv",
         DATA + "/psql/edges_gin.shuf.csv",
-        DATA + "/psql/node_prefixes.csv",
         DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"

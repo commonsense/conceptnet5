@@ -53,7 +53,6 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     output_edges = output_dir + '/edges.csv'
     output_relations = output_dir + '/relations.csv'
     output_sources = output_dir + '/sources.csv'
-    output_node_prefixes = output_dir + '/node_prefixes.csv'
     output_features = output_dir + '/edge_features.csv'
     output_edges_gin = output_dir + '/edges_gin.csv'
 
@@ -61,11 +60,9 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
     source_list = OrderedSet()
     assertion_list = OrderedSet()
     relation_list = OrderedSet()
-    seen_prefixes = set()
 
     edge_file = open(output_edges, 'w', encoding='utf-8')
     edge_gin_file = open(output_edges_gin, 'w', encoding='utf-8')
-    node_prefix_file = open(output_node_prefixes, 'w', encoding='utf-8')
     feature_file = open(output_features, 'w', encoding='utf-8')
 
     for assertion in read_msgpack_stream(msgpack_filename):
@@ -96,8 +93,6 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
             [assertion_idx, weight,
              json.dumps(gin_indexable_edge(assertion), ensure_ascii=False)]
         )
-        for node in (assertion['start'], assertion['end'], assertion['dataset']):
-            write_prefixes(node_prefix_file, seen_prefixes, node_list, node)
 
         features = []
         start_p_indices = [
@@ -122,19 +117,9 @@ def assertions_to_sql_csv(msgpack_filename, output_dir):
 
     edge_file.close()
     edge_gin_file.close()
-    node_prefix_file.close()
     write_ordered_set(output_nodes, node_list)
     write_ordered_set(output_sources, source_list)
     write_relations(output_relations, relation_list)
-
-
-def write_prefixes(prefix_file, seen_prefixes, node_list, node):
-    for prefix in uri_prefixes(node):
-        if (node, prefix) not in seen_prefixes:
-            seen_prefixes.add((node, prefix))
-            node_idx = node_list.add(node)
-            prefix_idx = node_list.add(prefix)
-            write_row(prefix_file, [node_idx, prefix_idx])
 
 
 def load_sql_csv(connection, input_dir):
@@ -144,7 +129,6 @@ def load_sql_csv(connection, input_dir):
         (input_dir + '/edges.csv', 'edges'),
         (input_dir + '/sources.csv', 'sources'),
         (input_dir + '/edges_gin.shuf.csv', 'edges_gin'),
-        (input_dir + '/node_prefixes.csv', 'node_prefixes'),
         (input_dir + '/edge_features.csv', 'edge_features'),
     ]:
         cursor = connection.cursor()

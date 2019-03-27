@@ -5,7 +5,6 @@ import json
 import itertools
 from ftfy.fixes import remove_control_chars
 
-NODE_PREFIX_CRITERIA = {'node', 'other', 'start', 'end'}
 LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 

@@ -32,11 +32,6 @@ TABLES = [
         data           jsonb NOT NULL
     )
     """,
-    """CREATE TABLE node_prefixes (
-        node_id   integer NOT NULL REFERENCES nodes (id),
-        prefix_id integer NOT NULL REFERENCES nodes (id)
-    )
-    """,
     """CREATE TABLE edges_gin (
         edge_id   integer NOT NULL REFERENCES edges (id),
         weight    real NOT NULL,
@@ -57,14 +52,12 @@ INDICES = [
     "ALTER TABLE sources ADD CONSTRAINT sources_unique_uri UNIQUE (uri)",
     "ALTER TABLE edges ADD CONSTRAINT edges_unique_uri UNIQUE (uri)",
     "ALTER TABLE relations ADD CONSTRAINT relations_unique_uri UNIQUE (uri)",
-    "ALTER TABLE node_prefixes ADD CONSTRAINT node_prefixes_unique UNIQUE (node_id, prefix_id)",
     "CREATE INDEX edge_relation ON edges (relation_id)",
     "CREATE INDEX edge_start ON edges (start_id)",
     "CREATE INDEX edge_end ON edges (end_id)",
     "CREATE INDEX edge_weight ON edges (weight)",
     "CREATE INDEX ef_feature ON edge_features (rel_id, direction, node_id)",
     "CREATE INDEX ef_node ON edge_features (node_id)",
-    "CREATE INDEX np_prefix ON node_prefixes (prefix_id)",
     """
     CREATE MATERIALIZED VIEW ranked_features AS (
     SELECT ef.rel_id, ef.direction, ef.node_id, ef.edge_id, e.weight,
