@@ -55,7 +55,8 @@ WITH matched_edges AS (
 SELECT e.uri, e.data, e.weight
 FROM matched_edges m, edges e
 WHERE m.edge_id = e.id
-ORDER BY weight DESC;
+ORDER BY weight DESC
+OFFSET %(offset)s LIMIT %(limit)s;
 """
 
 GIN_QUERY_2WAY = """
@@ -212,7 +213,14 @@ class AssertionFinder(object):
             )
         else:
             query = gin_jsonb_value(criteria)
-            cursor.execute(GIN_QUERY_1WAY, {'query': jsonify(query)})
+            cursor.execute(
+                GIN_QUERY_1WAY,
+                {
+                    'query': jsonify(query),
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
 
         results = [
             transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()

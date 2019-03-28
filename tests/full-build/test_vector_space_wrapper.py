@@ -92,12 +92,12 @@ def test_lookup_neighbors():
     term = '/c/pl/skoki_narciarskie'
     neighbors = vectors._find_neighbors(term=term, limit_per_term=10,
                                         weight=1.0)
-    expected_neighbors = [('/c/en/ski_jumping', 0.02),
+    expected_neighbors = {('/c/en/ski_jumping', 0.02),
+                          ('/c/en/ski_jumping', 0.01),
                           ('http://pl.dbpedia.org/resource/Skoki_narciarskie', 0.01),
                           ('/c/de/skispringen', 0.01),
-                          ('/c/en/ski_jumping', 0.01),
-                          ('/c/en/ski_jumping', 0.005)]
-    eq_(expected_neighbors, neighbors)
+                          ('/c/en/ski_jumping', 0.005)}
+    eq_(expected_neighbors, set(neighbors))
 
 
 @with_setup(setup_multiling_frame)
@@ -111,8 +111,8 @@ def test_expand_terms():
     # /c/en/bounder and /c/en/skier from neighbor search
     # /c/en/ski_jumping from prefix match
     expected_expanded_terms = [('/c/en/ski_jumper', 0.9523809523809523),
-                               ('/c/en/bounder', 0.019047619047619046),
                                ('/c/en/skier', 0.019047619047619046),
+                               ('/c/fi/mäkihyppääjä', 0.019047619047619046),
                                ('/c/en/ski_jumping', 0.009523809523809523)]
     eq_(expected_expanded_terms, expanded_terms)
 
@@ -166,4 +166,3 @@ def test_cache_with_oov():
     # If include_neighbors=True, the neighbor of 'test' in ConceptNet ('trial')
     #  will be used to approximate its vector
     ok_(vectors.get_vector('/c/en/test', oov_vector=True).any())
-
