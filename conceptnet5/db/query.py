@@ -31,7 +31,8 @@ else:
         ORDER BY random() LIMIT %(limit)s
     """
 
-
+# A query that's optimized for producing the edges, grouped by feature, that
+# you get when you look up a concept in the Web interface.
 NODE_TO_FEATURE_QUERY = """
 WITH node_ids AS (
     SELECT n.id FROM nodes n
@@ -46,6 +47,8 @@ AND rank <= %(limit)s
 ORDER BY direction, uri, rank;
 """
 
+# Queries that match arbitrary criteria using a GIN index. The @> operator
+# tests whether one JSONB structure includes all the values in another.
 GIN_QUERY_1WAY = """
 WITH matched_edges AS (
     SELECT edge_id FROM edges_gin
@@ -74,15 +77,56 @@ OFFSET %(offset)s LIMIT %(limit)s;
 
 
 def jsonify(value):
-    return json.dumps(value, ensure_ascii=False)
+    """
+    Convert a value into a JSON string that can be used for JSONB queries in
+    Postgres.
+
+    We run `remove_control_characters` on it because those
+    characters can make PostgreSQL sad.
+
+    The particular case I'm aware of is that nulls ("\u0000") can be
+    represented in JSON but not in PostgreSQL values, and this was once used
+    for a denial-of-service attack against ConceptNet when we were using a
+    flakier psql library.
+    """
+    return json.dumps(remove_control_chars(value), ensure_ascii=False)
 
 
 def gin_jsonb_value(criteria, node_forward=True):
+    """
+    Convert the given criteria into a query that matches the `edges_gin`
+    table using the JSONB @> operator.
+
+    In the table, we replace the 'start', 'end', 'rel', and 'dataset' URIs
+    with lists of their URI prefixes. We query those slots with a
+    single-element list, which will be a sub-list of the prefix list if
+    it's a match.
+
+    As an example, a query for {'start': '/c/en'} will become the GIN
+    query {'start': ['/c/en']}, which will match indexed edges such as
+    {
+        'start': ['/c/en', '/c/en/dog'],
+        'end': ['/c/en', '/c/en/bark'],
+        'rel': ['/r/CapableOf'],
+        ...
+    }
+
+    Bi-directional queries such as {'node': '/c/en/dog'} have to become two
+    separate query dictionaries, one where 'node' is 'start' and 'other' is
+    'end', and one where 'node' is 'end' and 'other' is 'start'.
+
+    For that case, we take the optional `node_forward` argument that
+    determines the mapping, and call this function twice, once where
+    `node_forward` is True and once where it is False.
+    """
     criteria_map = {
         'start': 'start',
         'end': 'end',
         'rel': 'rel',
         'dataset': 'dataset',
+
+        # edges have a 'sources' element, but the query key we've historically
+        # accepted is 'source', so let's just accept both
         'source': 'sources',
         'sources': 'sources'
     }
@@ -97,7 +141,7 @@ def gin_jsonb_value(criteria, node_forward=True):
     for criterion_in, criterion_out in criteria_map.items():
         if criterion_in in criteria:
             assert isinstance(criteria[criterion_in], str)
-            query[criterion_out] = [remove_control_chars(criteria[criterion_in])]
+            query[criterion_out] = [criteria[criterion_in]]
     return query
 
 
