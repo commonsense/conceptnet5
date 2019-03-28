@@ -410,7 +410,7 @@ rule prepare_db:
     output:
         DATA + "/psql/edges.csv",
         DATA + "/psql/edge_features.csv",
-        DATA + "/psql/edges_gin.csv",
+        temp(DATA + "/psql/edges_gin.csv"),
         DATA + "/psql/nodes.csv",
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv"
