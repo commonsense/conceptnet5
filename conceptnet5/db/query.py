@@ -81,15 +81,11 @@ def jsonify(value):
     Convert a value into a JSON string that can be used for JSONB queries in
     Postgres.
 
-    We run `remove_control_characters` on it because those
-    characters can make PostgreSQL sad.
-
-    The particular case I'm aware of is that nulls ("\u0000") can be
-    represented in JSON but not in PostgreSQL values, and this was once used
-    for a denial-of-service attack against ConceptNet when we were using a
-    flakier psql library.
+    If a string happens to contain the character U+0000, which cannot be
+    represented in a PostgreSQL value, remove the escape sequence representing
+    that character, effectively stripping out that character from all strings.
     """
-    return json.dumps(remove_control_chars(value), ensure_ascii=False)
+    return json.dumps(value, ensure_ascii=False).replace("\\u0000", "")
 
 
 def gin_jsonb_value(criteria, node_forward=True):
