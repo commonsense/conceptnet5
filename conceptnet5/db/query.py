@@ -120,11 +120,10 @@ def gin_jsonb_value(criteria, node_forward=True):
         'end': 'end',
         'rel': 'rel',
         'dataset': 'dataset',
-
         # edges have a 'sources' element, but the query key we've historically
         # accepted is 'source', so let's just accept both
         'source': 'sources',
-        'sources': 'sources'
+        'sources': 'sources',
     }
     if node_forward:
         criteria_map['node'] = 'start'
@@ -146,6 +145,7 @@ class AssertionFinder(object):
     The object that interacts with the database to find ConcetNet assertions
     (edges) matching certain criteria.
     """
+
     def __init__(self, dbname=None):
         self.connection = None
         self.dbname = dbname
@@ -203,7 +203,9 @@ class AssertionFinder(object):
         cursor.execute(NODE_TO_FEATURE_QUERY, {'node': uri, 'limit': limit})
         results = {}
         for feature, rows in itertools.groupby(cursor.fetchall(), extract_feature):
-            results[feature] = [transform_for_linked_data(feature_data(row)) for row in rows]
+            results[feature] = [
+                transform_for_linked_data(feature_data(row)) for row in rows
+            ]
         return results
 
     def lookup_assertion(self, uri):
@@ -228,7 +230,9 @@ class AssertionFinder(object):
             self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute(RANDOM_QUERY, {'limit': limit})
-        results = [transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()]
+        results = [
+            transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
+        ]
         return results
 
     def query(self, criteria, limit=20, offset=0):
@@ -248,18 +252,14 @@ class AssertionFinder(object):
                     'query_forward': jsonify(query_forward),
                     'query_backward': jsonify(query_backward),
                     'limit': limit,
-                    'offset': offset
-                }
+                    'offset': offset,
+                },
             )
         else:
             query = gin_jsonb_value(criteria)
             cursor.execute(
                 GIN_QUERY_1WAY,
-                {
-                    'query': jsonify(query),
-                    'limit': limit,
-                    'offset': offset
-                }
+                {'query': jsonify(query), 'limit': limit, 'offset': offset},
             )
 
         results = [

@@ -1,16 +1,15 @@
-from __future__ import unicode_literals, print_function
-
 import itertools
 import json
-
 import os
 
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.readers.wiktionary import valid_language
-from conceptnet5.uri import conjunction_uri,get_uri_language, is_absolute_url, Licenses, \
-    split_uri, uri_prefix
+from conceptnet5.uri import (
+    Licenses, conjunction_uri, get_uri_language, is_absolute_url, split_uri,
+    uri_prefix
+)
 from conceptnet5.util import get_support_data_filename
 
 N = 100
