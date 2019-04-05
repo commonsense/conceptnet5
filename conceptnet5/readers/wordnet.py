@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from collections import defaultdict
 
 from conceptnet5.edges import make_edge
@@ -8,48 +6,46 @@ from conceptnet5.formats.semantic_web import parse_nquads, resource_name
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import Licenses
 
-SOURCE = {'contributor': '/s/resource/wordnet/rdf/3.1'}
-DATASET = '/d/wordnet/3.1'
-WN20_URL = 'http://www.w3.org/2006/03/wn/wn20/instances/'
+SOURCE = {"contributor": "/s/resource/wordnet/rdf/3.1"}
+DATASET = "/d/wordnet/3.1"
+WN20_URL = "http://www.w3.org/2006/03/wn/wn20/instances/"
 
 PARTS_OF_SPEECH = {
-    'noun': 'n',
-    'verb': 'v',
-    'adjective': 'a',
-    'adjectivesatellite': 'a',
-    'adverb': 'r',
-    'phrase': 'p'
+    "noun": "n",
+    "verb": "v",
+    "adjective": "a",
+    "adjectivesatellite": "a",
+    "adverb": "r",
+    "phrase": "p",
 }
 
 REL_MAPPING = {
-    'hypernym': ('IsA', '{0} is a type of {1}'),
-    'hypernym-v': ('MannerOf', '{0} is a way to {1}'),
-    'part_meronym': ('PartOf', '{0} is a part of {1}'),
-    'domain_category': ('HasContext', '{0} is used in the context of {1}'),
-    'domain_region': ('HasContext', '{0} is used in the region of {1}'),
-    'cause': ('Causes', '{0} causes {1}'),
-    'action': ('UsedFor', '{0} is used for {1}'),
-    'result': ('UsedFor', '{0} is used for {1}'),
-    'beneficiary': ('UsedFor', '{0} is used for the benefit of {1}'),
-    'location': ('AtLocation', '{0} is located in {1}'),
-    'creator': ('CreatedBy', '{0} is created by {1}'),
-    'entail': ('Entails', '{0} entails {1}'),
-    'similar': ('SimilarTo', '{0} is similar to {1}'),
-    'also': ('RelatedTo', '{0} is related to {1}'),
-    'antonym': ('Antonym', '{0} is the opposite of {1}'),
-    'derivation': ('DerivedFrom', 'The word "{0}" is derived from "{1}"'),
-    'translation': ('~Synonym', '{0} is a translation of {1}'),
-
+    "hypernym": ("IsA", "{0} is a type of {1}"),
+    "hypernym-v": ("MannerOf", "{0} is a way to {1}"),
+    "part_meronym": ("PartOf", "{0} is a part of {1}"),
+    "domain_category": ("HasContext", "{0} is used in the context of {1}"),
+    "domain_region": ("HasContext", "{0} is used in the region of {1}"),
+    "cause": ("Causes", "{0} causes {1}"),
+    "action": ("UsedFor", "{0} is used for {1}"),
+    "result": ("UsedFor", "{0} is used for {1}"),
+    "beneficiary": ("UsedFor", "{0} is used for the benefit of {1}"),
+    "location": ("AtLocation", "{0} is located in {1}"),
+    "creator": ("CreatedBy", "{0} is created by {1}"),
+    "entail": ("Entails", "{0} entails {1}"),
+    "similar": ("SimilarTo", "{0} is similar to {1}"),
+    "also": ("RelatedTo", "{0} is related to {1}"),
+    "antonym": ("Antonym", "{0} is the opposite of {1}"),
+    "derivation": ("DerivedFrom", 'The word "{0}" is derived from "{1}"'),
+    "translation": ("~Synonym", "{0} is a translation of {1}"),
     # We may want some of these to be more specific, but it's hard to classify
     # them in terms of existing relations, and there aren't enough of them to
     # justify their own relations.
-    'pertainym': ('RelatedTo', '{0} is related to {1}'),
-    'agent': ('RelatedTo', '{0} is related to {1}'),
-    'patient': ('RelatedTo', '{0} is related to {1}'),
-    'theme': ('RelatedTo', '{0} is related to {1}'),
-    'instrument': ('RelatedTo', '{0} is related to {1}'),
-    'goal': ('RelatedTo', '{0} is related to {1}'),
-    
+    "pertainym": ("RelatedTo", "{0} is related to {1}"),
+    "agent": ("RelatedTo", "{0} is related to {1}"),
+    "patient": ("RelatedTo", "{0} is related to {1}"),
+    "theme": ("RelatedTo", "{0} is related to {1}"),
+    "instrument": ("RelatedTo", "{0} is related to {1}"),
+    "goal": ("RelatedTo", "{0} is related to {1}"),
     # Do we want a relation for verbs in the same VerbNet group?
 }
 
@@ -58,9 +54,7 @@ REL_MAPPING = {
 # http://compling.hss.ntu.edu.sg/omw/, but the language codes are translated
 # into BCP 47.
 
-SHAREALIKE_LANGUAGES = [
-    'ar', 'arb', 'nl', 'pt', 'ro', 'lt', 'sk', 'sl'
-]
+SHAREALIKE_LANGUAGES = ["ar", "arb", "nl", "pt", "ro", "lt", "sk", "sl"]
 
 
 def label_sort_key(label):
@@ -88,7 +82,13 @@ def label_sort_key(label):
     won't be disambiguated by adding the category "person". For people, we
     apply this rule no matter what, choosing their longest name.
     """
-    return (not label[0].isdigit(), label[-1].isdigit(), not label.islower(), -len(label), label)
+    return (
+        not label[0].isdigit(),
+        label[-1].isdigit(),
+        not label.islower(),
+        -len(label),
+        label,
+    )
 
 
 def run_wordnet(input_file, output_file):
@@ -105,20 +105,20 @@ def run_wordnet(input_file, output_file):
     synset_uris = {}
 
     # First pass: find data about synsets
-    quads = parse_nquads(open(input_file, encoding='utf-8'))
+    quads = parse_nquads(open(input_file, encoding="utf-8"))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        if 'url' not in subj_dict or 'url' not in rel_dict:
+        if "url" not in subj_dict or "url" not in rel_dict:
             continue
-        subj = subj_dict['url']
-        rel = rel_dict['url']
-        obj = obj_dict.get('url')
-        objtext = obj_dict.get('text')
+        subj = subj_dict["url"]
+        rel = rel_dict["url"]
+        obj = obj_dict.get("url")
+        objtext = obj_dict.get("text")
 
         relname = resource_name(rel)
-        if relname == 'label':
-            if obj_dict['lang'] == 'en':
+        if relname == "label":
+            if obj_dict["lang"] == "en":
                 synset_labels[subj].append(objtext)
-        elif relname == 'sameAs':
+        elif relname == "sameAs":
             if obj.startswith(WN20_URL):
                 # If we have a link to RDF WordNet 2.0, the URL (URI? IRI?)
                 # will contain a standardized label for this concept, which
@@ -127,22 +127,29 @@ def run_wordnet(input_file, output_file):
                 # a number of labels in no particular order, making it hard to
                 # determine from 3.1 alone what to name a category.
                 objname = resource_name(obj)
-                parts = objname.split('-')[1:-2]
+                parts = objname.split("-")[1:-2]
 
                 # Handle missing apostrophes
-                label = '-'.join(parts).replace('_s_', "'s_").replace('_s-', "'s_").replace("s__", "s'_").replace("s_-", "s'-").replace('_', ' ')
+                label = (
+                    "-".join(parts)
+                    .replace("_s_", "'s_")
+                    .replace("_s-", "'s_")
+                    .replace("s__", "s'_")
+                    .replace("s_-", "s'-")
+                    .replace("_", " ")
+                )
                 synset_canonical_labels[subj] = label
 
-        elif relname == 'domain_category':
+        elif relname == "domain_category":
             synset_categories[subj] = obj
-        elif relname == 'lexical_domain':
+        elif relname == "lexical_domain":
             target = resource_name(obj)
-            if '.' in target:
-                domain = target.split('.')[1]
+            if "." in target:
+                domain = target.split(".")[1]
                 synset_domains[subj] = domain
-        elif relname == 'gloss':
+        elif relname == "gloss":
             synset_glosses[subj] = objtext
-        elif relname == 'reference':
+        elif relname == "reference":
             lemma = resource_name(subj)
             synset = obj
             synset_senses[synset].append(lemma)
@@ -152,8 +159,9 @@ def run_wordnet(input_file, output_file):
     for synset, values in synset_labels.items():
         values.sort(key=lambda label: (label in used_labels,) + label_sort_key(label))
         if (
-            synset not in synset_canonical_labels or
-            synset_canonical_labels[synset][0].isupper() and synset_domains.get(synset) == 'person'
+            synset not in synset_canonical_labels
+            or synset_canonical_labels[synset][0].isupper()
+            and synset_domains.get(synset) == "person"
         ):
             label = values[0]
             synset_canonical_labels[synset] = label
@@ -164,63 +172,71 @@ def run_wordnet(input_file, output_file):
             category_name = synset_canonical_labels[synset_categories[synset]]
         else:
             category_name = synset_domains.get(synset, None)
-        synset_no_fragment = synset.split('#')[0]
+        synset_no_fragment = synset.split("#")[0]
         pos = synset_no_fragment[-1].lower()
-        assert pos in 'nvarsp', synset
-        if pos == 's':
-            pos = 'a'
-        elif pos == 'p':
-            pos = '-'
-        if category_name in ('pert', 'all', 'tops'):
+        assert pos in "nvarsp", synset
+        if pos == "s":
+            pos = "a"
+        elif pos == "p":
+            pos = "-"
+        if category_name in ("pert", "all", "tops"):
             category_name = None
         synset_disambig[synset] = (pos, category_name)
 
         canon = synset_canonical_labels[synset]
-        canon_uri = standardized_concept_uri('en', canon, pos, 'wn', category_name)
+        canon_uri = standardized_concept_uri("en", canon, pos, "wn", category_name)
         synset_uris[synset] = canon_uri
 
         for label in labels:
             if label != canon:
-                other_uri = standardized_concept_uri('en', label, pos, 'wn', category_name)
-                rel_uri = '/r/Synonym'
-                surface = '[[{0}]] is a synonym of [[{1}]]'.format(label, canon)
+                other_uri = standardized_concept_uri(
+                    "en", label, pos, "wn", category_name
+                )
+                rel_uri = "/r/Synonym"
+                surface = "[[{0}]] is a synonym of [[{1}]]".format(label, canon)
                 edge = make_edge(
-                    rel_uri, other_uri, canon_uri, dataset=DATASET, surfaceText=surface,
-                    license=Licenses.cc_attribution, sources=[SOURCE], weight=2.0
+                    rel_uri,
+                    other_uri,
+                    canon_uri,
+                    dataset=DATASET,
+                    surfaceText=surface,
+                    license=Licenses.cc_attribution,
+                    sources=[SOURCE],
+                    weight=2.0,
                 )
                 out.write(edge)
 
-    quads = parse_nquads(open(input_file, encoding='utf-8'))
+    quads = parse_nquads(open(input_file, encoding="utf-8"))
     for subj_dict, rel_dict, obj_dict, _graph in quads:
-        if 'url' not in subj_dict or 'url' not in rel_dict:
+        if "url" not in subj_dict or "url" not in rel_dict:
             continue
-        subj = subj_dict['url']
-        rel = rel_dict['url']
-        obj = obj_dict.get('url')
+        subj = subj_dict["url"]
+        rel = rel_dict["url"]
+        obj = obj_dict.get("url")
         relname = resource_name(rel)
         if relname in REL_MAPPING:
             pos, sense = synset_disambig.get(subj, (None, None))
-            if relname == 'hypernym' and pos == 'v':
-                relname = 'hypernym-v'
+            if relname == "hypernym" and pos == "v":
+                relname = "hypernym-v"
             rel, frame = REL_MAPPING[relname]
             reversed_frame = False
-            if rel.startswith('~'):
+            if rel.startswith("~"):
                 rel = rel[1:]
                 reversed_frame = True
-            rel_uri = '/r/' + rel
+            rel_uri = "/r/" + rel
             if obj is not None:
                 obj_uri = synset_uris.get(obj)
                 if obj not in synset_canonical_labels:
                     continue
                 obj_label = synset_canonical_labels[obj]
             else:
-                text = obj_dict['text']
+                text = obj_dict["text"]
                 # Some WordNets use strings with "!" in them to indicate
                 # out-of-band information, such as a missing translation
-                if (not text) or '!' in text:
+                if (not text) or "!" in text:
                     continue
-                lang = obj_dict['lang']
-                obj_uri = standardized_concept_uri(lang, text, pos, 'wn', sense)
+                lang = obj_dict["lang"]
+                obj_uri = standardized_concept_uri(lang, text, pos, "wn", sense)
                 obj_label = text
 
             if subj not in synset_uris or subj not in synset_canonical_labels:
@@ -228,7 +244,7 @@ def run_wordnet(input_file, output_file):
             subj_uri = synset_uris[subj]
             subj_label = synset_canonical_labels[subj]
             license = Licenses.cc_attribution
-            langcode = subj_uri.split('/')[2]
+            langcode = subj_uri.split("/")[2]
             if langcode in SHAREALIKE_LANGUAGES:
                 license = Licenses.cc_sharealike
 
@@ -236,19 +252,30 @@ def run_wordnet(input_file, output_file):
                 subj_uri, obj_uri = obj_uri, subj_uri
                 subj_label, obj_label = obj_label, subj_label
 
-            surface = frame.format('[[%s]]' % subj_label, '[[%s]]' % obj_label)
+            surface = frame.format("[[%s]]" % subj_label, "[[%s]]" % obj_label)
 
             edge = make_edge(
-                rel_uri, subj_uri, obj_uri, dataset=DATASET, surfaceText=surface,
-                license=license, sources=[SOURCE], weight=2.0
+                rel_uri,
+                subj_uri,
+                obj_uri,
+                dataset=DATASET,
+                surfaceText=surface,
+                license=license,
+                sources=[SOURCE],
+                weight=2.0,
             )
             out.write(edge)
 
     for wn_url in sorted(synset_uris):
         cn_uri = synset_uris[wn_url]
         edge = make_edge(
-            '/r/ExternalURL', cn_uri, wn_url, dataset=DATASET,
-            license=Licenses.cc_sharealike, sources=[SOURCE], weight=1.0
+            "/r/ExternalURL",
+            cn_uri,
+            wn_url,
+            dataset=DATASET,
+            license=Licenses.cc_sharealike,
+            sources=[SOURCE],
+            weight=1.0,
         )
         out.write(edge)
 

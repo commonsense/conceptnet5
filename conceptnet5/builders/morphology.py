@@ -61,11 +61,13 @@ def subwords_to_edges(language, input, output):
             if chunk != '_':
                 start = join_uri('x', language, chunk.strip('_'))
                 edge = make_edge(
-                    '/r/SubwordOf', start, end,
+                    '/r/SubwordOf',
+                    start,
+                    end,
                     dataset='/d/morphology',
                     license=Licenses.cc_attribution,
                     sources=MORPH_SOURCES,
-                    weight=0.01
+                    weight=0.01,
                 )
                 writer.write(edge)
     writer.close()

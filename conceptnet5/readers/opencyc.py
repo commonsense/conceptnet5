@@ -27,33 +27,61 @@ def opencyc_edge(rel, start, end, start_text, end_text):
     Get the ConceptNet representation of an OpenCyc edge.
     """
     return make_edge(
-        rel=rel, start=start, end=end,
+        rel=rel,
+        start=start,
+        end=end,
         dataset='/d/opencyc',
         license=Licenses.cc_attribution,
         sources=[SOURCE],
         weight=1.0,
         surfaceStart=start_text,
-        surfaceEnd=end_text
+        surfaceEnd=end_text,
     )
 
 
 def external_url_edge(start, end):
     return make_edge(
-        rel='/r/ExternalURL', start=start, end=end,
+        rel='/r/ExternalURL',
+        start=start,
+        end=end,
         dataset='/d/opencyc',
         license=Licenses.cc_attribution,
         sources=[SOURCE],
-        weight=1.0
+        weight=1.0,
     )
 
 
 # These words tend to indicate Cyc internals that are presented the same way
 # as facts about the external world.
 BLACKLIST_WORDS = {
-    'arg', 'arity', 'aura', 'bugzilla', 'cbl', 'cblask', 'cblassign',
-    'centroid', 'cw', 'cwe', 'cyc', 'cycl', 'deprecated', 'fn', 'individual',
-    'mett', 'microtheory', 'mr', 'mt', 'obo', 'opencyc', 'pcw', 'temporally',
-    'type', 'union', 'underspecified', 'wn', 'wordnet'
+    'arg',
+    'arity',
+    'aura',
+    'bugzilla',
+    'cbl',
+    'cblask',
+    'cblassign',
+    'centroid',
+    'cw',
+    'cwe',
+    'cyc',
+    'cycl',
+    'deprecated',
+    'fn',
+    'individual',
+    'mett',
+    'microtheory',
+    'mr',
+    'mt',
+    'obo',
+    'opencyc',
+    'pcw',
+    'temporally',
+    'type',
+    'union',
+    'underspecified',
+    'wn',
+    'wordnet',
 }
 
 
@@ -81,7 +109,12 @@ def run_opencyc(input_file, output_file):
         rel_name = resource_name(pred['url'])
         web_subj = subj.get('url')
         web_obj = obj.get('url')
-        if rel_name == 'subClassOf' and web_obj is not None and web_subj in labels and web_obj in labels:
+        if (
+            rel_name == 'subClassOf'
+            and web_obj is not None
+            and web_subj in labels
+            and web_obj in labels
+        ):
             subj_label = labels[web_subj]
             obj_label = labels[web_obj]
             if '_' in subj_label or '_' in obj_label:
@@ -104,7 +137,11 @@ def run_opencyc(input_file, output_file):
             if (obj_uri, web_obj) not in seen_external_urls:
                 out.write(external_url_edge(obj_uri, web_obj))
                 seen_external_urls.add((obj_uri, web_obj))
-        elif rel_name == 'sameAs' and web_subj in labels and web_obj.startswith('http://umbel.org/'):
+        elif (
+            rel_name == 'sameAs'
+            and web_subj in labels
+            and web_obj.startswith('http://umbel.org/')
+        ):
             subj_label = labels[web_subj]
             subj_uri = standardized_concept_uri('en', subj_label)
             if (subj_uri, web_obj) not in seen_external_urls:

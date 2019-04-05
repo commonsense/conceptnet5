@@ -2,7 +2,11 @@ import os
 
 import pkg_resources
 
-DATA_DIR = os.environ.get('CONCEPTNET_DATA') or os.environ.get('CONCEPTNET_BUILD_DATA') or os.path.expanduser('~/.conceptnet5')
+DATA_DIR = (
+    os.environ.get('CONCEPTNET_DATA')
+    or os.environ.get('CONCEPTNET_BUILD_DATA')
+    or os.path.expanduser('~/.conceptnet5')
+)
 if not os.path.exists(DATA_DIR):
     DATA_DIR = 'data'
 

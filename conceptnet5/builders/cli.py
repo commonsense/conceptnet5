@@ -26,12 +26,14 @@ def run_combine(input, output):
 
 @cli.command(name='reduce_assoc')
 @click.argument('assoc_filename', type=click.Path(readable=True, dir_okay=False))
-@click.argument('embedding_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False))
+@click.argument(
+    'embedding_filenames', nargs=-1, type=click.Path(readable=True, dir_okay=False)
+)
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
 def run_reduce_assoc(assoc_filename, embedding_filenames, output):
     """
-    Takes in a file of tab-separated simple associations, one or more 
-    hdf5 files defining vector embeddings, and removes from the associations 
+    Takes in a file of tab-separated simple associations, one or more
+    hdf5 files defining vector embeddings, and removes from the associations
     low-frequency terms and associations that are judged unlikely to be
     useful by various filters.
     """

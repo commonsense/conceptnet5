@@ -7,8 +7,11 @@ from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
-    cosine_similarity, normalize_vec, similar_to_vec, standardized_uri,
-    weighted_average
+    cosine_similarity,
+    normalize_vec,
+    similar_to_vec,
+    standardized_uri,
+    weighted_average,
 )
 from conceptnet5.vectors.formats import load_hdf
 from conceptnet5.vectors.transforms import l2_normalize_rows

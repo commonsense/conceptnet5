@@ -7,8 +7,11 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.languages import ALL_LANGUAGES
 from conceptnet5.readers.wiktionary import valid_language
 from conceptnet5.uri import (
-    Licenses, conjunction_uri, get_uri_language, is_absolute_url, split_uri,
-    uri_prefix
+    Licenses,
+    conjunction_uri,
+    get_uri_language,
+    is_absolute_url,
+    split_uri,
 )
 from conceptnet5.util import get_support_data_filename
 
@@ -90,9 +93,14 @@ def make_assertion(line_group):
         license = Licenses.cc_attribution
 
     return make_edge(
-        rel=rel, start=start, end=end, weight=weight,
-        dataset=dataset, license=license, sources=sources,
-        surfaceText=surface_text
+        rel=rel,
+        start=start,
+        end=end,
+        weight=weight,
+        dataset=dataset,
+        license=license,
+        sources=sources,
+        surfaceText=surface_text,
     )
 
 
@@ -112,6 +120,7 @@ def combine_assertions(input_filename, output_filename):
     This process requires its input to be a sorted CSV so that all edges for
     the same assertion will appear consecutively.
     """
+
     def group_func(line):
         "Group lines by their URI (their first column)."
         return line.split('\t', 1)[0]

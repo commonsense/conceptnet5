@@ -41,7 +41,9 @@ def prepare_db(inputs, dbfile):
                     # use these to disambiguate definitions later.
                     if item['rel'] != 'definition':
                         if 'language' in tfrom and valid_language(tfrom['language']):
-                            add_title(db, file_language, tfrom['language'], tfrom['text'])
+                            add_title(
+                                db, file_language, tfrom['language'], tfrom['text']
+                            )
                         if 'language' in tto and valid_language(tto['language']):
                             add_title(db, file_language, tto['language'], tto['text'])
 
@@ -55,10 +57,18 @@ def prepare_db(inputs, dbfile):
                         # Use only Etymology 1 entries for learning word forms.
                         if (tfrom.get('etym') or '1') == '1':
                             language = tfrom.get('language', tto.get('language'))
-                            if valid_language(language) and tfrom['text'] != tto['text']:
+                            if (
+                                valid_language(language)
+                                and tfrom['text'] != tto['text']
+                            ):
                                 add_form(
-                                    db, file_language, language,
-                                    tfrom['text'], pos, tto['text'], form_name
+                                    db,
+                                    file_language,
+                                    language,
+                                    tfrom['text'],
+                                    pos,
+                                    tto['text'],
+                                    form_name,
                                 )
             db.commit()
     finally:
@@ -66,15 +76,20 @@ def prepare_db(inputs, dbfile):
 
 
 def make_tables(db):
-    db.execute("CREATE TABLE titles "
-               "(id integer primary key, site_language text, language text, "
-               "title text)")
-    db.execute("CREATE UNIQUE INDEX titles_uniq ON titles "
-               "(site_language, language, title)")
+    db.execute(
+        "CREATE TABLE titles "
+        "(id integer primary key, site_language text, language text, "
+        "title text)"
+    )
+    db.execute(
+        "CREATE UNIQUE INDEX titles_uniq ON titles " "(site_language, language, title)"
+    )
     db.execute("CREATE INDEX titles_search ON titles (language, title)")
-    db.execute("CREATE TABLE forms "
-               "(id integer primary key, site_language text, language text, "
-               "word text, pos text, root text, form text)")
+    db.execute(
+        "CREATE TABLE forms "
+        "(id integer primary key, site_language text, language text, "
+        "word text, pos text, root text, form text)"
+    )
     db.execute("CREATE INDEX forms_search ON forms (language, word)")
 
 
@@ -82,7 +97,7 @@ def add_title(db, file_language, language, title):
     db.execute(
         "INSERT OR IGNORE INTO titles (site_language, language, title) "
         "VALUES (?, ?, ?)",
-        (file_language, language, title.lower())
+        (file_language, language, title.lower()),
     )
 
 
@@ -90,7 +105,14 @@ def add_form(db, file_language, language, word, pos, root, form):
     db.execute(
         "INSERT INTO forms (site_language, language, word, pos, root, form) "
         "VALUES (?, ?, ?, ?, ?, ?)",
-        (file_language, language, word.lower(), pos.lower(), root.lower(), form.lower())
+        (
+            file_language,
+            language,
+            word.lower(),
+            pos.lower(),
+            root.lower(),
+            form.lower(),
+        ),
     )
 
 
@@ -114,7 +136,7 @@ WIKT_RELATIONS = {
     "coordinate": ("/r/SimilarTo", False),
     "quasi-synonym": ("/r/SimilarTo", False),
     "translation": ("/r/Synonym", False),
-    "definition": (None, False)
+    "definition": (None, False),
 }
 
 
@@ -187,8 +209,10 @@ def disambiguate_language(text, assumed_languages, db):
     ok_languages = []
     for language in assumed_languages:
         c = db.cursor()
-        c.execute('SELECT * from titles where language=? and title=? limit 1',
-                  (language, text))
+        c.execute(
+            'SELECT * from titles where language=? and title=? limit 1',
+            (language, text),
+        )
         if c.fetchone():
             ok_languages.append(language)
 
@@ -238,10 +262,7 @@ def read_wiktionary(input_file, db_file, output_file):
         web_url = 'http://{}.wiktionary.org/wiki/{}'.format(language, url_title)
         web_source = '/s/resource/wiktionary/{}'.format(language)
 
-        source = {
-            'contributor': web_source,
-            'process': PARSER_RULE
-        }
+        source = {'contributor': web_source, 'process': PARSER_RULE}
 
         # Scan through the 'from' items, such as the start nodes of
         # translations, looking for distinct etymologies. If we get more than
@@ -250,7 +271,8 @@ def read_wiktionary(input_file, db_file, output_file):
         all_etyms = {
             (item['from']['language'], etym_label(language, item['from']))
             for item in items
-            if 'language' in item['from'] and item['from']['text'] == title
+            if 'language' in item['from']
+            and item['from']['text'] == title
             and etym_label(language, item['from']) is not None
         }
         word_languages = {wlang for (wlang, _) in all_etyms}
@@ -258,16 +280,19 @@ def read_wiktionary(input_file, db_file, output_file):
             if valid_language(wlang):
                 cpage = standardized_concept_uri(wlang, title)
                 ld_edge = make_edge(
-                    '/r/ExternalURL', cpage, web_url,
-                    dataset=dataset, weight=0.25, sources=[source],
-                    license=Licenses.cc_sharealike
+                    '/r/ExternalURL',
+                    cpage,
+                    web_url,
+                    dataset=dataset,
+                    weight=0.25,
+                    sources=[source],
+                    license=Licenses.cc_sharealike,
                 )
                 out.write(ld_edge)
         etym_to_translation_sense = {}
         language_etym_counts = Counter(lang for (lang, etym) in all_etyms)
         polysemous_languages = {
-            lang for lang in language_etym_counts
-            if language_etym_counts[lang] > 1
+            lang for lang in language_etym_counts if language_etym_counts[lang] > 1
         }
 
         for item in items:
@@ -282,13 +307,19 @@ def read_wiktionary(input_file, db_file, output_file):
                 assumed_languages.append(lang2)
 
             cfrom = transform_term(
-                language, tfrom, assumed_languages, db,
-                use_etyms=(lang1 in polysemous_languages)
+                language,
+                tfrom,
+                assumed_languages,
+                db,
+                use_etyms=(lang1 in polysemous_languages),
             )
             cpage = cfrom
             cto = transform_term(
-                language, tto, assumed_languages, db,
-                use_etyms=(lang2 in polysemous_languages)
+                language,
+                tto,
+                assumed_languages,
+                db,
+                use_etyms=(lang2 in polysemous_languages),
             )
 
             if cfrom is None or cto is None:
@@ -317,11 +348,17 @@ def read_wiktionary(input_file, db_file, output_file):
             weight = 1.
             if rel == '/r/EtymologicallyRelatedTo':
                 weight = 0.25
-            edge = make_edge(rel, cfrom, cto, dataset=dataset, weight=weight,
-                             sources=[source],
-                             surfaceStart=tfrom['text'],
-                             surfaceEnd=tto['text'],
-                             license=Licenses.cc_sharealike)
+            edge = make_edge(
+                rel,
+                cfrom,
+                cto,
+                dataset=dataset,
+                weight=weight,
+                sources=[source],
+                surfaceStart=tfrom['text'],
+                surfaceEnd=tto['text'],
+                license=Licenses.cc_sharealike,
+            )
             out.write(edge)
 
     out.close()

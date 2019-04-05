@@ -7,13 +7,21 @@ an edge.
 import re
 
 from conceptnet5.nodes import ld_node
-from conceptnet5.uri import (
-    assertion_uri, conjunction_uri, is_concept, uri_prefix
-)
+from conceptnet5.uri import assertion_uri, conjunction_uri, is_concept, uri_prefix
 
 
-def make_edge(rel, start, end, dataset, license, sources,
-              surfaceText=None, surfaceStart=None, surfaceEnd=None, weight=1.0):
+def make_edge(
+    rel,
+    start,
+    end,
+    dataset,
+    license,
+    sources,
+    surfaceText=None,
+    surfaceStart=None,
+    surfaceEnd=None,
+    weight=1.0,
+):
     """
     Take in the information representing an edge (a justified assertion),
     and output that edge in dictionary form.
@@ -50,7 +58,7 @@ def make_edge(rel, start, end, dataset, license, sources,
         features = [
             "%s %s -" % (pstart, rel),
             "%s - %s" % (pstart, pend),
-            "- %s %s" % (rel, pend)
+            "- %s %s" % (rel, pend),
         ]
     else:
         features = []
@@ -73,7 +81,7 @@ def make_edge(rel, start, end, dataset, license, sources,
         'weight': weight,
         'surfaceText': surfaceText,
         'surfaceStart': surfaceStart,
-        'surfaceEnd': surfaceEnd
+        'surfaceEnd': surfaceEnd,
     }
     return obj
 

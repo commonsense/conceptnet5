@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.json_stream import read_json_stream
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
@@ -19,37 +17,152 @@ and builds ConceptNet 5 edges from the data.
 # filter them out without losing his informative statements.
 
 BEDUME_FLAGGED_CONCEPTS = [
-  'cute', 'lost', 'sewing', 'brat', 'working', 'have sex', 'shopping',
-  'driving to work', 'typing', 'in jail', 'jogging in park', 'washing his car',
-  'washing her car', 'poor', 'pulling weeds', 'dancing', 'sleeping', 'pouting',
-  'raking leaves', 'washing her car', 'chopping wood', 'writing book',
-  'shouting', 'taking out garbage', 'crying', 'it', 'running', 'cooking',
-  'late', 'happy', 'eating', 'afraid', 'voting', 'it', 'thief',
-  'shoveling snow', 'drinking', 'drunk', 'watching tv', 'nut', 'early', 'well',
-  'ill', 'jogging', 'dead', 'naked', 'playing cards', 'sick', 'painting',
-  'reading', 'hunter', 'playing monopoly', 'building new house', 'riding horse',
-  'playing in football game', 'making love', 'knitting',
-  'going to take vacation', 'fishing', 'going to dentist', 'going to store',
-  'going to airport', 'going to go to store', 'kid', 'computer', 'stew',
-  'taking walk', 'tired', 'new computer', 'horn', 'serving mealfish',
-  'potatoe shed', 'hunting', 'crazy', 'buying new car', 'laughing',
-  'intoxicated', 'eating hamburger', 'wok'
+    'cute',
+    'lost',
+    'sewing',
+    'brat',
+    'working',
+    'have sex',
+    'shopping',
+    'driving to work',
+    'typing',
+    'in jail',
+    'jogging in park',
+    'washing his car',
+    'washing her car',
+    'poor',
+    'pulling weeds',
+    'dancing',
+    'sleeping',
+    'pouting',
+    'raking leaves',
+    'washing her car',
+    'chopping wood',
+    'writing book',
+    'shouting',
+    'taking out garbage',
+    'crying',
+    'it',
+    'running',
+    'cooking',
+    'late',
+    'happy',
+    'eating',
+    'afraid',
+    'voting',
+    'it',
+    'thief',
+    'shoveling snow',
+    'drinking',
+    'drunk',
+    'watching tv',
+    'nut',
+    'early',
+    'well',
+    'ill',
+    'jogging',
+    'dead',
+    'naked',
+    'playing cards',
+    'sick',
+    'painting',
+    'reading',
+    'hunter',
+    'playing monopoly',
+    'building new house',
+    'riding horse',
+    'playing in football game',
+    'making love',
+    'knitting',
+    'going to take vacation',
+    'fishing',
+    'going to dentist',
+    'going to store',
+    'going to airport',
+    'going to go to store',
+    'kid',
+    'computer',
+    'stew',
+    'taking walk',
+    'tired',
+    'new computer',
+    'horn',
+    'serving mealfish',
+    'potatoe shed',
+    'hunting',
+    'crazy',
+    'buying new car',
+    'laughing',
+    'intoxicated',
+    'eating hamburger',
+    'wok',
 ]
 BEDUME_FLAGGED_PLACES = [
-  'alaska', 'kansa', 'kansas', 'utah', 'austria', 'delaware', 'pennsylvania', 'italy',
-  'cuba', 'norway', 'idaho', 'france', 'utha', 'mexico', 'connecticut',
-  'massachusetts', 'montana', 'wyoming', 'every state', 'new york', 'maine',
-  'suface of moon', 'germany', 'nebraska', 'finland', 'louisiana', 'belgium',
-  'morrocco', 'ireland', 'ceylon', 'california', 'oregon', 'florida',
-  'uraguay', 'egypt', 'maryland', 'washington', 'morocco', 'south dakota',
-  'tuscon', 'panama', 'alberta', 'arizona', 'texas', 'new jersey', 'colorado',
-  'jamaica', 'vermont', 'nevada', 'delawere', 'hawaii', 'minnesota', 'tuscony',
-  'costa rica', 'south dakato', 'south dakota', 'china', 'argentina',
-  'venazuela', 'honduras', 'opera', 'wisconsin', 'great britain',
+    'alaska',
+    'kansa',
+    'kansas',
+    'utah',
+    'austria',
+    'delaware',
+    'pennsylvania',
+    'italy',
+    'cuba',
+    'norway',
+    'idaho',
+    'france',
+    'utha',
+    'mexico',
+    'connecticut',
+    'massachusetts',
+    'montana',
+    'wyoming',
+    'every state',
+    'new york',
+    'maine',
+    'suface of moon',
+    'germany',
+    'nebraska',
+    'finland',
+    'louisiana',
+    'belgium',
+    'morrocco',
+    'ireland',
+    'ceylon',
+    'california',
+    'oregon',
+    'florida',
+    'uraguay',
+    'egypt',
+    'maryland',
+    'washington',
+    'morocco',
+    'south dakota',
+    'tuscon',
+    'panama',
+    'alberta',
+    'arizona',
+    'texas',
+    'new jersey',
+    'colorado',
+    'jamaica',
+    'vermont',
+    'nevada',
+    'delawere',
+    'hawaii',
+    'minnesota',
+    'tuscony',
+    'costa rica',
+    'south dakato',
+    'south dakota',
+    'china',
+    'argentina',
+    'venazuela',
+    'honduras',
+    'opera',
+    'wisconsin',
+    'great britain',
 ]
-AROUND_PREPOSITIONS = [
-  'in', 'on', 'at', 'under', 'near'
-]
+AROUND_PREPOSITIONS = ['in', 'on', 'at', 'under', 'near']
 
 # Some specific relations were once added to ConceptNet that have no purpose
 # for us anymore, especially ones connected with a project that was trying to
@@ -59,7 +172,10 @@ AROUND_PREPOSITIONS = [
 # supposed to make it into the actual database.
 
 RELATIONS_TO_DROP = {
-    '/r/HasPainIntensity', '/r/HasPainCharacter', '/r/InheritsFrom', '/r/SimilarSize'
+    '/r/HasPainIntensity',
+    '/r/HasPainCharacter',
+    '/r/InheritsFrom',
+    '/r/SimilarSize',
 }
 CONTRIBUTOR_BLACKLIST = {
     '/s/contributor/omcs/brunogodoifred',
@@ -91,20 +207,45 @@ CONTRIBUTOR_BLACKLIST = {
 }
 CONCEPT_BLACKLIST = {
     # Too vague
-    '/c/en/', '/c/en/he', '/c/en/i', '/c/en/it', '/c/en/she',
-    '/c/en/something', '/c/en/someone', '/c/en/that', '/c/en/there',
-    '/c/en/they', '/c/en/this', '/c/en/you',
-    '/c/en/often', '/c/en/sometimes', '/c/en/usually', '/c/en/if',
-    '/c/en/when', '/c/en/whether', '/c/en/nothing', '/c/en/nobody',
+    '/c/en/',
+    '/c/en/he',
+    '/c/en/i',
+    '/c/en/it',
+    '/c/en/she',
+    '/c/en/something',
+    '/c/en/someone',
+    '/c/en/that',
+    '/c/en/there',
+    '/c/en/they',
+    '/c/en/this',
+    '/c/en/you',
+    '/c/en/often',
+    '/c/en/sometimes',
+    '/c/en/usually',
+    '/c/en/if',
+    '/c/en/when',
+    '/c/en/whether',
+    '/c/en/nothing',
+    '/c/en/nobody',
     '/c/en/no_one',
-
     # OMCS users tended to give unfortunate, stereotyped answers when asked
     # about terms distinguished by their gender. As part of the de-biasing
     # effort, we should skip these. We can learn enough about 'man' and 'woman'
     # from dictionary definitions and from statements about 'person'.
-    '/c/en/man', '/c/en/woman', '/c/en/boy', '/c/en/girl', '/c/en/boyfriend',
-    '/c/en/girlfriend', '/c/en/brother', '/c/en/sister', '/c/en/mother',
-    '/c/en/father', '/c/en/daughter', '/c/en/son', '/c/en/wife', '/c/en/husband'
+    '/c/en/man',
+    '/c/en/woman',
+    '/c/en/boy',
+    '/c/en/girl',
+    '/c/en/boyfriend',
+    '/c/en/girlfriend',
+    '/c/en/brother',
+    '/c/en/sister',
+    '/c/en/mother',
+    '/c/en/father',
+    '/c/en/daughter',
+    '/c/en/son',
+    '/c/en/wife',
+    '/c/en/husband',
 }
 ACTIVITY_BLACKLIST = {
     "20 Questions",
@@ -113,15 +254,49 @@ ACTIVITY_BLACKLIST = {
     "response to diagram",
     "commons2_reject",
     "globalmind",
-    "pycommons/question"
+    "pycommons/question",
 }
 
 MORE_STOPWORDS = [
-    'a', 'an', 'the', 'be', 'is', 'are',
-    'some', 'any', 'you', 'me', 'him', 'it', 'them', 'i', 'we', 'she', 'he', 'they',
-    'your', 'my', 'our', 'his', 'her', 'its', 'their', 'this', 'that',
-    'these', 'those', 'something', 'someone', 'somebody', 'anything', 'anyone',
-    "someone's", "something's", "anything's", "somebody's", "anyone's",
+    'a',
+    'an',
+    'the',
+    'be',
+    'is',
+    'are',
+    'some',
+    'any',
+    'you',
+    'me',
+    'him',
+    'it',
+    'them',
+    'i',
+    'we',
+    'she',
+    'he',
+    'they',
+    'your',
+    'my',
+    'our',
+    'his',
+    'her',
+    'its',
+    'their',
+    'this',
+    'that',
+    'these',
+    'those',
+    'something',
+    'someone',
+    'somebody',
+    'anything',
+    'anyone',
+    "someone's",
+    "something's",
+    "anything's",
+    "somebody's",
+    "anyone's",
 ]
 
 
@@ -150,7 +325,9 @@ def can_skip(parts_dict):
         return True
     if len(parts_dict["startText"]) == 0 or len(parts_dict["endText"]) == 0:
         return True
-    if lang == 'pt' and (len(parts_dict["startText"]) <= 2 or len(parts_dict["endText"]) <= 2):
+    if lang == 'pt' and (
+        len(parts_dict["startText"]) <= 2 or len(parts_dict["endText"]) <= 2
+    ):
         return True
     if 'rubycommons' in parts_dict["activity"]:
         return True
@@ -161,8 +338,8 @@ def can_skip(parts_dict):
     if parts_dict["activity"] in ACTIVITY_BLACKLIST:
         return True
     if not (
-        valid_concept_name(parts_dict["startText"]) and
-        valid_concept_name(parts_dict["endText"])
+        valid_concept_name(parts_dict["startText"])
+        and valid_concept_name(parts_dict["endText"])
     ):
         return True
     return False
@@ -174,7 +351,10 @@ def skip_assertion(source_dict, start, end):
     Filter out assertions that we can tell will be unhelpful after we've
     extracted them.
     """
-    if lemmatize_uri(start) in CONCEPT_BLACKLIST or lemmatize_uri(end) in CONCEPT_BLACKLIST:
+    if (
+        lemmatize_uri(start) in CONCEPT_BLACKLIST
+        or lemmatize_uri(end) in CONCEPT_BLACKLIST
+    ):
         return True
     if source_dict['contributor'] in CONTRIBUTOR_BLACKLIST:
         return True
@@ -204,7 +384,9 @@ def build_frame_text(parts_dict):
         frame_text = frame_text.replace('{%}', '')
     else:
         frame_text = frame_text.replace('{%}', 'not ')
-    frame_text = frame_text.replace('{1}', '[[%s]]' % parts_dict["startText"]).replace('{2}', '[[%s]]' % parts_dict["endText"])
+    frame_text = frame_text.replace('{1}', '[[%s]]' % parts_dict["startText"]).replace(
+        '{2}', '[[%s]]' % parts_dict["endText"]
+    )
     return frame_text
 
 
@@ -234,10 +416,7 @@ def filtered_uri(lang, text):
 
 
 def filter_stopwords(text):
-    words = [
-        word for word in simple_tokenize(text)
-        if word not in MORE_STOPWORDS
-    ]
+    words = [word for word in simple_tokenize(text) if word not in MORE_STOPWORDS]
     text2 = ' '.join(words)
     if not text2:
         text2 = text
@@ -286,8 +465,7 @@ def build_sources(parts_dict, preposition_fix=False):
     """
     creator_source = {}
     creator_node = join_uri(
-        '/s/contributor/omcs',
-        standardize_username(parts_dict["creator"])
+        '/s/contributor/omcs', standardize_username(parts_dict["creator"])
     )
     creator_source['contributor'] = creator_node
 
@@ -308,9 +486,11 @@ def build_sources(parts_dict, preposition_fix=False):
 
         vote_int = vote[1]
         vote_source = {
-            'contributor': join_uri('/s/contributor/omcs', standardize_username(username)),
+            'contributor': join_uri(
+                '/s/contributor/omcs', standardize_username(username)
+            ),
             'activity': '/s/activity/omcs/vote',
-            'weight': float(vote_int)
+            'weight': float(vote_int),
         }
         sources.append(vote_source)
     return sources
@@ -348,14 +528,11 @@ class CN4Builder(object):
         if '} around {' in parts_dict['frame_text']:
             for prep in AROUND_PREPOSITIONS:
                 if parts_dict['endText'].startswith(prep + ' '):
-                    parts_dict['endText'] = \
-                        parts_dict['endText'][len(prep) + 1:]
+                    parts_dict['endText'] = parts_dict['endText'][len(prep) + 1 :]
                     replacement = '} %s {' % prep
-                    parts_dict['frame_text'] = \
-                        parts_dict['frame_text'].replace(
-                            '} around {',
-                            replacement
-                        )
+                    parts_dict['frame_text'] = parts_dict['frame_text'].replace(
+                        '} around {', replacement
+                    )
                     preposition_fix = True
                     break
 
@@ -381,13 +558,16 @@ class CN4Builder(object):
             if not skip_assertion(source_dict, start, end):
                 weight = source_dict.pop('weight')
                 yield make_edge(
-                    rel=relation, start=start, end=end,
-                    dataset=dataset, license=Licenses.cc_attribution,
-                    sources=[source_dict], surfaceText=frame_text,
-
+                    rel=relation,
+                    start=start,
+                    end=end,
+                    dataset=dataset,
+                    license=Licenses.cc_attribution,
+                    sources=[source_dict],
+                    surfaceText=frame_text,
                     # The edge weight is the weight computed by build_sources,
                     # times the multiplier set on this instance
-                    weight=weight * self.weight
+                    weight=weight * self.weight,
                 )
 
     def transform_file(self, input_filename, output_file):

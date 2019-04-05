@@ -7,9 +7,7 @@ import pandas as pd
 
 from ordered_set import OrderedSet
 
-from .transforms import (
-    l1_normalize_columns, l2_normalize_rows, standardize_row_labels
-)
+from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
 
 
 def load_hdf(filename):
@@ -149,7 +147,7 @@ def load_glove(filename, max_rows=1000000):
             arr[i] = values
 
     if len(label_list) < max_rows:
-        arr = arr[:len(label_list)]
+        arr = arr[: len(label_list)]
     return pd.DataFrame(arr, index=label_list, dtype='f')
 
 
@@ -176,7 +174,7 @@ def load_fasttext(filename, max_rows=1000000):
                 label_list.append(label)
 
     if len(label_list) < max_rows:
-        arr = arr[:len(label_list)]
+        arr = arr[: len(label_list)]
     return pd.DataFrame(arr, index=label_list, dtype='f')
 
 

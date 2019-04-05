@@ -1,14 +1,10 @@
-from __future__ import print_function, unicode_literals
-
 import json
 from collections import defaultdict
 
 import click
 
 from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
-from conceptnet5.formats.msgpack_stream import (
-    MsgpackStreamWriter, read_msgpack_stream
-)
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter, read_msgpack_stream
 from conceptnet5.languages import COMMON_LANGUAGES
 from conceptnet5.uri import get_uri_language, join_uri, split_uri
 
@@ -44,7 +40,7 @@ def msgpack_to_tab_separated(input_filename, output_filename):
                 'weight': round(info['weight'], 3),
                 'sources': info['sources'],
                 'dataset': info['dataset'],
-                'license': info['license']
+                'license': info['license'],
             }
             for extra_key in 'surfaceText', 'surfaceStart', 'surfaceEnd':
                 if info.get(extra_key):
@@ -82,8 +78,8 @@ def msgpack_to_assoc(input_filename, output_filename):
             start_uri = info['start']
             end_uri = info['end']
             if not (
-                get_uri_language(start_uri) in COMMON_LANGUAGES and
-                get_uri_language(end_uri) in COMMON_LANGUAGES
+                get_uri_language(start_uri) in COMMON_LANGUAGES
+                and get_uri_language(end_uri) in COMMON_LANGUAGES
             ):
                 continue
             rel = info['rel']
@@ -100,7 +96,7 @@ def msgpack_to_assoc(input_filename, output_filename):
                         end=prefix,
                         weight=1.,
                         dataset=dataset,
-                        rel='/r/SenseOf'
+                        rel='/r/SenseOf',
                     )
                     weight_by_dataset[dataset] += 1.
                     count_by_dataset[dataset] += 1
@@ -125,8 +121,7 @@ def msgpack_to_assoc(input_filename, output_filename):
 
             for (start, end) in pairs:
                 line = "{start}\t{end}\t{weight}\t{dataset}\t{rel}".format(
-                    start=start, end=end, weight=weight, dataset=dataset,
-                    rel=rel
+                    start=start, end=end, weight=weight, dataset=dataset, rel=rel
                 )
                 weight_by_dataset[dataset] += weight
                 count_by_dataset[dataset] += 1

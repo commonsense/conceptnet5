@@ -1,5 +1,3 @@
-from __future__ import division, print_function, unicode_literals
-
 import re
 from collections import defaultdict
 
@@ -32,11 +30,54 @@ BAD_CLUE_REGEX = re.compile(
 # assertions. The list is much more extensive than the three and a half
 # stopwords that ConceptNet uses for English in general.
 STOPWORDS = {
-    'a', 'an', 'the', 'to', 'of', 'for', 'in', 'on', 'at', 'by', 'with', 'and',
-    'or', 'far', 'near', 'away', 'from', 'thing', 'something', 'things', 'be',
-    'is', 'are', 'was', 'were', 'as', 'so', 'get', 'i', 'me', 'you', 'it', 'he',
-    'she', 'him', 'her', 'this', 'that', 'they', 'them', 'some', 'many', 'no',
-    'one', 'all', 'either', 'both', 'er'
+    'a',
+    'an',
+    'the',
+    'to',
+    'of',
+    'for',
+    'in',
+    'on',
+    'at',
+    'by',
+    'with',
+    'and',
+    'or',
+    'far',
+    'near',
+    'away',
+    'from',
+    'thing',
+    'something',
+    'things',
+    'be',
+    'is',
+    'are',
+    'was',
+    'were',
+    'as',
+    'so',
+    'get',
+    'i',
+    'me',
+    'you',
+    'it',
+    'he',
+    'she',
+    'him',
+    'her',
+    'this',
+    'that',
+    'they',
+    'them',
+    'some',
+    'many',
+    'no',
+    'one',
+    'all',
+    'either',
+    'both',
+    'er',
 }
 
 
@@ -140,7 +181,7 @@ def handle_file(infile, outfile):
         # revisit.
         #
         # The weight is the score divided by 100. All divisions are floating
-        # point, as defined by the __future__ import at the top of this module.
+        # point.
         score = (freq * 2 - 1) * (1 - sls) * (1 - orderscore / 1000)
         if score <= 1.:
             outcomes['low score'] += 1
@@ -158,9 +199,7 @@ def handle_file(infile, outfile):
             rightwords.extend(morewords)
 
         for i, rightword in enumerate(rightwords):
-            source = {
-                'contributor': '/s/resource/verbosity'
-            }
+            source = {'contributor': '/s/resource/verbosity'}
             if i > 0:
                 source['process'] = '/s/process/split_words'
 
@@ -171,8 +210,14 @@ def handle_file(infile, outfile):
             outcomes['success'] += 1
             leftc = standardized_concept_uri('en', left)
             rightc = standardized_concept_uri('en', rightword)
-            edge = make_edge(rel, leftc, rightc, dataset='/d/verbosity',
-                             license=Licenses.cc_attribution,
-                             sources=[source], surfaceText=text,
-                             weight=weight)
+            edge = make_edge(
+                rel,
+                leftc,
+                rightc,
+                dataset='/d/verbosity',
+                license=Licenses.cc_attribution,
+                sources=[source],
+                surfaceText=text,
+                weight=weight,
+            )
             writer.write(edge)

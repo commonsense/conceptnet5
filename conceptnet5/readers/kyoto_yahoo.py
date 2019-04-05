@@ -14,11 +14,7 @@ DATASET = '/d/kyoto_yahoo'
 SOURCE = '/s/activity/kyoto_yahoo'
 
 
-WEIGHT_TABLE = {
-    '3': 0.5,
-    '4': 1.0,
-    '5': 2.0
-}
+WEIGHT_TABLE = {'3': 0.5, '4': 1.0, '5': 2.0}
 
 
 def handle_file(input_filename, output_file):
@@ -36,6 +32,6 @@ def handle_file(input_filename, output_file):
             dataset=DATASET,
             sources=[{'activity': SOURCE}],
             license=Licenses.cc_attribution,
-            weight=WEIGHT_TABLE[weight]
+            weight=WEIGHT_TABLE[weight],
         )
         out.write(edge)

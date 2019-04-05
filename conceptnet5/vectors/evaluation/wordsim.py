@@ -21,14 +21,12 @@ SAMPLE_SIZES = {
     'scws': 2003,
     'pku500-zh': 500,
     'jsim-ja': 4429,
-
     'semeval-2a-en': 500,
     'semeval-2a-de': 500,
     'semeval-2a-es': 500,
     'semeval-2a-it': 500,
     'semeval-2a-fa': 500,
     'semeval17-2a': 2000,
-
     'semeval-2b-de-es': 956,
     'semeval-2b-de-fa': 888,
     'semeval-2b-de-it': 912,
@@ -51,7 +49,7 @@ GROUPS = {
     'Stanford': 'Pennington et al. (2014)',
     'UFRGS': 'Salle et al. (2016)',
     'Google+HL': 'Soricut and Och (2015)',
-    'Oxford': 'Botha and Blunsom (2014)'
+    'Oxford': 'Botha and Blunsom (2014)',
 }
 
 
@@ -64,16 +62,11 @@ def confidence_interval(rho, N):
     interval = 1.96 / np.sqrt(N - 3)
     low = z - interval
     high = z + interval
-    return pd.Series(
-        [rho, np.tanh(low), np.tanh(high)],
-        index=['acc', 'low', 'high']
-    )
+    return pd.Series([rho, np.tanh(low), np.tanh(high)], index=['acc', 'low', 'high'])
 
 
 def empty_comparison_table():
-    return pd.DataFrame(
-        columns=['acc', 'low', 'high']
-    )
+    return pd.DataFrame(columns=['acc', 'low', 'high'])
 
 
 def make_comparison_table(scores):
@@ -93,293 +86,269 @@ COMPARISONS = {}
 # available
 
 # Levy et al., 2015
-COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table({
-    'men3000': .745,
-    'mturk': .686,
-    'rw': .462,
-    'simlex': .393,
-    'ws353': .721  # estimate
-})
+COMPARISONS['Bar-Ilan', 'PPMI'] = make_comparison_table(
+    {
+        'men3000': .745,
+        'mturk': .686,
+        'rw': .462,
+        'simlex': .393,
+        'ws353': .721,  # estimate
+    }
+)
 
-COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table({
-    'men3000': .778,
-    'mturk': .666,
-    'rw': .514,
-    'simlex': .432,
-    'ws353': .733  # estimate
-})
+COMPARISONS['Bar-Ilan', 'SVD'] = make_comparison_table(
+    {
+        'men3000': .778,
+        'mturk': .666,
+        'rw': .514,
+        'simlex': .432,
+        'ws353': .733,  # estimate
+    }
+)
 
-COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table({
-    'men3000': .774,
-    'mturk': .693,
-    'rw': .470,
-    'simlex': .438,
-    'ws353': .729  # estimate
-})
+COMPARISONS['Bar-Ilan', 'SGNS'] = make_comparison_table(
+    {
+        'men3000': .774,
+        'mturk': .693,
+        'rw': .470,
+        'simlex': .438,
+        'ws353': .729,  # estimate
+    }
+)
 
-COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table({
-    'men3000': .729,
-    'mturk': .632,
-    'rw': .403,
-    'simlex': .398,
-    'ws353': .654  # estimate
-})
+COMPARISONS['Bar-Ilan', 'GloVe'] = make_comparison_table(
+    {
+        'men3000': .729,
+        'mturk': .632,
+        'rw': .403,
+        'simlex': .398,
+        'ws353': .654,  # estimate
+    }
+)
 
-COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table({
-    'men3000': .732,
-    'rw': .385,
-    'ws353': .624,
-    'scws': .574
-})
+COMPARISONS['Google', 'word2vec SGNS'] = make_comparison_table(
+    {'men3000': .732, 'rw': .385, 'ws353': .624, 'scws': .574}
+)
 
 # Speer and Chin, 2016 - arXiv:1604.01692v1
-COMPARISONS['Luminoso', 'GloVe'] = make_comparison_table({
-    'rw': .528,
-    'men3000': .840,
-    'ws353': .798
-})
+COMPARISONS['Luminoso', 'GloVe'] = make_comparison_table(
+    {'rw': .528, 'men3000': .840, 'ws353': .798}
+)
 
-COMPARISONS['Luminoso', 'word2vec SGNS'] = make_comparison_table({
-    'rw': .476,
-    'men3000': .778,
-    'ws353': .731
-})
+COMPARISONS['Luminoso', 'word2vec SGNS'] = make_comparison_table(
+    {'rw': .476, 'men3000': .778, 'ws353': .731}
+)
 
-COMPARISONS['Luminoso', 'Numberbatch 2016.04'] = make_comparison_table({
-    'rw': .596,
-    'men3000': .859,
-    'ws353': .821
-})
+COMPARISONS['Luminoso', 'Numberbatch 2016.04'] = make_comparison_table(
+    {'rw': .596, 'men3000': .859, 'ws353': .821}
+)
 
-COMPARISONS['Luminoso', 'PPMI'] = make_comparison_table({
-    'rw': .420,
-    'men3000': .764,
-    'ws353': .651,
-    'scws': .608
-})
+COMPARISONS['Luminoso', 'PPMI'] = make_comparison_table(
+    {'rw': .420, 'men3000': .764, 'ws353': .651, 'scws': .608}
+)
 
 # Pennington et al., 2014
-COMPARISONS['Stanford', 'GloVe'] = make_comparison_table({
-    'rw': .477,
-    'men3000': .816,
-    'ws353': .759
-})
+COMPARISONS['Stanford', 'GloVe'] = make_comparison_table(
+    {'rw': .477, 'men3000': .816, 'ws353': .759}
+)
 
 # Joulin et al., 2016 - "Bag of Tricks"
 # Rounded-off numbers from the blog post at https://research.facebook.com/blog/fasttext/
-COMPARISONS['Facebook', 'fastText'] = make_comparison_table({
-    'rw': .46,
-    'ws353': .73,
-    'gur350-de': .69,
-    'zg222-de': .37,
-})
+COMPARISONS['Facebook', 'fastText'] = make_comparison_table(
+    {'rw': .46, 'ws353': .73, 'gur350-de': .69, 'zg222-de': .37}
+)
 
 # Salle et al., 2016 - LexVec
 # https://github.com/alexandres/lexvec
-COMPARISONS['UFRGS', 'LexVec'] = make_comparison_table({
-    'rw': .489,
-    'simlex': .384,
-    'scws': .652,
-    'ws353': .661,
-    'men3000': .759,
-    'mturk': .655
-})
+COMPARISONS['UFRGS', 'LexVec'] = make_comparison_table(
+    {
+        'rw': .489,
+        'simlex': .384,
+        'scws': .652,
+        'ws353': .661,
+        'men3000': .759,
+        'mturk': .655,
+    }
+)
 
-COMPARISONS['Google+HL', 'SG+Morph'] = make_comparison_table({
-    'rw': .418,
-    'ws353': .712,
-    'gur350-de': .641,
-    'zg222-de': .215,
-    'ws353-es': .473,
-})
+COMPARISONS['Google+HL', 'SG+Morph'] = make_comparison_table(
+    {'rw': .418, 'ws353': .712, 'gur350-de': .641, 'zg222-de': .215, 'ws353-es': .473}
+)
 
-COMPARISONS['Oxford', 'BB2014'] = make_comparison_table({
-    'rw': .300,
-    'ws353': .400,
-    'gur350-de': .560,
-    'zg222-de': .250
-})
+COMPARISONS['Oxford', 'BB2014'] = make_comparison_table(
+    {'rw': .300, 'ws353': .400, 'gur350-de': .560, 'zg222-de': .250}
+)
 
 # Comparisons from SemEval results
-COMPARISONS['SemEval2017', 'Luminoso'] = make_comparison_table({
-    'semeval-2a-en': .789,
-    'semeval-2a-de': .700,
-    'semeval-2a-es': .743,
-    'semeval-2a-it': .741,
-    'semeval-2a-fa': .503,
+COMPARISONS['SemEval2017', 'Luminoso'] = make_comparison_table(
+    {
+        'semeval-2a-en': .789,
+        'semeval-2a-de': .700,
+        'semeval-2a-es': .743,
+        'semeval-2a-it': .741,
+        'semeval-2a-fa': .503,
+        'semeval-2b-en-de': .763,
+        'semeval-2b-en-es': .761,
+        'semeval-2b-en-it': .776,
+        'semeval-2b-en-fa': .598,
+        'semeval-2b-de-es': .728,
+        'semeval-2b-de-it': .741,
+        'semeval-2b-de-fa': .598,
+        'semeval-2b-es-it': .753,
+        'semeval-2b-es-fa': .627,
+        'semeval-2b-it-fa': .604,
+    }
+)
 
-    'semeval-2b-en-de': .763,
-    'semeval-2b-en-es': .761,
-    'semeval-2b-en-it': .776,
-    'semeval-2b-en-fa': .598,
-    'semeval-2b-de-es': .728,
-    'semeval-2b-de-it': .741,
-    'semeval-2b-de-fa': .598,
-    'semeval-2b-es-it': .753,
-    'semeval-2b-es-fa': .627,
-    'semeval-2b-it-fa': .604,
-})
+COMPARISONS['SemEval2017', 'Nasari'] = make_comparison_table(
+    {
+        # This is the baseline system, by Uniroma
+        'semeval-2a-en': .682,
+        'semeval-2a-de': .514,
+        'semeval-2a-es': .600,
+        'semeval-2a-it': .596,
+        'semeval-2a-fa': .405,
+        'semeval-2b-en-de': .598,
+        'semeval-2b-en-es': .633,
+        'semeval-2b-en-it': .648,
+        'semeval-2b-en-fa': .505,
+        'semeval-2b-de-es': .549,
+        'semeval-2b-de-it': .561,
+        'semeval-2b-de-fa': .458,
+        'semeval-2b-es-it': .595,
+        'semeval-2b-es-fa': .479,
+        'semeval-2b-it-fa': .486,
+    }
+)
 
-COMPARISONS['SemEval2017', 'Nasari'] = make_comparison_table({
-    # This is the baseline system, by Uniroma
-    'semeval-2a-en': .682,
-    'semeval-2a-de': .514,
-    'semeval-2a-es': .600,
-    'semeval-2a-it': .596,
-    'semeval-2a-fa': .405,
+COMPARISONS['SemEval2017', 'QLUT'] = make_comparison_table({'semeval-2a-en': .778})
 
-    'semeval-2b-en-de': .598,
-    'semeval-2b-en-es': .633,
-    'semeval-2b-en-it': .648,
-    'semeval-2b-en-fa': .505,
-    'semeval-2b-de-es': .549,
-    'semeval-2b-de-it': .561,
-    'semeval-2b-de-fa': .458,
-    'semeval-2b-es-it': .595,
-    'semeval-2b-es-fa': .479,
-    'semeval-2b-it-fa': .486,
-})
+COMPARISONS['SemEval2017', 'HCCL'] = make_comparison_table(
+    {
+        'semeval-2a-en': .687,
+        'semeval-2a-de': .594,
+        'semeval-2a-es': .701,
+        'semeval-2a-it': .651,
+        'semeval-2a-fa': .436,
+        'semeval-2b-en-de': .307,
+        'semeval-2b-en-es': .087,
+        'semeval-2b-en-it': .055,
+        'semeval-2b-en-fa': .012,
+        'semeval-2b-de-es': .045,
+        'semeval-2b-de-it': .037,
+        'semeval-2b-de-fa': .023,
+        'semeval-2b-es-it': .064,
+        'semeval-2b-es-fa': .048,
+        'semeval-2b-it-fa': .000,
+    }
+)
 
-COMPARISONS['SemEval2017', 'QLUT'] = make_comparison_table({
-    'semeval-2a-en': .778,
-})
+COMPARISONS['SemEval2017', 'Mahtab'] = make_comparison_table({'semeval-2a-fa': .715})
 
-COMPARISONS['SemEval2017', 'HCCL'] = make_comparison_table({
-    'semeval-2a-en': .687,
-    'semeval-2a-de': .594,
-    'semeval-2a-es': .701,
-    'semeval-2a-it': .651,
-    'semeval-2a-fa': .436,
+COMPARISONS['SemEval2017', 'hhu'] = make_comparison_table(
+    {'semeval-2a-en': .704, 'semeval-2a-fa': .604, 'semeval-2b-en-fa': .513}
+)
 
-    'semeval-2b-en-de': .307,
-    'semeval-2b-en-es': .087,
-    'semeval-2b-en-it': .055,
-    'semeval-2b-en-fa': .012,
-    'semeval-2b-de-es': .045,
-    'semeval-2b-de-it': .037,
-    'semeval-2b-de-fa': .023,
-    'semeval-2b-es-it': .064,
-    'semeval-2b-es-fa': .048,
-    'semeval-2b-it-fa': .000,
-})
+COMPARISONS['SemEval2017', 'OoO'] = make_comparison_table(
+    {
+        'semeval-2b-en-de': .570,
+        'semeval-2b-en-es': .584,
+        'semeval-2b-en-it': .584,
+        'semeval-2b-de-es': .549,
+        'semeval-2b-de-it': .548,
+        'semeval-2b-es-it': .570,
+    }
+)
 
-COMPARISONS['SemEval2017', 'Mahtab'] = make_comparison_table({
-    'semeval-2a-fa': .715,
-})
+COMPARISONS['SemEval2017', 'SEW'] = make_comparison_table(
+    {
+        'semeval-2a-en': .464,
+        'semeval-2a-de': .449,
+        'semeval-2a-es': .616,
+        'semeval-2a-it': .569,
+        'semeval-2a-fa': .393,
+        'semeval-2b-en-de': .464,
+        'semeval-2b-en-es': .505,
+        'semeval-2b-en-it': .526,
+        'semeval-2b-en-fa': .420,
+        'semeval-2b-de-es': .530,
+        'semeval-2b-de-it': .520,
+        'semeval-2b-de-fa': .428,
+        'semeval-2b-es-it': .595,
+        'semeval-2b-es-fa': .515,
+        'semeval-2b-it-fa': .489,
+    }
+)
 
-COMPARISONS['SemEval2017', 'hhu'] = make_comparison_table({
-    'semeval-2a-en': .704,
-    'semeval-2a-fa': .604,
-    'semeval-2b-en-fa': .513,
-})
+COMPARISONS['SemEval2017', 'RUFINO'] = make_comparison_table(
+    {
+        'semeval-2a-en': .656,
+        'semeval-2a-de': .539,
+        'semeval-2a-es': .549,
+        'semeval-2a-it': .476,
+        'semeval-2a-fa': .360,
+        'semeval-2b-en-de': .330,
+        'semeval-2b-en-es': .340,
+        'semeval-2b-en-it': .342,
+        'semeval-2b-en-fa': .373,
+        'semeval-2b-de-es': .318,
+        'semeval-2b-de-it': .327,
+        'semeval-2b-de-fa': .267,
+        'semeval-2b-es-it': .356,
+        'semeval-2b-es-fa': .300,
+        'semeval-2b-it-fa': .249,
+    }
+)
 
-COMPARISONS['SemEval2017', 'OoO'] = make_comparison_table({
-    'semeval-2b-en-de': .570,
-    'semeval-2b-en-es': .584,
-    'semeval-2b-en-it': .584,
-    'semeval-2b-de-es': .549,
-    'semeval-2b-de-it': .548,
-    'semeval-2b-es-it': .570,
-})
+COMPARISONS['SemEval2017', 'Citius'] = make_comparison_table(
+    {'semeval-2a-en': .651, 'semeval-2a-es': .523, 'semeval-2b-en-es': .577}
+)
 
-COMPARISONS['SemEval2017', 'SEW'] = make_comparison_table({
-    'semeval-2a-en': .464,
-    'semeval-2a-de': .449,
-    'semeval-2a-es': .616,
-    'semeval-2a-it': .569,
-    'semeval-2a-fa': .393,
+COMPARISONS['SemEval2017', 'l2f'] = make_comparison_table({'semeval-2a-en': .649})
 
-    'semeval-2b-en-de': .464,
-    'semeval-2b-en-es': .505,
-    'semeval-2b-en-it': .526,
-    'semeval-2b-en-fa': .420,
-    'semeval-2b-de-es': .530,
-    'semeval-2b-de-it': .520,
-    'semeval-2b-de-fa': .428,
-    'semeval-2b-es-it': .595,
-    'semeval-2b-es-fa': .515,
-    'semeval-2b-it-fa': .489,
-})
+COMPARISONS['SemEval2017', 'gpv8'] = make_comparison_table(
+    {'semeval-2a-en': .555, 'semeval-2a-de': .347, 'semeval-2a-it': .499}
+)
 
-COMPARISONS['SemEval2017', 'RUFINO'] = make_comparison_table({
-    'semeval-2a-en': .656,
-    'semeval-2a-de': .539,
-    'semeval-2a-es': .549,
-    'semeval-2a-it': .476,
-    'semeval-2a-fa': .360,
+COMPARISONS['SemEval2017', 'MERALI'] = make_comparison_table({'semeval-2a-en': .594})
 
-    'semeval-2b-en-de': .330,
-    'semeval-2b-en-es': .340,
-    'semeval-2b-en-it': .342,
-    'semeval-2b-en-fa': .373,
-    'semeval-2b-de-es': .318,
-    'semeval-2b-de-it': .327,
-    'semeval-2b-de-fa': .267,
-    'semeval-2b-es-it': .356,
-    'semeval-2b-es-fa': .300,
-    'semeval-2b-it-fa': .249,
-})
+COMPARISONS['SemEval2017', 'Amateur'] = make_comparison_table({'semeval-2a-en': .589})
 
-COMPARISONS['SemEval2017', 'Citius'] = make_comparison_table({
-    'semeval-2a-en': .651,
-    'semeval-2a-es': .523,
-    'semeval-2b-en-es': .577,
-})
-
-COMPARISONS['SemEval2017', 'l2f'] = make_comparison_table({
-    'semeval-2a-en': .649,
-})
-
-COMPARISONS['SemEval2017', 'gpv8'] = make_comparison_table({
-    'semeval-2a-en': .555,
-    'semeval-2a-de': .347,
-    'semeval-2a-it': .499,
-})
-
-COMPARISONS['SemEval2017', 'MERALI'] = make_comparison_table({
-    'semeval-2a-en': .594,
-})
-
-COMPARISONS['SemEval2017', 'Amateur'] = make_comparison_table({
-    'semeval-2a-en': .589,
-})
-
-COMPARISONS['SemEval2017', 'Wild Devs'] = make_comparison_table({
-    'semeval-2a-en': .468,
-})
+COMPARISONS['SemEval2017', 'Wild Devs'] = make_comparison_table({'semeval-2a-en': .468})
 
 # Hypothetical SemEval runs of existing systems
-COMPARISONS['SemEval2017', 'fastText'] = make_comparison_table({
-    'semeval-2a-en': .468,
-    'semeval-2a-de': .507,
-    'semeval-2a-es': .417,
-    'semeval-2a-it': .344,
-    'semeval-2a-fa': .334,
-})
+COMPARISONS['SemEval2017', 'fastText'] = make_comparison_table(
+    {
+        'semeval-2a-en': .468,
+        'semeval-2a-de': .507,
+        'semeval-2a-es': .417,
+        'semeval-2a-it': .344,
+        'semeval-2a-fa': .334,
+    }
+)
 
 # Hypothetical SemEval runs of existing systems
-COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table({
-    'semeval-2a-en': .747,
-    'semeval-2a-de': .599,
-    'semeval-2a-es': .611,
-    'semeval-2a-it': .606,
-    'semeval-2a-fa': .363,
+COMPARISONS['SemEval2017', 'Luminoso, no OOV'] = make_comparison_table(
+    {
+        'semeval-2a-en': .747,
+        'semeval-2a-de': .599,
+        'semeval-2a-es': .611,
+        'semeval-2a-it': .606,
+        'semeval-2a-fa': .363,
+        'semeval-2b-en-de': .696,
+        'semeval-2b-en-es': .675,
+        'semeval-2b-en-it': .677,
+        'semeval-2b-en-fa': .502,
+        'semeval-2b-de-es': .620,
+        'semeval-2b-de-it': .612,
+        'semeval-2b-de-fa': .501,
+        'semeval-2b-es-it': .613,
+        'semeval-2b-es-fa': .482,
+        'semeval-2b-it-fa': .474,
+    }
+)
 
-    'semeval-2b-en-de': .696,
-    'semeval-2b-en-es': .675,
-    'semeval-2b-en-it': .677,
-    'semeval-2b-en-fa': .502,
-    'semeval-2b-de-es': .620,
-    'semeval-2b-de-it': .612,
-    'semeval-2b-de-fa': .501,
-    'semeval-2b-es-it': .613,
-    'semeval-2b-es-fa': .482,
-    'semeval-2b-it-fa': .474,
-})
-
-COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({
-    'semeval-2a-en': .575,
-})
+COMPARISONS['SemEval2017', 'word2vec'] = make_comparison_table({'semeval-2a-en': .575})
 
 
 def read_ws353():
@@ -466,7 +435,9 @@ def read_men3000(subset='dev'):
     as more related compared to another randomly chosen pair.
     """
     lang1, lang2 = 'en', 'en'
-    filename = get_support_data_filename('mensim/MEN_dataset_lemma_form.{}'.format(subset))
+    filename = get_support_data_filename(
+        'mensim/MEN_dataset_lemma_form.{}'.format(subset)
+    )
     with open(filename) as file:
         for line in file:
             parts = line.rstrip().split()
@@ -506,7 +477,9 @@ def read_jsim():
     """
     lang1, lang2 = 'ja', 'ja'
     for pos in ('noun', 'verb', 'adj', 'adv'):
-        filename = get_support_data_filename('jSIM/similarity_full/score_{}_new_full.csv'.format(pos))
+        filename = get_support_data_filename(
+            'jSIM/similarity_full/score_{}_new_full.csv'.format(pos)
+        )
         with open(filename, encoding='utf-8') as file:
             for line in file:
                 if line.startswith('word1'):
@@ -542,7 +515,9 @@ def read_semeval_crosslingual(lang1, lang2, subset='test'):
     """
     Parses Semeval2017-Task2 crosslingual word similarity (Subtask2) test collection.
     """
-    filename = get_support_data_filename('semeval17-2/{}-{}.{}.txt'.format(lang1, lang2, subset))
+    filename = get_support_data_filename(
+        'semeval17-2/{}-{}.{}.txt'.format(lang1, lang2, subset)
+    )
 
     with open(filename) as file:
         for line in file:
@@ -559,25 +534,28 @@ def compute_semeval_score(pearson_score, spearman_score):
     intervals = ['acc', 'low', 'high']
     scores = []
     for interval in intervals:
-        if any(np.isnan(x) for x in [spearman_score[interval], pearson_score[interval]]):
+        if any(
+            np.isnan(x) for x in [spearman_score[interval], pearson_score[interval]]
+        ):
             scores.append(float('NaN'))
         elif any(x <= 0 for x in [spearman_score[interval], pearson_score[interval]]):
             scores.append(0)
         else:
             scores.append(hmean([spearman_score[interval], pearson_score[interval]]))
 
-    return pd.Series(
-        scores,
-        index=intervals
-    )
+    return pd.Series(scores, index=intervals)
 
 
 def evaluate_semeval_monolingual(vectors, lang):
     """
     Get a semeval score for a single monolingual test set.
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_monolingual(lang))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_monolingual(lang))
+    spearman_score = measure_correlation(
+        spearmanr, vectors, read_semeval_monolingual(lang)
+    )
+    pearson_score = measure_correlation(
+        pearsonr, vectors, read_semeval_monolingual(lang)
+    )
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
@@ -586,8 +564,12 @@ def evaluate_semeval_crosslingual(vectors, lang1, lang2):
     """
     Get a semeval score for a single crosslingual test set
     """
-    spearman_score = measure_correlation(spearmanr, vectors, read_semeval_crosslingual(lang1, lang2))
-    pearson_score = measure_correlation(pearsonr, vectors, read_semeval_crosslingual(lang1, lang2))
+    spearman_score = measure_correlation(
+        spearmanr, vectors, read_semeval_crosslingual(lang1, lang2)
+    )
+    pearson_score = measure_correlation(
+        pearsonr, vectors, read_semeval_crosslingual(lang1, lang2)
+    )
     score = compute_semeval_score(spearman_score, pearson_score)
     return score
 
@@ -603,13 +585,14 @@ def evaluate_semeval_monolingual_global(vectors):
         score = evaluate_semeval_monolingual(vectors, lang)
         scores.append(score)
 
-    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-4:]
+    top_scores = sorted(
+        scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0
+    )[-4:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
     high_average = tmean([score['high'] for score in top_scores])
     return pd.Series(
-        [acc_average, low_average, high_average],
-        index=['acc', 'low', 'high']
+        [acc_average, low_average, high_average], index=['acc', 'low', 'high']
     )
 
 
@@ -625,13 +608,14 @@ def evaluate_semeval_crosslingual_global(vectors):
         score = evaluate_semeval_crosslingual(vectors, lang1, lang2)
         scores.append(score)
 
-    top_scores = sorted(scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0)[-6:]
+    top_scores = sorted(
+        scores, key=lambda x: x['acc'] if not np.isnan(x['acc']) else 0
+    )[-6:]
     acc_average = tmean([score['acc'] for score in top_scores])
     low_average = tmean([score['low'] for score in top_scores])
     high_average = tmean([score['high'] for score in top_scores])
     return pd.Series(
-        [acc_average, low_average, high_average],
-        index=['acc', 'low', 'high']
+        [acc_average, low_average, high_average], index=['acc', 'low', 'high']
     )
 
 
@@ -652,8 +636,9 @@ def measure_correlation(correlation_function, vectors, standard, verbose=0):
             our_score = vectors.get_similarity(uri1, uri2)
 
         else:
-            our_score = cosine_similarity(get_vector(vectors, term1, lang1),
-                                          get_vector(vectors, term2, lang2))
+            our_score = cosine_similarity(
+                get_vector(vectors, term1, lang1), get_vector(vectors, term2, lang2)
+            )
 
         if verbose > 1:
             print('%s\t%s\t%3.3f\t%3.3f' % (term1, term2, gold_score, our_score))
@@ -716,11 +701,14 @@ def evaluate(frame, subset='dev', semeval_scope='global'):
         languages = ['en', 'de', 'es', 'it', 'fa']
 
         for lang in languages:
-            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(vectors, lang)
+            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(
+                vectors, lang
+            )
 
         for lang1, lang2 in combinations(languages, 2):
-            results.loc['semeval-2b-{}-{}'.format(lang1, lang2)] = evaluate_semeval_crosslingual(
-                vectors, lang1, lang2)
+            results.loc[
+                'semeval-2b-{}-{}'.format(lang1, lang2)
+            ] = evaluate_semeval_crosslingual(vectors, lang1, lang2)
 
     return results
 
@@ -764,19 +752,24 @@ def evaluate_raw(frame, subset='dev', semeval_scope='global'):
         languages = ['en', 'de', 'es', 'it', 'fa']
 
         for lang in languages:
-            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(frame, lang)
+            results.loc['semeval-2a-{}'.format(lang)] = evaluate_semeval_monolingual(
+                frame, lang
+            )
 
         for lang1, lang2 in combinations(languages, 2):
-            results.loc['semeval-2b-{}-{}'.format(lang1, lang2)] = evaluate_semeval_crosslingual(
-                frame, lang1, lang2)
+            results.loc[
+                'semeval-2b-{}-{}'.format(lang1, lang2)
+            ] = evaluate_semeval_crosslingual(frame, lang1, lang2)
     return results
 
 
 def comparison_table():
     comparisons = dict(COMPARISONS)
     comparison_list = sorted(comparisons)
-    big_frame = pd.concat([comparisons[key] for key in comparison_list],
-                          keys=pd.MultiIndex.from_tuples(comparison_list))
+    big_frame = pd.concat(
+        [comparisons[key] for key in comparison_list],
+        keys=pd.MultiIndex.from_tuples(comparison_list),
+    )
 
     return big_frame.dropna()
 
@@ -785,7 +778,9 @@ def results_in_context(results, name=('Luminoso', 'Numberbatch 17.02')):
     comparisons = dict(COMPARISONS)
     comparisons[name] = results
     comparison_list = sorted(comparisons)
-    big_frame = pd.concat([comparisons[key] for key in comparison_list],
-                          keys=pd.MultiIndex.from_tuples(comparison_list))
+    big_frame = pd.concat(
+        [comparisons[key] for key in comparison_list],
+        keys=pd.MultiIndex.from_tuples(comparison_list),
+    )
 
     return big_frame.dropna()

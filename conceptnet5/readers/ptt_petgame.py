@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import codecs
 import json
 
@@ -21,7 +19,9 @@ def handle_raw_assertion(line):
     ftext = fdata['text']
     rel = fdata['relation']
 
-    surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace('{2}', '[[' + concept2 + ']]')
+    surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace(
+        '{2}', '[[' + concept2 + ']]'
+    )
     # We mark surface texts with * if {2} comes before {1}.
     if ftext.find('{2}') < ftext.find('{1}'):
         surfaceText = '*' + surfaceText
@@ -30,11 +30,18 @@ def handle_raw_assertion(line):
     end = standardized_concept_uri('zh_TW', concept2)
     source = {
         'contributor': '/s/contributor/petgame/' + user,
-        'activity': '/s/activity/ptt/petgame'
+        'activity': '/s/activity/ptt/petgame',
     }
-    yield make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
-                    license=Licenses.cc_attribution, sources=[source],
-                    surfaceText=surfaceText, weight=1)
+    yield make_edge(
+        rel,
+        start,
+        end,
+        dataset='/d/conceptnet/4/zh',
+        license=Licenses.cc_attribution,
+        sources=[source],
+        surfaceText=surfaceText,
+        weight=1,
+    )
 
 
 def handle_file(input_filename, output_file):

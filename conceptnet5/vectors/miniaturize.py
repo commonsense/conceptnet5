@@ -47,12 +47,16 @@ def miniaturize(frame, other_vocab=None, k=300, debias=True):
     #
     # Non-English languages use terms with frequency 1e-6 or greater, because
     # only that much of the list has been loaded.
-    vocab1 = [term for term in frame.index if '_' not in term
-              and term_freq(term) >= 1e-8]
+    vocab1 = [
+        term for term in frame.index if '_' not in term and term_freq(term) >= 1e-8
+    ]
     vocab_set = set(vocab1)
     if other_vocab is not None:
-        extra_vocab = [term for term in other_vocab if '_' in term and
-                       term in frame.index and term not in vocab_set]
+        extra_vocab = [
+            term
+            for term in other_vocab
+            if '_' in term and term in frame.index and term not in vocab_set
+        ]
         extra_vocab = extra_vocab[:20000]
     else:
         extra_vocab = []

@@ -1,9 +1,8 @@
-import numpy as np
 import pandas as pd
 from statsmodels.stats.proportion import proportion_confint
 
 from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import cosine_similarity, get_vector, standardized_uri
+from conceptnet5.vectors import cosine_similarity
 from conceptnet5.vectors.query import VectorSpaceWrapper
 
 
@@ -40,7 +39,9 @@ def evaluate(frame, subset='val'):
     elif subset == 'all':
         # for the final evaluation, use just the test data
         subset = 'test'
-    filename = get_support_data_filename('story-cloze/cloze_test_spring2016_%s.tsv' % subset)
+    filename = get_support_data_filename(
+        'story-cloze/cloze_test_spring2016_%s.tsv' % subset
+    )
     vectors = VectorSpaceWrapper(frame=frame)
     total = 0
     correct = 0

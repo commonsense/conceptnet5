@@ -46,19 +46,16 @@ RELATIONS = {
     'isPartOf': '/r/PartOf',
     'series': '/r/PartOf',
     'languageFamily': '/r/PartOf',
-
     'location': '/r/AtLocation',
     'place': '/r/AtLocation',
     'locatedInArea': '/r/AtLocation',
     'spokenIn': '/r/AtLocation',
-
     # leave out differentFrom, as it is mostly about confusable names
     'sameAs': '/r/Synonym',
     'similar': '/r/SimilarTo',
     'related': '/r/RelatedTo',
     'seeAlso': '/r/RelatedTo',
     'type': '/r/InstanceOf',
-
     'field': '/r/dbpedia/field',
     'academicDiscipline': '/r/dbpedia/field',
     'genre': '/r/dbpedia/genre',
@@ -70,19 +67,17 @@ RELATIONS = {
     'language': '/r/dbpedia/language',
     'occupation': '/r/dbpedia/occupation',
     'profession': '/r/dbpedia/occupation',
-
-    #'author': '/r/dbpedia/writer',
-    #'writer': '/r/dbpedia/writer',
-    #'director': '/r/dbpedia/director',
-    #'starring': '/r/dbpedia/starring',
-    #'producer': '/r/dbpedia/producer',
-    #'associatedBand': '/r/dbpedia/associatedBand',
-    #'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
-    #'bandMember': '/r/dbpedia/bandMember',
-    #'artist': '/r/dbpedia/artist',
-    #'musicalArtist': '/r/dbpedia/artist',
-    #'musicalBand': '/r/dbpedia/artist',
-
+    # 'author': '/r/dbpedia/writer',
+    # 'writer': '/r/dbpedia/writer',
+    # 'director': '/r/dbpedia/director',
+    # 'starring': '/r/dbpedia/starring',
+    # 'producer': '/r/dbpedia/producer',
+    # 'associatedBand': '/r/dbpedia/associatedBand',
+    # 'associatedMusicalArtist': '/r/dbpedia/associatedMusicalArtist',
+    # 'bandMember': '/r/dbpedia/bandMember',
+    # 'artist': '/r/dbpedia/artist',
+    # 'musicalArtist': '/r/dbpedia/artist',
+    # 'musicalBand': '/r/dbpedia/artist',
     'genus': '/r/dbpedia/genus',
     'leader': '/r/dbpedia/leader',
     'capital': '/r/dbpedia/capital',
@@ -92,14 +87,21 @@ RELATIONS = {
 
 # Ban some concepts that are way too generic and often differ from the common
 # way that people use these words
-CONCEPT_BLACKLIST = {
-    '/c/en/work/n', '/c/en/agent/n', '/c/en/artist/n', '/c/en/thing/n'
-}
+CONCEPT_BLACKLIST = {'/c/en/work/n', '/c/en/agent/n', '/c/en/artist/n', '/c/en/thing/n'}
 
 TYPE_BLACKLIST = {
-    'Settlement', 'Railway Line', 'Road', 'Sports Event', 'Event',
-    'Olympic Event', 'Soccer Tournament', 'Election', 'Diocese',
-    'Year', 'Football League Season', 'Grand Prix'
+    'Settlement',
+    'Railway Line',
+    'Road',
+    'Sports Event',
+    'Event',
+    'Olympic Event',
+    'Soccer Tournament',
+    'Election',
+    'Diocese',
+    'Year',
+    'Football League Season',
+    'Grand Prix',
 }
 
 
@@ -190,7 +192,15 @@ def interlanguage_mapping(interlang_path, ok_concepts):
         pieces = split_uri(subj_concept)
         if len(pieces) >= 6:
             sense = pieces[5]
-            if 'album' in sense or 'film' in sense or 'series' in sense or 'disambiguation' in sense or 'song' in sense or 'album' in sense or 'band' in sense:
+            if (
+                'album' in sense
+                or 'film' in sense
+                or 'series' in sense
+                or 'disambiguation' in sense
+                or 'song' in sense
+                or 'album' in sense
+                or 'band' in sense
+            ):
                 continue
         if uri_prefix(subj_concept) in ok_concepts:
             targets = [subj_url]
@@ -229,9 +239,11 @@ def process_dbpedia(input_dir, output_file, concept_file):
     for subj, pred, obj, _graph in quads:
         subj_url = subj['url']
         if (
-            'Category:' in subj_url or 'File:' in subj_url or
-            'List_of' in subj_url or '__' in subj_url or
-            'Template:' in subj_url
+            'Category:' in subj_url
+            or 'File:' in subj_url
+            or 'List_of' in subj_url
+            or '__' in subj_url
+            or 'Template:' in subj_url
         ):
             continue
         if subj_url in mapped_urls:
@@ -241,24 +253,27 @@ def process_dbpedia(input_dir, output_file, concept_file):
                 obj_concept = standardized_concept_uri('en', obj_type, 'n')
                 if obj_concept not in CONCEPT_BLACKLIST:
                     edge = make_edge(
-                        '/r/IsA', subj_concept, obj_concept,
+                        '/r/IsA',
+                        subj_concept,
+                        obj_concept,
                         dataset='/d/dbpedia/en',
                         license=Licenses.cc_sharealike,
                         sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
                         weight=0.5,
                         surfaceStart=url_to_label(subj['url']),
-                        surfaceEnd=url_to_label(obj['url'])
+                        surfaceEnd=url_to_label(obj['url']),
                     )
                     out.write(edge)
                 for other_url in mapped_urls[subj_url]:
                     if other_url.startswith('http://wikidata.dbpedia.org/'):
                         urledge = make_edge(
                             '/r/ExternalURL',
-                            subj_concept, other_url,
+                            subj_concept,
+                            other_url,
                             dataset='/d/dbpedia/en',
                             license=Licenses.cc_sharealike,
                             sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                            weight=1.0
+                            weight=1.0,
                         )
                         out.write(urledge)
                     else:
@@ -266,22 +281,28 @@ def process_dbpedia(input_dir, output_file, concept_file):
                         if other_concept:
                             urledge = make_edge(
                                 '/r/ExternalURL',
-                                other_concept, other_url,
+                                other_concept,
+                                other_url,
                                 dataset='/d/dbpedia/en',
                                 license=Licenses.cc_sharealike,
-                                sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
-                                weight=1.0
+                                sources=[
+                                    {'contributor': '/s/resource/dbpedia/2015/en'}
+                                ],
+                                weight=1.0,
                             )
                             out.write(urledge)
                             edge = make_edge(
                                 '/r/Synonym',
-                                other_concept, subj_concept,
+                                other_concept,
+                                subj_concept,
                                 dataset='/d/dbpedia/en',
                                 license=Licenses.cc_sharealike,
-                                sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
+                                sources=[
+                                    {'contributor': '/s/resource/dbpedia/2015/en'}
+                                ],
                                 weight=0.5,
                                 surfaceStart=url_to_label(other_url),
-                                surfaceEnd=url_to_label(subj_url)
+                                surfaceEnd=url_to_label(subj_url),
                             )
                             out.write(edge)
 
@@ -292,19 +313,23 @@ def process_dbpedia(input_dir, output_file, concept_file):
         obj_concept = translate_dbpedia_url(obj['url'])
         rel_name = resource_name(pred['url'])
         if (
-            subj_concept and obj_concept and
-            subj['url'] in mapped_urls and obj['url'] in mapped_urls
+            subj_concept
+            and obj_concept
+            and subj['url'] in mapped_urls
+            and obj['url'] in mapped_urls
         ):
             if rel_name in RELATIONS:
                 rel = RELATIONS[rel_name]
                 edge = make_edge(
-                    rel, subj_concept, obj_concept,
+                    rel,
+                    subj_concept,
+                    obj_concept,
                     dataset='/d/dbpedia/en',
                     license=Licenses.cc_sharealike,
                     sources=[{'contributor': '/s/resource/dbpedia/2015/en'}],
                     weight=0.5,
                     surfaceStart=url_to_label(subj['url']),
-                    surfaceEnd=url_to_label(obj['url'])
+                    surfaceEnd=url_to_label(obj['url']),
                 )
                 out.write(edge)
 

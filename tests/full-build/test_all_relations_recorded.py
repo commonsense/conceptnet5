@@ -20,6 +20,7 @@ def collect_relations(path):
             relations.add(relation)
     return relations
 
+
 def test_relations_recorded():
     built_relations_file = get_data_filename('stats/relations.txt')
     built_relations = collect_relations(built_relations_file)

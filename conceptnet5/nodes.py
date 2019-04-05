@@ -10,7 +10,12 @@ from urllib.parse import urlparse
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
 from conceptnet5.uri import (
-    concept_uri, get_uri_language, is_term, split_uri, uri_prefix, uri_to_label
+    concept_uri,
+    get_uri_language,
+    is_term,
+    split_uri,
+    uri_prefix,
+    uri_to_label,
 )
 from wordfreq import simple_tokenize
 from wordfreq.preprocess import preprocess_text

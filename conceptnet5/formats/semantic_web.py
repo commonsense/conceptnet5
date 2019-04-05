@@ -88,7 +88,8 @@ def resource_name(url):
             return path.split('/')[-1]
 
 
-NQUADS_ITEM_RE = re.compile(r'''
+NQUADS_ITEM_RE = re.compile(
+    r'''
     ( <                         # A URL (URI, IRI) enclosed in angle brackets
         (?P<url> [^> ]+)
       >
@@ -104,7 +105,9 @@ NQUADS_ITEM_RE = re.compile(r'''
       (?P<blank>[A-Za-z0-9_]+)  # A blank node identifier
     | [#] (?P<comment>.*)       # The line could end with a comment
     )\s*
-    ''', re.VERBOSE)
+    ''',
+    re.VERBOSE,
+)
 
 
 def parse_nquads_line(line):

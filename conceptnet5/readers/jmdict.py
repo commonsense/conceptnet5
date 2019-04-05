@@ -1,5 +1,3 @@
-from __future__ import print_function, unicode_literals
-
 import codecs
 import re
 
@@ -11,10 +9,6 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
 from conceptnet5.uri import Licenses
 
-# Now that Unicode literals are on, get the type of a Unicode string,
-# regardless of whether this is Python 2 or 3.
-STRING_TYPE = type("")
-
 # I took the time to record these, but in the end I don't think I plan
 # to use them. Japanese parts of speech don't fit neatly enough into
 # ConceptNet's neat n/v/a/r types.
@@ -24,7 +18,7 @@ STRING_TYPE = type("")
 # from their more helpful entity form).
 NOUN_TYPES = [
     "noun (comm",
-    "adverbial ",
+    "adverbial ",  # don't ask me what an adverbial noun is
     "noun, used",
     "noun (temp",
     "noun or pa",
@@ -35,10 +29,7 @@ ADJ_TYPES = [
     "adjectival",
     "pre-noun a",
 ]
-ADV_TYPES = [
-    "adverb (fu",
-    "adverb tak",
-]
+ADV_TYPES = ["adverb (fu", "adverb tak"]
 VERB_TYPES = [
     "Ichidan ve",
     "Nidan verb",
@@ -63,7 +54,7 @@ def convert_lang_code(code):
 def fix_context(context):
     ending = ' term'
     if context.endswith(ending):
-        return context[:-len(ending)]
+        return context[: -len(ending)]
     return context
 
 
@@ -86,14 +77,17 @@ def get_list(node, tag):
         return [subnode]
 
 
-GLOSS_RE = re.compile(r'''
+GLOSS_RE = re.compile(
+    r'''
     # Separate out text in parentheses or brackets.
     ^
     (\(.*?\)|\[.*?\] )?   # possibly a bracketed expression before the gloss
     (.*?)                 # the gloss itself
     ( \(.*?\)|\[.*?\])?   # possibly a bracketed expression after the gloss
     $
-''', re.VERBOSE)
+''',
+    re.VERBOSE,
+)
 
 
 def parse_gloss(text):
@@ -174,10 +168,7 @@ def handle_file(filename, output_file):
             #
             # Get all the glosses, including the lsource if it's there.
             glosses = get_list(sense, 'gloss') + get_list(sense, 'lsource')
-            contexts = [
-                fix_context(context)
-                for context in get_list(sense, 'field')
-            ]
+            contexts = [fix_context(context) for context in get_list(sense, 'field')]
             pos = '_'
             for pos_tag in get_list(sense, 'pos'):
                 if pos_tag[:10] in NOUN_TYPES:
@@ -196,7 +187,7 @@ def handle_file(filename, output_file):
                     # '@xml:lang' elements.
                     text = parse_gloss(gloss['#text'])
                     lang = convert_lang_code(gloss['@xml:lang'])
-                elif isinstance(gloss, STRING_TYPE):
+                elif isinstance(gloss, str):
                     # If there's no 'lang' attribute, the gloss is in English,
                     # and xmltodict gives it to us as a plain Unicode string.
                     lang = 'en'
@@ -210,13 +201,17 @@ def handle_file(filename, output_file):
                 # we can't expand them), and we also don't want to deal with texts
                 # that are more than five words long.
                 if (
-                    text is not None and '.' not in text and
-                    text.count(' ') <= 4 and valid_concept_name(text)
+                    text is not None
+                    and '.' not in text
+                    and text.count(' ') <= 4
+                    and valid_concept_name(text)
                 ):
                     for head in headwords:
                         if len(senses) >= 2:
                             sensekey = '%d' % (sense_num + 1)
-                            ja_concept = standardized_concept_uri('ja', head, pos, 'jmdict', sensekey)
+                            ja_concept = standardized_concept_uri(
+                                'ja', head, pos, 'jmdict', sensekey
+                            )
                         else:
                             ja_concept = standardized_concept_uri('ja', head, pos)
                         other_concept = standardized_concept_uri(lang, text)
@@ -231,9 +226,13 @@ def output_edge(out, rel, subj_concept, obj_concept):
     """
     Write an edge to `out`, an instance of MsgpackStreamWriter.
     """
-    edge = make_edge(rel, subj_concept, obj_concept,
-                     dataset='/d/jmdict',
-                     license=Licenses.cc_sharealike,
-                     sources=[{'contributor': '/s/resource/jmdict/1.07'}],
-                     weight=2.0)
+    edge = make_edge(
+        rel,
+        subj_concept,
+        obj_concept,
+        dataset='/d/jmdict',
+        license=Licenses.cc_sharealike,
+        sources=[{'contributor': '/s/resource/jmdict/1.07'}],
+        weight=2.0,
+    )
     out.write(edge)

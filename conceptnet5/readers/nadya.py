@@ -54,8 +54,19 @@ def handle_line(line, builder):
     ConceptNet edges that can be extracted from it.
     """
     parts = line.rstrip('\n').split('\t')
-    (cnet4_id, lang, frame_text, relname, start_text, end_text,
-     freq, vote, email, creator, voter) = parts
+    (
+        cnet4_id,
+        lang,
+        frame_text,
+        relname,
+        start_text,
+        end_text,
+        freq,
+        vote,
+        email,
+        creator,
+        voter,
+    ) = parts
     if cnet4_id == 'cnet4_id':
         return
 
@@ -85,7 +96,7 @@ def handle_line(line, builder):
             'creator': voter,
             'votes': [],
             'activity': 'nadya.jp',
-            'goodness': 3
+            'goodness': 3,
         }
         yield from builder.handle_assertion(parts_dict)
 

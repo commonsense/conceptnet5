@@ -26,7 +26,9 @@ def handle_file(input_file, output_file):
     tree = ET.parse(input_file)
     out = MsgpackStreamWriter(output_file)
     root = tree.getroot()
-    lang = root[0][1].attrib['type']  # language is at position [1] within the child node [0]
+    lang = root[0][1].attrib[
+        'type'
+    ]  # language is at position [1] within the child node [0]
 
     if len(root) >= 2:
         for annotation in root[1]:

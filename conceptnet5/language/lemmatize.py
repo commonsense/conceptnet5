@@ -193,6 +193,7 @@ class DBLemmatizer:
         root, _form = self.lookup(language, text, pos)
         return join_uri('c', language, root, *rest)
 
+
 LEMMATIZER = DBLemmatizer()
 
 

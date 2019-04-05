@@ -6,8 +6,15 @@ from .debias import de_bias_frame
 from .evaluation import analogy, bias, wordsim
 from .evaluation.compare import compare_embeddings, graph_comparison
 from .formats import (
-    convert_fasttext, convert_glove, convert_polyglot, convert_word2vec,
-    export_text, load_hdf, save_hdf, save_labels, save_npy
+    convert_fasttext,
+    convert_glove,
+    convert_polyglot,
+    convert_word2vec,
+    export_text,
+    load_hdf,
+    save_hdf,
+    save_labels,
+    save_npy,
 )
 from .merge import merge_intersect
 from .miniaturize import miniaturize
