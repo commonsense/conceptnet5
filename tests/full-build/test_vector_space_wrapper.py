@@ -10,34 +10,41 @@ TEST_FRAME = None
 
 
 def setup_simple_frame():
-    data = [[4, 4, 4],
-            [1, 1, 1],
-            [1, 2, 10],
-            [3, 3, 4],
-            [2, 3, 4],
-            [2, 3, 5],
-            [7, 2, 7],
-            [3, 8, 2]]
+    data = [
+        [4, 4, 4],
+        [1, 1, 1],
+        [1, 2, 10],
+        [3, 3, 4],
+        [2, 3, 4],
+        [2, 3, 5],
+        [7, 2, 7],
+        [3, 8, 2],
+    ]
 
-    index = ['island', 'Island', 'cat', 'figure', 'figure skating',
-             'figure skater', 'thing', '17']
+    index = [
+        'island',
+        'Island',
+        'cat',
+        'figure',
+        'figure skating',
+        'figure skater',
+        'thing',
+        '17',
+    ]
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
 
 def setup_multiling_frame():
-    data = [[8, 10, 3],
-            [4, 5, 6],
-            [4, 4, 5],
-            [10, 6, 12],
-            [10, 7, 11],
-            [20, 20, 7]]
-    index = ['/c/pl/kombinacja',
-             '/c/en/ski_jumping',
-             '/c/en/nordic_combined',
-             '/c/en/present',
-             '/c/en/gift',
-             '/c/en/quiz']
+    data = [[8, 10, 3], [4, 5, 6], [4, 4, 5], [10, 6, 12], [10, 7, 11], [20, 20, 7]]
+    index = [
+        '/c/pl/kombinacja',
+        '/c/en/ski_jumping',
+        '/c/en/nordic_combined',
+        '/c/en/present',
+        '/c/en/gift',
+        '/c/en/quiz',
+    ]
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
@@ -70,9 +77,11 @@ def test_match_prefix():
     vectors = VectorSpaceWrapper(frame=TEST_FRAME)
     vectors.load()
     term = '/c/en/figure_skate'
-    expected_prefix_matches = [('/c/en/figure', 0.0033333333333333335),
-                               ('/c/en/figure skater', 0.0033333333333333335),
-                               ('/c/en/figure skating', 0.0033333333333333335)]
+    expected_prefix_matches = [
+        ('/c/en/figure', 0.0033333333333333335),
+        ('/c/en/figure skater', 0.0033333333333333335),
+        ('/c/en/figure skating', 0.0033333333333333335),
+    ]
     prefix_matches = vectors._match_prefix(term=term, prefix_weight=0.01)
     eq_(expected_prefix_matches, prefix_matches)
 
@@ -90,13 +99,14 @@ def test_lookup_neighbors():
     vectors = VectorSpaceWrapper(frame=TEST_FRAME)
     vectors.load()
     term = '/c/pl/skoki_narciarskie'
-    neighbors = vectors._find_neighbors(term=term, limit_per_term=10,
-                                        weight=1.0)
-    expected_neighbors = {('/c/en/ski_jumping', 0.02),
-                          ('/c/en/ski_jumping', 0.01),
-                          ('http://pl.dbpedia.org/resource/Skoki_narciarskie', 0.01),
-                          ('/c/de/skispringen', 0.01),
-                          ('/c/en/ski_jumping', 0.005)}
+    neighbors = vectors._find_neighbors(term=term, limit_per_term=10, weight=1.0)
+    expected_neighbors = {
+        ('/c/en/ski_jumping', 0.02),
+        ('/c/en/ski_jumping', 0.01),
+        ('http://pl.dbpedia.org/resource/Skoki_narciarskie', 0.01),
+        ('/c/de/skispringen', 0.01),
+        ('/c/en/ski_jumping', 0.005),
+    }
     eq_(expected_neighbors, set(neighbors))
 
 
@@ -105,15 +115,14 @@ def test_expand_terms():
     vectors = VectorSpaceWrapper(frame=TEST_FRAME)
     vectors.load()
     term = [('/c/en/ski_jumper', 1.0)]
-    expanded_terms = vectors.expand_terms(terms=term, limit_per_term=2,
-                                          oov_vector=True)
+    expanded_terms = vectors.expand_terms(terms=term, limit_per_term=2, oov_vector=True)
 
-    # /c/en/bounder and /c/en/skier from neighbor search
-    # /c/en/ski_jumping from prefix match
-    expected_expanded_terms = [('/c/en/ski_jumper', 0.9523809523809523),
-                               ('/c/en/skier', 0.019047619047619046),
-                               ('/c/fi/mäkihyppääjä', 0.019047619047619046),
-                               ('/c/en/ski_jumping', 0.009523809523809523)]
+    expected_expanded_terms = [
+        ('/c/en/ski_jumper', 0.9523809523809523),
+        ('/c/pt/saltadores_de_esqui', 0.019047619047619046),
+        ('/c/pl/skoczek_narciarski', 0.019047619047619046),
+        ('/c/en/ski_jumping', 0.009523809523809523),
+    ]
     eq_(expected_expanded_terms, expanded_terms)
 
 
@@ -124,25 +133,30 @@ def test_similar_terms():
     """
     vectors = VectorSpaceWrapper(frame=TEST_FRAME)
     vectors.load()
-    ok_('/c/en/figure skating' in vectors.similar_terms('/c/en/figure skating',
-                                                        limit=3).index)
-    ok_('/c/en/figure skater' in vectors.similar_terms('/c/en/figure skating',
-                                                       limit=3).index)
-    ok_('/c/en/figure' in vectors.similar_terms('/c/en/figure skating',
-                                                limit=3).index)
+    ok_(
+        '/c/en/figure skating'
+        in vectors.similar_terms('/c/en/figure skating', limit=3).index
+    )
+    ok_(
+        '/c/en/figure skater'
+        in vectors.similar_terms('/c/en/figure skating', limit=3).index
+    )
+    ok_('/c/en/figure' in vectors.similar_terms('/c/en/figure skating', limit=3).index)
 
 
 @with_setup(setup_multiling_frame)
 def test_similar_terms_filter():
     vectors = VectorSpaceWrapper(frame=TEST_FRAME)
     vectors.load()
-    ok_('/c/pl/kombinacja' in vectors.similar_terms('/c/en/nordic_combined',
-                                                    filter='/c/pl',
-                                                    limit=1).index)
+    ok_(
+        '/c/pl/kombinacja'
+        in vectors.similar_terms('/c/en/nordic_combined', filter='/c/pl', limit=1).index
+    )
 
-    ok_('/c/en/present' in vectors.similar_terms('/c/en/gift',
-                                                 filter='/c/en/present',
-                                                 limit=1).index)
+    ok_(
+        '/c/en/present'
+        in vectors.similar_terms('/c/en/gift', filter='/c/en/present', limit=1).index
+    )
 
 
 @with_setup(setup_multiling_frame)
