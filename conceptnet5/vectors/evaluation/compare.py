@@ -1,7 +1,10 @@
-from conceptnet5.vectors.evaluation import analogy, story, wordsim, bias
-from conceptnet5.vectors.formats import load_hdf, save_hdf, load_glove, load_fasttext, load_word2vec_bin
 import numpy as np
 import pandas as pd
+
+from conceptnet5.vectors.evaluation import analogy, bias, story, wordsim
+from conceptnet5.vectors.formats import (
+    load_fasttext, load_glove, load_hdf, load_word2vec_bin, save_hdf
+)
 
 # The filename of Turney's SAT evaluation data, which cannot be distributed
 # with this code and must be requested from Peter Turney.

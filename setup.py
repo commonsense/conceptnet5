@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from setuptools import setup, find_packages, Command
-from setuptools.command.install import install
-from setuptools.command.develop import develop
 import sys
+
+from setuptools import Command, find_packages, setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 packages = find_packages()
 version_str = '5.7.0'

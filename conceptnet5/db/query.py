@@ -1,8 +1,9 @@
-from conceptnet5.db.connection import get_db_connection
-from conceptnet5.db.config import DB_NAME
-from conceptnet5.edges import transform_for_linked_data
-import json
 import itertools
+import json
+
+from conceptnet5.db.config import DB_NAME
+from conceptnet5.db.connection import get_db_connection
+from conceptnet5.edges import transform_for_linked_data
 from ftfy.fixes import remove_control_chars
 
 LIST_QUERIES = {}

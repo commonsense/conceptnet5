@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
+
 from collections import defaultdict
-from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri
+
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import (
-    resource_name, parse_nquads
-)
-
+from conceptnet5.formats.semantic_web import parse_nquads, resource_name
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import Licenses
 
 SOURCE = {'contributor': '/s/resource/wordnet/rdf/3.1'}
 DATASET = '/d/wordnet/3.1'

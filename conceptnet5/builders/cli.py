@@ -1,7 +1,8 @@
 import click
+
 from .combine_assertions import combine_assertions
-from .reduce_assoc import reduce_assoc
 from .morphology import prepare_vocab_for_morphology, subwords_to_edges
+from .reduce_assoc import reduce_assoc
 
 
 @click.group()

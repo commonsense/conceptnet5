@@ -4,7 +4,7 @@ from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.languages import ATOMIC_SPACE_LANGUAGES
 from conceptnet5.nodes import split_uri
-from conceptnet5.uri import get_uri_language, join_uri, Licenses
+from conceptnet5.uri import Licenses, get_uri_language, join_uri
 
 
 def prepare_vocab_for_morphology(language, input, output):

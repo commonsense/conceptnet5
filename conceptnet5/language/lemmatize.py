@@ -1,8 +1,8 @@
 import sqlite3
-import wordfreq
-from conceptnet5.util import get_data_filename
-from conceptnet5.uri import split_uri, join_uri
 
+import wordfreq
+from conceptnet5.uri import join_uri, split_uri
+from conceptnet5.util import get_data_filename
 
 WORDFREQ_LANGUAGES = set(wordfreq.available_languages())
 

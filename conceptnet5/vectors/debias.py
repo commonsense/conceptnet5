@@ -3,8 +3,7 @@ import pandas as pd
 from sklearn import svm
 from sklearn.preprocessing import normalize
 
-from conceptnet5.vectors import standardized_uri, normalize_vec
-
+from conceptnet5.vectors import normalize_vec, standardized_uri
 
 # A list of English words referring to nationalities, nations, ethnicities, and
 # religions. Our goal is to prevent ConceptNet from learning insults and

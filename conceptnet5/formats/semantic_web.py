@@ -1,7 +1,9 @@
-from ftfy.fixes import decode_escapes
-import urllib
-import langcodes
 import re
+import urllib
+
+import langcodes
+
+from ftfy.fixes import decode_escapes
 
 SEE_ALSO = 'http://www.w3.org/2000/01/rdf-schema#seeAlso'
 

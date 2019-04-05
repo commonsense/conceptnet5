@@ -1,12 +1,15 @@
 import io
+from unittest.mock import Mock, patch
+
 import numpy as np
 import pandas as pd
-
-from conceptnet5.uri import concept_uri, get_uri_language
-from conceptnet5.vectors.propagate import sharded_propagate, make_adjacency_matrix, propagate
 from numpy.testing import assert_allclose
 from scipy import sparse
-from unittest.mock import patch, Mock
+
+from conceptnet5.uri import concept_uri, get_uri_language
+from conceptnet5.vectors.propagate import (
+    make_adjacency_matrix, propagate, sharded_propagate
+)
 
 # Constant parameters.
 N_TRIALS = 20

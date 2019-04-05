@@ -1,9 +1,10 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
 
-from conceptnet5.uri import get_uri_language
 from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.uri import get_uri_language
+
 from .formats import load_hdf
 
 

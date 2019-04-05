@@ -1,6 +1,8 @@
-from __future__ import with_statement, print_function, unicode_literals, division
-from conceptnet5.util import get_support_data_filename
+from __future__ import (
+    division, print_function, unicode_literals, with_statement
+)
 
+from conceptnet5.util import get_support_data_filename
 
 PHONETIC_DICT = {}
 def _setup():

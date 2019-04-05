@@ -1,8 +1,9 @@
-from conceptnet5.formats.msgpack_stream import read_msgpack_stream
-from conceptnet5.uri import uri_prefixes
-from conceptnet5.relations import SYMMETRIC_RELATIONS
-from ordered_set import OrderedSet
 import json
+
+from conceptnet5.formats.msgpack_stream import read_msgpack_stream
+from conceptnet5.relations import SYMMETRIC_RELATIONS
+from conceptnet5.uri import uri_prefixes
+from ordered_set import OrderedSet
 
 
 def write_row(outfile, items):

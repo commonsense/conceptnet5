@@ -1,13 +1,15 @@
-from __future__ import unicode_literals, print_function
-import xmltodict
-import re
-import codecs
-import langcodes
-from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.uri import Licenses
-from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
-from conceptnet5.edges import make_edge
+from __future__ import print_function, unicode_literals
 
+import codecs
+import re
+
+import langcodes
+import xmltodict
+
+from conceptnet5.edges import make_edge
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
+from conceptnet5.uri import Licenses
 
 # Now that Unicode literals are on, get the type of a Unicode string,
 # regardless of whether this is Python 2 or 3.
@@ -235,4 +237,3 @@ def output_edge(out, rel, subj_concept, obj_concept):
                      sources=[{'contributor': '/s/resource/jmdict/1.07'}],
                      weight=2.0)
     out.write(edge)
-

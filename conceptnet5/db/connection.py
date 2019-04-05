@@ -1,4 +1,5 @@
 import psycopg2
+
 from conceptnet5.db import config
 
 _CONNECTIONS = {}

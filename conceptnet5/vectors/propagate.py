@@ -7,10 +7,12 @@ reduced graph.
 import numpy as np
 import pandas as pd
 from scipy.sparse import diags
+
 from conceptnet5.builders.reduce_assoc import ConceptNetAssociationGraph
 from conceptnet5.uri import get_uri_language
-from .sparse_matrix_builder import SparseMatrixBuilder
+
 from .formats import load_hdf, save_hdf
+from .sparse_matrix_builder import SparseMatrixBuilder
 
 
 class ConceptNetAssociationGraphForPropagation(ConceptNetAssociationGraph):

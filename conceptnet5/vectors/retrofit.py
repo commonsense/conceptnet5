@@ -1,8 +1,9 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
-from .sparse_matrix_builder import build_from_conceptnet_table
+
 from .formats import load_hdf, save_hdf
+from .sparse_matrix_builder import build_from_conceptnet_table
 
 
 def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,

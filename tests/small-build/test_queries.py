@@ -1,4 +1,5 @@
 from nose.tools import eq_
+
 from conceptnet5.db.query import AssertionFinder
 
 test_finder = None

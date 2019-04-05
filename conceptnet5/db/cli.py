@@ -1,7 +1,8 @@
 import click
-from .connection import get_db_connection, check_db_connection
+
+from .connection import check_db_connection, get_db_connection
 from .prepare_data import assertions_to_sql_csv, load_sql_csv
-from .schema import create_tables, create_indices
+from .schema import create_indices, create_tables
 
 
 @click.group()

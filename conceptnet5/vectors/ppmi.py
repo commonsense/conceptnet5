@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 from scipy.sparse import linalg
+
 from .sparse_matrix_builder import build_from_conceptnet_table
 
 

@@ -1,7 +1,8 @@
 import click
+
 from . import (
-    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, kyoto_yahoo,
-    nadya, ptt_petgame, opencyc, verbosity, wiktionary, wordnet
+    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, kyoto_yahoo, nadya,
+    opencyc, ptt_petgame, verbosity, wiktionary, wordnet
 )
 
 

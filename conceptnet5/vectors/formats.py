@@ -1,10 +1,15 @@
-import pandas as pd
-import numpy as np
 import gzip
-import struct
 import pickle
+import struct
+
+import numpy as np
+import pandas as pd
+
 from ordered_set import OrderedSet
-from .transforms import l1_normalize_columns, l2_normalize_rows, standardize_row_labels
+
+from .transforms import (
+    l1_normalize_columns, l2_normalize_rows, standardize_row_labels
+)
 
 
 def load_hdf(filename):

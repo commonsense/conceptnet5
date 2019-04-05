@@ -119,4 +119,3 @@ def make_small_frame(big_frame, concepts):
     """
     small_vocab = choose_small_vocabulary(big_frame.index, concepts)
     return big_frame.ix[small_vocab]
-

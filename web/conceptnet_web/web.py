@@ -1,18 +1,18 @@
 """
 This file sets up Flask to serve the ConceptNet 5 API in JSON-LD format.
 """
-from conceptnet5 import api as responses
-from conceptnet_web.filters import FILTERS
-from conceptnet_web.relations import REL_HEADINGS
-from conceptnet_web.error_logging import try_configuring_sentry
-from conceptnet5.uri import split_uri
-from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
+import os
 
 import flask
 from flask_limiter import Limiter
-import os
 
+from conceptnet5 import api as responses
+from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
+from conceptnet5.nodes import standardized_concept_uri
+from conceptnet5.uri import split_uri
+from conceptnet_web.error_logging import try_configuring_sentry
+from conceptnet_web.filters import FILTERS
+from conceptnet_web.relations import REL_HEADINGS
 
 # Configuration
 app = flask.Flask('conceptnet_web')
@@ -205,4 +205,3 @@ def render_error(status, details):
 if __name__ == '__main__':
     app.debug = True
     app.run('127.0.0.1', debug=True, port=8084)
-

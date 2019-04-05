@@ -4,11 +4,12 @@ includes the `make_edge` function, which builds the dictionary representing
 an edge.
 """
 
-from conceptnet5.uri import (
-    assertion_uri, uri_prefix, conjunction_uri, is_concept
-)
-from conceptnet5.nodes import ld_node
 import re
+
+from conceptnet5.nodes import ld_node
+from conceptnet5.uri import (
+    assertion_uri, conjunction_uri, is_concept, uri_prefix
+)
 
 
 def make_edge(rel, start, end, dataset, license, sources,

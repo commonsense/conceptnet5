@@ -5,10 +5,11 @@ associations.
 
 from collections import defaultdict
 
+import pandas as pd
+
 from conceptnet5.relations import is_negative_relation
 from conceptnet5.uri import is_concept, uri_prefix
 from conceptnet5.vectors.formats import load_hdf
-import pandas as pd
 
 
 def concept_is_bad(uri):

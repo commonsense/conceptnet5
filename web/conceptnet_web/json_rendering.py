@@ -1,10 +1,11 @@
+import json
+import re
+
+import flask
+from jinja2.ext import Markup
+from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name
-from pygments import highlight
-from jinja2.ext import Markup
-import flask
-import re
-import json
 
 
 def request_wants_json():

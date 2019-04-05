@@ -9,15 +9,14 @@ limited to ASCII.)
 
 from collections import defaultdict
 
-from wordfreq import simple_tokenize
-
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.formats.semantic_web import resource_name, parse_nquads
+from conceptnet5.formats.semantic_web import parse_nquads, resource_name
 from conceptnet5.language.token_utils import un_camel_case
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.readers.conceptnet4 import filter_stopwords
 from conceptnet5.uri import Licenses
+from wordfreq import simple_tokenize
 
 SOURCE = {'contributor': '/s/resource/opencyc/2012'}
 RDF_LABEL = 'http://www.w3.org/2000/01/rdf-schema#label'

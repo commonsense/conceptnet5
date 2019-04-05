@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import scipy
 
-from conceptnet5.vectors import standardized_uri, normalize_vec, get_vector
-from conceptnet5.vectors.transforms import (
-    l2_normalize_rows, subtract_mean_vector
-)
+from conceptnet5.vectors import get_vector, normalize_vec, standardized_uri
 from conceptnet5.vectors.debias import (
     FEMALE_WORDS, MALE_WORDS, PEOPLE_BY_BELIEF, PEOPLE_BY_ETHNICITY,
     get_category_axis, get_vocabulary_vectors
+)
+from conceptnet5.vectors.transforms import (
+    l2_normalize_rows, subtract_mean_vector
 )
 
 # A list of gender-stereotyped pairs, from Bolukbasi et al.:

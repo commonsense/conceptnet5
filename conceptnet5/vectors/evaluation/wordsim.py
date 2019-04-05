@@ -1,10 +1,12 @@
-from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import standardized_uri, get_vector, cosine_similarity
-from conceptnet5.vectors.query import VectorSpaceWrapper
-from scipy.stats import spearmanr, pearsonr, tmean, hmean
 from itertools import combinations
+
 import numpy as np
 import pandas as pd
+from scipy.stats import hmean, pearsonr, spearmanr, tmean
+
+from conceptnet5.util import get_support_data_filename
+from conceptnet5.vectors import cosine_similarity, get_vector, standardized_uri
+from conceptnet5.vectors.query import VectorSpaceWrapper
 
 SAMPLE_SIZES = {
     'ws353': 353,

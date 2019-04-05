@@ -3,13 +3,15 @@ from itertools import groupby, product
 
 import numpy as np
 import pandas as pd
-import wordfreq
-from scipy.stats import spearmanr, hmean
+from scipy.stats import hmean, spearmanr
 from statsmodels.stats.proportion import proportion_confint
 
+import wordfreq
 from conceptnet5.util import get_support_data_filename
 from conceptnet5.vectors import standardized_uri
-from conceptnet5.vectors.evaluation.wordsim import confidence_interval, empty_comparison_table
+from conceptnet5.vectors.evaluation.wordsim import (
+    confidence_interval, empty_comparison_table
+)
 from conceptnet5.vectors.query import VectorSpaceWrapper
 
 

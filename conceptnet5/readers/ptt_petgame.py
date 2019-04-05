@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
+
 import codecs
 import json
+
+from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.edges import make_edge
-from conceptnet5.util import get_support_data_filename
 from conceptnet5.uri import Licenses
-
+from conceptnet5.util import get_support_data_filename
 
 FRAME_DATA = json.load(
     codecs.open(get_support_data_filename('zh_frames.json'), encoding='utf-8')

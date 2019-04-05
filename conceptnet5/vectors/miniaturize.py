@@ -1,9 +1,10 @@
-import wordfreq
 import numpy as np
 import pandas as pd
 
-from conceptnet5.uri import split_uri
+import wordfreq
 from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.uri import split_uri
+
 from .debias import de_bias_frame
 
 

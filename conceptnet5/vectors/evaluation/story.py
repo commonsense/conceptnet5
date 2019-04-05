@@ -1,9 +1,10 @@
-from conceptnet5.util import get_support_data_filename
-from conceptnet5.vectors import get_vector, standardized_uri, get_vector, cosine_similarity
-from conceptnet5.vectors.query import VectorSpaceWrapper
-from statsmodels.stats.proportion import proportion_confint
 import numpy as np
 import pandas as pd
+from statsmodels.stats.proportion import proportion_confint
+
+from conceptnet5.util import get_support_data_filename
+from conceptnet5.vectors import cosine_similarity, get_vector, standardized_uri
+from conceptnet5.vectors.query import VectorSpaceWrapper
 
 
 def read_cloze(filename):

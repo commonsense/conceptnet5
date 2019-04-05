@@ -1,18 +1,18 @@
 from __future__ import unicode_literals
+
+from conceptnet5.edges import make_edge
+from conceptnet5.formats.json_stream import read_json_stream
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.language.lemmatize import lemmatize_uri
+from conceptnet5.nodes import standardized_concept_uri, valid_concept_name
+from conceptnet5.uri import Licenses, join_uri
+from wordfreq import simple_tokenize
+
 """
 This script reads the ConceptNet 4 data out of the flat files in raw_data,
 and builds ConceptNet 5 edges from the data.
 """
-from wordfreq import simple_tokenize
 
-from conceptnet5.formats.json_stream import read_json_stream
-from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.nodes import (
-    standardized_concept_uri, valid_concept_name
-)
-from conceptnet5.edges import make_edge
-from conceptnet5.language.lemmatize import lemmatize_uri
-from conceptnet5.uri import join_uri, Licenses
 
 # bedume is a prolific OMCS contributor who seemed to go off the rails at some
 # point, adding lots of highly correlated nonsense assertions. We need to
@@ -400,4 +400,3 @@ class CN4Builder(object):
 def handle_file(input_filename, output_file):
     builder = CN4Builder()
     builder.transform_file(input_filename, output_file)
-

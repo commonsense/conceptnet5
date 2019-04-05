@@ -5,8 +5,8 @@ Japan Corporation, published in this paper by Naoki Otani et al.:
 http://coling2016.okbqa.org/OKBQA201602.pdf
 """
 
-from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.edges import make_edge
+from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.uri import Licenses
 
 # Assign a unique dataset and source to this data
