@@ -9,22 +9,15 @@ LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 
 if DB_NAME == 'conceptnet-test':
-    # Random queries sample 10% of edges; dataset queries sample 100% of edges.
-    # This makes sure that we get matches in the test database where there
-    # isn't much data.
-    #
-    # The TABLESAMPLE SYSTEM sampler gets 'chunks' of edges in a way that
-    # favors efficiency over independent sampling, so it's quite possible for
-    # it to skip every edge in a dataset in a correlated way unless we sample
-    # 100%.
+    # Random queries sample 10% of edges. This makes sure we get matches in
+    # the test database, where there isn't much data.
     RANDOM_QUERY = """
         SELECT uri, data, weight FROM edges
         TABLESAMPLE SYSTEM(10)
         ORDER BY random() LIMIT %(limit)s
     """
 else:
-    # In the real database, random queries sample 0.01% of edges, and dataset
-    # queries sample 1% of edges.
+    # In the real database, random queries sample 0.01% of edges.
     RANDOM_QUERY = """
         SELECT uri, data, weight FROM edges
         TABLESAMPLE SYSTEM(0.01)
@@ -34,10 +27,6 @@ else:
 # A query that's optimized for producing the edges, grouped by feature, that
 # you get when you look up a concept in the Web interface.
 NODE_TO_FEATURE_QUERY = """
-WITH node_ids AS (
-    SELECT n.id FROM nodes n
-    WHERE n.uri=%(node)s
-)
 SELECT rf.direction, r.uri, e.data
 FROM ranked_features rf, edges e, relations r
 WHERE rf.node_id = (SELECT n.id FROM nodes n where n.uri=%(node)s)
