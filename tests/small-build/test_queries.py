@@ -11,7 +11,7 @@ def setUp():
 
 def test_lookup():
     quiz1 = list(test_finder.lookup('/c/en/quiz'))
-    eq_(len(quiz1), 2)
+    eq_(len(quiz1), 3)
 
     quiz2 = list(test_finder.lookup('/c/en/quiz', offset=1))
     eq_(quiz2, quiz1[1:])
@@ -31,6 +31,16 @@ def test_lookup():
     eq_(source['@id'], '/and/[/s/process/split_words/,/s/resource/verbosity/]')
 
 
+def test_lookup_dataset():
+    verbosity = list(test_finder.lookup('/d/verbosity'))
+    assert len(verbosity) >= 2
+
+
+def test_random_edges():
+    results = list(test_finder.random_edges(limit=10))
+    assert len(results) == 10
+
+
 def test_strip_control_chars():
     assert test_finder.lookup('/c/en/test\x00') == test_finder.lookup('/c/en/test')
     assert not test_finder.lookup('/s/\x1a')
@@ -42,18 +52,19 @@ def get_query_ids(query):
 
 def test_query_en_quiz():
     q1 = get_query_ids({'start': '/c/en/test', 'end': '/c/en/quiz'})
-    testquiz = [
+    testquiz = {
         '/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]',
         '/a/[/r/Synonym/,/c/en/test/n/,/c/en/quiz/]',
-    ]
-    eq_(q1, testquiz)
+        '/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/en/quiz/]'
+    }
+    eq_(set(q1), testquiz)
     q2 = get_query_ids({'node': '/c/en/quiz'})
-    eq_(q2, testquiz)
+    eq_(set(q2), testquiz)
 
     q3 = get_query_ids({'node': '/c/en/test', 'other': '/c/en/quiz'})
     q4 = get_query_ids({'node': '/c/en/quiz', 'other': '/c/en/test'})
-    eq_(q3, testquiz)
-    eq_(q4, testquiz)
+    eq_(set(q3), testquiz)
+    eq_(set(q4), testquiz)
 
 
 def test_query_en_form():
@@ -63,7 +74,7 @@ def test_query_en_form():
 
 def test_query_en_es():
     q = get_query_ids({'start': '/c/en/test', 'end': '/c/es'})
-    eq_(q, ['/a/[/r/Synonym/,/c/en/test/n/,/c/es/prueba/]'])
+    eq_(q, ['/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/es/prueba/]'])
 
 
 def test_query_es():
@@ -85,4 +96,4 @@ def test_query_source():
 def test_lookup_external():
     found = list(test_finder.lookup('http://dbpedia.org/resource/Test_(assessment)'))
     eq_(len(found), 1)
-    eq_(found[0]['start']['@id'], '/c/en/test/n')
+    eq_(found[0]['start']['@id'], '/c/en/test/n/wp/assessment')

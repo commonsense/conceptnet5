@@ -9,7 +9,8 @@ from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.edges import make_edge
 from conceptnet5.uri import Licenses
 
-DATASET = '/d/conceptnet/5/ja'
+# Assign a unique dataset and source to this data
+DATASET = '/d/kyoto_yahoo'
 SOURCE = '/s/activity/kyoto_yahoo'
 
 

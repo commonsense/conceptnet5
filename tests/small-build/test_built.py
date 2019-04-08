@@ -3,8 +3,6 @@ Test querying ConceptNet for information in the database that results from the
 small test build.
 """
 
-from conceptnet5.util import get_data_filename
-from conceptnet5.languages import CORE_LANGUAGES, COMMON_LANGUAGES, ALL_LANGUAGES
 from conceptnet5.db.query import AssertionFinder
 
 test_finder = None
@@ -24,7 +22,7 @@ TEST_QUERIES = [
     {'node': '/c/es/prueba/n', 'source': '/s/resource/wordnet/rdf/3.1'},
     {'node': '/c/en/test', 'rel': '/r/Synonym', 'other': '/c/es/prueba'},
 ]
-TEST_URI = "/a/[/r/Synonym/,/c/es/prueba/n/,/c/en/test/n/]"
+TEST_URI = "/a/[/r/Synonym/,/c/es/prueba/n/wn/act/,/c/en/test/n/wn/act/]"
 
 
 def check_query(query):

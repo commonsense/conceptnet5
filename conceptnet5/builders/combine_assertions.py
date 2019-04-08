@@ -65,11 +65,6 @@ def make_assertion(line_group):
     # on word senses. These don't get merged together, but they should.
     uri, rel, start, end, _ = lines[0].split('\t')
 
-    # We can't distinguish word senses well enough yet, so only keep them
-    # up to the part of speech
-    start = uri_prefix(start, 4)
-    end = uri_prefix(end, 4)
-
     if not (keep_concept(start) and keep_concept(end)):
         return None
 

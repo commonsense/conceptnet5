@@ -197,14 +197,15 @@ def uri_prefixes(uri, min_pieces=2):
     ['http://en.wikipedia.org/wiki/Example']
     """
     if is_absolute_url(uri):
-        yield uri
-        return
+        return [uri]
     pieces = []
+    prefixes = []
     for piece in split_uri(uri):
         pieces.append(piece)
         if len(pieces) >= min_pieces:
             if pieces.count('[') == pieces.count(']'):
-                yield join_uri(*pieces)
+                prefixes.append(join_uri(*pieces))
+    return prefixes
 
 
 def parse_compound_uri(uri):
