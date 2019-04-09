@@ -1,6 +1,8 @@
 from jinja2.ext import Markup
+
 from conceptnet5.languages import get_language_name
 from conceptnet5.uri import split_uri, uri_prefix
+
 from .json_rendering import highlight_and_link_json
 
 

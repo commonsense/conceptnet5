@@ -1,12 +1,14 @@
-import pandas as pd
 from collections import defaultdict
-from ordered_set import OrderedSet
+
+import pandas as pd
 from scipy import sparse
 from sklearn.preprocessing import normalize
 
 from conceptnet5.languages import CORE_LANGUAGES
 from conceptnet5.relations import SYMMETRIC_RELATIONS
 from conceptnet5.uri import get_uri_language, uri_prefix, uri_prefixes
+from ordered_set import OrderedSet
+
 from ..vectors import replace_numbers
 
 
@@ -15,6 +17,7 @@ class SparseMatrixBuilder:
     SparseMatrixBuilder is a utility class that helps build a matrix of
     unknown shape.
     """
+
     def __init__(self):
         self.row_index = []
         self.col_index = []
@@ -30,8 +33,9 @@ class SparseMatrixBuilder:
         self.values.append(val)
 
     def tocsr(self, shape, dtype=float):
-        return sparse.coo_matrix((self.values, (self.row_index, self.col_index)),
-                                 shape=shape, dtype=dtype).tocsr()
+        return sparse.coo_matrix(
+            (self.values, (self.row_index, self.col_index)), shape=shape, dtype=dtype
+        ).tocsr()
 
 
 def build_from_conceptnet_table(filename, orig_index=(), self_loops=True):

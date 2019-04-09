@@ -1,6 +1,7 @@
-import conceptnet5
 import inspect
 import os
+
+import conceptnet5
 
 
 def get_code_base():

@@ -1,7 +1,9 @@
-from conceptnet5.util import get_data_filename
-import os
 import logging
+import os
+
 from raven.contrib.flask import Sentry
+
+from conceptnet5.util import get_data_filename
 
 
 def try_configuring_sentry(app):

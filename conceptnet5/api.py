@@ -2,8 +2,8 @@
 This file defines the ConceptNet web API responses.
 """
 
+from conceptnet5.nodes import ld_node, standardized_concept_uri
 from conceptnet5.vectors.query import VectorSpaceWrapper
-from conceptnet5.nodes import standardized_concept_uri, ld_node
 
 VECTORS = VectorSpaceWrapper()
 FINDER = VECTORS.finder

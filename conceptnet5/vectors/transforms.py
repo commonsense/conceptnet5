@@ -18,11 +18,15 @@ def standardize_row_labels(frame, language='en', forms=True):
     # Check for en/term format we use to train fastText on OpenSubtitles data
     if all(label.count('/') == 1 for label in frame.index[0:5]):
         tuples = [label.partition('/') for label in frame.index]
-        frame.index = [uri_prefix(standardized_uri(language, text))
-                       for language, _slash, text in tuples]
+        frame.index = [
+            uri_prefix(standardized_uri(language, text))
+            for language, _slash, text in tuples
+        ]
 
     # Re-label the DataFrame with standardized, non-unique row labels
-    frame.index = [uri_prefix(standardized_uri(language, label)) for label in frame.index]
+    frame.index = [
+        uri_prefix(standardized_uri(language, label)) for label in frame.index
+    ]
 
     # Assign row n a weight of 1/(n+1) for weighted averaging
     nrows = frame.shape[0]
@@ -57,7 +61,9 @@ def l1_normalize_columns(frame):
     post-processing GloVe output.
     """
     index = frame.index
-    return pd.DataFrame(data=normalize(frame, norm='l1', copy=False, axis=0), index=index)
+    return pd.DataFrame(
+        data=normalize(frame, norm='l1', copy=False, axis=0), index=index
+    )
 
 
 def l2_normalize_rows(frame):
@@ -72,7 +78,9 @@ def l2_normalize_rows(frame):
     if frame.shape[0] == 0:
         return frame
     index = frame.index
-    return pd.DataFrame(data=normalize(frame, norm='l2', copy=False, axis=1), index=index)
+    return pd.DataFrame(
+        data=normalize(frame, norm='l2', copy=False, axis=1), index=index
+    )
 
 
 def subtract_mean_vector(frame):
@@ -119,4 +127,3 @@ def make_small_frame(big_frame, concepts):
     """
     small_vocab = choose_small_vocabulary(big_frame.index, concepts)
     return big_frame.ix[small_vocab]
-

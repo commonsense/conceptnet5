@@ -1,6 +1,6 @@
+import gzip
 import json
 import sys
-import gzip
 
 
 class JSONStreamWriter(object):

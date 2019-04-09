@@ -1,9 +1,9 @@
+import xml.etree.ElementTree as ET
+
 from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
-from conceptnet5.uri import Licenses
 from conceptnet5.nodes import standardized_concept_uri
-
-import xml.etree.ElementTree as ET
+from conceptnet5.uri import Licenses
 
 REL = '/r/SymbolOf'
 DATASET = '/d/emoji'
@@ -26,7 +26,9 @@ def handle_file(input_file, output_file):
     tree = ET.parse(input_file)
     out = MsgpackStreamWriter(output_file)
     root = tree.getroot()
-    lang = root[0][1].attrib['type']  # language is at position [1] within the child node [0]
+    lang = root[0][1].attrib[
+        'type'
+    ]  # language is at position [1] within the child node [0]
 
     if len(root) >= 2:
         for annotation in root[1]:

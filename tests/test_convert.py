@@ -1,11 +1,14 @@
-from conceptnet5.formats.convert import msgpack_to_json, json_to_msgpack
-from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
-from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter, read_msgpack_stream
+import os
+from itertools import zip_longest
+from tempfile import TemporaryDirectory
 
 from nose.tools import eq_
-from tempfile import TemporaryDirectory
-from itertools import zip_longest
-import os
+
+from conceptnet5.formats.convert import json_to_msgpack, msgpack_to_json
+from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
+from conceptnet5.formats.msgpack_stream import (
+    MsgpackStreamWriter, read_msgpack_stream
+)
 
 DATA = [
     {'a': 1},

@@ -1,12 +1,11 @@
-from __future__ import unicode_literals
 import codecs
 import json
+
+from conceptnet5.edges import make_edge
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
 from conceptnet5.nodes import standardized_concept_uri
-from conceptnet5.edges import make_edge
-from conceptnet5.util import get_support_data_filename
 from conceptnet5.uri import Licenses
-
+from conceptnet5.util import get_support_data_filename
 
 FRAME_DATA = json.load(
     codecs.open(get_support_data_filename('zh_frames.json'), encoding='utf-8')
@@ -20,7 +19,9 @@ def handle_raw_assertion(line):
     ftext = fdata['text']
     rel = fdata['relation']
 
-    surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace('{2}', '[[' + concept2 + ']]')
+    surfaceText = ftext.replace('{1}', '[[' + concept1 + ']]').replace(
+        '{2}', '[[' + concept2 + ']]'
+    )
     # We mark surface texts with * if {2} comes before {1}.
     if ftext.find('{2}') < ftext.find('{1}'):
         surfaceText = '*' + surfaceText
@@ -29,11 +30,18 @@ def handle_raw_assertion(line):
     end = standardized_concept_uri('zh_TW', concept2)
     source = {
         'contributor': '/s/contributor/petgame/' + user,
-        'activity': '/s/activity/ptt/petgame'
+        'activity': '/s/activity/ptt/petgame',
     }
-    yield make_edge(rel, start, end, dataset='/d/conceptnet/4/zh',
-                    license=Licenses.cc_attribution, sources=[source],
-                    surfaceText=surfaceText, weight=1)
+    yield make_edge(
+        rel,
+        start,
+        end,
+        dataset='/d/conceptnet/4/zh',
+        license=Licenses.cc_attribution,
+        sources=[source],
+        surfaceText=surfaceText,
+        weight=1,
+    )
 
 
 def handle_file(input_filename, output_file):

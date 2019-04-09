@@ -1,9 +1,10 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
 
-from conceptnet5.uri import get_uri_language
 from conceptnet5.languages import CORE_LANGUAGES
+from conceptnet5.uri import get_uri_language
+
 from .formats import load_hdf
 
 
@@ -26,8 +27,8 @@ def dataframe_svd_projection(frame, k):
 
 def concat_intersect(frame_filenames):
     """
-    Find the intersection of the labels of all the frames in the given 
-    files , and concatenate the vectors that the frames have for each of 
+    Find the intersection of the labels of all the frames in the given
+    files , and concatenate the vectors that the frames have for each of
     those labels.
 
     This is exactly what `pd.concat` is for. However, `pd.concat` uses too
@@ -67,7 +68,7 @@ def concat_intersect(frame_filenames):
         frame = load_hdf(frame_filename)
         width = frame.shape[1]
         for i, label in enumerate(label_intersection):
-            joindata[i, offset:(offset + width)] = frame.loc[label].values
+            joindata[i, offset : (offset + width)] = frame.loc[label].values
     del frame
 
     # Convert the array to a DataFrame with the appropriate labels, and
@@ -95,11 +96,15 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     # are single words in our CORE_LANGUAGES. Even those are too numerous,
     # so we take an arbitrary 1/n sample of them, where n is given by the
     # `subsample` parameter.
-    filtered_labels = pd.Series([
-        label for (i, label) in enumerate(joined.index)
-        if i % subsample == 0 and '_' not in label
-        and get_uri_language(label) in CORE_LANGUAGES
-    ])
+    filtered_labels = pd.Series(
+        [
+            label
+            for (i, label) in enumerate(joined.index)
+            if i % subsample == 0
+            and '_' not in label
+            and get_uri_language(label) in CORE_LANGUAGES
+        ]
+    )
 
     # Mean-center and L_2-normalize the data, to prevent artifacts
     # in dimensionality reduction.

@@ -3,9 +3,9 @@ This is a sanity check to run after the full ConceptNet build, confirming that
 we have data in all the appropriate languages, from all the appropriate sources.
 """
 
-from conceptnet5.util import get_data_filename
-from conceptnet5.languages import CORE_LANGUAGES, COMMON_LANGUAGES, ALL_LANGUAGES
 from conceptnet5.db.query import AssertionFinder
+from conceptnet5.languages import ALL_LANGUAGES, COMMON_LANGUAGES, CORE_LANGUAGES
+from conceptnet5.util import get_data_filename
 
 test_finder = None
 
@@ -34,12 +34,20 @@ def test_languages_exist():
 
 def test_datasets_exist():
     for dataset in [
-        '/d/conceptnet/4/en', '/d/conceptnet/4/pt', '/d/conceptnet/4/ja',
-        '/d/conceptnet/4/zh', '/d/conceptnet/4/nl',
-        '/d/dbpedia', '/d/jmdict', '/d/opencyc', '/d/verbosity', '/d/wordnet',
-        '/d/wiktionary/en', '/d/wiktionary/fr', '/d/wiktionary/de'
+        '/d/conceptnet/4/en',
+        '/d/conceptnet/4/pt',
+        '/d/conceptnet/4/ja',
+        '/d/conceptnet/4/zh',
+        '/d/conceptnet/4/nl',
+        '/d/dbpedia',
+        '/d/jmdict',
+        '/d/opencyc',
+        '/d/verbosity',
+        '/d/wordnet',
+        '/d/wiktionary/en',
+        '/d/wiktionary/fr',
+        '/d/wiktionary/de',
     ]:
         # Test that each dataset has at least 100 assertions
         q = test_finder.query({'dataset': dataset}, limit=100)
         assert len(q) == 100, dataset
-

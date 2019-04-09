@@ -1,5 +1,4 @@
 import msgpack
-import sys
 
 
 class MsgpackStreamWriter(object):

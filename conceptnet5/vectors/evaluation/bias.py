@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import scipy
 
-from conceptnet5.vectors import standardized_uri, normalize_vec, get_vector
-from conceptnet5.vectors.transforms import (
-    l2_normalize_rows, subtract_mean_vector
-)
+from conceptnet5.vectors import get_vector, normalize_vec, standardized_uri
 from conceptnet5.vectors.debias import (
     FEMALE_WORDS, MALE_WORDS, PEOPLE_BY_BELIEF, PEOPLE_BY_ETHNICITY,
     get_category_axis, get_vocabulary_vectors
+)
+from conceptnet5.vectors.transforms import (
+    l2_normalize_rows, subtract_mean_vector
 )
 
 # A list of gender-stereotyped pairs, from Bolukbasi et al.:
@@ -195,12 +195,16 @@ def measure_bias(frame):
     - Coarse-grained ethnicity
     - Religious beliefs
     """
-    gender_binary_axis = normalize_vec(get_category_axis(frame, FEMALE_WORDS) - get_category_axis(frame, MALE_WORDS))
+    gender_binary_axis = normalize_vec(
+        get_category_axis(frame, FEMALE_WORDS) - get_category_axis(frame, MALE_WORDS)
+    )
     gender_bias_numbers = []
     for female_biased_word, male_biased_word in GENDER_BIAS_PAIRS:
         female_biased_uri = standardized_uri('en', female_biased_word)
         male_biased_uri = standardized_uri('en', male_biased_word)
-        diff = normalize_vec(get_vector(frame, female_biased_uri) - get_vector(frame, male_biased_uri)).dot(gender_binary_axis)
+        diff = normalize_vec(
+            get_vector(frame, female_biased_uri) - get_vector(frame, male_biased_uri)
+        ).dot(gender_binary_axis)
         gender_bias_numbers.append(diff)
 
     mean = np.mean(gender_bias_numbers)

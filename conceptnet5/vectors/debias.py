@@ -3,8 +3,7 @@ import pandas as pd
 from sklearn import svm
 from sklearn.preprocessing import normalize
 
-from conceptnet5.vectors import standardized_uri, normalize_vec
-
+from conceptnet5.vectors import normalize_vec, standardized_uri
 
 # A list of English words referring to nationalities, nations, ethnicities, and
 # religions. Our goal is to prevent ConceptNet from learning insults and
@@ -361,11 +360,11 @@ GENDER_NEUTRAL_WORDS = [
 
 def make_shard_endpoints(total_length, shard_size=int(1e6)):
     """
-    Partition the half-open integer interval [0, total_length) into a 
-    sequence of half-open subintervals [s0,e0), [s1,e1), ... [s_n, e_n) 
-    such that s0 = 0, s_(k+1) = e_k, e_n = total_length, and each of these 
-    subintervals (except possibly the last) has length equal to the given 
-    shard_size.  Return the sequence of pairs of endpoints of the 
+    Partition the half-open integer interval [0, total_length) into a
+    sequence of half-open subintervals [s0,e0), [s1,e1), ... [s_n, e_n)
+    such that s0 = 0, s_(k+1) = e_k, e_n = total_length, and each of these
+    subintervals (except possibly the last) has length equal to the given
+    shard_size.  Return the sequence of pairs of endpoints of the
     subintervals.
     """
     shard_end = 0
@@ -595,11 +594,15 @@ def de_bias_frame(frame):
     The resulting space attempts not to learn stereotyped associations with
     anyone's race, color, religion, national origin, sex, gender presentation,
     or sexual orientation.
-    
-    The input frame is modified in-place; this can save considerable memory 
+
+    The input frame is modified in-place; this can save considerable memory
     with realistically sized semantic spaces.
     """
     de_bias_category(frame, PEOPLE_BY_ETHNICITY, CULTURE_PREJUDICES + SEX_PREJUDICES)
     de_bias_category(frame, PEOPLE_BY_BELIEF, CULTURE_PREJUDICES + SEX_PREJUDICES)
-    de_bias_category(frame, FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS, CULTURE_PREJUDICES + SEX_PREJUDICES)
+    de_bias_category(
+        frame,
+        FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS,
+        CULTURE_PREJUDICES + SEX_PREJUDICES
+    )
     de_bias_binary(frame, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)

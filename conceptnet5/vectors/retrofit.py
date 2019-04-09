@@ -1,19 +1,29 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import normalize
-from .sparse_matrix_builder import build_from_conceptnet_table
+
 from .formats import load_hdf, save_hdf
+from .sparse_matrix_builder import build_from_conceptnet_table
 
 
-def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
-                     iterations=5, nshards=6, verbosity=0,
-                     max_cleanup_iters=20, orig_vec_weight=0.15):
+def sharded_retrofit(
+    dense_hdf_filename,
+    conceptnet_filename,
+    output_filename,
+    iterations=5,
+    nshards=6,
+    verbosity=0,
+    max_cleanup_iters=20,
+    orig_vec_weight=0.15,
+):
     # frame_box is basically a reference to a single large DataFrame. The
     # DataFrame will at times be present or absent. When it's present, the list
     # contains one item, which is the DataFrame. When it's absent, the list
     # is empty.
     frame_box = [load_hdf(dense_hdf_filename)]
-    sparse_csr, combined_index = build_from_conceptnet_table(conceptnet_filename, orig_index=frame_box[0].index)
+    sparse_csr, combined_index = build_from_conceptnet_table(
+        conceptnet_filename, orig_index=frame_box[0].index
+    )
     shard_width = frame_box[0].shape[1] // nshards
 
     for i in range(nshards):
@@ -28,7 +38,15 @@ def sharded_retrofit(dense_hdf_filename, conceptnet_filename, output_filename,
         # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
-        retrofitted = retrofit(combined_index, dense_frame, sparse_csr, iterations, verbosity, max_cleanup_iters, orig_vec_weight)
+        retrofitted = retrofit(
+            combined_index,
+            dense_frame,
+            sparse_csr,
+            iterations,
+            verbosity,
+            max_cleanup_iters,
+            orig_vec_weight,
+        )
         save_hdf(retrofitted, temp_filename)
         del retrofitted
 
@@ -42,7 +60,7 @@ def join_shards(output_filename, nshards=6, sort=False):
         if joined_matrix is None:
             joined_matrix = np.zeros((nrows, ncols * nshards), dtype='f')
             joined_labels = shard.index
-        joined_matrix[:, (ncols * i):(ncols * (i + 1))] = shard.values
+        joined_matrix[:, (ncols * i) : (ncols * (i + 1))] = shard.values
         del shard
 
     normalize(joined_matrix, axis=1, norm='l2', copy=False)
@@ -52,9 +70,15 @@ def join_shards(output_filename, nshards=6, sort=False):
     save_hdf(dframe, output_filename)
 
 
-def retrofit(row_labels, dense_frame, sparse_csr,
-             iterations=5, verbosity=0, max_cleanup_iters=20,
-             orig_vec_weight=0.15):
+def retrofit(
+    row_labels,
+    dense_frame,
+    sparse_csr,
+    iterations=5,
+    verbosity=0,
+    max_cleanup_iters=20,
+    orig_vec_weight=0.15,
+):
     """
     Retrofitting is a process of combining information from a machine-learned
     space of term vectors with further structured information about those
@@ -82,14 +106,12 @@ def retrofit(row_labels, dense_frame, sparse_csr,
     appropriately.
     """
     # Initialize a DataFrame with rows that we know
-    retroframe = pd.DataFrame(
-        index=row_labels, columns=dense_frame.columns, dtype='f'
-    )
+    retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns, dtype='f')
     retroframe.update(dense_frame)
 
     # orig_weights = 1 for known vectors, 0 for unknown vectors
     orig_weights = 1 - retroframe.iloc[:, 0].isnull()
-    orig_vec_indicators = (orig_weights.values != 0)
+    orig_vec_indicators = orig_weights.values != 0
     orig_vecs = retroframe.fillna(0).values
 
     # Subtract the mean so that vectors don't just clump around common
@@ -102,7 +124,7 @@ def retrofit(row_labels, dense_frame, sparse_csr,
     vecs = orig_vecs
     for iteration in range(iterations):
         if verbosity >= 1:
-            print('Retrofitting: Iteration %s of %s' % (iteration+1, iterations))
+            print('Retrofitting: Iteration %s of %s' % (iteration + 1, iterations))
 
         # Since the sparse weight matrix is row-stochastic and has self-loops,
         # pre-multiplication by it replaces each vector by a weighted average
@@ -113,7 +135,7 @@ def retrofit(row_labels, dense_frame, sparse_csr,
         # terms with lots of zero neighbors.
 
         # Find, for every term, the total weight of its nonzero neighbors.
-        nonzero_indicators = (np.abs(vecs).sum(1) != 0)
+        nonzero_indicators = np.abs(vecs).sum(1) != 0
         total_neighbor_weights = sparse_csr.dot(nonzero_indicators)
 
         # Now average with all the neighbors.
@@ -126,17 +148,20 @@ def retrofit(row_labels, dense_frame, sparse_csr,
         # that are nonzero now, after averaging.  Also, we reshape the total
         # weights into a column vector so that numpy will broadcast the
         # division by weights across the columns of the embedding matrix.
-        nonzero_indicators = (np.abs(vecs).sum(1) != 0)
+        nonzero_indicators = np.abs(vecs).sum(1) != 0
         total_neighbor_weights = total_neighbor_weights[nonzero_indicators]
-        total_neighbor_weights = total_neighbor_weights.reshape((len(total_neighbor_weights), 1))
+        total_neighbor_weights = total_neighbor_weights.reshape(
+            (len(total_neighbor_weights), 1)
+        )
         vecs[nonzero_indicators] /= total_neighbor_weights
 
         # Re-center the (new) non-zero vectors.
         vecs[nonzero_indicators] -= vecs[nonzero_indicators].mean(0)
 
         # Average known rows with original vectors
-        vecs[orig_vec_indicators, :] = \
-            (1.0 - orig_vec_weight) * vecs[orig_vec_indicators, :] + orig_vec_weight * orig_vecs[orig_vec_indicators, :]
+        vecs[orig_vec_indicators, :] = (1.0 - orig_vec_weight) * vecs[
+            orig_vec_indicators, :
+        ] + orig_vec_weight * orig_vecs[orig_vec_indicators, :]
 
     # Clean up as many all-zero vectors as possible.  Zero vectors
     # can either come from components of the conceptnet graph that
@@ -152,7 +177,7 @@ def retrofit(row_labels, dense_frame, sparse_csr,
     # this code.
     n_zero_indicators_old = -1
     for iteration in range(max_cleanup_iters):
-        zero_indicators = (np.abs(vecs).sum(1) == 0)
+        zero_indicators = np.abs(vecs).sum(1) == 0
         n_zero_indicators = np.sum(zero_indicators)
         if n_zero_indicators == 0 or n_zero_indicators == n_zero_indicators_old:
             break
@@ -162,9 +187,15 @@ def retrofit(row_labels, dense_frame, sparse_csr,
         vecs[zero_indicators, :] = sparse_csr[zero_indicators, :].dot(vecs)
         # Now divide each newly nonzero vector (row) by the total weight of its
         # old nonzero neighbors.
-        new_nonzero_indicators = np.logical_and(zero_indicators, np.abs(vecs).sum(1) != 0)
-        total_neighbor_weights = sparse_csr[new_nonzero_indicators, :].dot(np.logical_not(zero_indicators))
-        total_neighbor_weights = total_neighbor_weights.reshape((len(total_neighbor_weights), 1))
+        new_nonzero_indicators = np.logical_and(
+            zero_indicators, np.abs(vecs).sum(1) != 0
+        )
+        total_neighbor_weights = sparse_csr[new_nonzero_indicators, :].dot(
+            np.logical_not(zero_indicators)
+        )
+        total_neighbor_weights = total_neighbor_weights.reshape(
+            (len(total_neighbor_weights), 1)
+        )
         vecs[new_nonzero_indicators, :] /= total_neighbor_weights
     else:
         print('Warning: cleanup iteration limit exceeded.')

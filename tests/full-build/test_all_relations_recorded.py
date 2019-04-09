@@ -3,8 +3,9 @@ This is a test to ensure that all of the relations produced by the full
 ConceptNet build are in fact recorded in the relations.py file.
 '''
 
-from conceptnet5.util import get_data_filename
 from conceptnet5.relations import ALL_RELATIONS
+from conceptnet5.util import get_data_filename
+
 
 def collect_relations(path):
     '''
@@ -18,6 +19,7 @@ def collect_relations(path):
             _count, relation = line.lstrip().split(maxsplit=2)
             relations.add(relation)
     return relations
+
 
 def test_relations_recorded():
     built_relations_file = get_data_filename('stats/relations.txt')

@@ -1,7 +1,18 @@
 import click
+
 from . import (
-    cc_cedict, conceptnet4, dbpedia, emoji, jmdict, kyoto_yahoo,
-    nadya, ptt_petgame, opencyc, verbosity, wiktionary, wordnet
+    cc_cedict,
+    conceptnet4,
+    dbpedia,
+    emoji,
+    jmdict,
+    kyoto_yahoo,
+    nadya,
+    opencyc,
+    ptt_petgame,
+    verbosity,
+    wiktionary,
+    wordnet,
 )
 
 
@@ -24,12 +35,16 @@ def run_conceptnet4(input, output):
 
 
 @cli.command(name='jmdict')
-@click.argument('input', type=click.Path(readable=True, dir_okay=False),
-                # help='XML file containing JMDict'
-                )
-@click.argument('output', type=click.Path(writable=True, dir_okay=False),
-                # help='msgpack file to output to'
-                )
+@click.argument(
+    'input',
+    type=click.Path(readable=True, dir_okay=False),
+    # help='XML file containing JMDict'
+)
+@click.argument(
+    'output',
+    type=click.Path(writable=True, dir_okay=False),
+    # help='msgpack file to output to'
+)
 def run_jmdict(input, output):
     """
     Import JMDict (a multilingual Japanese dictionary) from its XML format.
@@ -112,8 +127,7 @@ def run_verbosity(input, output):
 
 
 @cli.command(name='wiktionary_pre')
-@click.argument('inputs', type=click.Path(readable=True, dir_okay=False),
-                nargs=-1)
+@click.argument('inputs', type=click.Path(readable=True, dir_okay=False), nargs=-1)
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
 def run_wiktionary_pre(inputs, output):
     """

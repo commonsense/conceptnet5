@@ -2,8 +2,8 @@
 Handle data that has been collected from nadya.jp, an online word game
 created to collect data for ConceptNet, by Nihon Unisys and Dentsu.
 """
-from conceptnet5.readers.conceptnet4 import CN4Builder
 from conceptnet5.formats.msgpack_stream import MsgpackStreamWriter
+from conceptnet5.readers.conceptnet4 import CN4Builder
 
 # The nadya.jp data is distributed as a PostgreSQL database. The following
 # command will extract a file in the form of 'nadya-2017.csv' from such a
@@ -54,8 +54,19 @@ def handle_line(line, builder):
     ConceptNet edges that can be extracted from it.
     """
     parts = line.rstrip('\n').split('\t')
-    (cnet4_id, lang, frame_text, relname, start_text, end_text,
-     freq, vote, email, creator, voter) = parts
+    (
+        cnet4_id,
+        lang,
+        frame_text,
+        relname,
+        start_text,
+        end_text,
+        freq,
+        vote,
+        email,
+        creator,
+        voter,
+    ) = parts
     if cnet4_id == 'cnet4_id':
         return
 
@@ -85,7 +96,7 @@ def handle_line(line, builder):
             'creator': voter,
             'votes': [],
             'activity': 'nadya.jp',
-            'goodness': 3
+            'goodness': 3,
         }
         yield from builder.handle_assertion(parts_dict)
 

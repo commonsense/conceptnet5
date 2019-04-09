@@ -1,17 +1,18 @@
-import click
 from os import path
 
+import click
+
 from .debias import de_bias_frame
-from .evaluation import wordsim, analogy, bias
+from .evaluation import analogy, bias, wordsim
 from .evaluation.compare import compare_embeddings, graph_comparison
 from .formats import (
-    convert_glove,
-    convert_word2vec,
     convert_fasttext,
+    convert_glove,
     convert_polyglot,
+    convert_word2vec,
+    export_text,
     load_hdf,
     save_hdf,
-    export_text,
     save_labels,
     save_npy,
 )
@@ -19,7 +20,7 @@ from .merge import merge_intersect
 from .miniaturize import miniaturize
 from .propagate import sharded_propagate
 from .query import VectorSpaceWrapper
-from .retrofit import sharded_retrofit, join_shards
+from .retrofit import join_shards, sharded_retrofit
 from .transforms import make_big_frame, make_small_frame
 
 ANALOGY_FILENAME = 'data/raw/analogy/SAT-package-V3.txt'

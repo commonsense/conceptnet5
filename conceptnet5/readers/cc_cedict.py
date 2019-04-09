@@ -32,14 +32,17 @@ BRACKETS_REGEX = re.compile(r'\[.+?\]')  # pronunciation
 DATE_RANGE_REGEX = re.compile(r'(.+?)\s\(.+\d.+\),')  # date range
 DEFINITIONS_REGEX = re.compile(r'/|;')  # separate definitions
 HAN_CHAR_REGEX = regex.compile('([\p{IsIdeo}]+[\|·]?)+')  # Han characters
-LINE_REGEX = re.compile(r'(.+)\s(.+)\[.+\]\s/(.+)/')  # separate traditional and simplified words
+LINE_REGEX = re.compile(
+    r'(.+)\s(.+)\[.+\]\s/(.+)/'
+)  # separate traditional and simplified words
 LIT_FIG_REGEX = re.compile(r'(\b|\s)(fig|lit).\s')  # literally/figuratively
 PAREN_REGEX = re.compile(r'\(.+?\)')  # parenthesis
 SB_REGEX = re.compile(r'\b(sb)\b')
 STH_REGEX = re.compile(r'\b(sth)\b')
 SEE_ALSO_REGEX = re.compile(r'see( also)?')  # see also
-VARIANT_REGEX = re.compile(r'((old |Japanese )?variant of|archaic version of|also '
-                           r'written|same as)\s')  # variant syntax
+VARIANT_REGEX = re.compile(
+    r'((old |Japanese )?variant of|archaic version of|also ' r'written|same as)\s'
+)  # variant syntax
 
 
 def remove_reference_syntax(definition):
@@ -116,12 +119,14 @@ def handle_file(filename, output_file):
         traditional, simplified, definitions = re.match(LINE_REGEX, line).groups()
 
         # Make an edge between the traditional and simplified version
-        edge = make_edge(rel='/r/Synonym',
-                         start=standardized_concept_uri('zh-Hant', traditional),
-                         end=standardized_concept_uri('zh-Hans', simplified),
-                         dataset=DATASET,
-                         license=LICENSE,
-                         sources=SOURCE)
+        edge = make_edge(
+            rel='/r/Synonym',
+            start=standardized_concept_uri('zh-Hant', traditional),
+            end=standardized_concept_uri('zh-Hans', simplified),
+            dataset=DATASET,
+            license=LICENSE,
+            sources=SOURCE,
+        )
         out.write(edge)
 
         for definition in re.split(DEFINITIONS_REGEX, definitions):
@@ -135,20 +140,24 @@ def handle_file(filename, output_file):
             if person_match:
                 persons = extract_person(person_match)
                 for person in persons:
-                    edge = make_edge(rel='/r/Synonym',
-                                     start=standardized_concept_uri('zh-Hant', traditional),
-                                     end=standardized_concept_uri('en', person),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/Synonym',
+                        start=standardized_concept_uri('zh-Hant', traditional),
+                        end=standardized_concept_uri('en', person),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
 
-                    edge = make_edge(rel='/r/Synonym',
-                                     start=standardized_concept_uri('zh-Hans', simplified),
-                                     end=standardized_concept_uri('en', person),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/Synonym',
+                        start=standardized_concept_uri('zh-Hans', simplified),
+                        end=standardized_concept_uri('en', person),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
                 continue
 
@@ -156,20 +165,24 @@ def handle_file(filename, output_file):
             if definition.startswith('CL:'):
                 related_words = extract_measure_words(definition)
                 for word in related_words:
-                    edge = make_edge(rel='/r/RelatedTo',
-                                     start=standardized_concept_uri('zh-Hant', traditional),
-                                     end=standardized_concept_uri('zh', word),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/RelatedTo',
+                        start=standardized_concept_uri('zh-Hant', traditional),
+                        end=standardized_concept_uri('zh', word),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
 
-                    edge = make_edge(rel='/r/RelatedTo',
-                                     start=standardized_concept_uri('zh-Hans', simplified),
-                                     end=standardized_concept_uri('zh', word),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/RelatedTo',
+                        start=standardized_concept_uri('zh-Hans', simplified),
+                        end=standardized_concept_uri('zh', word),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
                 continue
 
@@ -180,40 +193,48 @@ def handle_file(filename, output_file):
             if re.match(VARIANT_REGEX, definition) or re.match(ABBR_REGEX, definition):
                 variants = extract_han_characters(definition)
                 for variant in variants:
-                    edge = make_edge(rel='/r/Synonym',
-                                     start=standardized_concept_uri('zh-Hant', traditional),
-                                     end=standardized_concept_uri('zh', variant),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/Synonym',
+                        start=standardized_concept_uri('zh-Hant', traditional),
+                        end=standardized_concept_uri('zh', variant),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
 
-                    edge = make_edge(rel='/r/Synonym',
-                                     start=standardized_concept_uri('zh-Hans', simplified),
-                                     end=standardized_concept_uri('zh', variant),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/Synonym',
+                        start=standardized_concept_uri('zh-Hans', simplified),
+                        end=standardized_concept_uri('zh', variant),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
                 continue
 
             if re.match(SEE_ALSO_REGEX, definition):
                 references = extract_han_characters(definition)
                 for reference in references:
-                    edge = make_edge(rel='/r/RelatedTo',
-                                     start=standardized_concept_uri('zh-Hant', traditional),
-                                     end=standardized_concept_uri('zh', reference),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/RelatedTo',
+                        start=standardized_concept_uri('zh-Hant', traditional),
+                        end=standardized_concept_uri('zh', reference),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
 
-                    edge = make_edge(rel='/r/RelatedTo',
-                                     start=standardized_concept_uri('zh-Hans', simplified),
-                                     end=standardized_concept_uri('zh', reference),
-                                     dataset=DATASET,
-                                     license=LICENSE,
-                                     sources=SOURCE)
+                    edge = make_edge(
+                        rel='/r/RelatedTo',
+                        start=standardized_concept_uri('zh-Hans', simplified),
+                        end=standardized_concept_uri('zh', reference),
+                        dataset=DATASET,
+                        license=LICENSE,
+                        sources=SOURCE,
+                    )
                     out.write(edge)
 
             # Remove 'lit.', 'fig.'
@@ -229,18 +250,22 @@ def handle_file(filename, output_file):
 
             # Skip long definitions and make an edge out of remaining information
             if len(definition.split()) < 6:
-                edge = make_edge(rel='/r/Synonym',
-                                 start=standardized_concept_uri('zh-Hant', traditional),
-                                 end=standardized_concept_uri('en', definition),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                edge = make_edge(
+                    rel='/r/Synonym',
+                    start=standardized_concept_uri('zh-Hant', traditional),
+                    end=standardized_concept_uri('en', definition),
+                    dataset=DATASET,
+                    license=LICENSE,
+                    sources=SOURCE,
+                )
                 out.write(edge)
 
-                edge = make_edge(rel='/r/Synonym',
-                                 start=standardized_concept_uri('zh-Hans', simplified),
-                                 end=standardized_concept_uri('en', definition),
-                                 dataset=DATASET,
-                                 license=LICENSE,
-                                 sources=SOURCE)
+                edge = make_edge(
+                    rel='/r/Synonym',
+                    start=standardized_concept_uri('zh-Hans', simplified),
+                    end=standardized_concept_uri('en', definition),
+                    dataset=DATASET,
+                    license=LICENSE,
+                    sources=SOURCE,
+                )
                 out.write(edge)

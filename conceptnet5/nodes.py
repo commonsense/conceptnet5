@@ -4,11 +4,8 @@ puts the tools in conceptnet5.uri together with functions that normalize
 terms and languages into a standard form (english_filter, simple_tokenize, LCODE_ALIASES).
 """
 
-from urllib.parse import urlparse
-
 import re
-from wordfreq import simple_tokenize
-from wordfreq.preprocess import preprocess_text
+from urllib.parse import urlparse
 
 from conceptnet5.language.english import english_filter
 from conceptnet5.languages import LCODE_ALIASES
@@ -20,6 +17,8 @@ from conceptnet5.uri import (
     uri_prefix,
     uri_to_label,
 )
+from wordfreq import simple_tokenize
+from wordfreq.preprocess import preprocess_text
 
 
 def preprocess_and_tokenize_text(lang, text):

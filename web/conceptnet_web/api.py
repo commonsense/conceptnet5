@@ -4,14 +4,15 @@ This file sets up Flask to serve the ConceptNet 5 API in JSON-LD format.
 import os
 
 import flask
+from flask_cors import CORS
+from flask_limiter import Limiter
+
 from conceptnet5 import api as responses
 from conceptnet5.api import VALID_KEYS, error
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet_web.error_logging import try_configuring_sentry
 from conceptnet_web.filters import FILTERS
 from conceptnet_web.json_rendering import jsonify
-from flask_cors import CORS
-from flask_limiter import Limiter
 
 # Configuration
 

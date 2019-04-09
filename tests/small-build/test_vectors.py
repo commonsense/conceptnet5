@@ -2,13 +2,14 @@ import os
 
 import numpy as np
 import pandas as pd
-from nose.tools import ok_, assert_almost_equal, with_setup
+from nose.tools import assert_almost_equal, ok_, with_setup
 
 from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
-from conceptnet5.vectors.transforms import standardize_row_labels, \
-    l1_normalize_columns, \
-    l2_normalize_rows, make_big_frame, make_small_frame, shrink_and_sort
+from conceptnet5.vectors.transforms import (
+    l1_normalize_columns, l2_normalize_rows, make_big_frame, make_small_frame,
+    shrink_and_sort, standardize_row_labels
+)
 
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "testdata")
 TEST_FRAME = None

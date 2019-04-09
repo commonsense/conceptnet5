@@ -1,5 +1,6 @@
-from conceptnet5.language.lemmatize import lemmatize
 from nose.tools import eq_
+
+from conceptnet5.language.lemmatize import lemmatize
 
 
 def test_lemmatize():
