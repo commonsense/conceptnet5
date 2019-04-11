@@ -176,8 +176,17 @@ def ld_node(uri, label=None):
     if is_term(uri):
         pieces = split_uri(uri)
         ld['language'] = get_uri_language(uri)
+
+        # Get a reasonably-distinct sense label for the term.
+        # Usually it will be the part of speech, but when we have fine-grained
+        # information from Wikipedia or WordNet, it'll include the last
+        # component as well.
         if len(pieces) > 3:
-            ld['sense_label'] = '/'.join(pieces[3:])
+            ld['sense_label'] = pieces[3]
+
+        if len(pieces) > 4 and pieces[4] in ('wp', 'wn'):
+            ld['sense_label'] += ', ' + pieces[-1]
+
         ld['term'] = uri_prefix(uri)
         ld['@type'] = 'Node'
     elif uri.startswith('http'):
