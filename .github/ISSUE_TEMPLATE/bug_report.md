@@ -1,6 +1,7 @@
 ---
 name: Bug report
-about: Report a problem with the code or data in ConceptNet
+about: Report a problem with the code or data in ConceptNet. (Please don't use this
+  page for questions.)
 title: ''
 labels: ''
 assignees: ''
