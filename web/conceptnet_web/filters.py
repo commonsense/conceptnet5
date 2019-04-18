@@ -1,3 +1,8 @@
+"""
+This file provides functions that can be called from Jinja templates, in order
+to put together the text on the browsable ConceptNet site.
+"""
+
 from jinja2.ext import Markup
 
 from conceptnet5.languages import get_language_name
@@ -7,10 +12,16 @@ from .json_rendering import highlight_and_link_json
 
 
 def describe_term_language(lang, description_language='en'):
+    """
+    Take in a language code for a ConceptNet term, and output a phrase
+    describing its language, such as 'A French term' or 'An English term'.
+
+    This text is for the ConceptNet interface, so it's in English, though
+    I'll leave the `description_language` parameter here as a reminder that
+    maybe one day we should localize ConceptNet's interface.
+    """
     if description_language != 'en':
-        raise NotImplementedError(
-            "We don't support non-English interface text yet."
-        )
+        raise NotImplementedError("We don't support non-English interface text yet.")
 
     language_name = get_language_name(lang)
     if language_name[0] in 'AEIOU' and not language_name.startswith('Uk'):
@@ -25,10 +36,15 @@ def describe_term_language(lang, description_language='en'):
 
 
 def full_language_name(term, description_language='en'):
+    """
+    Get the human-readable name of a language.
+
+    One place this text is used is for the title text when you hover over a
+    language code. For external links, there will be a site name there instead
+    of a language, so we support that here.
+    """
     if description_language != 'en':
-        raise NotImplementedError(
-            "We don't support non-English interface text yet."
-        )
+        raise NotImplementedError("We don't support non-English interface text yet.")
 
     if 'language' not in term:
         return term.get('site', '')
@@ -37,10 +53,10 @@ def full_language_name(term, description_language='en'):
 
 
 def source_link(url, name):
-    linked = '<a href="{url}">{name}</a>'.format(
-        url=url, name=name
-    )
-    return linked
+    """
+    Link to a ConceptNet source with the provided link text.
+    """
+    return '<a href="{url}">{name}</a>'.format(url=url, name=name)
 
 
 CONTRIBUTOR_NAME_MAP = {
@@ -64,15 +80,21 @@ ERROR_NAME_MAP = {
     404: 'Not found',
     429: 'Too many requests',
     500: 'Server error',
-    503: 'This ConceptNet interface is unavailable'
+    503: 'This ConceptNet interface is unavailable',
 }
 
 
 def error_name(code):
+    """
+    Get the human-readable name of an HTTP error code.
+    """
     return ERROR_NAME_MAP.get(code, code)
 
 
 def oxford_comma(items):
+    """
+    Join a list of human-readable items, using the Oxford comma when appropriate.
+    """
     if len(items) == 0:
         return ''
     elif len(items) == 1:
@@ -86,9 +108,18 @@ def oxford_comma(items):
 
 
 MAX_INDIVIDUALS = 3
+KYOTO_YAHOO_CREDIT = 'crowdsourcing by Kyoto University & Yahoo Research Japan'
 
 
 def describe_sources(sources, specific=True):
+    """
+    Build a marked-up text phrase describing the sources of our data.
+
+    If `specific` is True, sources with many known individual contributors
+    will list up to MAX_INDIVIDUALS of those contributors. If False, only
+    the source as a whole will be credited. specific=False is used for the
+    credit at the top of a page.
+    """
     omcs_contributors = []
     omcs_count = 0
     ptt_count = 0
@@ -98,6 +129,8 @@ def describe_sources(sources, specific=True):
     for source in sources:
         if 'activity' in source and source['activity'] == '/s/activity/omcs/nadya.jp':
             nadya_count += 1
+        elif 'activity' in source and source['activity'] == '/s/activity/kyoto_yahoo':
+            more_sources.add(source_link(source['activity'], KYOTO_YAHOO_CREDIT))
         elif 'contributor' in source:
             contributor = source['contributor']
             prefix = uri_prefix(contributor, 3)
@@ -109,7 +142,9 @@ def describe_sources(sources, specific=True):
             elif prefix == '/s/contributor/petgame':
                 ptt_count += 1
             elif contributor in CONTRIBUTOR_NAME_MAP:
-                more_sources.add(source_link(contributor, CONTRIBUTOR_NAME_MAP[contributor]))
+                more_sources.add(
+                    source_link(contributor, CONTRIBUTOR_NAME_MAP[contributor])
+                )
             else:
                 more_sources.add(source_link(contributor, contributor))
 
@@ -124,7 +159,9 @@ def describe_sources(sources, specific=True):
             )
             source_chunks.append(omcs_str)
         else:
-            source_chunks.append('<a href="/s/activity/omcs">Open Mind Common Sense</a> contributors')
+            source_chunks.append(
+                '<a href="/s/activity/omcs">Open Mind Common Sense</a> contributors'
+            )
     if ptt_count:
         if specific:
             if ptt_count == 1:
@@ -132,10 +169,14 @@ def describe_sources(sources, specific=True):
             else:
                 count_str = "{} players".format(ptt_count)
             source_chunks.append(
-                '{} of the <a href="/s/contributor/petgame">PTT Pet Game</a>'.format(count_str)
+                '{} of the <a href="/s/contributor/petgame">PTT Pet Game</a>'.format(
+                    count_str
+                )
             )
         else:
-            source_chunks.append('the <a href="/s/contributor/petgame">PTT Pet Game</a>')
+            source_chunks.append(
+                'the <a href="/s/contributor/petgame">PTT Pet Game</a>'
+            )
 
     if nadya_count:
         if specific:
@@ -144,7 +185,9 @@ def describe_sources(sources, specific=True):
             else:
                 count_str = "{} players".format(nadya_count)
             source_chunks.append(
-                '{} of <a href="/s/activity/omcs/nadya.jp">nadya.jp</a>'.format(count_str)
+                '{} of <a href="/s/activity/omcs/nadya.jp">nadya.jp</a>'.format(
+                    count_str
+                )
             )
         else:
             source_chunks.append('<a href="/s/activity/omcs/nadya.jp">nadya.jp</a>')
@@ -153,19 +196,26 @@ def describe_sources(sources, specific=True):
     if len(source_chunks) == 1:
         source_markup = "<strong>Source:</strong> {}".format(source_chunks[0])
     else:
-        source_markup = "<strong>Sources:</strong> {}".format(oxford_comma(source_chunks))
+        source_markup = "<strong>Sources:</strong> {}".format(
+            oxford_comma(source_chunks)
+        )
     return Markup(source_markup)
 
 
 def describe_sources_brief(sources):
+    """
+    Provide an easy way to call `describe_sources()` with `specific=False` from
+    a Jinja template.
+    """
     return describe_sources(sources, False)
 
 
+# Export functions that can be used in Jinja templates.
 FILTERS = {
     'highlight_json': highlight_and_link_json,
     'describe_term_language': describe_term_language,
     'describe_sources': describe_sources,
     'describe_sources_brief': describe_sources_brief,
     'full_language_name': full_language_name,
-    'error_name': error_name
+    'error_name': error_name,
 }
