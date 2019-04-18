@@ -11,18 +11,12 @@ from conceptnet5.uri import split_uri, uri_prefix
 from .json_rendering import highlight_and_link_json
 
 
-def describe_term_language(lang, description_language='en'):
+def describe_term_language(lang):
     """
-    Take in a language code for a ConceptNet term, and output a phrase
-    describing its language, such as 'A French term' or 'An English term'.
-
-    This text is for the ConceptNet interface, so it's in English, though
-    I'll leave the `description_language` parameter here as a reminder that
-    maybe one day we should localize ConceptNet's interface.
+    Take in a language code for a ConceptNet term, and output an English
+    phrase describing its language, such as 'A French term' or 'An English
+    term'.
     """
-    if description_language != 'en':
-        raise NotImplementedError("We don't support non-English interface text yet.")
-
     language_name = get_language_name(lang)
     if language_name[0] in 'AEIOU' and not language_name.startswith('Uk'):
         article = 'An'
@@ -35,17 +29,14 @@ def describe_term_language(lang, description_language='en'):
     return Markup(content)
 
 
-def full_language_name(term, description_language='en'):
+def full_language_name(term):
     """
-    Get the human-readable name of a language.
+    Get the English name of a language.
 
     One place this text is used is for the title text when you hover over a
     language code. For external links, there will be a site name there instead
     of a language, so we support that here.
     """
-    if description_language != 'en':
-        raise NotImplementedError("We don't support non-English interface text yet.")
-
     if 'language' not in term:
         return term.get('site', '')
     lang = term['language']
