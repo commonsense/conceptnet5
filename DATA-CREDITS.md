@@ -47,7 +47,7 @@ ConceptNet has been developed by:
   - Nihon Unisys Labs
   - Dentsu Inc.
   - Kyoto University
-  - Yahoo Research Japan
+  - Yahoo Japan Corporation
 
 * Luminoso Technologies, Inc.
 
