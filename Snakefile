@@ -393,6 +393,14 @@ rule sort_edges:
     shell:
         "mkdir -p {DATA}/tmp && cat {input} | LC_ALL=C sort -T {DATA}/tmp | LC_ALL=C uniq > {output}"
 
+rule shuffle_edges:
+    input:
+        DATA + "/collated/sorted/edges.csv"
+    output:
+        DATA + "/collated/sorted/edges-shuf.csv"
+    shell:
+        "shuf {input} > {output}"
+
 rule combine_assertions:
     input:
         DATA + "/collated/sorted/edges.csv"
