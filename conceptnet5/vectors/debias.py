@@ -503,26 +503,36 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
 
     # The bias axis is the vector difference between the average right example
     # and the average left example.
-    bias_axis = get_category_axis(frame, right_examples) - get_category_axis(frame, left_examples)
+    bias_axis = (
+        get_category_axis(frame, right_examples)
+        - get_category_axis(frame, left_examples)
+    )
 
     # Make a modified version of the space that projects the bias axis to 0.
     # Then weight each row of that space by "applicability", the probability
     # that each row should be de-biased.  This is also done on shards.
-    modified_component = np.zeros(shape=frame.values.shape, dtype=np.float32)
     for shard_start, shard_end in make_shard_endpoints(len(frame)):
-        modified_component[shard_start:shard_end, :] = \
-            reject_subspace(frame[shard_start:shard_end], [bias_axis]).mul(
-                applicability[shard_start:shard_end], axis=0).values
+        shard_len = shard_end - shard_start
+        modified_component = reject_subspace(
+            frame[shard_start:shard_end], [bias_axis]
+        ).mul(applicability[shard_start:shard_end], axis=0).values
 
-    # Make another component representing the vectors that should not be
-    # de-biased: the original space times (1 - applicability).
-    np.multiply(1 - applicability.reshape((len(frame), 1)), frame.values,
-                out=frame.values)
+        # Make another component representing the vectors that should not be
+        # de-biased: the original space times (1 - applicability).
+        np.multiply(
+            1 - applicability[shard_start:shard_end].reshape((shard_len, 1)),
+            frame.values[shard_start:shard_end, :],
+            out=frame.values[shard_start:shard_end]
+        )
 
-    # The sum of these two components is the de-biased space, where de-biasing
-    # applies to each row proportional to its applicability.
-    np.add(frame.values, modified_component, out=frame.values)
-    del modified_component
+        # The sum of these two components is the de-biased space, where
+        # de-biasing applies to each row proportional to its applicability.
+        np.add(
+            frame.values[shard_start:shard_end],
+            modified_component,
+            out=frame.values[shard_start:shard_end]
+        )
+        del modified_component
 
     # L_2-normalize the resulting rows in-place.
     normalize(frame.values, norm='l2', copy=False)
@@ -564,22 +574,28 @@ def de_bias_category(frame, category_examples, bias_examples):
     # Make a modified version of the space that projects the bias vectors to 0.
     # Then weight each row of that space by "applicability", the probability
     # that each row should be de-biased.  This is also done on shards.
-    modified_component = np.zeros(shape=frame.values.shape, dtype=np.float32)
     for shard_start, shard_end in make_shard_endpoints(len(frame)):
-        modified_component[shard_start:shard_end, :] = \
-            reject_subspace(frame[shard_start:shard_end], components_to_reject).mul(
-                applicability[shard_start:shard_end], axis=0).values
-    del components_to_reject
+        shard_len = shard_end - shard_start
+        modified_component = reject_subspace(
+            frame[shard_start:shard_end], components_to_reject
+        ).mul(applicability[shard_start:shard_end], axis=0).values
 
-    # Make another component representing the vectors that should not be
-    # de-biased: the original space times (1 - applicability).
-    np.multiply(1 - applicability.reshape((len(frame), 1)), frame.values,
-                out=frame.values)
+        # Make another component representing the vectors that should not be
+        # de-biased: the original space times (1 - applicability).
+        np.multiply(
+            1 - applicability[shard_start:shard_end].reshape((shard_len, 1)),
+            frame.values[shard_start:shard_end, :],
+            out=frame.values[shard_start:shard_end, :]
+        )
 
-    # The sum of these two components is the de-biased space, where de-biasing
-    # applies to each row proportional to its applicability.
-    np.add(frame.values, modified_component, out=frame.values)
-    del modified_component
+        # The sum of these two components is the de-biased space, where
+        # de-biasing applies to each row proportional to its applicability.
+        np.add(
+            frame.values[shard_start:shard_end, :],
+            modified_component,
+            out=frame.values[shard_start:shard_end, :]
+        )
+        del modified_component
 
     # L_2-normalize the resulting rows in-place.
     normalize(frame.values, norm='l2', copy=False)
@@ -605,4 +621,6 @@ def de_bias_frame(frame):
         FEMALE_WORDS + MALE_WORDS + ORIENTATION_WORDS + AGE_WORDS,
         CULTURE_PREJUDICES + SEX_PREJUDICES
     )
-    de_bias_binary(frame, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS)
+    de_bias_binary(
+        frame, GENDER_NEUTRAL_WORDS, GENDERED_WORDS, MALE_WORDS, FEMALE_WORDS
+    )
