@@ -58,7 +58,7 @@ WIKT_PARSER_VERSION = "2"
 
 CONVERT_SHARDS = 6
 RETROFIT_SHARDS = 6
-PROPAGATE_SHARDS = 12
+PROPAGATE_SHARDS = 10
 
 # Dataset filenames
 # =================
