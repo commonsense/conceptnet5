@@ -99,7 +99,7 @@ def oxford_comma(items):
 
 
 MAX_INDIVIDUALS = 3
-KYOTO_YAHOO_CREDIT = 'crowdsourcing by Kyoto University & Yahoo Research Japan'
+KYOTO_YAHOO_CREDIT = 'crowdsourcing by Kyoto University & Yahoo Japan Corporation'
 
 
 def describe_sources(sources, specific=True):
