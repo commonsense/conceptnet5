@@ -138,7 +138,7 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     """
     intersected, projection = merge_intersect(input_filenames)
     save_hdf(intersected, output_filename)
-    save_hdf(projection, projection_filename)
+    save_hdf(projection, projection_filename, format='mat')
 
 
 @cli.command(name='debias')
