@@ -20,20 +20,17 @@ def dataframe_svd_projection(frame, k):
     while `vframe` is the operation that projects those rows.
     """
     U, Σ, Vt = np.linalg.svd(frame.values, full_matrices=False)
-    uframe = pd.DataFrame(U[:, :k], index=frame.index, dtype='f')
-    vframe = pd.DataFrame(Vt.T[:, :k], index=frame.columns, dtype='f')
+    uframe = pd.DataFrame(U[:, :k], index=frame.index, dtype="f")
+    vframe = pd.DataFrame(Vt.T[:, :k], index=frame.columns, dtype="f")
     return uframe, Σ[:k], vframe
 
 
-def concat_intersect(frame_filenames):
+def _intersect_labels(frame_filenames):
     """
     Find the intersection of the labels of all the frames in the given
-    files , and concatenate the vectors that the frames have for each of
-    those labels.
-
-    This is exactly what `pd.concat` is for. However, `pd.concat` uses too
-    much memory. We have to emulate what it does while building the result
-    within a single matrix, instead of having multiple intermediate matrices.
+    files, the cumulative number of columns of the frames, and the mean
+    of the concatenations of the vectors that the frames have for each
+    of the labels in the intersection.
     """
     # Each frame will be associated with a range of columns in our concatenated
     # frame. As we scan through the frames, find out what the indices of those
@@ -56,24 +53,64 @@ def concat_intersect(frame_filenames):
 
     # Get the list of labels in a predictable order.
     label_intersection = sorted(label for label in label_intersection)
-    nrows = len(label_intersection)
 
-    # Now we know how many rows and columns of data we have, so allocate the
-    # NumPy array that will contain our results.
-    joindata = np.zeros((nrows, ncolumns), 'f')
+    # Get the mean of the concatenated vectors.
+    mean = np.zeros((ncolumns,), "f")
+    for frame_filename, offset in zip(frame_filenames, frame_col_offsets):
+        frame = load_hdf(frame_filename)
+        width = frame.shape[1]
+        for label in label_intersection:
+            mean[offset : (offset + width)] += frame.loc[label].values
+    del frame
+    mean /= len(label_intersection)
+
+    frame_col_offsets.append(ncolumns)
+    return label_intersection, frame_col_offsets, mean
+
+
+def _concat_intersect(frame_filenames, labels, frame_col_offsets, projection=None):
+    """
+    Given a list of frame filenames, a list of labels (all of which are
+    assumed to be present in the index of every one of the frames), the
+    cumulative numbers of columns in the frames, and (optionally) a
+    projection matrix (if not given, the identity is used), find, for
+    each label, the projection of the concatenation of the vectors assigned
+    by the frames to that label.
+
+    This is exactly what `pd.concat` is for. However, `pd.concat` uses too
+    much memory. We have to emulate what it does while building the result
+    within a single matrix, instead of having multiple intermediate matrices.
+    """
+    nrows = len(labels)
+    ncolumns = frame_col_offsets[-1]
+    frame_col_offsets = frame_col_offsets[:-1]
+
+    if projection is None:
+        n_projected = ncolumns
+    else:
+        assert projection.shape[0] == ncolumns
+        n_projected = projection.shape[1]
+    joindata = np.zeros((nrows, n_projected), "f")
 
     # Find the appropriate rows of each frame, extract them in the order of
     # our labels, and set those as the appropriate columns of the merged array.
     for frame_filename, offset in zip(frame_filenames, frame_col_offsets):
         frame = load_hdf(frame_filename)
         width = frame.shape[1]
-        for i, label in enumerate(label_intersection):
-            joindata[i, offset : (offset + width)] = frame.loc[label].values
+        if projection is None:
+            for i, label in enumerate(labels):
+                joindata[i, offset : (offset + width)] = frame.loc[label].values
+        else:
+            for i, label in enumerate(labels):
+                unprojected = np.zeros((1, ncolumns), "f")
+                unprojected[0, offset : (offset + width)] = frame.loc[label].values
+                projected = unprojected.dot(projection)
+                joindata[i, :] += projected[0]
     del frame
 
     # Convert the array to a DataFrame with the appropriate labels, and
     # return it.
-    joined = pd.DataFrame(joindata, index=label_intersection)
+    joined = pd.DataFrame(joindata, index=labels)
     return joined
 
 
@@ -87,9 +124,8 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     vocabulary will be the vocabulary of the retrofit knowledge graph,
     plus any other terms that happen to be in all of the frames.
     """
-    # Find the intersected vocabulary of the frames, and concatenate their
-    # vectors over that vocabulary.
-    joined = concat_intersect(frame_filenames)
+    # Find the intersected vocabulary of the frames.
+    joined_labels, frame_col_offsets, mean_vector = _intersect_labels(frame_filenames)
 
     # Find a subset of the labels that we'll use for calculating the
     # dimensionality-reduced version. The labels we particularly care about
@@ -99,18 +135,18 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     filtered_labels = pd.Series(
         [
             label
-            for (i, label) in enumerate(joined.index)
+            for (i, label) in enumerate(joined_labels)
             if i % subsample == 0
-            and '_' not in label
+            and "_" not in label
             and get_uri_language(label) in CORE_LANGUAGES
         ]
     )
 
     # Mean-center and L_2-normalize the data, to prevent artifacts
     # in dimensionality reduction.
-    adjusted = joined.loc[filtered_labels]
-    adjusted -= joined.mean(0)
-    normalize(adjusted.values, norm='l2', copy=False)
+    adjusted = _concat_intersect(frame_filenames, filtered_labels, frame_col_offsets)
+    adjusted -= mean_vector
+    normalize(adjusted.values, norm="l2", copy=False)
 
     # The SVD of this normalized matrix will give us its projection into
     # a lower-dimensional space (`projected`), as well as the operator that
@@ -123,10 +159,11 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     del adjusted
     del projected
 
-    # Project the original `joined` matrix into this space using the
-    # `projection` operator.
-    reprojected = joined.dot(projection)
-    del joined
+    # Compute the projections of all the concatenated vectors for all terms
+    # in the (full) common set of labels.
+    reprojected = _concat_intersect(
+        frame_filenames, joined_labels, frame_col_offsets, projection=projection
+    )
 
     # `projection` (V) is an orthogonal matrix, so when we multiply by it, we
     # get a `reprojected` that approximately preserves distances (U * Σ).
@@ -135,8 +172,8 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     # To mitigate this redundancy, and to match Levy and Goldberg's observation
     # that U * Σ ** (1/2) is a better SVD projection for word-representation
     # purposes than U * Σ, we divide by Σ ** (1/2).
-    np.divide(reprojected.values, eigenvalues ** .5, out=reprojected.values)
-    normalize(reprojected.values, norm='l2', copy=False)
+    np.divide(reprojected.values, eigenvalues ** 0.5, out=reprojected.values)
+    normalize(reprojected.values, norm="l2", copy=False)
 
     # Return our unified vectors, and the projection that could map other
     # concatenated vectors into the same vector space.

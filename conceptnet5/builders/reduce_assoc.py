@@ -181,8 +181,8 @@ def read_embedding_vocabularies(filenames):
     """
     result = pd.Index([])
     for filename in filenames:
-        vectors = load_hdf(filename)
-        result = result.union(vectors.index)
+        vectors_index = load_hdf(filename, index_only=True)
+        result = result.union(vectors_index)
     return result
 
 
