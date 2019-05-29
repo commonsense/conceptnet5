@@ -1,13 +1,14 @@
 """
 This module constructs URIs for nodes (concepts) in various languages. This
 puts the tools in conceptnet5.uri together with functions that normalize
-terms and languages into a standard form (english_filter, simple_tokenize, LCODE_ALIASES).
+terms and languages into a standard form (remove_english_stopwords, simple_tokenize,
+LCODE_ALIASES).
 """
 
 import re
 from urllib.parse import urlparse
 
-from conceptnet5.language.english import english_filter
+from conceptnet5.language.english import remove_english_stopwords
 from conceptnet5.languages import LCODE_ALIASES
 from conceptnet5.uri import (
     concept_uri,
@@ -119,7 +120,7 @@ def standardized_concept_uri(lang, text, *more):
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
     if lang == 'en':
-        token_filter = english_filter
+        token_filter = remove_english_stopwords
     else:
         token_filter = None
 
