@@ -40,6 +40,7 @@ def zz_remove_english_stopwords(tokens, use_small_stopwords_list):
     """
     Given a list of tokens, remove a small list of English stopwords.
     """
+    assert isinstance(use_small_stopwords_list, bool)
     non_stopwords = [token for token in tokens if token not in STOPWORDS_SMALL]
     while non_stopwords and non_stopwords[0] in DROP_FIRST:
         non_stopwords = non_stopwords[1:]
