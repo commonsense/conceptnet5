@@ -33,10 +33,10 @@ DROP_FIRST = ['to']
 
 
 def remove_english_stopwords(tokens):
-    return zz_remove_english_stopwords(tokens)
+    return zz_remove_english_stopwords(tokens, False)
 
 
-def zz_remove_english_stopwords(tokens):
+def zz_remove_english_stopwords(tokens, use_small_stopwords_list):
     """
     Given a list of tokens, remove a small list of English stopwords.
     """
