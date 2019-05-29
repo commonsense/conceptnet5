@@ -11,6 +11,10 @@ DROP_FIRST = ['to']
 
 
 def english_filter(tokens):
+    return remove_english_stopwords(tokens)
+
+
+def remove_english_stopwords(tokens):
     """
     Given a list of tokens, remove a small list of English stopwords.
     """
