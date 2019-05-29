@@ -33,4 +33,4 @@ def english_lemmatized_filter(tokens):
     reduce the words to their roots using a Wiktionary-based lemmatizer.
     """
     lemmas = [LEMMATIZER.lookup('en', tok)[0] for tok in tokens]
-    return english_filter(lemmas)
+    return remove_english_stopwords(lemmas)
