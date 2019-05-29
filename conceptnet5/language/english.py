@@ -32,11 +32,7 @@ STOPWORDS_LARGE = [
 DROP_FIRST = ['to']
 
 
-def remove_english_stopwords(tokens):
-    return zz_remove_english_stopwords(tokens, False)
-
-
-def zz_remove_english_stopwords(tokens, use_small_stopwords_list):
+def remove_english_stopwords(tokens, use_small_stopwords_list):
     """
     Given a list of tokens, remove a small list of English stopwords.
     """
@@ -57,4 +53,4 @@ def english_lemmatized_filter(tokens):
     reduce the words to their roots using a Wiktionary-based lemmatizer.
     """
     lemmas = [LEMMATIZER.lookup('en', tok)[0] for tok in tokens]
-    return zz_remove_english_stopwords(lemmas, False)
+    return remove_english_stopwords(lemmas, False)

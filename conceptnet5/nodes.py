@@ -8,7 +8,7 @@ LCODE_ALIASES).
 import re
 from urllib.parse import urlparse
 
-from conceptnet5.language.english import zz_remove_english_stopwords
+from conceptnet5.language.english import remove_english_stopwords
 from conceptnet5.languages import LCODE_ALIASES
 from conceptnet5.uri import (
     concept_uri,
@@ -120,7 +120,7 @@ def standardized_concept_uri(lang, text, *more):
     if lang in LCODE_ALIASES:
         lang = LCODE_ALIASES[lang]
     if lang == 'en':
-        token_filter = zz_remove_english_stopwords
+        token_filter = remove_english_stopwords
     else:
         token_filter = None
 
