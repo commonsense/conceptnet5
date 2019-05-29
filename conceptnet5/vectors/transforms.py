@@ -38,7 +38,7 @@ def standardize_row_labels(frame, language='en', forms=True):
 
     # Rearrange the items in descending order of weight, similar to the order
     # we get them in from word2vec and GloVe
-    combined_weights.sort(ascending=False)
+    combined_weights.sort_values(ascending=False, inplace=True)
     result = scaled.loc[combined_weights.index]
     return result
 
