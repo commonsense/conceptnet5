@@ -25,12 +25,14 @@ def dataframe_svd_projection(frame, k):
     return uframe, Σ[:k], vframe
 
 
-def _intersect_labels(frame_filenames):
+def _find_intersection(frame_filenames):
     """
-    Find the intersection of the labels of all the frames in the given
-    files, the cumulative number of columns of the frames, and the mean
-    of the concatenations of the vectors that the frames have for each
-    of the labels in the intersection.
+    Takes in the filenames of the DataFrames we're going to be merging, and produces
+    three outputs that we will need to merge them:
+
+    - The list of labels that are present in all frames
+    - The number of columns these frames will have when their columns are concatenated
+    - The mean of the concatenations of the vectors corresponding to the given labels
     """
     # Each frame will be associated with a range of columns in our concatenated
     # frame. As we scan through the frames, find out what the indices of those
@@ -124,8 +126,9 @@ def merge_intersect(frame_filenames, subsample=20, k=300):
     vocabulary will be the vocabulary of the retrofit knowledge graph,
     plus any other terms that happen to be in all of the frames.
     """
-    # Find the intersected vocabulary of the frames.
-    joined_labels, frame_col_offsets, mean_vector = _intersect_labels(frame_filenames)
+    # Find the intersected vocabulary of the frames, and other global information
+    # that we will need to merge them.
+    joined_labels, frame_col_offsets, mean_vector = _find_intersection(frame_filenames)
 
     # Find a subset of the labels that we'll use for calculating the
     # dimensionality-reduced version. The labels we particularly care about
