@@ -66,6 +66,9 @@ def miniaturize(input_filename, other_vocab=None, k=300, debias=True):
     vocab = vocab1 + extra_vocab
     del vocab1, extra_vocab, vocab_set
 
+    # Produce 'smaller', a version of the frame with only the selected vocabulary in
+    # 'vocab'.
+    #
     # We'd like to set smaller = load_hdf(input_filename).loc[vocab].values,
     # but that could run out of memory.  So we process the frame in shards.
     smaller = None
@@ -83,12 +86,17 @@ def miniaturize(input_filename, other_vocab=None, k=300, debias=True):
             vocab[shard_start:shard_end]
         ].values
 
+    # Take the SVD and keep only the top `k` components
     U, _S, _Vt = np.linalg.svd(smaller, full_matrices=False)
     del smaller, _S, _Vt
     redecomposed = pd.DataFrame(U[:, :k], index=vocab, dtype='f')
     del U, vocab
+
+    # De-biasing is more effective after dimensionality reduction than before
     if debias:
         de_bias_frame(redecomposed)
+
+    # Convert to 8-bit integers
     mini = (redecomposed * 64).astype(np.int8)
     mini.sort_index(inplace=True)
     return mini
