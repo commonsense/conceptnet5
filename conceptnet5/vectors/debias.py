@@ -358,14 +358,13 @@ GENDER_NEUTRAL_WORDS = [
 ]
 
 
-def make_shard_endpoints(total_length, shard_size=int(1e6)):
+def make_shard_endpoints(total_length, shard_size):
     """
-    Partition the half-open integer interval [0, total_length) into a
-    sequence of half-open subintervals [s0,e0), [s1,e1), ... [s_n, e_n)
-    such that s0 = 0, s_(k+1) = e_k, e_n = total_length, and each of these
-    subintervals (except possibly the last) has length equal to the given
-    shard_size.  Return the sequence of pairs of endpoints of the
-    subintervals.
+    Partition `range(0, total_length)` fully into sub-ranges of size at most
+    `shard_size`. The length of each sub-range except possibly the last will be
+    `shard_size`.
+
+    Returns the sub-ranges as a list of (start, end) pairs.
     """
     shard_end = 0
     shards = []
@@ -457,6 +456,41 @@ def two_class_svm(frame, pos_vocab, neg_vocab):
     return svc
 
 
+def _weighted_debias(frame, applicability, components_to_reject):
+    """
+    Make a modified version of the space that projects certain given components to 0
+    (the "hard-debiased" space). The final space will be a weighted combination of the
+    hard-debiased space and the original space, with 'applicability' determining the
+    proportion that is hard-debiased.
+
+    This function modifies `frame` in place and returns nothing, in order to save
+    memory.
+    """
+    for shard_start, shard_end in make_shard_endpoints(len(frame), 1000000):
+        # Calculate the hard-debiased space, multiplied by applicability.
+        shard_len = shard_end - shard_start
+        modified_component = reject_subspace(
+            frame[shard_start:shard_end], components_to_reject
+        ).mul(applicability[shard_start:shard_end], axis=0).values
+
+        # Make another component representing the components of vectors that should
+        # not be de-biased: the original space times (1 - applicability).
+        np.multiply(
+            1 - applicability[shard_start:shard_end, np.newaxis],
+            frame.values[shard_start:shard_end, :],
+            out=frame.values[shard_start:shard_end]
+        )
+
+        # The sum of these two components is the de-biased space, where
+        # de-biasing applies to each row proportional to its applicability.
+        np.add(
+            frame.values[shard_start:shard_end],
+            modified_component,
+            out=frame.values[shard_start:shard_end]
+        )
+        del modified_component
+
+
 def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examples):
     """
     De-bias a distinction that is presumed - for the purposes of de-biasing -
@@ -494,9 +528,12 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
     # The SVM can predict the probability, for each vector in the frame, that
     # it's in each class. The positive class is column 1 of this prediction.
     # This gives us a vector of how much each word in the vocabulary should be
-    # de-biased.  This is done on shards, to reduce peak memory consumption.
+    # de-biased.
+    #
+    # We calculate this 'applicability' value on shards of at most 1 million vectors
+    # at a time, to reduce peak memory consumption.
     applicability = np.zeros(shape=(len(frame),), dtype=np.float32)
-    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+    for shard_start, shard_end in make_shard_endpoints(len(frame), 1000000):
         applicability[shard_start:shard_end] = category_predictor.predict_proba(
             frame[shard_start:shard_end])[:, 1]
     del category_predictor
@@ -508,31 +545,8 @@ def de_bias_binary(frame, pos_examples, neg_examples, left_examples, right_examp
         - get_category_axis(frame, left_examples)
     )
 
-    # Make a modified version of the space that projects the bias axis to 0.
-    # Then weight each row of that space by "applicability", the probability
-    # that each row should be de-biased.  This is also done on shards.
-    for shard_start, shard_end in make_shard_endpoints(len(frame)):
-        shard_len = shard_end - shard_start
-        modified_component = reject_subspace(
-            frame[shard_start:shard_end], [bias_axis]
-        ).mul(applicability[shard_start:shard_end], axis=0).values
-
-        # Make another component representing the vectors that should not be
-        # de-biased: the original space times (1 - applicability).
-        np.multiply(
-            1 - applicability[shard_start:shard_end].reshape((shard_len, 1)),
-            frame.values[shard_start:shard_end, :],
-            out=frame.values[shard_start:shard_end]
-        )
-
-        # The sum of these two components is the de-biased space, where
-        # de-biasing applies to each row proportional to its applicability.
-        np.add(
-            frame.values[shard_start:shard_end],
-            modified_component,
-            out=frame.values[shard_start:shard_end]
-        )
-        del modified_component
+    # Apply weighted debiasing to remove this axis of bias.
+    _weighted_debias(frame, applicability, [bias_axis])
 
     # L_2-normalize the resulting rows in-place.
     normalize(frame.values, norm='l2', copy=False)
@@ -560,7 +574,7 @@ def de_bias_category(frame, category_examples, bias_examples):
     # Predict the probability of each word in the vocabulary being in the
     # category.  This is done on shards, to reduce peak memory consumption.
     applicability = np.zeros(shape=(len(frame),), dtype=np.float32)
-    for shard_start, shard_end in make_shard_endpoints(len(frame)):
+    for shard_start, shard_end in make_shard_endpoints(len(frame), 1000000):
         applicability[shard_start:shard_end] = category_predictor.predict_proba(
             frame[shard_start:shard_end])[:, 1]
     del category_predictor
@@ -571,31 +585,8 @@ def de_bias_category(frame, category_examples, bias_examples):
     ]
     components_to_reject = frame.reindex(vocab).dropna().values
 
-    # Make a modified version of the space that projects the bias vectors to 0.
-    # Then weight each row of that space by "applicability", the probability
-    # that each row should be de-biased.  This is also done on shards.
-    for shard_start, shard_end in make_shard_endpoints(len(frame)):
-        shard_len = shard_end - shard_start
-        modified_component = reject_subspace(
-            frame[shard_start:shard_end], components_to_reject
-        ).mul(applicability[shard_start:shard_end], axis=0).values
-
-        # Make another component representing the vectors that should not be
-        # de-biased: the original space times (1 - applicability).
-        np.multiply(
-            1 - applicability[shard_start:shard_end].reshape((shard_len, 1)),
-            frame.values[shard_start:shard_end, :],
-            out=frame.values[shard_start:shard_end, :]
-        )
-
-        # The sum of these two components is the de-biased space, where
-        # de-biasing applies to each row proportional to its applicability.
-        np.add(
-            frame.values[shard_start:shard_end, :],
-            modified_component,
-            out=frame.values[shard_start:shard_end, :]
-        )
-        del modified_component
+    # Apply weighted debiasing to remove all of these components.
+    _weighted_debias(frame, applicability, components_to_reject)
 
     # L_2-normalize the resulting rows in-place.
     normalize(frame.values, norm='l2', copy=False)
