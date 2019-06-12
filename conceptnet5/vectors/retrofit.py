@@ -16,10 +16,14 @@ def sharded_retrofit(
     max_cleanup_iters=20,
     orig_vec_weight=0.15,
 ):
-    # frame_box is basically a reference to a single large DataFrame. The
-    # DataFrame will at times be present or absent. When it's present, the list
-    # contains one item, which is the DataFrame. When it's absent, the list
-    # is empty.
+    """
+    Perform retrofitting on a large DataFrame by breaking it up into shards, by column,
+    and running retrofit() independenly on each shard. Later, we can join those shards
+    and normalize their rows, using join_shards().
+    """
+    # frame_box is a box (a one-element list) that contains a single large DataFrame
+    # that's loaded from a file. This allows us to explicitly reclaim its memory, when
+    # we need to, by clearing the list.
     frame_box = [load_hdf(dense_hdf_filename)]
     sparse_csr, combined_index = build_from_conceptnet_table(
         conceptnet_filename, orig_index=frame_box[0].index
@@ -52,6 +56,10 @@ def sharded_retrofit(
 
 
 def join_shards(output_filename, nshards=6, sort=False):
+    """
+    Take in data that has been saved in shards, with filenames ending in .shard0
+    through .shard{nshards - 1}, and join them into a single DataFrame.
+    """
     assert nshards > 0
     shard = load_hdf(output_filename + ".shard0")
     nrows, ncols = shard.shape
