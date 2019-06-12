@@ -433,7 +433,7 @@ def single_test_combined_index():
 def single_test_propagate():
     # Call the code under test.
     propagated = propagate(
-        COMBINED_INDEX, FRAME, ADJACENCY_MATRIX, len(NEW_ENGLISH_TERMS)
+        COMBINED_INDEX, [FRAME], ADJACENCY_MATRIX, len(NEW_ENGLISH_TERMS)
     )
 
     # The propagated terms should be the terms from the conbined index,
@@ -501,7 +501,7 @@ def single_test_sharded_propagate():
 
     # Run unsharded propagation for comparison.
     propagated = propagate(
-        COMBINED_INDEX, FRAME, ADJACENCY_MATRIX, len(NEW_ENGLISH_TERMS)
+        COMBINED_INDEX, [FRAME], ADJACENCY_MATRIX, len(NEW_ENGLISH_TERMS)
     )
 
     # Check that two shard files were written, to the correct filenames.

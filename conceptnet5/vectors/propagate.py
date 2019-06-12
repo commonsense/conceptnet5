@@ -182,13 +182,21 @@ def propagate(
     For as many non-English terms as possible in the ConceptNet graph whose
     edges are presented in the given adjacency matrix (with corresponding term
     labels in the given index), find a vector in the target space of the vector
-    embedding presented in the given embedding (given as the only element of
-    a list, so as to allow reclaiming its memory earlier).
+    embedding presented in the given embedding.
+
+    - `combined_index` is the list of labels for the combined set of word embeddings.
+    - `embedding_box` is a one-element list (which we call a "box"), which will be
+      cleared during this process to reclaim its memory.
+    - `adjacency_matrix` is the sparse matrix of adjacent nodes created by
+      SparseMatrixBuilder.
+    - `n_new_english` is the number of English terms, not originally in the vocabulary,
+      that appear at the end of the list. This is used to find the boundary
     """
 
     # Propagate the vectors from the embeddings to the remaining
     # terms, following the edges of the graph.
 
+    assert isinstance(embedding_box, list)
     embedding_dimension = embedding_box[0].values.shape[1]
     new_vocab_size = len(combined_index) - embedding_box[0].values.shape[0]
     vectors = np.vstack(
