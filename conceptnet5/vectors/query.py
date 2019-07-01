@@ -188,7 +188,8 @@ class VectorSpaceWrapper(object):
                 prefix_weight = 0.01
                 if get_uri_language(term) != 'en':
                     englishified = self._englishify(term)
-                    expanded.append((englishified, prefix_weight))
+                    if englishified is not None:
+                        expanded.append((englishified, prefix_weight))
 
                 prefix_matches = self._match_prefix(term, prefix_weight)
                 expanded.extend(prefix_matches)
