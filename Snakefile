@@ -56,9 +56,8 @@ EMOJI_LANGUAGES = [
 # Increment this number when we incompatibly change the parser
 WIKT_PARSER_VERSION = "2"
 
-CONVERT_SHARDS = 6
 RETROFIT_SHARDS = 6
-PROPAGATE_SHARDS = 10
+PROPAGATE_SHARDS = 6
 
 # Dataset filenames
 # =================
@@ -574,7 +573,7 @@ rule assoc_uniq:
 rule reduce_assoc:
     input:
         DATA + "/assoc/assoc.csv",
-        expand(DATA + "/vectors/{name}-converted.h5", name=INPUT_EMBEDDINGS)
+        expand(DATA + "/vectors/{name}.h5", name=INPUT_EMBEDDINGS)
     output:
         DATA + "/assoc/reduced.csv"
     shell:
@@ -588,113 +587,91 @@ rule convert_word2vec:
         DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/w2v-google-news-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/w2v-google-news.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_word2vec -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_glove:
     input:
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/glove12-840B-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/glove12-840B.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_glove -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_fasttext_crawl:
     input:
         DATA + "/raw/vectors/crawl-300d-2M.vec.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/crawl-300d-2M-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/crawl-300d-2M.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_fasttext:
     input:
         DATA + "/raw/vectors/fasttext-wiki-{lang}.vec.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/fasttext-wiki-{{lang}}-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/fasttext-wiki-{lang}.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} -l {wildcards.lang} {single_input} {output}")
 
 rule convert_lexvec:
     input:
         DATA + "/raw/vectors/lexvec.commoncrawl.300d.W+C.pos.vectors.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/lexvec-commoncrawl-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/lexvec-commoncrawl.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_opensubtitles_ft:
     input:
         DATA + "/raw/vectors/ft-opensubtitles.vec.gz",
         DATA + "/db/wiktionary.db"
     output:
-        temp(expand(DATA + "/vectors/fasttext-opensubtitles-converted.h5.shard{n}",
-                    n=range(CONVERT_SHARDS)))
+        DATA + "/vectors/fasttext-opensubtitles.h5"
     resources:
-        ram=15
+        ram=24
     run:
         single_input = input[0]
-        output_prefix = output[0][:-len(".shard0")]
-        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} --nshards {CONVERT_SHARDS} {single_input} {output_prefix}")
+        shell("CONCEPTNET_DATA=data cn5-vectors convert_fasttext -n {MULTILINGUAL_SOURCE_EMBEDDING_ROWS} {single_input} {output}")
 
 rule convert_polyglot:
     input:
         DATA + "/raw/vectors/polyglot-{language}.pkl",
         DATA + "/db/wiktionary.db"
     output:
-        DATA + "/vectors/polyglot-{language}-converted.h5"
+        DATA + "/vectors/polyglot-{language}.h5"
     run:
         single_input = input[0]
         shell("CONCEPTNET_DATA=data cn5-vectors convert_polyglot -l {wildcards.language} {single_input} {output}")
 
-rule join_convert:
-    input:
-        expand(DATA + "/vectors/{{name}}-converted.h5.shard{n}", n=range(CONVERT_SHARDS))
-    output:
-        DATA + "/vectors/{name}-converted.h5"
-    resources:
-        ram=15
-    shell:
-        "cn5-vectors join_shard_files -n {CONVERT_SHARDS} {output}"
-
 rule retrofit:
     input:
-        DATA + "/vectors/{name}-converted.h5",
+        DATA + "/vectors/{name}.h5",
         DATA + "/assoc/reduced.csv"
     output:
         temp(expand(DATA + "/vectors/{{name}}-retrofit.h5.shard{n}", n=range(RETROFIT_SHARDS)))
     resources:
-        ram=15
+        ram=24
     shell:
         "cn5-vectors retrofit -n {RETROFIT_SHARDS} {input} {DATA}/vectors/{wildcards.name}-retrofit.h5"
 
@@ -704,7 +681,7 @@ rule join_retrofit:
     output:
         DATA + "/vectors/{name}-retrofit.h5"
     resources:
-        ram=15
+        ram=24
     shell:
         "cn5-vectors join_shard_files -n {RETROFIT_SHARDS} {output}"
 
@@ -715,7 +692,7 @@ rule merge_intersect:
         DATA + "/vectors/numberbatch-retrofitted.h5",
         DATA + "/vectors/intersection-projection.h5"
     resources:
-        ram=15
+        ram=24
     shell:
         "cn5-vectors intersect {input} {output}"
 
@@ -726,7 +703,7 @@ rule propagate:
     output:
         temp(expand(DATA + "/vectors/numberbatch-biased.h5.shard{n}", n=range(PROPAGATE_SHARDS)))
     resources:
-        ram=15
+        ram=24
     shell:
         "cn5-vectors propagate -n {PROPAGATE_SHARDS} {input} {DATA}/vectors/numberbatch-biased.h5"
 
@@ -736,7 +713,7 @@ rule join_propagate:
     output:
         DATA + "/vectors/numberbatch-biased.h5"
     resources:
-        ram=15
+        ram=24
     shell:
         "cn5-vectors join_shard_files -n {PROPAGATE_SHARDS} --sort {output}"
 
@@ -746,14 +723,14 @@ rule debias:
     output:
         DATA + "/vectors/numberbatch.h5"
     resources:
-        ram=15
+        ram=30
     shell:
         "cn5-vectors debias {input} {output}"
 
 rule miniaturize:
     input:
         DATA + "/vectors/numberbatch-biased.h5",
-        DATA + "/vectors/w2v-google-news-converted.h5"
+        DATA + "/vectors/w2v-google-news.h5"
     output:
         DATA + "/vectors/mini.h5"
     resources:
@@ -817,7 +794,7 @@ rule compare_embeddings:
     input:
         DATA + "/raw/vectors/GoogleNews-vectors-negative300.bin.gz",
         DATA + "/raw/vectors/glove12.840B.300d.txt.gz",
-        DATA + "/vectors/glove12-840B-converted.h5",
+        DATA + "/vectors/glove12-840B.h5",
         DATA + "/raw/vectors/fasttext-wiki-en.vec.gz",
         DATA + "/vectors/numberbatch-biased.h5",
         DATA + "/vectors/numberbatch.h5",

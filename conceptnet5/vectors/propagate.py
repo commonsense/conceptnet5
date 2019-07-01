@@ -31,12 +31,8 @@ class ConceptNetAssociationGraphForPropagation(ConceptNetAssociationGraph):
         saves the edges as a set of (left, right) pairs.
         """
         super().add_edge(left, right, value, dataset, relation)
-        # We want to consider the edges as undirected, but save only
-        # one direction to save space.
-        if left < right:
-            self.edges.add((left, right))
-        else:
-            self.edges.add((right, left))
+        self.edges.add((left, right))
+        self.edges.add((right, left))  # save undirected edges
 
 
 def sharded_propagate(
@@ -52,26 +48,20 @@ def sharded_propagate(
     # contains one item, which is the DataFrame. When it's absent, the list
     # is empty.
     frame_box = [load_hdf(embedding_filename)]
-    shard_width = frame_box[0].shape[1] // nshards
-    labels = frame_box[0].index
-    frame_box.clear()  # reclaim memory used by values
     adjacency_matrix, combined_index, n_new_english = make_adjacency_matrix(
-        assoc_filename, labels
+        assoc_filename, frame_box[0].index
     )
-    del labels
+    shard_width = frame_box[0].shape[1] // nshards
 
     for i in range(nshards):
-        temp_filename = output_filename + ".shard%d" % i
+        temp_filename = output_filename + '.shard%d' % i
         shard_from = shard_width * i
         shard_to = shard_from + shard_width
         if len(frame_box) == 0:
             frame_box.append(load_hdf(embedding_filename))
+        embedding_shard = pd.DataFrame(frame_box[0].iloc[:, shard_from:shard_to])
 
-        # Box the shard as well, so that we retain no reference to it here,
-        # and so the propagate function can free its memory.
-        embedding_shard = [pd.DataFrame(frame_box[0].iloc[:, shard_from:shard_to])]
-
-        # Delete the full embedding while running propagation, because it takes
+        # Delete full_dense_frame while running retrofitting, because it takes
         # up a lot of memory and we can reload it from disk later.
         frame_box.clear()
 
@@ -110,8 +100,6 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
         assoc_filename, reject_negative_relations=False
     )
     component_labels = graph.find_components()
-    graph_edges = graph.edges
-    del graph  # this frees a lot of memory
 
     # Get the labels of components that overlap the embedding vocabulary.
     good_component_labels = set(
@@ -136,11 +124,11 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # than list comprehensions.)
     new_vocab = good_concepts - set(embedding_vocab)
     good_concepts = embedding_vocab.append(
-        pd.Index([term for term in new_vocab if get_uri_language(term) != "en"])
+        pd.Index([term for term in new_vocab if get_uri_language(term) != 'en'])
     )
     n_good_concepts_not_new_en = len(good_concepts)
     good_concepts = good_concepts.append(
-        pd.Index([term for term in new_vocab if get_uri_language(term) == "en"])
+        pd.Index([term for term in new_vocab if get_uri_language(term) == 'en'])
     )
     del new_vocab
     n_new_english = len(good_concepts) - n_good_concepts_not_new_en
@@ -158,15 +146,14 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
     # we may want to add such edges here as well.
 
     builder = SparseMatrixBuilder()
-    for v, w in graph_edges:
+    for v, w in graph.edges:
         try:
             index0 = good_concepts_map[v]
             index1 = good_concepts_map[w]
             builder[index0, index1] = 1
-            builder[index1, index0] = 1
         except KeyError:
             pass  # one of v, w wasn't good
-    del graph_edges, good_concepts_map
+    del graph
 
     adjacency_matrix = builder.tocsr(
         shape=(len(good_concepts), len(good_concepts)), dtype=np.int8
@@ -176,31 +163,28 @@ def make_adjacency_matrix(assoc_filename, embedding_vocab):
 
 
 def propagate(
-    combined_index, embedding_box, adjacency_matrix, n_new_english, iterations=20
+    combined_index, embedding, adjacency_matrix, n_new_english, iterations=20
 ):
     """
     For as many non-English terms as possible in the ConceptNet graph whose
     edges are presented in the given adjacency matrix (with corresponding term
     labels in the given index), find a vector in the target space of the vector
-    embedding presented in the given embedding (given as the only element of
-    a list, so as to allow reclaiming its memory earlier).
+    embedding presented in the given embedding file.
     """
 
     # Propagate the vectors from the embeddings to the remaining
     # terms, following the edges of the graph.
 
-    embedding_dimension = embedding_box[0].values.shape[1]
-    new_vocab_size = len(combined_index) - embedding_box[0].values.shape[0]
+    embedding_dimension = embedding.values.shape[1]
+    new_vocab_size = len(combined_index) - embedding.values.shape[0]
     vectors = np.vstack(
         [
-            embedding_box[0].values,
+            embedding.values,
             np.zeros(
-                (new_vocab_size, embedding_dimension),
-                dtype=embedding_box[0].values.dtype,
+                (new_vocab_size, embedding_dimension), dtype=embedding.values.dtype
             ),
         ]
     )
-    embedding_box.clear()  # free memory
 
     for iteration in range(iterations):
         zero_indicators = np.abs(vectors).sum(1) == 0
@@ -212,12 +196,12 @@ def propagate(
         fringe = np.logical_and(fringe, zero_indicators)
         # Update each as the average of its nonzero neighbors
         adjacent_nonzeros = adjacency_matrix[fringe, :].dot(
-            diags([nonzero_indicators.astype(np.int8)], [0], format="csc")
+            diags([nonzero_indicators.astype(np.int8)], [0], format='csc')
         )
         n_adjacent_nonzeros = adjacent_nonzeros.sum(axis=1).A[:, 0]
         weights = 1.0 / n_adjacent_nonzeros
         vectors[fringe, :] = adjacency_matrix[fringe, :].dot(vectors)
-        vectors[fringe, :] = diags([weights], [0], format="csr").dot(vectors[fringe, :])
+        vectors[fringe, :] = diags([weights], [0], format='csr').dot(vectors[fringe, :])
 
     n_old_plus_new_non_en = len(combined_index) - n_new_english
     result = pd.DataFrame(

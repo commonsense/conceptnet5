@@ -85,9 +85,8 @@ def run_retrofit(
 @click.argument('glove_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=500000)
-@click.option('--nshards', default=6)
-def run_convert_glove(glove_filename, output_filename, nrows=500000, nshards=6):
-    convert_glove(glove_filename, output_filename, nrows, nshards=nshards)
+def run_convert_glove(glove_filename, output_filename, nrows=500000):
+    convert_glove(glove_filename, output_filename, nrows)
 
 
 @cli.command(name='convert_fasttext')
@@ -95,35 +94,26 @@ def run_convert_glove(glove_filename, output_filename, nrows=500000, nshards=6):
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=500000)
 @click.option('--language', '-l', default='en')
-@click.option('--nshards', default=6)
 def run_convert_fasttext(
-    fasttext_filename, output_filename, nrows=500000, language='en', nshards=6
+    fasttext_filename, output_filename, nrows=500000, language='en'
 ):
-    convert_fasttext(
-        fasttext_filename,
-        output_filename,
-        nrows=nrows,
-        language=language,
-        nshards=nshards,
-    )
+    convert_fasttext(fasttext_filename, output_filename, nrows=nrows, language=language)
 
 
 @cli.command(name='convert_word2vec')
 @click.argument('word2vec_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--nrows', '-n', default=500000)
-@click.option('--nshards', default=6)
-def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000, nshards=6):
-    convert_word2vec(word2vec_filename, output_filename, nrows, nshards=nshards)
+def run_convert_word2vec(word2vec_filename, output_filename, nrows=500000):
+    convert_word2vec(word2vec_filename, output_filename, nrows)
 
 
 @cli.command(name='convert_polyglot')
 @click.argument('polyglot_filename', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output_filename', type=click.Path(writable=True, dir_okay=False))
 @click.option('--language', '-l')
-@click.option('--nshards', default=6)
-def run_convert_polyglot(polyglot_filename, output_filename, language, nshards=6):
-    convert_polyglot(polyglot_filename, output_filename, language, nshards=nshards)
+def run_convert_polyglot(polyglot_filename, output_filename, language):
+    convert_polyglot(polyglot_filename, output_filename, language)
 
 
 @cli.command(name='intersect')
@@ -138,7 +128,7 @@ def run_intersect(input_filenames, output_filename, projection_filename):
     """
     intersected, projection = merge_intersect(input_filenames)
     save_hdf(intersected, output_filename)
-    save_hdf(projection, projection_filename, format='mat')
+    save_hdf(projection, projection_filename)
 
 
 @cli.command(name='debias')
@@ -256,7 +246,7 @@ def run_compare_embeddings(input_filenames, output_filename, run_analogies):
         input_filenames, subset='all', run_analogies=run_analogies
     )
     print(results)
-    save_hdf(results, output_filename, format='mat')
+    save_hdf(results, output_filename)
 
 
 @cli.command(name='comparison_graph')
@@ -290,8 +280,11 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
     """
     Save a smaller version of a frame, which includes frequent terms and phrases.
     """
-    other_vocab = list(load_hdf(extra_vocab_filename, index_only=True))
-    mini = miniaturize(input_filename, other_vocab=other_vocab, k=k)
+    frame = load_hdf(input_filename)
+    other_frame = load_hdf(extra_vocab_filename)
+    other_vocab = list(other_frame.index)
+    del other_frame
+    mini = miniaturize(frame, other_vocab=other_vocab, k=k)
     save_hdf(mini, output_filename)
 
 

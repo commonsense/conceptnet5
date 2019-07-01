@@ -44,9 +44,8 @@ def compare_embeddings(filenames, subset='dev', run_analogies=False):
             frame_results.append(analogy_results)
 
         results.append(pd.concat(frame_results, axis=0))
-        del frame
     result = pd.concat(results, keys=filenames)
-    save_hdf(result, '/tmp/numberbatch-comparison.h5', format='mat')
+    save_hdf(result, '/tmp/numberbatch-comparison.h5')
     return result
 
 
@@ -75,7 +74,7 @@ def graph_comparison(table_filename, out_filename):
             'data/raw/vectors/GoogleNews-vectors-negative300.bin.gz',
         ),
         ('GloVe 1.2 840B', 'data/raw/vectors/glove12.840B.300d.txt.gz'),
-        ('GloVe renormalized', 'data/vectors/glove12-840B-converted.h5'),
+        ('GloVe renormalized', 'data/vectors/glove12-840B.h5'),
         ('fastText enWP (without OOV)', 'data/raw/vectors/fasttext-wiki-en.vec.gz'),
         # ('ConceptNet Numberbatch biased', 'data/vectors/numberbatch-biased.h5'),
         ('ConceptNet Numberbatch', 'data/vectors/numberbatch.h5'),

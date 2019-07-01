@@ -27,7 +27,7 @@ def sharded_retrofit(
     shard_width = frame_box[0].shape[1] // nshards
 
     for i in range(nshards):
-        temp_filename = output_filename + ".shard%d" % i
+        temp_filename = output_filename + '.shard%d' % i
         shard_from = shard_width * i
         shard_to = shard_from + shard_width
         if len(frame_box) == 0:
@@ -52,30 +52,21 @@ def sharded_retrofit(
 
 
 def join_shards(output_filename, nshards=6, sort=False):
-    assert nshards > 0
-    shard = load_hdf(output_filename + ".shard0")
-    nrows, ncols = shard.shape
-    if sort:
-        # Sort the index and save the permutation bringing it into
-        # ascending alphabetical order, _before_ allocating a big chunk
-        # of memory for the joined vector values, to keep the maximum
-        # memory consumption down.
-        joined_labels, permutation = shard.index.sort_values(return_indexer=True)
-    else:
-        joined_labels = shard.index
-        permutation = np.arange(nrows)
+    joined_matrix = None
+    joined_labels = None
+    for i in range(nshards):
+        shard = load_hdf(output_filename + '.shard%d' % i)
+        nrows, ncols = shard.shape
+        if joined_matrix is None:
+            joined_matrix = np.zeros((nrows, ncols * nshards), dtype='f')
+            joined_labels = shard.index
+        joined_matrix[:, (ncols * i) : (ncols * (i + 1))] = shard.values
+        del shard
 
-    joined_matrix = np.zeros((nrows, ncols * nshards), dtype="f")
-    joined_matrix[:, 0:ncols] = shard.values[permutation, :]
-    del shard
-
-    for i in range(1, nshards):
-        shard_values = load_hdf(output_filename + ".shard%d" % i).values
-        joined_matrix[:, (ncols * i) : (ncols * (i + 1))] = shard_values[permutation, :]
-        del shard_values
-
-    normalize(joined_matrix, axis=1, norm="l2", copy=False)
+    normalize(joined_matrix, axis=1, norm='l2', copy=False)
     dframe = pd.DataFrame(joined_matrix, index=joined_labels)
+    if sort:
+        dframe.sort_index(inplace=True)
     save_hdf(dframe, output_filename)
 
 
@@ -115,7 +106,7 @@ def retrofit(
     appropriately.
     """
     # Initialize a DataFrame with rows that we know
-    retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns, dtype="f")
+    retroframe = pd.DataFrame(index=row_labels, columns=dense_frame.columns, dtype='f')
     retroframe.update(dense_frame)
 
     # orig_weights = 1 for known vectors, 0 for unknown vectors
@@ -133,7 +124,7 @@ def retrofit(
     vecs = orig_vecs
     for iteration in range(iterations):
         if verbosity >= 1:
-            print("Retrofitting: Iteration %s of %s" % (iteration + 1, iterations))
+            print('Retrofitting: Iteration %s of %s' % (iteration + 1, iterations))
 
         # Since the sparse weight matrix is row-stochastic and has self-loops,
         # pre-multiplication by it replaces each vector by a weighted average
@@ -207,7 +198,7 @@ def retrofit(
         )
         vecs[new_nonzero_indicators, :] /= total_neighbor_weights
     else:
-        print("Warning: cleanup iteration limit exceeded.")
+        print('Warning: cleanup iteration limit exceeded.')
 
     retroframe = pd.DataFrame(data=vecs, index=row_labels, columns=dense_frame.columns)
     return retroframe

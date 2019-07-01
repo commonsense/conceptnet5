@@ -98,7 +98,7 @@ class VectorSpaceWrapper(object):
 
             self.k = self.frame.shape[1]
             self.small_k = 100
-            self.small_frame = self.frame.iloc[:, : self.small_k]
+            self.small_frame = self.frame.iloc[:, : self.small_k].copy()
         except OSError:
             raise MissingVectorSpace(
                 "Couldn't load the vector space %r. Do you need to build or "
