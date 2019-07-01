@@ -31,7 +31,7 @@ setup(
         'snakemake', 'click', 'requests', 'ftfy', 'msgpack-python', 'numpy',
         'langcodes >= 1.4.1', 'wordfreq >= 2.0.1',
         'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'psycopg2-binary',
-        'marisa-trie'
+        'marisa-trie', 'tables >= 3.5.1'
     ],
     python_requires='>=3.5',
     license='Apache License 2.0',
