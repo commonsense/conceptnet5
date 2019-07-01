@@ -73,6 +73,11 @@ RAW_DATA_URL = "https://zenodo.org/record/2579347/files/conceptnet-raw-data-5.7.
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
+
+# We need an external vocabulary to refer to when miniaturizing our set of
+# embeddings. In the normal case, this is the word2vec Google News vocabulary.
+# In the test build, we don't have that, we only have a cut-down version of GloVe,
+# so we'll switch it to that instead.
 MINI_VOCAB_SOURCE = "/vectors/w2v-google-news.h5"
 
 INPUT_EMBEDDINGS = [

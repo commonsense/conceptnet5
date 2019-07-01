@@ -122,7 +122,13 @@ class VectorSpaceWrapper(object):
 
     @staticmethod
     def _englishify(term):
+        """
+        Change the language of a /c/ term to English. If the input isn't a term,
+        return None.
+        """
         splits = split_uri(term)
+        if not term.startswith('/c/'):
+            return None
         if len(splits) > 2:
             englishified = '/c/en/' + splits[2]
             return englishified
