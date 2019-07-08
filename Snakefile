@@ -74,6 +74,12 @@ PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
 
+# We need an external vocabulary to refer to when miniaturizing our set of
+# embeddings. In the normal case, this is the word2vec Google News vocabulary.
+# In the test build, we don't have that, we only have a cut-down version of GloVe,
+# so we'll switch it to that instead.
+MINI_VOCAB_SOURCE = "/vectors/w2v-google-news.h5"
+
 INPUT_EMBEDDINGS = [
     'crawl-300d-2M', 'w2v-google-news', 'glove12-840B', 'fasttext-opensubtitles'
 ]
@@ -96,6 +102,7 @@ if TESTMODE:
     RAW_DATA_URL = "/missing/data"
     PRECOMPUTED_DATA_URL = "/missing/data"
     EMOJI_LANGUAGES = ['en', 'en_001']
+    MINI_VOCAB_SOURCE = "/vectors/glove12-840B.h5"
 
 
 CORE_DATASET_NAMES = [
@@ -161,6 +168,7 @@ rule test:
         DATA + "/assertions/assertions.csv",
         DATA + "/psql/done",
         DATA + "/assoc/reduced.csv",
+        DATA + "/vectors/mini.h5",
         DATA + "/vectors/plain/numberbatch-en.txt.gz",
 
 
@@ -730,7 +738,7 @@ rule debias:
 rule miniaturize:
     input:
         DATA + "/vectors/numberbatch-biased.h5",
-        DATA + "/vectors/w2v-google-news.h5"
+        DATA + MINI_VOCAB_SOURCE
     output:
         DATA + "/vectors/mini.h5"
     resources:
