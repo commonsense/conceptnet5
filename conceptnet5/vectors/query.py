@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 
 import wordfreq
-from conceptnet5.db.query import AssertionFinder
 from conceptnet5.uri import get_uri_language, split_uri, uri_prefix
 from conceptnet5.util import get_data_filename
 from conceptnet5.vectors import (
@@ -57,7 +56,7 @@ class VectorSpaceWrapper(object):
     while still using ConceptNet for looking up words outside their vocabulary.
     """
 
-    def __init__(self, vector_filename=None, frame=None, use_db=True):
+    def __init__(self, vector_filename=None, frame=None):
         if frame is None:
             self.frame = None
             self.vector_filename = vector_filename or get_data_filename(
@@ -69,11 +68,8 @@ class VectorSpaceWrapper(object):
         self.small_frame = None
         self.k = None
         self.small_k = None
-        self.finder = None
         self.trie = None
         self.cache = {}
-        if use_db:
-            self.finder = AssertionFinder()
 
     def load(self):
         """
@@ -90,7 +86,6 @@ class VectorSpaceWrapper(object):
                 # they're in English, and stick the English language tag on
                 # them without any further transformation, so we can be sure
                 # we're evaluating the vectors as provided.
-                self.finder = None
                 self.frame.index = ['/c/en/' + label for label in self.frame.index]
 
             if not self.frame.index.is_monotonic_increasing:
@@ -133,23 +128,6 @@ class VectorSpaceWrapper(object):
             englishified = '/c/en/' + splits[2]
             return englishified
 
-    def _find_neighbors(self, term, limit_per_term, weight):
-        neighbors = []
-        for edge in self.finder.lookup(term, limit=limit_per_term):
-            if field_match(edge['start']['term'], term) and not field_match(
-                edge['end']['term'], term
-            ):
-                neighbor = edge['end']['term']
-            elif field_match(edge['end']['term'], term) and not field_match(
-                edge['start']['term'], term
-            ):
-                neighbor = edge['start']['term']
-            else:
-                continue
-            neighbor_weight = weight * min(10, edge['weight']) * 0.01
-            neighbors.append((neighbor, neighbor_weight))
-        return neighbors
-
     def _match_prefix(self, term, prefix_weight):
         results = []
         while term:
@@ -173,24 +151,17 @@ class VectorSpaceWrapper(object):
 
     def expand_terms(self, terms, limit_per_term=10, oov_vector=True):
         """
-        Given a list of weighted terms as (term, weight) tuples, add terms that
-        are one step away in ConceptNet at a lower weight, terms in English that share the
-        surface form with these terms, and the terms which share prefix with these terms,
-        if the terms are OOV.
+        Given a list of weighted terms as (term, weight) tuples, if any of the terms
+        are OOV, find approximations to those terms: the same term in English, or terms
+        that share a prefix that's as long as possible with the given term.
 
-        This helps increase the recall power of the vector space, because it
-        means you can find terms that are too infrequent to have their own
-        vector by looking up their neighbors, etc.
-
-        This forms a reasonable approximation of the vector an infrequent term would have anyway.
+        This helps increase the recall power of the vector space, because it means
+        you can find terms that are too infrequent to have their own vector, getting
+        a reasonable guess at the vector they might have.
         """
-        self.load()
         expanded = terms[:]
         for term, weight in terms:
-            if oov_vector and term not in self.frame.index and self.finder is not None:
-                neighbors = self._find_neighbors(term, limit_per_term, weight)
-                expanded.extend(neighbors)
-
+            if oov_vector and term not in self.frame.index:
                 prefix_weight = 0.01
                 if get_uri_language(term) != 'en':
                     englishified = self._englishify(term)
@@ -218,7 +189,6 @@ class VectorSpaceWrapper(object):
         - The vectors for terms that share a sufficiently-long prefix with
           any terms in this list that are out-of-vocabulary
         """
-        self.load()
         return weighted_average(
             self.frame, self.expand_terms(terms, limit_per_term, oov_vector)
         )
@@ -239,7 +209,8 @@ class VectorSpaceWrapper(object):
         a vector to look up from it.
 
         If there are 5 or fewer terms involved and `oov_vector=True`, this
-        will allow expanded_vector to look up neighboring terms in ConceptNet.
+        will allow expanded_vector to use an out-of-vocab strategy to find missing
+        terms.
         """
         self.load()
 
