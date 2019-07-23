@@ -8,7 +8,9 @@ from scipy import sparse
 
 from conceptnet5.uri import concept_uri, get_uri_language
 from conceptnet5.vectors.propagate import (
-    make_adjacency_matrix, propagate, sharded_propagate
+    make_adjacency_matrix,
+    propagate,
+    sharded_propagate,
 )
 
 # Constant parameters.
@@ -50,6 +52,7 @@ def do_setup(setup=None, teardown=None):
     arguments), then the decorated function, then the teardown function (if 
     any, and with no arguments).
     """
+
     def decorate(func):
         def newfunc(*args, **kwargs):
             if setup is not None:
@@ -57,7 +60,9 @@ def do_setup(setup=None, teardown=None):
             func(*args, **kwargs)
             if teardown is not None:
                 teardown()
+
         return newfunc
+
     return decorate
 
 
@@ -78,6 +83,7 @@ def extract_positional_arg(mock_obj, call_number, position):
 
 
 _term_count = 0
+
 
 def make_term():
     """
@@ -116,6 +122,7 @@ class ConceptNetRandomTestGraph:
     Instances are randomly-generated association graphs suitable for testing 
     propagation code.
     """
+
     def __init__(self, max_n_terms=MAX_N_GRAPH_TERMS):
         """
         Construct a random concept graph by making its set of edges (pairs of
@@ -161,27 +168,28 @@ class ConceptNetRandomTestGraph:
         for left in terms:
             for right in terms:
                 if left <= right:
-                    continue # make no self-edges, consider each pair only once
+                    continue  # make no self-edges, consider each pair only once
                 if piece_map[left] != piece_map[right]:
-                    continue # make no edges between pieces
+                    continue  # make no edges between pieces
                 if random_gen.uniform() < GRAPH_EDGE_PROBA:
                     weight = random_gen.choice(WEIGHTS, p=WEIGHT_PROBA)
                     dataset = random_gen.choice(DATASETS, p=DATASET_PROBA)
                     rel = random_gen.choice(RELATIONS, p=RELATION_PROBA)
-                    self.assoc_file_contents.append('\t'.join([left, right, str(weight), dataset, rel]))
+                    self.assoc_file_contents.append(
+                        '\t'.join([left, right, str(weight), dataset, rel])
+                    )
                     self.edge_set.add((left, right))
                     self.edge_set.add((right, left))  # make the graph undirected
-                    self.vertices.add(left)  # only collect vertices on at least one edge
+                    self.vertices.add(
+                        left
+                    )  # only collect vertices on at least one edge
                     self.vertices.add(right)
         self.assoc_file_contents = '\n'.join(self.assoc_file_contents)
 
         # Save the pieces (for use in making frames to use with the graph).
-        pieces = [
-            [term for term in piece if term in self.vertices] for piece in pieces
-        ]
+        pieces = [[term for term in piece if term in self.vertices] for piece in pieces]
         self.pieces = [piece for piece in pieces if len(piece) > 0]
 
-    
     def make_frame(self, max_n_extra_terms=MAX_N_EXTRA_FRAME_TERMS):
         """
         Return a frame to use together with this graph in testing.  The 
@@ -191,18 +199,17 @@ class ConceptNetRandomTestGraph:
         n_extra_terms = random_gen.choice(max_n_extra_terms + 1)
         terms = make_term_list(n_extra_terms)
         for i_piece, piece in enumerate(self.pieces):
-            if i_piece == 0: # Take a random subset of the big piece.
+            if i_piece == 0:  # Take a random subset of the big piece.
                 n_terms = random_gen.choice(len(piece))
                 new_terms = list(random_gen.choice(piece, size=n_terms, replace=False))
-            else: # Take no, one, or all the elements of any other piece.
+            else:  # Take no, one, or all the elements of any other piece.
                 none = []
                 one = [random_gen.choice(piece)]
                 new_terms = random_gen.choice([none, one, piece])
             terms.extend(new_terms)
-        random_gen.shuffle(terms) # destroy order by pieces
+        random_gen.shuffle(terms)  # destroy order by pieces
         frame = make_random_frame(terms)
         return frame
-
 
     def combined_index_and_new_term_sets(self, frame):
         """
@@ -225,7 +232,7 @@ class ConceptNetRandomTestGraph:
         # frame.
         ranks = self.rank_vertices(frame)
         graph_terms = set(term for term in self.vertices if ranks[term] != -1)
-        
+
         all_terms = graph_terms | frame_terms
         new_terms = all_terms - frame_terms
         new_english_terms = set(
@@ -234,12 +241,9 @@ class ConceptNetRandomTestGraph:
         new_non_english_terms = new_terms - new_english_terms
 
         combined_index = pd.Index(
-            list(frame_terms) + \
-            list(new_non_english_terms) + \
-            list(new_english_terms)
+            list(frame_terms) + list(new_non_english_terms) + list(new_english_terms)
         )
         return combined_index, new_non_english_terms, new_english_terms
-
 
     def adjacency_matrix(self, combined_index):
         """
@@ -257,14 +261,13 @@ class ConceptNetRandomTestGraph:
                     values.append(np.int8(1))
                     rows.append(combined_index.get_loc(left))
                     cols.append(combined_index.get_loc(right))
-        
+
         adjacency_matrix = sparse.coo_matrix(
             (values, (rows, cols)),
             shape=(len(combined_index), len(combined_index)),
-            dtype=np.int8
+            dtype=np.int8,
         ).tocsr()
         return adjacency_matrix
-
 
     def rank_vertices(self, frame):
         """
@@ -275,7 +278,7 @@ class ConceptNetRandomTestGraph:
         """
         # Let ranks default to a value larger than any possible valid rank.
         bigger_than_any_rank = len(self.vertices)
-        ranks = {vertex : bigger_than_any_rank for vertex in self.vertices}
+        ranks = {vertex: bigger_than_any_rank for vertex in self.vertices}
 
         # But terms from the frame have rank 0.
         for term in frame.index:
@@ -306,6 +309,7 @@ class ConceptNetRandomTestGraph:
 
 # Setup and teardown functions to create/erase a single test data instance.
 
+
 def setup_frame_and_edges():
     global FRAME, ASSOC_FILE_CONTENTS, EDGE_SET
     graph = ConceptNetRandomTestGraph()
@@ -313,14 +317,17 @@ def setup_frame_and_edges():
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     EDGE_SET = graph.edge_set
 
+
 def setup_combined_index():
     global FRAME, ASSOC_FILE_CONTENTS
     global COMBINED_INDEX, NEW_ENGLISH_TERMS, NEW_NON_ENGLISH_TERMS
     graph = ConceptNetRandomTestGraph()
     FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
-    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
-        graph.combined_index_and_new_term_sets(FRAME)
+    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = graph.combined_index_and_new_term_sets(
+        FRAME
+    )
+
 
 def setup_adjacency_matrix():
     global FRAME, ASSOC_FILE_CONTENTS
@@ -329,9 +336,11 @@ def setup_adjacency_matrix():
     graph = ConceptNetRandomTestGraph()
     FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
-    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
-        graph.combined_index_and_new_term_sets(FRAME)
+    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = graph.combined_index_and_new_term_sets(
+        FRAME
+    )
     ADJACENCY_MATRIX = graph.adjacency_matrix(COMBINED_INDEX)
+
 
 def setup_ranks():
     global FRAME, ASSOC_FILE_CONTENTS, EDGE_SET
@@ -341,10 +350,12 @@ def setup_ranks():
     FRAME = graph.make_frame()
     ASSOC_FILE_CONTENTS = graph.assoc_file_contents
     EDGE_SET = graph.edge_set
-    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = \
-        graph.combined_index_and_new_term_sets(FRAME)
+    COMBINED_INDEX, NEW_NON_ENGLISH_TERMS, NEW_ENGLISH_TERMS = graph.combined_index_and_new_term_sets(
+        FRAME
+    )
     ADJACENCY_MATRIX = graph.adjacency_matrix(COMBINED_INDEX)
     RANKS = graph.rank_vertices(FRAME)
+
 
 def teardown_all():
     global FRAME, ASSOC_FILE_CONTENTS, EDGE_SET
@@ -366,15 +377,18 @@ def single_test_adjacency_matrix():
     # fixture rather than from a file.
     with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)):
         adjacency_matrix, combined_index, n_new_english = make_adjacency_matrix(
-            'ignored_filename', FRAME.index)
-    
+            'ignored_filename', FRAME.index
+        )
+
     # The adjacency matrix must be square with one row for each term in the
     # combined index.
-    assert (len(adjacency_matrix.shape) == 2), 'Adjacency matrix must be 2D.'
-    assert (adjacency_matrix.shape[0] == len(combined_index)), \
-        'Adjacency matrix must have one row for each term of the combined index.'
-    assert (adjacency_matrix.shape[1] == len(combined_index)), \
-        'Adjacency matrix must have one column for each term of the combined index.'
+    assert len(adjacency_matrix.shape) == 2, 'Adjacency matrix must be 2D.'
+    assert adjacency_matrix.shape[0] == len(
+        combined_index
+    ), 'Adjacency matrix must have one row for each term of the combined index.'
+    assert adjacency_matrix.shape[1] == len(
+        combined_index
+    ), 'Adjacency matrix must have one column for each term of the combined index.'
 
     # Each entry must be 0 or 1 according to whether the corresponding terms
     # are joined by an edge in the graph.  Note that it is problematic to
@@ -386,14 +400,23 @@ def single_test_adjacency_matrix():
             right = combined_index[i_right]
             is_edge = (left, right) in EDGE_SET
             entry = adjacency_matrix[i_left, i_right]
-            assert ((entry == 0) or (entry == 1)), \
-                'Invalid entry {} in adjacency matrix at row {} ({}) and column {} ({}).'.format(entry, i_left, left, i_right, right)
+            assert (entry == 0) or (
+                entry == 1
+            ), 'Invalid entry {} in adjacency matrix at row {} ({}) and column {} ({}).'.format(
+                entry, i_left, left, i_right, right
+            )
             if (left, right) in EDGE_SET:
-                assert (entry == 1), \
-                    'Edge between {} (row {}) and {} (column {}) missing in adjacency matrix.'.format(left, i_left, right, i_right)
+                assert (
+                    entry == 1
+                ), 'Edge between {} (row {}) and {} (column {}) missing in adjacency matrix.'.format(
+                    left, i_left, right, i_right
+                )
             else:
-                assert (entry == 0), \
-                    'Adjacency matrix incorrectly indicates an edge between {} (row {}) and {} (column {}).'.format(left, i_left, right, i_right)
+                assert (
+                    entry == 0
+                ), 'Adjacency matrix incorrectly indicates an edge between {} (row {}) and {} (column {}).'.format(
+                    left, i_left, right, i_right
+                )
 
 
 @do_setup(setup_combined_index, teardown_all)
@@ -402,31 +425,41 @@ def single_test_combined_index():
     # fixture rather than from a file.
     with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)):
         adjacency_matrix, combined_index, n_new_english = make_adjacency_matrix(
-            'ignored_filename', FRAME.index)
+            'ignored_filename', FRAME.index
+        )
 
     # The computed combined index must have the same terms as the reference,
     # but possibly in a different order.
-    assert (set(combined_index) == set(COMBINED_INDEX)), \
-        'Computed combined index has incorrect terms.'
+    assert set(combined_index) == set(
+        COMBINED_INDEX
+    ), 'Computed combined index has incorrect terms.'
 
     # No term should be listed twice in the combined index.
-    assert (len(combined_index) == len(set(combined_index))), \
-        'Computed combined index has repeated terms.'
+    assert len(combined_index) == len(
+        set(combined_index)
+    ), 'Computed combined index has repeated terms.'
 
     # The terms from the frame must preceed any other terms from the graph.
     n_frame_terms = len(FRAME.index)
-    assert (set(combined_index[:n_frame_terms]) == set(FRAME.index)), \
-        'Computed combined index does not start with the original terms from the embedding.'
+    assert set(combined_index[:n_frame_terms]) == set(
+        FRAME.index
+    ), 'Computed combined index does not start with the original terms from the embedding.'
 
     # Among the remaining terms, the terms in English must come last, and
     # their number must be reported correctly.
-    assert (n_new_english == len(NEW_ENGLISH_TERMS)), \
-        'Incorrect number {} (should be {}) of new terms from the association graph in English.'.format(n_new_english, len(NEW_ENGLISH_TERMS))
+    assert n_new_english == len(
+        NEW_ENGLISH_TERMS
+    ), 'Incorrect number {} (should be {}) of new terms from the association graph in English.'.format(
+        n_new_english, len(NEW_ENGLISH_TERMS)
+    )
     n_new_non_english = len(NEW_NON_ENGLISH_TERMS)
-    assert (set(combined_index[n_frame_terms:(n_frame_terms + n_new_non_english)]) == NEW_NON_ENGLISH_TERMS), \
-        'Incorrect list of new terms from the association graph not in English.'
-    assert (set(combined_index[(n_frame_terms + n_new_non_english):]) == NEW_ENGLISH_TERMS), \
-        'Incorrect list of new terms from the association graph in English.'
+    assert (
+        set(combined_index[n_frame_terms : (n_frame_terms + n_new_non_english)])
+        == NEW_NON_ENGLISH_TERMS
+    ), 'Incorrect list of new terms from the association graph not in English.'
+    assert (
+        set(combined_index[(n_frame_terms + n_new_non_english) :]) == NEW_ENGLISH_TERMS
+    ), 'Incorrect list of new terms from the association graph in English.'
 
 
 @do_setup(setup_ranks, teardown_all)
@@ -439,17 +472,24 @@ def single_test_propagate():
     # The propagated terms should be the terms from the conbined index,
     # starting with the terms of the frame and going up to the last new
     # term from the graph that is not in English.
-    assert (len(propagated) == len(FRAME) + len(NEW_NON_ENGLISH_TERMS)), \
-        'Incorrect number {} (should be {}) of propagated terms.'.format(len(propagated), len(FRAME) + len(NEW_NON_ENGLISH_TERMS))
+    assert len(propagated) == len(FRAME) + len(
+        NEW_NON_ENGLISH_TERMS
+    ), 'Incorrect number {} (should be {}) of propagated terms.'.format(
+        len(propagated), len(FRAME) + len(NEW_NON_ENGLISH_TERMS)
+    )
     for i_term in range(len(propagated)):
-        assert (propagated.index[i_term] == COMBINED_INDEX[i_term]), \
-            'Propagated output terms do not agree with the input terms.'
-    
-    # The original embedding should not be altered.
-    assert_allclose(propagated.values[:len(FRAME), :], FRAME.values,
-                    err_msg='Propagation changed an input embedding vector.')
+        assert (
+            propagated.index[i_term] == COMBINED_INDEX[i_term]
+        ), 'Propagated output terms do not agree with the input terms.'
 
-    # Terms not from the original embedding should be assigned the 
+    # The original embedding should not be altered.
+    assert_allclose(
+        propagated.values[: len(FRAME), :],
+        FRAME.values,
+        err_msg='Propagation changed an input embedding vector.',
+    )
+
+    # Terms not from the original embedding should be assigned the
     # average of the vectors of their neighbors of lesser rank, if all
     # of those neighbors are either from the original embedding or non-
     # English.
@@ -457,18 +497,16 @@ def single_test_propagate():
         count = 0
         sum = np.zeros((EMBEDDING_DIM,), dtype=np.float32)
         for other_term in COMBINED_INDEX:
-            if (
-                (term, other_term) in EDGE_SET
-                    and RANKS[other_term] < RANKS[term]
-            ):
+            if (term, other_term) in EDGE_SET and RANKS[other_term] < RANKS[term]:
                 if other_term in NEW_ENGLISH_TERMS:
                     break
                 count += 1
                 sum = np.add(sum, propagated.loc[other_term])
         else:
             assert_allclose(
-                propagated.loc[term], sum/count,
-                err_msg='Incorrect propagated vector for term {}'.format(term)
+                propagated.loc[term],
+                sum / count,
+                err_msg='Incorrect propagated vector for term {}'.format(term),
             )
 
 
@@ -487,16 +525,17 @@ def single_test_sharded_propagate():
     # failures of that function.
     nshards = 2
     shard_collector = Mock(return_value=None)  # save_hdf returns None
-    with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)), \
-         patch('conceptnet5.vectors.propagate.make_adjacency_matrix',
-               return_value=(ADJACENCY_MATRIX, COMBINED_INDEX, len(NEW_ENGLISH_TERMS))), \
-         patch('conceptnet5.vectors.propagate.load_hdf', return_value=FRAME), \
-         patch('conceptnet5.vectors.propagate.save_hdf', shard_collector):
+    with patch('builtins.open', return_value=io.StringIO(ASSOC_FILE_CONTENTS)), patch(
+        'conceptnet5.vectors.propagate.make_adjacency_matrix',
+        return_value=(ADJACENCY_MATRIX, COMBINED_INDEX, len(NEW_ENGLISH_TERMS)),
+    ), patch('conceptnet5.vectors.propagate.load_hdf', return_value=FRAME), patch(
+        'conceptnet5.vectors.propagate.save_hdf', shard_collector
+    ):
         sharded_propagate(
             'ignored_assoc_file',
             'ignored_embedding_file',
             'shard_filename_root',
-            nshards=nshards
+            nshards=nshards,
         )
 
     # Run unsharded propagation for comparison.
@@ -507,15 +546,18 @@ def single_test_sharded_propagate():
     # Check that two shard files were written, to the correct filenames.
     shard_arg = 0  # shard is 1st arg to save_hdf
     fname_arg = 1  # filename is 2nd arg to save_hdf.
-    assert (len(shard_collector.call_args_list) == nshards), \
-        'Incorrect number {} (should be {}) of shards written.'.format(
-            len(shard_collector.call_args_list), nshards)
+    assert (
+        len(shard_collector.call_args_list) == nshards
+    ), 'Incorrect number {} (should be {}) of shards written.'.format(
+        len(shard_collector.call_args_list), nshards
+    )
     for i_shard in range(nshards):
         # Get the positional argument in the filename position of the (i_shard)-th
         # call to the shard_collector Mock object (which mocks save_hdf).
         filename = extract_positional_arg(shard_collector, i_shard, fname_arg)
-        assert (filename == 'shard_filename_root.shard{}'.format(i_shard)), \
-            'Shard {} written to incorrect file name {}.'.format(i_shard, filename)
+        assert filename == 'shard_filename_root.shard{}'.format(
+            i_shard
+        ), 'Shard {} written to incorrect file name {}.'.format(i_shard, filename)
 
     # The shards should agree with the appropriate pieces of the unsharded output.
     for i_shard in range(nshards):
@@ -525,29 +567,37 @@ def single_test_sharded_propagate():
         shard = extract_positional_arg(shard_collector, i_shard, shard_arg)
         shard_start_dim = i_shard * EMBEDDING_DIM // nshards
         shard_end_dim = shard_start_dim + EMBEDDING_DIM // nshards
-        assert (len(shard.index) == len(propagated.index)), \
-            'Shard {} has incorrect length {} (should be {}).'.format(
-                i_shard, len(shard.index), len(propagated.index))
+        assert len(shard.index) == len(
+            propagated.index
+        ), 'Shard {} has incorrect length {} (should be {}).'.format(
+            i_shard, len(shard.index), len(propagated.index)
+        )
         for shard_term, ref_term in zip(shard.index, propagated.index):
-            assert (shard_term == ref_term), \
-                'Shard {} has term {} where reference has {}.'.format(
-                    i_shard, shard_term, ref_term)
+            assert (
+                shard_term == ref_term
+            ), 'Shard {} has term {} where reference has {}.'.format(
+                i_shard, shard_term, ref_term
+            )
         assert_allclose(
-            shard.values, propagated.values[:, shard_start_dim:shard_end_dim],
-            err_msg='Shard {} has incorrect propagated vectors.'.format(i_shard)
+            shard.values,
+            propagated.values[:, shard_start_dim:shard_end_dim],
+            err_msg='Shard {} has incorrect propagated vectors.'.format(i_shard),
         )
 
 
 # The test functions generate multiple instances of test data and apply
 # lower-level individual tests to each.
 
+
 def test_adjacency_matrix():
     for i_test in range(N_TRIALS):
         single_test_adjacency_matrix()
 
+
 def test_combined_index():
     for i_test in range(N_TRIALS):
         single_test_combined_index()
+
 
 def test_propagate():
     # It is useful to test propagation on graphs with no English terms,
@@ -564,6 +614,7 @@ def test_propagate():
     for i_test in range(N_TRIALS):
         single_test_propagate()
     LANGUAGES = saved_languages
+
 
 def test_sharded_propagate():
     for i_test in range(N_TRIALS):
