@@ -10,6 +10,7 @@ from scipy.sparse import diags
 
 from conceptnet5.builders.reduce_assoc import ConceptNetAssociationGraph
 from conceptnet5.uri import get_uri_language
+from conceptnet5.vectors import replace_numbers
 
 from .formats import load_hdf, save_hdf
 from .sparse_matrix_builder import SparseMatrixBuilder
@@ -30,6 +31,10 @@ class ConceptNetAssociationGraphForPropagation(ConceptNetAssociationGraph):
         In addition to the superclass's handling of a new edge,
         saves the edges as a set of (left, right) pairs.
         """
+        # Use URIs that have the additional standardization for vector-space labels,
+        # replacing sequences of digits with the # sign.
+        left = replace_numbers(left)
+        right = replace_numbers(right)
         super().add_edge(left, right, value, dataset, relation)
         self.edges.add((left, right))
         self.edges.add((right, left))  # save undirected edges
