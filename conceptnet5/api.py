@@ -3,10 +3,12 @@ This file defines the ConceptNet web API responses.
 """
 
 from conceptnet5.nodes import ld_node, standardized_concept_uri
+from conceptnet5.db.config import DB_NAME
+from conceptnet5.db.query import AssertionFinder
 from conceptnet5.vectors.query import VectorSpaceWrapper
 
 VECTORS = VectorSpaceWrapper()
-FINDER = VECTORS.finder
+FINDER = AssertionFinder(dbname=DB_NAME)
 CONTEXT = ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"]
 VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 

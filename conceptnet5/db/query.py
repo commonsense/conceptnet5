@@ -132,7 +132,7 @@ def gin_jsonb_value(criteria, node_forward=True):
 
 class AssertionFinder(object):
     """
-    The object that interacts with the database to find ConcetNet assertions
+    The object that interacts with the database to find ConceptNet assertions
     (edges) matching certain criteria.
     """
 

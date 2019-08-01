@@ -85,6 +85,18 @@ def extract_positional_arg(mock_obj, call_number, position):
 _term_count = 0
 
 
+def _numbers_to_letters(num):
+    """
+    Write base-10 numbers using the alphabet 'qrstuvwxyz', so that they won't be
+    normalized away.
+    """
+    numstr = str(num)
+    for digit in '0123456789':
+        letter = chr(ord(digit) - ord('0') + ord('q'))
+        numstr = numstr.replace(digit, letter)
+    return numstr
+
+
 def make_term():
     """
     Make and return a string representing a (synthetic) term in a randomly-
@@ -92,7 +104,8 @@ def make_term():
     """
     global _term_count
     language = random_gen.choice(LANGUAGES, p=LANGUAGE_PROBA)
-    term_text = 'term{}'.format(_term_count)
+    term_letters = _numbers_to_letters(_term_count)
+    term_text = 'term_{}'.format(term_letters)
     term = concept_uri(language, term_text)
     _term_count += 1
     return term
