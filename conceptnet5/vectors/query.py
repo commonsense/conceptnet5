@@ -149,7 +149,7 @@ class VectorSpaceWrapper(object):
             term = term[:-1]
         return results
 
-    def expand_terms(self, terms, limit_per_term=10, oov_vector=True):
+    def expand_terms(self, terms, oov_vector=True):
         """
         Given a list of weighted terms as (term, weight) tuples, if any of the terms
         are OOV, find approximations to those terms: the same term in English, or terms
@@ -179,18 +179,18 @@ class VectorSpaceWrapper(object):
                 (uri_prefix(term), weight / total_weight) for (term, weight) in expanded
             ]
 
-    def expanded_vector(self, terms, limit_per_term=10, oov_vector=True):
+    def expanded_vector(self, terms, oov_vector=True):
         """
         Given a list of weighted terms as (term, weight) tuples, make a vector
         representing information from:
 
         - The vectors for these terms
-        - The vectors for their neighbors in ConceptNet
+        - The vectors for equivalently spelled terms in the English vocabulary
         - The vectors for terms that share a sufficiently-long prefix with
           any terms in this list that are out-of-vocabulary
         """
         return weighted_average(
-            self.frame, self.expand_terms(terms, limit_per_term, oov_vector)
+            self.frame, self.expand_terms(terms, oov_vector)
         )
 
     def text_to_vector(self, language, text):
@@ -249,8 +249,8 @@ class VectorSpaceWrapper(object):
         - A single term
         - An existing vector
 
-        If the query contains 5 or fewer terms, it will be expanded to include
-        neighboring terms in ConceptNet.
+        If the query contains 5 or fewer terms, it will be expanded using the
+        out-of-vocab strategy.
         """
         self.load()
         vec = self.get_vector(query)
