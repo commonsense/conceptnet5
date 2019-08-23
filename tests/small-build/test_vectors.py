@@ -7,8 +7,12 @@ from nose.tools import assert_almost_equal, ok_, with_setup
 from conceptnet5.uri import is_term
 from conceptnet5.vectors import get_vector
 from conceptnet5.vectors.transforms import (
-    l1_normalize_columns, l2_normalize_rows, make_big_frame, make_small_frame,
-    shrink_and_sort, standardize_row_labels
+    l1_normalize_columns,
+    l2_normalize_rows,
+    make_big_frame,
+    make_small_frame,
+    shrink_and_sort,
+    standardize_row_labels,
 )
 
 DATA = os.environ.get("CONCEPTNET_BUILD_DATA", "testdata")
@@ -16,33 +20,41 @@ TEST_FRAME = None
 
 
 def setup_simple_frame():
-    data = [[4, 4, 4],
-            [1, 1, 1],
-            [1, 2, 10],
-            [3, 3, 4],
-            [2, 3, 4],
-            [2, 3, 5],
-            [7, 2, 7],
-            [3, 8, 2]]
+    data = [
+        [4, 4, 4],
+        [1, 1, 1],
+        [1, 2, 10],
+        [3, 3, 4],
+        [2, 3, 4],
+        [2, 3, 5],
+        [7, 2, 7],
+        [3, 8, 2],
+    ]
 
-    index = ['island', 'Island', 'cat', 'figure', 'figure skating', 'figure skater', 'thing', '17']
+    index = [
+        'island',
+        'Island',
+        'cat',
+        'figure',
+        'figure skating',
+        'figure skater',
+        'thing',
+        '17',
+    ]
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 
 
 def setup_multi_ling_frame():
-    data = [[8, 10, 3],
-            [4, 5, 6],
-            [4, 4, 5],
-            [10, 6, 12],
-            [10, 7, 11],
-            [20, 20, 7]]
-    index = ['/c/pl/kombinacja',
-             '/c/en/ski_jumping',
-             '/c/en/nordic_combined',
-             '/c/en/present',
-             '/c/en/gift',
-             '/c/en/quiz']
+    data = [[8, 10, 3], [4, 5, 6], [4, 4, 5], [10, 6, 12], [10, 7, 11], [20, 20, 7]]
+    index = [
+        '/c/pl/kombinacja',
+        '/c/en/ski_jumping',
+        '/c/en/nordic_combined',
+        '/c/en/present',
+        '/c/en/gift',
+        '/c/en/quiz',
+    ]
     global TEST_FRAME
     TEST_FRAME = pd.DataFrame(data=data, index=index)
 

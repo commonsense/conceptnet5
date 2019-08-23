@@ -4,13 +4,12 @@ small test build.
 """
 
 from conceptnet5.db.query import AssertionFinder
+import pytest
 
-test_finder = None
 
-
-def setUp():
-    global test_finder
-    test_finder = AssertionFinder('conceptnet-test')
+@pytest.fixture
+def test_finder():
+    return AssertionFinder('conceptnet-test')
 
 
 # Queries that all include the result "/r/Synonym/,/c/es/prueba/n/,/c/en/test/n/"
@@ -25,15 +24,11 @@ TEST_QUERIES = [
 TEST_URI = "/a/[/r/Synonym/,/c/es/prueba/n/wn/act/,/c/en/test/n/wn/act/]"
 
 
-def check_query(query):
+@pytest.mark.parametrize('query', TEST_QUERIES)
+def test_queries(test_finder, query):
+    # Test that each of the above queries finds the expected assertion
     q = test_finder.query(query)
     q_uris = [match['@id'] for match in q]
     q_uris_set = set(q_uris)
     assert len(q_uris) == len(q_uris_set)
     assert TEST_URI in q_uris_set, q_uris_set
-
-
-def test_queries():
-    # Test that each of the above queries finds the expected assertion
-    for query in TEST_QUERIES:
-        yield check_query, query
