@@ -3,8 +3,11 @@ Test querying ConceptNet for information in the database that results from the
 small test build.
 """
 
-from conceptnet5.db.query import AssertionFinder
+import subprocess
 import pytest
+
+from conceptnet5.db.query import AssertionFinder
+from tests.conftest import run_build
 
 
 @pytest.fixture
@@ -32,3 +35,28 @@ def test_queries(test_finder, query):
     q_uris_set = set(q_uris)
     assert len(q_uris) == len(q_uris_set)
     assert TEST_URI in q_uris_set, q_uris_set
+
+
+def _assert_result_dir_same_as_reference(result, reference):
+    """
+    Return True if all text files in result directory matched the text files in the
+    reference directory and False otherwise. Skip the msgpack files.
+    """
+    cmd_args = ['diff', '-urN', '-x', '*.msgpack']
+
+    # In Python 3.7, `stdout=subprocess.PIPE` can be replaced by the clearer
+    # `capture_output=True`
+    try:
+        subprocess.run(
+            cmd_args + [result, reference], stdout=subprocess.PIPE, check=True
+        )
+    except subprocess.CalledProcessError as err:
+        print(err.output.decode('utf-8')[:10000])
+        raise
+
+
+def test_build_result(run_build):
+    for subdir in ['assertions', 'assoc', 'edges']:
+        result_dir = 'testdata/current/' + subdir
+        reference_dir = 'testdata/reference/' + subdir
+        _assert_result_dir_same_as_reference(result_dir, reference_dir)
