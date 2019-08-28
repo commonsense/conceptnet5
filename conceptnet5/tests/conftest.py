@@ -4,10 +4,7 @@ import subprocess
 import pytest
 from shutil import copytree, rmtree
 
-
-def pytest_addoption(parser):
-    parser.addoption('--quick', action='store_true', help='Use existing input files in'
-                                                          ' tests/data')
+from conceptnet5.db.query import AssertionFinder
 
 
 @pytest.fixture(scope='session', name='is_quick_run')
@@ -43,3 +40,9 @@ def run_build(test_env_variables, setup_test_directory):
     has already been run and just quickly runs tests.
     """
     run_snakemake(test_env_variables)
+
+
+@pytest.fixture
+def test_finder():
+    return AssertionFinder('conceptnet-test')
+

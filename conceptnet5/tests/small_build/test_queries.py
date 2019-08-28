@@ -1,11 +1,5 @@
 import pytest
-from conceptnet5.db.query import AssertionFinder
-from conceptnet5.tests.conftest import run_build
-
-
-@pytest.fixture
-def test_finder():
-    return AssertionFinder('conceptnet-test')
+from conceptnet5.tests.conftest import run_build, test_finder
 
 
 def test_lookup(test_finder, run_build):

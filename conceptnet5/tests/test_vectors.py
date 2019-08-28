@@ -14,6 +14,7 @@ from conceptnet5.vectors.transforms import (
     shrink_and_sort,
     standardize_row_labels,
 )
+from conceptnet5.vectors.query import VectorSpaceWrapper
 
 
 @pytest.fixture
@@ -138,3 +139,109 @@ def test_make_small_frame(multi_ling_frame):
     assert '/c/en/nordic_combined' not in small_frame.index
     assert '/c/en/present' in small_frame.index
     assert '/c/en/gift' not in small_frame.index
+
+
+def test_load(simple_frame):
+    vectors = VectorSpaceWrapper(frame=simple_frame)
+    vectors.load()
+    assert vectors.frame is not None
+    assert vectors.small_frame is not None
+    assert all(label.startswith('/c/en/') for label in vectors.frame.index)
+    assert vectors.frame.index.is_monotonic_increasing
+    assert vectors.small_frame.shape[1] <= 100
+    assert vectors._trie is not None
+
+    # test there are no transformations to raw terms other than adding the
+    # English tag
+    assert '/c/en/figure skater' in vectors.frame.index  # no underscore
+    assert '/c/en/Island' in vectors.frame.index  # no case folding
+
+
+def test_englishify(simple_frame):
+    vectors = VectorSpaceWrapper(frame=simple_frame)
+    assert vectors._englishify('/c/sv/harry_potter') == '/c/en/harry_potter'
+
+
+def test_match_prefix(simple_frame):
+    vectors = VectorSpaceWrapper(frame=simple_frame)
+    vectors.load()
+    term = '/c/en/figure_skate'
+    expected_prefix_matches = [
+        ('/c/en/figure', 0.0033333333333333335),
+        ('/c/en/figure skater', 0.0033333333333333335),
+        ('/c/en/figure skating', 0.0033333333333333335),
+    ]
+    prefix_matches = vectors._match_prefix(term=term, prefix_weight=0.01)
+    assert expected_prefix_matches == prefix_matches
+
+
+def test_index_prefix_range(simple_frame):
+    vectors = VectorSpaceWrapper(frame=simple_frame)
+    vectors.load()
+    assert vectors._index_prefix_range('/c/en/figure') == (3, 6)
+    assert vectors._index_prefix_range('/c/en/skating')== (0, 0)
+
+
+def test_expand_terms(multi_ling_frame):
+    vectors = VectorSpaceWrapper(frame=multi_ling_frame)
+    vectors.load()
+    term = [('/c/en/ski_jumper', 1.0)]
+    expanded_terms = vectors.expand_terms(terms=term, oov_vector=True)
+
+    expected_expanded_terms = [
+        ('/c/en/ski_jumper', 0.9900990099009901),
+        ('/c/en/ski_jumping', 0.009900990099009901),
+    ]
+    assert expected_expanded_terms == expanded_terms
+
+
+def test_similar_terms(simple_frame):
+    """
+    Check if VectorSpaceWrapper's index is sorted and its elements are concepts.
+    """
+    vectors = VectorSpaceWrapper(frame=simple_frame)
+    vectors.load()
+    print(vectors.similar_terms('/c/en/figure skating', limit=3))
+    assert (
+        '/c/en/figure skating'
+        in vectors.similar_terms('/c/en/figure skating', limit=3).index
+    )
+    assert (
+        '/c/en/figure skater'
+        in vectors.similar_terms('/c/en/figure skating', limit=3).index
+    )
+    assert (
+        '/c/en/figure'
+        in vectors.similar_terms('/c/en/figure skating', limit=3).index
+    )
+
+
+def test_similar_terms_filter(multi_ling_frame):
+    vectors = VectorSpaceWrapper(frame=multi_ling_frame)
+    vectors.load()
+    assert (
+        '/c/pl/kombinacja'
+        in vectors.similar_terms('/c/en/nordic_combined', filter='/c/pl', limit=1).index
+    )
+
+    assert (
+        '/c/en/present'
+        in vectors.similar_terms('/c/en/gift', filter='/c/en/present', limit=1).index
+    )
+
+
+def test_missing_language(multi_ling_frame):
+    vectors = VectorSpaceWrapper(frame=multi_ling_frame)
+    vectors.load()
+
+    # The frame contains no Esperanto, of course, so the out-of-vocabulary
+    # mechanism will fail. We should simply get no results, not crash.
+    similarity = vectors.similar_terms('/c/eo/ekzemplo')
+    assert len(similarity) == 0
+
+
+def test_cache_with_oov(multi_ling_frame):
+    vectors = VectorSpaceWrapper(frame=multi_ling_frame)
+    vectors.load()
+    # check the vector of all zeros is returned if the term is not present
+    assert not vectors.get_vector('/c/en/test', oov_vector=False).any()
