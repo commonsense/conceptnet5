@@ -43,5 +43,3 @@ def run_build(test_env_variables, setup_test_directory):
     has already been run and just quickly runs tests.
     """
     run_snakemake(test_env_variables)
-
-
