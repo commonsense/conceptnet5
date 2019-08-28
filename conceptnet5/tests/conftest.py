@@ -27,9 +27,9 @@ def test_env_variables():
     return env_variables
 
 
-def run_snakemake(env_variables, options=('-j', '4', '-q'), targets=()):
+def run_snakemake(env_variables, options=('-j', '4'), targets=()):
     cmd_args = ["snakemake"] + list(options) + list(targets)
-    subprocess.call(cmd_args, env=env_variables)
+    subprocess.run(cmd_args, env=env_variables, check=True)
 
 
 @pytest.fixture(scope='session')
