@@ -7,7 +7,7 @@ import subprocess
 import pytest
 
 from conceptnet5.db.query import AssertionFinder
-from tests.conftest import run_build
+from conceptnet5.tests.conftest import run_build
 
 
 @pytest.fixture

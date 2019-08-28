@@ -1,5 +1,6 @@
 import pytest
 from conceptnet5.db.query import AssertionFinder
+from conceptnet5.tests.conftest import run_build
 
 
 @pytest.fixture
@@ -7,7 +8,7 @@ def test_finder():
     return AssertionFinder('conceptnet-test')
 
 
-def test_lookup(test_finder):
+def test_lookup(test_finder, run_build):
     quiz1 = list(test_finder.lookup('/c/en/quiz'))
     assert len(quiz1) == 3
 
@@ -29,17 +30,17 @@ def test_lookup(test_finder):
     assert source['@id'] == '/and/[/s/process/split_words/,/s/resource/verbosity/]'
 
 
-def test_lookup_dataset(test_finder):
+def test_lookup_dataset(test_finder, run_build):
     verbosity = list(test_finder.lookup('/d/verbosity'))
     assert len(verbosity) >= 2
 
 
-def test_random_edges(test_finder):
+def test_random_edges(test_finder, run_build):
     results = list(test_finder.random_edges(limit=10))
     assert len(results) == 10
 
 
-def test_strip_control_chars(test_finder):
+def test_strip_control_chars(test_finder, run_build):
     assert test_finder.lookup('/c/en/test\x00') == test_finder.lookup('/c/en/test')
     assert not test_finder.lookup('/s/\x1a')
 
@@ -48,7 +49,7 @@ def get_query_ids(query, test_finder):
     return [match['@id'] for match in test_finder.query(query)]
 
 
-def test_query_en_quiz(test_finder):
+def test_query_en_quiz(test_finder, run_build):
     q1 = get_query_ids({'start': '/c/en/test', 'end': '/c/en/quiz'}, test_finder)
     testquiz = {
         '/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]',
@@ -65,17 +66,17 @@ def test_query_en_quiz(test_finder):
     assert set(q4) == testquiz
 
 
-def test_query_en_form(test_finder):
+def test_query_en_form(test_finder, run_build):
     q = get_query_ids({'rel': '/r/FormOf', 'end': '/c/en/test'}, test_finder)
     assert q == ['/a/[/r/FormOf/,/c/en/tests/,/c/en/test/n/]']
 
 
-def test_query_en_es(test_finder):
+def test_query_en_es(test_finder, run_build):
     q = get_query_ids({'start': '/c/en/test', 'end': '/c/es'}, test_finder)
     assert q == ['/a/[/r/Synonym/,/c/en/test/n/wikt/en_1/,/c/es/prueba/]']
 
 
-def test_query_es(test_finder):
+def test_query_es(test_finder, run_build):
     q1 = get_query_ids({'node': '/c/es', 'rel': '/r/RelatedTo'}, test_finder)
     assert q1 == ['/a/[/r/RelatedTo/,/c/es/test/n/,/c/en/test/]']
 
@@ -90,14 +91,14 @@ def test_query_es(test_finder):
     assert q3 == ['/a/[/r/Synonym/,/c/es/test/n/,/c/es/prueba/]']
 
 
-def test_query_source(test_finder):
+def test_query_source(test_finder, run_build):
     q = get_query_ids(
         {'node': '/c/en/test', 'source': '/s/resource/jmdict/1.07'}, test_finder
     )
     assert q == ['/a/[/r/Synonym/,/c/ja/テスト/n/,/c/en/test/]']
 
 
-def test_lookup_external(test_finder):
+def test_lookup_external(test_finder, run_build):
     found = list(test_finder.lookup('http://dbpedia.org/resource/Test_(assessment)'))
     assert len(found) == 1
     assert found[0]['start']['@id'] == '/c/en/test/n/wp/assessment'

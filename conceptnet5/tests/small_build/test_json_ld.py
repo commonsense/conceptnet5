@@ -4,6 +4,7 @@ from pyld import jsonld
 
 from conceptnet5.api import lookup_grouped_by_feature, lookup_paginated
 from conceptnet5.util import get_support_data_filename
+from conceptnet5.tests.conftest import run_build
 
 
 CONTEXT = json.load(open(get_support_data_filename('ld/context.ld.json')))
@@ -67,7 +68,7 @@ def check_id_match(value, uri):
     assert value_id == uri
 
 
-def test_lookup_paginated():
+def test_lookup_paginated(run_build):
     response = lookup_paginated('/c/en/test', limit=5)
 
     # The original response points to a context file retrieved over HTTP.
@@ -112,7 +113,7 @@ def test_lookup_paginated():
     )
 
 
-def test_lookup_grouped():
+def test_lookup_grouped(run_build):
     response = lookup_grouped_by_feature('/c/en/test')
     ld = flat_map(response)
 
