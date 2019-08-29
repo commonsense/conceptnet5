@@ -45,5 +45,5 @@ process.
 Run `pytest --quick` to re-run the tests more quickly, with the assumption that
 the small test database has already been built.
 
-Run `pytest --full` to run additional tests on the fully built ConceptNet
+Run `pytest --fulldb` to run additional tests on the fully built ConceptNet
 database.
