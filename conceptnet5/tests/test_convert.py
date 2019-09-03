@@ -2,8 +2,6 @@ import os
 from itertools import zip_longest
 from tempfile import TemporaryDirectory
 
-from nose.tools import eq_
-
 from conceptnet5.formats.convert import json_to_msgpack, msgpack_to_json
 from conceptnet5.formats.json_stream import JSONStreamWriter, read_json_stream
 from conceptnet5.formats.msgpack_stream import (
@@ -30,7 +28,7 @@ def test_json_to_msgpack():
         json_to_msgpack(json_path, msgpack_path)
         reader = read_msgpack_stream(msgpack_path)
         for known, read in zip_longest(DATA, reader):
-            eq_(known, read)
+            assert known == read
 
 
 def test_msgpack_to_json():
@@ -46,4 +44,4 @@ def test_msgpack_to_json():
         msgpack_to_json(json_path, msgpack_path)
         reader = read_json_stream(msgpack_path)
         for known, read in zip_longest(DATA, reader):
-            eq_(known, read)
+            assert known == read

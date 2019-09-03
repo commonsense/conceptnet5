@@ -9,22 +9,6 @@ from ftfy.fixes import remove_control_chars
 LIST_QUERIES = {}
 FEATURE_QUERIES = {}
 
-if DB_NAME == 'conceptnet-test':
-    # Random queries sample 10% of edges. This makes sure we get matches in
-    # the test database, where there isn't much data.
-    RANDOM_QUERY = """
-        SELECT uri, data, weight FROM edges
-        TABLESAMPLE SYSTEM(10)
-        ORDER BY random() LIMIT %(limit)s
-    """
-else:
-    # In the real database, random queries sample 0.01% of edges.
-    RANDOM_QUERY = """
-        SELECT uri, data, weight FROM edges
-        TABLESAMPLE SYSTEM(0.01)
-        ORDER BY random() LIMIT %(limit)s
-    """
-
 # A query that's optimized for producing the edges, grouped by feature, that
 # you get when you look up a concept in the Web interface.
 NODE_TO_FEATURE_QUERY = """
@@ -218,8 +202,25 @@ class AssertionFinder(object):
         """
         if self.connection is None:
             self.connection = get_db_connection(self.dbname)
+
+        if self.dbname == 'conceptnet-test':
+            # Random queries sample 10% of edges. This makes sure we get matches in
+            # the test database, where there isn't much data.
+            random_query = """
+                SELECT uri, data, weight FROM edges
+                TABLESAMPLE SYSTEM(10)
+                ORDER BY random() LIMIT %(limit)s
+            """
+        else:
+            # In the real database, random queries sample 0.01% of edges.
+            random_query = """
+                SELECT uri, data, weight FROM edges
+                TABLESAMPLE SYSTEM(0.01)
+                ORDER BY random() LIMIT %(limit)s
+            """
+
         cursor = self.connection.cursor()
-        cursor.execute(RANDOM_QUERY, {'limit': limit})
+        cursor.execute(random_query, {'limit': limit})
         results = [
             transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
         ]

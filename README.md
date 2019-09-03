@@ -35,3 +35,15 @@ You may not need to build ConceptNet yourself! Try the [Web API][] first.
 [build process]: https://github.com/commonsense/conceptnet5/wiki/Build-process
 [Web API]: https://github.com/commonsense/conceptnet5/wiki/API
 [ConceptNet wiki]: https://github.com/commonsense/conceptnet5/wiki
+
+
+## Testing
+
+Run `pytest` to test the ConceptNet libraries and a small version of the build
+process.
+
+Run `pytest --quick` to re-run the tests more quickly, with the assumption that
+the small test database has already been built.
+
+Run `pytest --fulldb` to run additional tests on the fully built ConceptNet
+database.

@@ -1,18 +1,13 @@
 import json
 
-from nose.tools import eq_
 from pyld import jsonld
 
 from conceptnet5.api import lookup_grouped_by_feature, lookup_paginated
 from conceptnet5.util import get_support_data_filename
+from conceptnet5.tests.conftest import run_build
 
-context = None
 
-
-def setUp():
-    global context
-    context_filename = get_support_data_filename('ld/context.ld.json')
-    context = json.load(open(context_filename))
+CONTEXT = json.load(open(get_support_data_filename('ld/context.ld.json')))
 
 
 def flat_map(response):
@@ -21,11 +16,10 @@ def flat_map(response):
     dictionary mapping resources (as fully-qualified URLs) to their values
     (also containing fully-qualified URLs).
     """
-
     # The URL in '@context' may not be available yet, because we probably
     # haven't deployed. So replace the response's "@context" with the
     # contents of that file.
-    response['@context'] = context['@context']
+    response['@context'] = CONTEXT['@context']
 
     # jsonld.flatten gives us a list of objects, which all have @id values
     # (unless they're awkward "blank nodes", like definitions of features).
@@ -63,7 +57,7 @@ def check_id_match(value, uri):
     if isinstance(value, list):
         # If we got a list of results, it should have 1 item, and that item
         # should be the value we're interested in
-        eq_(len(value), 1)
+        assert len(value) == 1
         value = value[0]
 
     if isinstance(value, str):
@@ -71,16 +65,16 @@ def check_id_match(value, uri):
     else:
         value_id = value['@id']
 
-    eq_(value_id, uri)
+    assert value_id == uri
 
 
-def test_lookup_paginated():
+def test_lookup_paginated(run_build):
     response = lookup_paginated('/c/en/test', limit=5)
 
     # The original response points to a context file retrieved over HTTP.
     # Check its value before we mess with it.
     orig_context = response['@context']
-    eq_(orig_context, ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"])
+    assert orig_context == ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"]
 
     ld = flat_map(response)
 
@@ -88,7 +82,10 @@ def test_lookup_paginated():
     quiz = ld[api('/c/en/quiz')]
     check_id_match(quiz['@type'], vocab('Node'))
     quiz_label = quiz[vocab('label')][0]
-    eq_(quiz_label, {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'quiz'})
+    assert quiz_label == {
+        '@type': 'http://www.w3.org/2001/XMLSchema#string',
+        '@value': 'quiz',
+    }
 
     edge = ld[api('/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]')]
     check_id_match(edge['@type'], vocab('Edge'))
@@ -97,23 +94,26 @@ def test_lookup_paginated():
     check_id_match(edge[vocab('end')], api('/c/en/quiz'))
     check_id_match(edge[vocab('rel')], api('/r/RelatedTo'))
     check_id_match(edge[vocab('rel')], api('/r/RelatedTo'))
-    eq_(
-        edge[vocab('surfaceText')],
-        [{'@type': 'http://www.w3.org/2001/XMLSchema#string',
-          '@value': '[[test]] is related to [[quiz]]'}]
-    )
+    assert edge[vocab('surfaceText')] == [
+        {
+            '@type': 'http://www.w3.org/2001/XMLSchema#string',
+            '@value': '[[test]] is related to [[quiz]]',
+        }
+    ]
 
     # The resource we actually asked for has more properties
     test = ld[api('/c/en/test')]
-    eq_(len(test[vocab('edges')]), 5)
+    assert len(test[vocab('edges')]) == 5
 
     pagination = ld[api('/c/en/test?offset=0&limit=5')]
     check_id_match(pagination['@type'], vocab('pagination-PartialCollectionView'))
     check_id_match(pagination[vocab('pagination-paginatedProperty')], vocab('edges'))
-    check_id_match(pagination[vocab('pagination-nextPage')], api('/c/en/test?offset=5&limit=5'))
+    check_id_match(
+        pagination[vocab('pagination-nextPage')], api('/c/en/test?offset=5&limit=5')
+    )
 
 
-def test_lookup_grouped():
+def test_lookup_grouped(run_build):
     response = lookup_grouped_by_feature('/c/en/test')
     ld = flat_map(response)
 
@@ -122,7 +122,10 @@ def test_lookup_grouped():
     quiz = ld[api('/c/en/quiz')]
     check_id_match(quiz['@type'], vocab('Node'))
     quiz_label = quiz[vocab('label')][0]
-    eq_(quiz_label, {'@type': 'http://www.w3.org/2001/XMLSchema#string', '@value': 'quiz'})
+    assert quiz_label == {
+        '@type': 'http://www.w3.org/2001/XMLSchema#string',
+        '@value': 'quiz',
+    }
 
     edge = ld[api('/a/[/r/RelatedTo/,/c/en/test/,/c/en/quiz/]')]
     check_id_match(edge['@type'], vocab('Edge'))
@@ -131,11 +134,12 @@ def test_lookup_grouped():
     check_id_match(edge[vocab('end')], api('/c/en/quiz'))
     check_id_match(edge[vocab('rel')], api('/r/RelatedTo'))
     check_id_match(edge[vocab('rel')], api('/r/RelatedTo'))
-    eq_(
-        edge[vocab('surfaceText')],
-        [{'@type': 'http://www.w3.org/2001/XMLSchema#string',
-          '@value': '[[test]] is related to [[quiz]]'}]
-    )
+    assert edge[vocab('surfaceText')] == [
+        {
+            '@type': 'http://www.w3.org/2001/XMLSchema#string',
+            '@value': '[[test]] is related to [[quiz]]',
+        }
+    ]
 
     # We got a bunch of features
     test = ld[api('/c/en/test')]
@@ -144,11 +148,14 @@ def test_lookup_grouped():
 
 def test_meta_context():
     # Use the JSON-LD context to understand itself
-    ld = flat_map(context)
+    ld = flat_map(CONTEXT)
 
     # We get metadata about the context file
     top_level = ld[vocab('')]
-    check_id_match(top_level["http://www.w3.org/2000/01/rdf-schema#seeAlso"], "http://api.conceptnet.io/docs")
+    check_id_match(
+        top_level["http://www.w3.org/2000/01/rdf-schema#seeAlso"],
+        "http://api.conceptnet.io/docs",
+    )
 
     # We get RDF-ish definitions of the different properties, and comments
     rel = ld[vocab('rel')]

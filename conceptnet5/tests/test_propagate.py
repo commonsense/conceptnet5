@@ -12,6 +12,8 @@ from conceptnet5.vectors.propagate import (
     propagate,
     sharded_propagate,
 )
+from conceptnet5.tests.conftest import run_build
+
 
 # Constant parameters.
 N_TRIALS = 20

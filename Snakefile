@@ -96,7 +96,7 @@ if TESTMODE:
     INPUT_EMBEDDINGS = ['glove12-840B']
     SOURCE_EMBEDDING_ROWS = 5000
 
-    DATA = "testdata"
+    DATA = "testdata/current"
     USE_PRECOMPUTED = True
     HASH_WIDTH = 12
     RAW_DATA_URL = "/missing/data"

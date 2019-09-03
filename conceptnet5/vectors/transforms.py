@@ -117,7 +117,7 @@ def make_big_frame(frame, language):
      are in languages other than the language specified.
     """
     vocabulary = [term for term in frame.index if get_uri_language(term) == language]
-    big_frame = frame.ix[vocabulary]
+    big_frame = frame.loc[vocabulary]
     return big_frame
 
 
@@ -126,4 +126,4 @@ def make_small_frame(big_frame, concepts):
     Create a small frame using the output of choose_small_vocabulary()
     """
     small_vocab = choose_small_vocabulary(big_frame.index, concepts)
-    return big_frame.ix[small_vocab]
+    return big_frame.loc[small_vocab]
