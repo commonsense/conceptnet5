@@ -16,11 +16,9 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
-    if config.getoption("--fulldb"):
-        # --runslow given in cli: do not skip slow tests
-        return
-
-    skip_full = pytest.mark.skip(reason="need --fulldb option to run")
-    for item in items:
-        if "requires_full_build" in item.keywords:
-            item.add_marker(skip_full)
+    if not config.getoption("--fulldb"):
+        # mark all 'requires_full_build_' tests as skipped
+        skip_full = pytest.mark.skip(reason="need --fulldb option to run")
+        for item in items:
+            if "requires_full_build" in item.keywords:
+                item.add_marker(skip_full)
