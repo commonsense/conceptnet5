@@ -201,7 +201,6 @@ def test_similar_terms(simple_frame):
     """
     vectors = VectorSpaceWrapper(frame=simple_frame)
     vectors.load()
-    print(vectors.similar_terms('/c/en/figure skating', limit=3))
     assert (
         '/c/en/figure skating'
         in vectors.similar_terms('/c/en/figure skating', limit=3).index
