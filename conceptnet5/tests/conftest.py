@@ -26,6 +26,10 @@ def test_env_variables():
     env_variables['CONCEPTNET_REBUILD_PRECOMPUTED'] = '1'
     return env_variables
 
+@pytest.fixture(scope='session')
+def create_test_db():
+    subprocess.run(["dropdb", "conceptnet-test", "--if-exists"])
+    subprocess.run(["createdb", "conceptnet-test"])
 
 def run_snakemake(env_variables, options=('-j', '4'), targets=()):
     cmd_args = ["snakemake"] + list(options) + list(targets)
@@ -33,7 +37,7 @@ def run_snakemake(env_variables, options=('-j', '4'), targets=()):
 
 
 @pytest.fixture(scope='session')
-def run_build(test_env_variables, setup_test_directory):
+def run_build(test_env_variables, setup_test_directory, create_test_db):
     """
     Depending on this fixture will make sure that the (small) test build of ConceptNet
     is run, unless the 'quick' option is set, in which case it assumes the test build
@@ -45,4 +49,3 @@ def run_build(test_env_variables, setup_test_directory):
 @pytest.fixture
 def test_finder():
     return AssertionFinder('conceptnet-test')
-
