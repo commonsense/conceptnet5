@@ -27,9 +27,10 @@ def test_env_variables():
     return env_variables
 
 @pytest.fixture(scope='session')
-def create_test_db():
-    subprocess.run(["dropdb", "conceptnet-test", "--if-exists"])
-    subprocess.run(["createdb", "conceptnet-test"])
+def create_test_db(is_quick_run):
+    if not is_quick_run:
+        subprocess.run(["dropdb", "conceptnet-test", "--if-exists"])
+        subprocess.run(["createdb", "conceptnet-test"])
 
 def run_snakemake(env_variables, options=('-j', '4'), targets=()):
     cmd_args = ["snakemake"] + list(options) + list(targets)
