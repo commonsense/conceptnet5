@@ -1,8 +1,0 @@
-ConceptNet
-==========
-
-ConceptNet is a semantic network that represents things that computers should know about the world, especially for the purpose of understanding text written by people. Its "concepts" are represented using words and phrases of many different natural language -- unlike similar projects, it's not limited to a single language such as English. It expresses over 13 million links between these concepts, and makes the whole data set available under a Creative Commons license.
-
-Much of the current development of ConceptNet involves using it as an input for machine learning about the semantics of text. Its multilingual representation makes it particularly expressive, because the semantic overlaps and differences between languages are a useful signal that a learning system can learn from.
-
-ConceptNet grew out of Open Mind Common Sense, an early project for crowd-sourced knowledge, and expanded to cover many different languages through a collaboration with groups around the world. ConceptNet is cited in many research papers, and its public API gets over 50,000 hits per day.
