@@ -1,8 +1,11 @@
 {% extends "_base.html" %}
+
 {% from '_macros.html' import show_term, show_edge %}
+
 {% block title %}
 <title>ConceptNet 5: Query results</title>
 {% endblock %}
+
 {% block headleft %}
 <h1>
     {% if results.edges|length == 1 %}
