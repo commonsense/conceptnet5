@@ -49,13 +49,15 @@ linker = regex_replacement_stack([
 ])
 
 
+LEXER = get_lexer_by_name('json')
+FORMATTER = HtmlFormatter()
+
+
 def highlight_and_link_json(content):
     """
     Given JSON text, syntax-highlight it and convert URLs to links.
     """
-    formatter = HtmlFormatter()
-    lexer = get_lexer_by_name('json')
-    html = highlight(content, lexer, formatter)
+    html = highlight(content, LEXER, FORMATTER)
     urlized_html = linker(html)
     return Markup(urlized_html)
 
