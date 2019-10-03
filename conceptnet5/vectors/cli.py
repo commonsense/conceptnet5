@@ -1,3 +1,4 @@
+import os
 from os import path
 
 import click
@@ -294,6 +295,7 @@ def run_miniaturize(input_filename, extra_vocab_filename, output_filename, k):
 @click.argument('concepts_filename', type=click.Path(readable=True, dir_okay=False))
 @click.option('-l', '--language', default='en')
 def export_background(input_filename, output_dir, concepts_filename, language):
+    os.makedirs(output_dir, exist_ok=True)
     concepts = set(line.strip() for line in open(concepts_filename))
     frame = load_hdf(input_filename)
     big_frame = make_big_frame(frame, language)
