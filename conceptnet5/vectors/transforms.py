@@ -105,9 +105,15 @@ def choose_small_vocabulary(index, concepts):
     """
     Choose the vocabulary of the small frame, by eliminating the terms which:
      - contain more than one word
-     - are not in ConceptNet
+     - are not in the 'core' set of ConceptNet
+
+    ...but keeping the terms in Korean, which would be too aggressively filtered
+    by those criteria.
     """
-    vocab = [term for term in index if '_' not in term and term in concepts]
+    vocab = [
+        term for term in index
+        if ('_' not in term and term in concepts) or term.startswith('/c/ko/')
+    ]
     return vocab
 
 
