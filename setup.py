@@ -34,6 +34,7 @@ setup(
         'marisa-trie', 'tables >= 3.5.1'
     ],
     python_requires='>=3.5',
+    tests_require=['pytest', 'PyLD'],
     license='Apache License 2.0',
     entry_points={
         'console_scripts': [
