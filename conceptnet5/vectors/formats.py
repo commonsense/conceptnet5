@@ -108,11 +108,22 @@ def convert_word2vec(word2vec_filename, output_filename, nrows, language='en'):
     Convert word2vec data from its gzipped binary format to an HDF5
     dataframe.
     """
+    def _is_long_enough(term):
+        term_text = term.split('/')[3]
+        return len(term_text) >= 3
     w2v_raw = load_word2vec_bin(word2vec_filename, nrows)
     w2v_std = standardize_row_labels(w2v_raw, forms=False, language=language)
     del w2v_raw
-    w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_std))
+    # word2vec believes stupid things about two-letter combinations, so filter
+    # them out
+    filtered_labels = [
+        term for term in w2v_std.index
+        if _is_long_enough(term)
+    ]
+    w2v_filtered = w2v_std.loc[filtered_labels]
     del w2v_std
+    w2v_normal = l2_normalize_rows(l1_normalize_columns(w2v_filtered))
+    del w2v_filtered
     save_hdf(w2v_normal, output_filename)
 
 
