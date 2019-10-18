@@ -1,8 +1,11 @@
 {% extends "_base.html" %}
+
 {% from '_macros.html' import show_term, show_edge %}
+
 {% block title %}
 <title>ConceptNet 5: {{ error.status|error_name }}</title>
 {% endblock %}
+
 {% block headleft %}
     <h1 class="error">
         {{ error.status|error_name }}
@@ -11,6 +14,7 @@
         {{ error.details }}
     </h2>
 {% endblock headleft %}
+
 {% block content %}
     <div class="doc">
         <p>Sorry about that.

@@ -1,8 +1,11 @@
 {% extends "_base.html" %}
+
 {% from '_macros.html' import show_term %}
+
 {% block title %}
 <title>ConceptNet 5: {{ term.label }}</title>
 {% endblock %}
+
 {% block headleft %}
     {{ show_term(term, 'h1') }}
     <h2 class="subtitle">
@@ -16,6 +19,7 @@
         <a href="http://api.conceptnet.io{{term['@id']}}">View this term in the API</a>
     </div>
 {% endblock headleft %}
+
 {% block content %}
     <div class="rel-grid">
         <div class="pure-g">
