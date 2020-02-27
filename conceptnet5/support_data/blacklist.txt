@@ -1,3 +1,0 @@
-# We should be able to address particular bad assertions by removing them.
-# Here's one to start with.
-/a/[/r/HasSubevent/,/c/en/get_drunk/,/c/en/drive_carefully/]
