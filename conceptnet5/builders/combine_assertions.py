@@ -12,6 +12,8 @@ from conceptnet5.uri import (
     get_uri_language,
     is_absolute_url,
     split_uri,
+    uri_prefix,
+    uri_prefixes
 )
 from conceptnet5.util import get_support_data_filename
 
@@ -19,9 +21,51 @@ N = 100
 CURRENT_DIR = os.getcwd()
 
 
-def get_blacklist():
-    filename = get_support_data_filename('blacklist.txt')
-    return set(open(filename).readlines())
+class Blocklist:
+    def __init__(self):
+        self.simple_blocks = set()
+        self.complex_blocks = []
+        self.derivation_blocks = set()
+
+    @staticmethod
+    def load(filename):
+        bl = Blocklist()
+        for line in open(filename):
+            entry = line.strip()
+            if entry and not entry.startswith('#'):
+                if entry.upper().startswith('DERIVED '):
+                    entry = entry[8:]
+                    bl.derivation_blocks.add(entry)
+                elif ' ' in entry:
+                    bl.complex_blocks.append(entry.split(' '))
+                else:
+                    bl.simple_blocks.add(entry)
+        return bl
+
+    def propagate_blocks(self, edge):
+        if edge['rel'].endswith('DerivedFrom'):
+            if set(uri_prefixes(edge['end'])) & self.derivation_blocks:
+                prefix = uri_prefix(edge['start'], 3)
+                self.simple_blocks.add(prefix)
+                self.derivation_blocks.add(prefix)
+                print(f"Added derivation block: {prefix}")
+
+    def is_blocked(self, edge):
+        edge_values = set(
+            [
+                prefix
+                for value in edge.values() if isinstance(value, str)
+                for prefix in uri_prefixes(value)
+            ]
+        )
+        if edge_values & self.simple_blocks:
+            return True
+
+        for entry in self.complex_blocks:
+            if all(piece in edge_values for piece in entry):
+                return True
+
+        return False
 
 
 def weight_scale(weight):
@@ -128,7 +172,13 @@ def combine_assertions(input_filename, output_filename):
     out = MsgpackStreamWriter(output_filename)
     out_bad = MsgpackStreamWriter(output_filename + '.reject')
 
-    blacklist = get_blacklist()
+    blocklist = Blocklist.load(get_support_data_filename('blocklist.txt'))
+    with open(input_filename, encoding='utf-8') as stream:
+        for line in stream:
+            tmp_assertion = make_assertion([line.strip()])
+            if tmp_assertion is None:
+                continue
+            blocklist.propagate_blocks(tmp_assertion)
 
     with open(input_filename, encoding='utf-8') as stream:
         for key, line_group in itertools.groupby(stream, group_func):
@@ -138,9 +188,8 @@ def combine_assertions(input_filename, output_filename):
                 continue
             if assertion['weight'] <= 0:
                 destination = out_bad
-            for value in assertion.values():
-                if isinstance(value, str) and value in blacklist:
-                    destination = out_bad
+            if blocklist.is_blocked(assertion):
+                destination = out_bad
             destination.write(assertion)
 
     out.close()
