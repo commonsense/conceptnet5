@@ -54,7 +54,7 @@ EMOJI_LANGUAGES = [
 ]
 
 # Increment this number when we incompatibly change the parser
-WIKT_PARSER_VERSION = "2"
+WIKT_PARSER_VERSION = "3"
 
 RETROFIT_SHARDS = 6
 PROPAGATE_SHARDS = 6
