@@ -197,7 +197,10 @@ def ld_node(uri, label=None):
         # OpenCyc is down and UMBEL doesn't host their vocabulary on the
         # Web. This property indicates whether you can follow a link
         # via HTTP and retrieve more information.
-        ld['site_available'] = domain not in {'sw.opencyc.org', 'umbel.org'}
+        ld['site_available'] = True
+        if domain in {'sw.opencyc.org', 'umbel.org', 'wikidata.dbpedia.org'}:
+            ld['site_available'] = False
+        ld['path'] = urlparse(uri).path
         ld['@type'] = 'Node'
     elif uri.startswith('/r/'):
         ld['@type'] = 'Relation'

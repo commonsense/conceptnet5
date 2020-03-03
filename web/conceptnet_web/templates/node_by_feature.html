@@ -42,4 +42,18 @@
             {% endfor %}
         </div>
     </div>
+    {% if external_links %}
+    <div class="external-links">
+        <div class="pure-u-1 feature-box">
+            <h2>
+                <a href="{{term['@id']}}?rel=ExternalURL&limit=1000">Links to other resources</a>
+            </h2>
+            <ul>
+                {% for edge in external_links %}
+                    {{ show_term(edge['other'], 'li') }}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
 {% endblock content %}

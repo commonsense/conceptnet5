@@ -88,9 +88,12 @@ def browse_concept(uri):
     else:
         results = responses.lookup_grouped_by_feature(concept, filters, feature_limit=limit)
         sources = []
+        external_links = []
 
         if 'error' in results:
             return flask.render_template('error.html', error=results['error'])
+
+        rendered_features = []
 
         for feature in results['features']:
             rel = feature['feature']['rel']
@@ -107,8 +110,14 @@ def browse_concept(uri):
             for edge in feature['edges']:
                 sources.extend(edge['sources'])
 
+            if rel == '/r/ExternalURL':
+                external_links = feature['edges']
+            else:
+                rendered_features.append(feature)
+
         return flask.render_template(
-            'node_by_feature.html', term=results, features=results['features'], sources=sources
+            'node_by_feature.html', term=results, features=rendered_features, sources=sources,
+            external_links=external_links
         )
 
 

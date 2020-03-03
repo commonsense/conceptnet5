@@ -396,7 +396,7 @@ def uri_to_label(uri):
     'Q89'
     """
     if is_absolute_url(uri):
-        return uri.split('/')[-1]
+        return uri.split('/')[-1].replace('_', ' ')
     if is_term(uri):
         uri = uri_prefix(uri)
     parts = split_uri(uri)
