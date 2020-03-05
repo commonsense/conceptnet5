@@ -147,7 +147,11 @@ div.feature-box h2 {
     font-weight: normal;
     color: #888;
 }
-
+.external-links {
+    background: #ffffff;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
 /* A table of edges matching a query */
 .edge-list {
     background: #f4f4f4;
@@ -677,9 +681,18 @@ span.language {
     background-color: #fff;
     color: #f93;
 }
+.lang-mul span.language, .lang-mul span.language a {
+    background-color: #ff8;
+    color: #000;
+}
 
 /* Not a language, but could indicate a link to another resource */
 .lang-none span.language, .lang-none span.language a {
     background-color: #bdf;
     color: #000;
+}
+
+.nolink {
+    font-family: monospace;
+    font-size: 80%;
 }
