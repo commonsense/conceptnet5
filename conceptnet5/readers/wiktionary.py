@@ -137,6 +137,7 @@ WIKT_RELATIONS = {
     "quasi-synonym": ("/r/SimilarTo", False),
     "translation": ("/r/Synonym", False),
     "definition": (None, False),
+    "warning": (None, False),
 }
 
 
