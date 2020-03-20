@@ -97,6 +97,8 @@
 /c/en/paki
 /c/en/spic
 /c/en/spick
+/c/en/dago
+/c/en/mick
 /c/en/redskin
 /c/en/nigra
 /c/en/tarbaby
