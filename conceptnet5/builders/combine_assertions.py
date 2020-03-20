@@ -13,7 +13,7 @@ from conceptnet5.uri import (
     is_absolute_url,
     split_uri,
     uri_prefix,
-    uri_prefixes
+    uri_prefixes,
 )
 from conceptnet5.util import get_support_data_filename
 
@@ -22,13 +22,47 @@ CURRENT_DIR = os.getcwd()
 
 
 class Blocklist:
+    """
+    A class that keeps track of what node values we want to exclude from ConceptNet.
+    It can be loaded from a text file (see `support_data/blocklist.txt`, or the tame
+    version, `support_data/fake_blocklist.txt`).
+
+    "Simple blocks" are the URIs that appear on lines by themselves in the blocklist
+    file. If this URI is any of the values in an edge's dictionary -- such as its
+    start, end, or complete assertion URI -- the edge will be blocked.
+
+    "Derivation blocks" make use of the structure of DerivedFrom edges that we
+    get from Wiktionary. Any word DerivedFrom a concept that is listed as a
+    derivation block will be added as a "simple block" _and_ a "derivation
+    block". This allows us to block many forms of the same word, even though
+    the derived word forms might not have the same warnings as the root word.
+
+    This means that the words that get blocked depend on the order of the edges
+    that come from Wiktionary. The edges are ordered the same as the Wiktionary
+    DB dump, which is ordered by when the page was created. Often, derived
+    forms of words are created after the page for the root word, but there are
+    enough exceptions to this that we have to run propagation twice.
+
+    A word that is a derivation block is not necessarily a simple block. A case
+    exists where one sense of a word is a racial slur, while its other senses
+    are benign. Because we can't tell what word sense is being derived, we
+    block all its derived terms (many of which are slurs). But we allow the
+    non-slur meanings of the root word.
+    """
+
     def __init__(self):
         self.simple_blocks = set()
-        self.complex_blocks = []
         self.derivation_blocks = set()
 
     @staticmethod
     def load(filename):
+        """
+        Load the blocklist from a file.
+
+        Empty lines and lines starting with the comment symbol '#' are ignored.
+        Lines that start with 'DERIVED ' are derivation blocks. All other lines
+        are simple blocks.
+        """
         bl = Blocklist()
         for line in open(filename):
             entry = line.strip()
@@ -36,36 +70,38 @@ class Blocklist:
                 if entry.upper().startswith('DERIVED '):
                     entry = entry[8:]
                     bl.derivation_blocks.add(entry)
-                elif ' ' in entry:
-                    bl.complex_blocks.append(entry.split(' '))
                 else:
                     bl.simple_blocks.add(entry)
         return bl
 
-    def propagate_blocks(self, edge):
-        if edge['rel'].endswith('DerivedFrom'):
+    def propagate_blocks(self, edge, verbose=False):
+        """
+        Scan an edge and see if it is a DerivedFrom or FormOf edge whose right
+        side matches a derivation block. If so, add its left side as a simple
+        block and a derivation block.
+        """
+        if edge['rel'].endswith('DerivedFrom') or edge['rel'].endswith('FormOf'):
             if set(uri_prefixes(edge['end'])) & self.derivation_blocks:
                 prefix = uri_prefix(edge['start'], 3)
                 self.simple_blocks.add(prefix)
                 self.derivation_blocks.add(prefix)
-                print(f"Added derivation block: {prefix}")
+                if verbose:
+                    print(f"Added derivation block: {prefix}")
 
     def is_blocked(self, edge):
+        """
+        Test whether an edge should be blocked (whether any of its string values
+        match a simple block).
+        """
         edge_values = set(
             [
                 prefix
-                for value in edge.values() if isinstance(value, str)
+                for value in edge.values()
+                if isinstance(value, str)
                 for prefix in uri_prefixes(value)
             ]
         )
-        if edge_values & self.simple_blocks:
-            return True
-
-        for entry in self.complex_blocks:
-            if all(piece in edge_values for piece in entry):
-                return True
-
-        return False
+        return bool(edge_values & self.simple_blocks)
 
 
 def weight_scale(weight):
@@ -101,7 +137,12 @@ def keep_concept(uri):
     return bool(pieces[2])
 
 
-def make_assertion(line_group):
+def _make_assertion(line_group):
+    """
+    When a generator of tab-separated lines has been grouped by their assertion
+    URI, this function takes all the lines with the same URI and makes a single
+    assertion out of them.
+    """
     lines = [line.rstrip() for line in line_group]
     lines = [line for line in lines if line]
     if not lines:
@@ -148,7 +189,7 @@ def make_assertion(line_group):
     )
 
 
-def combine_assertions(input_filename, output_filename):
+def combine_assertions(input_filename, core_filename, output_filename):
     """
     Take in a tab-separated, sorted "CSV" files, indicated by
     `input_filename`, that should be grouped together into assertions.
@@ -172,17 +213,23 @@ def combine_assertions(input_filename, output_filename):
     out = MsgpackStreamWriter(output_filename)
     out_bad = MsgpackStreamWriter(output_filename + '.reject')
 
+    core_prefixes = set()
+    for line in open(core_filename, encoding='utf-8'):
+        core_prefixes.add(uri_prefix(line.strip(), 3))
+
+    # Scan through the assertions twice to add derived words to the blocklist
     blocklist = Blocklist.load(get_support_data_filename('blocklist.txt'))
-    with open(input_filename, encoding='utf-8') as stream:
-        for line in stream:
-            tmp_assertion = make_assertion([line.strip()])
-            if tmp_assertion is None:
-                continue
-            blocklist.propagate_blocks(tmp_assertion)
+    for iter in range(2):
+        with open(input_filename, encoding='utf-8') as stream:
+            for line in stream:
+                tmp_assertion = _make_assertion([line.strip()])
+                if tmp_assertion is None:
+                    continue
+                blocklist.propagate_blocks(tmp_assertion)
 
     with open(input_filename, encoding='utf-8') as stream:
         for key, line_group in itertools.groupby(stream, group_func):
-            assertion = make_assertion(line_group)
+            assertion = _make_assertion(line_group)
             destination = out
             if assertion is None:
                 continue
@@ -190,6 +237,12 @@ def combine_assertions(input_filename, output_filename):
                 destination = out_bad
             if blocklist.is_blocked(assertion):
                 destination = out_bad
+            if assertion['rel'] == 'ExternalURL':
+                # discard ExternalURL edges for things that aren't otherwise
+                # in ConceptNet
+                prefix = uri_prefix(assertion['start'], 3)
+                if prefix not in core_prefixes:
+                    destination = out_bad
             destination.write(assertion)
 
     out.close()
