@@ -68,6 +68,11 @@
 /a/[/r/HasPrerequisite/,/c/en/get_drunk/,/c/en/drive_carefully/]
 /c/en/populated_by_negroes
 
+# unreliable contributors
+/s/contributor/omcs/amberwright27
+/s/contributor/omcs/millerah
+/s/contributor/omcs/cheeser
+
 
 # Slurs that should not be included in ConceptNet, no matter the source.
 # These words are offensive in the majority of their usage, so we don't want
@@ -108,7 +113,6 @@
 /c/sv/neger
 /c/cs/negr
 /c/sh/niger
-/c/sh/čuga
 
 # Some slurs have a startling number of terms derived from them in Wiktionary,
 # and there's no markup to label a term in the 'Derived terms' list as offensive.
