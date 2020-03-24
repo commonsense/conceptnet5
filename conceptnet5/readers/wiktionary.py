@@ -10,6 +10,10 @@ from conceptnet5.languages import ALL_LANGUAGES, valid_language
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import Licenses, uri_prefix
 
+
+# By now, if we were matching the data version of wikiparsec, this would say
+# wikiparsec/3. But then we would have to change this value in all of the test
+# data, for no reason. Let's leave it at this string from now on.
 PARSER_RULE = '/s/process/wikiparsec/2'
 
 

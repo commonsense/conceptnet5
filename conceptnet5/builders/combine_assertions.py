@@ -21,6 +21,12 @@ N = 100
 CURRENT_DIR = os.getcwd()
 
 
+if os.environ.get('CONCEPTNET_BUILD_TEST'):
+    BLOCK_FILENAME = 'fake_blocklist.txt'
+else:
+    BLOCK_FILENAME = 'blocklist.txt'
+
+
 class Blocklist:
     """
     A class that keeps track of what node values we want to exclude from ConceptNet.
@@ -218,7 +224,7 @@ def combine_assertions(input_filename, core_filename, output_filename):
         core_prefixes.add(uri_prefix(line.strip(), 3))
 
     # Scan through the assertions twice to add derived words to the blocklist
-    blocklist = Blocklist.load(get_support_data_filename('blocklist.txt'))
+    blocklist = Blocklist.load(get_support_data_filename(BLOCK_FILENAME))
     for iter in range(2):
         with open(input_filename, encoding='utf-8') as stream:
             for line in stream:
