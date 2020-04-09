@@ -754,7 +754,7 @@ rule miniaturize:
     output:
         DATA + "/vectors/mini.h5"
     resources:
-        ram=4
+        ram=20
     shell:
         "cn5-vectors miniaturize {input} {output}"
 
