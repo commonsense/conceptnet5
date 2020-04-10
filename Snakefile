@@ -196,7 +196,7 @@ rule download_unicode_data:
     output:
         DATA + "/raw/cldr-common-" + CLDR_VERSION + ".zip"
     shell:
-        "wget -nv http://unicode.org/Public/cldr/{CLDR_VERSION_SHORT}/cldr-common-{CLDR_VERSION}.zip -O {output}"
+        "wget -nv https://conceptnet.s3.amazonaws.com/downloads/2020/cldr-common-{CLDR_VERSION}.zip -O {output}"
 
 rule extract_raw:
     input:
