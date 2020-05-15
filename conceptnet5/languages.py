@@ -27,12 +27,17 @@ LCODE_ALIASES = {
     'nds-de': 'nds',
     'nds-nl': 'nds',
 
-    # An easier case: consider Bahasa Indonesia and Bahasa Malay to be the
-    # same language, with code 'ms', because they're already 90% the same.
-    # Many sources use 'ms' to represent the entire macrolanguage, with
-    # 'zsm' to refer to Bahasa Malay in particular.
+    # The Malay language can be represented specifically as 'zsm', or as the
+    # more common language code 'ms'. 'ms' can also mean the macrolanguage of
+    # all the Malay languages, which encompasses other languages such as
+    # Indonesian.
+    #
+    # Prior to 5.8, we considered this a reason to unify Indonesian and Malay
+    # under the language code 'ms'. However, in most corpus data, they are
+    # distinguished as 'id' and 'ms', with 'ms' meaning the Malay language
+    # _specifically_. So now we only merge 'zsm' into 'ms', and leave 'id' as
+    # its own language.
     'zsm': 'ms',
-    'id': 'ms',
 
     # We had to make a decision here on Norwegian. Norwegian Bokmål ('nb') and
     # Nynorsk ('nn') have somewhat different vocabularies but are mutually
@@ -127,6 +132,7 @@ LANGUAGES = {
         'el',   # Greek
         'lv',   # Latvian
         'ms',   # Malay
+        'id',   # Indonesian
         'tr',   # Turkish
         'da',   # Danish
         'ga',   # Irish
@@ -471,7 +477,8 @@ LANGUAGE_NAMES = {
     'ro': 'Romanian',
     'el': 'Greek',
     'lv': 'Latvian',
-    'ms': 'Malay / Indonesian',
+    'ms': 'Malay',
+    'id': 'Indonesian',
     'tr': 'Turkish',
     'da': 'Danish',
     'ga': 'Irish',

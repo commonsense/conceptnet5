@@ -1,0 +1,127 @@
+# Any assertion that matches a line of this file will be excluded from the
+# ConceptNet build. There are also special keywords such as 'DERIVED' that
+# will follow DerivedFrom links and exclude those words as well.
+#
+# If you see things that should be added to or removed from the list,
+# probably the most useful way would be a private e-mail to me as the
+# maintainer of ConceptNet (see the README). I believe it would be
+# counterproductive to use a GitHub issue for this purpose.
+
+
+
+
+################################ WARNING ####################################
+#
+# The contents of this file are extremely inappropriate for a work
+# environment.
+#
+# We strongly recommend against displaying this file. If this is a code
+# review, please hide the section containing this file.
+#
+# Instead, you can look at the code that uses this file, in:
+#   conceptnet5/builders/combine_assertions.py
+#
+#############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# bad data found in OMCS
+/a/[/r/HasPrerequisite/,/c/en/get_drunk/,/c/en/drive_carefully/]
+/c/en/populated_by_negroes
+
+# unreliable contributors
+/s/contributor/omcs/amberwright27
+/s/contributor/omcs/millerah
+/s/contributor/omcs/cheeser
+
+
+# Slurs that should not be included in ConceptNet, no matter the source.
+# These words are offensive in the majority of their usage, so we don't want
+# them to slip through, even if it requires excluding technically-benign
+# senses that some words have.
+#
+# I had to skim a lot of poorly-labeled crud in Wiktionary to get most of this
+# list, and I found it in the database export in roughly the order it was added
+# to Wiktionary, and I got tired of this and stopped at some point, so I'm sorry
+# for whatever I missed.
+
+/c/en/nigger
+/c/en/niggers
+/c/en/nigga
+/c/en/negro
+/c/en/negress
+/c/en/coon
+/c/en/faggot
+/c/en/tranny
+/c/en/golliwog
+/c/en/wog
+/c/en/wop
+/c/en/gook
+/c/en/squaw
+/c/en/kike
+/c/en/yid
+/c/en/paki
+/c/en/spic
+/c/en/spick
+/c/en/dago
+/c/en/mick
+/c/en/redskin
+/c/en/nigra
+/c/en/tarbaby
+/c/en/towelhead
+/c/en/raghead
+/c/no/neger
+/c/sv/neger
+/c/cs/negr
+/c/sh/niger
+
+# Some slurs have a startling number of terms derived from them in Wiktionary,
+# and there's no markup to label a term in the 'Derived terms' list as offensive.
+# So these rules will propagate across DerivedFrom relations, adding any derived
+# term in Wiktionary to the blocklist.
+
+DERIVED /c/en/fag
+DERIVED /c/en/faggot
+DERIVED /c/en/nigger
+DERIVED /c/en/tranny
+DERIVED /c/en/wog
+

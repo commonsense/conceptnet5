@@ -27,11 +27,22 @@ USE_MORPHOLOGY = False
 # The versions of Wiktionary data to download. Updating these requires
 # uploading new Wiktionary dumps to ConceptNet's S3.
 WIKTIONARY_VERSIONS = {
+    # English wiktionary formatting has gotten even harder to deal with, let's
+    # stay with 2019 for now
     'en': '20190101',
-    'fr': '20160305',
-    'de': '20160407'
+    'fr': '20200301',
+    'de': '20200301'
 }
 WIKTIONARY_LANGUAGES = sorted(list(WIKTIONARY_VERSIONS))
+
+# Version of Unicode CLDR data, which will be downloaded separately from the
+# ConceptNet raw data
+CLDR_VERSION = '36.1'
+
+# If it's a .0 release of CLDR, the .0 is be omitted from the directory name.
+# For example, if the current version is '36.0', the short version should be
+# '36'.
+CLDR_VERSION_SHORT = '36.1'
 
 # Languages where morphemes should not be split anywhere except at spaces
 ATOMIC_SPACE_LANGUAGES = {'vi'}
@@ -54,7 +65,7 @@ EMOJI_LANGUAGES = [
 ]
 
 # Increment this number when we incompatibly change the parser
-WIKT_PARSER_VERSION = "2"
+WIKT_PARSER_VERSION = "3"
 
 RETROFIT_SHARDS = 6
 PROPAGATE_SHARDS = 6
@@ -69,7 +80,7 @@ PROPAGATE_SHARDS = 6
 # that will mainly be used to find more information about those terms.
 
 
-RAW_DATA_URL = "https://zenodo.org/record/2579347/files/conceptnet-raw-data-5.7.zip"
+RAW_DATA_URL = "https://zenodo.org/record/3739540/files/conceptnet-raw-data-5.8.zip"
 PRECOMPUTED_DATA_PATH = "/precomputed-data/2016"
 PRECOMPUTED_DATA_URL = "https://conceptnet.s3.amazonaws.com" + PRECOMPUTED_DATA_PATH
 PRECOMPUTED_S3_UPLOAD = "s3://conceptnet" + PRECOMPUTED_DATA_PATH
@@ -176,20 +187,20 @@ rule test:
 # ===========
 rule download_raw_package:
     output:
-        DATA + "/raw/conceptnet-raw-data-5.7.zip"
+        DATA + "/raw/conceptnet-raw-data-5.8.zip"
     shell:
         "wget -nv {RAW_DATA_URL} -O {output}"
 
 # Get emoji data directly from Unicode CLDR
 rule download_unicode_data:
     output:
-        DATA + "/raw/cldr-common-34.0.zip"
+        DATA + "/raw/cldr-common-" + CLDR_VERSION + ".zip"
     shell:
-        "wget -nv http://unicode.org/Public/cldr/34/cldr-common-34.0.zip -O {output}"
+        "wget -nv https://conceptnet.s3.amazonaws.com/downloads/2020/cldr-common-{CLDR_VERSION}.zip -O {output}"
 
 rule extract_raw:
     input:
-        DATA + "/raw/conceptnet-raw-data-5.7.zip"
+        DATA + "/raw/conceptnet-raw-data-5.8.zip"
     output:
         DATA + "/raw/{dirname}/{filename}"
     shell:
@@ -201,7 +212,7 @@ rule extract_raw:
 # TODO: integrate this with the rest of the raw data
 rule extract_emoji_data:
     input:
-        DATA + "/raw/cldr-common-34.0.zip"
+        DATA + "/raw/cldr-common-" + CLDR_VERSION + ".zip"
     output:
         DATA + "/raw/emoji/{filename}"
     shell:
@@ -411,7 +422,8 @@ rule shuffle_edges:
 
 rule combine_assertions:
     input:
-        DATA + "/collated/sorted/edges.csv"
+        DATA + "/collated/sorted/edges.csv",
+        DATA + "/stats/core_concepts.txt"
     output:
         DATA + "/assertions/assertions.msgpack"
     shell:
@@ -742,7 +754,7 @@ rule miniaturize:
     output:
         DATA + "/vectors/mini.h5"
     resources:
-        ram=4
+        ram=20
     shell:
         "cn5-vectors miniaturize {input} {output}"
 

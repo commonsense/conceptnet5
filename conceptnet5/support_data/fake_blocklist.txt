@@ -1,0 +1,15 @@
+# This file is an example of a "blocklist", used to keep bad or offensive
+# data out of ConceptNet. We don't want to use the real blocklist in test
+# cases, for good reasons, so here is a blocklist made of silly examples
+# instead.
+
+# Examples of things that can be blocked include:
+#
+# Specific unreliable statements
+/a/[/r/MadeOf/,/c/en/moon/,/c/en/green_cheese/]
+
+# Poisonous concepts that should be relegated to the past
+/c/en/mapreduce
+
+# Bad words with many derived forms
+DERIVED /c/en/heck

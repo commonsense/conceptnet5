@@ -12,16 +12,22 @@ def cli():
 
 @cli.command(name='combine')
 @click.argument('input', type=click.Path(readable=True, dir_okay=False))
+@click.argument('core', type=click.Path(readable=True, dir_okay=False))
 @click.argument('output', type=click.Path(writable=True, dir_okay=False))
-def run_combine(input, output):
+def run_combine(input, core, output):
     """
     Combine edges that have the same relation, start, and end, into
     higher-level assertions that add their weights and sources.
 
     `input` is a tab-separated CSV file to be grouped into assertions.
+
+    `core` is the "core concepts" vocabulary file, which we'll use to avoid
+    generating pointless ExternalURL edges for things that aren't otherwise
+    in ConceptNet.
+
     `output` is the combined assertions, as a Msgpack stream.
     """
-    combine_assertions(input, output)
+    combine_assertions(input, core, output)
 
 
 @cli.command(name='reduce_assoc')

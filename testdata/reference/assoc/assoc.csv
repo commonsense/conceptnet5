@@ -339,6 +339,13 @@
 /c/hu/testápolás	/c/hu/test/n	2.0	/d/wiktionary/de	/r/DerivedFrom
 /c/hu/testápoló	/c/hu/test/n	1.0	/d/wiktionary/de	/r/DerivedFrom
 /c/hu/testőr	/c/hu/test/n	1.0	/d/wiktionary/en	/r/DerivedFrom
+/c/id/percubaan/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
+/c/id/percubaan/n/wn/act	/c/id/percubaan	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/id/uji/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
+/c/id/uji/n/wn/act	/c/id/uji	1.0	/d/wordnet/3.1	/r/SenseOf
+/c/id/ujian	/c/en/test/n/wp/assessment	0.5	/d/dbpedia/en	/r/Synonym
+/c/id/ujian/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
+/c/id/ujian/n/wn/act	/c/id/ujian	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/it/cimento/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
 /c/it/cimento/n/wn/act	/c/it/cimento	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/it/compito_in_classe	/c/en/test/n/wp/assessment	0.5	/d/dbpedia/en	/r/Synonym
@@ -612,7 +619,6 @@
 /c/ms/percubaan/n/wn/act	/c/ms/percubaan	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/ms/uji/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
 /c/ms/uji/n/wn/act	/c/ms/uji	1.0	/d/wordnet/3.1	/r/SenseOf
-/c/ms/ujian	/c/en/test/n/wp/assessment	0.5	/d/dbpedia/en	/r/Synonym
 /c/ms/ujian/n/wn/act	/c/en/test/n/wn/act	2.0	/d/wordnet/3.1	/r/Synonym
 /c/ms/ujian/n/wn/act	/c/ms/ujian	1.0	/d/wordnet/3.1	/r/SenseOf
 /c/mul/♀	/c/en/female_sign	1.0	/d/emoji	/r/SymbolOf
