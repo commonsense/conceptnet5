@@ -6,7 +6,7 @@ from setuptools.command.develop import develop
 from setuptools.command.install import install
 
 packages = find_packages()
-version_str = '5.7.0'
+version_str = '5.8.1'
 
 if sys.version_info.major < 3:
     print("The ConceptNet 5 code can only run in Python 3.")
