@@ -2,6 +2,7 @@
 This file defines the ConceptNet web API responses.
 """
 
+from conceptnet5 import __version__ as VERSION
 from conceptnet5.nodes import ld_node, standardized_concept_uri
 from conceptnet5.db.config import DB_NAME
 from conceptnet5.db.query import AssertionFinder
@@ -15,11 +16,13 @@ VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
 
 def success(response):
     response['@context'] = CONTEXT
+    response['version'] = VERSION
     return response
 
 
 def error(response, status, details):
     response['@context'] = CONTEXT
+    response['version'] = VERSION
     response['error'] = {'status': status, 'details': details}
     return response
 
