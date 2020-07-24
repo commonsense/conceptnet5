@@ -166,7 +166,6 @@ rule webdata:
         DATA + "/psql/sources.csv",
         DATA + "/psql/relations.csv",
         DATA + "/psql/done",
-        DATA + "/vectors/mini.h5",
 
 rule clean:
     shell:

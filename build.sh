@@ -30,4 +30,4 @@ check_db () {
 check_disk_space
 pip3 install -e '.[vectors]'
 check_db
-snakemake --resources 'ram=30' -j 2
+snakemake --resources 'ram=30' -j 2 $@
