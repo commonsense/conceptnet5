@@ -197,7 +197,7 @@ class VectorSpaceWrapper(object):
         """
         Used in Story Cloze Test to create a vector for text.
         """
-        tokens = wordfreq.tokenize(text, language)
+        tokens = wordfreq.simple_tokenize(text)
         weighted_terms = [
             (uri_prefix(standardized_uri(language, token)), 1.) for token in tokens
         ]

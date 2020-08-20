@@ -7,7 +7,7 @@ import flask
 from flask_limiter import Limiter
 
 from conceptnet5 import api as responses
-from conceptnet5.languages import COMMON_LANGUAGES, LANGUAGE_NAMES
+from conceptnet5.languages import COMMON_LANGUAGES, get_language_name
 from conceptnet5.nodes import standardized_concept_uri
 from conceptnet5.uri import split_uri
 from conceptnet_web.error_logging import try_configuring_sentry
@@ -48,7 +48,7 @@ def get_int(args, key, default, minimum, maximum):
 # @app.route('/<any(a, c, d, r, s):top>/<path:query>')
 @app.route('/')
 def front_page():
-    languages = [(lang, LANGUAGE_NAMES[lang]) for lang in COMMON_LANGUAGES
+    languages = [(lang, get_language_name(lang)) for lang in COMMON_LANGUAGES
                  if lang != 'mul']
     languages.sort(key=lambda item: item[1])
     return flask.render_template('index.html', languages=languages)
