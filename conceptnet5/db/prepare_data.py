@@ -230,7 +230,8 @@ def load_sql_csv(connection, input_dir):
         (input_dir + '/edges_gin.shuf.csv', 'edges_gin'),
         (input_dir + '/edge_features.csv', 'edge_features'),
     ]:
-        with connection.cursor() as cursor:
-            with open(filename, 'rb') as file:
-                cursor.copy_from(file, tablename)
-        connection.commit()
+        with connection:
+            with connection.cursor() as cursor:
+                with open(filename, 'rb') as file:
+                    cursor.execute('TRUNCATE {}'.format(tablename))
+                    cursor.copy_from(file, tablename)
