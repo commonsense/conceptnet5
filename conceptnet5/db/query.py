@@ -121,15 +121,20 @@ class AssertionFinder(object):
     """
 
     def __init__(self, dbname=None):
-        self.connection = None
+        self._connection = None
         self.dbname = dbname
+
+    @property
+    def connection():
+        # See https://www.psycopg.org/docs/connection.html#connection.closed
+        if self._connection is None or self._connection.closed > 0:
+            self._connection = get_db_connection(self.dbname)
+        return self._connection
 
     def lookup(self, uri, limit=100, offset=0):
         """
         A query that returns all the edges that include a certain URI.
         """
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
         if uri.startswith('/c/') or uri.startswith('http'):
             criteria = {'node': uri}
         elif uri.startswith('/r/'):
@@ -153,8 +158,6 @@ class AssertionFinder(object):
         (incoming or outgoing).
         """
         uri = remove_control_chars(uri)
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
 
         def extract_feature(row):
             return tuple(row[:2])
@@ -189,8 +192,6 @@ class AssertionFinder(object):
         # Sanitize URIs to remove control characters such as \x00. The postgres driver would
         # remove \x00 anyway, but this avoids reporting a server error when that happens.
         uri = remove_control_chars(uri)
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
         cursor = self.connection.cursor()
         cursor.execute("SELECT data FROM edges WHERE uri=%(uri)s", {'uri': uri})
         results = [transform_for_linked_data(data) for (data,) in cursor.fetchall()]
@@ -200,9 +201,6 @@ class AssertionFinder(object):
         """
         Get a collection of distinct, randomly-selected edges.
         """
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
-
         if self.dbname == 'conceptnet-test':
             # Random queries sample 10% of edges. This makes sure we get matches in
             # the test database, where there isn't much data.
@@ -230,9 +228,6 @@ class AssertionFinder(object):
         """
         The most general way to query based on a set of criteria.
         """
-        if self.connection is None:
-            self.connection = get_db_connection(self.dbname)
-
         cursor = self.connection.cursor()
         if 'node' in criteria:
             query_forward = gin_jsonb_value(criteria, node_forward=True)
