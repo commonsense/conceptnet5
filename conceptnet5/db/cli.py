@@ -29,6 +29,7 @@ def load_data(input_dir):
     create_tables(conn)
     load_sql_csv(conn, input_dir)
     create_indices(conn)
+    conn.close()
 
 
 @cli.command(name='check')

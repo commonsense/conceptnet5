@@ -9,45 +9,56 @@ TABLES = [
     "DROP TABLE IF EXISTS sources",
     "DROP TABLE IF EXISTS relations",
     """CREATE TABLE nodes (
-        id     integer NOT NULL PRIMARY KEY,
+        id     integer NOT NULL,
         uri    text NOT NULL
     )""",
     """CREATE TABLE sources (
-        id     integer NOT NULL PRIMARY KEY,
+        id     integer NOT NULL,
         uri    text NOT NULL
     )""",
     """CREATE TABLE relations (
-        id        integer NOT NULL PRIMARY KEY,
+        id        integer NOT NULL,
         uri       text NOT NULL,
         directed  bool NOT NULL
     )
     """,
     """CREATE TABLE edges (
-        id             integer NOT NULL PRIMARY KEY,
+        id             integer NOT NULL,
         uri            text NOT NULL,
-        relation_id    integer NOT NULL REFERENCES relations (id),
-        start_id       integer NOT NULL REFERENCES nodes (id),
-        end_id         integer NOT NULL REFERENCES nodes (id),
+        relation_id    integer NOT NULL,
+        start_id       integer NOT NULL,
+        end_id         integer NOT NULL,
         weight         real NOT NULL,
         data           jsonb NOT NULL
     )
     """,
     """CREATE TABLE edges_gin (
-        edge_id   integer NOT NULL REFERENCES edges (id),
+        edge_id   integer NOT NULL,
         weight    real NOT NULL,
         data      jsonb NOT NULL
     )
     """,
     """CREATE TABLE edge_features (
-        rel_id    integer NOT NULL REFERENCES relations (id),
+        rel_id    integer NOT NULL,
         direction integer NOT NULL,
-        node_id   integer NOT NULL REFERENCES nodes (id),
-        edge_id   integer NOT NULL REFERENCES edges (id)
+        node_id   integer NOT NULL,
+        edge_id   integer NOT NULL
     )
     """,
 ]
 
 INDICES = [
+    "ALTER TABLE nodes ADD PRIMARY KEY (id)",
+    "ALTER TABLE sources ADD PRIMARY KEY (id)",
+    "ALTER TABLE relations ADD PRIMARY KEY (id)",
+    "ALTER TABLE edges ADD PRIMARY KEY (id)",
+    "ALTER TABLE edges ADD FOREIGN KEY (relation_id) REFERENCES relations (id)",
+    "ALTER TABLE edges ADD FOREIGN KEY (start_id) REFERENCES nodes (id)",
+    "ALTER TABLE edges ADD FOREIGN KEY (end_id) REFERENCES nodes (id)",
+    "ALTER TABLE edges_gin ADD FOREIGN KEY (edge_id) REFERENCES edges (id)",
+    "ALTER TABLE edge_features ADD FOREIGN KEY (rel_id) REFERENCES relations (id)",
+    "ALTER TABLE edge_features ADD FOREIGN KEY (node_id) REFERENCES nodes (id)",
+    "ALTER TABLE edge_features ADD FOREIGN KEY (edge_id) REFERENCES edges (id)",
     "ALTER TABLE nodes ADD CONSTRAINT nodes_unique_uri UNIQUE (uri)",
     "ALTER TABLE sources ADD CONSTRAINT sources_unique_uri UNIQUE (uri)",
     "ALTER TABLE edges ADD CONSTRAINT edges_unique_uri UNIQUE (uri)",
@@ -74,10 +85,10 @@ INDICES = [
 
 
 def run_commands(connection, commands):
-    cursor = connection.cursor()
-    for cmd in commands:
-        cursor.execute(cmd)
-    connection.commit()
+    with connection:
+        with connection.cursor() as cursor:
+            for cmd in commands:
+                cursor.execute(cmd)
 
 
 def create_tables(connection):
