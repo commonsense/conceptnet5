@@ -125,7 +125,7 @@ class AssertionFinder(object):
         self.dbname = dbname
 
     @property
-    def connection():
+    def connection(self):
         # See https://www.psycopg.org/docs/connection.html#connection.closed
         if self._connection is None or self._connection.closed > 0:
             self._connection = get_db_connection(self.dbname)
