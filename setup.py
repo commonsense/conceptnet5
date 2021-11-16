@@ -47,6 +47,6 @@ setup(
     },
     extras_require={
         'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn',
-                    'mecab-python3', 'jieba', 'marisa_trie', 'matplotlib >= 2', 'annoy']
+                    'mecab-python3', 'jieba', 'marisa_trie', 'matplotlib >= 2', 'annoy', 'ipadic']
     },
 )
