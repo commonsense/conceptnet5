@@ -77,3 +77,8 @@ assumption that the small test database has already been built.
 
 Run `pytest --fulldb` to run additional tests on the fully built
 ConceptNet database.
+
+## Docker
+Build docker image `docker build -t conceptnet:latest .`
+
+Run `docker run -d -p 8084:8084 --name conceptnet5 conceptnet`
