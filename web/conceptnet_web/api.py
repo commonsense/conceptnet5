@@ -6,6 +6,7 @@ import os
 import flask
 from flask_cors import CORS
 from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from conceptnet5 import api as responses
 from conceptnet5.api import VALID_KEYS, error
@@ -37,7 +38,7 @@ app.config.update({
 for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
-limiter = Limiter(app, global_limits=["600 per minute", "6000 per hour"])
+limiter = Limiter(app, key_func=get_remote_address,  global_limits=["600 per minute", "6000 per hour"])
 CORS(app)
 try_configuring_sentry(app)
 application = app  # for uWSGI
@@ -177,4 +178,4 @@ def render_error(status, details):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run('127.0.0.1', debug=True, port=8084)
+    app.run('0.0.0.0', debug=True, port=8084)
