@@ -79,6 +79,6 @@ Run `pytest --fulldb` to run additional tests on the fully built
 ConceptNet database.
 
 ## Docker
-Build docker image `docker build -t conceptnet:latest .`
+Build docker image `docker build -t conceptnet:latest --build-arg CONCEPTNET_DB_PASSWORD=<POSTGRESQL_PASSWORD> --build-arg CONCEPTNET_DB_HOST=<POSTGRESQL_HOST>  .`
 
 Run `docker run -d -p 8084:8084 --name conceptnet5 conceptnet`
