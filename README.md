@@ -62,9 +62,12 @@ process][] on our wiki for instructions.
 You may not need to build ConceptNet yourself! Try the [Web API][]
 first.
 
+There is also a simplified installation process made with docker. [Check it out][].
+
 [build process]: https://github.com/commonsense/conceptnet5/wiki/Build-process
 [Web API]: https://github.com/commonsense/conceptnet5/wiki/API
 [ConceptNet wiki]: https://github.com/commonsense/conceptnet5/wiki
+[Check it out]: https://github.com/tae898/conceptnet5
 
 
 ## Testing
