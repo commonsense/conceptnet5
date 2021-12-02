@@ -16,36 +16,35 @@ ARG CONCEPTNET_DB_PORT=5432
 
 
 #Define the ENV variable
-ENV CONCEPTNET_DATA=/conceptnet_data
 
 ENV CONCEPTNET_DB_PASSWORD=$CONCEPTNET_DB_PASSWORD
 ENV CONCEPTNET_DB_HOSTNAME=$CONCEPTNET_DB_HOSTNAME
 ENV CONCEPTNET_DB_NAME=$CONCEPTNET_DB_NAME
 ENV CONCEPTNET_DB_USER=$CONCEPTNET_DB_USER
+ENV POSTGRES_DB=$CONCEPTNET_DB_NAME
+ENV POSTGRES_USER=$CONCEPTNET_DB_USER
 
 RUN apt-get update
-RUN apt-get install -y build-essential python3-pip python3-dev libhdf5-dev libmecab-dev mecab-ipadic-utf8 
-# RUN postgresql postgresql-contrib
+RUN apt-get install -y build-essential python3-pip python3-dev libhdf5-dev libmecab-dev mecab-ipadic-utf8
+RUN apt-get install -y postgresql postgresql-contrib
 
-RUN mkdir data
 
-# RUN PGPASSWORD=$CONCEPTNET_DB_PASSWORD psql -U $CONCEPTNET_DB_USER
-# RUN CREATE DATABASE $CONCEPTNET_DB_NAME;
-# RUN \q
 
 COPY . /usr/src
 WORKDIR /usr/src
+
+RUN mkdir data
+RUN mkdir conceptnet5/data
 
 RUN pip install -U pip
 RUN pip install -e .
 RUN pip install -e '.[vectors]'
 
-RUN ./build.sh
-
 RUN pip install -e web
 
 RUN chown -R 1001:0 /usr/src
 USER 1001
+# RUN chown -R $CONCEPTNET_DB_USER:0 /usr/src
+# USER $CONCEPTNET_DB_USER
 
-WORKDIR /usr/src/web
-CMD ["python3", "conceptnet_web/api.py"]
+CMD ["python3", "web/conceptnet_web/web.py"]
