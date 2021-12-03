@@ -21,6 +21,7 @@ def get_db_connection(dbname=None):
 
 
 def _get_db_connection_inner(dbname):
+    print(f"Config user {config.DB_USERNAME} and host {config.DB_HOSTNAME}")
     if config.DB_PASSWORD:
         conn = psycopg2.connect(
             dbname=dbname,
