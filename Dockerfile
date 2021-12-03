@@ -26,7 +26,7 @@ ENV POSTGRES_PASSWORD=$CONCEPTNET_DB_PASSWORD
 
 RUN apt-get update
 RUN apt-get install -y build-essential python3-pip python3-dev libhdf5-dev libmecab-dev mecab-ipadic-utf8 unzip wget
-RUN apt-get install -y postgresql postgresql-contrib postgresql-client
+RUN apt-get install -y postgresql postgresql-contrib postgresql-client libreadline-dev libffi-dev curl libbz2-dev libsqlite3-dev
 
 COPY . /usr/src
 WORKDIR /usr/src
@@ -36,6 +36,7 @@ RUN mkdir conceptnet5/data
 
 RUN pip install -U pip
 RUN pip install -e .
+RUN pip install wheel ipadic
 RUN pip install -e '.[vectors]'
 
 RUN pip install -e web
