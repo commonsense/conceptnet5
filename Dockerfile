@@ -16,19 +16,17 @@ ARG CONCEPTNET_DB_PORT=5432
 
 
 #Define the ENV variable
-
 ENV CONCEPTNET_DB_PASSWORD=$CONCEPTNET_DB_PASSWORD
 ENV CONCEPTNET_DB_HOSTNAME=$CONCEPTNET_DB_HOSTNAME
 ENV CONCEPTNET_DB_NAME=$CONCEPTNET_DB_NAME
 ENV CONCEPTNET_DB_USER=$CONCEPTNET_DB_USER
 ENV POSTGRES_DB=$CONCEPTNET_DB_NAME
 ENV POSTGRES_USER=$CONCEPTNET_DB_USER
+ENV POSTGRES_PASSWORD=$CONCEPTNET_DB_PASSWORD
 
 RUN apt-get update
 RUN apt-get install -y build-essential python3-pip python3-dev libhdf5-dev libmecab-dev mecab-ipadic-utf8
 RUN apt-get install -y postgresql postgresql-contrib
-
-
 
 COPY . /usr/src
 WORKDIR /usr/src
@@ -42,9 +40,9 @@ RUN pip install -e '.[vectors]'
 
 RUN pip install -e web
 
-RUN chown -R 1001:0 /usr/src
-USER 1001
+# RUN chown -R 1001:0 /usr/src
+# USER 1001
 # RUN chown -R $CONCEPTNET_DB_USER:0 /usr/src
 # USER $CONCEPTNET_DB_USER
 
-CMD ["python3", "web/conceptnet_web/web.py"]
+CMD ["python3", "web/conceptnet_web/api.py"]
