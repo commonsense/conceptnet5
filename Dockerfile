@@ -7,6 +7,9 @@ LABEL description="This is custom Docker Image for Conceptnet 5."
 
 #RUN apt-get install postgresql-10 -y
 
+ENV CONCEPTNET_DB_USER=postgres
+ENV CONCEPTNET_DB_NAME=conceptnet5
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
@@ -18,10 +21,13 @@ RUN apt-get install postgresql postgresql-contrib postgresql-client -y
 
 # Install conceptnet
 WORKDIR "/"
-RUN git clone --single-branch --branch develop https://github.com/tae898/conceptnet5.git
-WORKDIR "/conceptnet5"
+COPY . /usr/src
+
+RUN chown -R 1001:0 /usr/src
+USER 1001
+
+WORKDIR /usr/src/conceptnet5
 RUN mkdir data
-RUN mkdir conceptnet5/data
 
 RUN pip install -U pip
 RUN pip install -e .
