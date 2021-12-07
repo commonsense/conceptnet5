@@ -23,10 +23,10 @@ RUN apt-get install postgresql postgresql-contrib postgresql-client -y
 WORKDIR "/"
 COPY . /usr/src
 
-RUN chown -R 1001:0 /usr/src
-USER 1001
+RUN chown -R ${CONCEPTNET_DB_USER}:0 /usr/src
+USER ${CONCEPTNET_DB_USER}
 
-WORKDIR /usr/src/conceptnet5
+WORKDIR /usr/src
 RUN mkdir data
 
 RUN pip install -U pip
@@ -35,5 +35,6 @@ RUN pip install wheel ipadic
 RUN pip install -e '.[vectors]'
 RUN pip install -e web
 
-
 CMD ["python3", "web/conceptnet_web/api.py"]
+
+EXPOSE 8084
