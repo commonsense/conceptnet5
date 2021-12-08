@@ -5,12 +5,10 @@ LABEL maintainer="mmachado@ibm.com"
 
 LABEL description="This is custom Docker Image for Conceptnet 5."
 
-#RUN apt-get install postgresql-10 -y
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV CONCEPTNET_DB_USER=postgres
 ENV CONCEPTNET_DB_NAME=conceptnet5
-
-ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update
 RUN apt-get install build-essential  python3-pip python3-dev zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev -y
