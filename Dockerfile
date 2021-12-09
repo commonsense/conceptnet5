@@ -24,6 +24,7 @@ RUN mkdir data
 
 RUN pip install -U pip
 RUN pip install pytest PyLD
+RUN pip install language_data
 RUN pip install -e .
 RUN pip install wheel ipadic
 RUN pip install -e '.[vectors]'
