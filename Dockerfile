@@ -14,7 +14,7 @@ RUN apt-get install wget libhdf5-dev libmecab-dev mecab-ipadic-utf8 liblzma-dev 
 
 # Install conceptnet
 WORKDIR "/"
-RUN git clone --single-branch --branch conceptnet-mini https://github.com/marcelomachado/conceptnet5.git
+RUN git clone --single-branch --branch main https://github.com/marcelomachado/conceptnet5.git
 RUN mv conceptnet5/* /usr/src
 WORKDIR /usr/src
 
