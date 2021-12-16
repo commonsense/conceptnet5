@@ -28,6 +28,6 @@ RUN pip install wheel ipadic
 RUN pip install -e '.[vectors]'
 RUN pip install -e web
 
-CMD ["python3", "web/conceptnet_web/web.py"]
+CMD ["python3", "web/conceptnet_web/api.py"]
 
 EXPOSE 8084
