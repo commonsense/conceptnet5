@@ -18,6 +18,7 @@ from conceptnet_web.json_rendering import jsonify
 # Configuration
 
 app = flask.Flask('conceptnet_web')
+app.config["APPLICATION_ROOT"] = os.environ.get('APPLICATION_ROOT', '')
 
 
 def app_path(path):
