@@ -18,8 +18,7 @@ from conceptnet_web.json_rendering import jsonify
 # Configuration
 
 app = flask.Flask('conceptnet_web')
-app.config["APPLICATION_ROOT"] = os.environ.get('APPLICATION_ROOT', '')
-
+bp = flask.Blueprint('ignore', 'conceptnet_web' , template_folder='ignore')
 
 def app_path(path):
     """
@@ -56,7 +55,7 @@ def get_int(args, key, default, minimum, maximum):
 
 
 # Lookup: match any path starting with /a/, /c/, /d/, /r/, or /s/
-@app.route('/<any(a, c, d, r, s):top>/<path:query>')
+@bp.route('/<any(a, c, d, r, s):top>/<path:query>')
 def query_node(top, query):
     req_args = flask.request.args
     path = '/%s/%s' % (top, query.strip('/'))
@@ -73,8 +72,8 @@ def query_node(top, query):
     return jsonify(results)
 
 
-@app.route('/search')
-@app.route('/query')
+@bp.route('/search')
+@bp.route('/query')
 def query():
     req_args = flask.request.args
     criteria = {}
@@ -87,9 +86,9 @@ def query():
     return jsonify(results)
 
 
-@app.route('/uri')
-@app.route('/normalize')
-@app.route('/standardize')
+@bp.route('/uri')
+@bp.route('/normalize')
+@bp.route('/standardize')
 def query_standardize_uri():
     """
     Look up the URI for a given piece of text. 'text' and 'language' should be
@@ -107,7 +106,7 @@ def query_standardize_uri():
     })
 
 
-@app.route('/')
+@bp.route('/')
 def see_documentation():
     """
     This function redirects to the api documentation
@@ -118,7 +117,7 @@ def see_documentation():
     })
 
 
-@app.route('/related/<path:uri>')
+@bp.route('/related/<path:uri>')
 @limiter.limit("60 per minute")
 def query_top_related(uri):
     req_args = flask.request.args
@@ -129,7 +128,7 @@ def query_top_related(uri):
     return jsonify(results)
 
 
-@app.route('/relatedness')
+@bp.route('/relatedness')
 @limiter.limit("60 per minute")
 def query_relatedness():
     req_args = flask.request.args
@@ -169,7 +168,7 @@ def internal_server_error(e):
 # Visiting this URL intentionally causes an error, so we can see if Sentry
 # is working. It has a silly name instead of just 'error' to decrease the
 # probability of it being accidentally crawled.
-@app.route('/i-am-error')
+@bp.route('/i-am-error')
 def fake_error():
     raise Exception("Fake error for testing")
 
@@ -177,6 +176,7 @@ def fake_error():
 def render_error(status, details):
     return jsonify(error({}, status=status, details=details), status=status)
 
+app.register_blueprint(bp, url_prefix=os.environ.get('APPLICATION_ROOT', ''))
 
 if __name__ == '__main__':
     app.debug = True
