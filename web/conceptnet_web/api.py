@@ -180,4 +180,4 @@ app.register_blueprint(bp, url_prefix=os.environ.get('APPLICATION_ROOT', ''))
 
 if __name__ == '__main__':
     app.debug = True
-    app.run('0.0.0.0', debug=True, port=8084)
+    app.run(os.environ.get('HOSTNAME', '0.0.0.0'), debug=True, port=int(os.environ.get('PORT', '8084')))
