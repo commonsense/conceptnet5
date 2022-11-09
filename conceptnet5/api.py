@@ -11,7 +11,7 @@ from conceptnet5.vectors.query import VectorSpaceWrapper
 VECTORS = VectorSpaceWrapper()
 FINDER = AssertionFinder(dbname=DB_NAME)
 CONTEXT = ["http://api.conceptnet.io/ld/conceptnet5.7/context.ld.json"]
-VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri']
+VALID_KEYS = ['rel', 'start', 'end', 'node', 'other', 'source', 'uri', 'dataset']
 
 
 def success(response):
