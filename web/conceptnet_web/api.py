@@ -39,7 +39,7 @@ for filter_name, filter_func in FILTERS.items():
     app.jinja_env.filters[filter_name] = filter_func
 app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
 limiter = Limiter(app, key_func=get_remote_address,
-                  global_limits=["600 per minute", "6000 per hour"])
+                  default_limits=["600 per minute", "6000 per hour"])
 CORS(app)
 try_configuring_sentry(app)
 application = app  # for uWSGI
