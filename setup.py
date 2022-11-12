@@ -28,10 +28,10 @@ setup(
     include_package_data=True,
     exclude_package_data={'conceptnet5': ['support_data/testdata']},
     install_requires=[
-        'snakemake < 5.6', 'click', 'requests', 'ftfy', 'msgpack-python', 'numpy',
-        'langcodes >= 2.1', 'wordfreq >= 2.0.1',
-        'xmltodict >= 0.11.0, < 0.12.0', 'ordered_set', 'psycopg2-binary',
-        'marisa-trie', 'tables >= 3.5.1'
+        'snakemake == 5.5.4', 'click == 8.0.3', 'requests == 2.26.0', 'ftfy == 6.0.3', 'msgpack-python == 0.5.6', 'numpy == 1.21.4',
+        'langcodes == 3.3.0', 'wordfreq == 2.5.1',
+        'xmltodict == 0.11.0', 'ordered_set == 4.0.2', 'psycopg2-binary == 2.9.2',
+        'marisa-trie == 0.7.7', 'tables == 3.6.1'
     ],
     python_requires='>=3.5',
     tests_require=['pytest', 'PyLD'],
@@ -46,7 +46,7 @@ setup(
         ]
     },
     extras_require={
-        'vectors': ['numpy', 'scipy', 'statsmodels', 'tables', 'pandas', 'scikit-learn',
-                    'mecab-python3', 'jieba', 'marisa_trie', 'matplotlib >= 2', 'annoy']
+        'vectors': ['numpy == 1.21.4', 'scipy == 1.7.3', 'statsmodels == 0.13.1', 'tables == 3.6.1', 'pandas == 1.3.5', 'scikit-learn == 1.0.1',
+                    'mecab-python3 == 1.0.4', 'jieba == 0.42.1', 'marisa_trie == 0.7.7', 'matplotlib == 3.5.1', 'annoy == 1.17.0']
     },
 )
