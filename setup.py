@@ -46,7 +46,7 @@ setup(
         ]
     },
     extras_require={
-        'vectors': ['numpy == 1.21.4', 'scipy == 1.7.3', 'statsmodels == 0.13.1', 'tables == 3.6.1', 'pandas == 1.3.5', 'scikit-learn == 1.0.1',
-                    'mecab-python3 == 1.0.4', 'jieba == 0.42.1', 'marisa_trie == 0.7.7', 'matplotlib == 3.5.1', 'annoy == 1.17.0']
+        'vectors': ['numpy == 1.21.4', 'scipy == 1.9.1', 'statsmodels == 0.13.1', 'tables == 3.6.1', 'pandas == 1.3.5', 'scikit-learn == 1.0.1',
+                    'mecab-python3 == 1.0.4', 'jieba == 0.42.1', 'marisa_trie == 0.7.7', 'matplotlib == 3.5.1', 'annoy == 1.17.1']
     },
 )
