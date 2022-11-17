@@ -232,6 +232,9 @@ class AssertionFinder(object):
         if 'node' in criteria:
             query_forward = gin_jsonb_value(criteria, node_forward=True)
             query_backward = gin_jsonb_value(criteria, node_forward=False)
+            print(f"Query Forward: {jsonify(query_forward)}")
+            print(f"Query Backward: {jsonify(query_backward)}")
+            print(f"GIN_QUERY_2WAY: {jsonify(GIN_QUERY_2WAY)}")
             cursor.execute(
                 GIN_QUERY_2WAY,
                 {
@@ -243,6 +246,8 @@ class AssertionFinder(object):
             )
         else:
             query = gin_jsonb_value(criteria)
+            print(f"Query: {jsonify(query)}")
+            print(f"GIN_QUERY_1WAY: {GIN_QUERY_1WAY}")
             cursor.execute(
                 GIN_QUERY_1WAY,
                 {'query': jsonify(query), 'limit': limit, 'offset': offset},
