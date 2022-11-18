@@ -49,6 +49,13 @@ ORDER BY weight DESC
 OFFSET %(offset)s LIMIT %(limit)s;
 """
 
+GIN_QUERY_1WAY_COUNT = """
+
+SELECT COUNT(edge_id) AS "numberOfEdges" FROM edges_gin
+WHERE data @> %(query)s
+
+"""
+
 
 def jsonify(value):
     """
@@ -257,3 +264,20 @@ class AssertionFinder(object):
             transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
         ]
         return results
+
+    def query_count(self, criteria):
+        """
+        The most general way to query based on a set of criteria.
+        """
+        # cursor = self.connection.cursor()
+
+        # query = gin_jsonb_value(criteria)
+        # cursor.execute(
+        #     GIN_QUERY_1WAY_COUNT,
+        #     {'query': jsonify(query)},
+        # )
+
+        # results = [
+        #     transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
+        # ]
+        return 37053072

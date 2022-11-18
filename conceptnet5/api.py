@@ -242,8 +242,9 @@ def query_paginated(query, offset=0, limit=50):
     function in the `.api` module constructs such a dictionary.
     """
     found = FINDER.query(query, limit=limit + 1, offset=offset)
+    count = FINDER.query_count(query)
     edges = found[:limit]
-    response = {'@id': make_query_url('/query', query.items()), 'edges': edges}
+    response = {'@id': make_query_url('/query', query.items()), 'edges': edges, 'numberOfEdges': count}
     more = len(found) > len(edges)
     if len(found) > len(edges) or offset != 0:
         response['view'] = make_paginated_view(
