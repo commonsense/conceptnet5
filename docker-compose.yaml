@@ -1,0 +1,79 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: conceptnet5
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    volumes:
+      - .:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  conceptnet: #
+    container_name: conceptnet-mini
+    restart: always
+    image: marceloocmachado/conceptnet-mini:latest
+    build:
+      context: .
+      target: prod
+    ports:
+      - 8084:8084
+      - 5678:5678
+    volumes:
+      - .:/usr/src
+    environment:
+      - CONCEPTNET_DB_USER=postgres
+      - CONCEPTNET_DB_PASSWORD=
+      - CONCEPTNET_DB_HOSTNAME=postgres
+      - CONCEPTNET_DB_NAME=conceptnet5
+      - APPLICATION_ROOT=/api
+  
+  conceptnet-wb: #
+    container_name: conceptnet-mini
+    restart: always
+    image: marceloocmachado/conceptnet-mini:latest
+    build:
+      context: .
+      target: prod
+    ports:
+      - 8084:8084
+      - 5678:5678
+    volumes:
+      - .:/usr/src
+    environment:
+      - CONCEPTNET_DB_USER=postgres
+      - CONCEPTNET_DB_PASSWORD=
+      - CONCEPTNET_DB_HOSTNAME=postgres
+      - CONCEPTNET_DB_NAME=conceptnet5
+    entrypoint: ["python3", "web/conceptnet_web/web.py"]
+
+  conceptnet-job: #
+    container_name: conceptnet-job
+    restart: always
+    image: marceloocmachado/conceptnet-mini:latest
+    build:
+      context: .
+      target: prod
+    ports:
+      - 8084:8084
+      - 5678:5678
+    volumes:
+      - .:/usr/src/conceptnet
+    environment:
+      - CONCEPTNET_DB_USER=postgres
+      - CONCEPTNET_DB_PASSWORD=
+      - CONCEPTNET_DB_HOSTNAME=postgres
+      - CONCEPTNET_DB_NAME=conceptnet5
+      - APPLICATION_ROOT=/api
+    entrypoint: ["/bin/sh", "-c", "../build.sh"]
