@@ -243,7 +243,7 @@ def query_paginated(query, offset=0, limit=50):
     """
     
     edges_count = FINDER.query_count(query) # Count the total number of edges matching the query (It supports Linked Data Fragments)
-    print(f"Count: {edges_count}" )
+
     found = FINDER.query(query, limit=limit + 1, offset=offset)
     
     edges = found[:limit]
@@ -253,6 +253,22 @@ def query_paginated(query, offset=0, limit=50):
         response['view'] = make_paginated_view(
             '/query', sorted(query.items()), offset, limit, more=more
         )
+    return success(response)
+
+
+def query_count(query):
+    """
+    Search counting the total number of edges matching the query
+
+    The query should be provided as a dictionary of criteria. The `query`
+    function in the `.api` module constructs such a dictionary.
+    """
+    
+    edges_count = FINDER.query_count(query) # Count the total number of edges matching the query (It supports Linked Data Fragments)
+ 
+    
+    response = {'numberOfEdges': edges_count}
+
     return success(response)
 
 

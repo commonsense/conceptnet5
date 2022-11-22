@@ -85,6 +85,17 @@ def query():
     results = responses.query_paginated(criteria, offset=offset, limit=limit)
     return jsonify(results)
 
+@bp.route('/search/count')
+@bp.route('/query/count')
+def query_count():
+    req_args = flask.request.args
+    criteria = {}
+    for key in flask.request.args:
+        if key in VALID_KEYS:
+            criteria[key] = flask.request.args[key]
+    results = responses.query_count(criteria)
+    return jsonify(results)
+
 
 @bp.route('/uri')
 @bp.route('/normalize')
