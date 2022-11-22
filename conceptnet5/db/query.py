@@ -239,9 +239,6 @@ class AssertionFinder(object):
         if 'node' in criteria:
             query_forward = gin_jsonb_value(criteria, node_forward=True)
             query_backward = gin_jsonb_value(criteria, node_forward=False)
-            print(f"Query Forward: {jsonify(query_forward)}")
-            print(f"Query Backward: {jsonify(query_backward)}")
-            print(f"GIN_QUERY_2WAY: {jsonify(GIN_QUERY_2WAY)}")
             cursor.execute(
                 GIN_QUERY_2WAY,
                 {
@@ -253,9 +250,6 @@ class AssertionFinder(object):
             )
         else:
             query = gin_jsonb_value(criteria)
-            print(f"Query: {jsonify(query)}")
-            print(f"GIN_QUERY_1WAY: {GIN_QUERY_1WAY}")
-            print(f"Criteria: {criteria}")
             cursor.execute(
                 GIN_QUERY_1WAY,
                 {'query': jsonify(query), 'limit': limit, 'offset': offset},
@@ -268,12 +262,14 @@ class AssertionFinder(object):
 
     def query_count(self, criteria):
         """
-        The most general way to query based on a set of criteria.
+        Count the number of edges matching a set of criteria.
+        This supports Linked Data Fragments interfaces such as the 
+        Triple Pattern Fragment
         """
 
         if len(criteria) == 0: 
             # return the total number of edges in the database
-            # this is hardcoded to avoid i/o operation in database in further versions it should be updated
+            # this is hardcoded to avoid i/o operation in database. Further versions should update it.
             return 37053072
        
         cursor = self.connection.cursor()

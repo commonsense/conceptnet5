@@ -88,7 +88,11 @@ def query():
 @bp.route('/search/count')
 @bp.route('/query/count')
 def query_count():
-    req_args = flask.request.args
+    """
+    Count the number of edges matching a query.
+    This supports Linked Data Fragments interfaces such as the 
+    Triple Pattern Fragment
+    """
     criteria = {}
     for key in flask.request.args:
         if key in VALID_KEYS:
