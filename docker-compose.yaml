@@ -39,7 +39,7 @@ services:
       - CONCEPTNET_DB_NAME=conceptnet5
       - APPLICATION_ROOT=/api
   
-  conceptnet-wb: #
+  conceptnet-web: #
     container_name: conceptnet-mini
     restart: always
     image: marceloocmachado/conceptnet-mini:latest
