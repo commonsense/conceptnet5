@@ -51,7 +51,7 @@ OFFSET %(offset)s LIMIT %(limit)s;
 
 GIN_QUERY_1WAY_COUNT = """
 
-SELECT COUNT(edge_id) AS "numberOfEdges" FROM edges_gin
+SELECT COUNT(*) FROM edges_gin
 WHERE data @> %(query)s
 
 """
@@ -255,6 +255,7 @@ class AssertionFinder(object):
             query = gin_jsonb_value(criteria)
             print(f"Query: {jsonify(query)}")
             print(f"GIN_QUERY_1WAY: {GIN_QUERY_1WAY}")
+            print(f"Criteria: {criteria}")
             cursor.execute(
                 GIN_QUERY_1WAY,
                 {'query': jsonify(query), 'limit': limit, 'offset': offset},
@@ -269,15 +270,20 @@ class AssertionFinder(object):
         """
         The most general way to query based on a set of criteria.
         """
-        # cursor = self.connection.cursor()
 
-        # query = gin_jsonb_value(criteria)
-        # cursor.execute(
-        #     GIN_QUERY_1WAY_COUNT,
-        #     {'query': jsonify(query)},
-        # )
+        if len(criteria) == 0: 
+            # return the total number of edges in the database
+            # this is hardcoded to avoid i/o operation in database in further versions it should be updated
+            return 37053072
+       
+        cursor = self.connection.cursor()
 
-        # results = [
-        #     transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
-        # ]
-        return 37053072
+        query = gin_jsonb_value(criteria)
+        cursor.execute(
+            GIN_QUERY_1WAY_COUNT,
+            {'query': jsonify(query)},
+        )
+
+        numberOfEdges = cursor.fetchone()
+
+        return numberOfEdges[0]
