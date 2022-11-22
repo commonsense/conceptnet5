@@ -27,8 +27,8 @@ RUN pip install pytest PyLD language_data wheel ipadic
 
 # Install conceptnet
 WORKDIR "/"
-RUN git clone --single-branch --branch main https://github.com/marcelomachado/conceptnet5.git
-RUN mv conceptnet5/* /usr/src
+
+COPY . /usr/src
 
 WORKDIR /usr/src
 
