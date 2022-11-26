@@ -85,8 +85,7 @@ def query():
     results = responses.query_paginated(criteria, offset=offset, limit=limit)
     return jsonify(results)
 
-@bp.route('/search/count')
-@bp.route('/query/count')
+@bp.route('/count')
 def query_count():
     """
     Count the number of edges matching a query.
