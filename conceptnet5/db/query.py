@@ -36,6 +36,19 @@ ORDER BY weight DESC
 OFFSET %(offset)s LIMIT %(limit)s;
 """
 
+GIN_SIMPLIFIED_QUERY_1WAY = """
+WITH matched_edges AS (
+    SELECT * FROM simplified_edges
+    WHERE data @> %(query)s
+    LIMIT 10000
+)
+SELECT e.uri, e.data, e.weight
+FROM matched_edges m, edges e
+WHERE m.edge_id = e.id
+ORDER BY weight DESC
+OFFSET %(offset)s LIMIT %(limit)s;
+"""
+
 GIN_QUERY_2WAY = """
 WITH matched_edges AS (
     SELECT edge_id FROM edges_gin
@@ -252,6 +265,35 @@ class AssertionFinder(object):
             query = gin_jsonb_value(criteria)
             cursor.execute(
                 GIN_QUERY_1WAY,
+                {'query': jsonify(query), 'limit': limit, 'offset': offset},
+            )
+
+        results = [
+            transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
+        ]
+        return results
+
+    def simplified_query(self, criteria, limit=20, offset=0):
+        """
+        The most general way to query based on a set of criteria.
+        """
+        cursor = self.connection.cursor()
+        if 'node' in criteria:
+            query_forward = gin_jsonb_value(criteria, node_forward=True)
+            query_backward = gin_jsonb_value(criteria, node_forward=False)
+            cursor.execute(
+                GIN_QUERY_2WAY,
+                {
+                    'query_forward': jsonify(query_forward),
+                    'query_backward': jsonify(query_backward),
+                    'limit': limit,
+                    'offset': offset,
+                },
+            )
+        else:
+            query = gin_jsonb_value(criteria)
+            cursor.execute(
+                GIN_SIMPLIFIED_QUERY_1WAY,
                 {'query': jsonify(query), 'limit': limit, 'offset': offset},
             )
 

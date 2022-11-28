@@ -85,7 +85,21 @@ def query():
     results = responses.query_paginated(criteria, offset=offset, limit=limit)
     return jsonify(results)
 
-@bp.route('/count')
+@bp.route('/simplified-search')
+@bp.route('/simplified-query')
+def simplified_query():
+    req_args = flask.request.args
+    criteria = {}
+    offset = get_int(req_args, 'offset', 0, 0, 100000)
+    limit = get_int(req_args, 'limit', 50, 0, 1000)
+    for key in flask.request.args:
+        if key in VALID_KEYS:
+            criteria[key] = flask.request.args[key]
+    results = responses.simplified_query_paginated(criteria, offset=offset, limit=limit)
+    return jsonify(results)
+
+@bp.route('/search/count')
+@bp.route('/query/count')
 def query_count():
     """
     Count the number of edges matching a query.

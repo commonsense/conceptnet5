@@ -81,6 +81,24 @@ INDICES = [
     """,
     "CREATE INDEX rf_node ON ranked_features (node_id)",
     "CREATE INDEX edges_gin_index ON edges_gin USING gin (data jsonb_path_ops)",
+    """
+    CREATE MATERIALIZED VIEW simplified_edges AS (
+        SELECT 
+            ed.id as edge_id, 
+            ed.uri as edge_uri, 
+            s.uri as start_uri, 
+            e.uri as end_uri, 
+            r.uri as rel_uri, 
+            ed.data->>'dataset' as dataset,
+            ed.data, 
+            ed.weight 
+        FROM edges ed
+        INNER JOIN nodes s on ed.start_id = s.id
+        INNER JOIN nodes e on ed.end_id = e.id
+        INNER JOIN relations r on ed.relation_id = r.id
+	) WITH DATA
+    """,
+    "CREATE INDEX se_edge ON simplified_edges (node_id)",
 ]
 
 
