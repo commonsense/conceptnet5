@@ -465,6 +465,12 @@ rule load_db:
     shell:
         "cn5-db load_data {DATA}/psql && touch {output}"
 
+rule load_simplified_edges_view: 
+    output:
+        DATA + "/psql/done_view"
+    shell:
+        "cn5-db load_simplified_edges_view && touch {output}"
+
 
 # Collecting statistics
 # =====================

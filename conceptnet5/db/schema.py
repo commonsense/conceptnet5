@@ -81,6 +81,9 @@ INDICES = [
     """,
     "CREATE INDEX rf_node ON ranked_features (node_id)",
     "CREATE INDEX edges_gin_index ON edges_gin USING gin (data jsonb_path_ops)",
+]
+
+SIMPLIFIED_EDGES_VIEW = [
     """
     CREATE MATERIALIZED VIEW simplified_edges AS (
         SELECT 
@@ -90,7 +93,6 @@ INDICES = [
             e.uri as end_uri, 
             r.uri as rel_uri, 
             ed.data->>'dataset' as dataset,
-            ed.data, 
             ed.weight 
         FROM edges ed
         INNER JOIN nodes s on ed.start_id = s.id
@@ -98,7 +100,6 @@ INDICES = [
         INNER JOIN relations r on ed.relation_id = r.id
 	) WITH DATA
     """,
-    "CREATE INDEX se_edge ON simplified_edges (node_id)",
 ]
 
 
@@ -108,10 +109,11 @@ def run_commands(connection, commands):
             for cmd in commands:
                 cursor.execute(cmd)
 
-
 def create_tables(connection):
     run_commands(connection, TABLES)
 
+def create_simplified_edges_view(connection):
+    run_commands(connection, SIMPLIFIED_EDGES_VIEW)
 
 def create_indices(connection):
     run_commands(connection, INDICES)

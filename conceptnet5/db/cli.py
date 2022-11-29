@@ -2,7 +2,7 @@ import click
 
 from .connection import check_db_connection, get_db_connection
 from .prepare_data import assertions_to_sql_csv, load_sql_csv
-from .schema import create_indices, create_tables
+from .schema import create_indices, create_tables, create_simplified_edges_view
 
 
 @click.group()
@@ -29,6 +29,12 @@ def load_data(input_dir):
     create_tables(conn)
     load_sql_csv(conn, input_dir)
     create_indices(conn)
+    conn.close()
+
+@cli.command(name='load_simplified_edges_view')
+def load_simplified_edges_view():
+    conn = get_db_connection()
+    create_simplified_edges_view(conn)
     conn.close()
 
 

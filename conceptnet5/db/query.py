@@ -36,19 +36,6 @@ ORDER BY weight DESC
 OFFSET %(offset)s LIMIT %(limit)s;
 """
 
-GIN_SIMPLIFIED_QUERY_1WAY = """
-WITH matched_edges AS (
-    SELECT * FROM simplified_edges
-    WHERE data @> %(query)s
-    LIMIT 10000
-)
-SELECT e.uri, e.data, e.weight
-FROM matched_edges m, edges e
-WHERE m.edge_id = e.id
-ORDER BY weight DESC
-OFFSET %(offset)s LIMIT %(limit)s;
-"""
-
 GIN_QUERY_2WAY = """
 WITH matched_edges AS (
     SELECT edge_id FROM edges_gin
@@ -277,28 +264,37 @@ class AssertionFinder(object):
         """
         The most general way to query based on a set of criteria.
         """
+        GIN_SIMPLIFIED_QUERY_1WAY = """
+        SELECT se.start_uri, se.rel_uri, se.end_uri, se.dataset
+        FROM simplified_edges se
+        """
         cursor = self.connection.cursor()
-        if 'node' in criteria:
-            query_forward = gin_jsonb_value(criteria, node_forward=True)
-            query_backward = gin_jsonb_value(criteria, node_forward=False)
-            cursor.execute(
-                GIN_QUERY_2WAY,
-                {
-                    'query_forward': jsonify(query_forward),
-                    'query_backward': jsonify(query_backward),
-                    'limit': limit,
-                    'offset': offset,
-                },
-            )
-        else:
+
+       
+        where = ''
+        if len(criteria) > 0:
             query = gin_jsonb_value(criteria)
-            cursor.execute(
-                GIN_SIMPLIFIED_QUERY_1WAY,
-                {'query': jsonify(query), 'limit': limit, 'offset': offset},
-            )
+            where = '\nWHERE '
+            if query.start:
+                where+= f'se.start_uri = {query.start} AND '
+            if query.rel:
+                where+= f'se.rel_uri = {query.rel} AND '
+            if query.end:
+                where+= f'se.end_uri = {query.end} AND '
+            if query.dataset:
+                where+= f'se.dataset = {query.dataset}'
+            if where.endswith(' AND '):
+                # slice out  AND from where
+                where = where[:-5]
+        GIN_SIMPLIFIED_QUERY_1WAY +=f'\n {where}'
+        GIN_SIMPLIFIED_QUERY_1WAY +="\nOFFSET %(offset)s LIMIT %(limit)s;"
+        cursor.execute(
+            GIN_SIMPLIFIED_QUERY_1WAY,
+            {'limit': limit, 'offset': offset},
+        )
 
         results = [
-            transform_for_linked_data(data) for uri, data, weight in cursor.fetchall()
+            transform_for_linked_data(data) for data in cursor.fetchall()
         ]
         return results
 
