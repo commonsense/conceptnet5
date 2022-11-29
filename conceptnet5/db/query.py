@@ -265,29 +265,30 @@ class AssertionFinder(object):
         The most general way to query based on a set of criteria.
         """
         GIN_SIMPLIFIED_QUERY_1WAY = """
-        SELECT se.start_uri, se.rel_uri, se.end_uri, se.dataset
-        FROM simplified_edges se
-        """
-        cursor = self.connection.cursor()
-
-       
+SELECT se.start_uri, se.rel_uri, se.end_uri, se.dataset
+FROM simplified_edges se"""
+        
         where = ''
         if len(criteria) > 0:
             query = gin_jsonb_value(criteria)
             where = '\nWHERE '
-            if query.start:
-                where+= f'se.start_uri = {query.start} AND '
-            if query.rel:
-                where+= f'se.rel_uri = {query.rel} AND '
-            if query.end:
-                where+= f'se.end_uri = {query.end} AND '
-            if query.dataset:
-                where+= f'se.dataset = {query.dataset}'
+            print(query)
+            if 'start' in query:
+                where+= f'se.start_uri = {query["start"]} AND '
+            if 'rel' in query:
+                where+= f'se.rel_uri = {query["rel"]} AND '
+            if 'end' in query:
+                where+= f'se.end_uri = {query["end"]} AND '
+            if 'dataset' in query:
+                where+= f'se.dataset = {query["dataset"]}'
             if where.endswith(' AND '):
                 # slice out  AND from where
                 where = where[:-5]
-        GIN_SIMPLIFIED_QUERY_1WAY +=f'\n {where}'
+        GIN_SIMPLIFIED_QUERY_1WAY +=where
         GIN_SIMPLIFIED_QUERY_1WAY +="\nOFFSET %(offset)s LIMIT %(limit)s;"
+
+        print(GIN_SIMPLIFIED_QUERY_1WAY)
+        cursor = self.connection.cursor()
         cursor.execute(
             GIN_SIMPLIFIED_QUERY_1WAY,
             {'limit': limit, 'offset': offset},
