@@ -52,4 +52,8 @@ ENV PYTHONUNBUFFERED 1
 
 FROM base as prod
 
-CMD python3 web/conceptnet_web/api.py
+# STANDALONE MODE
+#CMD python3 web/conceptnet_web/api.py
+
+# THREADED MODE
+CMD /bin/bash runner.sh
