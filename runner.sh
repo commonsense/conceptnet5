@@ -13,7 +13,7 @@ while true; do
         python3 ./web/conceptnet_web/api.py
         ;;
     *)
-        /usr/local/bin/uwsgi
+        uwsgi
         ;;
   esac
 
