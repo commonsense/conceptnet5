@@ -274,13 +274,13 @@ FROM simplified_edges se"""
             where = '\nWHERE '
             print(query)
             if 'start' in query:
-                where+= f'se.start_uri = {query["start"]} AND '
+                where+= f'se.start_uri = \'{query["start"][0]}\' AND '
             if 'rel' in query:
-                where+= f'se.rel_uri = {query["rel"]} AND '
+                where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
             if 'end' in query:
-                where+= f'se.end_uri = {query["end"]} AND '
+                where+= f'se.end_uri = \'{query["end"][0]}\' AND '
             if 'dataset' in query:
-                where+= f'se.dataset = {query["dataset"]}'
+                where+= f'se.dataset = \'{query["dataset"][0]}\''
             if where.endswith(' AND '):
                 # slice out  AND from where
                 where = where[:-5]
@@ -294,9 +294,12 @@ FROM simplified_edges se"""
             {'limit': limit, 'offset': offset},
         )
 
-        results = [
-            transform_for_linked_data(data) for data in cursor.fetchall()
-        ]
+        rows = cursor.fetchall()
+
+        results = []
+        for row in rows:
+            results.append({'start':row[0], 'rel': row[1], 'end': row[2], 'dataset': row[3]})
+
         return results
 
     def query_count(self, criteria):

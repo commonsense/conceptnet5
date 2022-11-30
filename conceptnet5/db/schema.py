@@ -87,14 +87,15 @@ SIMPLIFIED_EDGES_VIEW = [
     """
     CREATE MATERIALIZED VIEW simplified_edges AS (
         SELECT 
-            ed.id as edge_id, 
+            me.edge_id as edge_id, 
             ed.uri as edge_uri, 
             s.uri as start_uri, 
             e.uri as end_uri, 
             r.uri as rel_uri, 
             ed.data->>'dataset' as dataset,
             ed.weight 
-        FROM edges ed
+        FROM edges_gin me
+		INNER JOIN edges ed ON me.edge_id = ed.id
         INNER JOIN nodes s on ed.start_id = s.id
         INNER JOIN nodes e on ed.end_id = e.id
         INNER JOIN relations r on ed.relation_id = r.id

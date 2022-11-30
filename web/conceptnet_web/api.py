@@ -100,6 +100,8 @@ def simplified_query():
 
 @bp.route('/search/count')
 @bp.route('/query/count')
+@bp.route('/simplified-search/count')
+@bp.route('/simplified-query/count')
 def query_count():
     """
     Count the number of edges matching a query.
