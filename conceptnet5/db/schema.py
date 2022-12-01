@@ -101,6 +101,9 @@ SIMPLIFIED_EDGES_VIEW = [
         INNER JOIN relations r on ed.relation_id = r.id
 	) WITH DATA
     """,
+    "CREATE INDEX edges_start_uri ON simplified_edges (start_uri)",
+    "CREATE INDEX edges_end_uri ON simplified_edges (end_uri)",
+    "CREATE INDEX edges_rel_uri ON simplified_edges (rel_uri)",
 ]
 
 
