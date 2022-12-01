@@ -100,8 +100,6 @@ def simplified_query():
 
 @bp.route('/search/count')
 @bp.route('/query/count')
-@bp.route('/simplified-search/count')
-@bp.route('/simplified-query/count')
 def query_count():
     """
     Count the number of edges matching a query.
@@ -114,6 +112,22 @@ def query_count():
             criteria[key] = flask.request.args[key]
     results = responses.query_count(criteria)
     return jsonify(results)
+
+@bp.route('/simplified-search/count')
+@bp.route('/simplified-query/count')
+def simplified_query_count():
+    """
+    Count the number of edges matching a query.
+    This supports Linked Data Fragments interfaces such as the 
+    Triple Pattern Fragment
+    """
+    criteria = {}
+    for key in flask.request.args:
+        if key in VALID_KEYS:
+            criteria[key] = flask.request.args[key]
+    results = responses.simplified_query_count(criteria)
+    return jsonify(results)
+
 
 
 @bp.route('/uri')
@@ -210,4 +224,4 @@ app.register_blueprint(bp, url_prefix=os.environ.get('APPLICATION_ROOT', ''))
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(os.environ.get('HOSTNAME', '0.0.0.0'), debug=True, port=int(os.environ.get('PORT', '8084')))
+    app.run(os.environ.get('HOSTNAME', '0.0.0.0'), debug=False, port=int(os.environ.get('PORT', '8084')))

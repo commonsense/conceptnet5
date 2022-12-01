@@ -312,7 +312,7 @@ FROM simplified_edges se"""
         if len(criteria) == 0: 
             # return the total number of edges in the database
             # this is hardcoded to avoid i/o operation in database. Further versions should update it.
-            return 37053072
+            return 37062820
        
         cursor = self.connection.cursor()
 
@@ -321,6 +321,48 @@ FROM simplified_edges se"""
             GIN_QUERY_1WAY_COUNT,
             {'query': jsonify(query)},
         )
+
+        numberOfEdges = cursor.fetchone()
+
+        return numberOfEdges[0]
+
+    def simplified_query_count(self, criteria):
+        """
+        Count the number of edges matching a set of criteria.
+        This supports Linked Data Fragments interfaces such as the 
+        Triple Pattern Fragment
+        """
+
+        if len(criteria) == 0: 
+            # return the total number of edges in the database
+            # this is hardcoded to avoid i/o operation in database. Further versions should update it.
+            return 37062820
+
+        GIN_SIMPLIFIED_QUERY_1WAY_COUNT = """
+SELECT COUNT(*)
+FROM simplified_edges se"""
+        
+        where = ''
+        if len(criteria) > 0:
+            query = gin_jsonb_value(criteria)
+            where = '\nWHERE '
+            print(query)
+            if 'start' in query:
+                where+= f'se.start_uri = \'{query["start"][0]}\' AND '
+            if 'rel' in query:
+                where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
+            if 'end' in query:
+                where+= f'se.end_uri = \'{query["end"][0]}\' AND '
+            if 'dataset' in query:
+                where+= f'se.dataset = \'{query["dataset"][0]}\''
+            if where.endswith(' AND '):
+                # slice out  AND from where
+                where = where[:-5]
+        GIN_SIMPLIFIED_QUERY_1WAY_COUNT +=where
+       
+        cursor = self.connection.cursor()
+
+        cursor.execute(GIN_SIMPLIFIED_QUERY_1WAY_COUNT)
 
         numberOfEdges = cursor.fetchone()
 

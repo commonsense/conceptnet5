@@ -268,7 +268,7 @@ def simplified_query_paginated(query, offset=0, limit=50):
     
     edges = found[:limit]
     response = {'@id': make_query_url('/simplified-query', query.items()), 'edges': edges}
-    
+
     return success(response)
 
 
@@ -286,6 +286,22 @@ def query_count(query):
     response = {'numberOfEdges': edges_count}
 
     return success(response)
+
+def simplified_query_count(query):
+    """
+    Search counting the total number of edges matching the query
+
+    The query should be provided as a dictionary of criteria. The `query`
+    function in the `.api` module constructs such a dictionary.
+    """
+    
+    edges_count = FINDER.simplified_query_count(query) # Count the total number of edges matching the query (It supports Linked Data Fragments)
+ 
+    
+    response = {'numberOfEdges': edges_count}
+
+    return success(response)
+
 
 
 def standardize_uri(language, text):

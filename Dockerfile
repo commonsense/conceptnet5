@@ -9,10 +9,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update
 
 #basics
-RUN apt-get install git curl wget unzip build-essential libffi-dev -y
+RUN apt-get install git curl wget unzip build-essential -y
 
 # python
-RUN apt-get install python3-pip python3-dev python3-setuptools -y
+RUN apt-get install python3-pip python3-dev -y
 
 #etc
 RUN apt-get install postgresql-client -y
