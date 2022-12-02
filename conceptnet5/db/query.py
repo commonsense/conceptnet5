@@ -123,20 +123,24 @@ def gin_jsonb_value(criteria, node_forward=True):
 def create_simplified_where(query):
     where = '\nWHERE '
 
-    if 'node' in query or 'other' in query:
-        if 'node' in query:
-            where+= f'se.start_uri = \'{query["node"][0]}\' OR se.end_uri = \'{query["node"][0]}\' AND '
+    if ('node' in query) ^ ('other' in query):
+        field = 'node'
         if 'other' in query:
-            where+= f'se.start_uri = \'{query["other"][0]}\' OR se.end_uri = \'{query["other"][0]}\''
+            field = 'other'
+
+        where+= f'se.start_uri = \'{query[field]}\' OR se.end_uri = \'{query[field]}\''
+    elif 'node' in query and 'other' in query:
+        where+= f'(se.start_uri = \'{query["node"]}\' AND se.end_uri = \'{query["other"]}\') OR (se.start_uri = \'{query["other"]}\' AND se.end_uri = \'{query["node"]}\')'
+        
     else:
         if 'start' in query:
-            where+= f'se.start_uri = \'{query["start"][0]}\' AND '
+            where+= f'se.start_uri = \'{query["start"]}\' AND '
         if 'rel' in query:
-            where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
+            where+= f'se.rel_uri = \'{query["rel"]}\' AND '
         if 'end' in query:
-            where+= f'se.end_uri = \'{query["end"][0]}\' AND '
+            where+= f'se.end_uri = \'{query["end"]}\' AND '
         if 'dataset' in query:
-            where+= f'se.dataset = \'{query["dataset"][0]}\''
+            where+= f'se.dataset = \'{query["dataset"]}\''
 
     if where.endswith(' AND '):
         # slice out AND from where
@@ -293,16 +297,12 @@ FROM simplified_edges se"""
         
         where = ''
         if len(criteria) > 0:
-            cursor = self.connection.cursor()
-            
-            query = gin_jsonb_value(criteria)
-
-            where = create_simplified_where(query)
+            where = create_simplified_where(criteria)
            
         GIN_SIMPLIFIED_QUERY_1WAY +=where
         GIN_SIMPLIFIED_QUERY_1WAY +="\nOFFSET %(offset)s LIMIT %(limit)s;"
 
-       
+        cursor = self.connection.cursor()
         cursor.execute(
             GIN_SIMPLIFIED_QUERY_1WAY,
             {'limit': limit, 'offset': offset},
@@ -357,9 +357,7 @@ FROM simplified_edges se"""
         
         where = ''
         if len(criteria) > 0:
-            query = gin_jsonb_value(criteria)
-            
-            where = create_simplified_where(query)
+            where = create_simplified_where(criteria)
 
         GIN_SIMPLIFIED_QUERY_1WAY_COUNT+=where
        
