@@ -50,10 +50,9 @@ OFFSET %(offset)s LIMIT %(limit)s;
 """
 
 GIN_QUERY_1WAY_COUNT = """
-
-SELECT COUNT(*) FROM edges_gin
-WHERE data @> %(query)s
-
+SELECT COUNT(*) FROM edges_gin eg
+INNER JOIN edges e ON eg.edge_id = e.id
+WHERE eg.data @> %(query)s
 """
 
 
@@ -120,6 +119,30 @@ def gin_jsonb_value(criteria, node_forward=True):
             query[criterion_out] = [criteria[criterion_in]]
     return query
 
+
+def create_simplified_where(query):
+    where = '\nWHERE '
+
+    if 'node' in query or 'other' in query:
+        if 'node' in query:
+            where+= f'se.start_uri = \'{query["node"][0]}\' OR se.end_uri = \'{query["node"][0]}\' AND '
+        if 'other' in query:
+            where+= f'se.start_uri = \'{query["other"][0]}\' OR se.end_uri = \'{query["other"][0]}\''
+    else:
+        if 'start' in query:
+            where+= f'se.start_uri = \'{query["start"][0]}\' AND '
+        if 'rel' in query:
+            where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
+        if 'end' in query:
+            where+= f'se.end_uri = \'{query["end"][0]}\' AND '
+        if 'dataset' in query:
+            where+= f'se.dataset = \'{query["dataset"][0]}\''
+
+    if where.endswith(' AND '):
+        # slice out AND from where
+        where = where[:-5]
+
+    return where
 
 class AssertionFinder(object):
     """
@@ -270,25 +293,16 @@ FROM simplified_edges se"""
         
         where = ''
         if len(criteria) > 0:
+            cursor = self.connection.cursor()
+            
             query = gin_jsonb_value(criteria)
-            where = '\nWHERE '
-            print(query)
-            if 'start' in query:
-                where+= f'se.start_uri = \'{query["start"][0]}\' AND '
-            if 'rel' in query:
-                where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
-            if 'end' in query:
-                where+= f'se.end_uri = \'{query["end"][0]}\' AND '
-            if 'dataset' in query:
-                where+= f'se.dataset = \'{query["dataset"][0]}\''
-            if where.endswith(' AND '):
-                # slice out  AND from where
-                where = where[:-5]
+
+            where = create_simplified_where(query)
+           
         GIN_SIMPLIFIED_QUERY_1WAY +=where
         GIN_SIMPLIFIED_QUERY_1WAY +="\nOFFSET %(offset)s LIMIT %(limit)s;"
 
-        print(GIN_SIMPLIFIED_QUERY_1WAY)
-        cursor = self.connection.cursor()
+       
         cursor.execute(
             GIN_SIMPLIFIED_QUERY_1WAY,
             {'limit': limit, 'offset': offset},
@@ -332,7 +346,6 @@ FROM simplified_edges se"""
         This supports Linked Data Fragments interfaces such as the 
         Triple Pattern Fragment
         """
-
         if len(criteria) == 0: 
             # return the total number of edges in the database
             # this is hardcoded to avoid i/o operation in database. Further versions should update it.
@@ -345,20 +358,10 @@ FROM simplified_edges se"""
         where = ''
         if len(criteria) > 0:
             query = gin_jsonb_value(criteria)
-            where = '\nWHERE '
-            print(query)
-            if 'start' in query:
-                where+= f'se.start_uri = \'{query["start"][0]}\' AND '
-            if 'rel' in query:
-                where+= f'se.rel_uri = \'{query["rel"][0]}\' AND '
-            if 'end' in query:
-                where+= f'se.end_uri = \'{query["end"][0]}\' AND '
-            if 'dataset' in query:
-                where+= f'se.dataset = \'{query["dataset"][0]}\''
-            if where.endswith(' AND '):
-                # slice out  AND from where
-                where = where[:-5]
-        GIN_SIMPLIFIED_QUERY_1WAY_COUNT +=where
+            
+            where = create_simplified_where(query)
+
+        GIN_SIMPLIFIED_QUERY_1WAY_COUNT+=where
        
         cursor = self.connection.cursor()
 
@@ -367,3 +370,4 @@ FROM simplified_edges se"""
         numberOfEdges = cursor.fetchone()
 
         return numberOfEdges[0]
+    
