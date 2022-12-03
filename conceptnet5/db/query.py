@@ -49,13 +49,6 @@ ORDER BY weight DESC
 OFFSET %(offset)s LIMIT %(limit)s;
 """
 
-GIN_QUERY_1WAY_COUNT = """
-SELECT COUNT(*) FROM edges_gin eg
-INNER JOIN edges e ON eg.edge_id = e.id
-WHERE eg.data @> %(query)s
-"""
-
-
 def jsonify(value):
     """
     Convert a value into a JSON string that can be used for JSONB queries in
@@ -292,7 +285,7 @@ class AssertionFinder(object):
         The most general way to query based on a set of criteria.
         """
         GIN_SIMPLIFIED_QUERY_1WAY = """
-SELECT se.start_uri, se.rel_uri, se.end_uri, se.dataset
+SELECT se.edge_uri, se.start_uri, se.rel_uri, se.end_uri, se.dataset, se.weight
 FROM simplified_edges se"""
         
         where = ''
@@ -312,7 +305,7 @@ FROM simplified_edges se"""
 
         results = []
         for row in rows:
-            results.append({'start':row[0], 'rel': row[1], 'end': row[2], 'dataset': row[3]})
+            results.append({'edge_uri': row[0], 'start':row[1], 'rel': row[2], 'end': row[3], 'dataset': row[4], 'weight': row[5]})
 
         return results
 
@@ -328,6 +321,11 @@ FROM simplified_edges se"""
             # this is hardcoded to avoid i/o operation in database. Further versions should update it.
             return 37062820
        
+        GIN_QUERY_1WAY_COUNT = """
+SELECT COUNT(*) FROM edges_gin eg
+INNER JOIN edges e ON eg.edge_id = e.id
+WHERE eg.data @> %(query)s
+"""
         cursor = self.connection.cursor()
 
         query = gin_jsonb_value(criteria)
