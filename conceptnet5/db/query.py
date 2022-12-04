@@ -121,25 +121,25 @@ def create_simplified_where(query):
         field = 'node'
         if 'other' in query:
             field = 'other'
-        filters.field = query[field]
+        filters["field"] = query[field]
         where+= 'se.start_uri = %(field)s OR se.end_uri = %(field)s'
     elif 'node' in query and 'other' in query:
-        filters.node = query["node"]
-        filters.other = query["other"]
+        filters["node"] = query["node"]
+        filters["other"] = query["other"]
         where+= '(se.start_uri = %(node)s AND se.end_uri = %(other)s) OR (se.start_uri = %(other)s AND se.end_uri = %(node)s)'
         
     else:
         if 'start' in query:
-            filters.start = query["start"]
+            filters["start"] = query["start"]
             where+= 'se.start_uri = %(start)s AND '
         if 'rel' in query:
-            filters.rel = query["rel"]
+            filters["rel"] = query["rel"]
             where+= 'se.rel_uri = %(rel)s AND '
         if 'end' in query:
-            filters.end = query["end"]
+            filters["end"] = query["end"]
             where+= 'se.end_uri = %(end)s AND '
         if 'dataset' in query:
-            filters.dataset = query["dataset"]
+            filters["dataset"] = query["dataset"]
             where+= 'se.dataset = %(dataset)s'
 
     if where.endswith(' AND '):
@@ -305,7 +305,7 @@ FROM simplified_edges se"""
         cursor = self.connection.cursor()
         cursor.execute(
             GIN_SIMPLIFIED_QUERY_1WAY,
-            {'limit': limit, 'offset': offset} | filters,
+            {**{'limit': limit, 'offset': offset}, **filters},
         )
 
         rows = cursor.fetchall()
@@ -368,7 +368,7 @@ FROM simplified_edges se"""
        
         cursor = self.connection.cursor()
 
-        cursor.execute(GIN_SIMPLIFIED_QUERY_1WAY_COUNT, filter)
+        cursor.execute(GIN_SIMPLIFIED_QUERY_1WAY_COUNT, filters)
 
         numberOfEdges = cursor.fetchone()
 
