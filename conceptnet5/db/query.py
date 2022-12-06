@@ -296,6 +296,7 @@ SELECT se.edge_uri, se.start_uri, se.rel_uri, se.end_uri, se.dataset, se.weight
 FROM simplified_edges se"""
         
         where = ''
+        filters = {}
         if len(criteria) > 0:
             where, filters = create_simplified_where(criteria)
            
@@ -361,6 +362,7 @@ SELECT COUNT(*)
 FROM simplified_edges se"""
         
         where = ''
+        filters = {}
         if len(criteria) > 0:
             where, filters = create_simplified_where(criteria)
 
