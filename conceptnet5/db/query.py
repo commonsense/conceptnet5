@@ -328,19 +328,41 @@ FROM simplified_edges se"""
             # return the total number of edges in the database
             # this is hardcoded to avoid i/o operation in database. Further versions should update it.
             return 37062820
-       
-        GIN_QUERY_1WAY_COUNT = """
+        
+        cursor = self.connection.cursor()
+        
+        if 'node' in criteria:
+            GIN_QUERY_2WAY_COUNT = """
+WITH matched_edges AS (
+    SELECT edge_id FROM edges_gin
+    WHERE data @> %(query_forward)s OR data @> %(query_backward)s
+)
+SELECT COUNT(*)
+FROM matched_edges m, edges e
+WHERE m.edge_id = e.id
+"""
+            query_forward = gin_jsonb_value(criteria, node_forward=True)
+            query_backward = gin_jsonb_value(criteria, node_forward=False)
+            cursor.execute(
+                GIN_QUERY_2WAY_COUNT,
+                {
+                    'query_forward': jsonify(query_forward),
+                    'query_backward': jsonify(query_backward)
+                },
+            )
+        else:
+            GIN_QUERY_1WAY_COUNT = """
 SELECT COUNT(*) FROM edges_gin eg
 INNER JOIN edges e ON eg.edge_id = e.id
 WHERE eg.data @> %(query)s
 """
-        cursor = self.connection.cursor()
-
-        query = gin_jsonb_value(criteria)
-        cursor.execute(
-            GIN_QUERY_1WAY_COUNT,
-            {'query': jsonify(query)},
-        )
+            query = gin_jsonb_value(criteria)
+            cursor.execute(
+                GIN_QUERY_1WAY_COUNT,
+                {
+                    'query': jsonify(query)
+                },
+            )
 
         numberOfEdges = cursor.fetchone()
 
