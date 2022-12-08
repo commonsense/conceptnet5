@@ -263,7 +263,7 @@ class AssertionFinder(object):
         The most general way to query based on a set of criteria.
         """
         cursor = self.connection.cursor()
-        if 'node' in criteria:
+        if ('node' in criteria) or ('other' in criteria):
             query_forward = gin_jsonb_value(criteria, node_forward=True)
             query_backward = gin_jsonb_value(criteria, node_forward=False)
             cursor.execute(
@@ -331,7 +331,7 @@ FROM simplified_edges se"""
         
         cursor = self.connection.cursor()
         
-        if 'node' in criteria:
+        if 'node' in criteria or 'other' in criteria:
             GIN_QUERY_2WAY_COUNT = """
 WITH matched_edges AS (
     SELECT edge_id FROM edges_gin
